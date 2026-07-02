@@ -1,0 +1,238 @@
+\chapter{Matrices and Graphs}\label{ch:tle:matrix}
+
+A matrix is a rectangular array of numbers, added and multiplied by rules
+designed so that matrix algebra represents the composition of linear
+transformations. Matrices solve linear systems, drive coupled recurrent
+sequences, and count walks in networks --- the mathematics behind search
+engines and shortest-path algorithms.
+
+\section{Matrix algebra}
+
+\begin{definition}[Matrix]\label{def:tle:matrix:matrix}
+An \emph{$m \times n$ matrix}\index{matrix} is a table of real numbers with
+$m$ rows and $n$ columns:
+$A = (a_{ij})$, where $a_{ij}$ is the entry in row $i$, column $j$.
+Two matrices of the same size are added entry by entry, and
+$\lambda A = (\lambda a_{ij})$.
+\end{definition}
+
+\begin{definition}[Matrix product]\label{def:tle:matrix:product}
+Let $A$ be $m \times n$ and $B$ be $n \times p$. The product $AB$ is the
+$m \times p$ matrix whose $(i,j)$ entry is
+\[
+(AB)_{ij} = \sum_{k=1}^{n} a_{ik} b_{kj}
+\]
+(the ``row $i$ of $A$ times column $j$ of $B$'' rule).
+\end{definition}
+
+\begin{example}
+$\begin{pmatrix} 1 & 2\\ 3 & 4\end{pmatrix}
+\begin{pmatrix} 0 & 1\\ 1 & 1\end{pmatrix}
+= \begin{pmatrix} 2 & 3\\ 4 & 7\end{pmatrix}$,
+\quad while \quad
+$\begin{pmatrix} 0 & 1\\ 1 & 1\end{pmatrix}
+\begin{pmatrix} 1 & 2\\ 3 & 4\end{pmatrix}
+= \begin{pmatrix} 3 & 4\\ 4 & 6\end{pmatrix}$:
+\emph{matrix multiplication is not commutative}.
+\end{example}
+
+\begin{proposition}[Rules of matrix algebra]\label{prop:tle:matrix:rules}
+Whenever the sizes make the products meaningful:
+\[
+(AB)C = A(BC), \qquad A(B + C) = AB + AC, \qquad (A+B)C = AC + BC,
+\]
+and the \emph{identity matrix} $I_n$ (ones on the diagonal, zeros elsewhere)
+satisfies $I_m A = A I_n = A$ for $A$ of size $m \times n$.
+\end{proposition}
+
+\begin{proof}
+All are entry-by-entry verifications from
+\cref{def:tle:matrix:product}; associativity, the only nontrivial one,
+amounts to exchanging two finite sums:
+$\bigl((AB)C\bigr)_{ij} = \sum_l \left(\sum_k a_{ik}b_{kl}\right) c_{lj}
+= \sum_k a_{ik} \left(\sum_l b_{kl} c_{lj}\right)
+= \bigl(A(BC)\bigr)_{ij}$.
+\end{proof}
+
+\begin{definition}[Inverse]\label{def:tle:matrix:inverse}
+A square matrix $A$ of size $n$ is \emph{invertible}\index{matrix!inverse}
+if there is a matrix $B$ with $AB = BA = I_n$; $B$ is then unique, written
+$A^{-1}$.
+\end{definition}
+
+\begin{proposition}[Inverse of a $2\times2$ matrix]\label{prop:tle:matrix:inverse2x2}
+Let $A = \begin{pmatrix} a & b\\ c & d\end{pmatrix}$ and
+$\det A = ad - bc$ (the \emph{determinant}\index{determinant}). Then $A$ is
+invertible if and only if $\det A \neq 0$, in which case
+\[
+A^{-1} = \frac{1}{ad - bc}\begin{pmatrix} d & -b\\ -c & a\end{pmatrix}.
+\]
+\end{proposition}
+
+\begin{proof}
+A computation gives
+$A \begin{pmatrix} d & -b\\ -c & a\end{pmatrix}
+= \begin{pmatrix} d & -b\\ -c & a\end{pmatrix} A = (ad - bc) I_2$; if
+$ad - bc \neq 0$, divide. Conversely, if $ad - bc = 0$, the columns of $A$
+are proportional, and so are the columns of $AB$ for any $B$; but the
+columns of $I_2$ are not proportional, so no $B$ can satisfy $AB = I_2$.
+\end{proof}
+
+\begin{method}[Linear systems]\label{met:tle:matrix:systems}
+The system
+$\begin{cases} ax + by = e\\ cx + dy = f \end{cases}$
+is the matrix equation $AX = Y$ with
+$X = \begin{pmatrix} x \\ y\end{pmatrix}$,
+$Y = \begin{pmatrix} e \\ f\end{pmatrix}$. If $\det A \neq 0$, its unique
+solution is $X = A^{-1}Y$. The same formalism handles $n$ equations in $n$
+unknowns.
+\end{method}
+
+\section{Matrix powers and recurrent sequences}
+
+\begin{definition}\label{def:tle:matrix:power}
+For a square matrix $A$ and $k \in \N$, $A^k = A \times \dots \times A$
+($k$ factors), with $A^0 = I$.
+\end{definition}
+
+\begin{method}[Diagonal-plus-nilpotent and diagonalizable cases]\label{met:tle:matrix:powers}
+Two standard ways to compute $A^k$:
+\begin{itemize}
+  \item If $A = \lambda I + N$ where $N^2 = 0$, the binomial theorem
+        (valid here since $I$ and $N$ commute) collapses to two terms:
+        $A^k = \lambda^k I + k \lambda^{k-1} N$.
+  \item If one finds an invertible $P$ with $A = PDP^{-1}$ and $D$ diagonal,
+        then $A^k = P D^k P^{-1}$, and $D^k$ is computed entry by entry.
+        (Finding such a $P$ systematically is the theory of
+        \emph{diagonalization}, developed in licence; at this level $P$ is
+        given.)
+\end{itemize}
+\end{method}
+
+\begin{example}[Coupled sequences]\label{ex:tle:matrix:coupled}
+Let $u_{n+1} = 3u_n + v_n$ and $v_{n+1} = u_n + 3v_n$. Setting
+$X_n = \begin{pmatrix} u_n\\ v_n \end{pmatrix}$ and
+$A = \begin{pmatrix} 3 & 1\\ 1 & 3\end{pmatrix}$, we get
+$X_{n+1} = AX_n$, so $X_n = A^n X_0$. The auxiliary sequences
+$s_n = u_n + v_n$ and $d_n = u_n - v_n$ satisfy $s_{n+1} = 4s_n$ and
+$d_{n+1} = 2d_n$, so $s_n = 4^n s_0$, $d_n = 2^n d_0$ and
+\[
+u_n = \frac{4^n(u_0+v_0) + 2^n(u_0-v_0)}{2}, \qquad
+v_n = \frac{4^n(u_0+v_0) - 2^n(u_0-v_0)}{2}.
+\]
+(Behind the scenes: $(1,1)$ and $(1,-1)$ are eigenvector directions of $A$.)
+\end{example}
+
+\section{Graphs and walks}
+
+\begin{definition}[Graph, adjacency matrix]\label{def:tle:matrix:graph}
+A \emph{graph}\index{graph} consists of vertices $1, 2, \dots, n$ and edges
+joining certain pairs of vertices (ordered pairs for a \emph{directed}
+graph). Its \emph{adjacency matrix}\index{adjacency matrix} is the
+$n \times n$ matrix $M$ with $m_{ij} = 1$ if there is an edge from $i$ to
+$j$, and $0$ otherwise. A \emph{walk} of length $k$ from $i$ to $j$ is a
+sequence of $k$ consecutive edges leading from $i$ to $j$.
+\end{definition}
+
+\begin{theorem}[Counting walks]\label{thm:tle:matrix:walks}
+The number of walks of length $k$ from vertex $i$ to vertex $j$ is the
+$(i,j)$ entry of $M^k$.
+\end{theorem}
+
+\begin{proof}
+Induction on $k$. For $k = 1$ this is the definition of $M$. Assume the
+claim for $k$. A walk of length $k+1$ from $i$ to $j$ is a walk of length
+$k$ from $i$ to some vertex $l$, followed by an edge from $l$ to $j$; by the
+addition and multiplication principles, their number is
+\[
+\sum_{l=1}^{n} \bigl(M^k\bigr)_{il}\, m_{lj} = \bigl(M^{k+1}\bigr)_{ij}.
+\qedhere
+\]
+\end{proof}
+
+\begin{example}
+For the triangle graph ($3$ vertices, all pairs joined),
+$M = \begin{pmatrix} 0&1&1\\ 1&0&1\\ 1&1&0\end{pmatrix}$ and
+$M^2 = \begin{pmatrix} 2&1&1\\ 1&2&1\\ 1&1&2\end{pmatrix}$: from each vertex
+there are $2$ walks of length $2$ back to itself (via either neighbor) and
+$1$ to each other vertex.
+\end{example}
+
+\section{Exercises}
+
+\begin{exercise}[$\star$]\label{exo:tle:matrix:1}
+Let $A = \begin{pmatrix} 1 & 2\\ 0 & 1 \end{pmatrix}$ and
+$B = \begin{pmatrix} 2 & 0\\ 1 & 1 \end{pmatrix}$. Compute $A + B$, $AB$,
+$BA$ and $A^2$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:tle:matrix:2}
+Determine whether the following matrices are invertible, and compute the
+inverses when they exist:
+\[
+A = \begin{pmatrix} 2 & 5\\ 1 & 3\end{pmatrix}, \qquad
+B = \begin{pmatrix} 3 & 6\\ 2 & 4\end{pmatrix}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:tle:matrix:3}
+Solve by matrix inversion the system
+$\begin{cases} 2x + 5y = 1\\ x + 3y = 2 . \end{cases}$
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:tle:matrix:4}
+Let $A = \begin{pmatrix} 2 & 1\\ 0 & 2\end{pmatrix} = 2I + N$ with
+$N = \begin{pmatrix} 0 & 1\\ 0 & 0 \end{pmatrix}$.
+\begin{enumerate}
+  \item Check that $N^2 = 0$ and that $I$ and $N$ commute.
+  \item Deduce $A^k$ for all $k \in \N$ and verify the formula for $k=2$ by
+        direct computation.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:tle:matrix:5}
+Let $A = \begin{pmatrix} 0 & 1\\ 1 & 1\end{pmatrix}$ and $F_n$ the Fibonacci
+sequence ($F_0 = 0$, $F_1 = 1$, $F_{n+2} = F_{n+1} + F_n$). Show by
+induction that for $n \geq 1$,
+\[
+A^n = \begin{pmatrix} F_{n-1} & F_n\\ F_n & F_{n+1}\end{pmatrix},
+\]
+and deduce the identity $F_{n+1}F_{n-1} - F_n^2 = (-1)^n$.
+(Hint: determinants multiply: $\det(MN) = \det M \det N$, which you may
+check for $2\times2$ matrices.)
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:tle:matrix:6}
+A directed graph on vertices $\{1, 2, 3\}$ has edges
+$1\to2$, $2\to3$, $3\to1$ and $1\to3$.
+\begin{enumerate}
+  \item Write the adjacency matrix $M$ and compute $M^2$ and $M^3$.
+  \item How many walks of length $3$ go from $1$ to $1$? List them.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:tle:matrix:7}
+A car-sharing company moves vehicles between two cities $A$ and $B$. Each
+week, $80\%$ of the cars in $A$ stay in $A$ and $20\%$ move to $B$; $30\%$
+of the cars in $B$ move to $A$ and $70\%$ stay. Let $a_n, b_n$ be the
+proportions of the fleet in each city.
+\begin{enumerate}
+  \item Write $X_{n+1} = MX_n$ with
+        $X_n = \begin{pmatrix} a_n\\ b_n\end{pmatrix}$ and identify $M$.
+  \item Find the equilibrium proportions (solve $MX = X$ with
+        $a + b = 1$).
+  \item Show that $c_n = a_n - 0.6$ satisfies $c_{n+1} = 0.5\,c_n$, and
+        conclude that the fleet distribution converges to the equilibrium.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:tle:matrix:8}
+Let $A = \begin{pmatrix} 3 & 1\\ 1 & 3 \end{pmatrix}$,
+$P = \begin{pmatrix} 1 & 1\\ 1 & -1 \end{pmatrix}$.
+\begin{enumerate}
+  \item Compute $P^{-1}$, then $D = P^{-1}AP$, and check that $D$ is
+        diagonal.
+  \item Deduce a closed formula for $A^n$ and compare with
+        \cref{ex:tle:matrix:coupled}.
+\end{enumerate}
+\end{exercise}

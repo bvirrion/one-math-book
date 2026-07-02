@@ -1,0 +1,236 @@
+\chapter{Random Variables and the Binomial Distribution}\label{ch:tle:randvar}
+
+A random variable attaches a number to each outcome of an experiment: a
+gain, a count, a duration. Its expectation is the long-run average of the
+values it produces, its variance measures their spread. The star of this
+chapter is the binomial distribution, which counts successes in repeated
+independent trials.
+
+\section{Discrete random variables}
+
+\begin{definition}[Random variable, distribution]\label{def:tle:randvar:rv}
+A \emph{random variable}\index{random variable} on a finite sample space
+$\Omega$ is a function $X \colon \Omega \to \R$. Its
+\emph{distribution}\index{distribution} (or law) is the data of its possible
+values $x_1, \dots, x_k$ and of the probabilities
+\[
+p_i = \P(X = x_i), \qquad \sum_{i=1}^{k} p_i = 1 .
+\]
+\end{definition}
+
+\begin{definition}[Expectation, variance, standard deviation]\label{def:tle:randvar:exp}
+The \emph{expectation}\index{expectation} of $X$ is
+\[
+\E(X) = \sum_{i=1}^{k} p_i\, x_i ,
+\]
+its \emph{variance}\index{variance} and \emph{standard deviation} are
+\[
+\V(X) = \E\bigl((X - \E(X))^2\bigr) = \sum_{i=1}^k p_i\bigl(x_i - \E(X)\bigr)^2,
+\qquad
+\sigma(X) = \sqrt{\V(X)} .
+\]
+\end{definition}
+
+\begin{proposition}[König--Huygens formula]\label{prop:tle:randvar:konig}
+\index{König--Huygens formula}
+$\V(X) = \E(X^2) - \E(X)^2$.
+\end{proposition}
+
+\begin{proof}
+Write $m = \E(X)$ and expand:
+\[
+\V(X) = \sum_i p_i (x_i^2 - 2m x_i + m^2)
+= \E(X^2) - 2m\sum_i p_i x_i + m^2\sum_i p_i
+= \E(X^2) - 2m^2 + m^2 . \qedhere
+\]
+\end{proof}
+
+\begin{proposition}[Affine transformation]\label{prop:tle:randvar:affine}
+For $a, b \in \R$:
+\[
+\E(aX + b) = a\,\E(X) + b, \qquad
+\V(aX + b) = a^2\,\V(X) .
+\]
+\end{proposition}
+
+\begin{proof}
+The first is a rearrangement of the defining sum. For the second, $aX + b$
+deviates from its mean by $a(X - \E(X))$, and squaring multiplies by
+$a^2$.
+\end{proof}
+
+\begin{example}[Fair games]\label{ex:tle:randvar:game}
+A game costs $2$ euros; a die is rolled, and the player receives the value
+shown if it is at least $5$, nothing otherwise. The gain $G$ takes values
+$-2$ (probability $\frac46$), $3$ ($\frac16$), $4$ ($\frac16$):
+\[
+\E(G) = \frac{-8 + 3 + 4}{6} = -\frac{1}{6} < 0 .
+\]
+On average, the player loses $17$ cents per game: the game is unfavorable
+(as most real games are).
+\end{example}
+
+\section{Bernoulli trials and the binomial distribution}
+
+\begin{definition}[Bernoulli distribution]\label{def:tle:randvar:bernoulli}
+A \emph{Bernoulli trial}\index{Bernoulli trial} is an experiment with two
+outcomes, \emph{success} (probability $p$) and \emph{failure}
+($q = 1 - p$). The indicator $X$ of success ($X = 1$ on success, $0$ on
+failure) follows the \emph{Bernoulli distribution} $\mathcal B(p)$:
+\[
+\E(X) = p, \qquad \V(X) = p(1-p) .
+\]
+(Indeed $\E(X) = p$, $\E(X^2) = p$, and König--Huygens gives
+$\V(X) = p - p^2$.)
+\end{definition}
+
+\begin{definition}[Binomial distribution]\label{def:tle:randvar:binomial}
+Repeat a Bernoulli trial $n$ times independently, and let $X$ be the total
+number of successes. The distribution of $X$ is the \emph{binomial
+distribution}\index{binomial distribution} $\mathcal B(n, p)$.
+\end{definition}
+
+\begin{theorem}\label{thm:tle:randvar:binomial}
+If $X \sim \mathcal B(n, p)$, then for $0 \leq k \leq n$:
+\[
+\P(X = k) = \binom{n}{k} p^k (1-p)^{n-k},
+\]
+and
+\[
+\E(X) = np, \qquad \V(X) = np(1-p) .
+\]
+\end{theorem}
+
+\begin{proof}
+A specified sequence of outcomes with $k$ successes and $n-k$ failures has
+probability $p^k(1-p)^{n-k}$ by independence; the number of such sequences
+is the number of ways to place the $k$ successes among the $n$ trials,
+namely $\binom nk$ (\cref{ch:tle:comb}). Summing over the sequences gives
+the formula --- and the binomial theorem confirms
+$\sum_k \P(X = k) = (p + q)^n = 1$.
+
+For the expectation, using $k\binom nk = n\binom{n-1}{k-1}$
+(\cref{exo:tle:comb:7}):
+\[
+\E(X) = \sum_{k=1}^{n} k\binom nk p^k q^{n-k}
+= np\sum_{k=1}^{n} \binom{n-1}{k-1} p^{k-1} q^{(n-1)-(k-1)}
+= np\,(p + q)^{n-1} = np .
+\]
+The variance formula is proved similarly with the identity
+$k(k-1)\binom nk = n(n-1)\binom{n-2}{k-2}$, giving
+$\E(X(X-1)) = n(n-1)p^2$, whence
+$\V(X) = n(n-1)p^2 + np - (np)^2 = np(1-p)$. (A structural proof --- the
+variance of a sum of independent variables --- comes with
+\cref{thm:tle:sums:variance}.)
+\end{proof}
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+  width=10cm, height=4.8cm,
+  ybar, bar width=4pt,
+  xlabel={$k$}, ylabel={$\P(X = k)$},
+  xmin=-1, xmax=21, ymin=0,
+  ytick={0, 0.1, 0.2},
+  title={$\mathcal B(20,\ 0.3)$}]
+  \addplot[fill=omDef!40, draw=omDef] coordinates {
+    (0,0.000798) (1,0.006839) (2,0.027846) (3,0.071604)
+    (4,0.130421) (5,0.178863) (6,0.191639) (7,0.164262)
+    (8,0.114397) (9,0.065370) (10,0.030817) (11,0.012006)
+    (12,0.003859) (13,0.001018) (14,0.000218) (15,0.000037)
+    (16,0.000005) (17,0.000001) (18,0) (19,0) (20,0)};
+\end{axis}
+\end{tikzpicture}
+
+{\small The distribution $\mathcal B(20, 0.3)$: mean $np = 6$, standard
+deviation $\sqrt{npq} \approx 2.05$.}
+\end{center}
+
+\begin{method}[Recognizing a binomial situation]\label{met:tle:randvar:recognize}
+Check the three ingredients before writing $X \sim \mathcal B(n,p)$: a
+\emph{fixed number} $n$ of trials; \emph{two outcomes} per trial with the
+\emph{same} success probability $p$; \emph{independence} of trials
+(sampling \emph{with} replacement, or from a large population). Then use
+\[
+\P(X \geq 1) = 1 - (1-p)^n
+\]
+for ``at least one success'', and a calculator or cumulative tables for
+general $\P(X \leq k)$.
+\end{method}
+
+\begin{example}\label{ex:tle:randvar:atleastone}
+How many times must one roll a die to have at least a $99\%$ chance of
+rolling a six? With $X \sim \mathcal B\left(n, \frac16\right)$:
+$\P(X \geq 1) = 1 - \left(\frac56\right)^n \geq 0.99$ means
+$\left(\frac56\right)^n \leq 0.01$, \emph{i.e.}
+$n \geq \frac{\ln 0.01}{\ln(5/6)} \approx 25.3$: from $n = 26$ rolls on.
+\end{example}
+
+\section{Exercises}
+
+\begin{exercise}[$\star$]\label{exo:tle:randvar:1}
+A random variable $X$ takes the values $-1, 0, 2, 5$ with probabilities
+$0.3, 0.2, 0.4, 0.1$. Compute $\E(X)$, $\V(X)$ and $\sigma(X)$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:tle:randvar:2}
+A multiple-choice test has $10$ questions, each with $4$ choices, one of
+which is correct. A student answers uniformly at random, independently.
+Let $X$ be the number of correct answers.
+\begin{enumerate}
+  \item Give the distribution of $X$, $\E(X)$ and $\sigma(X)$.
+  \item Compute $\P(X = 0)$, $\P(X = 5)$ and $\P(X \geq 1)$.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:tle:randvar:3}
+An insurance company insures $n = 400$ clients; each files a claim during
+the year with probability $p = 0.05$, independently. Let $X$ be the number
+of claims. Identify the distribution of $X$ and compute its expectation and
+standard deviation.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:tle:randvar:4}
+In the game of \cref{ex:tle:randvar:game}, the organizer wants a fair game
+($\E(G) = 0$) by changing the entry price $c$. Find $c$. Compute the
+variance of the gain for this fair version; is ``fair'' the same as
+``riskless''?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:tle:randvar:5}
+A basketball player scores free throws with probability $0.7$. She shoots
+$8$ times (independent shots). Compute the probability that she scores:
+exactly $6$; at least $6$; at least once. What is the most probable number
+of scores?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:tle:randvar:6}
+An airline knows that each booked passenger shows up with probability
+$0.9$, independently. A flight has $100$ seats and the airline sells $104$
+tickets. Express, using a binomial distribution, the probability that more
+passengers show up than there are seats, and bound it numerically using a
+calculator (give the exact expression).
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:tle:randvar:7}
+Let $X \sim \mathcal B(n, p)$. Show that
+\[
+\frac{\P(X = k+1)}{\P(X = k)} = \frac{n-k}{k+1}\cdot\frac{p}{1-p},
+\]
+and deduce that the distribution increases up to
+$k^* = \floor{(n+1)p}$ and decreases afterwards (the \emph{mode} of the
+binomial).
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:tle:randvar:8}
+\emph{(Saint Petersburg, tamed.)} A fair coin is tossed until heads
+appears, but at most $10$ times. Let $N$ be the number of tosses used, and
+the player receives $2^N$ euros if heads appeared, $0$ otherwise.
+\begin{enumerate}
+  \item Give the distribution of $N$ restricted to the winning outcomes:
+        $\P(\text{heads first at toss } k) = 2^{-k}$ for
+        $1 \leq k \leq 10$, and check the total probability of winning.
+  \item Compute the expected payoff. What would it become without the cap
+        of $10$ tosses?
+\end{enumerate}
+\end{exercise}
