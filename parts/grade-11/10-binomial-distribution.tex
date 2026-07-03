@@ -1,0 +1,330 @@
+\chapter{The Binomial Distribution}\label{ch:g11:binom}
+
+Repeat the same yes/no experiment several times, independently, and count
+the successes: the resulting distribution --- the \emph{binomial} --- is
+the most important discrete distribution of all. This chapter builds it
+with trees and path counting; the closed formula for the path counts (with
+factorials) comes with the counting tools of \cref{ch:g12:comb}, and the
+distribution is revisited in \cref{ch:g12:randvar}.
+
+\section{Bernoulli trials}
+
+\begin{definition}[Bernoulli trial]\label{def:g11:binom:bernoulli}
+A \emph{Bernoulli trial}\index{Bernoulli trial} is an experiment with
+exactly two outcomes: \emph{success}, with probability $p$, and
+\emph{failure}, with probability $1 - p$. The random variable $X$ equal
+to $1$ on success and $0$ on failure is said to follow the
+\emph{Bernoulli distribution} $\mathcal B(p)$; then
+\[
+\E(X) = p,
+\qquad
+\V(X) = p(1 - p).
+\]
+\end{definition}
+
+\begin{proof}[Proof of the two formulas]
+$\E(X) = p \times 1 + (1-p) \times 0 = p$; and since $X^2 = X$ (both $0$
+and $1$ are their own squares), $\E(X^2) = p$, so by
+\cref{prop:g11:prob:konig}, $\V(X) = p - p^2 = p(1-p)$.
+\end{proof}
+
+\begin{definition}[Repeated independent trials]\label{def:g11:binom:repeated}
+Repeating a Bernoulli trial $n$ times \emph{independently} means: the
+outcome of each trial has no influence on the others, and the probability
+of any complete sequence of outcomes is the \emph{product} of the
+probabilities along the corresponding path of the tree --- $p$ for each
+success, $1 - p$ for each failure.
+\end{definition}
+
+\begin{example}\label{ex:g11:binom:threetrials}
+Three independent trials with success probability $p$. The sequence SFS
+(success, failure, success) has probability $p(1-p)p = p^2(1-p)$ --- and
+so does \emph{every} sequence with exactly two successes, regardless of
+the positions: only the \emph{number} of S's and F's matters.
+\end{example}
+
+\section{Path counts and binomial coefficients}
+
+\begin{definition}[Binomial coefficient]\label{def:g11:binom:coefficient}
+In the tree of $n$ independent trials, the \emph{binomial
+coefficient}\index{binomial coefficient} $\binom{n}{k}$ (read ``$n$
+choose $k$'') is the number of paths containing exactly $k$ successes.
+\end{definition}
+
+\begin{example}
+$\binom{3}{2} = 3$: the paths SSF, SFS, FSS. Likewise $\binom{3}{0} = 1$
+(the path FFF), $\binom{3}{1} = 3$ and $\binom{3}{3} = 1$. By
+convention and by the tree, $\binom n0 = \binom nn = 1$ for every $n$.
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}[font=\small]
+  \coordinate (root) at (0,0);
+  \node (S) at (1.5,1.5) {S};
+  \node (F) at (1.5,-1.5) {F};
+  \node (SS) at (3.0,2.25) {S};
+  \node (SF) at (3.0,0.75) {F};
+  \node (FS) at (3.0,-0.75) {S};
+  \node (FF) at (3.0,-2.25) {F};
+  \node (SSS) at (4.5,2.6) {S};
+  \node (SSF) at (4.5,1.85) {F};
+  \node (SFS) at (4.5,1.1) {S};
+  \node (SFF) at (4.5,0.35) {F};
+  \node (FSS) at (4.5,-0.35) {S};
+  \node (FSF) at (4.5,-1.1) {F};
+  \node (FFS) at (4.5,-1.85) {S};
+  \node (FFF) at (4.5,-2.6) {F};
+  \draw[omThm, thick] (root) -- (S);
+  \draw[omThm, thick] (S) -- (SS);   \draw[omThm, thick] (SS) -- (SSF);
+  \draw[omThm, thick] (S) -- (SF);   \draw[omThm, thick] (SF) -- (SFS);
+  \draw[omThm, thick] (root) -- (F);
+  \draw[omThm, thick] (F) -- (FS);   \draw[omThm, thick] (FS) -- (FSS);
+  \draw[gray] (SS) -- (SSS);
+  \draw[gray] (SF) -- (SFF);
+  \draw[gray] (FS) -- (FSF);
+  \draw[gray] (F) -- (FF);
+  \draw[gray] (FF) -- (FFS);
+  \draw[gray] (FF) -- (FFF);
+  \node[gray, anchor=west] at (5.0,2.6) {$3$ successes};
+  \node[omThm, anchor=west] at (5.0,1.85) {$2$ successes};
+  \node[omThm, anchor=west] at (5.0,1.1) {$2$ successes};
+  \node[gray, anchor=west] at (5.0,0.35) {$1$ success};
+  \node[omThm, anchor=west] at (5.0,-0.35) {$2$ successes};
+  \node[gray, anchor=west] at (5.0,-1.1) {$1$ success};
+  \node[gray, anchor=west] at (5.0,-1.85) {$1$ success};
+  \node[gray, anchor=west] at (5.0,-2.6) {$0$ successes};
+\end{tikzpicture}
+
+{\small The tree of $n = 3$ trials: $\binom{3}{2} = 3$ paths (red) carry
+exactly two successes, each with probability $p^2(1-p)$.}
+\end{omfigure}
+
+\begin{proposition}[Pascal's rule]\label{prop:g11:binom:pascal}
+\index{Pascal's triangle}
+For $1 \leq k \leq n - 1$:
+\[
+\binom{n}{k} = \binom{n-1}{k-1} + \binom{n-1}{k}.
+\]
+\end{proposition}
+
+\begin{proof}
+Sort the paths of the $n$-trial tree with $k$ successes according to
+their \emph{last} trial. Those ending in a success are obtained from a
+path of the first $n-1$ trials with $k - 1$ successes: there are
+$\binom{n-1}{k-1}$ of them. Those ending in a failure extend a path with
+$k$ successes among the first $n-1$ trials: $\binom{n-1}{k}$ of them.
+Every path is of exactly one of the two kinds.
+\end{proof}
+
+Pascal's rule generates the coefficients row by row --- each entry is the
+sum of the two above it:
+\[
+\begin{array}{ccccccccccc}
+&&&&&1&&&&&\\
+&&&&1&&1&&&&\\
+&&&1&&2&&1&&&\\
+&&1&&3&&3&&1&&\\
+&1&&4&&6&&4&&1&\\
+1&&5&&10&&10&&5&&1
+\end{array}
+\]
+
+\begin{remark}
+A closed formula, $\binom nk = \frac{n!}{k!(n-k)!}$, together with a
+systematic theory of counting, is established in \cref{ch:g12:comb}. At
+this level, Pascal's triangle computes every coefficient we need.
+\end{remark}
+
+\section{The binomial distribution}
+
+\begin{theorem}[Binomial distribution]\label{thm:g11:binom:binomial}
+Let $X$ count the successes in $n$ independent Bernoulli trials of
+parameter $p$. Then $X$ follows the \emph{binomial
+distribution}\index{binomial distribution} $\mathcal B(n, p)$:
+\[
+\P(X = k) = \binom{n}{k}\, p^k (1-p)^{n-k},
+\qquad k = 0, 1, \dots, n .
+\]
+\end{theorem}
+
+\begin{proof}
+The event $X = k$ is the collection of all paths with exactly $k$
+successes. Each such path has probability $p^k(1-p)^{n-k}$: the product
+along the path contains $k$ factors $p$ and $n - k$ factors $1-p$, in
+some order (\cref{def:g11:binom:repeated}). There are $\binom nk$ such
+paths (\cref{def:g11:binom:coefficient}), and their probabilities add up.
+\end{proof}
+
+\begin{example}\label{ex:g11:binom:quiz}
+A quiz has $5$ independent questions, each with $4$ choices; a student
+answers at random, so each question is a success with $p = \frac14$. The
+number $X$ of correct answers follows $\mathcal B\left(5, \frac14\right)$,
+and, using row $5$ of Pascal's triangle:
+\[
+\P(X = 2) = \binom52 \left(\frac14\right)^2\left(\frac34\right)^3
+= 10 \times \frac{1}{16} \times \frac{27}{64}
+= \frac{270}{1024} \approx 0.26 .
+\]
+The probability of at least one correct answer uses the complement:
+$\P(X \geq 1) = 1 - \P(X = 0) = 1 - \left(\frac34\right)^5 \approx
+0.76$.
+\end{example}
+
+\begin{proposition}[Expectation and variance]\label{prop:g11:binom:expectation}
+If $X \sim \mathcal B(n, p)$:
+\[
+\E(X) = np,
+\qquad
+\V(X) = np(1-p).
+\]
+\end{proposition}
+
+\begin{proof}[Justification]
+Write $X = X_1 + X_2 + \dots + X_n$, where $X_i$ equals $1$ if the
+$i$-th trial succeeds: each $X_i$ is a Bernoulli variable of expectation
+$p$ (\cref{def:g11:binom:bernoulli}). Averages add --- summing the $n$
+contributions gives $\E(X) = np$. That \emph{variances} also add for
+independent variables is true but more delicate: the variance formula is
+\emph{admitted at this level} and proved in \cref{ch:g12:sums}.
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[
+  width=10cm, height=5cm,
+  ybar, bar width=9pt,
+  xlabel={$k$}, ylabel={$\P(X = k)$},
+  xmin=-0.8, xmax=10.8, ymin=0, ymax=0.3,
+  xtick={0,1,2,3,4,5,6,7,8,9,10},
+  ytick={0.1, 0.2},
+  tick label style={font=\small},
+  label style={font=\small},
+  title={$\mathcal B(10,\ 0.5)$}]
+  \addplot[fill=omDef!40, draw=omDef] coordinates {
+    (0,0.00098) (1,0.00977) (2,0.04395) (3,0.11719) (4,0.20508)
+    (5,0.24609) (6,0.20508) (7,0.11719) (8,0.04395) (9,0.00977)
+    (10,0.00098)};
+\end{axis}
+\end{tikzpicture}
+
+{\small The distribution $\mathcal B(10, 0.5)$ (ten fair coin tosses):
+centered at $\E(X) = np = 5$, symmetric, with nearly all the probability
+between $2$ and $8$.}
+\end{omfigure}
+
+\begin{method}[Recognizing a binomial situation]\label{met:g11:binom:recognize}
+Before writing $X \sim \mathcal B(n, p)$, check three ingredients: a
+\emph{fixed number} $n$ of trials, decided in advance; each trial has
+\emph{two outcomes} with the \emph{same} success probability $p$; the
+trials are \emph{independent} (with replacement, or separate devices).
+Drawing without replacement from a small population is \emph{not}
+binomial --- the probability changes at each draw
+(\cref{exo:g11:prob:6}).
+\end{method}
+
+\section{Sampling: is the observation surprising?}
+
+The binomial distribution answers a very practical question: \emph{if the
+success probability really is $p$, what counts of successes are
+plausible?}
+
+\begin{example}\label{ex:g11:binom:decision}
+A machine is supposed to produce $10\%$ defective items at most. In a
+batch of $10$ items, $4$ are defective. Bad luck or broken machine? If
+the machine is fine, the number of defectives follows
+$\mathcal B(10, 0.1)$, and
+\[
+\P(X \geq 4) = 1 - \P(X \leq 3) \approx 1 - 0.987 = 0.013 :
+\]
+about one chance in $80$. Observing an event this unlikely is a strong
+signal --- one \emph{rejects} the hypothesis that the machine still works
+at $10\%$, while keeping in mind that the decision could be wrong with
+probability about $0.013$.
+\end{example}
+
+\begin{method}[Decision rule from a binomial model]\label{met:g11:binom:decision}
+To judge an observed number $k$ of successes against a hypothesis
+$X \sim \mathcal B(n, p)$: compute the probability, under the hypothesis,
+of a result \emph{at least as extreme} as $k$. If that probability is
+very small (a common convention: below $5\%$), reject the hypothesis;
+otherwise the observation is compatible with it. The threshold is a
+choice, not a theorem --- statistics quantifies the risk, and the user
+accepts it.
+\end{method}
+
+\section{Exercises}
+
+\begin{exercise}[$\star$]\label{exo:g11:binom:1}
+Extend Pascal's triangle to row $7$, and give the values of
+$\binom62$, $\binom{7}{3}$ and $\binom74$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g11:binom:2}
+A fair die is rolled $4$ times; $X$ counts the sixes. Justify that
+$X \sim \mathcal B\left(4, \frac16\right)$ and compute $\P(X = 0)$,
+$\P(X = 1)$ and $\P(X \geq 2)$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g11:binom:3}
+Which of the following is binomial? Justify.
+\begin{enumerate}
+  \item Number of heads in $20$ tosses of a fair coin.
+  \item Number of aces in $5$ cards dealt from one deck.
+  \item Number of rainy days next week, if each day is rainy with
+        probability $0.3$ independently.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g11:binom:4}
+$X \sim \mathcal B(50, 0.2)$. Give $\E(X)$, $\V(X)$ and $\sigma(X)$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:binom:5}
+An archer hits the target with probability $0.7$ at each shot,
+independently. In $6$ shots, compute the probability of exactly $4$ hits,
+and of at least $5$ hits.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:binom:6}
+A true/false test has $8$ questions; a student guesses each answer.
+What is the probability of passing (at least $6$ correct answers)?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:binom:7}
+Each purchased cereal box contains figurine A or figurine B, with
+probability $\frac12$ each, independently. A collector buys $5$ boxes.
+Compute the probability that the collector gets at least one figurine of
+each kind. (Complement: all A or all B.)
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:binom:8}
+A basketball player scores free throws with probability $p$,
+independently. Let $X \sim \mathcal B(3, p)$ be the number of scores in
+three throws. Express $\P(X = 3)$ and $\P(X \geq 1)$ as functions of $p$,
+and find for which $p$ the probability of scoring all three equals
+$\frac{27}{64}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:binom:9}
+How many times must a fair coin be tossed for the probability of getting
+at least one head to exceed $0.99$? (Complement, then try successive
+values of $n$.)
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:binom:10}
+Using Pascal's rule (\cref{prop:g11:binom:pascal}) and
+$\binom n0 = \binom nn = 1$, prove that the entries of each row of
+Pascal's triangle sum to $2^n$: interpret both sides as counting all the
+paths of the tree.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g11:binom:11}
+A politician claims $60\%$ approval. In a random sample of $10$ people,
+only $3$ approve.
+\begin{enumerate}
+  \item Under the claim, what distribution does the number $X$ of
+        approvals in the sample follow? Compute $\P(X \leq 3)$.
+  \item Using the decision rule of \cref{met:g11:binom:decision} with a
+        $5\%$ threshold, is the observation compatible with the claim?
+\end{enumerate}
+\end{exercise}

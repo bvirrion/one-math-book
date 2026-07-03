@@ -16,8 +16,9 @@ collected at the end of the book.
 
 | Part | Level | Status |
 |------|-------|--------|
+| Grade 11 (age 16–17) | Penultimate year of secondary school, advanced track | ✅ 10 chapters, exercises + solutions |
 | Grade 12 (age 17–18) | Final year of secondary school, advanced track | ✅ 16 chapters, exercises + solutions |
-| Other years | Kindergarten → Bachelor Year 3 | 🚧 planned |
+| Other years | Kindergarten → Grade 10, Bachelor Years 1–3 | 🚧 planned |
 
 ## Building the book
 
