@@ -1,0 +1,374 @@
+\chapter{Differentiation and Convexity}\label{ch:g12:deriv}
+
+The derivative measures the instantaneous rate of change of a function; it is
+the slope of the tangent line to its graph. This chapter reviews and extends
+the differentiation rules, links the sign of $f'$ to the variations of $f$,
+and introduces convexity, which is governed by the second derivative.
+
+\section{The derivative}
+
+\begin{definition}[Derivative at a point]\label{def:g12:deriv:derivative}
+Let $f$ be defined on an interval $I$ and $a \in I$. The function $f$ is
+\emph{differentiable at $a$}\index{derivative} if the difference quotient
+\[
+\frac{f(a+h) - f(a)}{h}
+\]
+has a finite limit as $h \to 0$. This limit is called the \emph{derivative of
+$f$ at $a$} and written $f'(a)$. If $f$ is differentiable at every point of
+$I$, the function $f' \colon x \mapsto f'(x)$ is the \emph{derivative} of
+$f$.
+\end{definition}
+
+\begin{definition}[Tangent line]\label{def:g12:deriv:tangent}
+If $f$ is differentiable at $a$, the \emph{tangent}\index{tangent} to the
+curve of $f$ at the point $(a, f(a))$ is the line of equation
+\[
+y = f(a) + f'(a)(x - a).
+\]
+\end{definition}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, clip=false,
+  width=9.6cm, height=6.8cm,
+  xmin=-0.4, xmax=3.4, ymin=-0.4, ymax=4.3,
+  xtick={1,2.5}, xticklabels={$a$,$a+h$}, ytick=\empty]
+  \addplot[omProp!40, thick, domain=0.2:2.7] {1 + 1.75*(x-1)};
+  \addplot[omProp!70, thick, domain=0.07:2.95] {1 + 1.5*(x-1)};
+  \addplot[omProp, thick, domain=-0.12:3.3] {1 + 1.25*(x-1)};
+  \addplot[omThm, thick, domain=-0.4:3.3] {x};
+  \addplot[omDef, thick, domain=-0.4:2.72] {x^2/2 + 0.5};
+  \draw[black, dashed, thin] (axis cs:1,1) -- (axis cs:2.5,1)
+    node[midway, below, font=\small] {$h$};
+  \draw[black, dashed, thin] (axis cs:2.5,1) -- (axis cs:2.5,3.625)
+    node[midway, right, font=\small] {$f(a+h)-f(a)$};
+  \fill (axis cs:2.5,3.625) circle (1.5pt);
+  \fill (axis cs:2,2.5) circle (1.5pt);
+  \fill (axis cs:1.5,1.625) circle (1.5pt);
+  \fill (axis cs:1,1) circle (1.5pt)
+    node[above left, font=\small] {$A$};
+  \node[omThm, font=\small, anchor=west] at (axis cs:3.38,3.3) {tangent};
+\end{axis}
+\end{tikzpicture}
+
+{\small As $h$ decreases, the secant line through $A = (a, f(a))$ and
+$(a+h, f(a+h))$ (orange) rotates towards the tangent at $A$ (red): its
+slope $\frac{f(a+h)-f(a)}{h}$ tends to $f'(a)$.}
+\end{omfigure}
+
+\begin{proposition}\label{prop:g12:deriv:diffcont}
+A function differentiable at $a$ is continuous at $a$. The converse is false.
+\end{proposition}
+
+\begin{proof}
+For $h \neq 0$ small, $f(a+h) - f(a) = h \cdot \frac{f(a+h)-f(a)}{h}$. As
+$h \to 0$, the right side tends to $0 \times f'(a) = 0$, so
+$f(a+h) \to f(a)$. For the converse, $x \mapsto \abs{x}$ is continuous at
+$0$, but its difference quotient at $0$ equals $\frac{\abs h}{h} = \pm 1$
+depending on the sign of $h$, and has no limit.
+\end{proof}
+
+\subsection{Differentiation rules}
+
+\begin{proposition}[Operations]\label{prop:g12:deriv:operations}
+Let $u, v$ be differentiable on $I$ and $\lambda \in \R$. Then $u + v$,
+$\lambda u$, $uv$ are differentiable on $I$, as is $\frac{u}{v}$ where
+$v \neq 0$, and
+\[
+(u+v)' = u' + v', \quad (\lambda u)' = \lambda u', \quad
+(uv)' = u'v + uv', \quad
+\left(\frac{u}{v}\right)' = \frac{u'v - uv'}{v^2}.
+\]
+\end{proposition}
+
+\begin{proof}[Proof of the product rule]
+Write the difference quotient of $uv$ at $a$ as
+\[
+\frac{u(a+h)v(a+h) - u(a)v(a)}{h}
+= \frac{u(a+h) - u(a)}{h}\,v(a+h) + u(a)\,\frac{v(a+h) - v(a)}{h}.
+\]
+As $h \to 0$, $v(a+h) \to v(a)$ by continuity
+(\cref{prop:g12:deriv:diffcont}), so the right side tends to
+$u'(a)v(a) + u(a)v'(a)$. The other rules are proved similarly.
+\end{proof}
+
+\begin{theorem}[Chain rule]\label{thm:g12:deriv:chain}
+\index{chain rule}
+Let $u$ be differentiable on $I$ with values in $J$, and $g$ differentiable
+on $J$. Then $g \circ u$ is differentiable on $I$ and
+\[
+(g \circ u)' = (g' \circ u) \cdot u' .
+\]
+In particular, for $u$ differentiable:
+\[
+(u^n)' = n\,u'\,u^{n-1} \ (n \in \Z), \qquad
+\left(\sqrt{u}\right)' = \frac{u'}{2\sqrt{u}} \ (u > 0), \qquad
+\left(\eu^{u}\right)' = u'\,\eu^{u}.
+\]
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+When $u(a+h) \neq u(a)$ for $h$ small, write
+\[
+\frac{g(u(a+h)) - g(u(a))}{h}
+= \frac{g(u(a+h)) - g(u(a))}{u(a+h) - u(a)} \cdot \frac{u(a+h) - u(a)}{h}.
+\]
+As $h \to 0$, $u(a+h) \to u(a)$, so the first factor tends to $g'(u(a))$ and
+the second to $u'(a)$. (A complete proof must handle the case where
+$u(a+h) = u(a)$ for $h$ arbitrarily small; this technical point is treated at
+university.)
+\end{proof}
+
+\begin{example}
+The usual derivatives, valid on the natural domains:
+\[
+(x^n)' = nx^{n-1}, \quad
+\left(\frac{1}{x}\right)' = -\frac{1}{x^2}, \quad
+(\sqrt{x})' = \frac{1}{2\sqrt{x}}, \quad
+(\cos x)' = -\sin x, \quad
+(\sin x)' = \cos x .
+\]
+The first is proved by induction from the product rule, and the last two in
+\cref{ch:g12:trigo}.
+\end{example}
+
+\section{Variations and extrema}
+
+\begin{theorem}[Sign of the derivative and variations]\label{thm:g12:deriv:variations}
+Let $f$ be differentiable on an interval $I$.
+\begin{enumerate}
+  \item $f$ is increasing on $I$ if and only if $f' \geq 0$ on $I$.
+  \item $f$ is decreasing on $I$ if and only if $f' \leq 0$ on $I$.
+  \item If $f' > 0$ on $I$ except at finitely many points where it
+        vanishes, then $f$ is strictly increasing on $I$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}[Partial proof]
+If $f$ is increasing, every difference quotient
+$\frac{f(a+h)-f(a)}{h}$ is $\geq 0$, and passing to the limit gives
+$f'(a) \geq 0$. The converse implications rest on the mean value theorem,
+proved at university; they are \emph{admitted at this level}.
+\end{proof}
+
+\begin{definition}[Local extremum]\label{def:g12:deriv:extremum}
+$f$ has a \emph{local maximum}\index{extremum} at $a$ if $f(x) \leq f(a)$ for
+all $x$ near $a$; local minima are defined symmetrically.
+\end{definition}
+
+\begin{proposition}[First-order condition]\label{prop:g12:deriv:critical}
+If $f$ is differentiable on an \emph{open} interval $I$ and has a local
+extremum at $a \in I$, then $f'(a) = 0$. The converse is false
+($f(x) = x^3$ at $a = 0$).
+\end{proposition}
+
+\begin{proof}
+Say $a$ is a local maximum. For $h > 0$ small,
+$\frac{f(a+h)-f(a)}{h} \leq 0$, so letting $h \to 0^+$ gives $f'(a) \leq 0$;
+for $h < 0$ the quotient is $\geq 0$, giving $f'(a) \geq 0$. Hence
+$f'(a) = 0$.
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=8.4cm, height=5.6cm,
+  xmin=-2.5, xmax=2.5, ymin=-4.2, ymax=4.2,
+  xtick={-1,1}, ytick={-2,2}]
+  \addplot[omProp, thick, domain=-1.8:-0.2] {2};
+  \addplot[omProp, thick, domain=0.2:1.8] {-2};
+  \addplot[omDef, thick, domain=-2.15:2.15] {x^3 - 3*x};
+  \fill (axis cs:-1,2) circle (1.5pt);
+  \fill (axis cs:1,-2) circle (1.5pt);
+\end{axis}
+\end{tikzpicture}
+
+{\small At a local extremum inside an open interval, the tangent
+(orange) is horizontal: $f'(a) = 0$. Here $f(x) = x^3 - 3x$, with a
+local maximum at $-1$ and a local minimum at $1$.}
+\end{omfigure}
+
+\begin{method}[Variation table]\label{met:g12:deriv:table}
+To study a function $f$: determine its domain and limits at the boundary;
+compute $f'$ and factor it; determine the sign of $f'$ on each subinterval;
+record everything in a variation table, marking extrema; deduce the number of
+solutions of $f(x) = k$ using the bijection theorem
+(\cref{thm:g12:limcont:bijection}).
+\end{method}
+
+\section{Convexity}
+
+\begin{definition}[Convex function]\label{def:g12:deriv:convex}
+A function $f$ defined on an interval $I$ is \emph{convex}\index{convexity}
+on $I$ if every chord of its graph lies above the graph: for all
+$a, b \in I$ and $t \in \intcc{0}{1}$,
+\[
+f\bigl((1-t)a + t b\bigr) \leq (1-t) f(a) + t f(b).
+\]
+It is \emph{concave} if the reverse inequality holds ($-f$ convex).
+\end{definition}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=8.8cm, height=6cm,
+  xmin=-1.9, xmax=2.5, ymin=-0.8, ymax=4.3,
+  xtick={-1,1.5}, xticklabels={$a$,$b$}, ytick=\empty]
+  \addplot[omThm, thick, domain=-1.25:1.75] {0.5*x + 1.5};
+  \addplot[omProp, thick, domain=-0.45:2.3] {x - 0.25};
+  \addplot[omDef, thick, domain=-1.6:2.0] {x^2};
+  \draw[black, dashed, thin] (axis cs:0.25,0.0625) -- (axis cs:0.25,1.625);
+  \fill (axis cs:-1,1) circle (1.5pt);
+  \fill (axis cs:1.5,2.25) circle (1.5pt);
+  \fill (axis cs:0.5,0.25) circle (1.5pt);
+  \node[omThm, font=\small, above left] at (axis cs:1.7,2.4) {chord};
+  \node[omProp, font=\small, below right] at (axis cs:1.75,1.5) {tangent};
+\end{axis}
+\end{tikzpicture}
+
+{\small A convex function: every chord (red) lies above the graph, and
+the graph lies above each of its tangents (orange). The dashed segment
+shows the gap between $f\bigl((1-t)a+tb\bigr)$ and $(1-t)f(a)+tf(b)$.}
+\end{omfigure}
+
+\begin{theorem}[Convexity and derivatives]\label{thm:g12:deriv:convexity}
+Let $f$ be differentiable on an interval $I$. The following are equivalent:
+\begin{enumerate}
+  \item $f$ is convex on $I$;
+  \item $f'$ is increasing on $I$;
+  \item the graph of $f$ lies above each of its tangents.
+\end{enumerate}
+If $f$ is twice differentiable, these are also equivalent to $f'' \geq 0$ on
+$I$.
+\end{theorem}
+
+\begin{proof}[Proof of (2) $\Rightarrow$ (3)]
+Fix $a \in I$ and set
+$g(x) = f(x) - f(a) - f'(a)(x-a)$, the gap between the curve and the tangent
+at $a$. Then $g$ is differentiable and $g'(x) = f'(x) - f'(a)$. If $f'$ is
+increasing, $g' \leq 0$ on $I \cap \intoc{-\infty}{a}$ and $g' \geq 0$ on
+$I \cap \intco{a}{+\infty}$: $g$ decreases before $a$ and increases after,
+so $g$ attains its minimum $g(a) = 0$, hence $g \geq 0$.
+The remaining implications are admitted at this level; the equivalence with
+$f'' \geq 0$ follows from \cref{thm:g12:deriv:variations} applied to $f'$.
+\end{proof}
+
+\begin{definition}[Inflection point]\label{def:g12:deriv:inflection}
+A point where the curve of $f$ crosses its tangent is an \emph{inflection
+point}\index{inflection point}. For $f$ twice differentiable, inflection
+points are the points where $f''$ changes sign.
+\end{definition}
+
+\begin{example}\label{ex:g12:deriv:cube}
+$f(x) = x^3$ has $f''(x) = 6x$: $f$ is concave on $\intoc{-\infty}{0}$,
+convex on $\intco{0}{+\infty}$, with an inflection point at the origin,
+where the curve crosses its tangent (the $x$-axis).
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=7.6cm, height=5.6cm,
+  xmin=-1.7, xmax=1.7, ymin=-2.9, ymax=2.9,
+  xtick={-1,1}, ytick={-1,1}]
+  \addplot[omProp, thick, domain=-1.2:1.2] {0};
+  \addplot[omDef, thick, domain=-1.4:1.4] {x^3};
+  \fill (axis cs:0,0) circle (1.5pt);
+  \node[font=\small, anchor=east] at (axis cs:-0.45,-1.7) {concave};
+  \node[font=\small, anchor=west] at (axis cs:0.45,1.7) {convex};
+\end{axis}
+\end{tikzpicture}
+
+{\small The inflection point of $x \mapsto x^3$ at the origin: the curve
+crosses its tangent (orange), concave on the left, convex on the right.}
+\end{omfigure}
+
+\begin{example}[Convexity inequalities]\label{ex:g12:deriv:ineq}
+The exponential is convex on $\R$ (its second derivative is itself, positive).
+Its tangent at $0$ is $y = 1 + x$, so
+\[
+\eu^x \geq 1 + x \quad \text{for all } x \in \R .
+\]
+Such \emph{tangent line inequalities} are a standard product of convexity.
+\end{example}
+
+\begin{method}[Using convexity]\label{met:g12:deriv:convexity}
+\begin{itemize}
+  \item To prove an inequality $f(x) \geq ax + b$: identify the line as a
+        tangent of a convex $f$ and invoke
+        \cref{thm:g12:deriv:convexity}(3).
+  \item To locate inflection points: solve $f''(x) = 0$ \emph{and} check
+        that $f''$ changes sign there.
+  \item In a variation table, convexity refines the sketch of the curve
+        (which way it bends).
+\end{itemize}
+\end{method}
+
+\section{Exercises}
+
+\begin{exercise}[$\star$]\label{exo:g12:deriv:1}
+Differentiate the following functions on their domains:
+\[
+f(x) = x^3 - 5x + 2, \quad
+g(x) = \frac{x}{x^2+1}, \quad
+h(x) = (2x+1)^5, \quad
+k(x) = \sqrt{x^2 + 1}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:deriv:2}
+Give the equation of the tangent to the curve of $f(x) = x^2 - 3x + 1$ at
+the point of abscissa $a = 2$, and determine the positions of the curve
+relative to this tangent.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:deriv:3}
+Using the definition of the derivative, compute
+\[
+\lim_{x \to 0} \frac{(1+x)^{100} - 1}{x}
+\qquad\text{and}\qquad
+\lim_{h \to 0} \frac{\sqrt{4+h} - 2}{h}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:deriv:4}
+Study the function $f(x) = \dfrac{x^2 + 3}{x - 1}$ on its domain: limits,
+derivative, variation table, local extrema.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:deriv:5}
+A box without a lid is made from a square sheet of cardboard of side
+$30\,$cm by cutting equal squares of side $x$ from the corners and folding up
+the sides. Determine $x$ maximizing the volume of the box.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:deriv:6}
+Let $f(x) = x^4 - 4x^3 + 10$.
+\begin{enumerate}
+  \item Compute $f''$ and determine the convexity intervals and inflection
+        points of $f$.
+  \item Show that the tangent at the inflection point of abscissa $2$
+        crosses the curve there.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:deriv:7}
+Using a tangent line inequality, show that for all $x > 0$,
+\[
+\sqrt{x} \leq \frac{x + 1}{2},
+\]
+and identify when equality holds. (Hint: the square root is concave.)
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:deriv:8}
+Let $f$ be convex and differentiable on $\R$, and suppose that $f'$ vanishes
+at some point $a$. Show that $f(a)$ is the \emph{global} minimum of $f$
+on~$\R$.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:deriv:9}
+Show that among all rectangles of fixed perimeter $p$, the square has the
+largest area. Then show that among all rectangles of fixed area $A$, the
+square has the smallest perimeter, and explain how the two statements are
+related.
+\end{exercise}

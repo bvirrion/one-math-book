@@ -1,0 +1,350 @@
+\chapter{Integration}\label{ch:g12:integ}
+
+Integration answers two questions at once: what is the area under a curve,
+and how can one recover a function from its rate of change? The fundamental
+theorem of calculus states that these are the same question --- the deepest
+and most useful discovery of seventeenth-century mathematics.
+
+\section{The integral of a continuous function}
+
+\begin{definition}[Integral of a positive function]\label{def:g12:integ:area}
+Let $f$ be continuous and positive on $\intcc{a}{b}$. The
+\emph{integral}\index{integral}
+\[
+\int_a^b f(x)\,\dd x
+\]
+is the area, in units of area, of the region bounded by the curve of $f$,
+the $x$-axis, and the vertical lines $x = a$ and $x = b$.
+\end{definition}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[
+  width=8.4cm, height=5cm,
+  axis lines=middle, xmin=-0.4, xmax=3.4, ymin=-0.3, ymax=2.3,
+  xtick={0.5,2.7}, xticklabels={$a$,$b$}, ytick=\empty,
+  samples=100, domain=-0.2:3.3]
+  \addplot[name path=curve, omDef, thick, domain=0.2:3.2]
+    {1 + 0.5*sin(deg(2*x)) + 0.2*x};
+  \path[name path=axis] (0.5,0) -- (2.7,0);
+  \addplot[omDef!20] fill between[of=curve and axis, soft clip={domain=0.5:2.7}];
+  \node at (axis cs:1.6,0.55) {$\displaystyle\int_a^b f$};
+\end{axis}
+\end{tikzpicture}
+\end{omfigure}
+
+For a function of arbitrary sign, areas below the $x$-axis are counted
+negatively; and one sets
+$\int_b^a f(x)\,\dd x = -\int_a^b f(x)\,\dd x$.
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=9.6cm, height=4.8cm,
+  xmin=-0.5, xmax=7, ymin=-1.4, ymax=1.4,
+  xtick={3.1416,6.2832}, xticklabels={$\pi$,$2\pi$}, ytick={-1,1}]
+  \addplot[name path=sine, omDef, thick, domain=0:6.2832, samples=120]
+    {sin(deg(x))};
+  \path[name path=xaxis] (0,0) -- (6.2832,0);
+  \addplot[omDef!20] fill between[of=sine and xaxis,
+    soft clip={domain=0:3.1416}];
+  \addplot[omThm!20] fill between[of=sine and xaxis,
+    soft clip={domain=3.1416:6.2832}];
+  \node at (axis cs:1.57,0.4) {$+$};
+  \node at (axis cs:4.71,-0.4) {$-$};
+\end{axis}
+\end{tikzpicture}
+
+{\small Signed areas: $\int_0^{2\pi} \sin x\,\dd x = 0$, the region
+below the axis (red) cancelling the region above (blue).}
+\end{omfigure}
+
+\begin{proposition}[Properties of the integral]\label{prop:g12:integ:properties}
+Let $f, g$ be continuous on an interval containing $a, b, c$, and
+$\lambda \in \R$.
+\begin{enumerate}
+  \item \emph{Linearity:}
+        $\displaystyle\int_a^b (f + \lambda g) = \int_a^b f + \lambda \int_a^b g$.
+  \item \emph{Chasles relation:}
+        $\displaystyle\int_a^c f = \int_a^b f + \int_b^c f$.
+  \item \emph{Positivity:} if $a \leq b$ and $f \geq 0$ on $\intcc{a}{b}$,
+        then $\displaystyle\int_a^b f \geq 0$; if $f \leq g$, then
+        $\displaystyle\int_a^b f \leq \int_a^b g$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+Chasles and positivity are immediate from the area interpretation (areas add
+up when regions are juxtaposed; a region of positive height has positive
+area). The comparison follows by applying positivity to $g - f$. Linearity is
+intuitively clear for the sum of positive functions (stack the areas) and is
+proved rigorously at university; \emph{it is admitted here}.
+\end{proof}
+
+\section{The fundamental theorem of calculus}
+
+\begin{definition}[Primitive]\label{def:g12:integ:primitive}
+A \emph{primitive}\index{primitive} (or antiderivative) of $f$ on an interval
+$I$ is a differentiable function $F$ on $I$ such that $F' = f$.
+\end{definition}
+
+\begin{proposition}\label{prop:g12:integ:primunique}
+If $F$ is a primitive of $f$ on an interval $I$, the primitives of $f$ on
+$I$ are exactly the functions $F + c$, $c \in \R$. Given $x_0 \in I$ and
+$y_0 \in \R$, there is a unique primitive with $F(x_0) = y_0$.
+\end{proposition}
+
+\begin{proof}
+If $G' = F' = f$, then $(G - F)' = 0$ on the interval $I$, so $G - F$ is
+constant.\footnote{That a function with zero derivative on an interval is
+constant follows from \cref{thm:g12:deriv:variations}: it is both increasing
+and decreasing.} Conversely every $F + c$ is a primitive. The condition
+$F(x_0) = y_0$ pins down the constant.
+\end{proof}
+
+\begin{theorem}[Fundamental theorem of calculus]\label{thm:g12:integ:ftc}
+\index{fundamental theorem of calculus}
+Let $f$ be continuous on an interval $I$ and $a \in I$. The function
+\[
+F \colon x \longmapsto \int_a^x f(t)\,\dd t
+\]
+is the primitive of $f$ on $I$ vanishing at $a$. Consequently, for any
+primitive $G$ of $f$ and $a, b \in I$:
+\[
+\int_a^b f(t)\,\dd t = \bigl[G(t)\bigr]_a^b = G(b) - G(a).
+\]
+\end{theorem}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=9.2cm, height=5.6cm,
+  xmin=-0.4, xmax=4.2, ymin=-0.4, ymax=2.9,
+  xtick={0.5,2.2,2.7}, xticklabels={$a$,$x$,\ $x+h$}, ytick=\empty]
+  \addplot[name path=curve, omDef, thick, domain=0:3.9, samples=80]
+    {1 + 0.4*x + 0.2*sin(deg(2*x))};
+  \path[name path=xaxis] (0,0) -- (3.9,0);
+  \addplot[omDef!20] fill between[of=curve and xaxis,
+    soft clip={domain=0.5:2.2}];
+  \addplot[omProp!40] fill between[of=curve and xaxis,
+    soft clip={domain=2.2:2.7}];
+  \draw[black, dashed, thin] (axis cs:2.2,1.69) -- (axis cs:2.7,1.69);
+  \draw[black, dashed, thin] (axis cs:2.2,1.925) -- (axis cs:2.7,1.925)
+    node[above right, font=\small] {$f(x+h)$};
+  \node at (axis cs:1.35,0.6) {$F(x)$};
+\end{axis}
+\end{tikzpicture}
+
+{\small The idea of the proof: the increment $F(x+h) - F(x)$ is the area
+of the narrow strip (orange), squeezed between the rectangles of heights
+$f(x)$ and $f(x+h)$ over a base of length $h$.}
+\end{omfigure}
+
+\begin{proof}[Proof when $f$ is increasing]
+Fix $x \in I$ and $h > 0$ with $x + h \in I$. By Chasles,
+\[
+F(x+h) - F(x) = \int_x^{x+h} f(t)\,\dd t .
+\]
+Since $f$ is increasing, $f(x) \leq f(t) \leq f(x+h)$ for
+$t \in \intcc{x}{x+h}$, and by comparison of integrals (the integral of a
+constant $c$ over an interval of length $h$ is $ch$):
+\[
+h\,f(x) \leq F(x+h) - F(x) \leq h\,f(x+h),
+\]
+so
+\[
+f(x) \leq \frac{F(x+h) - F(x)}{h} \leq f(x+h).
+\]
+As $h \to 0^+$, $f(x+h) \to f(x)$ by continuity, and the squeeze theorem
+gives that the difference quotient tends to $f(x)$; the case $h < 0$ is
+symmetric. Hence $F' = f$, and $F(a) = 0$. The general (non-monotonic)
+continuous case is proved at university.
+
+Finally, if $G$ is any primitive, $G = F + c$
+(\cref{prop:g12:integ:primunique}), so
+$G(b) - G(a) = F(b) - F(a) = \int_a^b f$.
+\end{proof}
+
+\begin{example}
+$\displaystyle\int_0^1 x^2\,\dd x = \left[\frac{x^3}{3}\right]_0^1 =
+\frac13$: the area under the parabola is one third of the unit square, as
+Archimedes knew.
+\end{example}
+
+The table of primitives is read from the table of derivatives
+($u$ denotes a differentiable function, $c$ an arbitrary constant):
+\begin{center}
+\renewcommand{\arraystretch}{1.7}
+\begin{tabular}{c|c||c|c}
+$f(x)$ & primitive & $f$ & primitive \\
+\hline
+$x^n \ (n \neq -1)$ & $\dfrac{x^{n+1}}{n+1} + c$ &
+$u'u^n \ (n \neq -1)$ & $\dfrac{u^{n+1}}{n+1} + c$\\
+$\dfrac1x \ (x > 0)$ & $\ln x + c$ &
+$\dfrac{u'}{u} \ (u > 0)$ & $\ln u + c$\\
+$\eu^x$ & $\eu^x + c$ &
+$u'\eu^u$ & $\eu^u + c$\\
+$\cos x$ & $\sin x + c$ &
+$\dfrac{u'}{\sqrt u} \ (u>0)$ & $2\sqrt u + c$\\
+$\sin x$ & $-\cos x + c$ & &
+\end{tabular}
+\end{center}
+
+\begin{method}[Recognizing the form $u' \times (\text{something in } u)$]\label{met:g12:integ:uprime}
+To integrate a product, look for a factor which is the derivative of an inner
+function $u$, up to a multiplicative constant. For instance in
+$\int_0^1 x\,\eu^{x^2}\dd x$, the factor $x$ is $\frac12 (x^2)'$:
+\[
+\int_0^1 x\,\eu^{x^2}\dd x = \frac12\left[\eu^{x^2}\right]_0^1
+= \frac{\eu - 1}{2}.
+\]
+\end{method}
+
+\begin{theorem}[Integration by parts]\label{thm:g12:integ:ibp}
+\index{integration by parts}
+Let $u, v$ be differentiable on $\intcc{a}{b}$ with continuous derivatives.
+Then
+\[
+\int_a^b u'(t)\,v(t)\,\dd t
+= \bigl[u(t)\,v(t)\bigr]_a^b - \int_a^b u(t)\,v'(t)\,\dd t .
+\]
+\end{theorem}
+
+\begin{proof}
+The product rule gives $(uv)' = u'v + uv'$; integrating both sides over
+$\intcc{a}{b}$ and using the fundamental theorem for the left-hand side
+yields $\bigl[uv\bigr]_a^b = \int_a^b u'v + \int_a^b uv'$.
+\end{proof}
+
+\begin{example}\label{ex:g12:integ:ibp}
+$\displaystyle\int_0^1 t\,\eu^{t}\,\dd t$: take $u' = \eu^t$, $v = t$, so
+$u = \eu^t$, $v' = 1$:
+\[
+\int_0^1 t\,\eu^t\,\dd t = \bigl[t\,\eu^t\bigr]_0^1 - \int_0^1 \eu^t\,\dd t
+= \eu - (\eu - 1) = 1 .
+\]
+\end{example}
+
+\section{Applications}
+
+\begin{definition}[Mean value]\label{def:g12:integ:mean}
+The \emph{mean value}\index{mean value} of a continuous function $f$ on
+$\intcc{a}{b}$ ($a<b$) is
+\[
+\mu = \frac{1}{b-a}\int_a^b f(t)\,\dd t .
+\]
+\end{definition}
+
+\begin{proposition}\label{prop:g12:integ:meanbounds}
+If $m \leq f \leq M$ on $\intcc{a}{b}$, then $m \leq \mu \leq M$.
+\end{proposition}
+
+\begin{proof}
+Integrate the inequalities $m \leq f(t) \leq M$ over $\intcc{a}{b}$ and
+divide by $b - a > 0$.
+\end{proof}
+
+\begin{method}[Area between two curves]\label{met:g12:integ:areabetween}
+If $f \geq g$ on $\intcc{a}{b}$, the area between the two curves is
+$\int_a^b \bigl(f(x) - g(x)\bigr)\dd x$. If the curves cross, split the
+interval at the crossing points and integrate $\abs{f - g}$ piece by piece.
+\end{method}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=8.4cm, height=5.8cm,
+  xmin=-2.1, xmax=2.9, ymin=-1.8, ymax=5.6,
+  xtick={-1,2}, ytick=\empty]
+  \addplot[name path=line, omThm, thick, domain=-1.7:2.5] {x + 1};
+  \addplot[name path=parab, omDef, thick, domain=-1.9:2.45] {x^2 - 1};
+  \addplot[omDef!20] fill between[of=line and parab,
+    soft clip={domain=-1:2}];
+  \fill (axis cs:-1,0) circle (1.5pt);
+  \fill (axis cs:2,3) circle (1.5pt);
+\end{axis}
+\end{tikzpicture}
+
+{\small The area between the line $y = x + 1$ (red) and the parabola
+$y = x^2 - 1$ (blue) is $\int_{-1}^{2}
+\bigl((x+1) - (x^2-1)\bigr)\dd x = \frac92$.}
+\end{omfigure}
+
+\section{Exercises}
+
+\begin{exercise}[$\star$]\label{exo:g12:integ:1}
+Compute
+\[
+\int_1^2 \left(3x^2 - \frac{1}{x^2}\right)\dd x, \qquad
+\int_0^{\pi/2} \cos t \,\dd t, \qquad
+\int_0^{1} \frac{\dd t}{2t+1} .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:integ:2}
+Find the primitive $F$ of $f(x) = x\eu^{x^2}$ on $\R$ such that $F(0) = 1$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:integ:3}
+Compute the mean value of $f(t) = \sin t$ on $\intcc{0}{\pi}$, and interpret
+the result on a graph.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:integ:4}
+Using integration by parts, compute
+\[
+\int_1^{\eu} \ln t\,\dd t
+\qquad\text{and}\qquad
+\int_0^{\pi} t \sin t\,\dd t .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:integ:5}
+Compute the area of the region between the parabola $y = x^2$ and the line
+$y = x + 2$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:integ:6}
+Let $I = \displaystyle\int_0^1 \frac{\dd t}{1 + t}$.
+\begin{enumerate}
+  \item Compute $I$.
+  \item For $n \in \N$, let $I_n = \displaystyle\int_0^1 \frac{t^n}{1+t}\dd t$.
+        Show that $I_n + I_{n+1} = \dfrac{1}{n+1}$, and that
+        $0 \leq I_n \leq \dfrac{1}{n+1}$.
+  \item Deduce that
+        $1 - \frac12 + \frac13 - \dots + \frac{(-1)^{n-1}}{n}
+        \xrightarrow[n \to +\infty]{} \ln 2$.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:integ:7}
+The speed of a train (in m/s) during the first $100$ seconds after departure
+is modeled by $v(t) = 30\bigl(1 - \eu^{-t/50}\bigr)$. Compute the distance
+traveled during these $100$ seconds, and the train's average speed over the
+interval.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:integ:8}
+For $n \geq 1$, let $S_n = \dfrac1n \displaystyle\sum_{k=1}^{n} \frac{1}{1 + k/n}$.
+\begin{enumerate}
+  \item Interpret $S_n$ as an area of rectangles approximating a region
+        under the curve of $t \mapsto \frac{1}{1+t}$ on $\intcc{0}{1}$.
+  \item Using the monotonicity of $t \mapsto \frac{1}{1+t}$, show that
+        \[
+        S_n \leq \int_0^1 \frac{\dd t}{1+t} \leq S_n + \frac1n\left(1 - \frac12\right),
+        \]
+        and deduce $\lim\limits_{n\to+\infty} S_n = \ln 2$.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:integ:9}
+\emph{(Wallis integrals.)} For $n \in \N$, let
+$W_n = \displaystyle\int_0^{\pi/2} \sin^n t\,\dd t$.
+\begin{enumerate}
+  \item Compute $W_0$ and $W_1$.
+  \item Writing $\sin^{n+2}t = \sin t \cdot \sin^{n+1} t$ and integrating by
+        parts, show that $W_{n+2} = \dfrac{n+1}{n+2}\,W_n$.
+  \item Deduce $W_2$, $W_3$, $W_4$ and show that $(W_n)$ is decreasing and
+        positive.
+\end{enumerate}
+\end{exercise}

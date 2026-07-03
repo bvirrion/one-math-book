@@ -40,7 +40,7 @@ automatically within the chapter):
 |---|---|
 | `definition` | new notions; put the defined term in `\emph{...}` and `\index{...}` it |
 | `theorem` / `proposition` / `lemma` / `corollary` | results, by decreasing importance |
-| `method` | prépa-style recipes for standard tasks |
+| `method` | step-by-step recipes for standard tasks |
 | `example`, `remark`, `notation` | worked examples, comments |
 | `proof` | proofs (amsthm); a partial proof is titled `\begin{proof}[Partial proof]` |
 | `exercise` | end-of-chapter exercises, difficulty in the optional argument: `[$\star$]` to `[$\star\star\star$]` |
@@ -48,7 +48,7 @@ automatically within the chapter):
 
 ## Style rules
 
-1. **Prépa discipline**: state precisely, prove what is provable at the
+1. **Rigor**: state precisely, prove what is provable at the
    level of the year; a result stated without proof must say so explicitly
    ("admitted at this level"), ideally pointing to where it will be proved.
 2. **Concision**: no filler. An example after each substantial definition or
@@ -56,10 +56,11 @@ automatically within the chapter):
 3. **Exercises**: 8–12 per chapter, graded `$\star$` (direct application) to
    `$\star\star\star$` (challenging); **every exercise must have a full
    solution** in the matching solutions file.
-4. **English text**, with the French term in a parenthesis or footnote when
-   it helps French readers (e.g. half-life, *demi-vie*).
+4. **English text**, written for readers anywhere in the world: avoid
+   references to any particular country's educational system or
+   curriculum-specific terminology.
 5. Use the macros of `onemath.sty`: `\R, \N, \Z, \Q, \C`, `\abs{}`,
-   `\intcc{a}{b}` (and `\intoo`, `\intco`, `\intoc`) for French-style
+   `\intcc{a}{b}` = [a, b] (and `\intoo` = (a, b), `\intco`, `\intoc`) for
    intervals, `\dd` in integrals, `\eu`/`\iu` for upright e and i, `\E`,
    `\V`, `\P`, `\pcond{B}{A}` (probability of A given B), `\vect{AB}`,
    `\conj{z}`.
@@ -68,14 +69,14 @@ automatically within the chapter):
 
 All labels are namespaced: `<type>:<year>:<chapter-slug>:<name>`.
 
-- Chapters: `ch:tle:seq`
-- Statements: `def:tle:seq:limit`, `thm:tle:seq:monotone`,
+- Chapters: `ch:g12:seq`
+- Statements: `def:g12:seq:limit`, `thm:g12:seq:monotone`,
   `prop:...`, `lem:...`, `cor:...`, `met:...`, `ex:...` (examples)
-- Exercises and solutions: `exo:tle:seq:3` — the solution references this
-  same label via `\begin{solution}{exo:tle:seq:3}`.
+- Exercises and solutions: `exo:g12:seq:3` — the solution references this
+  same label via `\begin{solution}{exo:g12:seq:3}`.
 
-Year prefixes: `tle` for Terminale; future years will use `1re`, `2de`,
-`l1`, `l2`, `l3`, etc.
+Year prefixes: `g12` for Grade 12; other years will use `k` (kindergarten),
+`g1`–`g11`, and `b1`–`b3` (bachelor years).
 
 Cross-reference with `\cref{...}` (cleveref), never with bare `\ref`.
 

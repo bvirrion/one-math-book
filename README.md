@@ -1,23 +1,23 @@
 # One Math Book
 
-*One math book to rule them all.*
+*The One Math Book to Rule Them All.*
 
-An open-source mathematics book, written in English, with the ambition of
-covering the entire French curriculum **from kindergarten to the end of the
-licence** (bachelor's degree) — in a single, coherent volume.
+An open-source mathematics book, written in English for readers anywhere in
+the world, with the ambition of covering everything **from kindergarten to
+the end of the bachelor's degree** — in a single, coherent volume.
 
-The style is that of the French *classes préparatoires*: concise courses
-built from **definitions, examples, propositions, theorems and methods**,
-with proofs whenever they are accessible at the given level (results admitted
-without proof are explicitly marked), followed by graded **exercises with
-full solutions** collected at the end of the book.
+The style is concise and rigorous: courses built from **definitions,
+examples, propositions, theorems and methods**, with proofs whenever they
+are accessible at the given level (results admitted without proof are
+explicitly marked), followed by graded **exercises with full solutions**
+collected at the end of the book.
 
 ## Current status
 
 | Part | Level | Status |
 |------|-------|--------|
-| Terminale | Grade 12 (union of former Terminale S + Spécialité Maths + Maths Expertes) | ✅ 16 chapters, exercises + solutions |
-| Other years | Kindergarten → Licence 3 | 🚧 planned |
+| Grade 12 (age 17–18) | Final year of secondary school, advanced track | ✅ 16 chapters, exercises + solutions |
+| Other years | Kindergarten → Bachelor Year 3 | 🚧 planned |
 
 ## Building the book
 
@@ -48,6 +48,11 @@ Contributions are welcome — new chapters and years, corrections, better
 proofs, additional exercises, figures. Please read
 [CONTRIBUTING.md](CONTRIBUTING.md) for the structure, environments and
 style conventions of the project.
+
+## Contributors
+
+- Benjamin Virrion
+- Fable 5 (Anthropic's Claude)
 
 ## License
 
