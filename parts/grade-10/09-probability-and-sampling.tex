@@ -1,0 +1,293 @@
+\chapter{Probability and Sampling}\label{ch:g10:proba}
+
+Probability assigns numbers to chance. Starting from experiments with
+equally likely outcomes --- dice, coins, cards --- this chapter builds the
+basic rules for computing probabilities of events, introduces tree
+diagrams for two-step experiments, and ends with the link between
+probabilities and observed frequencies. The theory continues in
+\cref{ch:g11:prob}.
+
+\section{Random experiments and events}
+
+\begin{definition}[Outcomes and events]\label{def:g10:proba:events}
+A \emph{random experiment}\index{random experiment} is an experiment whose
+result cannot be predicted (rolling a die). The set of all possible
+results is the \emph{sample space}\index{sample space}
+$\Omega = \{\omega_1, \dots, \omega_n\}$; its elements are the
+\emph{outcomes}. An \emph{event}\index{event} is a set of outcomes; an
+event \emph{occurs} when the result of the experiment belongs to it.
+\end{definition}
+
+\begin{definition}[Probability distribution]\label{def:g10:proba:distribution}
+Assigning to each outcome $\omega_i$ a number $p_i \geq 0$, with
+$p_1 + \dots + p_n = 1$, defines a \emph{probability}\index{probability}:
+the probability $\P(A)$ of an event $A$ is the sum of the $p_i$ of the
+outcomes in $A$. In particular $\P(\Omega) = 1$ and the impossible event
+$\varnothing$ has probability $0$.
+\end{definition}
+
+\begin{proposition}[Equally likely outcomes]\label{prop:g10:proba:uniform}
+If the $n$ outcomes are equally likely (each $p_i = \frac1n$), then for
+every event $A$:
+\[
+\P(A) = \frac{\text{number of outcomes in } A}{n}
+= \frac{\text{favorable cases}}{\text{possible cases}} .
+\]
+\end{proposition}
+
+\begin{proof}
+$A$ contains some number $k$ of outcomes, each of probability $\frac1n$,
+so $\P(A) = \frac kn$.
+\end{proof}
+
+\begin{example}\label{ex:g10:proba:die}
+Roll a fair die: $\Omega = \{1, 2, 3, 4, 5, 6\}$, each outcome having
+probability $\frac16$. The event $A$: ``the result is even'' is
+$A = \{2, 4, 6\}$, so $\P(A) = \frac36 = \frac12$. The event $B$: ``the
+result is at least $5$'' is $B = \{5, 6\}$, so $\P(B) = \frac26 =
+\frac13$.
+\end{example}
+
+\section{Combining events}
+
+\begin{definition}[Intersection, union, complement]\label{def:g10:proba:operations}
+Let $A$ and $B$ be events.
+\begin{itemize}
+  \item $A \cap B$ (``$A$ and $B$'') occurs when both occur;
+  \item $A \cup B$ (``$A$ or $B$'') occurs when at least one occurs;
+  \item the \emph{complement}\index{complement} $\bar A$ (``not $A$'')
+        occurs exactly when $A$ does not;
+  \item $A$ and $B$ are \emph{incompatible} when they cannot occur
+        together: $A \cap B = \varnothing$.
+\end{itemize}
+\end{definition}
+
+\begin{theorem}[Addition rules]\label{thm:g10:proba:addition}
+For all events $A$ and $B$:
+\[
+\P(A \cup B) = \P(A) + \P(B) - \P(A \cap B),
+\qquad
+\P(\bar A) = 1 - \P(A) .
+\]
+For incompatible events, the first rule simplifies to
+$\P(A \cup B) = \P(A) + \P(B)$.
+\end{theorem}
+
+\begin{proof}
+Summing $\P(A) + \P(B)$ adds the probability of every outcome of
+$A \cup B$ once, \emph{except} those of $A \cap B$, which are counted
+twice --- once in $A$ and once in $B$. Subtracting $\P(A \cap B)$ repairs
+the double counting. For the complement: $A$ and $\bar A$ are incompatible
+and $A \cup \bar A = \Omega$, so $\P(A) + \P(\bar A) = \P(\Omega) = 1$.
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=0.9]
+  \draw[omExo, thick, rounded corners] (-3.1,-1.7) rectangle (3.4,1.7);
+  \node[omExo, font=\small] at (3.0,1.45) {$\Omega$};
+  \begin{scope}
+    \clip (-0.8,0) circle (1.25);
+    \fill[omProp!25] (0.8,0) circle (1.25);
+  \end{scope}
+  \draw[omDef, thick] (-0.8,0) circle (1.25);
+  \draw[omThm, thick] (0.8,0) circle (1.25);
+  \node[omDef, font=\small] at (-1.6,0.9) {$A$};
+  \node[omThm, font=\small] at (1.7,0.9) {$B$};
+  \node[font=\small] at (0,0) {$A \cap B$};
+\end{tikzpicture}
+
+{\small Two overlapping events: in $\P(A) + \P(B)$, the shaded
+intersection $A \cap B$ is counted twice, which explains the subtraction
+in the addition rule.}
+\end{omfigure}
+
+\begin{example}\label{ex:g10:proba:cards}
+Draw one card from a standard $52$-card deck. Let $A$: ``the card is a
+heart'' ($13$ cards) and $B$: ``the card is a king'' ($4$ cards). Then
+$A \cap B$ is ``the king of hearts'' ($1$ card), and
+\[
+\P(A \cup B) = \frac{13}{52} + \frac{4}{52} - \frac{1}{52} = \frac{16}{52}
+= \frac{4}{13}.
+\]
+The complement rule is often the fastest route: the probability that the
+card is \emph{not} a heart is $1 - \frac{13}{52} = \frac34$.
+\end{example}
+
+\section{Tree diagrams}
+
+\begin{method}[Two-step experiments]\label{met:g10:proba:tree}
+For an experiment performed in two steps:
+\begin{enumerate}
+  \item draw a \emph{tree}\index{tree diagram}: one branch per possible
+        result of the first step, then from each of these, one branch per
+        result of the second step, writing the probability on each branch
+        (the branches leaving any node must sum to $1$);
+  \item the probability of a \emph{path} (a leaf of the tree) is the
+        product of the probabilities along its branches;
+  \item the probability of an event is the sum of the probabilities of
+        the paths that realize it.
+\end{enumerate}
+\end{method}
+
+\begin{example}\label{ex:g10:proba:tree}
+An urn contains $3$ red balls and $2$ blue balls. Draw one ball, put it
+back, draw again. Each draw gives red (R) with probability $\frac35$ and
+blue (B) with probability $\frac25$.
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=1.0]
+  \coordinate (root) at (0,0);
+  \coordinate (R) at (2.3,1.1);
+  \coordinate (B) at (2.3,-1.1);
+  \coordinate (RR) at (5.0,1.7);
+  \coordinate (RB) at (5.0,0.5);
+  \coordinate (BR) at (5.0,-0.5);
+  \coordinate (BB) at (5.0,-1.7);
+  \draw (root) -- (R) node[midway, above, font=\small, sloped] {$\frac35$};
+  \draw (root) -- (B) node[midway, below, font=\small, sloped] {$\frac25$};
+  \draw (R) -- (RR) node[midway, above, font=\small, sloped] {$\frac35$};
+  \draw (R) -- (RB) node[midway, below, font=\small, sloped] {$\frac25$};
+  \draw (B) -- (BR) node[midway, above, font=\small, sloped] {$\frac35$};
+  \draw (B) -- (BB) node[midway, below, font=\small, sloped] {$\frac25$};
+  \node[omThm, font=\small] at (R) [above left=-2pt] {R};
+  \node[omDef, font=\small] at (B) [below left=-2pt] {B};
+  \node[right, font=\small] at (RR)
+    {RR:\ $\frac35 \times \frac35 = \frac{9}{25}$};
+  \node[right, font=\small] at (RB)
+    {RB:\ $\frac35 \times \frac25 = \frac{6}{25}$};
+  \node[right, font=\small] at (BR)
+    {BR:\ $\frac25 \times \frac35 = \frac{6}{25}$};
+  \node[right, font=\small] at (BB)
+    {BB:\ $\frac25 \times \frac25 = \frac{4}{25}$};
+\end{tikzpicture}
+
+{\small The tree of two draws with replacement. The four path
+probabilities sum to $1$.}
+\end{omfigure}
+
+The probability of getting two balls of the same color is
+$\P(\text{RR}) + \P(\text{BB}) = \frac{9}{25} + \frac{4}{25} =
+\frac{13}{25}$; the probability of at least one blue is
+$1 - \P(\text{RR}) = 1 - \frac{9}{25} = \frac{16}{25}$ (complement rule).
+\end{example}
+
+\begin{remark}
+Without replacement, the probabilities of the second draw depend on the
+first: with the urn above, after drawing a red ball, only $2$ red and $2$
+blue remain, so the second branch carries $\frac24$ and $\frac24$. The
+tree method works unchanged; only the numbers on the second-level branches
+change.
+\end{remark}
+
+\section{Frequencies and sampling}
+
+When a random experiment is repeated many times, the observed frequency
+of an event approaches its probability --- this is why probability is
+useful for describing the real world.
+
+\begin{definition}[Sample]\label{def:g10:proba:sample}
+A \emph{sample}\index{sample} of size $n$ is the result of repeating the
+same experiment $n$ times independently. The \emph{observed frequency} of
+an event in the sample is the number of occurrences divided by $n$.
+\end{definition}
+
+\begin{example}\label{ex:g10:proba:sampling}
+A fair coin gives heads with probability $0.5$. Tossing it $100$ times
+rarely gives exactly $50$ heads: samples \emph{fluctuate}. Typical runs of
+$100$ tosses give frequencies like $0.46$, $0.53$, $0.49$ --- close to
+$0.5$, but not equal. Larger samples fluctuate less: with $10\,000$
+tosses, observed frequencies are usually within about $0.01$ of $0.5$.
+\end{example}
+
+\begin{remark}[Fluctuation interval]
+A useful rule of thumb, justified in \cref{ch:g11:binom}: for a sample of
+size $n$ of an event of probability $p$ (with $n$ reasonably large), the
+observed frequency lies in the interval
+\[
+\intcc{p - \frac{1}{\sqrt n}}{\,p + \frac{1}{\sqrt n}}
+\]
+in roughly $95\%$ of samples. If an observed frequency falls far outside
+this interval, doubt the value of $p$: this is the starting point of
+statistical testing.
+\end{remark}
+
+\begin{example}\label{ex:g10:proba:test}
+A factory claims that only $10\%$ of its parts are defective
+($p = 0.1$). In a sample of $n = 400$ parts, $64$ are defective: observed
+frequency $\frac{64}{400} = 0.16$. The fluctuation interval is
+$\intcc{0.1 - \frac{1}{20}}{0.1 + \frac{1}{20}} = \intcc{0.05}{0.15}$,
+and $0.16$ falls outside it: the sample casts serious doubt on the claim.
+\end{example}
+
+\section{Exercises}
+
+\begin{exercise}[$\star$]\label{exo:g10:proba:1}
+A fair die is rolled. Compute the probability of each event: ``getting a
+$6$''; ``getting an odd number''; ``getting at most $4$''; ``getting a
+$7$''.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g10:proba:2}
+A bag contains $5$ green, $3$ yellow and $2$ black marbles; one marble is
+drawn at random. Compute the probability that it is green; that it is not
+black; that it is green or yellow.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g10:proba:3}
+In a class of $30$ students, $18$ study Spanish, $10$ study German, and
+$4$ study both. A student is picked at random. Using the addition rule,
+compute the probability that this student studies at least one of the two
+languages, then the probability that they study neither.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g10:proba:4}
+A fair coin is tossed twice. Draw the tree of the experiment and compute
+the probability of getting two heads; exactly one head; at least one
+head.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g10:proba:5}
+An urn contains $4$ red and $6$ white balls. Two balls are drawn one after
+the other \emph{without} replacement. Draw the tree with the correct
+probabilities on the second level, and compute the probability of drawing
+two red balls, then of drawing two balls of different colors.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g10:proba:6}
+Two fair dice are rolled and their sum is recorded.
+\begin{enumerate}
+  \item Explain why the sample space can be taken as the $36$ equally
+        likely pairs $(1,1), (1,2), \dots, (6,6)$.
+  \item Compute the probability that the sum is $7$; that it is $12$;
+        that it is at most $4$.
+  \item Which sum is the most likely?
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g10:proba:7}
+A multiple-choice question offers $4$ answers, one correct. A student
+answers $2$ independent such questions completely at random. Compute the
+probability of answering both correctly, exactly one correctly, none
+correctly. Check that the three probabilities sum to $1$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g10:proba:8}
+A politician claims $50\%$ approval. In a poll of $n = 900$ randomly
+chosen voters, $396$ approve.
+\begin{enumerate}
+  \item Compute the observed frequency and the fluctuation interval
+        around $p = 0.5$ for $n = 900$.
+  \item Does the poll cast doubt on the claim?
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g10:proba:9}
+A game costs $2$ to play: you roll a fair die and win $6$ if you roll a
+$6$, $3$ if you roll a $5$, nothing otherwise.
+\begin{enumerate}
+  \item Compute the probability of each amount won ($6$, $3$, $0$).
+  \item Over $600$ games, about how many of each outcome do you expect?
+        Compute the total expected gain and loss: is the game worth
+        playing?
+\end{enumerate}
+\end{exercise}
