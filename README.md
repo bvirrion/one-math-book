@@ -16,6 +16,8 @@ collected at the end of the book.
 
 | Part | Level | Status |
 |------|-------|--------|
+| Grade 1 (age 6–7) | First year of primary school | ✅ 6 chapters, exercises + solutions |
+| Grade 2 (age 7–8) | Second year of primary school | ✅ 7 chapters, exercises + solutions |
 | Grade 3 (age 8–9) | Third year of primary school | ✅ 7 chapters, exercises + solutions |
 | Grade 4 (age 9–10) | Fourth year of primary school | ✅ 8 chapters, exercises + solutions |
 | Grade 5 (age 10–11) | Last year of primary school | ✅ 8 chapters, exercises + solutions |
@@ -26,7 +28,7 @@ collected at the end of the book.
 | Grade 10 (age 15–16) | First year of upper secondary school | ✅ 9 chapters, exercises + solutions |
 | Grade 11 (age 16–17) | Penultimate year of secondary school, advanced track | ✅ 10 chapters, exercises + solutions |
 | Grade 12 (age 17–18) | Final year of secondary school, advanced track | ✅ 16 chapters, exercises + solutions |
-| Other years | Kindergarten → Grade 2, Bachelor Years 1–3 | 🚧 planned |
+| Other years | Kindergarten, Bachelor Years 1–3 | 🚧 planned |
 
 The lower the grade, the younger the reader it is written for: earlier
 parts use more figures, more detailed worked steps, and gentler
