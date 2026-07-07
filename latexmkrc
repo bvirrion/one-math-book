@@ -1,6 +1,7 @@
 # latexmk configuration for One Math Book
 $pdf_mode = 1;              # pdflatex
 $out_dir = 'build';
+$jobname = 'one_math_book'; # output is build/one_math_book.pdf (not main.pdf)
 @default_files = ('main.tex');
 # The book's many TikZ/pgfplots figures exceed pdfTeX's default main
 # memory (5M words); raise the runtime limits.

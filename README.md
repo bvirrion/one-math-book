@@ -2,9 +2,9 @@
 
 *The One Math Book to Rule Them All.*
 
-An open-source mathematics book, written in English for readers anywhere in
-the world, with the ambition of covering everything **from kindergarten to
-the end of the bachelor's degree** — in a single, coherent volume.
+A mathematics book, written in English for readers anywhere in the world,
+with the ambition of covering everything **from kindergarten to the end of
+the bachelor's degree** — in a single, coherent volume.
 
 The style is concise and rigorous: courses built from **definitions,
 examples, propositions, theorems and methods**, with proofs whenever they
@@ -43,7 +43,7 @@ Requirements: a TeX Live installation with `latexmk` (packages used:
 make            # or just: latexmk
 ```
 
-The PDF is produced at `build/main.pdf`. `make clean` removes auxiliary
+The PDF is produced at `build/one_math_book.pdf`. `make clean` removes auxiliary
 files, `make distclean` removes the whole `build/` directory.
 
 ## Repository layout
@@ -71,4 +71,4 @@ style conventions of the project.
 
 ## License
 
-To be decided (a free-culture license such as CC-BY-SA is envisioned).
+Not yet decided.

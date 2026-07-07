@@ -1,0 +1,43 @@
+name: Build and Release PDF
+
+on:
+  push:
+    tags:
+      - 'v*'            # triggers on tags like v0.0.1, v1.2.3
+
+permissions:
+  contents: write       # needed to create releases and upload assets
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0            # need the tag's metadata for its date
+
+      - name: Generate version info
+        run: |
+          DATE=$(git for-each-ref --format='%(creatordate:short)' "refs/tags/${GITHUB_REF_NAME}")
+          printf '\\renewcommand{\\bookdate}{%s}\n'    "$DATE"            >  version.tex
+          printf '\\renewcommand{\\bookversion}{%s}\n' "$GITHUB_REF_NAME" >> version.tex
+
+      - name: Compile LaTeX
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: main.tex
+          latexmk_use_lualatex: false
+          # latexmkrc in the repo sets pdflatex mode, build/ output and the
+          # one_math_book jobname.
+
+      - name: Check for undefined references
+        run: |
+          ! grep -E "(Reference|Citation).*undefined" build/one_math_book.log
+
+      - name: Name the PDF with the version
+        run: cp build/one_math_book.pdf "one_math_book_${GITHUB_REF_NAME}.pdf"
+
+      - name: Create release and attach PDF
+        uses: softprops/action-gh-release@v2
+        with:
+          files: one_math_book_${{ github.ref_name }}.pdf

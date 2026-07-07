@@ -5,8 +5,8 @@ project and the conventions that keep the book coherent.
 
 ## Project structure
 
-The book is **one single document** (`main.tex` → `build/main.pdf`), split
-into many files:
+The book is **one single document** (`main.tex` → `build/one_math_book.pdf`),
+split into many files:
 
 - `styles/onemath.sty` — **the only place** where packages are loaded and
   macros/environments are defined. Chapter files must not use `\usepackage`
@@ -25,11 +25,11 @@ solutions directory in the *Solutions* appendix (`solutions/solutions.tex`).
 ## Building
 
 ```sh
-make          # runs latexmk (pdflatex), output in build/main.pdf
+make          # runs latexmk (pdflatex), output in build/one_math_book.pdf
 ```
 
 A pull request must build with **zero errors** and introduce no undefined
-references (`grep -E "undefined" build/main.log` should stay clean).
+references (`grep -E "undefined" build/one_math_book.log` should stay clean).
 
 ## Environments
 
