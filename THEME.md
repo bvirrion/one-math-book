@@ -64,6 +64,9 @@ White A4 page, coordinates in cm from the bottom-left corner:
 - wordmark centered at y = 20.6;
 - title block: 40 pt bold `ocDarkBlue` title (y = 16.4), italic subtitle,
   one-line scope text; short centered quad line under it (x 6.6–14.4);
+- volume line just below the short quad line (y ≈ 11.15): bold serif in
+  `ocDarkBlue`, "Book N: <Volume title>" (each book's entry file defines
+  it as `\bookline`);
 - credits block near y = 6, then version and date;
 - full-width quad bottom band (h = 1.0).
 
