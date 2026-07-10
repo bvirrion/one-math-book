@@ -5,12 +5,19 @@ project and the conventions that keep the book coherent.
 
 ## Project structure
 
-The book is **one single document** (`main.tex` → `build/one_math_book.pdf`),
-split into many files:
+The project is a **series of books** sharing one style and one `parts/`
+tree. Each book has its own entry file at the repository root:
+
+- `one_math_book_primary_middle_school.tex` — Grades 1–9;
+- `one_math_book_high_school.tex` — Grades 10–12;
+- `one_math_book_university_year_1.tex` — Bachelor Year 1.
+
+The shared files:
 
 - `styles/onemath.sty` — **the only place** where packages are loaded and
   macros/environments are defined. Chapter files must not use `\usepackage`
   or define commands.
+- `frontmatter/` — title page, colophon, preface, shared by all books.
 - `parts/<year>/part.tex` — declares the `\part` for a school year and
   `\input`s its chapters.
 - `parts/<year>/NN-slug.tex` — one chapter per file, numbered in reading
@@ -19,17 +26,26 @@ split into many files:
   exercises, same file name.
 
 To add a new year: create `parts/<year>/part.tex` plus chapter files, add
-one `\input` line in the *Parts* section of `main.tex`, and mirror the
-solutions directory in the *Solutions* appendix (`solutions/solutions.tex`).
+one `\input` line in the *Parts* section of the relevant book's entry file,
+and mirror the solutions directory in its *Solutions* appendix
+(`solutions/solutions.tex`). A new book (e.g.\ University Year 2) gets a
+new entry file copied from an existing one, plus a line in `latexmkrc`'s
+`@default_files` and in both GitHub workflows.
+
+**Cross-volume references:** `\cref` only works within one book. Never
+reference a label that lives in another book; name the volume in prose
+instead ("the distance formula, taken up in the High School volume").
 
 ## Building
 
 ```sh
-make          # runs latexmk (pdflatex), output in build/one_math_book.pdf
+make          # runs latexmk (pdflatex), builds every book into build/
 ```
 
+A single book: `latexmk one_math_book_high_school.tex`.
+
 A pull request must build with **zero errors** and introduce no undefined
-references (`grep -E "undefined" build/one_math_book.log` should stay clean).
+references (`grep -E "undefined" build/*.log` should stay clean).
 
 ## Environments
 

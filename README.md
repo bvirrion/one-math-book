@@ -2,57 +2,73 @@
 
 *The One Math Book to Rule Them All.*
 
-A mathematics book, written in English for readers anywhere in the world,
-with the ambition of covering everything **from kindergarten to the end of
-the bachelor's degree** — in a single, coherent volume.
+A series of mathematics books, written in English for readers anywhere in
+the world, with the ambition of covering everything **from kindergarten to
+the end of the bachelor's degree** — as one coherent course, published in
+several volumes:
+
+1. **Primary & Middle School Mathematics** — Grades 1–9;
+2. **High School Mathematics** — Grades 10–12;
+3. **University Mathematics — Year 1**;
+4. **University Mathematics — Year 2** (planned);
+5. **University Mathematics — Year 3** (planned).
 
 The style is concise and rigorous: courses built from **definitions,
 examples, propositions, theorems and methods**, with proofs whenever they
 are accessible at the given level (results admitted without proof are
 explicitly marked), followed by graded **exercises with full solutions**
-collected at the end of the book.
+collected at the end of each book.
 
 ## Current status
 
-| Part | Level | Status |
-|------|-------|--------|
-| Grade 1 (age 6–7) | First year of primary school | ✅ 6 chapters, exercises + solutions |
-| Grade 2 (age 7–8) | Second year of primary school | ✅ 7 chapters, exercises + solutions |
-| Grade 3 (age 8–9) | Third year of primary school | ✅ 7 chapters, exercises + solutions |
-| Grade 4 (age 9–10) | Fourth year of primary school | ✅ 8 chapters, exercises + solutions |
-| Grade 5 (age 10–11) | Last year of primary school | ✅ 8 chapters, exercises + solutions |
-| Grade 6 (age 11–12) | First year of lower secondary school | ✅ 8 chapters, exercises + solutions |
-| Grade 7 (age 12–13) | Second year of lower secondary school | ✅ 9 chapters, exercises + solutions |
-| Grade 8 (age 13–14) | Third year of lower secondary school | ✅ 9 chapters, exercises + solutions |
-| Grade 9 (age 14–15) | Last year of lower secondary school | ✅ 9 chapters, exercises + solutions |
-| Grade 10 (age 15–16) | First year of upper secondary school | ✅ 9 chapters, exercises + solutions |
-| Grade 11 (age 16–17) | Penultimate year of secondary school, advanced track | ✅ 10 chapters, exercises + solutions |
-| Grade 12 (age 17–18) | Final year of secondary school, advanced track | ✅ 16 chapters, exercises + solutions |
-| Bachelor Year 1 (age 18–19) | First post-secondary year (old French MPSI program) | ✅ 25 chapters, exercises + solutions |
-| Other years | Kindergarten, Bachelor Years 2–3 | 🚧 planned |
+| Book | Part | Level | Status |
+|------|------|-------|--------|
+| Primary & Middle School | Grade 1 (age 6–7) | First year of primary school | ✅ 6 chapters, exercises + solutions |
+| Primary & Middle School | Grade 2 (age 7–8) | Second year of primary school | ✅ 7 chapters, exercises + solutions |
+| Primary & Middle School | Grade 3 (age 8–9) | Third year of primary school | ✅ 7 chapters, exercises + solutions |
+| Primary & Middle School | Grade 4 (age 9–10) | Fourth year of primary school | ✅ 8 chapters, exercises + solutions |
+| Primary & Middle School | Grade 5 (age 10–11) | Last year of primary school | ✅ 8 chapters, exercises + solutions |
+| Primary & Middle School | Grade 6 (age 11–12) | First year of lower secondary school | ✅ 8 chapters, exercises + solutions |
+| Primary & Middle School | Grade 7 (age 12–13) | Second year of lower secondary school | ✅ 9 chapters, exercises + solutions |
+| Primary & Middle School | Grade 8 (age 13–14) | Third year of lower secondary school | ✅ 9 chapters, exercises + solutions |
+| Primary & Middle School | Grade 9 (age 14–15) | Last year of lower secondary school | ✅ 9 chapters, exercises + solutions |
+| High School | Grade 10 (age 15–16) | First year of upper secondary school | ✅ 9 chapters, exercises + solutions |
+| High School | Grade 11 (age 16–17) | Penultimate year of secondary school, advanced track | ✅ 10 chapters, exercises + solutions |
+| High School | Grade 12 (age 17–18) | Final year of secondary school, advanced track | ✅ 16 chapters, exercises + solutions |
+| University — Year 1 | Bachelor Year 1 (age 18–19) | First post-secondary year (old French MPSI program) | ✅ 25 chapters, exercises + solutions |
+| Other | Kindergarten, University Years 2–3 | | 🚧 planned |
 
 The lower the grade, the younger the reader it is written for: earlier
 parts use more figures, more detailed worked steps, and gentler
 exercises.
 
-## Building the book
+## Building the books
 
 Requirements: a TeX Live installation with `latexmk` (packages used:
 `tcolorbox`, `pgfplots`, `amsthm`, `cleveref`, `imakeidx`, …).
 
 ```sh
-make            # or just: latexmk
+make            # or just: latexmk — builds all books
 ```
 
-The PDF is produced at `build/one_math_book.pdf`. `make clean` removes auxiliary
-files, `make distclean` removes the whole `build/` directory.
+The PDFs are produced at
+
+```
+build/one_math_book_primary_middle_school.pdf
+build/one_math_book_high_school.pdf
+build/one_math_book_university_year_1.pdf
+```
+
+`make clean` removes auxiliary files, `make distclean` removes the whole
+`build/` directory. To build a single book:
+`latexmk one_math_book_high_school.tex`.
 
 ## Repository layout
 
 ```
-main.tex                  the single entry point of the book
+one_math_book_*.tex       one entry file per book of the series
 styles/onemath.sty        all packages, theorem environments, macros
-frontmatter/              title page, preface
+frontmatter/              title page, preface (shared by all books)
 parts/<year>/part.tex     one \part per school year
 parts/<year>/NN-*.tex     one file per chapter
 parts/<year>/solutions/   solutions, one file per chapter

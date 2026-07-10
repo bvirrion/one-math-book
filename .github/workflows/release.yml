@@ -1,4 +1,4 @@
-name: Build and Release PDF
+name: Build and Release PDFs
 
 on:
   push:
@@ -25,19 +25,25 @@ jobs:
       - name: Compile LaTeX
         uses: xu-cheng/latex-action@v3
         with:
-          root_file: main.tex
+          # One entry file per book of the series.
+          root_file: |
+            one_math_book_primary_middle_school.tex
+            one_math_book_high_school.tex
+            one_math_book_university_year_1.tex
           latexmk_use_lualatex: false
-          # latexmkrc in the repo sets pdflatex mode, build/ output and the
-          # one_math_book jobname.
+          # latexmkrc in the repo sets pdflatex mode and build/ output.
 
       - name: Check for undefined references
         run: |
-          ! grep -E "(Reference|Citation).*undefined" build/one_math_book.log
+          ! grep -E "(Reference|Citation).*undefined" build/*.log
 
-      - name: Name the PDF with the version
-        run: cp build/one_math_book.pdf "one_math_book_${GITHUB_REF_NAME}.pdf"
+      - name: Name the PDFs with the version
+        run: |
+          for slug in primary_middle_school high_school university_year_1; do
+            cp "build/one_math_book_${slug}.pdf" "one_math_book_${slug}_${GITHUB_REF_NAME}.pdf"
+          done
 
-      - name: Create release and attach PDF
+      - name: Create release and attach PDFs
         uses: softprops/action-gh-release@v2
         with:
-          files: one_math_book_${{ github.ref_name }}.pdf
+          files: one_math_book_*_${{ github.ref_name }}.pdf
