@@ -1,0 +1,341 @@
+\chapter{Counting}\label{ch:b1:counting}
+
+Counting finite sets sounds elementary --- and quickly becomes subtle.
+This chapter defines cardinality properly (through bijections, in the
+spirit of \cref{ch:b1:logic}), establishes the handful of counting
+principles from which everything follows, and derives the classical
+counts: lists, permutations, subsets, binomial coefficients.
+
+\section{Cardinality of finite sets}
+
+\begin{definition}[Finite set, cardinality]\label{def:b1:counting:card}
+For $n \in \N^*$, write $\intint{1}{n} = \{1, 2, \dots,
+n\}$. A set $E$ is \emph{finite}\index{finite set} when $E = \emptyset$
+or there is a bijection from $\intint{1}{n}$ onto $E$ for
+some $n \in \N^*$; this $n$ is unique (\cref{thm:b1:counting:welldef})
+and is the \emph{cardinality}\index{cardinality} of $E$, written
+$\abs{E}$ (with $\abs{\emptyset} = 0$).
+\end{definition}
+
+\begin{theorem}[Cardinality is well defined]\label{thm:b1:counting:welldef}
+If $m \neq n$, there is no bijection from $\intint{1}{m}$
+onto $\intint{1}{n}$. More precisely, if $m > n$ there is
+no injection from $\intint{1}{m}$ into $\intint{1}{n}$.
+\end{theorem}
+
+\begin{proof}
+We prove by induction on $n$ the statement: \emph{for all $m > n$,
+there is no injection $\intint{1}{m} \to \intint{1}{n}$}. For $n = 0$ the target is empty and $m \geq 1$: no map
+exists at all. Assume the statement for $n$, and suppose $f \colon
+\intint{1}{m} \to \intint{1}{n+1}$ is an
+injection with $m > n + 1$. If the value $n + 1$ is not attained, $f$
+is an injection into $\intint{1}{n}$, contradicting the
+induction hypothesis. Otherwise $f(a) = n + 1$ for exactly one $a$;
+swap $f(a)$ and $f(m)$ (formally: compose with the transposition of
+the two values), so that the new injection $g$ has $g(m) = n + 1$.
+Then the restriction of $g$ to $\intint{1}{m-1}$ is an
+injection into $\intint{1}{n}$ with $m - 1 > n$ ---
+contradiction again.
+\end{proof}
+
+\begin{corollary}[Pigeonhole principle]\label{cor:b1:counting:pigeonhole}
+If $\abs{E} > \abs{F}$, no map $f \colon E \to F$ is injective: some
+two elements of $E$ share their image\index{pigeonhole principle}.
+\end{corollary}
+
+\begin{proposition}[Injections, surjections and cardinality]\label{prop:b1:counting:injsur}
+Let $E, F$ be finite sets with $\abs{E} = \abs{F}$, and $f \colon E
+\to F$. Then
+\[
+f \text{ injective} \iff f \text{ surjective} \iff f \text{ bijective}.
+\]
+\end{proposition}
+
+\begin{proof}
+Suppose $f$ injective. Then $f$ is a bijection from $E$ onto $f(E)$,
+so $\abs{f(E)} = \abs{E} = \abs{F}$. If $f(E)$ missed a point $y_0$ of
+$F$, then $f$ would be an injection of $E$ into $F \setminus \{y_0\}$,
+a set of cardinality $\abs{F} - 1 < \abs{E}$ --- impossible by the
+pigeonhole principle. So $f(E) = F$: $f$ is surjective, hence
+bijective.
+
+Suppose $f$ surjective. Choose for each $y \in F$ one preimage $s(y)
+\in E$; then $f \circ s = \mathrm{id}_F$, so $s$ is injective
+(\cref{prop:b1:logic:comp}). By the previous paragraph applied to $s$
+(the cardinalities are equal), $s$ is bijective. From $f \circ s =
+\mathrm{id}_F$ we get $f = \mathrm{id}_F \circ s^{-1} = s^{-1}$, so
+$f$ is bijective. Finally, a bijective map is by definition both
+injective and surjective, which closes the cycle of implications.
+\end{proof}
+
+\section{The counting principles}
+
+\begin{proposition}[Sum and product rules]\label{prop:b1:counting:rules}
+Let $E, F$ be finite sets.
+\begin{enumerate}
+  \item If $E \cap F = \emptyset$, then $\abs{E \cup F} = \abs{E} +
+        \abs{F}$; more generally, for a partition of $E$ into pieces
+        $E_1, \dots, E_k$, $\abs{E} = \sum_i \abs{E_i}$.
+  \item In general, $\abs{E \cup F} = \abs{E} + \abs{F} - \abs{E \cap
+        F}$.
+  \item $\abs{E \times F} = \abs{E} \times \abs{F}$.
+  \item The set $F^E$ of all maps from $E$ to $F$ satisfies
+        $\abs{F^E} = \abs{F}^{\abs{E}}$.
+  \item $\abs{\mathcal{P}(E)} = 2^{\abs{E}}$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(1) Concatenate enumerations: if $E = \{x_1, \dots, x_m\}$ and $F =
+\{y_1, \dots, y_n\}$ with no repetition, then $x_1, \dots, x_m, y_1,
+\dots, y_n$ enumerates $E \cup F$ without repetition (disjointness).
+Induction extends this to $k$ pieces.
+
+(2) $E \cup F$ is the disjoint union of $E$ and $F \setminus E$, and
+$F$ is the disjoint union of $F \cap E$ and $F \setminus E$; so
+$\abs{E \cup F} = \abs{E} + \abs{F \setminus E} = \abs{E} + \abs{F} -
+\abs{E \cap F}$.
+
+(3) $E \times F$ is the disjoint union, over $x \in E$, of the sets
+$\{x\} \times F$, each of cardinality $\abs{F}$; apply (1).
+
+(4) A map from $E = \{x_1, \dots, x_m\}$ to $F$ is exactly the choice
+of the $m$-tuple $(f(x_1), \dots, f(x_m)) \in F^m$; this
+correspondence is a bijection, and $\abs{F^m} = \abs{F}^m$ by (3) and
+induction.
+
+(5) Subsets of $E$ correspond bijectively to maps $E \to \{0, 1\}$
+(send $A$ to its indicator function); apply (4).
+\end{proof}
+
+\section{Lists, permutations, subsets}
+
+\begin{definition}[Arrangements, permutations, combinations]\label{def:b1:counting:objects}
+Let $E$ be a set with $\abs{E} = n$ and let $0 \leq k \leq n$.
+\begin{itemize}
+  \item A \emph{$k$-arrangement} of $E$ is an injective $k$-tuple of
+        elements of $E$ (an ordered selection without repetition);
+  \item a \emph{permutation}\index{permutation} of $E$ is a bijection
+        from $E$ to itself --- equivalently, an $n$-arrangement;
+  \item a \emph{$k$-combination} is a subset of $E$ with $k$ elements
+        (an unordered selection without repetition). Their number is
+        written $\binom{n}{k}$, read ``$n$ choose $k$''
+        \index{binomial coefficient}.
+\end{itemize}
+\end{definition}
+
+\begin{theorem}[The three counts]\label{thm:b1:counting:counts}
+With $n = \abs{E}$ and $0 \leq k \leq n$:
+\begin{enumerate}
+  \item the number of $k$-arrangements of $E$ is $n (n-1) \cdots
+        (n-k+1) = \dfrac{n!}{(n-k)!}$;
+  \item the number of permutations of $E$ is $n!$;
+  \item $\dbinom{n}{k} = \dfrac{n!}{k!\,(n-k)!}$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) Choose the first coordinate ($n$ ways), then the second ($n - 1$
+remaining choices), \dots, then the $k$-th ($n - k + 1$ choices).
+Formally, induct on $k$: the set of $k$-arrangements is the disjoint
+union, over the $(k-1)$-arrangements, of the sets of possible last
+coordinates, each of size $n - k + 1$; apply the sum rule.
+
+(2) is (1) with $k = n$.
+
+(3) Each $k$-subset orders into $k!$ distinct $k$-arrangements, and
+every $k$-arrangement arises from exactly one subset: so
+$\frac{n!}{(n-k)!} = \binom nk \cdot k!$.
+\end{proof}
+
+\begin{proposition}[Basic identities]\label{prop:b1:counting:identities}
+For $0 \leq k \leq n$:
+\[
+\binom{n}{k} = \binom{n}{n-k},
+\qquad
+\binom{n}{k} = \binom{n-1}{k-1} + \binom{n-1}{k}
+\quad (1 \leq k \leq n-1),
+\qquad
+\sum_{k=0}^{n} \binom{n}{k} = 2^n .
+\]
+\end{proposition}
+
+\begin{proof}
+First identity: $A \mapsto E \setminus A$ is a bijection between
+$k$-subsets and $(n-k)$-subsets. Pascal's rule\index{Pascal's rule}:
+fix an element $a \in E$; the $k$-subsets split into those containing
+$a$ (choose the $k - 1$ others: $\binom{n-1}{k-1}$) and those avoiding
+$a$ ($\binom{n-1}{k}$). Third identity: both sides count all subsets
+of $E$, split by size on the left
+(\cref{prop:b1:counting:rules}~(1) and (5)).
+\end{proof}
+
+\begin{theorem}[Binomial theorem]\label{thm:b1:counting:binomial}
+For all $a, b$ in a commutative ring (say $\R$ or $\C$) and $n \in \N$:
+\[
+(a + b)^n = \sum_{k=0}^{n} \binom{n}{k} a^k b^{\,n-k} .
+\]
+\end{theorem}
+
+\begin{proof}
+Expanding $(a+b)(a+b)\cdots(a+b)$ distributively yields one term per
+choice, in each factor, of either $a$ or $b$: the term $a^k b^{n-k}$
+appears once for each way of choosing which $k$ of the $n$ factors
+contribute $a$ --- that is, $\binom nk$ times. (Alternatively: induct
+on $n$ using Pascal's rule.)
+\end{proof}
+
+\begin{example}\label{ex:b1:counting:binomial}
+Two classical specializations: $a = b = 1$ recovers $\sum_k \binom nk
+= 2^n$; $a = -1$, $b = 1$ gives $\sum_{k} (-1)^k \binom nk = 0$ for
+$n \geq 1$: among the subsets of a nonempty set, exactly half have
+even cardinality.
+\end{example}
+
+\begin{method}[Which count applies?]\label{met:b1:counting:which}
+Before computing, answer two questions about the selection: does the
+\emph{order} matter, and are \emph{repetitions} allowed?
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{l|c|c}
+ & order matters & order does not matter \\
+\hline
+no repetition & $\dfrac{n!}{(n-k)!}$ & $\dbinom{n}{k}$ \\[6pt]
+repetition allowed & $n^k$ & (\cref{exo:b1:counting:10}) \\
+\end{tabular}
+\end{center}
+Then hunt for a bijection or a partition reducing the problem to these
+model counts; a correct count is a disguised bijection.
+\end{method}
+
+\begin{example}[Poker-style count]\label{ex:b1:counting:poker}
+From a $52$-card deck, the number of $5$-card hands is
+$\binom{52}{5} = 2\,598\,960$. Hands containing exactly one ace:
+choose the ace ($4$ ways) then $4$ cards among the $48$ non-aces:
+$4 \binom{48}{4} = 778\,320$. The product rule applies because the
+choice splits into independent stages.
+\end{example}
+
+\section{Inclusion--exclusion}
+
+\begin{theorem}[Inclusion--exclusion]\label{thm:b1:counting:inclexcl}
+For finite sets $A_1, \dots, A_p$:
+\[
+\Bigl|\, \bigcup_{i=1}^{p} A_i \,\Bigr|
+= \sum_{\emptyset \neq I \subseteq \intint{1}{p}}
+(-1)^{\abs{I}+1} \Bigl|\, \bigcap_{i \in I} A_i \,\Bigr| .
+\]
+For $p = 3$:
+$\abs{A \cup B \cup C} = \abs A + \abs B + \abs C - \abs{A \cap B} -
+\abs{A \cap C} - \abs{B \cap C} + \abs{A \cap B \cap C}$.
+\end{theorem}
+
+\begin{proof}
+Fix an element $x$ of the union and count its contribution to the
+right-hand side. Let $J = \{i : x \in A_i\}$, of cardinality $m \geq
+1$. The element $x$ is counted once in $\abs{\bigcap_{i \in I} A_i}$
+exactly when $\emptyset \neq I \subseteq J$, with sign
+$(-1)^{\abs I + 1}$; its total contribution is
+\[
+\sum_{k=1}^{m} \binom{m}{k} (-1)^{k+1}
+= 1 - \sum_{k=0}^{m} \binom mk (-1)^k = 1 - 0 = 1
+\]
+by \cref{ex:b1:counting:binomial}. So each element of the union is
+counted exactly once.
+\end{proof}
+
+\begin{example}[Derangements]\label{ex:b1:counting:derangement}
+A \emph{derangement} is a permutation with no fixed point. Let $A_i$
+be the set of permutations of $\intint{1}{n}$ fixing $i$;
+then $\abs{\bigcap_{i \in I} A_i} = (n - \abs I)!$, and
+inclusion--exclusion counts the permutations with at least one fixed
+point; the derangements number
+\[
+D_n = n! \sum_{k=0}^{n} \frac{(-1)^k}{k!} .
+\]
+Since $\sum (-1)^k / k! \to \eu^{-1}$ (see \cref{ch:b1:series}), about
+$37\%$ of all permutations are derangements, whatever $n$ is.
+\end{example}
+
+\section{Exercises}
+
+\begin{exercise}[$\star$]\label{exo:b1:counting:1}
+A license plate consists of two letters (A--Z), then three digits, then
+two letters. How many plates are possible? How many with no repeated
+letter among the four?
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:counting:2}
+How many anagrams (rearrangements of the letters, meaningful or not)
+has the word \textsc{orange}? And \textsc{banana}?
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:counting:3}
+A committee of $4$ people is chosen from $7$ women and $5$ men. How
+many committees: in total? with exactly $2$ women? with at least one
+man?
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:counting:4}
+Prove that in any group of $13$ people, two share their birth month;
+and that among any $n + 1$ integers chosen from $\intint{1}{2n}$, two are consecutive. \emph{(Pigeonhole both times: name
+the boxes.)}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:counting:5}
+Compute $\sum_{k=0}^{n} k \binom{n}{k}$. \emph{Hint: differentiate
+$(1 + x)^n$, or use $k \binom nk = n \binom{n-1}{k-1}$ (prove it).}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:counting:6}
+How many strictly increasing maps are there from $\intint{1}{k}$ to $\intint{1}{n}$? Deduce the number of
+increasing (not necessarily strictly) maps. \emph{Hint for the second
+count: $f$ increasing $\mapsto$ $g(i) = f(i) + i - 1$.}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:counting:7}
+(Vandermonde) Prove, by counting $k$-subsets of a set split into two
+blocks of sizes $m$ and $n$:
+\[
+\binom{m+n}{k} = \sum_{j=0}^{k} \binom{m}{j} \binom{n}{k-j} .
+\]
+Deduce $\sum_{j=0}^{n} \binom nj^2 = \binom{2n}{n}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:counting:8}
+How many integers in $\intint{1}{1000}$ are divisible by
+$2$ or $3$ or $5$? (Inclusion--exclusion; $\lfloor 1000/6 \rfloor$
+counts the multiples of $6$, etc.)
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:counting:9}
+Count the surjections from a set of $4$ elements onto a set of $2$
+elements; then onto a set of $3$ elements. \emph{Hint: count the
+non-surjective maps with inclusion--exclusion on the missed values.}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:counting:10}
+(Stars and bars) Prove that the number of $k$-selections of $n$
+objects \emph{with} repetition, order ignored --- equivalently, the
+number of $(x_1, \dots, x_n) \in \N^n$ with $x_1 + \dots + x_n = k$
+--- is $\binom{n + k - 1}{k}$. \emph{Hint: encode a solution as a row
+of $k$ stars and $n - 1$ bars.}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:counting:11}
+Prove the formula of \cref{ex:b1:counting:derangement} for $D_n$ in
+detail, and deduce $n! = \sum_{k=0}^{n} \binom{n}{k} D_{n-k}$ (also
+prove this identity directly by classifying permutations by their
+fixed-point set).
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:counting:12}
+For $n \in \N^*$, prove by a double count of pairs (subset, marked
+element):
+\[
+\sum_{k=1}^{n} k \binom{n}{k} = n\, 2^{n-1},
+\qquad\text{then}\qquad
+\sum_{k=1}^{n} k^2 \binom{n}{k} = n(n+1)\, 2^{n-2} .
+\]
+\emph{For the second: count pairs of marked elements, equal or not.}
+\end{exercise}
