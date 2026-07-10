@@ -1,0 +1,362 @@
+\chapter{Differentiation}\label{ch:b1:derivative}
+
+Derivatives were computed throughout \cref{ch:g12:deriv}; what was
+missing is the chain of theorems that turns computation into
+information about functions: Rolle's theorem, the mean value theorem,
+and their consequences --- monotonicity criteria, Lipschitz bounds,
+convexity. Everything in this chapter concerns functions defined on
+an interval $I$.
+
+\section{The derivative}
+
+\begin{definition}\label{def:b1:derivative:def}
+$f \colon I \to \R$ is \emph{differentiable at $x_0 \in
+I$}\index{derivative} when the difference quotient
+$\frac{f(x) - f(x_0)}{x - x_0}$ has a (finite) limit as $x \to x_0$;
+the limit is written $f'(x_0)$. Equivalently:
+\[
+f(x_0 + h) = f(x_0) + f'(x_0)\,h + h\,\varepsilon(h),
+\qquad \varepsilon(h) \xrightarrow[h \to 0]{} 0 ,
+\]
+the graph then admitting the tangent line $y = f(x_0) + f'(x_0)(x -
+x_0)$. Differentiability at $x_0$ implies continuity at $x_0$ (read
+the display). $f$ is differentiable on $I$ when it is at every point;
+$f$ is of class $C^1$ when moreover $f'$ is continuous, and of
+class $C^k$\index{Ck function@$C^k$ function} when $f$ can be
+differentiated $k$ times with $f^{(k)}$ continuous.
+\end{definition}
+
+\begin{example}\label{ex:b1:derivative:notc1}
+The converse of ``differentiable $\Rightarrow$ continuous'' fails:
+$\abs{\,\cdot\,}$ at $0$. More surprisingly, differentiable does not
+imply $C^1$: the function $f(x) = x^2 \sin\frac 1x$ ($f(0) = 0$) is
+differentiable everywhere, with $f'(0) = 0$, but $f'(x) = 2x
+\sin\frac1x - \cos\frac 1x$ has no limit at $0$
+(\cref{exo:b1:derivative:2}).
+\end{example}
+
+\begin{theorem}[Operations]\label{thm:b1:derivative:operations}
+If $f, g$ are differentiable at $x_0$ (and where the formulas make
+sense):
+\[
+(f + g)' = f' + g', \qquad
+(fg)' = f'g + fg', \qquad
+\Bigl(\frac fg\Bigr)' = \frac{f'g - fg'}{g^2},
+\]
+and if $g$ is differentiable at $f(x_0)$:
+$\;(g \circ f)'(x_0) = g'\bigl(f(x_0)\bigr)\, f'(x_0)$ (chain
+rule\index{chain rule}).
+\end{theorem}
+
+\begin{proof}
+Sum: immediate. Product: write
+\[
+f(x)g(x) - f(x_0)g(x_0)
+= \bigl(f(x) - f(x_0)\bigr) g(x) + f(x_0)\bigl(g(x) - g(x_0)\bigr),
+\]
+divide by $x - x_0$ and let $x \to x_0$ ($g$ is continuous at $x_0$).
+Quotient: treat $\frac 1g$ via $\frac{1/g(x) - 1/g(x_0)}{x - x_0} =
+\frac{-1}{g(x)g(x_0)}\cdot\frac{g(x) - g(x_0)}{x - x_0}$, then apply
+the product rule. Chain rule: with $y_0 = f(x_0)$, define
+$\theta(y) = \frac{g(y) - g(y_0)}{y - y_0}$ for $y \neq y_0$ and
+$\theta(y_0) = g'(y_0)$: $\theta$ is continuous at $y_0$, and for
+$x \neq x_0$,
+\[
+\frac{g(f(x)) - g(f(x_0))}{x - x_0}
+= \theta\bigl(f(x)\bigr)\cdot \frac{f(x) - f(x_0)}{x - x_0}
+\longrightarrow g'(y_0)\, f'(x_0),
+\]
+the first factor by composition of limits (this device handles the
+case $f(x) = f(x_0)$ cleanly, where the naive ``multiply and divide
+by $f(x) - f(x_0)$'' breaks).
+\end{proof}
+
+\begin{theorem}[Derivative of an inverse function]\label{thm:b1:derivative:inverse}
+Let $f$ be continuous and strictly monotonic on $I$, differentiable
+at $x_0$ with $f'(x_0) \neq 0$. Then $f^{-1}$
+(\cref{thm:b1:continuity:bijection}) is differentiable at $y_0 =
+f(x_0)$, with
+\[
+(f^{-1})'(y_0) = \frac{1}{f'(x_0)} = \frac{1}{f'\bigl(f^{-1}(y_0)\bigr)} .
+\]
+If $f'(x_0) = 0$, the inverse has a vertical tangent at $y_0$.
+\end{theorem}
+
+\begin{proof}
+For $y \to y_0$, set $x = f^{-1}(y)$: continuity of $f^{-1}$ gives $x
+\to x_0$, and
+\[
+\frac{f^{-1}(y) - f^{-1}(y_0)}{y - y_0}
+= \frac{x - x_0}{f(x) - f(x_0)}
+= \frac{1}{\dfrac{f(x) - f(x_0)}{x - x_0}}
+\longrightarrow \frac{1}{f'(x_0)} . \qedhere
+\]
+\end{proof}
+
+\section{Rolle and the mean value theorem}
+
+\begin{proposition}[Interior extremum]\label{prop:b1:derivative:fermat}
+If $f$ is differentiable at an \emph{interior} point $x_0$ of $I$ and
+has a local extremum there, then $f'(x_0) = 0$.
+\end{proposition}
+
+\begin{proof}
+Say a local maximum: for small $h > 0$, $\frac{f(x_0 + h) -
+f(x_0)}{h} \leq 0$, giving $f'(x_0) \leq 0$ in the limit; for small
+$h < 0$ the quotient is $\geq 0$, giving $f'(x_0) \geq 0$. (At an
+endpoint, only one sign is available: the conclusion fails there ---
+think of $x$ on $\intcc{0}{1}$.)
+\end{proof}
+
+\begin{theorem}[Rolle]\label{thm:b1:derivative:rolle}
+Let $f$ be continuous on $\intcc{a}{b}$, differentiable on
+$\intoo{a}{b}$, with $f(a) = f(b)$. Then $f'(c) = 0$ for some $c \in
+\intoo{a}{b}$.\index{Rolle's theorem}
+\end{theorem}
+
+\begin{proof}
+By the extreme value theorem (\cref{thm:b1:continuity:evt}), $f$
+attains its maximum and minimum on $\intcc{a}{b}$. If both are
+attained at endpoints, then (since $f(a) = f(b)$) max $=$ min and $f$
+is constant: any interior $c$ works. Otherwise an extremum is
+attained at an interior point $c$, and
+\cref{prop:b1:derivative:fermat} gives $f'(c) = 0$.
+\end{proof}
+
+\begin{theorem}[Mean value theorem]\label{thm:b1:derivative:mvt}
+Let $f$ be continuous on $\intcc{a}{b}$, differentiable on
+$\intoo{a}{b}$. There exists $c \in \intoo{a}{b}$ with
+\[
+f(b) - f(a) = f'(c)\,(b - a) .
+\]
+\emph{Mean value inequality:} if moreover $m \leq f' \leq M$ on
+$\intoo{a}{b}$, then $m(b-a) \leq f(b) - f(a) \leq M(b-a)$; in
+particular $\abs{f'} \leq K$ implies that $f$ is $K$-Lipschitz.
+\index{mean value theorem}
+\end{theorem}
+
+\begin{proof}
+Apply Rolle to $g(x) = f(x) - \frac{f(b) - f(a)}{b - a}(x - a)$: $g$
+is continuous on $\intcc{a}{b}$, differentiable inside, and $g(a) =
+f(a) = g(b)$. At the point $c$ where $g'(c) = 0$: $f'(c) =
+\frac{f(b)-f(a)}{b-a}$. The inequality follows by bounding $f'(c)$;
+the Lipschitz statement applies it to every pair of points.
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=8.2cm, height=5.4cm,
+    xmin=0, xmax=4.6, ymin=0, ymax=3.2,
+    xtick={0.7,2.2,3.9}, xticklabels={$a$,$c$,$b$}, ytick=\empty]
+  \addplot[omDef, very thick, domain=0.7:3.9, samples=100]
+    {0.5 + 1.4*ln(x+0.3)};
+  \addplot[omExo, thick] coordinates {(0.7,1.5) (3.9,2.5)};
+  \addplot[omThm, thick, dashed, domain=1.1:3.4]
+    {2.06 + 0.3125*(x - 2.2)};
+  \fill[omThm] (axis cs:2.2,2.06) circle (1.6pt);
+\end{axis}
+\end{tikzpicture}
+
+{\small The mean value theorem: some tangent (dashed) is parallel to
+the chord (gray). Its abscissa $c$ is where Rolle's theorem, applied
+to the function minus its chord, finds a critical point.}
+\end{omfigure}
+
+\begin{corollary}[Monotonicity criterion]\label{cor:b1:derivative:monotone}
+Let $f$ be continuous on $I$, differentiable on the interior.
+\begin{enumerate}
+  \item $f' \geq 0$ on the interior $\iff$ $f$ is increasing; $f' = 0$
+        $\iff$ $f$ constant.
+  \item If $f' > 0$ except at finitely many points where it vanishes,
+        $f$ is \emph{strictly} increasing.
+\end{enumerate}
+\end{corollary}
+
+\begin{proof}
+If $f' \geq 0$: for $x < y$ in $I$, the mean value theorem on
+$\intcc{x}{y}$ gives $f(y) - f(x) = f'(c)(y - x) \geq 0$. Conversely,
+difference quotients of an increasing function are $\geq 0$, so their
+limits are too. The constant case: apply the previous to $f'$ and
+$-f' \geq 0$. Strict version: $f$ is increasing; equality $f(x) =
+f(y)$ for $x < y$ would freeze $f$ on $\intcc{x}{y}$, forcing $f' =
+0$ there --- infinitely many points.
+\end{proof}
+
+\begin{theorem}[Leibniz formula]\label{thm:b1:derivative:leibniz}
+If $f, g$ are $n$ times differentiable, so is $fg$,
+and\index{Leibniz formula}
+\[
+(fg)^{(n)} = \sum_{k=0}^{n} \binom nk f^{(k)}\, g^{(n-k)} .
+\]
+\end{theorem}
+
+\begin{proof}
+Induction on $n$, exactly parallel to the binomial theorem: the step
+differentiates the sum and regroups with Pascal's rule
+(\cref{prop:b1:counting:identities}).
+\end{proof}
+
+\section{Convexity}
+
+\begin{definition}\label{def:b1:derivative:convex}
+$f \colon I \to \R$ is \emph{convex}\index{convex function} when
+every chord lies above the graph:
+\[
+\forall x, y \in I,\ \forall t \in \intcc{0}{1}, \quad
+f\bigl(tx + (1-t)y\bigr) \leq t f(x) + (1-t) f(y).
+\]
+($f$ is \emph{concave} when $-f$ is convex.)
+\end{definition}
+
+\begin{theorem}[Differential characterizations]\label{thm:b1:derivative:convexchar}
+Let $f$ be differentiable on $I$. The following are equivalent:
+\begin{enumerate}
+  \item $f$ is convex;
+  \item $f'$ is increasing on $I$;
+  \item the graph lies above every tangent: $f(y) \geq f(x) +
+        f'(x)(y - x)$ for all $x, y \in I$.
+\end{enumerate}
+If $f$ is twice differentiable: $f$ convex $\iff f'' \geq 0$.
+\end{theorem}
+
+\begin{proof}
+(1 $\Rightarrow$ 3) Convexity written as $\frac{f(x + t(y-x)) -
+f(x)}{t} \leq f(y) - f(x)$ for $t \in \intoc{0}{1}$; let $t \to 0^+$:
+$f'(x)(y - x) \leq f(y) - f(x)$.
+
+(3 $\Rightarrow$ 2) For $x < y$, the two tangent inequalities at $x$
+and at $y$ give $f'(x)(y-x) \leq f(y) - f(x) \leq f'(y)(y - x)$,
+hence $f'(x) \leq f'(y)$.
+
+(2 $\Rightarrow$ 1) Fix $x < y$ and $t \in \intoo{0}{1}$, and let $z
+= tx + (1-t)y \in \intoo{x}{y}$. By the mean value theorem on
+$\intcc{x}{z}$ and $\intcc{z}{y}$: there are $c_1 < z < c_2$ with
+\[
+\frac{f(z) - f(x)}{z - x} = f'(c_1) \leq f'(c_2)
+= \frac{f(y) - f(z)}{y - z} ,
+\]
+and clearing denominators ($z - x = (1-t)(y-x)$, $y - z = t(y-x)$)
+rearranges exactly into the convexity inequality.
+
+Twice differentiable case: $f'' \geq 0 \iff f'$ increasing
+(\cref{cor:b1:derivative:monotone}).
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=8.2cm, height=5.6cm,
+    xmin=-2.4, xmax=2.6, ymin=-0.8, ymax=3.4,
+    xtick=\empty, ytick=\empty]
+  \addplot[omDef, very thick, domain=-2.1:2.3, samples=100]
+    {0.5*x*x};
+  \addplot[omExo, thick] coordinates {(-1.6,1.28) (2,2)};
+  \addplot[omThm, thick, dashed, domain=-1.2:2.4] {0.72*(x-0.72)+0.2592};
+\end{axis}
+\end{tikzpicture}
+
+{\small Convexity, twice: every chord (gray) lies above the graph,
+and the graph lies above every tangent (dashed).}
+\end{omfigure}
+
+\begin{example}[Classical convexity inequalities]\label{ex:b1:derivative:convexineq}
+$\exp$ is convex ($\exp'' = \exp > 0$): its tangent at $0$ gives
+$\eu^x \geq 1 + x$ for all $x$. $\ln$ is concave: its tangent at $1$
+gives $\ln x \leq x - 1$; its chords give, for $0 < a \leq b$, the
+inequality between geometric and arithmetic means: taking $t =
+\frac12$ in concavity,
+\[
+\ln\frac{a + b}{2} \geq \frac{\ln a + \ln b}{2} = \ln\sqrt{ab},
+\qquad\text{so}\qquad
+\sqrt{ab} \leq \frac{a+b}{2} .
+\]
+The general arithmetic--geometric inequality is
+\cref{exo:b1:derivative:9}.
+\end{example}
+
+\section{Exercises}
+
+\begin{exercise}[$\star$]\label{exo:b1:derivative:1}
+Differentiate (specifying the domains): $x^x$;
+$\;\ln\bigl(x + \sqrt{x^2+1}\bigr)$; $\;\arctan\frac{1}{x}$;
+$\;\sqrt{1 + \eu^{2x}}$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:derivative:2}
+Complete \cref{ex:b1:derivative:notc1}: prove that $f(x) = x^2
+\sin\frac1x$, $f(0) = 0$, is differentiable at $0$ with $f'(0) = 0$,
+and that $f'$ has no limit at $0$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:derivative:3}
+Using the mean value theorem or the tangent inequalities, prove that
+for all $x > 0$:
+\[
+\frac{x}{1 + x} < \ln(1 + x) < x .
+\]
+Deduce $\lim_{n\to\infty} \bigl(1 + \frac xn\bigr)^n = \eu^x$ for
+every $x > 0$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:derivative:4}
+Let $P$ be a real polynomial with $k$ distinct real roots. Prove that
+$P'$ has at least $k - 1$ distinct real roots, interlaced with those
+of $P$. Deduce that if $P$ has all its roots real, so does $P'$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:derivative:5}
+Let $f$ be differentiable on $\R$ with $f' (x)\to \ell$ as $x \to
++\infty$. Prove that $\frac{f(x)}{x} \to \ell$ \emph{(mean value
+theorem on $\intcc{A}{x}$)}. Does $f(x+1) - f(x) \to \ell$ hold too?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:derivative:6}
+(A discrete Rolle) Let $f$ be $n$ times differentiable on $I$ and
+vanish at $n + 1$ distinct points. Prove that $f^{(n)}$ vanishes at
+least once. Application: a polynomial of degree $\leq n$ vanishing at
+$n+1$ points is zero (again).
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:derivative:7}
+Let $f$ be twice differentiable on $\intcc{a}{b}$ with $f(a) = f(b)
+= 0$ and $f(x_0) > 0$ for some interior $x_0$. Prove that $f''(c) <
+0$ for some $c \in \intoo{a}{b}$. \emph{(Two mean value theorems and
+a comparison of slopes.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:derivative:8}
+Study the function $f(x) = \dfrac{\ln x}{x}$ on
+$\intoo{0}{+\infty}$: variations, limits, maximum. Deduce that $a^b
+> b^a$ for all reals $\eu \leq a < b$, and settle the famous special
+case: which of $\eu^\pi$, $\pi^\eu$ is larger? Check against the
+small integer pairs $(2,3)$ and $(2,4)$: why do they behave
+differently?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:derivative:9}
+(Arithmetic--geometric inequality) Using the concavity of $\ln$ with
+general weights (Jensen's inequality for $n$ points, to be proved by
+induction on $n$), show that for positive reals $a_1, \dots, a_n$:
+\[
+\sqrt[n]{a_1 a_2 \cdots a_n} \leq \frac{a_1 + \dots + a_n}{n},
+\]
+with equality iff all $a_i$ are equal.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:derivative:10}
+(Darboux: derivatives take intermediate values) Let $f$ be
+differentiable on $I$ and $a < b$ in $I$ with $f'(a) < v < f'(b)$.
+By considering $g(x) = f(x) - vx$ and the point where $g$ attains
+its minimum on $\intcc{a}{b}$, prove that $f'(c) = v$ for some $c
+\in \intoo{a}{b}$ --- even though $f'$ need not be continuous
+(\cref{exo:b1:derivative:2}).
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:derivative:11}
+Let $f \colon \R \to \R$ be differentiable with $\abs{f'(x)} \leq k
+< 1$ for all $x$ (a \emph{contraction}). Prove that $f$ has exactly
+one fixed point $\ell$, and that every sequence $u_{n+1} = f(u_n)$
+converges to $\ell$ with $\abs{u_n - \ell} \leq k^n\abs{u_0 -
+\ell}$. \emph{(Existence: apply the intermediate value theorem to
+$f(x) - x$ on a large segment, using the Lipschitz bound; or use
+completeness with the Cauchy criterion.)}
+\end{exercise}
