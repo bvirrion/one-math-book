@@ -28,7 +28,8 @@ collected at the end of the book.
 | Grade 10 (age 15–16) | First year of upper secondary school | ✅ 9 chapters, exercises + solutions |
 | Grade 11 (age 16–17) | Penultimate year of secondary school, advanced track | ✅ 10 chapters, exercises + solutions |
 | Grade 12 (age 17–18) | Final year of secondary school, advanced track | ✅ 16 chapters, exercises + solutions |
-| Other years | Kindergarten, Bachelor Years 1–3 | 🚧 planned |
+| Bachelor Year 1 (age 18–19) | First post-secondary year (old French MPSI program) | ✅ 25 chapters, exercises + solutions |
+| Other years | Kindergarten, Bachelor Years 2–3 | 🚧 planned |
 
 The lower the grade, the younger the reader it is written for: earlier
 parts use more figures, more detailed worked steps, and gentler

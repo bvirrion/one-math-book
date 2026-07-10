@@ -1,0 +1,279 @@
+\chapter{Matrices}\label{ch:b1:matrices}
+
+A matrix is a linear map written in coordinates. This chapter sets
+up the dictionary --- composition becomes matrix product, bijectivity
+becomes invertibility, change of basis becomes conjugation --- and
+the algorithmic side: row operations, computation of ranks and
+inverses. First met in \cref{ch:g12:matrix}, matrices are now
+grounded in the theory of
+\cref{ch:b1:vspaces,ch:b1:findim,ch:b1:linmaps}.
+
+\section{Matrices and linear maps}
+
+\begin{definition}\label{def:b1:matrices:def}
+$\mathcal{M}_{n,p}(K)$ is the vector space of $n \times p$ arrays $A
+= (a_{ij})$ of scalars ($i$: row, $j$: column), of dimension $np$
+(basis: the matrices $E_{ij}$ with a single $1$). Given bases
+$\mathcal{B} = (e_1, \dots, e_p)$ of $E$ and $\mathcal{C}$ of $F$
+($\dim F = n$), the \emph{matrix of $u \in \mathcal{L}(E, F)$} is
+the array whose $j$-th column lists the coordinates of $u(e_j)$ in
+$\mathcal{C}$:
+\[
+\operatorname{Mat}_{\mathcal{B},\mathcal{C}}(u) = (a_{ij}),
+\qquad u(e_j) = \sum_{i=1}^{n} a_{ij}\, f_i .
+\]
+The map $u \mapsto \operatorname{Mat}_{\mathcal{B},\mathcal{C}}(u)$
+is an isomorphism from $\mathcal{L}(E, F)$ onto
+$\mathcal{M}_{n,p}(K)$ (\cref{prop:b1:linmaps:basis}: a linear map
+is exactly a choice of images of the $e_j$).
+\end{definition}
+
+\begin{definition}[Product]\label{def:b1:matrices:product}
+For $A \in \mathcal{M}_{n,p}$ and $B \in \mathcal{M}_{p,q}$:
+\[
+(AB)_{ik} = \sum_{j=1}^{p} a_{ij}\, b_{jk}
+\qquad (1 \leq i \leq n,\ 1 \leq k \leq q).
+\]
+This is precisely the matrix of the composition:
+$\operatorname{Mat}(v \circ u) = \operatorname{Mat}(v)\,
+\operatorname{Mat}(u)$ (bases matching in the middle). Similarly,
+if $X$ is the column of coordinates of $x$, the column of $u(x)$ is
+$AX$.
+\end{definition}
+
+\begin{proof}[Proof of the composition formula]
+\[
+v(u(e_k)) = v\Bigl(\sum_j b_{jk} f_j\Bigr) = \sum_j b_{jk}\, v(f_j)
+= \sum_j b_{jk} \sum_i a_{ij}\, g_i
+= \sum_i \Bigl(\sum_j a_{ij} b_{jk}\Bigr) g_i . \qedhere
+\]
+\end{proof}
+
+\begin{proposition}[The algebra $\mathcal{M}_n(K)$]\label{prop:b1:matrices:ring}
+Square matrices $\mathcal{M}_n(K)$ form a (non-commutative for $n
+\geq 2$) ring, with identity $I_n$; its group of units is the
+\emph{general linear group}\index{general linear group}
+$GL_n(K)$, corresponding to bijective endomorphisms. For $A, B \in
+\mathcal{M}_n(K)$:
+\[
+AB = I_n \implies A \in GL_n(K) \text{ and } B = A^{-1}
+\]
+(one-sided inverses are two-sided, by
+\cref{cor:b1:linmaps:samedim}).
+\end{proposition}
+
+\begin{proof}
+Ring axioms transport from $\mathcal{L}(E)$ through the
+isomorphism; non-commutativity: $E_{12}E_{21} = E_{11} \neq E_{22}
+= E_{21}E_{12}$. If $AB = I_n$: the endomorphism $a$ of $A$
+satisfies $a \circ b = \mathrm{id}$, so $a$ is surjective, hence
+bijective in finite dimension (\cref{cor:b1:linmaps:samedim}), and
+$b = a^{-1}$.
+\end{proof}
+
+\begin{definition}[Transpose; trace]\label{def:b1:matrices:transpose}
+The \emph{transpose} of $A = (a_{ij}) \in \mathcal{M}_{n,p}$ is $A^{\mathsf T}
+= (a_{ji}) \in \mathcal{M}_{p,n}$; it satisfies $(AB)^{\mathsf T} = B^{\mathsf T}
+A^{\mathsf T}$ and $(A^{\mathsf T})^{\mathsf T} = A$. The
+\emph{trace}\index{trace} of a square matrix is $\operatorname{tr} A
+= \sum_i a_{ii}$; it is linear, and
+\[
+\operatorname{tr}(AB) = \operatorname{tr}(BA)
+\qquad (A \in \mathcal{M}_{n,p},\ B \in \mathcal{M}_{p,n}).
+\]
+\end{definition}
+
+\begin{proof}[Proof of the trace identity]
+$\operatorname{tr}(AB) = \sum_i \sum_j a_{ij} b_{ji}$ and
+$\operatorname{tr}(BA) = \sum_j \sum_i b_{ji} a_{ij}$: the same
+double sum.
+\end{proof}
+
+\section{Change of basis}
+
+\begin{definition}\label{def:b1:matrices:changeofbasis}
+Let $\mathcal{B}, \mathcal{B}'$ be bases of $E$. The \emph{change of
+basis matrix}\index{change of basis} $P =
+P_{\mathcal{B}\to\mathcal{B}'}$ has for columns the coordinates of
+the \emph{new} basis vectors in the \emph{old} basis. It is
+invertible, $P^{-1} = P_{\mathcal{B}'\to\mathcal{B}}$, and
+coordinates transform by $X = PX'$ (old $=$ $P\,\cdot$ new).
+\end{definition}
+
+\begin{theorem}[Change of basis for a map]\label{thm:b1:matrices:conjugation}
+Let $u \in \mathcal{L}(E)$ with matrix $A$ in $\mathcal{B}$ and $A'$
+in $\mathcal{B}'$, and $P = P_{\mathcal{B}\to\mathcal{B}'}$. Then
+\[
+A' = P^{-1} A\, P .
+\]
+Two matrices related this way are \emph{similar}\index{similar
+matrices}. (For $u \colon E \to F$ with two pairs of bases, the
+formula is $A' = Q^{-1} A P$ --- \emph{equivalent}
+matrices\index{equivalent matrices}.)
+\end{theorem}
+
+\begin{proof}
+For any $x$: $X = PX'$ and the image satisfies $Y = AX$, $Y = PY'$.
+So $PY' = APX'$, i.e.\ $Y' = (P^{-1}AP)X'$ for all $X'$: the matrix
+of $u$ in the new basis is $P^{-1}AP$ (take for $X'$ the canonical
+columns).
+\end{proof}
+
+\begin{theorem}[Rank normal form]\label{thm:b1:matrices:rank}
+The \emph{rank} of a matrix (the rank of its columns, equivalently
+of the associated linear map) is the only invariant of equivalence:
+every $A \in \mathcal{M}_{n,p}$ of rank $r$ is equivalent to
+\[
+J_r = \begin{pmatrix} I_r & 0 \\ 0 & 0 \end{pmatrix},
+\]
+and $\operatorname{rk}(A^{\mathsf T}) = \operatorname{rk}(A)$: row rank
+equals column rank.
+\end{theorem}
+
+\begin{proof}
+Let $u \colon E \to F$ have rank $r$. Choose a supplementary $S$ of
+$\ker u$ ($\dim S = r$, \cref{thm:b1:linmaps:ranknullity}) with
+basis $(e_1, \dots, e_r)$, completed by a basis of $\ker u$ into a
+basis of $E$; the images $f_i = u(e_i)$, $i \leq r$, form a basis of
+$\operatorname{im} u$ (the restriction is an isomorphism), completed
+into a basis of $F$. In these bases the matrix of $u$ is exactly
+$J_r$. So $A = Q J_r P^{-1}$ for invertible $P, Q$.
+
+Transposing: $A^{\mathsf T} = (P^{-1})^{\mathsf T} J_r^{\mathsf T} Q^{\mathsf T}$
+with $J_r^{\mathsf T}$ of the same form (rank $r$) and the outer
+factors invertible (transpose of invertible is invertible, from
+$(AB)^{\mathsf T} = B^{\mathsf T}A^{\mathsf T}$ applied to $AA^{-1} = I$):
+$\operatorname{rk} A^{\mathsf T} = r$.
+\end{proof}
+
+\section{Row operations}
+
+\begin{method}[Gaussian elimination on matrices]\label{met:b1:matrices:gauss}
+The three \emph{elementary row operations}\index{row operations} ---
+swap two rows, multiply a row by $\lambda \neq 0$, add a multiple of
+a row to another --- do not change the rank (each is left
+multiplication by an invertible matrix). Algorithm: create a pivot
+(leftmost nonzero entry), clear its column below, move to the next
+row and column; the number of pivots of the resulting echelon form
+is the rank.
+
+\emph{Inverse computation:} run the algorithm on the block $(A \mid
+I_n)$ until the left block becomes $I_n$ (possible iff $A$ is
+invertible); the right block is then $A^{-1}$ --- indeed the product
+of the elementary matrices used equals $A^{-1}$.
+\end{method}
+
+\begin{example}\label{ex:b1:matrices:inverse}
+$A = \begin{pmatrix} 1 & 2 \\ 3 & 4 \end{pmatrix}$: reduce $(A \mid
+I_2)$:
+\[
+\begin{pmatrix} 1 & 2 & 1 & 0\\ 3 & 4 & 0 & 1 \end{pmatrix}
+\to
+\begin{pmatrix} 1 & 2 & 1 & 0\\ 0 & -2 & -3 & 1 \end{pmatrix}
+\to
+\begin{pmatrix} 1 & 0 & -2 & 1\\ 0 & 1 & \tfrac32 & -\tfrac12
+\end{pmatrix},
+\]
+(operations: $L_2 \leftarrow L_2 - 3L_1$; then $L_1 \leftarrow L_1
++ L_2$, $L_2 \leftarrow -\frac12 L_2$). So $A^{-1} =
+\begin{pmatrix} -2 & 1 \\ \tfrac32 & -\tfrac12\end{pmatrix}$.
+\emph{Check:} $AA^{-1} = I_2$.
+\end{example}
+
+\begin{example}[Computing powers]\label{ex:b1:matrices:powers}
+$A = \begin{pmatrix} 1 & 1 \\ 0 & 1\end{pmatrix} = I + N$ with $N =
+E_{12}$, $N^2 = 0$. Since $I$ and $N$ commute, the binomial theorem
+(\cref{prop:b1:structures:binomial}) truncates:
+\[
+A^k = I + kN = \begin{pmatrix} 1 & k \\ 0 & 1 \end{pmatrix}
+\qquad (k \in \N, \text{ and } k \in \Z \text{ using } A^{-1} = I -
+N).
+\]
+\end{example}
+
+\section{Exercises}
+
+\begin{exercise}[$\star$]\label{exo:b1:matrices:1}
+Let $A = \begin{pmatrix} 1 & 2 \\ 0 & 1 \end{pmatrix}$ and $B =
+\begin{pmatrix} 0 & 1 \\ 1 & 0\end{pmatrix}$. Compute $AB$, $BA$,
+$A^2 - B^2$ and $(A+B)(A-B)$; explain why the last two differ.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:matrices:2}
+Compute the rank of
+\[
+M = \begin{pmatrix}
+1 & 2 & 3\\
+2 & 4 & 6\\
+1 & 1 & 1
+\end{pmatrix},
+\qquad
+N = \begin{pmatrix}
+1 & 1 & 0 & 2\\
+0 & 1 & 1 & 1\\
+1 & 2 & 1 & 3
+\end{pmatrix}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:matrices:3}
+Invert, by row reduction, $A = \begin{pmatrix} 1 & 0 & 1\\ 2 & 1 &
+1\\ 1 & 1 & 1 \end{pmatrix}$, and check on one product.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:matrices:4}
+Write the matrix, in the canonical basis of $\R_2[X]$, of the
+endomorphism $u(P) = P(X + 1)$. Explain, without computation, why
+it is invertible, and give the matrix of $u^{-1}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:matrices:5}
+Let $A = \begin{pmatrix} 2 & 1 \\ 0 & 2\end{pmatrix}$. Write $A =
+2I + N$, compute $N^2$, and deduce $A^k$ for all $k \in \N$ by the
+binomial theorem.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:matrices:6}
+Prove that there are no matrices $A, B \in \mathcal{M}_n(K)$ (with
+$K = \R$ or $\C$) such that $AB - BA = I_n$. \emph{(Take traces.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:matrices:7}
+A matrix $A$ is \emph{nilpotent} when $A^m = 0$ for some $m$. Prove
+that $I - A$ is then invertible, with
+\[
+(I - A)^{-1} = I + A + A^2 + \dots + A^{m-1} .
+\]
+Application: invert $\begin{pmatrix} 1 & 2 & 3\\ 0 & 1 & 2\\ 0 & 0 &
+1\end{pmatrix}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:matrices:8}
+Let $A \in \mathcal{M}_n(\R)$ satisfy $A^2 = A$ (idempotent). Prove
+that $\operatorname{tr} A = \operatorname{rk} A$. \emph{(Interpret
+$A$ as a projection and choose an adapted basis;
+\cref{thm:b1:matrices:conjugation} says the trace is
+basis-independent since $\operatorname{tr}(P^{-1}MP) =
+\operatorname{tr} M$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:matrices:9}
+Let $J \in \mathcal{M}_n(\R)$ be the all-ones matrix. Compute $J^2$,
+and deduce, for $a, b \in \R$, the condition of invertibility of $M
+= aI + bJ$ together with $M^{-1}$ \emph{(look for an inverse of the
+same form $\alpha I + \beta J$)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:matrices:10}
+(Rank inequalities) For $A, B \in \mathcal{M}_n(K)$, prove
+\[
+\operatorname{rk}(A + B) \leq \operatorname{rk} A +
+\operatorname{rk} B,
+\qquad
+\operatorname{rk}(AB) \geq \operatorname{rk} A + \operatorname{rk}
+B - n .
+\]
+\emph{(For the second --- Sylvester's inequality --- apply
+rank--nullity to the restriction of the map of $A$ to
+$\operatorname{im} B$.)}
+\end{exercise}
