@@ -1,0 +1,352 @@
+\chapter{Integer Arithmetic}\label{ch:b1:arith}
+
+Arithmetic --- the study of divisibility in $\Z$ --- was begun in
+\cref{ch:g12:arith}. This chapter rebuilds it completely from the
+Euclidean division, with full proofs: greatest common divisor and the
+Euclidean algorithm, Bézout's identity and Gauss's lemma, prime
+factorization, and the calculus of congruences up to Fermat's little
+theorem. Beyond its own charm, this material is the model that
+\cref{ch:b1:poly} imitates for polynomials.
+
+\section{Divisibility and Euclidean division}
+
+\begin{definition}[Divisibility]\label{def:b1:arith:divides}
+For $a, b \in \Z$, $b$ \emph{divides} $a$ (written $b \mid
+a$)\index{divisibility} when $a = bq$ for some $q \in \Z$. Basic
+consequences: if $b \mid a$ and $b \mid a'$ then $b \mid (ua + va')$
+for all $u, v \in \Z$; if $b \mid a$ and $a \neq 0$ then $\abs b \leq
+\abs a$; and $a \mid b$ together with $b \mid a$ force $b = \pm a$.
+\end{definition}
+
+\begin{theorem}[Euclidean division]\label{thm:b1:arith:division}
+For all $a \in \Z$ and $b \in \N^*$, there is exactly one pair $(q, r)
+\in \Z \times \N$ with
+\[
+a = bq + r, \qquad 0 \leq r < b .
+\]
+\end{theorem}
+
+\begin{proof}
+\emph{Existence.} The set $A = \{a - bk : k \in \Z\} \cap \N$ is a
+nonempty subset of $\N$ (take $k = -\abs a$: $a + b\abs a \geq a +
+\abs a \geq 0$). Let $r = a - bq$ be its least element. If $r \geq b$,
+then $r - b = a - b(q+1)$ would be a smaller element of $A$:
+contradiction. So $0 \leq r < b$.
+
+\emph{Uniqueness.} If $bq + r = bq' + r'$ with $0 \leq r, r' < b$,
+then $b(q - q') = r' - r$ and $\abs{r' - r} < b$: the multiple of $b$
+in the left-hand side must be $0$, so $q = q'$ and $r = r'$.
+\end{proof}
+
+\section{Greatest common divisor}
+
+\begin{theorem}[Subgroups of $\Z$; existence of the gcd]\label{thm:b1:arith:gcd}
+\begin{enumerate}
+  \item Every subgroup of $(\Z, +)$ is of the form $n\Z = \{nk : k
+        \in \Z\}$ for a unique $n \in \N$.
+  \item For $a, b \in \Z$ not both zero, the set $a\Z + b\Z = \{au +
+        bv : u, v \in \Z\}$ is a subgroup of $\Z$, hence equals
+        $d\,\Z$ for a unique $d \in \N^*$. This $d$ is the
+        \emph{greatest common divisor}\index{greatest common divisor}
+        $\gcd(a, b)$: it divides $a$ and $b$, and every common
+        divisor of $a$ and $b$ divides $d$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) Let $H \subseteq \Z$ be a subgroup (nonempty, stable under
+subtraction; the formal definition is in \cref{ch:b1:structures},
+and only these two properties are used). If $H = \{0\}$, take $n = 0$.
+Otherwise $H$ contains a nonzero element and its opposite, hence a
+smallest strictly positive element $n$. Then $n\Z \subseteq H$. For $x
+\in H$, write $x = nq + r$ with $0 \leq r < n$
+(\cref{thm:b1:arith:division}); $r = x - nq \in H$, and minimality of
+$n$ forces $r = 0$: $x \in n\Z$. Uniqueness: $n$ is the least positive
+element of $n\Z$.
+
+(2) $a\Z + b\Z$ contains $0$ and is stable under subtraction, so it is
+$d\Z$ with $d \geq 1$ (it contains $a$ or $b$ nonzero). Since $a, b
+\in d\Z$, $d$ divides both. And if $c$ divides $a$ and $b$, then $c$
+divides every $au + bv$ --- in particular $c \mid d$, since $d \in a\Z
++ b\Z$. This is the property announced (and it implies $\abs c \leq
+d$, so $d$ deserves the name \emph{greatest} common divisor).
+\end{proof}
+
+\begin{corollary}[Bézout's identity]\label{cor:b1:arith:bezout}
+For $a, b$ not both zero, there exist $u, v \in \Z$ with
+\[
+au + bv = \gcd(a, b) .
+\]
+In particular ($\gcd(a,b) = 1$, the \emph{coprime}\index{coprime}
+case): $a$ and $b$ are coprime if and only if $au + bv = 1$ has a
+solution.
+\end{corollary}
+
+\begin{proof}
+$\gcd(a,b) = d \in d\Z = a\Z + b\Z$. For the equivalence: if
+$\gcd(a,b) = 1$, Bézout provides the solution; conversely $au + bv =
+1$ forces every common divisor of $a, b$ to divide $1$.
+\end{proof}
+
+\begin{method}[Euclidean algorithm, extended]\label{met:b1:arith:euclid}
+To compute $\gcd(a, b)$ ($a > b > 0$): divide $a = bq + r$; then
+$\gcd(a, b) = \gcd(b, r)$ (common divisors of $(a,b)$ and of $(b,r)$
+coincide, since $r = a - bq$); iterate until the remainder is $0$; the
+last nonzero remainder is the gcd\index{Euclidean algorithm}. Running
+the divisions backwards (or maintaining the coefficients on the way
+down) produces a Bézout pair $(u, v)$.
+\end{method}
+
+\begin{example}\label{ex:b1:arith:euclid}
+$\gcd(120, 23)$: $120 = 5 \times 23 + 5$; $23 = 4 \times 5 + 3$; $5 =
+1\times 3 + 2$; $3 = 1 \times 2 + 1$; $2 = 2 \times 1 + 0$. So
+$\gcd = 1$. Backwards:
+\begin{align*}
+1 &= 3 - 2 = 3 - (5 - 3) = 2\times 3 - 5 = 2(23 - 4\times 5) - 5 \\
+&= 2 \times 23 - 9 \times 5 = 2\times 23 - 9(120 - 5\times 23)
+= 47 \times 23 - 9 \times 120 .
+\end{align*}
+Check: $47 \times 23 = 1081$, $9 \times 120 = 1080$.
+\end{example}
+
+\begin{theorem}[Gauss's lemma and consequences]\label{thm:b1:arith:gauss}
+Let $a, b, c \in \Z$.
+\begin{enumerate}
+  \item (Gauss's lemma\index{Gauss's lemma}) If $a \mid bc$ and
+        $\gcd(a, b) = 1$, then $a \mid c$.
+  \item If $a \mid c$, $b \mid c$ and $\gcd(a,b) = 1$, then $ab \mid
+        c$.
+  \item If $\gcd(a, b) = \gcd(a, c) = 1$, then $\gcd(a, bc) = 1$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) Bézout: $au + bv = 1$. Multiply by $c$: $acu + bcv = c$. Both
+terms are divisible by $a$ (the second because $a \mid bc$), so $a
+\mid c$.
+
+(2) Write $c = aq$; from $b \mid aq$ and $\gcd(a, b) = 1$, point (1)
+gives $b \mid q$, so $ab \mid aq = c$.
+
+(3) $au + bv = 1$ and $au' + cv' = 1$; multiplying, $a(\cdots) +
+bc\,vv' = 1$, a Bézout relation for $(a, bc)$.
+\end{proof}
+
+\begin{definition}[Least common multiple]\label{def:b1:arith:lcm}
+$\operatorname{lcm}(a, b)$\index{least common multiple} is the
+generator in $\N$ of the subgroup $a\Z \cap b\Z$: it is a common
+multiple of $a$ and $b$ that divides every common multiple, and for
+$a, b \in \N^*$,
+\[
+\gcd(a,b) \times \operatorname{lcm}(a,b) = ab
+\qquad (\text{proof in } \cref{exo:b1:arith:5}).
+\]
+\end{definition}
+
+\section{Prime numbers}
+
+\begin{definition}\label{def:b1:arith:prime}
+An integer $p \geq 2$ is \emph{prime}\index{prime number} when its
+only positive divisors are $1$ and $p$. For $p$ prime and $a \in \Z$:
+either $p \mid a$, or $\gcd(p, a) = 1$. Consequently
+(\cref{thm:b1:arith:gauss}), \emph{Euclid's lemma} holds: if $p \mid
+ab$ then $p \mid a$ or $p \mid b$.
+\end{definition}
+
+\begin{theorem}[Euclid]\label{thm:b1:arith:euclidprimes}
+There are infinitely many primes.
+\end{theorem}
+
+\begin{proof}
+Every integer $n \geq 2$ has a prime divisor: its smallest divisor
+$\geq 2$ is prime (a proper factorization of it would produce a
+smaller divisor of $n$). Now suppose $p_1, \dots, p_k$ were all the
+primes, and let $N = p_1 p_2 \cdots p_k + 1 \geq 2$. Some prime $p_i$
+divides $N$; but $p_i$ also divides $N - 1 = p_1\cdots p_k$, so $p_i
+\mid 1$ --- absurd.
+\end{proof}
+
+\begin{theorem}[Fundamental theorem of arithmetic]\label{thm:b1:arith:fta}
+Every integer $n \geq 2$ is a product of primes, and the factorization
+\[
+n = p_1^{\alpha_1} p_2^{\alpha_2} \cdots p_k^{\alpha_k}
+\qquad (p_1 < p_2 < \dots < p_k \text{ primes},\ \alpha_i \in \N^*)
+\]
+is unique.\index{prime factorization}
+\end{theorem}
+
+\begin{proof}
+\emph{Existence} by strong induction (\cref{thm:b1:logic:induction}):
+$n = 2$ is prime; for $n > 2$, either $n$ is prime, or $n = ab$ with
+$2 \leq a, b < n$, and the induction hypothesis factors $a$ and $b$.
+
+\emph{Uniqueness.} Suppose $p_1 \cdots p_r = q_1 \cdots q_s$ (primes
+listed with repetition). The prime $p_1$ divides the right-hand side,
+so by Euclid's lemma (iterated) $p_1$ divides some $q_j$, hence $p_1 =
+q_j$. Cancel both and induct on $r$. The exponent form groups equal
+primes.
+\end{proof}
+
+\begin{proposition}[Valuations]\label{prop:b1:arith:valuation}
+For $p$ prime and $n \in \N^*$, write $v_p(n)$\index{p-adic
+valuation@$p$-adic valuation} for the exponent of $p$ in the
+factorization of $n$ (with $v_p(n) = 0$ if $p \nmid n$). Then
+\[
+v_p(mn) = v_p(m) + v_p(n),
+\qquad
+m \mid n \iff \forall p,\ v_p(m) \leq v_p(n),
+\]
+\[
+v_p\bigl(\gcd(m,n)\bigr) = \min\bigl(v_p(m), v_p(n)\bigr),
+\qquad
+v_p\bigl(\operatorname{lcm}(m,n)\bigr) = \max\bigl(v_p(m),
+v_p(n)\bigr).
+\]
+\end{proposition}
+
+\begin{proof}
+The first identity holds because the factorizations multiply and the
+factorization of $mn$ is unique. If $m \mid n$, write $n = mq$ and
+apply it. Conversely, if all $v_p(m) \leq v_p(n)$, the integer $q =
+\prod_p p^{\,v_p(n) - v_p(m)}$ satisfies $mq = n$. The gcd formula:
+the integer $d = \prod p^{\min}$ divides both by the criterion, and
+every common divisor $c$ has $v_p(c) \leq \min$ for all $p$, so $c
+\mid d$; same reasoning for the lcm with $\max$.
+\end{proof}
+
+\section{Congruences}
+
+\begin{definition}\label{def:b1:arith:congruence}
+For $n \in \N^*$: $a \equiv b \pmod n$\index{congruence} when $n \mid
+a - b$. This is an equivalence relation compatible with addition and
+multiplication: if $a \equiv b$ and $a' \equiv b'$ (mod $n$), then
+$a + a' \equiv b + b'$, $aa' \equiv bb'$, and $a^k \equiv b^k$ for
+$k \in \N$.
+\end{definition}
+
+\begin{proposition}[Invertibility mod $n$]\label{prop:b1:arith:invmod}
+$a$ is \emph{invertible mod $n$} (i.e.\ $ab \equiv 1 \pmod n$ for some
+$b$) if and only if $\gcd(a, n) = 1$. The inverse is then unique mod
+$n$ and computed by the extended Euclidean algorithm.
+\end{proposition}
+
+\begin{proof}
+$ab \equiv 1 \pmod n$ means $ab + nk = 1$ for some $k$: a Bézout
+relation, which exists iff $\gcd(a,n) = 1$
+(\cref{cor:b1:arith:bezout}). Uniqueness: if $ab \equiv ab' \equiv 1$,
+then $b \equiv b(ab') = (ab)b' \equiv b' \pmod n$.
+\end{proof}
+
+\begin{theorem}[Fermat's little theorem]\label{thm:b1:arith:fermat}
+Let $p$ be prime. For every $a \in \Z$:
+\[
+a^p \equiv a \pmod p,
+\]
+and if $p \nmid a$, then $a^{p-1} \equiv 1 \pmod
+p$.\index{Fermat's little theorem}
+\end{theorem}
+
+\begin{proof}
+First, for $1 \leq k \leq p - 1$, the binomial coefficient $\binom pk
+= \frac{p!}{k!(p-k)!}$ is divisible by $p$: indeed $k!\,(p-k)!\,
+\binom pk = p!$ and $p$ divides $p!$ but is coprime to $k!(p-k)!$
+(all factors are $< p$), so Gauss's lemma gives $p \mid \binom pk$.
+
+Now prove $a^p \equiv a$ for $a \in \N$ by induction. True for $a =
+0$. If $a^p \equiv a$, then by the binomial theorem
+\[
+(a+1)^p = \sum_{k=0}^{p} \binom pk a^k
+\equiv a^p + 1 \equiv a + 1 \pmod p,
+\]
+all middle terms vanishing mod $p$. For $a < 0$, apply the result to
+$-a$ and separate $p = 2$ (where $x \equiv -x$) from odd $p$ (where
+$(-a)^p = -a^p$). Finally, if $p \nmid a$, multiply $a^p \equiv a$ by
+an inverse of $a$ mod $p$ (\cref{prop:b1:arith:invmod}).
+\end{proof}
+
+\begin{example}[Practical congruence computations]\label{ex:b1:arith:congruences}
+What is the remainder of $7^{2026}$ mod $11$? By Fermat, $7^{10}
+\equiv 1 \pmod{11}$. Since $2026 = 10 \times 202 + 6$:
+\[
+7^{2026} \equiv 7^6 = (7^2)^3 = 49^3 \equiv 5^3 = 125 \equiv 4
+\pmod{11}.
+\]
+The remainder is $4$. The strategy: reduce the exponent modulo the
+order provided by Fermat, then reduce intermediate powers at every
+step.
+\end{example}
+
+\section{Exercises}
+
+\begin{exercise}[$\star$]\label{exo:b1:arith:1}
+Compute $\gcd(1\,001, 777)$ by the Euclidean algorithm, and a Bézout
+pair for it.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:arith:2}
+Prove the divisibility rules in base $10$: an integer is congruent mod
+$9$ to the sum of its digits, and mod $11$ to the alternating sum of
+its digits. What is $123\,456\,789$ mod $9$ and mod $11$?
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:arith:3}
+Solve in $\Z$: $91x \equiv 1 \pmod{237}$ \emph{(extended Euclid)}.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:arith:4}
+Find all pairs $(x, y) \in \Z^2$ with $17x + 39y = 1$; then all pairs
+with $17 x + 39 y = 5$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:arith:5}
+Prove that for $a, b \in \N^*$: $\gcd(a,b) \times
+\operatorname{lcm}(a,b) = ab$. \emph{(Use the valuation formulas of
+\cref{prop:b1:arith:valuation} and $\min(\alpha,\beta) +
+\max(\alpha,\beta) = \alpha + \beta$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:arith:6}
+Let $a = 2^{10} \times 3^4 \times 5^2$ and $b = 2^6 \times 3^7 \times
+7$. Compute $\gcd(a, b)$, $\operatorname{lcm}(a,b)$, and the number of
+positive divisors of $a$. \emph{(Prove the divisor-count formula
+$\prod_i (\alpha_i + 1)$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:arith:7}
+Prove that $\sqrt p$ is irrational for every prime $p$, using
+valuations: compare $v_p$ of both sides of $p q^2 = r^2$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:arith:8}
+(Chinese remainder problem) Find all integers $x$ with
+\[
+x \equiv 2 \pmod 7, \qquad x \equiv 5 \pmod{11}.
+\]
+Prove along the way that for coprime $m, n$, the pair of congruences
+$x \equiv a \ (m)$, $x \equiv b\ (n)$ always has a solution, unique
+mod $mn$.\index{Chinese remainder theorem}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:arith:9}
+Compute $3^{1000}$ mod $7$, and the last two decimal digits of
+$7^{100}$ \emph{(mod $100 = 4 \times 25$: use
+\cref{exo:b1:arith:8})}.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:arith:10}
+For $m, n \in \N^*$, prove that $\gcd(2^m - 1,\, 2^n - 1) =
+2^{\gcd(m,n)} - 1$. \emph{Hint: show first that the remainder of $2^m
+- 1$ mod $2^n - 1$ is $2^r - 1$ where $r$ is the remainder of $m$ mod
+$n$; then follow the Euclidean algorithm.}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:arith:11}
+(Wilson's theorem) Let $p$ be a prime. Prove that
+\[
+(p-1)! \equiv -1 \pmod p ,
+\]
+by pairing each factor of $(p-1)!$ with its inverse mod $p$ and
+identifying the self-paired factors (solve $x^2 \equiv 1 \pmod p$
+first). Check the converse: if $n \geq 2$ is not prime, then $(n-1)!
+\not\equiv -1 \pmod n$.
+\end{exercise}
