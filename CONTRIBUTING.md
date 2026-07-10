@@ -65,6 +65,10 @@ automatically within the chapter):
    `\V`, `\P`, `\pcond{B}{A}` (probability of A given B), `\vect{AB}`,
    `\conj{z}`.
 
+The `oc*` colors and the `\ocRosette`/`\ocQuadLine` macros are the One Course
+brand (title page only, not for chapter content); they are documented in
+`THEME.md`.
+
 ## Labels
 
 All labels are namespaced: `<type>:<year>:<chapter-slug>:<name>`.
