@@ -8,14 +8,17 @@ project and the conventions that keep the book coherent.
 The project is a **series of books** sharing one style and one `parts/`
 tree. Each book has its own entry file at the repository root:
 
-- `one_math_book_primary_middle_school.tex` — Grades 1–9 (English);
-- `one_math_book_primary_middle_school_fr.tex` — Grades 1–9 (French);
-- `one_math_book_primary_middle_school_nl.tex` — Grades 1–9 (Dutch);
-- `one_math_book_high_school.tex` — Grades 10–12 (English);
-- `one_math_book_high_school_fr.tex` — Grades 10–12 (French);
-- `one_math_book_high_school_nl.tex` — Grades 10–12 (Dutch);
-- `one_math_book_university_year_1.tex` — Bachelor Year 1;
-- `one_math_book_university_year_2.tex` — Bachelor Year 2.
+- `one_math_book_1_primary_middle_school.tex` — Book 1, Grades 1–9 (English);
+- `one_math_book_1_primary_middle_school_fr.tex` — Book 1 (French);
+- `one_math_book_1_primary_middle_school_nl.tex` — Book 1 (Dutch);
+- `one_math_book_2_high_school.tex` — Book 2, Grades 10–12 (English);
+- `one_math_book_2_high_school_fr.tex` — Book 2 (French);
+- `one_math_book_2_high_school_nl.tex` — Book 2 (Dutch);
+- `one_math_book_3_university_year_1.tex` — Book 3, Bachelor Year 1;
+- `one_math_book_4_university_year_2.tex` — Book 4, Bachelor Year 2.
+
+Naming: `one_math_book_<N>_<slug>[_<lang>].tex` → PDF
+`build/one_math_book_<N>_<slug>[_<lang>].pdf`.
 
 The shared files:
 
@@ -60,7 +63,7 @@ instead ("the distance formula, taken up in the High School volume").
 make          # runs latexmk (pdflatex), builds every book into build/
 ```
 
-A single book: `latexmk one_math_book_high_school.tex`.
+A single book: `latexmk one_math_book_2_high_school.tex`.
 
 A pull request must build with **zero errors** and introduce no undefined
 references (`grep -E "undefined" build/*.log` should stay clean).

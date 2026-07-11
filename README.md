@@ -62,20 +62,20 @@ make            # or just: latexmk — builds all books
 The PDFs are produced at
 
 ```
-build/one_math_book_primary_middle_school.pdf
-build/one_math_book_primary_middle_school_fr.pdf
-build/one_math_book_primary_middle_school_nl.pdf
-build/one_math_book_high_school.pdf
-build/one_math_book_high_school_fr.pdf
-build/one_math_book_high_school_nl.pdf
-build/one_math_book_university_year_1.pdf
-build/one_math_book_university_year_2.pdf
+build/one_math_book_1_primary_middle_school.pdf
+build/one_math_book_1_primary_middle_school_fr.pdf
+build/one_math_book_1_primary_middle_school_nl.pdf
+build/one_math_book_2_high_school.pdf
+build/one_math_book_2_high_school_fr.pdf
+build/one_math_book_2_high_school_nl.pdf
+build/one_math_book_3_university_year_1.pdf
+build/one_math_book_4_university_year_2.pdf
 ```
 
 `make clean` removes auxiliary files, `make distclean` removes the whole
 `build/` directory. To build a single book, e.g.\
-`latexmk one_math_book_high_school_fr.tex` or
-`latexmk one_math_book_primary_middle_school_nl.tex`.
+`latexmk one_math_book_2_high_school_fr.tex` or
+`latexmk one_math_book_1_primary_middle_school_nl.tex`.
 
 Translated editions: install `texlive-lang-french` / Dutch babel support
 when available (better hyphenation); books still build without them.
@@ -84,9 +84,9 @@ UI strings come from `styles/lang/<lang>.tex`.
 ## Repository layout
 
 ```
-one_math_book_*.tex          one entry file per book / language
+one_math_book_<N>_*.tex      entry file per book / language (N = series number)
 styles/onemath.sty           packages, theorem environments, macros
-styles/lang/<lang>.tex       UI strings (en, fr, …)
+styles/lang/<lang>.tex       UI strings (en, fr, nl, …)
 frontmatter/                 title page, preface (shared layout)
 parts/<year>/part.tex        shared structure for a school year
 parts/<year>/NN-*.tex        English chapter

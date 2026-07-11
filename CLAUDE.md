@@ -20,18 +20,18 @@ chapters.
 
 ```sh
 make                                       # latexmk builds all books into build/
-latexmk one_math_book_university_year_3.tex   # a single book
-latexmk one_math_book_primary_middle_school_fr.tex  # French primary volume
-latexmk one_math_book_high_school_nl.tex              # Dutch high school
+latexmk one_math_book_3_university_year_1.tex   # a single book
+latexmk one_math_book_1_primary_middle_school_fr.tex  # French primary volume
+latexmk one_math_book_2_high_school_nl.tex              # Dutch high school
 ```
 
 The build is pdflatex via `latexmkrc` (which also raises pdfTeX memory
 limits for the TikZ-heavy books — don't bypass it). PDFs land in
-`build/one_math_book_<slug>.pdf`. There are no tests; the quality gate is
+`build/one_math_book_<N>_<slug>.pdf`. There are no tests; the quality gate is
 the log:
 
 ```sh
-L=build/one_math_book_<slug>.log
+L=build/one_math_book_<N>_<slug>.log
 grep -c '^!' $L                 # errors — must be 0
 grep -ci 'undefined' $L         # undefined references — must be 0
 grep -c 'Overfull' $L           # overfull boxes — keep at 0 (fix by breaking long inline math into displays / align*)
@@ -40,13 +40,13 @@ grep -c 'Overfull' $L           # overfull boxes — keep at 0 (fix by breaking 
 CI (`.github/workflows/build.yml`) builds all books on every push;
 `release.yml` additionally generates `version.tex` (overriding
 `\bookversion`/`\bookdate` in the entry files) and attaches
-`one_math_book_<slug>_vX.Y.Z.pdf` to the release.
+`one_math_book_<N>_<slug>_vX.Y.Z.pdf` to the release.
 
 ## Architecture
 
-- `one_math_book_<slug>.tex` — entry file per book: optionally sets
-  `\booklang` (default `en`), loads `styles/onemath.sty`, defines
-  `\bookline` ("Book N: ..." shown on the shared cover), inputs
+- `one_math_book_<N>_<slug>.tex` — entry file per book (series number N):
+  optionally sets `\booklang` (default `en`), loads `styles/onemath.sty`,
+  defines `\bookline` ("Book N: ..." shown on the shared cover), inputs
   `parts/<year>/part.tex` for its years, then a Solutions appendix
   inputting `parts/<year>/solutions/solutions.tex`.
 - `styles/onemath.sty` — **the only place** packages are loaded and
@@ -77,16 +77,16 @@ CI (`.github/workflows/build.yml`) builds all books on every push;
 1. Add `styles/lang/<lang>.tex` (copy `en.tex` or `fr.tex`).
 2. Translate bodies to `parts/<year>/<lang>/` and
    `parts/<year>/solutions/<lang>/` (same file names and labels).
-3. Add entry file `one_math_book_<slug>_<lang>.tex` with
+3. Add entry file `one_math_book_<N>_<slug>_<lang>.tex` with
    `\newcommand{\booklang}{<lang>}` before `\usepackage{styles/onemath}`.
 4. Register the entry in `latexmkrc` and both GitHub workflows.
 
 Reference implementations:
 
-- `one_math_book_primary_middle_school_fr.tex` / `_nl.tex`
-- `one_math_book_high_school_fr.tex` / `_nl.tex`
+- `one_math_book_1_primary_middle_school_fr.tex` / `_nl.tex`
+- `one_math_book_2_high_school_fr.tex` / `_nl.tex`
 
-PDFs: `build/one_math_book_<slug>_<lang>.pdf`.
+PDFs: `build/one_math_book_<N>_<slug>[_<lang>].pdf`.
 
 ## Invariants to verify after writing/editing chapters
 

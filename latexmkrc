@@ -2,16 +2,16 @@
 $pdf_mode = 1;              # pdflatex
 $out_dir = 'build';
 # One entry file per book; each PDF is named after its entry file
-# (build/one_math_book_<slug>.pdf).
+# (build/one_math_book_<N>_<slug>.pdf).
 @default_files = (
-    'one_math_book_primary_middle_school.tex',
-    'one_math_book_primary_middle_school_fr.tex',
-    'one_math_book_primary_middle_school_nl.tex',
-    'one_math_book_high_school.tex',
-    'one_math_book_high_school_fr.tex',
-    'one_math_book_high_school_nl.tex',
-    'one_math_book_university_year_1.tex',
-    'one_math_book_university_year_2.tex',
+    'one_math_book_1_primary_middle_school.tex',
+    'one_math_book_1_primary_middle_school_fr.tex',
+    'one_math_book_1_primary_middle_school_nl.tex',
+    'one_math_book_2_high_school.tex',
+    'one_math_book_2_high_school_fr.tex',
+    'one_math_book_2_high_school_nl.tex',
+    'one_math_book_3_university_year_1.tex',
+    'one_math_book_4_university_year_2.tex',
 );
 # The books' many TikZ/pgfplots figures exceed pdfTeX's default main
 # memory (5M words); raise the runtime limits.
