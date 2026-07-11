@@ -1,0 +1,316 @@
+\chapter{Quadratic Forms}\label{ch:b2:quadratic}
+
+A quadratic form is the algebraic shadow of a geometry: signature
+zero parts flatten, positive parts curve one way, negative the
+other. This chapter reduces every real quadratic form to a sum of
+$\pm$ squares (Gauss), proves that the counts of signs are intrinsic
+(Sylvester), and then crowns Euclidean geometry with the
+\emph{spectral theorem}: symmetric endomorphisms diagonalize in
+orthonormal bases --- the single most-used theorem of applied
+linear algebra.
+
+\section{Bilinear and quadratic forms}
+
+\begin{definition}\label{def:b2:quadratic:def}
+A \emph{symmetric bilinear form} on a real vector space $E$ is a
+bilinear $\varphi \colon E \times E \to \R$ with $\varphi(x, y) =
+\varphi(y, x)$; the associated \emph{quadratic
+form}\index{quadratic form} is $q(x) = \varphi(x, x)$. The form
+$\varphi$ is recovered from $q$ by
+\emph{polarization}\index{polarization identity}:
+\[
+\varphi(x, y) = \tfrac12\bigl(q(x + y) - q(x) - q(y)\bigr).
+\]
+In a basis $(e_i)$, the \emph{matrix} of $\varphi$ is the symmetric
+$B = (\varphi(e_i, e_j))$, with $q(x) = X^{\mathsf T} B X$; a change
+of basis with matrix $P$ replaces $B$ by $P^{\mathsf T} B P$
+(\emph{congruence}\index{congruent matrices} --- not similarity!).
+The \emph{rank} of $q$ is $\operatorname{rk} B$ (invariant:
+congruence multiplies by invertible matrices).
+\end{definition}
+
+\begin{example}
+On $\R^2$: $q(x, y) = x^2 + 4xy + y^2$ has matrix $\begin{pmatrix}
+1 & 2\\ 2 & 1\end{pmatrix}$. An inner product is exactly a
+symmetric bilinear form whose quadratic form is positive definite;
+this chapter studies the general, sign-indefinite case.
+\end{example}
+
+\section{Gauss reduction and Sylvester's inertia}
+
+\begin{theorem}[Gauss reduction]\label{thm:b2:quadratic:gauss}
+Every quadratic form $q$ on a finite-dimensional real space can be
+written\index{Gauss reduction}
+\[
+q = \sum_{i=1}^{s} \ell_i^2 - \sum_{j=1}^{t} m_j^2 ,
+\]
+where $\ell_1, \dots, \ell_s, m_1, \dots, m_t$ are linearly
+independent linear forms; equivalently, some basis makes the
+matrix of $q$ diagonal with entries $+1$ ($s$ times), $-1$ ($t$
+times), $0$.
+\end{theorem}
+
+\begin{proof}
+Induction on the number of variables, in coordinates: $q(x_1,
+\dots, x_n)$.
+
+\emph{Case 1: some square appears}, say the coefficient $a$ of
+$x_1^2$ is nonzero. Group all the $x_1$-terms and complete the
+square:
+\[
+q = a\Bigl(x_1 + \frac{1}{a}\,\lambda(x_2, \dots,
+x_n)\Bigr)^{\!2} + q_1(x_2, \dots, x_n),
+\]
+where $\lambda$ is linear and $q_1$ quadratic in the remaining
+variables: one independent form split off (it involves $x_1$, the
+others do not), induction applies to $q_1$, and $\pm$ signs come
+from the sign of $a$ after rescaling by $\sqrt{\abs a}$.
+
+\emph{Case 2: no square, but some cross term}, say $b\,x_1x_2$ with
+$b \neq 0$. Use the identity
+\[
+x_1x_2 = \tfrac14\bigl((x_1 + x_2)^2 - (x_1 - x_2)^2\bigr)
+\]
+after grouping: writing $q = b\,x_1x_2 + x_1\alpha + x_2\beta +
+q_2$ (with $\alpha, \beta, q_2$ in the other variables), one checks
+\[
+q = \frac{b}{4}\Bigl[\Bigl(x_1 + x_2 + \frac{\alpha +
+\beta}{b}\Bigr)^{2} - \Bigl(x_1 - x_2 + \frac{\beta -
+\alpha}{b}\Bigr)^{2}\Bigr] + \widetilde q ,
+\]
+with $\widetilde q$ free of $x_1, x_2$: two independent forms split
+off, and induction finishes. Independence of the collected forms:
+each batch involves variables absent from the later ones ---
+formally, the union is triangular with respect to the variable
+order, hence free.
+\end{proof}
+
+\begin{theorem}[Sylvester's law of inertia]\label{thm:b2:quadratic:sylvester}
+The pair $(s, t)$ in \cref{thm:b2:quadratic:gauss} depends only on
+$q$, not on the reduction: it is the
+\emph{signature}\index{signature of a quadratic form} of $q$.
+Moreover
+\[
+s = \max\{\dim F : q|_F \text{ positive definite}\},
+\]
+and symmetrically for $t$.
+\end{theorem}
+
+\begin{proof}
+Let $q = \sum_{i \leq s}\ell_i^2 - \sum_{j\leq t} m_j^2$ and let
+$F_+$ be the span of the (pre-)dual vectors on which $(\ell_i)$
+restrict to coordinates --- concretely, complete
+$(\ell_i, m_j)$ into a basis of $E^*$, take the pre-dual basis of
+$E$, and let $F_+$ be spanned by the first $s$ vectors: on $F_+$,
+$q = \sum \ell_i^2$ is positive definite, so the max in the display
+is $\geq s$. Conversely, let $F$ be any subspace with $q|_F$
+positive definite, and $G = \{x : \ell_1(x) = \dots = \ell_s(x) =
+0\}$, of codimension $\leq s$; on $G$, $q(x) = -\sum m_j^2 \leq 0$.
+Then $F \cap G = \{0\}$ (a nonzero vector there would have $q > 0$
+and $q \leq 0$), so $\dim F \leq \dim E - \dim G \leq s$. Hence the
+max equals $s$ for \emph{every} reduction: $s$ is intrinsic, and $t
+= \operatorname{rk} q - s$ likewise.
+\end{proof}
+
+\begin{example}\label{ex:b2:quadratic:gaussexample}
+$q(x, y, z) = xy + yz + zx$ (no squares). With $x_1 = x$, $x_2 =
+y$: $q = xy + z(x + y)$, and the two-square identity gives
+\[
+q = \tfrac14(x + y + 2z)^2 - \tfrac14(x - y)^2 - z^2 ,
+\]
+(expand to check). Three independent forms: signature $(1, 2)$,
+rank $3$. One positive direction, two negative: the ``light cone''
+geometry of this form.
+\end{example}
+
+\section{The spectral theorem}
+
+Now let $E$ be Euclidean (inner product $\langle\cdot,\cdot\rangle$,
+Year 1 volume).
+
+\begin{definition}[Adjoint; symmetric endomorphisms]\label{def:b2:quadratic:adjoint}
+For $u \in \mathcal{L}(E)$, the \emph{adjoint}\index{adjoint}
+$u^*$ is the unique endomorphism with
+\[
+\langle u(x), y\rangle = \langle x, u^*(y)\rangle
+\qquad (x, y \in E);
+\]
+in an orthonormal basis, $\operatorname{Mat}(u^*) =
+\operatorname{Mat}(u)^{\mathsf T}$. $u$ is
+\emph{symmetric}\index{symmetric endomorphism} (self-adjoint) when
+$u^* = u$ --- equivalently its matrix in an orthonormal basis is
+symmetric.
+\end{definition}
+
+\begin{proof}[Existence and uniqueness of the adjoint]
+For fixed $y$, the form $x \mapsto \langle u(x), y\rangle$ is
+linear, hence (finite dimension) of the shape $\langle x,
+z_y\rangle$ for a unique $z_y$ --- the map $y \mapsto z_y =:
+u^*(y)$ being linear by uniqueness. The matrix identification:
+$\langle u(e_i), e_j\rangle$ read both ways.
+\end{proof}
+
+\begin{theorem}[Spectral theorem]\label{thm:b2:quadratic:spectral}
+Let $u$ be a symmetric endomorphism of a Euclidean space $E$. Then
+$E$ has an \emph{orthonormal basis of eigenvectors} of $u$; all
+eigenvalues are real, and eigenspaces for distinct eigenvalues are
+orthogonal. Matrix form: every real symmetric matrix $A$ writes
+\[
+A = P\,D\,P^{\mathsf T},
+\qquad P \text{ orthogonal } (P^{\mathsf T} P = I),\ D
+\text{ diagonal}.\index{spectral theorem}
+\]
+\end{theorem}
+
+\begin{proof}
+\emph{An eigenvector exists.} The function $x \mapsto \langle u(x),
+x\rangle$ is continuous on the unit sphere $S$ of $E$, which is
+compact (finite dimension, \cref{thm:b2:nvs:finitedim}): it attains
+its maximum $\lambda$ at some $a \in S$. We claim $u(a) = \lambda
+a$. For any $y \perp a$ with $\norm y = 1$ and $t \in \R$, the
+vector $x_t = \frac{a + ty}{\sqrt{1 + t^2}}$ lies on $S$; expanding
+the maximized function,
+\[
+g(t) = \frac{\langle u(a), a\rangle + 2t\langle u(a), y\rangle +
+t^2\langle u(y), y\rangle}{1 + t^2}
+\]
+(symmetry of $u$ merged the two cross terms). $g$ is differentiable
+with a maximum at $t = 0$: $g'(0) = 2\langle u(a), y\rangle = 0$.
+So $u(a)$ is orthogonal to the whole hyperplane $a^\perp$: $u(a)
+\in (a^{\perp})^{\perp} = \R a$, i.e.\ $u(a) = \mu a$; and $\mu =
+\langle u(a), a\rangle = \lambda$.
+
+\emph{Induction.} The orthogonal complement $F = a^\perp$ is
+$u$-stable: for $x \perp a$, $\langle u(x), a\rangle = \langle x,
+u(a)\rangle = \lambda\langle x, a\rangle = 0$. The restriction
+$u|_F$ is symmetric for the induced inner product; by induction on
+the dimension, $F$ has an orthonormal eigenbasis; prepend $a$.
+
+\emph{Complements.} Eigenvalues are the real numbers $\langle u(e),
+e\rangle$ on the eigenbasis. Orthogonality of eigenspaces: $u(x) =
+\lambda x$, $u(y) = \mu y$ give $\lambda\langle x, y\rangle =
+\langle u(x), y\rangle = \langle x, u(y)\rangle = \mu\langle x,
+y\rangle$, so $\langle x, y\rangle = 0$ when $\lambda \neq \mu$.
+Matrix form: columns of $P$ = the orthonormal eigenbasis.
+\end{proof}
+
+\begin{corollary}[Principal axes; positivity tests]\label{cor:b2:quadratic:principalaxes}
+\begin{enumerate}
+  \item Every quadratic form $q$ on a Euclidean space diagonalizes
+        in some \emph{orthonormal} basis: $q(x) = \sum_i \lambda_i
+        x_i^2$ with $\lambda_i$ the eigenvalues of the symmetric
+        matrix of $q$; the signature counts positive and negative
+        eigenvalues.
+  \item A symmetric matrix is positive semidefinite (resp.\
+        definite) iff all its eigenvalues are $\geq 0$ (resp.\ $>
+        0$); and then the extreme values of the Rayleigh quotient
+        are
+        \[
+        \min_{\norm x = 1} \langle Ax, x\rangle = \lambda_{\min},
+        \qquad
+        \max_{\norm x = 1} \langle Ax, x\rangle = \lambda_{\max} .
+        \]
+\end{enumerate}
+\end{corollary}
+
+\begin{proof}
+(1) Write $q(x) = \langle A x, x\rangle$ with $A$ symmetric (the
+matrix of $q$ in an orthonormal basis); diagonalize $A$ by the
+spectral theorem: in the eigenbasis, $q = \sum\lambda_i x_i^2$.
+Signature: Sylvester (the reduction is a Gauss reduction).
+
+(2) In the eigenbasis, $\langle Ax, x\rangle = \sum \lambda_i
+x_i^2$, trapped between $\lambda_{\min}\norm x^2$ and
+$\lambda_{\max}\norm x^2$, with equality at the corresponding
+eigenvectors.
+\end{proof}
+
+\begin{example}\label{ex:b2:quadratic:spectralexample}
+$A = \begin{pmatrix} 2 & 1\\ 1 & 2 \end{pmatrix}$: eigenvalues $3$
+(eigenvector $\frac{1}{\sqrt2}(1,1)$) and $1$
+($\frac{1}{\sqrt2}(1,-1)$). The quadratic form $2x^2 + 2xy + 2y^2$
+becomes $3X^2 + Y^2$ in the rotated orthonormal frame: an ellipse's
+principal axes, computed. The Gauss reduction reaches a diagonal
+form too, but only the spectral theorem reaches it \emph{without
+distorting lengths}.
+\end{example}
+
+\section{Exercises}
+
+\begin{exercise}[$\star$]\label{exo:b2:quadratic:1}
+Gauss-reduce and give rank and signature:
+\[
+q_1(x,y) = x^2 + 4xy + y^2,
+\qquad
+q_2(x,y,z) = x^2 + 2y^2 + 3z^2 + 2xy + 2yz .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:quadratic:2}
+Diagonalize orthogonally $A = \begin{pmatrix} 0 & 1 & 1\\ 1 & 0 &
+1\\ 1 & 1 & 0\end{pmatrix}$ (eigenvalues from
+\cref{ch:b2:reduction}'s computation; now make the basis
+orthonormal) and reduce the form $q(x,y,z) = 2xy + 2yz + 2zx$ to
+principal axes.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:quadratic:3}
+Prove that $u^{**} = u$, $(u \circ v)^* = v^* \circ u^*$, and that
+$\ker u^* = (\operatorname{im} u)^{\perp}$. Deduce
+$\operatorname{rk} u^* = \operatorname{rk} u$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:quadratic:4}
+Let $A$ be real symmetric with $A^3 = A$. Prove that $A^2$ is the
+matrix of an orthogonal projection. More generally, relate the
+spectral decompositions of $A$ and $P(A)$ for a polynomial $P$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:quadratic:5}
+Prove that $O(n) = \{P : P^{\mathsf T}P = I\}$ is a compact subset
+of $\mathcal{M}_n(\R)$ \emph{(closed: preimage of $\{I\}$ under a
+continuous map; bounded: columns are unit vectors)}. Is it
+connected?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:quadratic:6}
+(Square root) Let $A$ be symmetric positive semidefinite. Construct
+a symmetric positive semidefinite $B$ with $B^2 = A$, and prove
+that it is \emph{unique} \emph{(existence: take square roots of the
+eigenvalues in a spectral basis; uniqueness: a candidate $B$
+commutes with $A = B^2$, so preserves its eigenspaces --- reduce to
+the scalar case on each)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:quadratic:7}
+For real symmetric $A$, prove that $\vertiii{A}_2 :=
+\sup_{\norm x_2 = 1}\norm{Ax}_2 = \max_i \abs{\lambda_i}$
+(spectral radius), and compute $\vertiii{A}_2$ for $A =
+\begin{pmatrix} 1 & 2\\ 2 & 1\end{pmatrix}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:quadratic:8}
+(Sylvester's criterion) Let $A$ be real symmetric with leading
+principal minors $\Delta_1, \dots, \Delta_n$ (determinants of the
+top-left blocks). Prove that $A$ is positive definite if and only
+if all $\Delta_k > 0$. \emph{(For $\Rightarrow$: restrictions of a
+definite form are definite, and the determinant of a positive
+definite matrix --- the product of its eigenvalues --- is positive.
+For $\Leftarrow$: induct on $n$; the top-left $(n-1)$-block is
+positive definite, diagonalize the form on that subspace and
+complete the square in the last variable; the sign of the last
+diagonal entry is governed by $\det A = \Delta_n > 0$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:quadratic:9}
+(Courant--Fischer, second eigenvalue) Let $u$ be symmetric with
+eigenvalues $\lambda_1 \geq \lambda_2 \geq \dots \geq \lambda_n$.
+Prove
+\[
+\lambda_2 = \min_{\substack{H \text{ hyperplane}}}\;
+\max_{\substack{x \in H,\ \norm x = 1}} \langle u(x), x\rangle .
+\]
+\emph{(For $\leq$: any hyperplane meets the $2$-plane spanned by
+the top two eigenvectors. For $\geq$: choose $H =
+(e_1)^{\perp}$.)}
+\end{exercise}

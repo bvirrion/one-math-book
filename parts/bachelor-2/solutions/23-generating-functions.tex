@@ -1,0 +1,216 @@
+\section*{Chapter \ref{ch:b2:genfun} --- Probability Generating Functions}
+
+\begin{solution}{exo:b2:genfun:1}
+Fair die: $G(t) = \frac16(t + t^2 + \dots + t^6) = \frac t6(1 + t
++ \dots + t^5)$. If the sum of two fair dice were uniform on
+$\{2, \dots, 12\}$, then
+\[
+G(t)^2 = \frac{t^2}{36}\,h(t)^2
+= \frac{t^2}{11}\sum_{k=0}^{10}t^k ,
+\qquad h(t) = 1 + t + \dots + t^5 .
+\]
+Now $h$ is a real polynomial of odd degree $5$, so it has a real
+root (intermediate value theorem; concretely $h(-1) = 0$), hence
+$h^2$ has a real root. But $\sum_{k=0}^{10}t^k$ has none: it is
+positive for $t \geq 0$, and for $t < 0$ it equals
+$\frac{t^{11} - 1}{t - 1}$, a quotient of two negative numbers.
+Contradiction --- the sum of two fair dice is never uniform (as
+the familiar triangular distribution of dice sums confirms).
+\end{solution}
+
+\begin{solution}{exo:b2:genfun:2}
+\emph{Binomial:} $G(t) = (1 - p + pt)^n$, $G'(t) = np(1 - p +
+pt)^{n-1}$, $G''(t) = n(n-1)p^2(1 - p + pt)^{n-2}$, so
+\[
+\E(X) = G'(1) = np,
+\qquad
+V(X) = G''(1) + G'(1) - G'(1)^2
+= n(n-1)p^2 + np - n^2p^2 = np(1-p).
+\]
+\emph{Geometric} ($q = 1 - p$): $G(t) = \frac{pt}{1 - qt}$, so
+$G'(t) = \frac{p}{(1 - qt)^2}$ and $G''(t) = \frac{2pq}{(1 -
+qt)^3}$; at $t = 1$ (using $1 - q = p$):
+\[
+\E(X) = \frac{p}{p^2} = \frac1p,
+\qquad
+V(X) = \frac{2q}{p^2} + \frac1p - \frac{1}{p^2}
+= \frac{2q + p - 1}{p^2}
+= \frac{q}{p^2} ,
+\]
+matching \cref{exo:b2:randomvar:1} with less work.
+\end{solution}
+
+\begin{solution}{exo:b2:genfun:3}
+No, even with different loadings. Suppose $X, Y$ are laws on
+$\{1, \dots, 6\}$ with uniform sum. Then $G_X(t) = t\,a(t)$ and
+$G_Y(t) = t\,b(t)$ with $a, b$ real polynomials of degree \emph{at
+most} $5$ --- and their degrees must sum to $10$ (the sum reaches
+$12$ with positive probability), so $\deg a = \deg b = 5$, both
+odd. As in \cref{exo:b2:genfun:1},
+\[
+a(t)\,b(t) = \frac{1}{11}\sum_{k=0}^{10}t^k
+\]
+would force a real root on the left (each odd-degree real
+polynomial has one) and none on the right. So no loading of two
+independent dice --- equal or not --- produces a uniform sum.
+\end{solution}
+
+\begin{solution}{exo:b2:genfun:4}
+By \cref{thm:b2:genfun:compound} with $G_N(s) = e^{\lambda(s-1)}$
+and $G_X(t) = 1 - p + pt$:
+\[
+G_S(t) = e^{\lambda(1 - p + pt - 1)} = e^{\lambda p(t - 1)} :
+\]
+$S \sim \mathcal{P}(\lambda p)$. The discarded count $D = N - S$
+counts the same items kept with probability $1 - p$, so by the
+same computation $D \sim \mathcal{P}(\lambda(1 - p))$.
+Independence, directly: for $j, k \in \N$,
+\begin{align*}
+\P(S = j,\ D = k)
+&= \P(N = j + k)\,\binom{j+k}{j}p^jq^k
+= e^{-\lambda}\frac{\lambda^{j+k}}{(j+k)!}\,
+\frac{(j+k)!}{j!\,k!}\,p^jq^k\\
+&= \Bigl(e^{-\lambda p}\frac{(\lambda p)^j}{j!}\Bigr)
+\Bigl(e^{-\lambda q}\frac{(\lambda q)^k}{k!}\Bigr)
+\end{align*}
+with $q = 1 - p$: the joint law factors as
+$\mathcal{P}(\lambda p) \otimes \mathcal{P}(\lambda q)$. A Poisson
+flow split at random yields \emph{independent} Poisson flows ---
+a small miracle constantly used in queueing theory.
+\end{solution}
+
+\begin{solution}{exo:b2:genfun:5}
+The waiting times between consecutive heads are independent
+geometric $\mathcal{G}(p)$ variables (memorylessness: after each
+head the game restarts), so $T_r = W_1 + \dots + W_r$ and
+multiplicativity (\cref{thm:b2:genfun:product}) gives
+\[
+G_{T_r}(t) = \Bigl(\frac{pt}{1 - qt}\Bigr)^{r},
+\qquad
+\E(T_r) = r\,\E(W_1) = \frac rp,
+\qquad
+V(T_r) = r\,V(W_1) = \frac{rq}{p^2}
+\]
+($q = 1 - p$; variances add by independence). Expansion: by the
+generalized binomial series
+(\cref{ch:b2:powerseries}), $(1 - qt)^{-r} = \sum_{m\geq0}
+\binom{m + r - 1}{r - 1}q^mt^m$, so the coefficient of $t^n$ in
+$p^rt^r(1 - qt)^{-r}$ is (with $m = n - r$)
+\[
+\P(T_r = n) = \binom{n-1}{r-1}p^r(1-p)^{n-r},
+\qquad n \geq r ,
+\]
+the \emph{negative binomial} law --- combinatorially: the $r$-th
+head falls at toss $n$ iff the previous $r - 1$ heads choose their
+places among the first $n - 1$ tosses.
+\end{solution}
+
+\begin{solution}{exo:b2:genfun:6}
+$m = 1\cdot\frac38 + 2\cdot\frac38 + 3\cdot\frac18 = \frac{3 + 6 +
+3}{8} = \frac32 > 1$: supercritical. The generating function is
+\[
+G(t) = \frac{1 + 3t + 3t^2 + t^3}{8} = \frac{(1 + t)^3}{8} ,
+\]
+so fixed points solve $(1 + t)^3 = 8t$, i.e.\ $t^3 + 3t^2 - 5t + 1
+= 0$. Factoring out the guaranteed root $t = 1$:
+\[
+t^3 + 3t^2 - 5t + 1 = (t - 1)\bigl(t^2 + 4t - 1\bigr),
+\]
+and $t^2 + 4t - 1 = 0$ gives $t = -2 \pm \sqrt5$. The root in
+$\intco{0}{1}$ is $\sqrt5 - 2 \approx 0.236$: by
+\cref{thm:b2:genfun:extinction},
+\[
+q = \sqrt 5 - 2 .
+\]
+(A pleasant check: the offspring law is that of $3$ independent
+fair coins, $Z_1 \sim \mathcal{B}(3, \frac12)$.)
+\end{solution}
+
+\begin{solution}{exo:b2:genfun:7}
+\emph{Expectation.} First $\E(Z_n) = m^n$: by
+\cref{thm:b2:genfun:compound}, $\E(Z_{n+1}) = \E(Z_n)\,m$, and
+$\E(Z_0) = 1$. The family $\bigl(Z_n(\omega)\P(\{\omega\})
+\bigr)_{n, \omega}$ is nonnegative, so Fubini for families applies
+unconditionally:
+\[
+\E(Y) = \sum_{n=0}^{\infty}\E(Z_n)
+= \sum_{n=0}^\infty m^n = \frac{1}{1 - m} < \infty
+\]
+(in particular $Y$ is almost surely finite: consistent with
+certain extinction in the subcritical case).
+
+\emph{Functional equation.} Decompose the population by the
+ancestor's children: if the ancestor has $Z_1 = k$ children, the
+total progeny is $Y = 1 + Y_1 + \dots + Y_k$, where $Y_i$ is the
+total progeny of the $i$-th child's line --- and the $Y_i$ are
+independent copies of $Y$, independent of $Z_1$ (distinct lines
+use disjoint, independent reproduction events). Conditioning on
+$Z_1$ as in \cref{thm:b2:genfun:compound}:
+\[
+H(t) = \E\bigl(t^Y\bigr)
+= t\sum_{k=0}^\infty \P(Z_1 = k)\,H(t)^k
+= t\,G\bigl(H(t)\bigr),
+\]
+the factor $t$ accounting for the ancestor itself. (For the
+law $p_0 = 1 - p$, $p_2 = p$ of binary branching, this quadratic
+equation in $H$ can be solved explicitly and expanded --- the
+Catalan numbers of \cref{ch:b2:powerseries} count the family
+trees.)
+\end{solution}
+
+\begin{solution}{exo:b2:genfun:8}
+Let $R > 1$ be the radius and fix $t \in \intoo{1}{R}$. Then
+$\E(t^X) = G(t) < \infty$, and Markov's inequality
+(\cref{thm:b2:randomvar:markov}) applied to the nonnegative
+variable $t^X$ at level $t^n$:
+\[
+\P(X \geq n) = \P\bigl(t^X \geq t^n\bigr)
+\leq \frac{G(t)}{t^n} = C\rho^n,
+\qquad C = G(t),\quad \rho = \frac1t \in \intoo{0}{1}.
+\]
+\emph{Converse:} if $\P(X \geq n) \leq C\rho^n$, then $p_n \leq
+\P(X \geq n) \leq C\rho^n$, so for $\abs t < \frac1\rho$ the
+series $\sum p_n\abs t^n$ is dominated by the convergent geometric
+series $C\sum(\rho\abs t)^n$: the radius is at least
+$\frac1\rho > 1$. Radius of the generating function and geometric
+decay of the tail are two faces of the same property.
+\end{solution}
+
+\begin{solution}{exo:b2:genfun:9}
+Write $p_k^{(n)} = \P(X_n = k)$, $p_k = \P(X = k)$.
+
+\emph{Case $k = 0$.} For $t \in \intoo{0}{1}$ and any law
+$(q_j)$ with $\sum_j q_j \leq 1$:
+\[
+\Bigl|\,q_0 - \sum_j q_jt^j\Bigr|
+= \sum_{j \geq 1} q_j t^j
+\leq \sum_{j\geq1}t^j = \frac{t}{1 - t} .
+\]
+Hence
+\[
+\abs{p_0^{(n)} - p_0}
+\leq \frac{2t}{1 - t}
++ \abs{G_{X_n}(t) - G_X(t)} .
+\]
+Given $\varepsilon > 0$, choose $t$ with $\frac{2t}{1-t} <
+\frac\varepsilon2$, then $n_0$ such that the last term is $<
+\frac\varepsilon2$ for $n \geq n_0$: so $p_0^{(n)} \to p_0$.
+
+\emph{Induction step.} Assume $p_j^{(n)} \to p_j$ for $j < k$.
+Consider the \emph{shifted} functions
+\[
+g_n(t) = \frac{G_{X_n}(t) - p^{(n)}_0}{t}
+= \sum_{j\geq0} p^{(n)}_{j+1}t^j,
+\qquad
+g(t) = \frac{G_X(t) - p_0}{t} ,
+\]
+generating functions of the sub-probability sequences
+$(p^{(n)}_{j+1})_j$ (total mass $\leq 1$, which is all the
+$k = 0$ argument used). For fixed $t \in \intoo{0}{1}$, $g_n(t)
+\to g(t)$ by hypothesis and the case $k = 0$. Applying the $k =
+0$ argument to $g_n$ gives $p_1^{(n)} \to p_1$; iterating the
+shift $k$ times gives $p_k^{(n)} \to p_k$ for every $k$. (This is
+the discrete, elementary instance of Lévy's continuity theorem,
+whose general form --- for characteristic functions --- is a Year
+3 landmark.)
+\end{solution}

@@ -10,7 +10,7 @@ several volumes:
 1. **Primary & Middle School Mathematics** — Grades 1–9;
 2. **High School Mathematics** — Grades 10–12;
 3. **University Mathematics — Year 1**;
-4. **University Mathematics — Year 2** (planned);
+4. **University Mathematics — Year 2**;
 5. **University Mathematics — Year 3** (planned).
 
 The style is concise and rigorous: courses built from **definitions,
@@ -36,7 +36,8 @@ collected at the end of each book.
 | High School | Grade 11 (age 16–17) | Penultimate year of secondary school, advanced track | ✅ 10 chapters, exercises + solutions |
 | High School | Grade 12 (age 17–18) | Final year of secondary school, advanced track | ✅ 16 chapters, exercises + solutions |
 | University — Year 1 | Bachelor Year 1 (age 18–19) | First post-secondary year (old French MPSI program) | ✅ 25 chapters, exercises + solutions |
-| Other | Kindergarten, University Years 2–3 | | 🚧 planned |
+| University — Year 2 | Bachelor Year 2 (age 19–20) | Second post-secondary year (French MP* program) | ✅ 23 chapters, exercises + solutions |
+| Other | Kindergarten, University Year 3 | | 🚧 planned |
 
 The lower the grade, the younger the reader it is written for: earlier
 parts use more figures, more detailed worked steps, and gentler
@@ -57,6 +58,7 @@ The PDFs are produced at
 build/one_math_book_primary_middle_school.pdf
 build/one_math_book_high_school.pdf
 build/one_math_book_university_year_1.pdf
+build/one_math_book_university_year_2.pdf
 ```
 
 `make clean` removes auxiliary files, `make distclean` removes the whole

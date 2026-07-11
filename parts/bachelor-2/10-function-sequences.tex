@@ -1,0 +1,296 @@
+\chapter{Sequences and Series of Functions}\label{ch:b2:funcseq}
+
+When functions converge to a function, which properties survive the
+passage to the limit? Pointwise convergence preserves almost
+nothing; \emph{uniform} convergence --- convergence in the sup norm
+--- preserves continuity, integrals on segments and, with one twist,
+derivatives. This chapter proves the three transfer theorems,
+their series versions, and crowns them with the Weierstrass
+approximation theorem, proved by Bernstein's beautiful probabilistic
+polynomials.
+
+\section{Pointwise and uniform convergence}
+
+\begin{definition}\label{def:b2:funcseq:def}
+Let $f_n, f \colon X \to \R$ (or $\C$, or a normed space), $X$ any
+set. $(f_n)$ converges to $f$
+\emph{pointwise}\index{pointwise convergence} when $f_n(x) \to
+f(x)$ for every $x$; \emph{uniformly}\index{uniform convergence}
+when
+\[
+\norm{f_n - f}_\infty = \sup_{x \in X}\, \abs{f_n(x) - f(x)}
+\xrightarrow[n \to \infty]{} 0 .
+\]
+Uniform implies pointwise; on $C(\intcc{a}{b})$, uniform convergence
+is exactly convergence in the Banach space
+$\bigl(C(\intcc{a}{b}), \norm\cdot_\infty\bigr)$ of
+\cref{ch:b2:nvs}.
+\end{definition}
+
+\begin{example}\label{ex:b2:funcseq:xn}
+On $\intcc{0}{1}$, $f_n(x) = x^n$ converges pointwise to the
+\emph{discontinuous} limit $f = \mathbf{1}_{\{1\}}$; the convergence
+is not uniform: $\norm{f_n - f}_\infty \geq f_n\bigl(1 -
+\tfrac1n\bigr) = (1 - \tfrac1n)^n \to \eu^{-1} \neq 0$. On
+$\intcc{0}{a}$ with $a < 1$ it \emph{is} uniform ($\sup = a^n \to
+0$): uniformity is a property of the domain as much as of the
+sequence.
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=8.2cm, height=5.6cm,
+    xmin=0, xmax=1.08, ymin=0, ymax=1.15,
+    xtick={0,1}, ytick={1}]
+  \addplot[omDef!40, thick, domain=0:1, samples=80] {x^2};
+  \addplot[omDef!60, thick, domain=0:1, samples=80] {x^5};
+  \addplot[omDef, thick, domain=0:1, samples=120] {x^15};
+  \addplot[omThm, very thick, domain=0:1, samples=160] {x^40};
+  \node[font=\small, omDef] at (axis cs:0.62,0.5) {$x^2$};
+  \node[font=\small, omDef] at (axis cs:0.83,0.48) {$x^5$};
+  \node[font=\small, omThm] at (axis cs:0.987,0.5) {$x^{40}$};
+\end{axis}
+\end{tikzpicture}
+
+{\small The sequence $x^n$ on $\intcc{0}{1}$: the graphs sag toward
+$0$ but all must climb to $1$ at $x = 1$ --- the sup distance to the
+discontinuous pointwise limit never shrinks below a constant.}
+\end{omfigure}
+
+\section{The three transfer theorems}
+
+\begin{theorem}[Continuity]\label{thm:b2:funcseq:continuity}
+If each $f_n$ is continuous at $a$ and $f_n \to f$ uniformly on a
+neighborhood of $a$, then $f$ is continuous at $a$. A uniform limit
+of continuous functions is continuous.
+\end{theorem}
+
+\begin{proof}
+The $3\varepsilon$ argument already used in
+\cref{thm:b2:metric:rncomplete}: pick $n$ with $\norm{f_n -
+f}_\infty \leq \varepsilon$, then $\delta$ from continuity of
+$f_n$ at $a$; for $\abs{x - a} \leq \delta$,
+\[
+\abs{f(x) - f(a)} \leq \abs{f(x) - f_n(x)} + \abs{f_n(x) - f_n(a)}
++ \abs{f_n(a) - f(a)} \leq 3\varepsilon . \qedhere
+\]
+\end{proof}
+
+\begin{theorem}[Integration on a segment]\label{thm:b2:funcseq:integration}
+If $f_n \to f$ uniformly on $\intcc{a}{b}$, with $f_n$ piecewise
+continuous ($f$ likewise), then
+\[
+\int_a^b f_n \longrightarrow \int_a^b f .
+\]
+\end{theorem}
+
+\begin{proof}
+$\bigl|\int_a^b (f_n - f)\bigr| \leq (b - a)\,\norm{f_n -
+f}_\infty \to 0$. (On non-compact intervals this fails without
+domination: the sliding bumps of \cref{ch:b2:integration}'s remark;
+uniform convergence on $\R$ does not control mass escaping to
+infinity.)
+\end{proof}
+
+\begin{theorem}[Differentiation]\label{thm:b2:funcseq:differentiation}
+Let $f_n$ be $C^1$ on an interval $I$, with: $(f_n')$ converging
+\emph{uniformly} on $I$ (or on every segment of $I$) to some $g$,
+and $(f_n(x_0))$ converging at one point $x_0$. Then $(f_n)$
+converges (uniformly on segments) to a $C^1$ function $f$, and $f'
+= g$: one may differentiate the limit.
+\end{theorem}
+
+\begin{proof}
+Define $f(x) = \lim f_n(x_0) + \int_{x_0}^x g$: legitimate, $g$
+being continuous (\cref{thm:b2:funcseq:continuity}). By the
+fundamental theorem of calculus, $f_n(x) = f_n(x_0) + \int_{x_0}^x
+f_n'$; subtracting,
+\[
+\abs{f_n(x) - f(x)} \leq \abs{f_n(x_0) - \lim f_n(x_0)}
++ \abs{x - x_0}\,\norm{f_n' - g}_{\infty} ,
+\]
+which tends to $0$ uniformly on every segment. And $f$ is $C^1$
+with $f' = g$ by construction.
+\end{proof}
+
+\section{Series of functions}
+
+\begin{definition}\label{def:b2:funcseq:series}
+A series of functions $\sum u_n$ converges pointwise/uniformly when
+its partial sums do. It converges
+\emph{normally}\index{normal convergence} (on $X$) when $\sum
+\norm{u_n}_\infty < \infty$. Normal convergence implies uniform
+convergence (in the Banach space of bounded functions:
+\cref{thm:b2:nvs:absoluteconvergence}), which implies pointwise;
+both implications are strict.
+\end{definition}
+
+\begin{theorem}[Transfer for series]\label{thm:b2:funcseq:seriestransfer}
+If $\sum u_n$ converges uniformly (e.g.\ normally) on the relevant
+set: continuity of all $u_n$ at $a$ passes to the sum; integration
+on a segment can be done term by term; and if $\sum u_n(x_0)$
+converges while $\sum u_n'$ converges uniformly on segments, the
+sum is $C^1$ with derivative $\sum u_n'$.
+\end{theorem}
+
+\begin{proof}
+Apply the three theorems to the partial sums.
+\end{proof}
+
+\begin{example}[The Riemann $\zeta$ function]\label{ex:b2:funcseq:zeta}
+$\zeta(s) = \sum_{n\geq1} n^{-s}$ converges normally on every
+half-line $\intco{a}{+\infty}$, $a > 1$ ($\norm{n^{-s}}_\infty =
+n^{-a}$, summable): $\zeta$ is continuous on $\intoo{1}{+\infty}$;
+differentiating termwise (the derived series $\sum -\ln n\; n^{-s}$
+also converges normally on $\intco{a}{\infty}$), $\zeta$ is $C^1$
+--- and, iterating, $C^\infty$ --- with $\zeta'(s) = -\sum \frac{\ln
+n}{n^s}$. Note the discipline: normal convergence is checked on
+\emph{sub}-half-lines, never on the open $\intoo{1}{\infty}$
+itself, where it fails.
+\end{example}
+
+\section{The Weierstrass approximation theorem}
+
+\begin{theorem}[Weierstrass, via Bernstein]\label{thm:b2:funcseq:weierstrass}
+Every continuous $f \colon \intcc{0}{1} \to \R$ is a uniform limit
+of polynomials --- explicitly, of its \emph{Bernstein
+polynomials}\index{Bernstein polynomials}\index{Weierstrass
+approximation theorem}
+\[
+B_n(f)(x) = \sum_{k=0}^{n} f\Bigl(\frac kn\Bigr)\binom nk x^k
+(1-x)^{n-k} .
+\]
+\end{theorem}
+
+\begin{proof}
+Fix $x \in \intcc{0}{1}$ and set $p_k(x) = \binom nk x^k(1 -
+x)^{n-k}$. Three binomial identities, obtained by evaluating
+$(x + y)^n$ and its two $x$-derivatives at $y = 1 - x$:
+\[
+\sum_k p_k = 1,
+\qquad
+\sum_k k\,p_k = nx,
+\qquad
+\sum_k k(k-1) p_k = n(n-1)x^2 ,
+\]
+whence the \emph{variance identity} $\sum_k (k - nx)^2 p_k = nx(1 -
+x) \leq \frac n4$.
+
+Now estimate, using $\sum p_k = 1$:
+\[
+\abs{B_n(f)(x) - f(x)}
+\leq \sum_{k} \Bigl| f\Bigl(\frac kn\Bigr) - f(x)\Bigr|\, p_k(x)
+= \Sigma_{\text{near}} + \Sigma_{\text{far}} ,
+\]
+splitting according to $\abs{\frac kn - x} \leq \delta$ or not.
+Given $\varepsilon > 0$, uniform continuity of $f$ (Heine) provides
+$\delta$ with $\Sigma_{\text{near}} \leq \varepsilon$. For the far
+sum, with $M = \norm f_\infty$: by the variance identity and
+Chebyshev's counting trick,
+\[
+\Sigma_{\text{far}} \leq 2M \sum_{\abs{k - nx} > n\delta} p_k
+\leq 2M\,\frac{\sum_k (k - nx)^2 p_k}{n^2\delta^2}
+\leq \frac{2M}{4 n \delta^2} \cdot 1
+= \frac{M}{2n\delta^2}
+\xrightarrow[n\to\infty]{} 0 ,
+\]
+uniformly in $x$. So $\norm{B_n(f) - f}_\infty \leq \varepsilon +
+\frac{M}{2n\delta^2} \leq 2\varepsilon$ for large $n$.
+\end{proof}
+
+\begin{remark}
+By affine substitution the theorem holds on any segment
+$\intcc{a}{b}$. It fails on $\R$ (a uniform limit of polynomials on
+$\R$ is a polynomial: \cref{exo:b2:funcseq:8}). The probabilistic
+reading --- $B_n(f)(x)$ is the expected value of $f$ at a binomial
+average, and the variance bound is Chebyshev's inequality --- is
+made honest in \cref{ch:b2:genfun}.
+\end{remark}
+
+\section{Exercises}
+
+\begin{exercise}[$\star$]\label{exo:b2:funcseq:1}
+Study the pointwise and uniform convergence on $\intcc{0}{1}$, then
+on $\intcc{0}{a}$ ($a < 1$) or $\intco{\delta}{1}$ as relevant, of:
+\[
+f_n(x) = \frac{x}{1 + nx},
+\qquad
+g_n(x) = n x\,\eu^{-n x^2},
+\qquad
+h_n(x) = x^n(1 - x^n).
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:funcseq:2}
+Prove that $\displaystyle\int_0^1 g_n \not\to \int_0^1 \lim g_n$
+for the $g_n$ of \cref{exo:b2:funcseq:1}, and reconcile with
+\cref{thm:b2:funcseq:integration}.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:funcseq:3}
+Prove that $S(x) = \sum_{n\geq1} \dfrac{x^n}{n^2}$ is continuous on
+$\intcc{-1}{1}$, and that $S$ is $C^1$ on $\intoo{-1}{1}$ with
+$S'(x) = -\frac{\ln(1-x)}{x}$ for $0 < \abs x < 1$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:4}
+Let $F(x) = \sum_{n \geq 0} \dfrac{(-1)^n}{n + x}$ on
+$\intoo{0}{+\infty}$. Prove uniform (not normal) convergence on
+$\intco{\delta}{\infty}$ via the alternating series remainder
+bound, continuity, and the functional equation $F(x) + F(x + 1) =
+\frac1x$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:5}
+(Dini) Let $f_n \colon K \to \R$ be continuous on a \emph{compact}
+metric space, with $f_n \to f$ \emph{pointwise}, $f$ continuous,
+and $(f_n(x))$ \emph{decreasing} in $n$ for each $x$. Prove that
+the convergence is uniform. \emph{(Given $\varepsilon$, the open
+sets $U_n = \{x : f_n(x) - f(x) < \varepsilon\}$ increase and cover
+$K$; extract a finite subcover ---
+\cref{thm:b2:metric:borellebesgue}.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:6}
+Prove that $\displaystyle\lim_{n\to\infty} \int_0^1
+\frac{n\,f(x)}{1 + n^2x^2}\,\dd x = \frac{\pi}{2} f(0)$ for every
+continuous $f$ on $\intcc{0}{1}$. \emph{(Substitute $u = nx$; split
+off $f(0)$; dominate.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:7}
+Compute the Bernstein polynomials of $f(x) = x^2$ explicitly and
+verify the uniform error $\norm{B_n f - f}_\infty =
+O\bigl(\frac1n\bigr)$ predicted by the proof of
+\cref{thm:b2:funcseq:weierstrass} --- here exactly $\frac{x(1 -
+x)}{n}$ at each point.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:8}
+Prove that if polynomials $P_n$ converge uniformly \emph{on all of
+$\R$} to $f$, then $f$ is a polynomial. \emph{(For large $m, n$,
+$P_n - P_m$ is a bounded polynomial on $\R$, hence constant; so the
+sequence stabilizes modulo constants.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:funcseq:9}
+(A continuous, nowhere differentiable function --- guided) Let
+$\varphi$ be the distance to the nearest integer ($1$-periodic,
+$\norm{\varphi}_\infty = \frac12$, $1$-Lipschitz) and
+\[
+W(x) = \sum_{n=0}^{\infty} \Bigl(\frac{3}{4}\Bigr)^{\!n}
+\varphi(4^n x) .
+\]
+Prove: (a) $W$ is continuous on $\R$ (normal convergence); (b) for
+every $x$ and every $m$, choosing $h_m = \pm\frac12\cdot 4^{-m}$
+with the sign making $\varphi$ affine on the segment from $4^m x$
+to $4^m(x + h_m)$, the difference quotient satisfies
+\[
+\Bigl|\frac{W(x + h_m) - W(x)}{h_m}\Bigr| \geq 3^m -
+\sum_{n<m} 3^n \geq \frac{3^m + 1}{2} \xrightarrow[m\to\infty]{}
+\infty
+\]
+(terms $n > m$ vanish by periodicity; term $n = m$ contributes
+exactly $3^m$; terms $n < m$ are bounded by the Lipschitz property).
+Conclude that $W$ is differentiable nowhere.
+\end{exercise}

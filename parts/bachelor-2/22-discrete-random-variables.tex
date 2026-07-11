@@ -1,0 +1,429 @@
+\chapter{Discrete Random Variables}\label{ch:b2:randomvar}
+
+Random variables organize probability computations around
+functions rather than events. On countable spaces the theory is
+powered by the summable families of \cref{ch:b2:series}:
+expectation is the sum of a family indexed by the sample space,
+and all its properties --- linearity, transfer, product formula
+for independent variables --- are theorems about summable
+families. The chapter proves the key inequalities of Markov,
+Chebyshev, Cauchy--Schwarz and Jensen, and ends with the classical
+laws and the weak law of large numbers, whose proof is two lines
+once Chebyshev is available.
+
+\section{Random variables and their laws}
+
+\begin{definition}[Discrete random variable; law]\label{def:b2:randomvar:law}
+Let $(\Omega, \P)$ be a countable probability space. A
+\emph{random variable} is a map $X \colon \Omega \to E$ ($E$ any
+set; \emph{real} random variable when $E = \R$). Its \emph{law}
+(or \emph{distribution}) is the probability measure $\P_X$ on the
+countable set $X(\Omega)$ defined by
+\[
+\P_X(\{x\}) = \P(X = x)
+= \P\bigl(\{\omega : X(\omega) = x\}\bigr) .
+\]
+\end{definition}
+
+\begin{example}[The classical laws]\label{ex:b2:randomvar:laws}
+\leavevmode
+\begin{itemize}
+\item \emph{Bernoulli} $\mathcal{B}(p)$: $X \in \{0, 1\}$, $\P(X =
+1) = p$. Indicator of an event.
+\item \emph{Binomial} $\mathcal{B}(n, p)$: $\P(X = k) =
+\binom nk p^k(1-p)^{n-k}$, $0 \leq k \leq n$: number of successes
+in $n$ independent Bernoulli trials (High School volume; re-proved
+below via sums of independent variables).
+\item \emph{Geometric} $\mathcal{G}(p)$: $\P(X = k) =
+(1-p)^{k-1}p$, $k \in \N^*$: rank of the first success
+(\cref{ex:b2:proba:geometric}).
+\item \emph{Poisson} $\mathcal{P}(\lambda)$: $\P(X = k) =
+e^{-\lambda}\frac{\lambda^k}{k!}$, $k \in \N$ --- a probability
+measure by the exponential series. The law of rare events
+(\cref{ch:b2:genfun}).
+\end{itemize}
+\end{example}
+
+\begin{proposition}[Memorylessness of the geometric
+law]\label{prop:b2:randomvar:memoryless}
+If $X \sim \mathcal{G}(p)$, then for all $m, n \in \N$:
+\[
+\P(X > m + n \mid X > m) = \P(X > n) ,
+\]
+and the geometric laws are the only laws on $\N^*$ with this
+property.
+\end{proposition}
+
+\begin{proof}
+Summing the geometric weights, $\P(X > n) = (1-p)^n$. Hence
+\[
+\P(X > m + n \mid X > m)
+= \frac{\P(X > m + n)}{\P(X > m)}
+= \frac{(1-p)^{m+n}}{(1-p)^m} = (1-p)^n = \P(X > n).
+\]
+Conversely, if $G(n) = \P(X > n)$ satisfies $G(m + n) =
+G(m)G(n)$ with $G(0) = 1$, then $G(n) = G(1)^n$ by induction; $q =
+G(1) \in \intco{0}{1}$, and $q = 0$ or the law is
+$\mathcal{G}(1 - q)$: $\P(X = k) = G(k-1) - G(k) =
+q^{k-1}(1 - q)$.
+\end{proof}
+
+\section{Expectation}
+
+\begin{definition}[Expectation]\label{def:b2:randomvar:expectation}
+A real random variable $X$ on $(\Omega, \P)$ \emph{has an
+expectation} if the family
+$\bigl(X(\omega)\,\P(\{\omega\})\bigr)_{\omega \in \Omega}$ is
+summable (\cref{ch:b2:series}); its \emph{expectation} is then
+\[
+\E(X) = \sum_{\omega \in \Omega} X(\omega)\,\P(\{\omega\}) .
+\]
+\end{definition}
+
+\begin{theorem}[Transfer theorem]\label{thm:b2:randomvar:transfer}
+$X$ has an expectation if and only if the family $\bigl(x\,\P(X =
+x)\bigr)_{x \in X(\Omega)}$ is summable, and then
+\[
+\E(X) = \sum_{x \in X(\Omega)} x\,\P(X = x) .
+\]
+More generally, for $f \colon X(\Omega) \to \R$, the variable
+$f(X)$ has an expectation iff $\sum_x \abs{f(x)}\,\P(X = x) <
+\infty$, and then $\E(f(X)) = \sum_x f(x)\,\P(X = x)$.
+\end{theorem}
+
+\begin{proof}
+Partition $\Omega$ into the level sets $\Omega_x = \{X = x\}$, $x
+\in X(\Omega)$. By the summation-by-packets theorem for summable
+families (\cref{ch:b2:series}), the family
+$(X(\omega)\P(\{\omega\}))_\omega$ is summable iff each packet is
+(automatic: $\sum_{\omega \in \Omega_x}\abs{x}\P(\{\omega\}) =
+\abs x\,\P(X = x)$) \emph{and} the family of packet sums
+$\bigl(x\,\P(X = x)\bigr)_x$ is summable --- and then the total
+sums agree. The statement for $f(X)$ is the same argument applied
+to the variable $f \circ X$, whose level sets refine along the
+values of $f$.
+\end{proof}
+
+\begin{theorem}[Properties of expectation]\label{thm:b2:randomvar:linearity}
+On the set of random variables with expectation:
+\begin{enumerate}
+\item (Linearity) $\E(aX + bY) = a\,\E(X) + b\,\E(Y)$.
+\item (Positivity and monotonicity) $X \geq 0 \Rightarrow \E(X)
+\geq 0$; $X \leq Y \Rightarrow \E(X) \leq \E(Y)$; and
+$\abs{\E(X)} \leq \E(\abs X)$.
+\item (Domination) If $\abs X \leq Z$ and $Z$ has an expectation,
+so does $X$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+All are properties of sums of summable families
+(\cref{ch:b2:series}): linearity of the sum, positivity term by
+term, and the domination criterion for summability. (Note that
+linearity is immediate on the \emph{definition} over $\Omega$,
+while it would be awkward on the transfer formula --- one benefit
+of defining $\E$ upstream.)
+\end{proof}
+
+\begin{example}\label{ex:b2:randomvar:expectations}
+$X \sim \mathcal{B}(n, p)$: writing $X = X_1 + \dots + X_n$ as a
+sum of Bernoulli indicators and using linearity, $\E(X) = np$ ---
+no binomial coefficients needed. $X \sim \mathcal{G}(p)$: $\E(X) =
+\sum_{k\geq1}k(1-p)^{k-1}p = p\cdot\frac{1}{(1 - (1-p))^2} =
+\frac1p$, by differentiating the geometric series inside its disk
+(\cref{ch:b2:powerseries}). $X \sim \mathcal{P}(\lambda)$: $\E(X)
+= \sum_{k\geq1}k e^{-\lambda}\frac{\lambda^k}{k!} = \lambda
+e^{-\lambda}\sum_{j\geq0}\frac{\lambda^j}{j!} = \lambda$.
+\end{example}
+
+\begin{theorem}[Independence and products]\label{thm:b2:randomvar:product}
+Random variables $X, Y$ are \emph{independent} if $\P(X = x, Y =
+y) = \P(X = x)\P(Y = y)$ for all $x, y$ --- equivalently, the
+events $\{X \in A\}$ and $\{Y \in B\}$ are independent for all $A,
+B$. If $X$ and $Y$ are independent real variables with
+expectations, then $XY$ has an expectation and
+\[
+\E(XY) = \E(X)\,\E(Y) .
+\]
+\end{theorem}
+
+\begin{proof}
+The equivalence of the two formulations follows by summing the
+pointwise identity over $(x, y) \in A \times B$
+($\sigma$-additivity twice). For the product: the double family
+$\bigl(xy\,\P(X = x)\P(Y = y)\bigr)_{(x,y)}$ is summable, since by
+Fubini for families (\cref{ch:b2:series})
+\[
+\sum_{x, y}\abs x \abs y\,\P(X{=}x)\P(Y{=}y)
+= \Bigl(\sum_x \abs x \P(X{=}x)\Bigr)
+\Bigl(\sum_y \abs y \P(Y{=}y)\Bigr) < \infty ;
+\]
+by independence this family is exactly $\bigl(xy\,\P(X = x, Y =
+y)\bigr)$, whose sum is $\E(XY)$ by transfer applied to the
+variable $(X, Y) \mapsto xy$; Fubini again evaluates the unsigned
+sum as the product $\E(X)\E(Y)$.
+\end{proof}
+
+\section{Variance, covariance, and the classical inequalities}
+
+\begin{definition}[Moments, variance]\label{def:b2:randomvar:variance}
+$X$ has a \emph{moment of order 2} if $X^2$ has an expectation
+(then so does $X$, by domination: $\abs X \leq \frac{1 +
+X^2}{2}$). Its \emph{variance} and \emph{standard deviation} are
+then
+\[
+V(X) = \E\bigl((X - \E(X))^2\bigr)
+= \E(X^2) - \E(X)^2 ,
+\qquad
+\sigma(X) = \sqrt{V(X)} ,
+\]
+(the second form by expanding the square and linearity: the
+\emph{König--Huygens} formula). For $X, Y$ with second moments,
+the \emph{covariance} is
+\[
+\operatorname{Cov}(X, Y)
+= \E\bigl((X - \E X)(Y - \E Y)\bigr)
+= \E(XY) - \E(X)\E(Y) .
+\]
+\end{definition}
+
+\begin{theorem}[Variance toolkit]\label{thm:b2:randomvar:variancerules}
+For variables with second moments:
+\begin{enumerate}
+\item $V(aX + b) = a^2\,V(X)$;
+\item $V(X + Y) = V(X) + V(Y) + 2\operatorname{Cov}(X, Y)$, and
+more generally
+\[
+V\Bigl(\sum_{i=1}^n X_i\Bigr)
+= \sum_{i=1}^n V(X_i)
++ 2\sum_{i < j}\operatorname{Cov}(X_i, X_j) ;
+\]
+\item if $X, Y$ are independent, $\operatorname{Cov}(X, Y) = 0$
+(the converse is false), so variances of independent variables
+add.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\emph{1} and \emph{2} are expansions of squares plus linearity;
+the products $X_iX_j$ have expectations by Cauchy--Schwarz below
+(or by $\abs{X_iX_j} \leq \frac{X_i^2 + X_j^2}{2}$). \emph{3} is
+\cref{thm:b2:randomvar:product} applied to the centered
+variables. A standard counterexample to the converse: $X$ uniform
+on $\{-1, 0, 1\}$ and $Y = X^2$ are uncorrelated
+($\E(XY) = \E(X^3) = 0 = \E X \cdot \E Y$) but clearly dependent.
+\end{proof}
+
+\begin{theorem}[Markov and Chebyshev
+inequalities]\label{thm:b2:randomvar:markov}
+\leavevmode
+\begin{enumerate}
+\item (Markov) If $X \geq 0$ has an expectation, then for every $a
+> 0$:
+\[
+\P(X \geq a) \leq \frac{\E(X)}{a} .
+\]
+\item (Chebyshev) If $X$ has a second moment, then for every
+$\varepsilon > 0$:
+\[
+\P\bigl(\abs{X - \E(X)} \geq \varepsilon\bigr)
+\leq \frac{V(X)}{\varepsilon^2} .
+\]
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\emph{1.} Pointwise, $a\,\mathbf{1}_{X \geq a} \leq X$ (on the
+event the left side is $a \leq X$; off it, $0 \leq X$). Take
+expectations: $a\,\P(X \geq a) \leq \E(X)$ by monotonicity and
+$\E(\mathbf{1}_A) = \P(A)$.
+\emph{2.} Apply Markov to the nonnegative variable $(X - \E
+X)^2$ at level $a = \varepsilon^2$: the event $\{(X - \E X)^2
+\geq \varepsilon^2\}$ is exactly $\{\abs{X - \E X} \geq
+\varepsilon\}$.
+\end{proof}
+
+\begin{theorem}[Cauchy--Schwarz and Jensen]\label{thm:b2:randomvar:jensen}
+\leavevmode
+\begin{enumerate}
+\item (Cauchy--Schwarz) If $X, Y$ have second moments, $XY$ has an
+expectation and $\E(XY)^2 \leq \E(X^2)\,\E(Y^2)$; consequently
+$\operatorname{Cov}(X,Y)^2 \leq V(X)V(Y)$.
+\item (Jensen) If $\varphi \colon I \to \R$ is convex on an
+interval containing $X(\Omega)$, and $X$, $\varphi(X)$ have
+expectations, then
+\[
+\varphi\bigl(\E(X)\bigr) \leq \E\bigl(\varphi(X)\bigr) .
+\]
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\emph{1.} Summability of $XY$: $\abs{XY} \leq \frac{X^2 + Y^2}2$.
+The map $(X, Y) \mapsto \E(XY)$ is a positive symmetric bilinear
+form on the space of variables with second moments, so the abstract
+Cauchy--Schwarz inequality of \cref{ch:b2:quadratic} applies
+(positive \emph{semi}-definite suffices for the inequality).
+Applying it to the centered variables gives the covariance bound.
+
+\emph{2.} First, $m = \E(X)$ lies in $I$: $I$ is an interval
+containing all values of $X$, and expectation is monotone, so $m$
+is between $\inf X(\Omega)$ and $\sup X(\Omega)$. By the
+support-line theorem for convex functions
+(\cref{ch:b2:realfun}), there are $\alpha, \beta$ with
+$\varphi(t) \geq \alpha t + \beta$ for all $t \in I$ and
+$\varphi(m) = \alpha m + \beta$. Then, pointwise on $\Omega$,
+$\varphi(X) \geq \alpha X + \beta$; taking expectations,
+\[
+\E\bigl(\varphi(X)\bigr) \geq \alpha\,\E(X) + \beta
+= \varphi\bigl(\E(X)\bigr). \qedhere
+\]
+\end{proof}
+
+\begin{example}
+Jensen with $\varphi(t) = t^2$ gives $\E(X)^2 \leq \E(X^2)$ ---
+positivity of the variance; with $\varphi(t) = 1/t$ on
+$\intoo{0}{\infty}$: $\frac{1}{\E X} \leq \E\bigl(\frac1X\bigr)$
+--- the harmonic mean is below the arithmetic mean, now in random
+form.
+\end{example}
+
+\section{The weak law of large numbers}
+
+\begin{theorem}[Weak law of large numbers]\label{thm:b2:randomvar:lln}
+Let $(X_k)_{k \geq 1}$ be pairwise independent random variables
+with the same law, admitting a second moment; write $m = \E(X_1)$
+and $S_n = X_1 + \dots + X_n$. Then for every $\varepsilon > 0$:
+\[
+\P\Bigl(\,\Bigl|\frac{S_n}{n} - m\Bigr| \geq \varepsilon\Bigr)
+\;\leq\; \frac{V(X_1)}{n\,\varepsilon^2}
+\xrightarrow[n \to \infty]{} 0 .
+\]
+\end{theorem}
+
+\begin{proof}
+By linearity $\E(S_n/n) = m$; by
+\cref{thm:b2:randomvar:variancerules} (pairwise independence
+kills the covariances) $V(S_n) = n\,V(X_1)$, so $V(S_n/n) =
+V(X_1)/n$. Chebyshev's inequality applied to $S_n/n$ gives the
+bound.
+\end{proof}
+
+\begin{remark}
+This is the theorem that connects probability to frequency: for
+$X_k$ the indicator of an event $A$ in independent repetitions,
+$S_n/n$ is the observed frequency of $A$, and the law of large
+numbers says it concentrates around $\P(A)$ at rate
+$\frac{p(1-p)}{n\varepsilon^2}$. The \emph{strong} law ($S_n/n \to
+m$ almost surely) is a Year 3 theorem --- its proof for fourth
+moments is within reach, though: see \cref{exo:b2:randomvar:9},
+which runs Borel--Cantelli on the Chebyshev-type bound. The same
+Chebyshev estimate powered the Bernstein-polynomial proof of the
+Weierstrass approximation theorem in \cref{ch:b2:funcseq} --- the
+counting lemma there \emph{was} the weak law of large numbers in
+disguise.
+\end{remark}
+
+\section{Exercises}
+
+\begin{exercise}[$\star$]\label{exo:b2:randomvar:1}
+Compute $\E(X)$ and $V(X)$ for $X \sim \mathcal{B}(n, p)$ (via
+indicators), $X \sim \mathcal{P}(\lambda)$ (show $V(X) =
+\lambda$), and $X \sim \mathcal{G}(p)$ (show $V(X) =
+\frac{1-p}{p^2}$; use $\E(X(X-1))$ and the second derivative of
+the geometric series).
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:randomvar:2}
+Let $X \sim \mathcal{P}(\lambda)$ and $Y \sim \mathcal{P}(\mu)$ be
+independent. Show that $X + Y \sim \mathcal{P}(\lambda + \mu)$
+(convolution of the weights; binomial theorem), and that the
+conditional law of $X$ given $X + Y = n$ is binomial
+$\mathcal{B}\bigl(n, \frac{\lambda}{\lambda + \mu}\bigr)$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:randomvar:3}
+(Coupon collector, expectation) A cereal brand hides one of $n$
+distinct toys, uniformly, in each box. Let $T_n$ be the number of
+boxes needed to collect all $n$ toys. Writing $T_n$ as a sum of
+independent geometric variables (time to see a \emph{new} toy when
+$k$ are still missing), show
+\[
+\E(T_n) = n\sum_{k=1}^{n}\frac{1}{k} \sim n\ln n
+\]
+(equivalent by the series--integral comparison of
+\cref{ch:b2:comparison}).
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:randomvar:4}
+Let $X \geq 0$ be integer-valued. Prove the \emph{tail formula}
+\[
+\E(X) = \sum_{n=1}^{\infty} \P(X \geq n)
+\]
+(when either side is finite), by writing $X =
+\sum_{n\geq1}\mathbf{1}_{X \geq n}$ and exchanging summations
+(Fubini for nonnegative families). Recover $\E(X) = \frac1p$ for
+the geometric law.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:randomvar:5}
+(Sampling without replacement is more concentrated) An urn has $N$
+balls, $M$ of them white. Draw $n \leq N$ without replacement and
+let $X$ count the whites (\emph{hypergeometric} law). Using
+indicators $X = \sum_{i=1}^n Y_i$ with $Y_i$ the $i$-th draw:
+show each $Y_i$ is Bernoulli of parameter $p = M/N$ (symmetry!),
+conclude $\E(X) = np$ exactly as with replacement, and show
+$\operatorname{Cov}(Y_i, Y_j) = -\frac{p(1-p)}{N-1} < 0$ for $i
+\neq j$, hence $V(X) = np(1-p)\frac{N - n}{N - 1} \leq np(1-p)$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:randomvar:6}
+Let $X$ have a second moment. Show that $c \mapsto \E\bigl((X -
+c)^2\bigr)$ is minimal exactly at $c = \E(X)$, with minimum
+$V(X)$. Then show that $\P(X = \E(X)) = 1$ if and only if $V(X) =
+0$. \emph{(For the second point: if $V(X) = 0$, use Chebyshev
+with $\varepsilon = 1/n$ and monotone continuity,
+\cref{thm:b2:proba:continuity}.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:randomvar:7}
+(Concentration beats Markov) Let $S_n \sim \mathcal{B}(n,
+\frac12)$ (number of heads in $n$ fair tosses). Compare the
+bounds given by Markov ($\P(S_n \geq \frac{3n}{4})$), by Chebyshev,
+and by the exponential (Chernoff) method:
+\[
+\P\Bigl(S_n \geq \frac{3n}4\Bigr)
+\leq \E\bigl(e^{tS_n}\bigr)e^{-3nt/4}
+= \Bigl(\frac{1 + e^t}{2}\Bigr)^n e^{-3nt/4}
+\quad (t > 0),
+\]
+and optimize $t$ to obtain an exponentially small bound. \emph{(At
+$t = \ln 3$: bound $\bigl(2\cdot 3^{-3/4}\bigr)^n \approx
+(0.877)^n$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:randomvar:8}
+(Weierstrass again, probabilistically) Let $f \colon [0,1] \to \R$
+be continuous and $S_n \sim \mathcal{B}(n, x)$. Show that the
+Bernstein polynomial $B_nf(x) = \sum_{k=0}^n f\bigl(\frac
+kn\bigr)\binom nk x^k(1-x)^{n-k}$ equals
+$\E\bigl[f\bigl(\frac{S_n}{n}\bigr)\bigr]$, and re-derive the
+estimate $\abs{B_nf(x) - f(x)} \leq \omega_f(\delta) +
+\frac{2\norm f_\infty}{4n\delta^2}$ of \cref{ch:b2:funcseq} in
+this probabilistic language (split on $\bigl|\frac{S_n}{n} -
+x\bigr| \geq \delta$ and use Chebyshev).
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:randomvar:9}
+(Strong law under fourth moments) Let $(X_k)$ be independent,
+identically distributed, centered ($\E X_1 = 0$), with
+$\E(X_1^4) < \infty$. Expanding $\E(S_n^4)$ and counting the
+surviving terms (only $\E(X_i^4)$ and $\E(X_i^2X_j^2)$ terms, $i
+\neq j$), show $\E(S_n^4) \leq C n^2$ for a constant $C$. Deduce
+$\sum_n \P\bigl(\abs{S_n/n} \geq \varepsilon\bigr) < \infty$
+for each $\varepsilon > 0$ (Markov at order 4) and conclude with
+Borel--Cantelli (\cref{thm:b2:proba:borelcantelli}) that
+$S_n/n \to 0$ almost surely along a suitable formulation: the
+event $\bigcap_{j}\bigcup_N\bigcap_{n \geq N}\{\abs{S_n/n} <
+\frac1j\}$ has probability $1$.
+\end{exercise}

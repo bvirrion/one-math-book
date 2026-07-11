@@ -1,0 +1,410 @@
+\chapter{Reduction of Endomorphisms}\label{ch:b2:reduction}
+
+To understand an endomorphism, find the directions it merely
+stretches. This chapter builds the machinery --- eigenvalues,
+characteristic and minimal polynomials, the kernel-decomposition
+lemma --- and its rewards: diagonalization and trigonalization
+criteria, Cayley--Hamilton, the Dunford decomposition, and the
+computation of powers and exponentials that
+\cref{ch:b2:diffeq} will feed on. Throughout, $E$ is a
+finite-dimensional $K$-vector space ($K = \R$ or $\C$) and $u \in
+\mathcal{L}(E)$, $n = \dim E$.
+
+\section{Eigenvalues and eigenvectors}
+
+\begin{definition}\label{def:b2:reduction:eigen}
+$\lambda \in K$ is an \emph{eigenvalue}\index{eigenvalue} of $u$
+when $u(x) = \lambda x$ for some $x \neq 0$ (an
+\emph{eigenvector}); the \emph{eigenspace} is $E_\lambda(u) =
+\ker(u - \lambda\,\mathrm{id})$. The set of eigenvalues is the
+\emph{spectrum} $\operatorname{Sp}(u)$. A subspace $F$ is
+\emph{stable} when $u(F) \subseteq F$; eigenspaces are stable, and
+stable subspaces allow induced endomorphisms $u|_F$.
+\end{definition}
+
+\begin{theorem}[Independence of eigenspaces]\label{thm:b2:reduction:independence}
+Eigenvectors associated with pairwise distinct eigenvalues form a
+free family; equivalently, the sum of the eigenspaces
+$E_{\lambda_1} + \dots + E_{\lambda_r}$ (distinct $\lambda_i$) is
+direct. In particular $u$ has at most $n$ eigenvalues.
+\end{theorem}
+
+\begin{proof}
+By induction on $r$. Suppose $x_1 + \dots + x_r = 0$ with $x_i \in
+E_{\lambda_i}$, the statement known for $r - 1$. Apply $u$ and
+subtract $\lambda_r$ times the relation:
+\[
+\sum_{i=1}^{r-1} (\lambda_i - \lambda_r)\, x_i = 0 ,
+\]
+so by induction each $(\lambda_i - \lambda_r)x_i = 0$, i.e.\ $x_i =
+0$ for $i < r$, then $x_r = 0$. Direct sums of nonzero spaces in a
+space of dimension $n$ have at most $n$ summands.
+\end{proof}
+
+\begin{definition}[Characteristic polynomial]\label{def:b2:reduction:charpoly}
+$\chi_u(X) = \det(X\,\mathrm{id} - u)$\index{characteristic
+polynomial} --- computed in any basis as $\det(XI_n - A)$, a monic
+polynomial of degree $n$, invariant under similarity
+(\cref{thm:b2:linalg:detrules}). Its roots in $K$ are exactly the
+eigenvalues ($\lambda$ eigenvalue $\iff u - \lambda\,\mathrm{id}$
+not injective $\iff \chi_u(\lambda) = 0$), and
+\[
+\chi_u(X) = X^n - (\operatorname{tr} u)\, X^{n-1} + \dots +
+(-1)^n \det u .
+\]
+The \emph{algebraic multiplicity} $m_\lambda$ of an eigenvalue is
+its multiplicity as a root of $\chi_u$; the \emph{geometric
+multiplicity} is $\dim E_\lambda$, and $1 \leq \dim E_\lambda \leq
+m_\lambda$.
+\end{definition}
+
+\begin{proof}[Proof of the stated facts]
+The coefficient claims: expand $\det(XI - A)$ by the permutation
+formula; the identity permutation contributes $\prod_i (X - a_{ii})
+= X^n - (\sum a_{ii})X^{n-1} + \dots$, and every other permutation
+fixes at most $n - 2$ diagonal positions, contributing degree $\leq
+n - 2$: the top two coefficients are as stated; $X = 0$ gives the
+constant term $\det(-A) = (-1)^n\det A$.
+
+Geometric $\leq$ algebraic: let $d = \dim E_\lambda$ and complete a
+basis of $E_\lambda$ into a basis of $E$; the matrix of $u$ is block
+upper-triangular with top-left block $\lambda I_d$, so $\chi_u(X) =
+(X - \lambda)^d\, \chi_{\text{(bottom block)}}(X)$: the multiplicity
+of $\lambda$ is at least $d$.
+\end{proof}
+
+\begin{definition}[Diagonalizable, trigonalizable]\label{def:b2:reduction:diag}
+$u$ is \emph{diagonalizable}\index{diagonalizable} when $E$ has a
+basis of eigenvectors (matrix: similar to a diagonal matrix);
+\emph{trigonalizable} when its matrix in some basis is upper
+triangular.
+\end{definition}
+
+\begin{theorem}[Diagonalizability criteria]\label{thm:b2:reduction:diagcrit}
+The following are equivalent:
+\begin{enumerate}
+  \item $u$ is diagonalizable;
+  \item $E = \bigoplus_{\lambda \in \operatorname{Sp} u} E_\lambda$;
+  \item $\chi_u$ splits over $K$ and $\dim E_\lambda = m_\lambda$
+        for every eigenvalue;
+  \item (sufficient, not necessary) $\chi_u$ has $n$ distinct roots
+        in $K$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1 $\iff$ 2): a basis of eigenvectors sorts into bases of the
+$E_\lambda$'s, and conversely concatenating bases of the direct
+summands gives a basis of $E$
+(\cref{thm:b2:reduction:independence} makes the sum direct; equality
+of dimensions makes it everything).
+
+(2 $\iff$ 3): in the diagonal basis, $\chi_u = \prod (X -
+\lambda)^{\dim E_\lambda}$ splits with matching multiplicities;
+conversely, $\sum_\lambda \dim E_\lambda = \sum_\lambda m_\lambda =
+\deg\chi_u = n$ when $\chi$ splits with equalities, so the direct
+sum has full dimension.
+
+(4 $\Rightarrow$ 1): $n$ distinct eigenvalues give $n$ independent
+eigenvectors (\cref{thm:b2:reduction:independence}): a basis.
+\end{proof}
+
+\begin{theorem}[Trigonalization]\label{thm:b2:reduction:trigonalization}
+$u$ is trigonalizable over $K$ if and only if $\chi_u$ splits over
+$K$. In particular every endomorphism of a $\C$-vector space is
+trigonalizable.\index{trigonalization}
+\end{theorem}
+
+\begin{proof}
+($\Rightarrow$) The characteristic polynomial of a triangular matrix
+is $\prod(X - t_{ii})$: split.
+
+($\Leftarrow$) Induction on $n$. Since $\chi_u$ splits, it has a
+root $\lambda$: pick an eigenvector $e_1$. In a basis starting with
+$e_1$, the matrix is $\begin{pmatrix} \lambda & \ast\\ 0 &
+B\end{pmatrix}$, and $\chi_u = (X - \lambda)\chi_B$: $\chi_B$ splits
+too. By the induction hypothesis applied to the $(n-1) \times
+(n-1)$ matrix $B$, there is an invertible $Q$ with $Q^{-1}BQ$ upper
+triangular; conjugating the whole matrix by $\begin{pmatrix}1 & 0\\
+0 & Q\end{pmatrix}$ triangularizes it.
+\end{proof}
+
+\section{Polynomials of an endomorphism}
+
+\begin{definition}\label{def:b2:reduction:polyu}
+For $P = \sum a_k X^k \in K[X]$, set $P(u) = \sum a_k u^k \in
+\mathcal{L}(E)$. The map $P \mapsto P(u)$ is a morphism of algebras
+$K[X] \to \mathcal{L}(E)$ (\cref{def:b2:structures:algebra});
+its kernel $\{P : P(u) = 0\}$ is an ideal of $K[X]$, nonzero (the
+family $(\mathrm{id}, u, \dots, u^{n^2})$ is linked in the
+$n^2$-dimensional $\mathcal{L}(E)$), hence generated by a unique
+monic polynomial $\mu_u$: the \emph{minimal
+polynomial}\index{minimal polynomial}
+(\cref{thm:b2:structures:principal}).
+\end{definition}
+
+\begin{proposition}\label{prop:b2:reduction:minpoly}
+\begin{enumerate}
+  \item $P(u) = 0 \iff \mu_u \mid P$; eigenvalues of $u$ are roots
+        of every annihilating polynomial, and the roots of $\mu_u$
+        are \emph{exactly} the eigenvalues.
+  \item If $F$ is stable, $\mu_{u|_F} \mid \mu_u$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(1) The divisibility is the definition of a generator. If $u(x) =
+\lambda x$, $x \neq 0$, then $0 = P(u)(x) = P(\lambda)x$, so
+$P(\lambda) = 0$: eigenvalues are roots of annihilators, in
+particular of $\mu_u$. Conversely, if $\lambda$ is a root, $\mu_u =
+(X - \lambda)Q$ with $Q(u) \neq 0$ (degree of $\mu_u$ minimal): pick
+$y$ with $Q(u)(y) \neq 0$; then $(u - \lambda)(Q(u)(y)) = \mu_u(u)(y)
+= 0$ exhibits the eigenvector $Q(u)(y)$.
+
+(2) $\mu_u(u|_F) = \mu_u(u)|_F = 0$, and apply (1) to $u|_F$.
+\end{proof}
+
+\begin{theorem}[Kernel decomposition lemma]\label{thm:b2:reduction:kernels}
+If $P = P_1 P_2 \cdots P_r$ with the $P_i$ pairwise coprime,
+then\index{kernel decomposition lemma}
+\[
+\ker P(u) = \ker P_1(u) \oplus \dots \oplus \ker P_r(u),
+\]
+and the projections onto the summands are polynomials in $u$.
+\end{theorem}
+
+\begin{proof}
+It suffices to treat $r = 2$ and induct. Bézout in $K[X]$
+(\cref{thm:b2:structures:principal}): $U P_1 + V P_2 = 1$, so for
+every $x$,
+\[
+x = \underbrace{U(u)P_1(u)(x)}_{=:\,x_2}
++ \underbrace{V(u)P_2(u)(x)}_{=:\,x_1}.
+\]
+If $x \in \ker P(u)$: $P_2(u)(x_2) = U(u)\,P(u)(x) = 0$ (polynomials
+in $u$ commute), so $x_2 \in \ker P_2(u)$, and symmetrically $x_1
+\in \ker P_1(u)$: the sum fills $\ker P(u)$; both summands sit
+inside $\ker P(u)$ ($P_i \mid P$). Directness: $x \in \ker P_1(u)
+\cap \ker P_2(u)$ gives $x = U(u)P_1(u)x + V(u)P_2(u)x = 0$. The
+formulas for $x_1, x_2$ exhibit the projections as $V(u)P_2(u)$ and
+$U(u)P_1(u)$.
+\end{proof}
+
+\begin{corollary}[Diagonalizability via the minimal polynomial]\label{cor:b2:reduction:minpolycrit}
+$u$ is diagonalizable $\iff$ $\mu_u$ splits over $K$ with
+\emph{simple} roots $\iff$ some annihilating polynomial of $u$
+splits with simple roots.
+\end{corollary}
+
+\begin{proof}
+If $P(u) = 0$ with $P = \prod_{i}(X - \lambda_i)$ (distinct
+$\lambda_i$), the lemma gives $E = \ker P(u) = \bigoplus_i \ker(u -
+\lambda_i)$: a direct sum of eigenspaces, so $u$ is diagonalizable
+(\cref{thm:b2:reduction:diagcrit}). Conversely, a diagonalizable
+$u$ is killed by $\prod_{\lambda \in \operatorname{Sp}u}(X -
+\lambda)$ (it kills each eigenspace), which splits with simple
+roots; and $\mu_u$ divides it while having the same roots
+(\cref{prop:b2:reduction:minpoly}): $\mu_u$ is exactly that product.
+\end{proof}
+
+\begin{example}\label{ex:b2:reduction:projections}
+Projections satisfy $p^2 = p$: annihilated by $X(X-1)$, split simple
+roots — diagonalizable with spectrum $\subseteq \{0, 1\}$, and $E =
+\ker p \oplus \ker(p - \mathrm{id})$: Year 1's geometric analysis,
+re-proved in one line. Symmetries ($s^2 = \mathrm{id}$,
+annihilator $X^2 - 1$): diagonalizable when $\operatorname{char} K
+\neq 2$, spectrum $\subseteq \{\pm 1\}$. An endomorphism with $u^3 =
+u^2$ and $u^2 \neq u$: annihilated by $X^2(X - 1)$, \emph{not}
+necessarily diagonalizable --- the criterion detects it (double root
+$0$ must be tested: diagonalizable iff moreover $\ker u^2 = \ker
+u$).
+\end{example}
+
+\begin{theorem}[Cayley--Hamilton]\label{thm:b2:reduction:cayleyhamilton}
+$\chi_u(u) = 0$; consequently $\mu_u \mid \chi_u$, and $\deg \mu_u
+\leq n$.\index{Cayley--Hamilton theorem}
+\end{theorem}
+
+\begin{proof}
+Fix $x \neq 0$ and let $d$ be maximal with $(x, u(x), \dots,
+u^{d-1}(x))$ free; write
+\[
+u^d(x) = -a_0 x - a_1 u(x) - \dots - a_{d-1}u^{d-1}(x),
+\]
+and set $P_x = X^d + a_{d-1}X^{d-1} + \dots + a_0$, so $P_x(u)(x) =
+0$. Complete the free family into a basis of $E$: on it, $u$ has
+block form $\begin{pmatrix} C & \ast\\ 0 & D\end{pmatrix}$ where $C$
+is the companion matrix of $P_x$, whose characteristic polynomial is
+$P_x$ (expand $\det(XI - C)$ along the first column, by induction on
+$d$). Hence $\chi_u = P_x \cdot \chi_D$, and
+\[
+\chi_u(u)(x) = \chi_D(u)\bigl(P_x(u)(x)\bigr) = 0 .
+\]
+The argument holds for every $x$: $\chi_u(u) = 0$.
+\end{proof}
+
+\section{Nilpotents and the Dunford decomposition}
+
+\begin{proposition}[Nilpotent endomorphisms]\label{prop:b2:reduction:nilpotent}
+For $u$ with $\chi_u$ split, the following are equivalent: $u^n =
+0$; $u^k = 0$ for some $k$; $\operatorname{Sp}(u) = \{0\}$; $\chi_u
+= X^n$; $u$ is trigonalizable with zero diagonal. A nilpotent
+endomorphism has $\mu_u = X^{\text{(nilpotence index)}}$, and index
+$\leq n$.\index{nilpotent endomorphism}
+\end{proposition}
+
+\begin{proof}
+$u^k = 0$ makes every eigenvalue a root of $X^k$: spectrum $\{0\}$
+(nonempty when $\chi$ splits --- over $\C$ always). Then $\chi_u =
+X^n$ (all roots zero) and Cayley--Hamilton gives $u^n = 0$;
+trigonalization (\cref{thm:b2:reduction:trigonalization}) puts
+zeros on the diagonal (the diagonal carries the eigenvalues).
+Conversely strictly upper triangular matrices satisfy $A^n = 0$
+(each power pushes the nonzero band one step up: prove $A^k$ has
+zeros on the first $k$ diagonals by induction). The minimal
+polynomial divides $X^n$ and annihilation defines the index.
+\end{proof}
+
+\begin{theorem}[Dunford decomposition]\label{thm:b2:reduction:dunford}
+Suppose $\chi_u$ splits over $K$ (automatic for $K = \C$). Then
+there is a \emph{unique} pair $(d, \nu)$ with
+\[
+u = d + \nu, \qquad d \text{ diagonalizable}, \quad \nu
+\text{ nilpotent}, \quad d\nu = \nu d ,
+\]
+and moreover $d$ and $\nu$ are polynomials in
+$u$.\index{Dunford decomposition}
+\end{theorem}
+
+\begin{proof}
+\emph{Existence.} Write $\chi_u = \prod_{i=1}^{r} (X -
+\lambda_i)^{m_i}$ (distinct $\lambda_i$) and set $N_i = \ker(u -
+\lambda_i)^{m_i}$, the \emph{characteristic subspaces}. By
+Cayley--Hamilton and the kernel lemma
+(\cref{thm:b2:reduction:kernels}),
+\[
+E = N_1 \oplus \dots \oplus N_r ,
+\]
+with projections $\pi_i$ polynomial in $u$; each $N_i$ is stable
+(polynomials in $u$ commute with $u$). Define $d = \sum_i \lambda_i
+\pi_i$: a polynomial in $u$, diagonalizable (it acts as $\lambda_i$
+on $N_i$, so $E$ decomposes into its eigenspaces). Then $\nu = u -
+d$ is a polynomial in $u$ (hence commutes with $d$), and on each
+$N_i$ it acts as $u - \lambda_i$, with $(u - \lambda_i)^{m_i} = 0$
+there: $\nu^{\max m_i} = 0$ on each summand, so $\nu$ is nilpotent.
+
+\emph{Uniqueness.} Let $u = d' + \nu'$ be another such pair. Since
+$d'$ and $\nu'$ commute with each other, they commute with $u = d' +
+\nu'$, hence with every polynomial in $u$ --- in particular with $d$
+and $\nu$. Then $d - d'$ is diagonalizable (two commuting
+diagonalizable maps are simultaneously diagonalizable:
+\cref{exo:b2:reduction:9}) and equals $\nu' - \nu$, which is
+nilpotent (commuting nilpotents: binomial expansion of $(\nu' -
+\nu)^{k+k'}$). A diagonalizable nilpotent is zero (its spectrum is
+$\{0\}$ and it is diagonal in some basis): $d = d'$, $\nu = \nu'$.
+\end{proof}
+
+\begin{example}[Powers and exponentials]\label{ex:b2:reduction:powers}
+$A = \begin{pmatrix} 3 & 1\\ -1 & 1\end{pmatrix}$: $\chi_A = X^2 -
+4X + 4 = (X-2)^2$, single eigenvalue $2$, eigenspace of dimension
+$1$: not diagonalizable. Dunford: $D = 2I$, $N = A - 2I =
+\begin{pmatrix} 1 & 1\\ -1 & -1\end{pmatrix}$, $N^2 = 0$. Then
+\[
+A^k = (2I + N)^k = 2^k I + k\,2^{k-1} N ,
+\qquad
+\eu^{tA} = \eu^{2t}(I + tN),
+\]
+by the commuting binomial theorem, resp.\ the exponential series
+(\cref{ch:b2:diffeq}) split on commuting summands. Reduction turns
+matrix dynamics into scalar dynamics.
+\end{example}
+
+\section{Exercises}
+
+\begin{exercise}[$\star$]\label{exo:b2:reduction:1}
+Diagonalize (eigenvalues, bases of eigenspaces, invertible $P$):
+\[
+A = \begin{pmatrix} 1 & 2\\ 2 & 1 \end{pmatrix},
+\qquad
+B = \begin{pmatrix} 0 & 1 & 1\\ 1 & 0 & 1\\ 1 & 1 & 0
+\end{pmatrix}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:reduction:2}
+Show that $C = \begin{pmatrix} 1 & 1\\ 0 & 1\end{pmatrix}$ is not
+diagonalizable, twice: via eigenspaces, and via the minimal
+polynomial.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:reduction:3}
+Let $u$ satisfy $u^2 - 5u + 6\,\mathrm{id} = 0$. Prove that $u$ is
+diagonalizable, determine the possible spectra, and compute $u^k$
+as a combination of $\mathrm{id}$ and $u$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:4}
+Let $u$ be diagonalizable and $F$ a stable subspace. Prove that
+$u|_F$ is diagonalizable \emph{(restrict an annihilating polynomial
+with simple split roots)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:5}
+(Fibonacci) Let $A = \begin{pmatrix} 1 & 1\\ 1 & 0\end{pmatrix}$.
+Diagonalize $A$ over $\R$, and deduce Binet's formula for the
+Fibonacci sequence ($F_0 = 0$, $F_1 = 1$, $F_{n+1} = F_n +
+F_{n-1}$):
+\[
+F_n = \frac{\varphi^n - \psi^n}{\sqrt 5},
+\qquad \varphi = \frac{1 + \sqrt5}{2},\ \psi = \frac{1 -
+\sqrt5}{2}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:6}
+Let $u \in \mathcal{L}(E)$ with $u^2$ diagonalizable and $u$
+invertible ($K = \C$). Prove that $u$ is diagonalizable. Give a
+counterexample when $u$ is not invertible.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:7}
+Compute the Dunford decomposition, $A^k$, and $\eu^{tA}$ for
+\[
+A = \begin{pmatrix} 2 & 1 & 0\\ 0 & 2 & 1\\ 0 & 0 & 2
+\end{pmatrix}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:8}
+Let $A \in \mathcal{M}_n(\C)$ with $A^k = I$ for some $k \geq 1$.
+Prove that $A$ is diagonalizable and its eigenvalues are $k$-th
+roots of unity. Deduce that a finite-order invertible complex matrix
+similar to a triangular matrix with unit diagonal is the identity.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:reduction:9}
+(Simultaneous diagonalization) Let $u, v$ be diagonalizable and
+commuting. Prove that they are \emph{simultaneously}
+diagonalizable: some basis diagonalizes both. \emph{(Each eigenspace
+of $u$ is $v$-stable; diagonalize the restrictions of $v$ there,
+using \cref{exo:b2:reduction:4}.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:reduction:10}
+Let $u \in \mathcal{L}(\C^n)$. Prove that $u$ is diagonalizable if
+and only if every $u$-stable subspace has a $u$-stable
+supplementary subspace. \emph{(For $\Leftarrow$: apply the property
+to $F = \sum_\lambda E_\lambda(u)$, the sum of all eigenspaces; if a
+stable supplement $G$ were nonzero, trigonalizing $u|_G$ would
+produce an eigenvector of $u$ inside $G$ --- contradicting $G \cap
+F = \{0\}$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:reduction:11}
+(Spectral radius by Gelfand-lite, $2\times2$ taste of analysis to
+come) Let $A \in \mathcal{M}_2(\C)$ with both eigenvalues of
+modulus $< 1$. Prove that $A^k \to 0$ entrywise as $k \to \infty$.
+\emph{(Trigonalize: $A = P(T)P^{-1}$ with $T$ upper triangular;
+compute $T^k$ explicitly --- distinguish equal and distinct
+eigenvalues --- and bound.)}
+\end{exercise}

@@ -1,0 +1,346 @@
+\chapter{Differential Equations}\label{ch:b2:diffeq}
+
+Year 1 solved the linear equations that admit formulas. This chapter
+supplies what formulas cannot: the \emph{Cauchy--Lipschitz theorem}
+--- existence and uniqueness for $y' = f(t, y)$ --- proved with the
+Banach fixed point theorem, exactly as promised in
+\cref{ch:b2:metric}; then the complete theory of \emph{linear
+systems} $X' = A(t)X + B(t)$, with the matrix exponential and the
+wronskian as computational engines.
+
+\section{The Cauchy--Lipschitz theorem}
+
+\begin{theorem}[Cauchy--Lipschitz, global Lipschitz version]\label{thm:b2:diffeq:cauchylipschitz}
+Let $I$ be a segment, $f \colon I \times \R^n \to \R^n$ continuous
+and \emph{Lipschitz in the second variable}, uniformly in the
+first: $\norm{f(t, y) - f(t, z)} \leq k\,\norm{y - z}$ for all $t
+\in I$. Then for every $(t_0, y_0) \in I \times \R^n$, the Cauchy
+problem\index{Cauchy--Lipschitz theorem}
+\[
+y' = f(t, y), \qquad y(t_0) = y_0
+\]
+has exactly one solution $y \colon I \to \R^n$ of class $C^1$.
+\end{theorem}
+
+\begin{proof}
+\emph{Reformulation.} A continuous $y$ solves the problem iff it
+satisfies the integral equation
+\[
+y(t) = y_0 + \int_{t_0}^{t} f\bigl(s, y(s)\bigr)\,\dd s
+=: T(y)(t)
+\]
+(fundamental theorem of calculus both ways; a continuous solution
+of the integral equation is automatically $C^1$).
+
+\emph{A contraction, after re-norming.} On the Banach space $E =
+C(I, \R^n)$ with the \emph{weighted} norm
+\[
+N(y) = \sup_{t \in I}\; \eu^{-2k\abs{t - t_0}}\,\norm{y(t)} ,
+\]
+(equivalent to the sup norm: the weight is bounded above and below
+on the segment $I$, so $E$ stays complete), estimate for $y, z \in
+E$ and, say, $t \geq t_0$:
+\[
+\norm{T(y)(t) - T(z)(t)}
+\leq \int_{t_0}^{t} k\,\norm{y(s) - z(s)}\,\dd s
+\leq k\,N(y - z)\int_{t_0}^{t} \eu^{2k(s - t_0)}\dd s
+\leq \frac{N(y-z)}{2}\,\eu^{2k(t - t_0)} .
+\]
+Multiplying by $\eu^{-2k(t - t_0)}$ and taking the sup (the case $t
+< t_0$ is symmetric): $N\bigl(T(y) - T(z)\bigr) \leq \frac12 N(y -
+z)$: $T$ is a $\frac12$-contraction of the complete $(E, N)$. The
+Banach fixed point theorem (\cref{thm:b2:metric:banach}) yields a
+unique fixed point: the unique solution.
+\end{proof}
+
+\begin{remark}
+For $f$ merely $C^1$ (locally Lipschitz), the theorem holds
+\emph{locally}, with a maximal solution on a maximal open interval;
+solutions can explode in finite time ($y' = y^2$, $y(0) = 1$: $y(t)
+= \frac{1}{1-t}$, gone at $t = 1$). The global Lipschitz hypothesis
+is what buys the whole segment. Two consequences worth engraving:
+solution curves of an ODE with Lipschitz field \emph{never cross};
+and the zero function is the only solution vanishing anywhere of a
+linear homogeneous equation.
+\end{remark}
+
+\section{Linear systems}
+
+\begin{theorem}[Structure of linear systems]\label{thm:b2:diffeq:linear}
+Let $A \colon I \to \mathcal{M}_n(\R)$ and $B \colon I \to \R^n$ be
+continuous on an interval $I$. For every $(t_0, X_0)$ the problem
+\[
+X' = A(t)X + B(t), \qquad X(t_0) = X_0
+\]
+has exactly one solution on \emph{all} of $I$. The solutions of the
+homogeneous system ($B = 0$) form a vector space $\mathcal{S}_H$ of
+dimension exactly $n$, and evaluation $X \mapsto X(t_0)$ is an
+isomorphism $\mathcal{S}_H \to \R^n$; general solution $=$
+particular $+$ homogeneous.
+\end{theorem}
+
+\begin{proof}
+On every segment $J \subseteq I$ containing $t_0$: $f(t, X) =
+A(t)X + B(t)$ is continuous, and Lipschitz in $X$ with constant $k
+= \sup_J \vertiii{A(t)}$ (finite: continuous on a segment):
+\cref{thm:b2:diffeq:cauchylipschitz} applies on $J$; letting $J$
+exhaust $I$, uniqueness glues the solutions into one on $I$.
+Linearity of the solution set and of the evaluation map are clear;
+evaluation is bijective by existence (surjective) and uniqueness
+(injective): $\dim \mathcal{S}_H = n$. The affine structure is Year
+1's argument verbatim.
+\end{proof}
+
+\begin{definition}[Wronskian]\label{def:b2:diffeq:wronskian}
+For solutions $X_1, \dots, X_n$ of the homogeneous system, the
+\emph{wronskian}\index{wronskian} is $W(t) = \det\bigl(X_1(t),
+\dots, X_n(t)\bigr)$. By the isomorphism above, either $W$ vanishes
+identically (the family is linked) or never (a \emph{fundamental
+system}); quantitatively, $W' = \operatorname{tr}\bigl(A(t)\bigr)
+W$, so
+\[
+W(t) = W(t_0)\,\exp\Bigl(\int_{t_0}^{t}
+\operatorname{tr} A(s)\,\dd s\Bigr)
+\quad \text{(Liouville's formula)}.
+\]
+\end{definition}
+
+\begin{proof}[Proof of Liouville's formula]
+$W(t) = \det M(t)$ with $M' = AM$. Differentiating the determinant
+as a multilinear function of the columns,
+\[
+W'(t) = \sum_j \det(X_1, \dots, X_j', \dots, X_n)
+= \sum_j \det(X_1, \dots, AX_j, \dots, X_n) .
+\]
+Now the map $(C_1, \dots, C_n) \mapsto \sum_j \det(C_1, \dots,
+AC_j, \dots, C_n)$ is $n$-linear and alternating (with two equal
+columns $C_i = C_k$, the terms $j \notin \{i, k\}$ vanish outright,
+and the terms $j = i$ and $j = k$ cancel in pairs after one column
+swap): by the uniqueness theorem
+(\cref{thm:b2:linalg:detspace}) it is $c \cdot \det$, with $c$ read
+on the canonical columns: $c = \sum_j \det(e_1, \dots, Ae_j, \dots,
+e_n) = \sum_j a_{jj} = \operatorname{tr} A$. Hence $W' =
+\operatorname{tr}\bigl(A(t)\bigr)W$: a scalar linear ODE, solved by
+the Year 1 formula.
+\end{proof}
+
+\section{Constant coefficients: the matrix exponential}
+
+\begin{theorem}\label{thm:b2:diffeq:matrixexp}
+For $A \in \mathcal{M}_n(\R)$ (or $\C$), the exponential $\eu^{tA}
+= \sum_k \frac{(tA)^k}{k!}$ (\cref{ex:b2:nvs:matrixexp}) satisfies:
+$t \mapsto \eu^{tA}$ is $C^1$ (indeed $C^\infty$)
+with\index{matrix exponential}
+\[
+\frac{\dd}{\dd t}\,\eu^{tA} = A\,\eu^{tA} = \eu^{tA}A ,
+\qquad
+\eu^{(s+t)A} = \eu^{sA}\,\eu^{tA},
+\qquad
+(\eu^{A})^{-1} = \eu^{-A} ;
+\]
+and $\eu^{A + B} = \eu^A\eu^B$ \emph{when} $AB = BA$. The Cauchy
+problem $X' = AX$, $X(0) = X_0$ has the unique solution $X(t) =
+\eu^{tA}X_0$; with a source, the \emph{variation of constants}
+formula holds:
+\[
+X(t) = \eu^{(t - t_0)A}X_0 + \int_{t_0}^{t} \eu^{(t-s)A}B(s)\,\dd
+s .
+\]
+\end{theorem}
+
+\begin{proof}
+\emph{Differentiability:} the series $\sum \frac{t^kA^k}{k!}$ and
+its term-derived series $\sum \frac{t^{k-1}A^k}{(k-1)!} = A\sum
+\frac{(tA)^{k-1}}{(k-1)!}$ converge normally on every segment
+(norms $\leq \frac{(\abs t\,\vertiii A)^k}{k!}$): differentiate
+term by term (\cref{thm:b2:funcseq:seriestransfer}, vector-valued).
+The two orderings $A\eu^{tA}$ and $\eu^{tA}A$ agree since every
+partial sum commutes with $A$.
+
+\emph{Group law:} for commuting $A, B$, the Cauchy product of the
+two exponential series reorganizes by the binomial theorem exactly
+as in \cref{ex:b2:series:exp} (absolute convergence in the Banach
+algebra justifies it): $\eu^{A+B} = \eu^A\eu^B$; with $B = sA$ this
+gives the one-parameter group law, and $B = -A$ the inverse.
+
+\emph{Cauchy problem:} $X(t) = \eu^{tA}X_0$ solves it (differentiate);
+uniqueness by \cref{thm:b2:diffeq:linear}. Variation of constants:
+set $Y(t) = \eu^{-tA}X(t)$; differentiating, $Y' = \eu^{-tA}(X' -
+AX) = \eu^{-tA}B(t)$; integrate from $t_0$ to $t$ and multiply
+back by $\eu^{tA}$.
+\end{proof}
+
+\begin{method}[Computing $\eu^{tA}$]\label{met:b2:diffeq:computeexp}
+Reduce $A$ (\cref{ch:b2:reduction}): if $A = PDP^{-1}$ diagonal,
+$\eu^{tA} = P\,\eu^{tD}P^{-1}$ with $\eu^{tD}$ diagonal of
+$\eu^{t\lambda_i}$; in general use Dunford $A = D + N$
+(commuting): $\eu^{tA} = \eu^{tD}\,\eu^{tN}$ with $\eu^{tN}$ a
+\emph{polynomial} in $t$ (nilpotence truncates the series). Complex
+eigenvalues pair into rotation-times-exponential blocks
+(\cref{exo:b2:diffeq:5}).
+\end{method}
+
+\begin{example}[A phase portrait]\label{ex:b2:diffeq:phaseportrait}
+$X' = AX$ with $A = \begin{pmatrix} 0 & 1\\ -1 & 0\end{pmatrix}$:
+$A^2 = -I$, so the series splits into
+\[
+\eu^{tA} = (\cos t)\,I + (\sin t)\,A
+= \begin{pmatrix} \cos t & \sin t\\ -\sin t & \cos t
+\end{pmatrix} :
+\]
+trajectories are circles run clockwise --- the harmonic oscillator
+$x'' + x = 0$ in first-order clothes. Eigenvalues $\pm\iu$ on the
+imaginary axis: a \emph{center}. More generally the real parts of
+the eigenvalues of $A$ decide growth or decay of $\norm{X(t)}$
+(\cref{exo:b2:diffeq:8}).
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=6.4cm, height=6.4cm,
+    xmin=-2.3, xmax=2.3, ymin=-2.3, ymax=2.3,
+    xtick={-1,1}, ytick={-1,1}]
+  \addplot[omDef, thick, domain=0:360, samples=90, smooth]
+    ({cos(x)}, {-sin(x)});
+  \addplot[omDef!60, thick, domain=0:360, samples=90, smooth]
+    ({1.7*cos(x)}, {-1.7*sin(x)});
+  \draw[-Stealth, omThm, thick] (axis cs:1,0) -- (axis cs:0.995,-0.12);
+  \draw[-Stealth, omThm, thick] (axis cs:1.7,0) -- (axis cs:1.695,-0.12);
+\end{axis}
+\end{tikzpicture}
+\hspace{6mm}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=6.4cm, height=6.4cm,
+    xmin=-2.3, xmax=2.3, ymin=-2.3, ymax=2.3,
+    xtick={-1,1}, ytick={-1,1}]
+  % A = diag(-1,-2)-type stable node: trajectories y = c x^2
+  \addplot[omMeth, thick, domain=-1.5:1.5, samples=60] {x^2};
+  \addplot[omMeth, thick, domain=-1.5:1.5, samples=60] {-x^2};
+  \addplot[omMeth, thick, domain=-2.2:2.2, samples=2] {0};
+  \addplot[omMeth!60, thick, domain=-1.2:1.2, samples=60] {2*x^2};
+  \draw[-Stealth, omThm, thick] (axis cs:1.2,1.44) --
+    (axis cs:1.05,1.1);
+  \draw[-Stealth, omThm, thick] (axis cs:-1.2,-1.44) --
+    (axis cs:-1.05,-1.1);
+\end{axis}
+\end{tikzpicture}
+
+{\small Two linear phase portraits. Left: a \emph{center}
+(eigenvalues $\pm\iu$) --- closed circular orbits of the harmonic
+oscillator. Right: a \emph{stable node} (eigenvalues $-1, -2$) ---
+all trajectories fall into the origin tangentially to the slow
+eigendirection.}
+\end{omfigure}
+
+\section{Second order with variable coefficients}
+
+\begin{proposition}\label{prop:b2:diffeq:secondorder}
+The equation $y'' + a(t)y' + b(t)y = c(t)$ ($a, b, c$ continuous on
+$I$) is the system $X' = A(t)X + B(t)$ for $X = (y, y')$: solutions
+exist and are unique on all of $I$ for any initial data $(y(t_0),
+y'(t_0))$; homogeneous solutions form a plane. If one nonvanishing
+homogeneous solution $y_1$ is known, a second independent one is
+found by \emph{lowering the order}: setting $y = y_1 z$ turns the
+homogeneous equation into a first-order equation for $z'$, solved
+by quadratures.
+\end{proposition}
+
+\begin{proof}
+The system form and \cref{thm:b2:diffeq:linear} give everything
+structural. Lowering: substituting $y = y_1z$,
+\[
+y_1 z'' + (2y_1' + a y_1)z' + \underbrace{(y_1'' + ay_1' +
+by_1)}_{=\,0}\,z = 0 :
+\]
+a first-order linear equation in $u = z'$, solvable by the Year 1
+formula; integrating $u$ gives $z$, hence $y_2 = y_1 z$,
+independent of $y_1$ whenever $z$ is nonconstant.
+\end{proof}
+
+\begin{example}\label{ex:b2:diffeq:lowering}
+$t^2y'' - 2y = 0$ on $\intoo{0}{\infty}$: $y_1 = t^2$ is a
+solution. Substitute $y = t^2z$: from $y' = t^2z' + 2tz$ and $y''
+= t^2z'' + 4tz' + 2z$,
+\[
+t^2y'' - 2y = t^4 z'' + 4t^3z' = 0,
+\qquad\text{i.e.}\qquad \frac{z''}{z'} = -\frac4t :
+\]
+$z' = t^{-4}$ (up to a constant), $z = -\frac{1}{3t^3}$, and $y_2
+= t^2z = -\frac{1}{3t}$. General solution: $y = \alpha t^2 +
+\frac{\beta}{t}$.
+\end{example}
+
+\section{Exercises}
+
+\begin{exercise}[$\star$]\label{exo:b2:diffeq:1}
+Solve $X' = AX$, $X(0) = (1, 0)^{\mathsf T}$, for $A =
+\begin{pmatrix} 1 & 1\\ 0 & 2\end{pmatrix}$ (diagonalize) and $A =
+\begin{pmatrix} 2 & 1\\ 0 & 2 \end{pmatrix}$ (Dunford).
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:diffeq:2}
+Which Cauchy problems have unique global solutions on $\R$ by
+\cref{thm:b2:diffeq:cauchylipschitz}? $y' = \sin(ty)$; $\;y' =
+y^2$; $\;y' = \abs y$. For the last, solve explicitly with $y(0) =
+0$ and $y(0) = 1$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:diffeq:3}
+Prove that two distinct maximal solutions of $y' = f(t,y)$ ($f$
+Lipschitz in $y$) never take the same value at the same time, and
+deduce that solutions of $y' = y(1 - y)$ starting in
+$\intoo{0}{1}$ remain in $\intoo{0}{1}$ forever.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:diffeq:4}
+Compute $\eu^{tA}$ for $A = \begin{pmatrix} 3 & 1\\ -1 &
+1\end{pmatrix}$ \emph{(Dunford: $(A - 2I)^2 = 0$)}, and solve $X' =
+AX + \begin{pmatrix} \eu^{2t}\\ 0\end{pmatrix}$, $X(0) = 0$, by
+variation of constants.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:diffeq:5}
+For $A = \begin{pmatrix} \alpha & -\beta\\ \beta &
+\alpha\end{pmatrix}$, prove $\eu^{tA} =
+\eu^{\alpha t}\begin{pmatrix} \cos\beta t & -\sin\beta t\\
+\sin\beta t & \cos\beta t\end{pmatrix}$ --- spiral trajectories ---
+two ways: via the series (write $A = \alpha I + \beta J$, $J^2 =
+-I$), and via the complex identification $z' = (\alpha +
+\iu\beta)z$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:diffeq:6}
+(Gronwall's lemma) Let $u$ be continuous nonnegative with $u(t)
+\leq C + k\int_{t_0}^{t} u(s)\,\dd s$ on $\intco{t_0}{T}$. Prove
+$u(t) \leq C\,\eu^{k(t - t_0)}$ \emph{(differentiate $v(t) =
+\eu^{-kt}\int_{t_0}^t u$)}. Deduce again the uniqueness in
+Cauchy--Lipschitz and the continuous dependence $\norm{y(t) -
+z(t)} \leq \norm{y_0 - z_0}\,\eu^{k\abs{t - t_0}}$ for two
+solutions with different initial data.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:diffeq:7}
+Knowing that $y_1(t) = \frac{\sin t}{t}$ solves $ty'' + 2y' + ty =
+0$ on $\intoo{0}{\pi}$, find a second independent solution by
+lowering the order, and give the general solution.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:diffeq:8}
+Let $A \in \mathcal{M}_n(\C)$ with all eigenvalues of (strictly)
+negative real part. Prove that every solution of $X' = AX$ tends to
+$0$ as $t \to +\infty$, with an exponential rate: $\norm{X(t)}
+\leq C\,\eu^{-\alpha t}$ for some $\alpha > 0$.
+\emph{(Trigonalize; treat the triangular system from the last row
+up, or use Dunford: $\eu^{tA} = \eu^{tD}\eu^{tN}$ with
+$\norm{\eu^{tD}} \leq \eu^{-\alpha' t}$ and $\eu^{tN}$ polynomial
+in $t$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:diffeq:9}
+(No escape in finite time for linear growth) Suppose $f$ is
+continuous with $\norm{f(t, y)} \leq a\norm y + b$ on
+$\intco{0}{\infty} \times \R^n$, locally Lipschitz in $y$. Using
+Gronwall (\cref{exo:b2:diffeq:6}) on the integral form, prove that
+maximal solutions are global (defined on all of
+$\intco{0}{\infty}$).
+\end{exercise}

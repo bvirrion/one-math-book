@@ -1,0 +1,372 @@
+\chapter{Probability on Countable Spaces}\label{ch:b2:proba}
+
+The final three chapters develop the probability theory of the
+modern MP* program: probability measures on countable sample
+spaces, discrete random variables, and generating functions. The
+finite theory of the High School volume acquires its full
+infrastructure: $\sigma$-additivity replaces finite additivity,
+and the summable-family machinery of \cref{ch:b2:series} is
+exactly what makes infinite sample spaces workable. The
+centerpiece results here are the continuity of probability along
+monotone sequences of events and the Borel--Cantelli lemma.
+
+\section{Probability spaces}
+
+\begin{definition}[Countable probability space]\label{def:b2:proba:space}
+Let $\Omega$ be a nonempty finite or countable set (the
+\emph{sample space}). A \emph{probability measure} on $\Omega$ is
+a map $\P$ from the set $\mathcal{P}(\Omega)$ of all subsets of
+$\Omega$ (\emph{events}) to $[0, 1]$ such that:
+\begin{enumerate}
+\item $\P(\Omega) = 1$;
+\item ($\sigma$-additivity) for every sequence $(A_n)_{n\in\N}$ of
+pairwise disjoint events,
+\[
+\P\Bigl(\,\bigcup_{n \in \N} A_n\Bigr)
+= \sum_{n=0}^{\infty} \P(A_n) .
+\]
+\end{enumerate}
+The pair $(\Omega, \P)$ is a \emph{(countable) probability space}.
+\end{definition}
+
+\begin{remark}
+On a countable $\Omega$ we may take all subsets as events; on
+uncountable spaces (as needed for continuous models in Year 3)
+this is no longer possible, and one restricts $\P$ to a suitable
+collection of events, a \emph{$\sigma$-algebra}. All the formulas
+of this chapter survive that generalization verbatim.
+\end{remark}
+
+\begin{proposition}[Elementary rules]\label{prop:b2:proba:rules}
+For events $A, B$ and a probability measure $\P$:
+$\P(\emptyset) = 0$; $\P$ is finitely additive; $\P(A^c) = 1 -
+\P(A)$; if $A \subseteq B$ then $\P(A) \leq \P(B)$; and
+\[
+\P(A \cup B) = \P(A) + \P(B) - \P(A \cap B) .
+\]
+\end{proposition}
+
+\begin{proof}
+Applying $\sigma$-additivity to $A_0 = \Omega$, $A_n = \emptyset$
+($n \geq 1$) gives $1 = 1 + \sum_{n\geq1}\P(\emptyset)$, so
+$\P(\emptyset) = 0$; padding a finite disjoint union with empty
+sets then gives finite additivity. The rest follows as in the
+finite case (High School volume): $1 = \P(A) + \P(A^c)$;
+$\P(B) = \P(A) + \P(B \setminus A) \geq \P(A)$; and decomposing $A
+\cup B = (A \setminus B) \sqcup (B \setminus A) \sqcup (A \cap B)$
+yields inclusion--exclusion.
+\end{proof}
+
+\begin{proposition}[Distributions on a countable
+space]\label{prop:b2:proba:distribution}
+Giving a probability measure on a countable $\Omega =
+\{\omega_0, \omega_1, \dots\}$ amounts exactly to giving weights
+$p_i = \P(\{\omega_i\}) \geq 0$ with $\sum_i p_i = 1$; then for
+every $A \subseteq \Omega$,
+\[
+\P(A) = \sum_{\omega \in A} \P(\{\omega\}) ,
+\]
+an (absolutely convergent) sub-sum of the family $(p_i)$.
+\end{proposition}
+
+\begin{proof}
+Given $\P$, the singletons $\{\omega\}$, $\omega \in A$, form a
+countable disjoint cover of $A$, so $\sigma$-additivity forces the
+displayed formula --- in particular $\sum_i p_i = \P(\Omega) = 1$.
+Conversely, given nonnegative weights of total sum $1$, define
+$\P(A) = \sum_{\omega \in A}p_\omega$: the family is summable, and
+$\sigma$-additivity is exactly the theorem on summation by packets
+of \cref{ch:b2:series} applied to the partition of $\bigcup A_n$
+into the $A_n$.
+\end{proof}
+
+\begin{example}[Geometric model: waiting for the first
+head]\label{ex:b2:proba:geometric}
+Toss a coin with head probability $p \in \intoo{0}{1}$ repeatedly,
+and let $\Omega = \N^* \cup \{\infty\}$ record the rank of the
+first head. The natural weights are
+\[
+\P(\{k\}) = (1 - p)^{k-1}p
+\quad (k \in \N^*),
+\qquad
+\P(\{\infty\}) = 0 ,
+\]
+a probability measure since $\sum_{k\geq1}(1-p)^{k-1}p =
+\frac{p}{1 - (1-p)} = 1$: with probability $1$ the game ends ---
+but the sample space must still contain the possibility that it
+does not. Countable additivity is what lets us assert
+$\P(\text{the game ends}) = \sum_k \P(\{k\})$.
+\end{example}
+
+\begin{theorem}[Monotone continuity]\label{thm:b2:proba:continuity}
+Let $(A_n)$ be a sequence of events.
+\begin{enumerate}
+\item If $A_n \subseteq A_{n+1}$ for all $n$
+(\emph{increasing}), then
+$\P\bigl(\bigcup_n A_n\bigr) = \lim_{n\to\infty} \P(A_n)$.
+\item If $A_n \supseteq A_{n+1}$ for all $n$
+(\emph{decreasing}), then
+$\P\bigl(\bigcap_n A_n\bigr) = \lim_{n\to\infty} \P(A_n)$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\emph{1.} Disjointify: let $B_0 = A_0$ and $B_n = A_n \setminus
+A_{n-1}$. The $B_n$ are pairwise disjoint with $\bigcup_{k \leq n}
+B_k = A_n$ and $\bigcup_n B_n = \bigcup_n A_n$. By
+$\sigma$-additivity and finite additivity,
+\[
+\P\Bigl(\bigcup_n A_n\Bigr)
+= \sum_{n=0}^\infty \P(B_n)
+= \lim_{N\to\infty}\sum_{n=0}^N \P(B_n)
+= \lim_{N\to\infty}\P(A_N) .
+\]
+\emph{2.} Pass to complements: $(A_n^c)$ is increasing with union
+$\bigl(\bigcap A_n\bigr)^c$, and apply part 1:
+$1 - \P(\bigcap A_n) = \lim (1 - \P(A_n))$.
+\end{proof}
+
+\begin{corollary}[Countable subadditivity]\label{cor:b2:proba:subadd}
+For any sequence of events, $\P\bigl(\bigcup_n A_n\bigr) \leq
+\sum_{n=0}^\infty \P(A_n)$.
+\end{corollary}
+
+\begin{proof}
+Finite subadditivity $\P(A_0 \cup \dots \cup A_N) \leq
+\sum_0^N \P(A_n)$ follows from inclusion--exclusion by induction
+(or from additivity over the disjointified $B_n \subseteq A_n$).
+Let $N \to \infty$: the left side converges to
+$\P(\bigcup_n A_n)$ by monotone continuity applied to the
+increasing sequence $C_N = A_0 \cup \dots \cup A_N$.
+\end{proof}
+
+\section{Conditioning and independence}
+
+\begin{definition}[Conditional probability]\label{def:b2:proba:conditional}
+For events $A, B$ with $\P(B) > 0$, the \emph{conditional
+probability of $A$ given $B$} is
+\[
+\P(A \mid B) = \frac{\P(A \cap B)}{\P(B)} .
+\]
+The map $A \mapsto \P(A \mid B)$ is itself a probability measure
+on $\Omega$.
+\end{definition}
+
+\begin{theorem}[Compound probabilities, total probability,
+Bayes]\label{thm:b2:proba:bayes}
+\leavevmode
+\begin{enumerate}
+\item (Chain rule) If $\P(A_1 \cap \dots \cap A_{n-1}) > 0$,
+\[
+\P(A_1 \cap \dots \cap A_n)
+= \P(A_1)\,\P(A_2 \mid A_1)\cdots
+\P(A_n \mid A_1 \cap \dots \cap A_{n-1}) .
+\]
+\item (Total probability) If $(B_i)_{i \in I}$ is a finite or
+countable partition of $\Omega$ with $\P(B_i) > 0$, then for every
+event $A$:
+\[
+\P(A) = \sum_{i \in I} \P(A \mid B_i)\,\P(B_i) .
+\]
+\item (Bayes) Under the same hypotheses, if moreover $\P(A) > 0$:
+\[
+\P(B_j \mid A)
+= \frac{\P(A \mid B_j)\,\P(B_j)}
+       {\sum_{i \in I} \P(A \mid B_i)\,\P(B_i)} .
+\]
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\emph{1.} The right side telescopes: each factor's denominator
+cancels the previous numerator, leaving $\P(A_1 \cap \dots \cap
+A_n)$.
+\emph{2.} The sets $A \cap B_i$ are pairwise disjoint with union
+$A$; apply ($\sigma$-)additivity and the definition of
+conditioning.
+\emph{3.} Both sides of $\P(B_j \mid A)\P(A) = \P(A \mid
+B_j)\P(B_j)$ equal $\P(A \cap B_j)$; divide by $\P(A)$ and expand
+$\P(A)$ by total probability.
+\end{proof}
+
+\begin{definition}[Independence]\label{def:b2:proba:independence}
+Events $A$ and $B$ are \emph{independent} if $\P(A \cap B) =
+\P(A)\P(B)$. A family $(A_i)_{i \in I}$ of events is
+\emph{(mutually) independent} if for every finite subset $J
+\subseteq I$,
+\[
+\P\Bigl(\bigcap_{i \in J} A_i\Bigr)
+= \prod_{i \in J} \P(A_i) .
+\]
+\end{definition}
+
+\begin{remark}
+Mutual independence is strictly stronger than pairwise
+independence: with two fair coin tosses, the events ``first is a
+head'', ``second is a head'', ``both agree'' are pairwise
+independent (each pair has intersection probability $\frac14 =
+\frac12\cdot\frac12$), yet the triple intersection has probability
+$\frac14 \neq \frac18$. Note also that if $A, B$ are independent,
+so are $A, B^c$ (compute: $\P(A \cap B^c) = \P(A) - \P(A\cap B) =
+\P(A)(1 - \P(B))$), hence also $A^c, B^c$.
+\end{remark}
+
+\section{The Borel--Cantelli lemma}
+
+\begin{definition}[Limit superior of events]\label{def:b2:proba:limsup}
+For a sequence $(A_n)$ of events, the event
+\[
+\limsup_n A_n
+= \bigcap_{N=0}^{\infty}\ \bigcup_{n \geq N} A_n
+= \{\omega \in \Omega : \omega \in A_n
+\text{ for infinitely many } n\}
+\]
+is the event ``$A_n$ occurs infinitely often''.
+\end{definition}
+
+\begin{theorem}[Borel--Cantelli]\label{thm:b2:proba:borelcantelli}
+\leavevmode
+\begin{enumerate}
+\item If $\sum_{n} \P(A_n) < \infty$, then
+$\P\bigl(\limsup_n A_n\bigr) = 0$.
+\item If the events $A_n$ are independent and $\sum_n \P(A_n) =
+\infty$, then $\P\bigl(\limsup_n A_n\bigr) = 1$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\emph{1.} Let $C_N = \bigcup_{n \geq N}A_n$; the sequence $(C_N)$
+is decreasing with intersection $\limsup A_n$, and by countable
+subadditivity (\cref{cor:b2:proba:subadd})
+\[
+\P(C_N) \leq \sum_{n \geq N}\P(A_n)
+\xrightarrow[N\to\infty]{} 0
+\]
+(tail of a convergent series). Monotone continuity
+(\cref{thm:b2:proba:continuity}) concludes: $\P(\limsup A_n) =
+\lim_N \P(C_N) = 0$.
+
+\emph{2.} It suffices to show $\P\bigl(\bigcup_{n\geq N}A_n\bigr)
+= 1$ for every $N$, then intersect (a countable intersection of
+events of probability $1$ has probability $1$, by subadditivity
+of the complements). Fix $N$, and consider for $M > N$ the
+complement:
+\[
+\P\Bigl(\bigcap_{n=N}^{M} A_n^c\Bigr)
+= \prod_{n=N}^{M}\bigl(1 - \P(A_n)\bigr)
+\leq \prod_{n=N}^{M} e^{-\P(A_n)}
+= \exp\Bigl(-\sum_{n=N}^M \P(A_n)\Bigr) ,
+\]
+using independence of the complements and the convexity bound $1 -
+x \leq e^{-x}$. As $M \to \infty$ the exponent tends to $-\infty$
+by divergence of the series, so by monotone continuity
+(decreasing sequence) $\P\bigl(\bigcap_{n \geq N}A_n^c\bigr) = 0$,
+i.e.\ $\P\bigl(\bigcup_{n \geq N}A_n\bigr) = 1$.
+\end{proof}
+
+\begin{example}[Infinite runs of heads]\label{ex:b2:proba:runs}
+Toss a fair coin forever, and let $A_n$ be the event ``tosses $n,
+n+1, \dots, n + k - 1$ are all heads'' (a run of $k$ heads
+starting at time $n$), for fixed $k$. The events $A_{jk}$ ($j =
+1, 2, \dots$), depending on disjoint blocks of tosses, are
+independent, each of probability $2^{-k}$, and $\sum_j 2^{-k} =
+\infty$: by Borel--Cantelli~2, with probability $1$ infinitely
+many blocks are all-heads --- \emph{every} fixed pattern recurs
+infinitely often, almost surely. Conversely, if we let the run
+length grow, $B_n = {}$``a run of $2\log_2 n$ heads starts at
+$n$'' has $\P(B_n) = n^{-2}$ summable, so almost surely only
+finitely many such long runs start: Borel--Cantelli calibrates
+precisely \emph{how long} the longest runs are.
+\end{example}
+
+\begin{remark}
+In \cref{ex:b2:proba:runs} the underlying sample space (infinite
+sequences of tosses) is uncountable, so strictly speaking the
+example lives in the measure-theoretic framework of Year 3; the
+\emph{computations}, though, use only the rules proved in this
+chapter, applied to events determined by finitely many tosses and
+their countable combinations. This is the standard MP* convention:
+the theory is stated on countable spaces, and infinite-game
+examples are treated with the same toolkit.
+\end{remark}
+
+\section{Exercises}
+
+\begin{exercise}[$\star$]\label{exo:b2:proba:1}
+An urn contains $n$ numbered balls. Balls are drawn one by one
+without replacement. Compute the probability that ball number $1$
+is drawn before ball number $2$. Generalize: the probability that
+ball $1$ is drawn first among balls $1, \dots, k$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:proba:2}
+Show that on $\Omega = \N^*$ the weights $p_k = \frac{1}{k(k+1)}$
+define a probability measure, and compute $\P(2\N^*)$ (even
+outcomes) as a series; show that it equals $1 - \ln 2$.
+\emph{(Telescope $\frac{1}{2j(2j+1)} = \frac{1}{2j} -
+\frac{1}{2j+1}$ and use the alternating harmonic series,
+\cref{ch:b2:series}.)}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:proba:3}
+(False positives) A disease affects one person in $10\,000$. A
+test detects it with probability $0.99$ on the sick, and gives a
+false positive with probability $0.01$ on the healthy. Compute
+the probability of being sick given a positive test, and comment.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:proba:4}
+Let $A_1, \dots, A_n$ be events. Prove the inclusion--exclusion
+formula
+\[
+\P\Bigl(\bigcup_{i=1}^n A_i\Bigr)
+= \sum_{\emptyset \neq J \subseteq \{1,\dots,n\}}
+(-1)^{\abs J + 1}\,\P\Bigl(\bigcap_{i \in J}A_i\Bigr)
+\]
+by integrating the identity $1 - \prod_{i=1}^n(1 -
+\mathbf{1}_{A_i}) = \mathbf{1}_{\bigcup A_i}$ over $\Omega$
+(i.e.\ summing weighted by $\P(\{\omega\})$).
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:proba:5}
+(Matching problem, via inclusion--exclusion) $n$ letters are put
+uniformly at random into $n$ envelopes, one each. Using
+\cref{exo:b2:proba:4}, show that the probability of \emph{no}
+correct match is $\sum_{k=0}^n \frac{(-1)^k}{k!} \to e^{-1}$, and
+deduce the probability of exactly one match.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:proba:6}
+A biased coin (head probability $p \in \intoo{0}{1}$) is tossed
+until two consecutive heads appear. Let $q_n$ be the probability
+that the game lasts more than $n$ tosses. Show, conditioning on
+the first toss(es), that $q_n = (1-p)\,q_{n-1} + p(1-p)\,q_{n-2}$
+for $n \geq 2$, and deduce that the game ends with probability
+$1$. \emph{(Show $q_n \to 0$ by comparing with a geometric
+sequence: both roots of the characteristic equation lie in
+$\intoo{0}{1}$ in absolute value.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:proba:7}
+(Records) Draw an infinite sequence of independent uniform
+rankings, in the following combinatorial sense: for each $n$, the
+relative order of the first $n$ draws is uniform among the $n!$
+possibilities, and $R_n = {}$``the $n$-th draw is a record (larger
+than all previous ones)''. Admitting that the events $R_n$ are
+independent with $\P(R_n) = 1/n$ (prove at least this last
+equality by symmetry), show using Borel--Cantelli that infinitely
+many records occur almost surely, but that records at
+\emph{consecutive} times $n, n+1$ occur infinitely often with
+probability --- compute $\sum_n \P(R_n \cap R_{n+1})$ and
+conclude what Borel--Cantelli~1 gives.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:proba:8}
+(Kochen--Stone flavour, easier version) Let $(A_n)$ be independent
+events with $\P(A_n) = \frac{1}{n+1}$. Show that
+$\P(\limsup A_n) = 1$, although $\P(A_n) \to 0$: ``individually
+rare, collectively certain''. Conversely, exhibit a sequence of
+(dependent) events with $\sum\P(A_n) = \infty$ and
+$\P(\limsup A_n) = 0$, showing independence cannot be dropped in
+Borel--Cantelli~2.
+\end{exercise}

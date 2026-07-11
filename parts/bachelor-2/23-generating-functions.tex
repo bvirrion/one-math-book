@@ -1,0 +1,461 @@
+\chapter{Probability Generating Functions}\label{ch:b2:genfun}
+
+The power series of \cref{ch:b2:powerseries} return with a
+probabilistic mission: to an $\N$-valued random variable we attach
+the power series with coefficients $\P(X = n)$. This
+\emph{generating function} converts sums of independent variables
+into products, moments into derivatives at $1$, and hard
+combinatorial identities into one-line multiplications. The
+chapter closes the book with two showpieces: the Poisson
+approximation of rare events, and the extinction criterion for
+branching processes --- a genuinely infinite probabilistic
+computation solved entirely by the geometry of a convex curve.
+
+\section{Definition and basic properties}
+
+\begin{definition}[Probability generating function]\label{def:b2:genfun:pgf}
+Let $X$ be an $\N$-valued random variable, $p_n = \P(X = n)$. The
+\emph{(probability) generating function} of $X$ is the sum of the
+power series
+\[
+G_X(t) = \E\bigl(t^X\bigr) = \sum_{n=0}^{\infty} p_n\,t^n .
+\]
+\end{definition}
+
+\begin{proposition}[Radius and first properties]\label{prop:b2:genfun:radius}
+The series defining $G_X$ has radius of convergence $\geq 1$;
+$G_X$ is defined and continuous on $\intcc{-1}{1}$,
+$\mathcal{C}^\infty$ on $\intoo{-1}{1}$, with $G_X(1) = 1$ and
+$\abs{G_X(t)} \leq 1$ there. Moreover $G_X$ determines the law of
+$X$:
+\[
+p_n = \frac{G_X^{(n)}(0)}{n!} .
+\]
+\end{proposition}
+
+\begin{proof}
+Since $\sum p_n = 1$ converges, the terms $p_n\,1^n$ are bounded,
+so the radius is $\geq 1$ (Abel's lemma,
+\cref{ch:b2:powerseries}); at $t = \pm1$ the series converges
+absolutely ($\sum p_n = 1$ dominates), and normal convergence on
+$\intcc{-1}{1}$ gives continuity there
+(\cref{ch:b2:funcseq}). Smoothness inside and the coefficient
+formula are the general theory of power series; the coefficients
+being recoverable, two variables with the same generating function
+have the same law.
+\end{proof}
+
+\begin{example}[The classical laws]\label{ex:b2:genfun:classical}
+\leavevmode
+\begin{itemize}
+\item Bernoulli $\mathcal{B}(p)$: $G(t) = 1 - p + pt$.
+\item Binomial $\mathcal{B}(n, p)$: $G(t) = \sum_k \binom nk
+(pt)^k(1-p)^{n-k} = (1 - p + pt)^n$ (binomial theorem).
+\item Geometric $\mathcal{G}(p)$: $G(t) =
+\sum_{k\geq1}(1-p)^{k-1}p\,t^k = \dfrac{pt}{1 - (1-p)t}$ (radius
+$\frac{1}{1-p} > 1$).
+\item Poisson $\mathcal{P}(\lambda)$: $G(t) =
+\sum_k e^{-\lambda}\frac{(\lambda t)^k}{k!} = e^{\lambda(t - 1)}$
+(radius $\infty$).
+\end{itemize}
+\end{example}
+
+\begin{theorem}[Moments from the generating
+function]\label{thm:b2:genfun:moments}
+$X$ has an expectation if and only if $G_X$ is differentiable at
+$1^-$ (left derivative, finite), and then $\E(X) = G_X'(1)$.
+Similarly $X$ has a second moment iff $G_X$ is twice
+differentiable at $1^-$, and then
+\[
+\E\bigl(X(X - 1)\bigr) = G_X''(1),
+\qquad
+V(X) = G_X''(1) + G_X'(1) - G_X'(1)^2 .
+\]
+\end{theorem}
+
+\begin{proof}
+For $t \in \intoo{0}{1}$, term-by-term differentiation inside the
+disk gives $G_X'(t) = \sum_{n\geq1} np_n t^{n-1}$, a series with
+nonnegative coefficients: $t \mapsto G_X'(t)$ is nondecreasing on
+$\intoo{0}{1}$, and by monotone convergence of partial sums (or
+Abel's theorem for nonnegative coefficients,
+\cref{ch:b2:powerseries}),
+\[
+\lim_{t \to 1^-} G_X'(t)
+= \sum_{n\geq1} n\,p_n \in \intcc{0}{+\infty} ,
+\]
+each side finite exactly when the other is. When finite, the mean
+value theorem squeezes the difference quotients $\frac{G_X(1) -
+G_X(t)}{1 - t}$ between values of $G_X'$, so $G_X$ is
+differentiable at $1^-$ with $G_X'(1) = \sum np_n = \E(X)$ (by
+transfer). The second-order statement is identical with $G''_X(t)
+= \sum n(n-1)p_nt^{n-2}$, and König--Huygens turns
+$\E(X(X-1))$ into the variance formula.
+\end{proof}
+
+\begin{example}
+Poisson: $G'(t) = \lambda e^{\lambda(t-1)}$, so $\E(X) = \lambda$;
+$G''(1) = \lambda^2$, so $V(X) = \lambda^2 + \lambda - \lambda^2 =
+\lambda$ --- the computations of \cref{ch:b2:randomvar} in one
+line each.
+\end{example}
+
+\section{Sums of independent variables}
+
+\begin{theorem}[Multiplicativity]\label{thm:b2:genfun:product}
+If $X$ and $Y$ are independent $\N$-valued random variables, then
+\[
+G_{X + Y}(t) = G_X(t)\,G_Y(t)
+\qquad (\abs t \leq 1),
+\]
+and by induction $G_{X_1 + \dots + X_n} = \prod_i G_{X_i}$ for
+independent $X_1, \dots, X_n$.
+\end{theorem}
+
+\begin{proof}
+Two proofs, both instructive. \emph{Via expectations:} $t^X$ and
+$t^Y$ are independent bounded variables, so
+(\cref{thm:b2:randomvar:product})
+\[
+G_{X+Y}(t) = \E\bigl(t^{X+Y}\bigr)
+= \E\bigl(t^X t^Y\bigr)
+= \E\bigl(t^X\bigr)\E\bigl(t^Y\bigr) .
+\]
+\emph{Via Cauchy products:} the law of $X + Y$ is the convolution
+$\P(X + Y = n) = \sum_{k=0}^n \P(X = k)\P(Y = n - k)$, and the
+Cauchy product theorem for absolutely convergent series
+(\cref{ch:b2:series}) multiplies the two power series exactly
+along this convolution.
+\end{proof}
+
+\begin{example}[Stability of the classical laws]\label{ex:b2:genfun:stability}
+Independent binomials with the same $p$ add: $(1 - p + pt)^m(1 -
+p + pt)^n = (1 - p + pt)^{m+n}$, so $\mathcal{B}(m, p) +
+\mathcal{B}(n, p) = \mathcal{B}(m + n, p)$ --- in particular a sum
+of $n$ independent Bernoulli variables is binomial, re-proving the
+law of the number of successes. Independent Poissons add:
+$e^{\lambda(t-1)}e^{\mu(t-1)} = e^{(\lambda + \mu)(t-1)}$, so
+$\mathcal{P}(\lambda) + \mathcal{P}(\mu) = \mathcal{P}(\lambda +
+\mu)$ --- the convolution computation of
+\cref{exo:b2:randomvar:2}, now without computation.
+\end{example}
+
+\begin{theorem}[Random sums: Wald's identity for generating
+functions]\label{thm:b2:genfun:compound}
+Let $(X_k)_{k\geq1}$ be independent $\N$-valued variables with the
+same law and generating function $G_X$, and let $N$ be an
+$\N$-valued variable independent of the $X_k$, with generating
+function $G_N$. Then the random sum $S = X_1 + \dots + X_N$ (with
+$S = 0$ when $N = 0$) has generating function
+\[
+G_S = G_N \circ G_X .
+\]
+In particular, if $N$ and $X_1$ have expectations, $\E(S) =
+\E(N)\,\E(X_1)$.
+\end{theorem}
+
+\begin{proof}
+Condition on $N$ (total probability,
+\cref{thm:b2:proba:bayes}): for $\abs t \leq 1$,
+\[
+G_S(t) = \sum_{n=0}^\infty \P(N = n)\,
+\E\bigl(t^{X_1 + \dots + X_n}\bigr)
+= \sum_{n=0}^\infty \P(N = n)\,G_X(t)^n
+= G_N\bigl(G_X(t)\bigr),
+\]
+using multiplicativity for each fixed $n$ and the summability of
+the whole double family ($\abs{G_X(t)} \leq 1$). The exchange of
+summations is Fubini for summable families
+(\cref{ch:b2:series}). Differentiating at $1^-$ by the chain rule
+and \cref{thm:b2:genfun:moments}: $\E(S) = G_N'(G_X(1))\,G_X'(1)
+= G_N'(1)G_X'(1) = \E(N)\E(X_1)$.
+\end{proof}
+
+\section{Poisson approximation}
+
+\begin{theorem}[Law of rare events]\label{thm:b2:genfun:rareevents}
+Let $X_n \sim \mathcal{B}(n, p_n)$ with $n\,p_n \to \lambda > 0$.
+Then for every $k \in \N$:
+\[
+\P(X_n = k)
+\xrightarrow[n\to\infty]{}
+e^{-\lambda}\frac{\lambda^k}{k!} :
+\]
+the binomial law of many rare independent events converges to the
+Poisson law of parameter $\lambda$.
+\end{theorem}
+
+\begin{proof}
+Direct computation with $p_n = \frac{\lambda_n}{n}$, $\lambda_n
+\to \lambda$:
+\[
+\P(X_n = k)
+= \binom nk p_n^k(1 - p_n)^{n-k}
+= \frac{n(n-1)\cdots(n-k+1)}{n^k}\cdot
+\frac{\lambda_n^k}{k!}\,
+\bigl(1 - \tfrac{\lambda_n}{n}\bigr)^{n-k} .
+\]
+As $n \to \infty$ with $k$ fixed: the first factor tends to $1$
+(product of $k$ factors $\to 1$); $\lambda_n^k \to \lambda^k$;
+and $\bigl(1 - \frac{\lambda_n}{n}\bigr)^{n-k} =
+\exp\bigl((n-k)\ln(1 - \frac{\lambda_n}{n})\bigr) \to
+e^{-\lambda}$ since $(n - k)\ln\bigl(1 - \frac{\lambda_n}{n}\bigr)
+\sim -\lambda_n \to -\lambda$
+(\cref{ch:b2:comparison}). Alternatively, at the level of
+generating functions: $G_{X_n}(t) = \bigl(1 +
+\frac{\lambda_n(t-1)}{n}\bigr)^n \to e^{\lambda(t - 1)} =
+G_{\mathcal{P}(\lambda)}(t)$ for each fixed $t \in [0, 1]$ ---
+convergence of generating functions, which (for $\N$-valued
+variables) is equivalent to convergence of each $\P(X_n = k)$;
+see \cref{exo:b2:genfun:9}.
+\end{proof}
+
+\begin{remark}
+This is why Poisson laws model counts of rare events --- typos per
+page, radioactive decays per second, accidents per day at a
+crossing: each opportunity is nearly negligible, opportunities are
+many, and only the mean rate $\lambda$ survives in the limit.
+\end{remark}
+
+\section{Branching processes}
+
+Consider a population starting from one ancestor; each individual,
+independently, has a random number of children with law $(p_k)_{k
+\in \N}$ and generating function $G$ (the \emph{offspring
+distribution}). Let $Z_n$ be the size of generation $n$ ($Z_0 =
+1$), and let $m = G'(1) = \E(Z_1)$ be the mean offspring number.
+
+\begin{proposition}\label{prop:b2:genfun:branching}
+The generating function of $Z_n$ is the $n$-th iterate
+$G_{Z_n} = G \circ G \circ \dots \circ G$ ($n$ times), and the
+extinction probabilities $q_n = \P(Z_n = 0)$ satisfy
+\[
+q_0 = 0, \qquad q_{n+1} = G(q_n),
+\]
+and increase to the probability $q$ of eventual extinction, which
+is a fixed point of $G$.
+\end{proposition}
+
+\begin{proof}
+Generation $n + 1$ is the random sum of the offspring of the $Z_n$
+members of generation $n$, with counts independent of each other
+and of $Z_n$: \cref{thm:b2:genfun:compound} gives $G_{Z_{n+1}} =
+G_{Z_n} \circ G$, and induction from $G_{Z_0}(t) = t$ yields the
+$n$-fold iterate --- which, by associativity of composition, can
+equally be read as $G_{Z_{n+1}} = G \circ G_{Z_n}$. Evaluating
+this second form at $0$: $q_{n+1} = G_{Z_{n+1}}(0) =
+G\bigl(G_{Z_n}(0)\bigr) = G(q_n)$. The events $\{Z_n = 0\}$ increase (extinct populations stay
+extinct), so $q_n \uparrow q = \P\bigl(\bigcup_n\{Z_n = 0\}\bigr)$
+by monotone continuity (\cref{thm:b2:proba:continuity}), and
+continuity of $G$ on $[0, 1]$ turns $q_{n+1} = G(q_n)$ into $q =
+G(q)$ at the limit.
+\end{proof}
+
+\begin{theorem}[Extinction criterion]\label{thm:b2:genfun:extinction}
+Assume $p_1 \neq 1$. The extinction probability $q$ is the
+\emph{smallest} fixed point of $G$ in $\intcc{0}{1}$, and:
+\begin{itemize}
+\item if $m \leq 1$ (subcritical or critical), $q = 1$: extinction
+is certain;
+\item if $m > 1$ (supercritical), $q < 1$: the population survives
+forever with positive probability $1 - q$.
+\end{itemize}
+\end{theorem}
+
+\begin{proof}
+$G$ is convex on $\intcc{0}{1}$ (power series with nonnegative
+coefficients: $G'' \geq 0$), nondecreasing, with $G(1) = 1$.
+
+\emph{Smallest fixed point:} let $r \in \intcc{0}{1}$ be any fixed
+point. Then $q_0 = 0 \leq r$, and inductively $q_{n+1} = G(q_n)
+\leq G(r) = r$ (monotonicity): so $q = \lim q_n \leq r$.
+
+\emph{Case $m \leq 1$:} suppose $r < 1$ is a fixed point. By the
+mean value theorem on $[r, 1]$, there is $c \in \intoo{r}{1}$ with
+$G'(c) = \frac{G(1) - G(r)}{1 - r} = \frac{1 - r}{1 - r} = 1$. But
+$G'$ is nondecreasing (convexity) with $\lim_{t\to1^-}G'(t) = m
+\leq 1$, so $G' \leq 1$ on $\intoo{0}{1}$; the equality $G'(c) =
+1$ then forces $G'$ to be constant equal to $1$ on $\intco{c}{1}$,
+hence $G'' = \sum n(n-1)p_nt^{n-2} \equiv 0$ there. A power series
+with nonnegative coefficients vanishing on an interval has all
+these coefficients zero: $p_n = 0$ for $n \geq 2$, so $G(t) = p_0
++ p_1t$ and $1 = G'(c) = p_1$ --- contradicting the hypothesis
+$p_1 \neq 1$. So $1$ is the only fixed point: $q = 1$.
+
+\emph{Case $m > 1$:} near $1$, $G(t) - t$ has derivative $G'(t) -
+1 \to m - 1 > 0$ as $t \to 1^-$, so $G(t) - t < G(1) - 1 = 0$ on
+some interval $\intoo{1 - \delta}{1}$: the continuous function
+$G(t) - t$ is $\geq 0$ at $t = 0$ ($G(0) = p_0 \geq 0$) and $< 0$
+just below $1$, so it vanishes at some $r < 1$ (intermediate value
+theorem). The smallest fixed point is then $q \leq r < 1$.
+\end{proof}
+
+\begin{figure}[ht]
+\centering
+% Subcritical: G(t) = 0.5 + 0.1 t + 0.4 t^2 => m = 0.9 <= 1
+\begin{tikzpicture}[scale=2.9]
+  \draw[->] (0,0) -- (1.15,0) node[below] {$t$};
+  \draw[->] (0,0) -- (0,1.15);
+  \draw[dashed] (0,0) -- (1,1);
+  \draw[thick, ocBlue, domain=0:1, smooth, samples=40]
+    plot (\x, {0.5 + 0.1*\x + 0.4*\x*\x});
+  \fill (1,1) circle (0.02);
+  \node[below, font=\small] at (0.55,-0.06)
+    {$m \leq 1$: $q = 1$};
+  % cobweb from 0
+  \draw[ocRed, ->] (0,0) -- (0,0.5);
+  \draw[ocRed, ->] (0,0.5) -- (0.5,0.5);
+  \draw[ocRed, ->] (0.5,0.5) -- (0.5,0.65);
+  \draw[ocRed, ->] (0.5,0.65) -- (0.65,0.65);
+  \draw[ocRed, ->] (0.65,0.65) -- (0.65,0.734);
+  \draw[ocRed, ->] (0.65,0.734) -- (0.734,0.734);
+  \node[font=\small, ocBlue] at (0.32,0.75) {$G$};
+\end{tikzpicture}
+\qquad
+% Supercritical: G(t) = 0.25 + 0.15 t + 0.6 t^2 => m = 1.35 > 1
+\begin{tikzpicture}[scale=2.9]
+  \draw[->] (0,0) -- (1.15,0) node[below] {$t$};
+  \draw[->] (0,0) -- (0,1.15);
+  \draw[dashed] (0,0) -- (1,1);
+  \draw[thick, ocBlue, domain=0:1, smooth, samples=40]
+    plot (\x, {0.25 + 0.15*\x + 0.6*\x*\x});
+  \fill (1,1) circle (0.02);
+  % fixed point q: 0.6q^2 - 0.85q + 0.25 = 0 -> q = 5/12 ~ 0.4167
+  \fill[ocRed] (0.4167,0.4167) circle (0.02)
+    node[below right, font=\small] {$q$};
+  \node[below, font=\small] at (0.55,-0.06)
+    {$m > 1$: $q < 1$};
+  % cobweb from 0
+  \draw[ocRed, ->] (0,0) -- (0,0.25);
+  \draw[ocRed, ->] (0,0.25) -- (0.25,0.25);
+  \draw[ocRed, ->] (0.25,0.25) -- (0.25,0.325);
+  \draw[ocRed, ->] (0.25,0.325) -- (0.325,0.325);
+  \draw[ocRed, ->] (0.325,0.325) -- (0.325,0.3623);
+  \draw[ocRed, ->] (0.325,0.3623) -- (0.3623,0.3623);
+  \node[font=\small, ocBlue] at (0.28,0.72) {$G$};
+\end{tikzpicture}
+\caption{Extinction probabilities as a fixed-point iteration
+$q_{n+1} = G(q_n)$ starting at $q_0 = 0$ (red staircase). Left: a
+subcritical offspring law --- the convex curve stays above the
+diagonal, the iteration climbs to the unique fixed point $1$.
+Right: a supercritical law --- the curve crosses the diagonal at
+$q < 1$, where the iteration stops: survival has probability $1 -
+q > 0$.}
+\label{fig:b2:genfun:branching}
+\end{figure}
+
+\begin{example}\label{ex:b2:genfun:branchingexample}
+Offspring law: no child, one child, two children with
+probabilities $\frac14, \frac14, \frac12$. Then $m = \frac14 + 1 =
+\frac54 > 1$ and $G(t) = \frac14 + \frac14 t + \frac12 t^2$. Fixed
+points: $\frac12 t^2 - \frac34 t + \frac14 = 0$, i.e.\ $2t^2 - 3t
++ 1 = (2t - 1)(t - 1) = 0$: $q = \frac12$. The family line dies
+out with probability $\frac12$ --- and with probability $\frac12$
+it lives forever.
+\end{example}
+
+\section*{Closing the volume}
+
+The generating function is a fitting final object for this book:
+it is simultaneously a power series (\cref{ch:b2:powerseries}), a
+tool of summable families (\cref{ch:b2:series}), an expectation
+(\cref{ch:b2:randomvar}), a convex function whose geometry decides
+extinction (\cref{ch:b2:realfun}), and a fixed-point iteration
+(\cref{ch:b2:metric}). The mathematics of Year 2 is one subject.
+The Year 3 volume will open the doors deliberately left closed
+here: Lebesgue integration (discharging the dominated convergence
+theorem of \cref{ch:b2:integration}), measure-theoretic
+probability on uncountable spaces, and the inverse function
+theorem's full proof (\cref{ch:b2:diffcalc}) in the setting of
+differential geometry.
+
+\section{Exercises}
+
+\begin{exercise}[$\star$]\label{exo:b2:genfun:1}
+Compute the generating function of the uniform law on $\{1, 2,
+\dots, 6\}$ (a fair die). Show that the sum of two fair dice
+\emph{cannot} be uniform on $\{2, \dots, 12\}$: factor $G_{X+Y}$
+and count roots. \emph{(A uniform sum would force $G_X(t)G_Y(t) =
+\frac{t^2}{11}\sum_{k=0}^{10}t^k$, whose nonzero roots are the
+$11$-th roots of unity other than $1$ --- none of them real ---
+while $G_X/t$ and $G_Y/t$ are real polynomials of degree $5$, each
+owning at least one real root.)}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:genfun:2}
+Using generating functions, recover $\E$ and $V$ for the binomial
+and geometric laws (\cref{thm:b2:genfun:moments}).
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:genfun:3}
+Two loaded dice: is it possible to load two dice (independently,
+identically or not) so that their sum is uniform on $\{2, \dots,
+12\}$? \emph{(Same factorization obstruction as in
+\cref{exo:b2:genfun:1}: the answer is no even with different
+loadings, because each factor $G_X(t)/t$ has odd degree $5$,
+hence a real root, while the target has none.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:genfun:4}
+Let $X_1, X_2, \dots$ be independent Bernoulli $\mathcal{B}(p)$
+and $N \sim \mathcal{P}(\lambda)$ independent of them. Show,
+via \cref{thm:b2:genfun:compound}, that $S = X_1 + \dots + X_N
+\sim \mathcal{P}(\lambda p)$: a Poisson number of items, each kept
+with probability $p$, leaves a Poisson number --- \emph{thinning}.
+Compute also the law of the discarded count and admire: it is
+$\mathcal{P}(\lambda(1-p))$, and one can show it is independent
+of $S$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:genfun:5}
+(Negative binomial) Let $T_r$ be the number of tosses to obtain
+$r$ heads (head probability $p$). Write $T_r$ as a sum of $r$
+independent geometric variables, deduce
+\[
+G_{T_r}(t) = \Bigl(\frac{pt}{1 - (1-p)t}\Bigr)^{r},
+\qquad
+\E(T_r) = \frac rp,
+\qquad
+V(T_r) = \frac{r(1-p)}{p^2},
+\]
+and expand $G_{T_r}$ to find $\P(T_r = n) = \binom{n-1}{r-1}
+p^r(1-p)^{n-r}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:genfun:6}
+For the offspring law $p_0 = \frac18$, $p_1 = \frac38$, $p_2 =
+\frac38$, $p_3 = \frac18$: compute $m$, decide
+supercriticality, and compute the extinction probability $q$
+exactly. \emph{(Factor out the root $t = 1$ of $G(t) - t$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:genfun:7}
+(Total progeny) In a subcritical branching process ($m < 1$), let
+$Y = \sum_{n\geq0} Z_n$ be the total number of individuals ever
+born. Show $\E(Y) = \sum_n m^n = \frac{1}{1 - m}$ (justify the
+exchange of summations), and prove that the generating function
+$H = G_Y$ satisfies the functional equation $H(t) = t\,G(H(t))$.
+\emph{(The ancestor, plus the total progenies of each of its
+children, which are independent copies of $Y$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:genfun:8}
+Let $X$ have generating function $G$ with radius of convergence $>
+1$. Prove the \emph{exponential tail bound}: there are $C > 0$ and
+$\rho \in \intoo{0}{1}$ with $\P(X \geq n) \leq C\rho^n$.
+\emph{(Markov applied to $t^X$ for a fixed $t > 1$ inside the
+disk.)} Conversely, show that if $\P(X \geq n) \leq C\rho^n$ with
+$\rho < 1$, the radius of $G$ is $\geq 1/\rho > 1$.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:genfun:9}
+(Continuity theorem, elementary case) Let $X, X_1, X_2, \dots$ be
+$\N$-valued with $G_{X_n}(t) \to G_X(t)$ for every $t \in
+\intco{0}{1}$. Show that $\P(X_n = k) \to \P(X = k)$ for every
+$k$. \emph{(Induction on $k$: for $k = 0$ take $t \to 0$ ---
+carefully: fix $t$ small, use $\abs{\P(X_n = 0) - G_{X_n}(t)}
+\leq \frac{t}{1-t}$, valid since the tail $\sum_{j \geq 1}p_jt^j
+\leq \frac{t}{1 - t}$; then diagonalize. For the induction step,
+consider $\frac{G(t) - \P(X = 0)}{t}$, the generating function of
+a shifted law.)}
+\end{exercise}

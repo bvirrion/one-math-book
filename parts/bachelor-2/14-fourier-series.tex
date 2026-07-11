@@ -1,0 +1,301 @@
+\chapter{Fourier Series}\label{ch:b2:fourier}
+
+Can every periodic signal be rebuilt from pure sines and cosines?
+Fourier's audacious ``yes'' created a century of analysis. This
+chapter proves the two pillars within MP* reach: \emph{Dirichlet's
+theorem} (pointwise reconstruction for piecewise $C^1$ functions,
+via the Dirichlet kernel) and \emph{Parseval's identity} (the energy
+of a signal is the sum of the energies of its harmonics), and
+harvests the classical numerical series --- Basel's $\sum 1/n^2 =
+\pi^2/6$ first among them.
+
+Throughout, functions are $2\pi$-periodic, piecewise continuous,
+complex-valued; $\mathcal{C}$ denotes the continuous ones.
+
+\section{Fourier coefficients}
+
+\begin{definition}\label{def:b2:fourier:coefficients}
+The \emph{Fourier coefficients}\index{Fourier coefficients} of $f$
+are
+\[
+c_n(f) = \frac{1}{2\pi}\int_{-\pi}^{\pi} f(t)\,\eu^{-\iu n t}\,\dd
+t \qquad (n \in \Z),
+\]
+and the real-form coefficients $a_n = c_n + c_{-n}$, $b_n = \iu(c_n
+- c_{-n})$, so that the \emph{Fourier partial sums} are
+\[
+S_N(f)(t) = \sum_{n=-N}^{N} c_n(f)\,\eu^{\iu nt}
+= \frac{a_0}{2} + \sum_{n=1}^{N}\bigl(a_n\cos nt + b_n \sin
+nt\bigr).
+\]
+On $\mathcal{C}$, define the Hermitian inner product $\langle f,
+g\rangle = \frac{1}{2\pi}\int_{-\pi}^{\pi}\conj f\,g$: the
+exponentials $e_n(t) = \eu^{\iu nt}$ are \emph{orthonormal}
+($\langle e_m, e_n\rangle = \delta_{mn}$, direct computation), and
+$c_n(f) = \langle e_n, f\rangle$: Fourier analysis is Hermitian
+geometry (\cref{ch:b2:hermitian}) in infinite dimension.
+\end{definition}
+
+\begin{proposition}[Bessel's inequality]\label{prop:b2:fourier:bessel}
+$S_N(f)$ is the orthogonal projection of $f$ onto the space
+$\mathcal{T}_N$ of trigonometric polynomials of degree $\leq N$,
+and\index{Bessel's inequality}
+\[
+\sum_{n=-N}^{N} \abs{c_n(f)}^2 \leq \norm f_2^2 =
+\frac{1}{2\pi}\int_{-\pi}^{\pi} \abs f^2 :
+\]
+the series $\sum \abs{c_n}^2$ converges, and $c_n(f) \to 0$ as
+$\abs n \to \infty$ (Riemann--Lebesgue for coefficients).
+\end{proposition}
+
+\begin{proof}
+$f - S_N(f)$ is orthogonal to each $e_k$, $\abs k \leq N$ ($\langle
+e_k, f - S_N f\rangle = c_k - c_k = 0$): $S_Nf$ is the orthogonal
+projection onto $\mathcal{T}_N = \operatorname{Vect}(e_{-N}, \dots,
+e_N)$ (Year 1 volume's projection theorem, verbatim in the
+Hermitian setting). Pythagoras: $\norm f_2^2 = \norm{S_Nf}_2^2 +
+\norm{f - S_Nf}_2^2 \geq \norm{S_Nf}_2^2 = \sum_{\abs n \leq N}
+\abs{c_n}^2$; let $N \to \infty$.
+\end{proof}
+
+\section{Dirichlet's theorem}
+
+\begin{lemma}[Dirichlet kernel]\label{lem:b2:fourier:kernel}
+$S_N(f)(x) = \frac{1}{2\pi}\int_{-\pi}^{\pi} f(x + u)\,D_N(u)\,\dd
+u$, where\index{Dirichlet kernel}
+\[
+D_N(u) = \sum_{n=-N}^{N} \eu^{\iu nu}
+= \frac{\sin\bigl((N + \frac12)u\bigr)}{\sin\frac u2}
+\quad (u \notin 2\pi\Z),
+\qquad
+\frac{1}{2\pi}\int_{-\pi}^{\pi} D_N = 1 .
+\]
+\end{lemma}
+
+\begin{proof}
+Insert the definition of $c_n$ into $S_N$ and swap sum and integral
+(finite sum): $S_N(f)(x) = \frac{1}{2\pi}\int f(t) \sum_n \eu^{\iu
+n(x - t)}\dd t$; substitute $u = t - x$ and use periodicity. The
+closed form: geometric sum with ratio $\eu^{\iu u}$,
+\[
+D_N(u) = \eu^{-\iu Nu}\,\frac{\eu^{\iu(2N+1)u} - 1}{\eu^{\iu u} -
+1}
+= \frac{\eu^{\iu(N + \frac12)u} - \eu^{-\iu(N+\frac12)u}}
+{\eu^{\iu u/2} - \eu^{-\iu u/2}} ,
+\]
+which is the sine quotient. Its mean is $1$: only $n = 0$
+contributes.
+\end{proof}
+
+\begin{theorem}[Riemann--Lebesgue lemma]\label{thm:b2:fourier:riemannlebesgue}
+For $g$ piecewise continuous on a segment,
+$\int_a^b g(t)\sin(\lambda t + \varphi)\,\dd t \to 0$ as $\lambda
+\to +\infty$.\index{Riemann--Lebesgue lemma}
+\end{theorem}
+
+\begin{proof}
+Approximate $g$ uniformly by step functions
+(\cref{thm:b2:funcseq:weierstrass} is not needed --- the elementary
+step-function approximation of piecewise continuous functions
+suffices) and integrate each step explicitly: every piece
+contributes $O\bigl(\frac1\lambda\bigr)$, and the approximation
+error contributes $\varepsilon(b - a)$. This argument was carried
+out in full as the final exercise of the Year 1 volume's
+integration chapter; for $C^1$ pieces one can instead integrate by
+parts and bound by $\frac C\lambda$.
+\end{proof}
+
+\begin{theorem}[Dirichlet]\label{thm:b2:fourier:dirichlet}
+Let $f$ be $2\pi$-periodic and piecewise $C^1$. Then for every $x$,
+\[
+S_N(f)(x) \xrightarrow[N \to \infty]{}
+\frac{f(x^+) + f(x^-)}{2}
+\]
+(the mean of one-sided limits) --- in particular $S_N(f)(x) \to
+f(x)$ at every point of continuity.\index{Dirichlet's theorem}
+\end{theorem}
+
+\begin{proof}
+By the kernel lemma and its unit mean, splitting the integral into
+$u > 0$ and $u < 0$ halves (each of mean $\frac12$):
+\begin{align*}
+S_N(f)(x) - \frac{f(x^+) + f(x^-)}{2}
+&= \frac{1}{2\pi}\int_{0}^{\pi} \bigl(f(x+u) -
+f(x^+)\bigr)D_N(u)\,\dd u\\
+&\quad+ \frac{1}{2\pi}\int_{-\pi}^{0}\bigl(f(x+u) -
+f(x^-)\bigr)D_N(u)\,\dd u .
+\end{align*}
+Treat the first (the second is symmetric). Write
+\[
+\bigl(f(x + u) - f(x^+)\bigr)\,D_N(u)
+= \underbrace{\frac{f(x+u) - f(x^+)}{\sin\frac u2}}_{g(u)}\,
+\sin\Bigl(\Bigl(N + \frac12\Bigr)u\Bigr) .
+\]
+The function $g$ is piecewise continuous on $\intoc{0}{\pi}$ and
+has a \emph{finite limit at $0^+$}: since $f$ is piecewise $C^1$,
+$\frac{f(x+u) - f(x^+)}{u} \to f'(x^+)$ and $\frac{u}{\sin(u/2)}
+\to 2$. So $g$ extends piecewise continuously to $\intcc{0}{\pi}$,
+and Riemann--Lebesgue (\cref{thm:b2:fourier:riemannlebesgue}) sends
+the integral to $0$.
+\end{proof}
+
+\begin{theorem}[Normal convergence for $C^1$; Parseval]\label{thm:b2:fourier:parseval}
+\begin{enumerate}
+  \item If $f$ is continuous, $2\pi$-periodic and piecewise $C^1$,
+        then $c_n(f') = \iu n\,c_n(f)$, the Fourier series of $f$
+        converges \emph{normally} on $\R$, and its sum is $f$.
+  \item (Parseval) For every piecewise continuous $2\pi$-periodic
+        $f$:\index{Parseval's identity}
+        \[
+        \frac{1}{2\pi}\int_{-\pi}^{\pi}\abs{f}^2
+        = \sum_{n=-\infty}^{\infty} \abs{c_n(f)}^2
+        = \frac{\abs{a_0}^2}{4} + \frac12\sum_{n\geq1}
+        \bigl(\abs{a_n}^2 + \abs{b_n}^2\bigr).
+        \]
+        \emph{(Proved here for $f$ continuous piecewise $C^1$;
+        admitted in general.)}
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) Integration by parts on each $C^1$ piece (boundary terms cancel
+by continuity and periodicity): $c_n(f') = \iu n c_n(f)$. Then, by
+Cauchy--Schwarz on the two square-summable families
+(\cref{prop:b2:fourier:bessel} for $f'$):
+\[
+\sum_{n \neq 0} \abs{c_n(f)} = \sum_{n\neq0}
+\frac{\abs{c_n(f')}}{\abs n}
+\leq \Bigl(\sum \abs{c_n(f')}^2\Bigr)^{1/2}
+\Bigl(\sum_{n\neq0}\frac{1}{n^2}\Bigr)^{1/2} < \infty :
+\]
+normal convergence of the Fourier series. Its sum is continuous and
+coincides with $f$ at every point by Dirichlet
+(\cref{thm:b2:fourier:dirichlet}: $f$ is continuous): the series
+converges to $f$, uniformly.
+
+(2) For such $f$: $S_N f \to f$ uniformly, so $\norm{f - S_Nf}_2
+\leq \norm{f - S_Nf}_\infty \to 0$, and Pythagoras
+($\norm f_2^2 = \sum_{\abs n \leq N}\abs{c_n}^2 + \norm{f -
+S_Nf}_2^2$) passes to the limit. The real form is bookkeeping with
+$a_n, b_n$.
+\end{proof}
+
+\begin{example}[Basel and friends]\label{ex:b2:fourier:basel}
+Let $f(t) = t$ on $\intoo{-\pi}{\pi}$, extended $2\pi$-periodically
+(a sawtooth, piecewise $C^1$). Computing, $a_n = 0$ (oddness) and
+\[
+b_n = \frac{1}{\pi}\int_{-\pi}^{\pi} t\sin nt\,\dd t
+= \frac{2(-1)^{n+1}}{n} .
+\]
+Dirichlet at $t = \frac\pi2$ recovers Leibniz's $\frac\pi4 = 1 -
+\frac13 + \frac15 - \dots$; Parseval gives
+\[
+\frac{1}{2\pi}\int_{-\pi}^{\pi} t^2\,\dd t = \frac{\pi^2}{3}
+= \frac12\sum_{n\geq1}\frac{4}{n^2}
+\quad\Longrightarrow\quad
+\boxed{\;\sum_{n\geq1}\frac{1}{n^2} = \frac{\pi^2}{6}\;}
+\]
+--- Euler's Basel sum, in two lines. The function $f(t) = t^2$
+similarly yields $\sum \frac1{n^4} = \frac{\pi^4}{90}$
+(\cref{exo:b2:fourier:3}).
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=9.2cm, height=5.6cm,
+    xmin=-3.6, xmax=3.6, ymin=-1.5, ymax=1.5,
+    xtick={-3.1416, 0, 3.1416},
+    xticklabels={$-\pi$, $0$, $\pi$}, ytick={-1,1}]
+  \addplot[omExo, thick] coordinates {(-3.1416,-1) (0,-1)};
+  \addplot[omExo, thick] coordinates {(0,1) (3.1416,1)};
+  \addplot[omDef, thick, domain=-3.3:3.3, samples=200]
+    {4/pi*sin(deg(x))};
+  \addplot[omThm, very thick, domain=-3.3:3.3, samples=400]
+    {4/pi*(sin(deg(x)) + sin(deg(3*x))/3 + sin(deg(5*x))/5 +
+     sin(deg(7*x))/7 + sin(deg(9*x))/9)};
+\end{axis}
+\end{tikzpicture}
+
+{\small The square wave (gray) and the Fourier partial sums $S_1$
+(blue) and $S_9$ (red): convergence at every continuity point, but
+a persistent $\sim 9\%$ overshoot near the jumps --- the
+\emph{Gibbs phenomenon}\index{Gibbs phenomenon}. Uniform
+convergence fails exactly because the limit is discontinuous.}
+\end{omfigure}
+
+\section{Exercises}
+
+\begin{exercise}[$\star$]\label{exo:b2:fourier:1}
+Compute the Fourier coefficients of the square wave ($f = -1$ on
+$\intoo{-\pi}{0}$, $+1$ on $\intoo{0}{\pi}$), state Dirichlet's
+conclusion at $t = \frac\pi2$ and at the jump $t = 0$, and recover
+Leibniz's series.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:fourier:2}
+Expand $f(t) = \abs t$ ($\abs t \leq \pi$, $2\pi$-periodic) in
+Fourier series; justify \emph{normal} convergence; evaluate at $t =
+0$ to obtain $\sum_{k\geq0}\frac{1}{(2k+1)^2} = \frac{\pi^2}{8}$,
+and re-derive Basel from it.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:fourier:3}
+Expand $f(t) = t^2$ ($\abs t \leq \pi$) and deduce
+\[
+\sum_{n\geq1}\frac{(-1)^{n+1}}{n^2} = \frac{\pi^2}{12},
+\qquad
+\sum_{n\geq1}\frac{1}{n^4} = \frac{\pi^4}{90}
+\quad\text{(Parseval)}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:fourier:4}
+Let $f$ be continuous $2\pi$-periodic with $c_n(f) = 0$ for all
+$n$. Prove $f = 0$ \emph{(Parseval --- for which class is it proved
+here? justify that continuity plus piecewise $C^1$ can be dropped
+by admitting general Parseval, or give the density argument in
+outline)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:fourier:5}
+For $\alpha \notin \Z$, expand $f(t) = \cos(\alpha t)$ ($\abs t
+\leq \pi$) and deduce the partial-fraction expansion of the
+cotangent:
+\[
+\pi\cot(\pi\alpha) = \frac{1}{\alpha} + \sum_{n\geq1}
+\frac{2\alpha}{\alpha^2 - n^2} .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:fourier:6}
+Prove that if $f$ is $2\pi$-periodic and $C^k$ with $f^{(k)}$
+piecewise continuous, then $c_n(f) = O\bigl(\abs n^{-k}\bigr)$:
+smoothness of the signal $=$ decay of its spectrum.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:fourier:7}
+(Wirtinger's inequality) Let $f$ be $C^1$, $2\pi$-periodic, with
+$\int_{-\pi}^{\pi} f = 0$. Prove
+\[
+\int_{-\pi}^{\pi} \abs{f}^2 \leq \int_{-\pi}^{\pi} \abs{f'}^2 ,
+\]
+with equality iff $f(t) = a\cos t + b\sin t$. \emph{(Parseval on
+both sides; compare $\abs{c_n}^2$ and $n^2\abs{c_n}^2$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:fourier:8}
+(The Gibbs constant) For the square wave of
+\cref{exo:b2:fourier:1}, evaluate the partial sum at $x_N =
+\frac{\pi}{2N}$: writing $u_k = \frac{(2k+1)\pi}{2N}$ and $\Delta u
+= \frac{\pi}{N}$, show that
+\[
+S_{2N-1}\Bigl(\frac{\pi}{2N}\Bigr)
+= \frac{4}{\pi}\sum_{k=0}^{N-1} \frac{\sin u_k}{2k+1}
+= \frac{2}{\pi}\sum_{k=0}^{N-1} \frac{\sin u_k}{u_k}\,\Delta u
+\xrightarrow[N\to\infty]{}
+\frac{2}{\pi}\int_0^{\pi}\frac{\sin u}{u}\,\dd u \approx 1.179 :
+\]
+a Riemann sum of $\frac{2}{\pi}\cdot\frac{\sin u}{u}$ on
+$\intcc{0}{\pi}$ at midpoints. Conclude that the overshoot beyond
+the jump value $1$ does not vanish as $N \to \infty$.
+\end{exercise}
