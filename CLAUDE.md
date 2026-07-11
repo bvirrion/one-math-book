@@ -6,16 +6,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 A series of five LaTeX math books (Grades 1–9, Grades 10–12, University
 Year 1, University Year 2, University Year 3) built from **one shared `parts/` tree**, one
-entry file per book at the repo root, and a single style file. Everything
-is written in English for an international audience. `CONTRIBUTING.md`
-holds the authoritative style/structure conventions; `THEME.md` documents
-the One Course cover brand. Read both before writing chapters.
+entry file per book at the repo root, and a single style file. The primary
+& middle school volume also exists in a full French translation
+(`one_math_book_primary_middle_school_fr.tex` + `parts/grade-N/fr/`).
+Everything is written in English for an international audience (French
+edition translates the primary & middle school content).
+`CONTRIBUTING.md` holds the authoritative style/structure conventions;
+`THEME.md` documents the One Course cover brand. Read both before writing
+chapters.
 
 ## Build
 
 ```sh
-make                                       # latexmk builds all four books into build/
+make                                       # latexmk builds all books into build/
 latexmk one_math_book_university_year_3.tex   # a single book
+latexmk one_math_book_primary_middle_school_fr.tex  # French primary volume
 ```
 
 The build is pdflatex via `latexmkrc` (which also raises pdfTeX memory
@@ -30,33 +35,52 @@ grep -ci 'undefined' $L         # undefined references — must be 0
 grep -c 'Overfull' $L           # overfull boxes — keep at 0 (fix by breaking long inline math into displays / align*)
 ```
 
-CI (`.github/workflows/build.yml`) builds all four books on every push;
+CI (`.github/workflows/build.yml`) builds all books on every push;
 `release.yml` additionally generates `version.tex` (overriding
 `\bookversion`/`\bookdate` in the entry files) and attaches
 `one_math_book_<slug>_vX.Y.Z.pdf` to the release.
 
 ## Architecture
 
-- `one_math_book_<slug>.tex` — entry file per book: loads
-  `styles/onemath.sty`, defines `\bookline` ("Book N: ..." shown on the
-  shared cover), inputs `parts/<year>/part.tex` for its years, then a
-  Solutions appendix inputting `parts/<year>/solutions/solutions.tex`.
+- `one_math_book_<slug>.tex` — entry file per book: optionally sets
+  `\booklang` (default `en`), loads `styles/onemath.sty`, defines
+  `\bookline` ("Book N: ..." shown on the shared cover), inputs
+  `parts/<year>/part.tex` for its years, then a Solutions appendix
+  inputting `parts/<year>/solutions/solutions.tex`.
 - `styles/onemath.sty` — **the only place** packages are loaded and
   macros/environments defined. Chapter files never `\usepackage` or
-  `\newcommand`.
-- `parts/<year>/part.tex` — declares the `\part` and inputs the chapters;
-  `parts/<year>/NN-slug.tex` one chapter per file;
-  `parts/<year>/solutions/NN-slug.tex` mirrors it. **Adding a chapter
-  requires registering it in both `part.tex` and
-  `solutions/solutions.tex`.**
+  `\newcommand`. Language UI strings live in `styles/lang/<lang>.tex`.
+- `styles/lang/en.tex`, `styles/lang/fr.tex` — theorem titles, solution
+  headers, cover strings, part titles (`\omstr{part.grade1}`, …).
+- Language-aware content paths:
+  - English (canonical): `parts/<year>/NN-slug.tex`
+  - Other languages: `parts/<year>/<lang>/NN-slug.tex` (same labels)
+  - `\ominput{grade-1}{01-counting-to-20}` and `\ominputsol{...}` pick
+    the language file when it exists, else fall back to English.
+- `parts/<year>/part.tex` — shared structure: `\part{\omstr{...}}` and
+  `\ominput` lines; `solutions/solutions.tex` likewise with `\ominputsol`.
 - Year label prefixes: `g1`–`g12`, `b1`, `b2`, `b3` (future: `k`). All
   labels are namespaced `<type>:<year>:<chapter-slug>:<name>`, e.g.
   `thm:b2:fourier:parseval`, exercises `exo:b2:fourier:3`. Reference with
-  `\cref`, never bare `\ref`.
+  `\cref`, never bare `\ref`. Labels are **language-independent** (same
+  IDs in English and French).
 - **Cross-volume references are prose-only** ("the Year 1 volume", "the
   High School volume") — `\cref` to another book's label will build
   locally by accident and break that book. Check with
   `grep -rn 'ref{[^}]*b1:' parts/bachelor-2/` (adapt prefixes).
+
+### Adding a language edition
+
+1. Add `styles/lang/<lang>.tex` (copy `en.tex` or `fr.tex`).
+2. Translate bodies to `parts/<year>/<lang>/` and
+   `parts/<year>/solutions/<lang>/` (same file names and labels).
+3. Add entry file `one_math_book_<slug>_<lang>.tex` with
+   `\newcommand{\booklang}{<lang>}` before `\usepackage{styles/onemath}`.
+4. Register the entry in `latexmkrc` and both GitHub workflows.
+
+French primary/middle school is the reference implementation
+(`one_math_book_primary_middle_school_fr.tex` →
+`build/one_math_book_primary_middle_school_fr.pdf`).
 
 ## Invariants to verify after writing/editing chapters
 
@@ -65,6 +89,9 @@ Every exercise has exactly one solution, keyed by label. Per chapter:
 ```sh
 diff <(grep -o 'label{exo:[^}]*}' parts/<year>/NN-slug.tex | sed 's/label{//;s/}//') \
      <(grep -o 'begin{solution}{[^}]*}' parts/<year>/solutions/NN-slug.tex | sed 's/begin{solution}{//;s/}//')
+# French edition:
+diff <(grep -o 'label{exo:[^}]*}' parts/<year>/fr/NN-slug.tex | sed 's/label{//;s/}//') \
+     <(grep -o 'begin{solution}{[^}]*}' parts/<year>/solutions/fr/NN-slug.tex | sed 's/begin{solution}{//;s/}//')
 grep -rho 'label{[^}]*}' parts/<year>/ | sort | uniq -d   # duplicate labels
 grep -rn 'end{[a-z]*>' parts/<year>/                       # \end{proof> typo class
 ```
@@ -104,3 +131,6 @@ Content rules (from CONTRIBUTING.md, enforced in review):
 - Map overfull boxes to source files by walking the log's file-stack
   (parse `(` filename / `)` tokens around each `Overfull \hbox ... at
   lines N--M` entry).
+- French edition: install `texlive-lang-french` when possible so babel
+  loads `french.ldf` (hyphenation/spacing). Without it the FR book still
+  builds; UI strings come from `styles/lang/fr.tex`.

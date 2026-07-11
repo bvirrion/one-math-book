@@ -4,9 +4,18 @@
 % All packages, theorem environments and macros live here. Chapter files must
 % not load packages or define macros: if you need something new, add it here
 % and document it in CONTRIBUTING.md.
+%
+% Language: set \booklang before loading (default en). UI strings and part
+% titles live in styles/lang/<lang>.tex. Chapter bodies for non-English
+% languages live under parts/<year>/<lang>/ (see \ominput / \ominputsol).
 % ============================================================================
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{onemath}[2026/07/02 v0.1 One Math Book common style]
+\ProvidesPackage{onemath}[2026/07/11 v0.2 One Math Book common style]
+
+% ----------------------------------------------------------------------------
+% Language selection (default: English)
+% ----------------------------------------------------------------------------
+\providecommand{\booklang}{en}
 
 % ----------------------------------------------------------------------------
 % Core packages
@@ -16,6 +25,23 @@
 \RequirePackage{lmodern}
 \RequirePackage{microtype}
 \RequirePackage[a4paper,inner=2.2cm,outer=2.2cm,top=2.4cm,bottom=2.6cm,headheight=14pt]{geometry}
+
+% babel: only for non-English editions (keeps English builds unchanged).
+% Compare expanded token lists so \newcommand{\booklang}{fr} matches.
+% Load french babel only when french.ldf is installed (texlive-lang-french);
+% UI strings still come from styles/lang/fr.tex either way.
+\edef\om@booklang@exp{\booklang}%
+\def\om@lang@fr{fr}%
+\ifx\om@booklang@exp\om@lang@fr
+  \IfFileExists{french.ldf}{%
+    \RequirePackage[french]{babel}%
+  }{%
+    \PackageWarning{onemath}{%
+      french.ldf not found; building French without babel.
+      Install texlive-lang-french for hyphenation and spacing}%
+  }%
+\fi
+
 \RequirePackage{amsmath}
 \RequirePackage{amssymb}
 \RequirePackage{amsthm}
@@ -52,6 +78,34 @@
 
 \setlist[enumerate]{itemsep=1pt,topsep=3pt}
 \setlist[itemize]{itemsep=1pt,topsep=3pt}
+
+% ----------------------------------------------------------------------------
+% Language strings (theorem names, cover, part titles, …)
+% ----------------------------------------------------------------------------
+\input{styles/lang/\booklang.tex}
+
+% Lookup structural string defined in the lang file via \@namedef{omstr@KEY}.
+\newcommand{\omstr}[1]{\csname omstr@#1\endcsname}
+
+% ----------------------------------------------------------------------------
+% Language-aware content paths
+%
+% \ominput{grade-1}{01-counting-to-20}
+%   → parts/grade-1/<lang>/01-counting-to-20.tex if it exists
+%   → else parts/grade-1/01-counting-to-20.tex (English canonical)
+%
+% \ominputsol{grade-1}{01-counting-to-20} — same rule under solutions/
+% ----------------------------------------------------------------------------
+\newcommand{\ominput}[2]{%
+  \IfFileExists{parts/#1/\booklang/#2.tex}%
+    {\input{parts/#1/\booklang/#2}}%
+    {\input{parts/#1/#2}}%
+}
+\newcommand{\ominputsol}[2]{%
+  \IfFileExists{parts/#1/solutions/\booklang/#2.tex}%
+    {\input{parts/#1/solutions/\booklang/#2}}%
+    {\input{parts/#1/solutions/#2}}%
+}
 
 % ----------------------------------------------------------------------------
 % Page layout details
@@ -135,21 +189,22 @@
 % decorates. All statement environments share one counter, numbered within
 % chapter. Exercises have their own counter.
 %
+% Titles come from styles/lang/<lang>.tex (\omnameDefinition, …).
 % Usage: \begin{theorem}[Monotone convergence]\label{thm:tle:seq:monotone}
 % ----------------------------------------------------------------------------
 \theoremstyle{definition}                 % upright body text, bold heading
-\newtheorem{definition}{Definition}[chapter]
-\newtheorem{theorem}[definition]{Theorem}
-\newtheorem{proposition}[definition]{Proposition}
-\newtheorem{lemma}[definition]{Lemma}
-\newtheorem{corollary}[definition]{Corollary}
-\newtheorem{method}[definition]{Method}
-\newtheorem{example}[definition]{Example}
-\newtheorem{notation}[definition]{Notation}
+\newtheorem{definition}{\omnameDefinition}[chapter]
+\newtheorem{theorem}[definition]{\omnameTheorem}
+\newtheorem{proposition}[definition]{\omnameProposition}
+\newtheorem{lemma}[definition]{\omnameLemma}
+\newtheorem{corollary}[definition]{\omnameCorollary}
+\newtheorem{method}[definition]{\omnameMethod}
+\newtheorem{example}[definition]{\omnameExample}
+\newtheorem{notation}[definition]{\omnameNotation}
 \theoremstyle{remark}
-\newtheorem{remark}[definition]{Remark}
+\newtheorem{remark}[definition]{\omnameRemark}
 
-\newtheorem{exercise}{Exercise}[chapter]
+\newtheorem{exercise}{\omnameExercise}[chapter]
 
 % Decoration: colored left rule + light background.
 % "lines before break" forces boxes with no room for their first lines to
@@ -176,19 +231,19 @@
 \omdecorate{exercise}{omExo}
 
 % Results stated without proof
-\newcommand{\admitted}{\begin{proof}[Proof]\emph{Admitted at this level.}\end{proof}}
+\newcommand{\admitted}{\begin{proof}[\omnameProof]\emph{\omadmittedtext}\end{proof}}
 
 % cleveref names
-\crefname{exercise}{Exercise}{Exercises}
-\Crefname{exercise}{Exercise}{Exercises}
+\crefname{exercise}{\omnameExercise}{\omnameExercises}
+\Crefname{exercise}{\omnameExercise}{\omnameExercises}
 
 % ----------------------------------------------------------------------------
 % Solutions appendix
 % Usage: \begin{solution}{exo:tle:seq:1} ... \end{solution}
-% Prints "Solution of Exercise <n> (page <p>)."
+% Prints "Solution of Exercise <n> (page <p>)." / French equivalent.
 % ----------------------------------------------------------------------------
 \newenvironment{solution}[1]{%
-  \par\medskip\noindent\textbf{Solution of \cref{#1}} (page~\pageref{#1}).\par\nopagebreak\smallskip
+  \par\medskip\noindent\textbf{\omsolutionof~\cref{#1}} (\ompage~\pageref{#1}).\par\nopagebreak\smallskip
   \noindent\ignorespaces
 }{\par\medskip}
 
@@ -242,5 +297,4 @@
 % Arithmetic
 \DeclareMathOperator{\lcm}{lcm}
 
-% Misc
-\newcommand{\st}{\text{ such that }}
+% Misc: \st is defined in styles/lang/<lang>.tex

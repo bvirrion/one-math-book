@@ -3,11 +3,13 @@
 *The One Math Book to Rule Them All.*
 
 A series of mathematics books, written in English for readers anywhere in
-the world, with the ambition of covering everything **from kindergarten to
+the world (with a full **French** edition of the primary & middle school
+volume), with the ambition of covering everything **from kindergarten to
 the end of the bachelor's degree** — as one coherent course, published in
 several volumes:
 
-1. **Primary & Middle School Mathematics** — Grades 1–9;
+1. **Primary & Middle School Mathematics** — Grades 1–9
+   (also available in French);
 2. **High School Mathematics** — Grades 10–12;
 3. **University Mathematics — Year 1**;
 4. **University Mathematics — Year 2**;
@@ -37,6 +39,7 @@ collected at the end of each book.
 | High School | Grade 12 (age 17–18) | Final year of secondary school, advanced track | ✅ 16 chapters, exercises + solutions |
 | University — Year 1 | Bachelor Year 1 (age 18–19) | First post-secondary year (old French MPSI program) | ✅ 25 chapters, exercises + solutions |
 | University — Year 2 | Bachelor Year 2 (age 19–20) | Second post-secondary year (French MP* program) | ✅ 23 chapters, exercises + solutions |
+| Primary & Middle School (FR) | Années 1–9 | Full French translation | ✅ same chapter set as English |
 | Other | Kindergarten, University Year 3 | | 🚧 planned |
 
 The lower the grade, the younger the reader it is written for: earlier
@@ -56,6 +59,7 @@ The PDFs are produced at
 
 ```
 build/one_math_book_primary_middle_school.pdf
+build/one_math_book_primary_middle_school_fr.pdf
 build/one_math_book_high_school.pdf
 build/one_math_book_university_year_1.pdf
 build/one_math_book_university_year_2.pdf
@@ -63,17 +67,23 @@ build/one_math_book_university_year_2.pdf
 
 `make clean` removes auxiliary files, `make distclean` removes the whole
 `build/` directory. To build a single book:
-`latexmk one_math_book_high_school.tex`.
+`latexmk one_math_book_high_school.tex` or
+`latexmk one_math_book_primary_middle_school_fr.tex`.
+
+French edition: install `texlive-lang-french` when available (better
+hyphenation via babel); the book still builds without it.
 
 ## Repository layout
 
 ```
-one_math_book_*.tex       one entry file per book of the series
-styles/onemath.sty        all packages, theorem environments, macros
-frontmatter/              title page, preface (shared by all books)
-parts/<year>/part.tex     one \part per school year
-parts/<year>/NN-*.tex     one file per chapter
-parts/<year>/solutions/   solutions, one file per chapter
+one_math_book_*.tex          one entry file per book / language
+styles/onemath.sty           packages, theorem environments, macros
+styles/lang/<lang>.tex       UI strings (en, fr, …)
+frontmatter/                 title page, preface (shared layout)
+parts/<year>/part.tex        shared structure for a school year
+parts/<year>/NN-*.tex        English chapter
+parts/<year>/<lang>/NN-*.tex translated chapter (same labels)
+parts/<year>/solutions/      English + <lang>/ solutions
 ```
 
 ## Contributing
