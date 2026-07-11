@@ -1,0 +1,286 @@
+\chapter{Variables aléatoires et loi binomiale}\label{ch:g12:randvar}
+
+Une variable aléatoire attache un nombre à chaque issue d'une expérience~:
+un gain, un compte, une durée. Son espérance est la moyenne à long terme
+des valeurs qu'elle produit, sa variance mesure leur dispersion. La star de
+ce chapitre est la loi binomiale, qui compte les succès dans des épreuves
+indépendantes répétées. Les variables aléatoires et la loi binomiale ont
+été rencontrées dans les
+\cref{ch:g11:prob,ch:g11:binom}~; ce chapitre les revoit et les approfondit,
+avec les outils combinatoires du \cref{ch:g12:comb} désormais disponibles.
+
+\section{Variables aléatoires discrètes}
+
+\begin{definition}[Variable aléatoire, loi]\label{def:g12:randvar:rv}
+Une \emph{variable aléatoire}\index{variable aléatoire} sur un univers fini
+$\Omega$ est une fonction $X \colon \Omega \to \R$. Sa
+\emph{loi}\index{loi} (ou distribution) est la donnée de ses valeurs
+possibles $x_1, \dots, x_k$ et des probabilités
+\[
+p_i = \P(X = x_i), \qquad \sum_{i=1}^{k} p_i = 1 .
+\]
+\end{definition}
+
+\begin{definition}[Espérance, variance, écart-type]\label{def:g12:randvar:exp}
+L'\emph{espérance}\index{espérance} de $X$ est
+\[
+\E(X) = \sum_{i=1}^{k} p_i\, x_i ,
+\]
+sa \emph{variance}\index{variance} et son \emph{écart-type} sont
+\[
+\V(X) = \E\bigl((X - \E(X))^2\bigr) = \sum_{i=1}^k p_i\bigl(x_i - \E(X)\bigr)^2,
+\qquad
+\sigma(X) = \sqrt{\V(X)} .
+\]
+\end{definition}
+
+\begin{proposition}[Formule de König--Huygens]\label{prop:g12:randvar:konig}
+\index{formule de König--Huygens}
+$\V(X) = \E(X^2) - \E(X)^2$.
+\end{proposition}
+
+\begin{proof}
+Écrire $m = \E(X)$ et développer~:
+\[
+\V(X) = \sum_i p_i (x_i^2 - 2m x_i + m^2)
+= \E(X^2) - 2m\sum_i p_i x_i + m^2\sum_i p_i
+= \E(X^2) - 2m^2 + m^2 . \qedhere
+\]
+\end{proof}
+
+\begin{proposition}[Transformation affine]\label{prop:g12:randvar:affine}
+Pour $a, b \in \R$~:
+\[
+\E(aX + b) = a\,\E(X) + b, \qquad
+\V(aX + b) = a^2\,\V(X) .
+\]
+\end{proposition}
+
+\begin{proof}
+La première est un réarrangement de la somme définissante. Pour la seconde,
+$aX + b$ s'écarte de sa moyenne de $a(X - \E(X))$, et le carré multiplie par
+$a^2$.
+\end{proof}
+
+\begin{example}[Jeux équitables]\label{ex:g12:randvar:game}
+Un jeu coûte $2$ euros~; on lance un dé, et le joueur reçoit la valeur
+affichée si elle est au moins $5$, rien sinon. Le gain $G$ prend les valeurs
+$-2$ (probabilité $\frac46$), $3$ ($\frac16$), $4$ ($\frac16$)~:
+\[
+\E(G) = \frac{-8 + 3 + 4}{6} = -\frac{1}{6} < 0 .
+\]
+En moyenne, le joueur perd $17$ centimes par partie~: le jeu est défavorable
+(comme la plupart des jeux réels).
+\end{example}
+
+\section{Épreuves de Bernoulli et loi binomiale}
+
+\begin{definition}[Loi de Bernoulli]\label{def:g12:randvar:bernoulli}
+Une \emph{épreuve de Bernoulli}\index{épreuve de Bernoulli} est une
+expérience à deux issues, \emph{succès} (probabilité $p$) et
+\emph{échec} ($q = 1 - p$). L'indicatrice $X$ de succès ($X = 1$ en cas de
+succès, $0$ en cas d'échec) suit la \emph{loi de Bernoulli}
+$\mathcal B(p)$~:
+\[
+\E(X) = p, \qquad \V(X) = p(1-p) .
+\]
+(En effet $\E(X) = p$, $\E(X^2) = p$, et König--Huygens donne
+$\V(X) = p - p^2$.)
+\end{definition}
+
+\begin{definition}[Loi binomiale]\label{def:g12:randvar:binomial}
+Répéter une épreuve de Bernoulli $n$ fois indépendamment, et soit $X$ le
+nombre total de succès. La loi de $X$ est la \emph{loi
+binomiale}\index{loi binomiale} $\mathcal B(n, p)$.
+\end{definition}
+
+\begin{omfigure}
+\begin{tikzpicture}[font=\small]
+  \coordinate (root) at (0,0);
+  \node (S) at (1.6,1.6) {S};
+  \node (F) at (1.6,-1.6) {E};
+  \node (SS) at (3.2,2.4) {S};
+  \node (SF) at (3.2,0.8) {E};
+  \node (FS) at (3.2,-0.8) {S};
+  \node (FF) at (3.2,-2.4) {E};
+  \node (SSS) at (4.8,2.8) {S};
+  \node (SSF) at (4.8,2.0) {E};
+  \node (SFS) at (4.8,1.2) {S};
+  \node (SFF) at (4.8,0.4) {E};
+  \node (FSS) at (4.8,-0.4) {S};
+  \node (FSF) at (4.8,-1.2) {E};
+  \node (FFS) at (4.8,-2.0) {S};
+  \node (FFF) at (4.8,-2.8) {E};
+  \draw[omThm, thick] (root) -- (S);
+  \draw[omThm, thick] (S) -- (SS);   \draw[omThm, thick] (SS) -- (SSF);
+  \draw[omThm, thick] (S) -- (SF);   \draw[omThm, thick] (SF) -- (SFS);
+  \draw[omThm, thick] (root) -- (F);
+  \draw[omThm, thick] (F) -- (FS);   \draw[omThm, thick] (FS) -- (FSS);
+  \draw[gray] (SS) -- (SSS);
+  \draw[gray] (SF) -- (SFF);
+  \draw[gray] (FS) -- (FSF);
+  \draw[gray] (F) -- (FF);
+  \draw[gray] (FF) -- (FFS);
+  \draw[gray] (FF) -- (FFF);
+  \node[gray, anchor=west] at (5.3,2.8) {$X=3$};
+  \node[omThm, anchor=west] at (5.3,2.0) {$X=2$};
+  \node[omThm, anchor=west] at (5.3,1.2) {$X=2$};
+  \node[gray, anchor=west] at (5.3,0.4) {$X=1$};
+  \node[omThm, anchor=west] at (5.3,-0.4) {$X=2$};
+  \node[gray, anchor=west] at (5.3,-1.2) {$X=1$};
+  \node[gray, anchor=west] at (5.3,-2.0) {$X=1$};
+  \node[gray, anchor=west] at (5.3,-2.8) {$X=0$};
+\end{tikzpicture}
+
+{\small Trois épreuves de Bernoulli~: exactement $\binom{3}{2} = 3$ des
+$2^3$ chemins donnent deux succès (en rouge), chacun de probabilité
+$p^2(1-p)$, donc $\P(X = 2) = 3p^2(1-p)$.}
+\end{omfigure}
+
+\begin{theorem}\label{thm:g12:randvar:binomial}
+Si $X \sim \mathcal B(n, p)$, alors pour $0 \leq k \leq n$~:
+\[
+\P(X = k) = \binom{n}{k} p^k (1-p)^{n-k},
+\]
+et
+\[
+\E(X) = np, \qquad \V(X) = np(1-p) .
+\]
+\end{theorem}
+
+\begin{proof}
+Une suite spécifiée d'issues avec $k$ succès et $n-k$ échecs a pour
+probabilité $p^k(1-p)^{n-k}$ par indépendance~; le nombre de telles suites
+est le nombre de façons de placer les $k$ succès parmi les $n$ épreuves,
+soit $\binom nk$ (\cref{ch:g12:comb}). En sommant sur les suites on obtient
+la formule --- et la formule du binôme confirme
+$\sum_k \P(X = k) = (p + q)^n = 1$.
+
+Pour l'espérance, en utilisant $k\binom nk = n\binom{n-1}{k-1}$
+(\cref{exo:g12:comb:7})~:
+\[
+\E(X) = \sum_{k=1}^{n} k\binom nk p^k q^{n-k}
+= np\sum_{k=1}^{n} \binom{n-1}{k-1} p^{k-1} q^{(n-1)-(k-1)}
+= np\,(p + q)^{n-1} = np .
+\]
+La formule de la variance se prouve de façon analogue avec l'identité
+$k(k-1)\binom nk = n(n-1)\binom{n-2}{k-2}$, donnant
+$\E(X(X-1)) = n(n-1)p^2$, d'où
+$\V(X) = n(n-1)p^2 + np - (np)^2 = np(1-p)$. (Une preuve structurelle ---
+la variance d'une somme de variables indépendantes --- arrive avec
+\cref{thm:g12:sums:variance}.)
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[
+  width=10cm, height=4.8cm,
+  ybar, bar width=4pt,
+  xlabel={$k$}, ylabel={$\P(X = k)$},
+  xmin=-1, xmax=21, ymin=0,
+  ytick={0, 0.1, 0.2},
+  title={$\mathcal B(20,\ 0.3)$}]
+  \addplot[fill=omDef!40, draw=omDef] coordinates {
+    (0,0.000798) (1,0.006839) (2,0.027846) (3,0.071604)
+    (4,0.130421) (5,0.178863) (6,0.191639) (7,0.164262)
+    (8,0.114397) (9,0.065370) (10,0.030817) (11,0.012006)
+    (12,0.003859) (13,0.001018) (14,0.000218) (15,0.000037)
+    (16,0.000005) (17,0.000001) (18,0) (19,0) (20,0)};
+\end{axis}
+\end{tikzpicture}
+
+{\small La loi $\mathcal B(20, 0.3)$~: moyenne $np = 6$, écart-type
+$\sqrt{npq} \approx 2.05$.}
+\end{omfigure}
+
+\begin{method}[Reconnaître une situation binomiale]\label{met:g12:randvar:recognize}
+Vérifier les trois ingrédients avant d'écrire $X \sim \mathcal B(n,p)$~: un
+\emph{nombre fixé} $n$ d'épreuves~; \emph{deux issues} par épreuve avec la
+\emph{même} probabilité de succès $p$~; \emph{indépendance} des épreuves
+(tirage \emph{avec} remise, ou dans une grande population). Puis utiliser
+\[
+\P(X \geq 1) = 1 - (1-p)^n
+\]
+pour «~au moins un succès~», et une calculatrice ou des tables cumulatives
+pour $\P(X \leq k)$ en général.
+\end{method}
+
+\begin{example}\label{ex:g12:randvar:atleastone}
+Combien de fois faut-il lancer un dé pour avoir au moins $99\%$ de chance
+d'obtenir un six~? Avec $X \sim \mathcal B\left(n, \frac16\right)$~:
+$\P(X \geq 1) = 1 - \left(\frac56\right)^n \geq 0.99$ signifie
+$\left(\frac56\right)^n \leq 0.01$, \emph{c'est-à-dire}
+$n \geq \frac{\ln 0.01}{\ln(5/6)} \approx 25.3$~: à partir de $n = 26$
+lancers.
+\end{example}
+
+\section{Exercices}
+
+\begin{exercise}[$\star$]\label{exo:g12:randvar:1}
+Une variable aléatoire $X$ prend les valeurs $-1, 0, 2, 5$ avec les
+probabilités $0.3, 0.2, 0.4, 0.1$. Calculer $\E(X)$, $\V(X)$ et
+$\sigma(X)$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:randvar:2}
+Un QCM a $10$ questions, chacune à $4$ choix dont un seul est correct. Un
+élève répond uniformément au hasard, indépendamment. Soit $X$ le nombre de
+réponses correctes.
+\begin{enumerate}
+  \item Donner la loi de $X$, $\E(X)$ et $\sigma(X)$.
+  \item Calculer $\P(X = 0)$, $\P(X = 5)$ et $\P(X \geq 1)$.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:randvar:3}
+Une compagnie d'assurance assure $n = 400$ clients~; chacun déclare un
+sinistre dans l'année avec probabilité $p = 0.05$, indépendamment. Soit $X$
+le nombre de sinistres. Identifier la loi de $X$ et calculer son espérance
+et son écart-type.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:randvar:4}
+Dans le jeu de l'\cref{ex:g12:randvar:game}, l'organisateur veut un jeu
+équitable ($\E(G) = 0$) en changeant le prix d'entrée $c$. Trouver $c$.
+Calculer la variance du gain pour cette version équitable~; «~équitable~»
+est-il la même chose que «~sans risque~»~?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:randvar:5}
+Un joueur de basket marque ses lancers francs avec probabilité $0.7$. Elle
+tire $8$ fois (tirs indépendants). Calculer la probabilité qu'elle marque~:
+exactement $6$~; au moins $6$~; au moins une fois. Quel est le nombre le
+plus probable de paniers~?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:randvar:6}
+Une compagnie aérienne sait que chaque passager ayant réservé se présente
+avec probabilité $0.9$, indépendamment. Un vol a $100$ places et la
+compagnie vend $104$ billets. Exprimer, à l'aide d'une loi binomiale, la
+probabilité que plus de passagers se présentent qu'il n'y a de places, et
+la borner numériquement avec une calculatrice (donner l'expression exacte).
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:randvar:7}
+Soit $X \sim \mathcal B(n, p)$. Montrer que
+\[
+\frac{\P(X = k+1)}{\P(X = k)} = \frac{n-k}{k+1}\cdot\frac{p}{1-p},
+\]
+et en déduire que la loi croît jusqu'à
+$k^* = \floor{(n+1)p}$ et décroît ensuite (le \emph{mode} de la
+binomiale).
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:randvar:8}
+\emph{(Saint-Pétersbourg, apprivoisé.)} On lance une pièce équilibrée
+jusqu'à l'apparition de pile, mais au plus $10$ fois. Soit $N$ le nombre de
+lancers utilisés, et le joueur reçoit $2^N$ euros si pile est apparu, $0$
+sinon.
+\begin{enumerate}
+  \item Donner la loi de $N$ restreinte aux issues gagnantes~:
+        $\P(\text{pile d'abord au lancer } k) = 2^{-k}$ pour
+        $1 \leq k \leq 10$, et vérifier la probabilité totale de gagner.
+  \item Calculer le gain espéré. Que deviendrait-il sans le plafond de
+        $10$ lancers~?
+\end{enumerate}
+\end{exercise}

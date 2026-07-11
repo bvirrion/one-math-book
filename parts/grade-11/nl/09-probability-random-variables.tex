@@ -1,0 +1,318 @@
+\chapter{Kansrekening en stochastische variabelen}\label{ch:g11:prob}
+
+Kansrekening modelleert experimenten waarvan de uitkomst onzeker is: een
+dobbelworp, een getrokken kaart, een gespeeld spel. Dit hoofdstuk zet de
+woordenschat op eindige verzamelingen op, en introduceert daarna de
+centrale figuur van de hele kansrekening: de \emph{stochastische
+variabele} en haar \emph{verwachting}. Deze begrippen worden hernomen en
+verdiept in \cref{ch:g12:randvar}, en voorwaardelijke kansen volgen in
+\cref{ch:g12:condprob}.
+
+\section{Kans op een eindige verzameling}
+
+\begin{definition}[Kansmodel]\label{def:g11:prob:model}
+Een experiment met eindig veel uitkomsten wordt gemodelleerd door zijn
+\emph{uitkomstenruimte}\index{uitkomstenruimte}
+$\Omega = \{\omega_1, \dots, \omega_n\}$ (de verzameling uitkomsten)
+samen met een \emph{kans}\index{kans} $\P$ die aan elke uitkomst
+$\omega_i$ een getal $p_i \geq 0$ toekent, met $p_1 + \dots + p_n = 1$.
+Een \emph{gebeurtenis}\index{gebeurtenis} is een deelverzameling
+$A \subseteq \Omega$, en
+\[
+\P(A) = \sum_{\omega_i \in A} p_i .
+\]
+Wanneer alle uitkomsten even waarschijnlijk zijn ($p_i = \frac1n$: het
+\emph{uniforme model}\index{uniform model}),
+\[
+\P(A) = \frac{\text{aantal uitkomsten in } A}
+{\text{aantal uitkomsten in } \Omega}.
+\]
+\end{definition}
+
+\begin{example}\label{ex:g11:prob:twodice}
+Gooi twee onderscheidbare dobbelstenen: $\Omega$ is de verzameling van
+$36$ geordende paren $(i, j)$ met $1 \leq i, j \leq 6$, alle even
+waarschijnlijk. De gebeurtenis $S$ = ``de som is $7$'' bevat de $6$
+paren $(1,6), (2,5), (3,4), (4,3), (5,2), (6,1)$, dus
+$\P(S) = \frac{6}{36} = \frac16$. De gebeurtenis ``de som is $12$''
+bevat alleen $(6,6)$: kans $\frac{1}{36}$. De \emph{juiste}
+uitkomstenruimte kiezen --- geordende paren, niet ongeordende --- is wat
+het uniforme model toepasbaar maakt.
+\end{example}
+
+\begin{proposition}[Kansregels]\label{prop:g11:prob:rules}
+Voor gebeurtenissen $A, B \subseteq \Omega$:
+\[
+\P(\emptyset) = 0, \qquad \P(\Omega) = 1, \qquad
+\P(\bar A) = 1 - \P(A),
+\]
+\[
+\P(A \cup B) = \P(A) + \P(B) - \P(A \cap B),
+\]
+waar $\bar A$ het \emph{complement} van $A$ is (alle uitkomsten niet in
+$A$). In het bijzonder $\P(A \cup B) = \P(A) + \P(B)$ wanneer $A$ en $B$
+\emph{onverenigbaar} zijn ($A \cap B = \emptyset$).
+\end{proposition}
+
+\begin{proof}
+De lege gebeurtenis bevat geen uitkomst (lege som), en $\Omega$ bevat ze
+allemaal (totale som $1$). Elke uitkomst zit in precies één van $A$,
+$\bar A$, dus $\P(A) + \P(\bar A) = 1$. Voor de vereniging: sommeren van
+de $p_i$ over $A$ en daarna over $B$ telt de uitkomsten van
+$A \cap B$ twee keer; aftrekken van $\P(A \cap B)$ corrigeert de
+dubbeltelling.
+\end{proof}
+
+\begin{example}
+In een klas studeert $60\%$ muziek ($M$), speelt $45\%$ een sport
+($S$), en doet $25\%$ beide. Het aandeel dat minstens één doet is
+$\P(M \cup S) = 0.60 + 0.45 - 0.25 = 0.80$, dus $20\%$ doet geen van
+beide (complement).
+\end{example}
+
+\section{Stochastische variabelen}
+
+\begin{definition}[Stochastische variabele, verdeling]\label{def:g11:prob:rv}
+Een \emph{stochastische variabele}\index{stochastische variabele} op
+$\Omega$ is een functie $X$ die aan elke uitkomst een getal toekent.
+Haar \emph{verdeling}\index{verdeling} is de tabel van haar mogelijke
+waarden $x_1, \dots, x_k$ samen met hun kansen
+\[
+\P(X = x_i) = \P\bigl(\{\omega : X(\omega) = x_i\}\bigr),
+\qquad
+\sum_{i=1}^k \P(X = x_i) = 1 .
+\]
+\end{definition}
+
+\begin{example}\label{ex:g11:prob:game}
+Een spel: betaal $2$ euro, gooi één eerlijke dobbelsteen, ontvang de
+getoonde waarde als die minstens $5$ is, anders niets. Laat $G$ de
+\emph{winst} zijn (ontvangen minus betaald). De uitkomsten $1, 2, 3, 4$
+geven $G = -2$; de uitkomst $5$ geeft $G = 3$; de uitkomst $6$ geeft
+$G = 4$. De verdeling van $G$:
+\begin{center}
+\begin{tabular}{c|ccc}
+$g$ & $-2$ & $3$ & $4$\\
+\hline\rule{0pt}{11pt}%
+$\P(G = g)$ & $\dfrac46$ & $\dfrac16$ & $\dfrac16$
+\end{tabular}
+\end{center}
+\end{example}
+
+\begin{method}[Een verdelingstabel opbouwen]\label{met:g11:prob:table}
+Som de mogelijke waarden van $X$ op; verzamel voor elke waarde de
+uitkomsten die haar produceren en tel hun kansen op; controleer dat de
+rij van kansen tot $1$ somt.
+\end{method}
+
+\section{Verwachting}
+
+\begin{definition}[Verwachting]\label{def:g11:prob:expectation}
+De \emph{verwachting}\index{verwachting} (of het gemiddelde) van $X$ is
+het gemiddelde van haar waarden gewogen met hun kansen:
+\[
+\E(X) = \sum_{i=1}^{k} \P(X = x_i)\; x_i .
+\]
+\end{definition}
+
+\begin{remark}
+$\E(X)$ is wat het gemiddelde van een enorm aantal onafhankelijke
+herhalingen van het experiment zou zijn --- de precieze versie van deze
+uitspraak is de wet van de grote aantallen, bewezen in
+\cref{ch:g12:sums}. Merk de formele analogie op met het gemiddelde van
+een dataset met frequenties (\cref{def:g11:stat:mean}): kansen spelen de
+rol van de relatieve frequenties $\frac{n_i}{n}$.
+\end{remark}
+
+\begin{example}\label{ex:g11:prob:gameexp}
+Voor het spel van \cref{ex:g11:prob:game}:
+\[
+\E(G) = \frac46 \times (-2) + \frac16 \times 3 + \frac16 \times 4
+= \frac{-8 + 3 + 4}{6} = -\frac16 \approx -0.17 .
+\]
+Gemiddeld verliest de speler ongeveer $17$ cent per spel: het spel is
+ongunstig. Een spel heet \emph{eerlijk} wanneer de verwachte winst $0$
+is.
+\end{example}
+
+\begin{proposition}[Lineariteit]\label{prop:g11:prob:linearity}
+Voor alle reële $a, b$:
+\[
+\E(aX + b) = a\,\E(X) + b .
+\]
+\end{proposition}
+
+\begin{proof}
+De variabele $aX + b$ neemt de waarde $a x_i + b$ aan met kans
+$\P(X = x_i)$, dus
+\[
+\E(aX + b) = \sum_i \P(X = x_i)(a x_i + b)
+= a \sum_i \P(X = x_i)\,x_i + b \underbrace{\sum_i \P(X =
+x_i)}_{=\,1} = a\,\E(X) + b .
+\]
+\end{proof}
+
+\section{Variantie en standaardafwijking}
+
+\begin{definition}[Variantie]\label{def:g11:prob:variance}
+De \emph{variantie}\index{variantie} van $X$ meet de spreiding van haar
+waarden rond de verwachting $m = \E(X)$:
+\[
+\V(X) = \E\bigl((X - m)^2\bigr)
+= \sum_{i=1}^{k} \P(X = x_i)\,(x_i - m)^2,
+\qquad
+\sigma(X) = \sqrt{\V(X)} .
+\]
+\end{definition}
+
+\begin{proposition}[Snelle formule]\label{prop:g11:prob:konig}
+\[
+\V(X) = \E(X^2) - \E(X)^2 .
+\]
+\end{proposition}
+
+\begin{proof}
+Ontwikkel $(x_i - m)^2 = x_i^2 - 2m\,x_i + m^2$ in de som:
+\[
+\V(X) = \sum_i \P(X = x_i)\,x_i^2
+- 2m \sum_i \P(X = x_i)\,x_i + m^2\sum_i \P(X = x_i)
+= \E(X^2) - 2m^2 + m^2 ,
+\]
+wat $\E(X^2) - m^2$ is. Dit is de stochastische-variabele-versie van de
+identiteit bewezen voor datasets in \cref{prop:g11:stat:shortcut}.
+\end{proof}
+
+\begin{proposition}[Affiene transformatie]\label{prop:g11:prob:affine}
+$\V(aX + b) = a^2\,\V(X)$ en $\sigma(aX + b) = \abs a\,\sigma(X)$.
+\end{proposition}
+
+\begin{proof}
+Door lineariteit wijkt $aX + b$ af van haar verwachting $a m + b$ met
+$(aX + b) - (am + b) = a(X - m)$: elke afwijking wordt geschaald met $a$,
+dus elke gekwadrateerde afwijking met $a^2$, en hun gewogen gemiddelde
+ook. De verschuiving $b$ is verdwenen --- een variabele verschuiven
+verandert haar spreiding niet.
+\end{proof}
+
+\begin{example}\label{ex:g11:prob:variance}
+Voor het spel van \cref{ex:g11:prob:game}:
+$\E(G^2) = \frac46 \times 4 + \frac16 \times 9 + \frac16 \times 16
+= \frac{16 + 9 + 16}{6} = \frac{41}{6}$, dus
+\[
+\V(G) = \frac{41}{6} - \left(-\frac16\right)^2
+= \frac{41}{6} - \frac{1}{36} = \frac{245}{36} \approx 6.8,
+\qquad
+\sigma(G) \approx 2.6 .
+\]
+Het verlies van $0.17$ per spel gemiddeld gaat gepaard met
+schommelingen van typische grootte $2.6$ euro --- verwachting zonder
+standaardafwijking vertelt maar half het verhaal.
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[
+  width=8.6cm, height=5.2cm,
+  ybar, bar width=14pt,
+  xlabel={$g$}, ylabel={$\P(G = g)$},
+  xmin=-3.5, xmax=5.5, ymin=0, ymax=0.8,
+  xtick={-2,3,4}, ytick={1/6, 4/6},
+  yticklabels={$\tfrac16$,$\tfrac46$},
+  tick label style={font=\small},
+  label style={font=\small}]
+  \addplot[fill=omDef!40, draw=omDef] coordinates {
+    (-2,0.6667) (3,0.1667) (4,0.1667)};
+  \draw[omThm, dashed, thick] (axis cs:-0.1667,0) --
+    (axis cs:-0.1667,0.75);
+  \node[omThm, font=\small, anchor=south west] at (axis cs:-0.05,0.62)
+    {$\E(G)$};
+\end{axis}
+\end{tikzpicture}
+
+{\small De verdeling van de winst $G$ van \cref{ex:g11:prob:game}, en
+haar verwachting $\E(G) = -\frac16$ (gestippeld): het evenwichtspunt van
+de kansmassa's.}
+\end{omfigure}
+
+\section{Oefeningen}
+
+\begin{exercise}[$\star$]\label{exo:g11:prob:1}
+Een kaart wordt getrokken uit een standaard spels van $52$ kaarten.
+Bereken de kans op: een harten; een heer; een harten of een heer; noch
+een harten noch een heer.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g11:prob:2}
+Twee eerlijke dobbelstenen worden gegooid en hun som $S$ genoteerd.
+Bereken met het $36$-uitkomstenmodel van \cref{ex:g11:prob:twodice}
+$\P(S = 6)$, $\P(S \geq 10)$ en $\P(S \text{ is even})$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g11:prob:3}
+Een stochastische variabele heeft verdeling
+\begin{center}
+\begin{tabular}{c|cccc}
+$x$ & $-1$ & $0$ & $2$ & $5$\\
+\hline
+$\P(X=x)$ & $0.3$ & $0.2$ & $0.4$ & $p$
+\end{tabular}
+\end{center}
+Vind $p$, bereken daarna $\E(X)$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g11:prob:4}
+$X$ voldoet aan $\E(X) = 3$ en $\V(X) = 4$. Geef de verwachting,
+variantie en standaardafwijking van $Y = 2X - 5$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:prob:5}
+Een rad van fortuin heeft $10$ gelijke sectoren: $5$ tonen $0$ euro, $3$
+tonen $2$ euro, $2$ tonen $5$ euro. Spelen kost $2$ euro. Geef de
+verdeling van de winst $G$ (winst minus inzet), bereken $\E(G)$, en
+beslis of het spel gunstig is.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:prob:6}
+Een urn bevat $3$ rode en $2$ blauwe ballen; twee ballen worden
+getrokken \emph{zonder} teruglegging. Laat $X$ het aantal rode ballen
+zijn. Bouw de verdeling van $X$ (sommeer de $20$ geordende trekkingen,
+of gebruik een boom), en bereken $\E(X)$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:prob:7}
+Bereken voor het rad van \cref{exo:g11:prob:5} $\V(G)$ en $\sigma(G)$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:prob:8}
+Een verzekeringsmaatschappij verkoopt een polis voor $80$ euro. Met kans
+$0.05$ claimt de klant $1000$ euro, met kans $0.01$ claimt de klant
+$5000$ euro, anders niets. Laat $B$ het voordeel van de maatschappij op
+één polis zijn. Geef de verdeling van $B$, bereken $\E(B)$, en
+interpreteer.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:prob:9}
+Een meerkeuzevraag heeft $4$ antwoorden, waarvan één correct. Een
+correct antwoord scoort $+1$; om raden te ontmoedigen scoort een fout
+antwoord $x < 0$. Een leerling antwoordt willekeurig. Voor welke waarde
+van $x$ is de verwachte score van de leerling nul?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:prob:10}
+Twee eerlijke munten worden opgegooid. Ann stelt voor: ``als beide
+munten matchen, betaal ik jou $1$ euro; als ze verschillen, betaal jij
+mij $1$ euro.'' Bereken de verwachte winst van elke speler. Is het spel
+eerlijk? Zelfde vraag met drie munten, waarbij Ann $2$ euro betaalt als
+alle drie matchen.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g11:prob:11}
+Een loterij verkoopt $1000$ loten à $5$ euro. Eén lot wint $2000$ euro,
+vijf loten winnen $200$ euro, twintig loten winnen $25$ euro.
+\begin{enumerate}
+  \item Geef de verdeling van de totale opbrengst minus prijzen van de
+        organisator, en van de winst $G$ van één speler.
+  \item Bereken $\E(G)$ en de totale verwachte winst van de organisator.
+        Controleer dat de twee antwoorden consistent zijn.
+\end{enumerate}
+\end{exercise}

@@ -1,0 +1,269 @@
+\chapter{Probabilités conditionnelles et indépendance}\label{ch:g12:condprob}
+
+La probabilité quantifie l'incertitude~; la probabilité conditionnelle
+quantifie comment l'information la modifie. Apprendre qu'un événement $B$
+s'est produit remodèle les probabilités de tous les autres événements ---
+un mécanisme formalisé par Bayes et mal utilisé chaque jour dans les
+tribunaux et les journaux. Ce chapitre met en place les règles du
+conditionnement et le sens exact de l'indépendance.
+
+\section{Espaces de probabilité (rappel)}
+
+Une expérience à un nombre fini d'issues se modélise par un \emph{univers}
+$\Omega$ (l'ensemble des issues) et une probabilité $\P$ associant à chaque
+événement $A \subseteq \Omega$ un nombre $\P(A) \in \intcc{0}{1}$, additive
+sur les unions disjointes et avec $\P(\Omega) = 1$. Rappeler les règles de
+base~:
+\[
+\P(\bar A) = 1 - \P(A),
+\qquad
+\P(A \cup B) = \P(A) + \P(B) - \P(A \cap B).
+\]
+Lorsque toutes les issues sont équiprobables,
+$\P(A) = \frac{\abs A}{\abs\Omega}$ --- et le calcul des probabilités se
+réduit aux techniques de dénombrement du \cref{ch:g12:comb}.
+
+\section{Probabilité conditionnelle}
+
+\begin{definition}[Probabilité conditionnelle]\label{def:g12:condprob:cond}
+Soit $B$ un événement avec $\P(B) > 0$. La \emph{probabilité de $A$ sachant
+$B$}\index{probabilité conditionnelle} est
+\[
+\pcond{B}{A} = \frac{\P(A \cap B)}{\P(B)} .
+\]
+\end{definition}
+
+L'application $A \mapsto \pcond BA$ est elle-même une probabilité (toutes
+les règles s'appliquent)~; elle représente le nouvel état de connaissance de
+quelqu'un qui a appris que $B$ s'est produit.
+
+\begin{proposition}[Règle de multiplication]\label{prop:g12:condprob:product}
+Pour des événements de probabilités non nulles~:
+\[
+\P(A \cap B) = \P(B)\,\pcond{B}{A} = \P(A)\,\pcond{A}{B},
+\]
+et plus généralement
+$\P(A_1 \cap A_2 \cap A_3) = \P(A_1)\,\pcond{A_1}{A_2}\,
+\pcond{A_1 \cap A_2}{A_3}$, etc.
+\end{proposition}
+
+\begin{proof}
+Réarranger la définition~; la formule en chaîne suit par itération.
+\end{proof}
+
+\begin{theorem}[Formule des probabilités totales]\label{thm:g12:condprob:total}
+\index{formule des probabilités totales}
+Soient $B_1, \dots, B_n$ une partition de $\Omega$ en événements de
+probabilité non nulle. Pour tout événement $A$~:
+\[
+\P(A) = \sum_{i=1}^{n} \P(B_i)\,\pcond{B_i}{A}.
+\]
+\end{theorem}
+
+\begin{proof}
+Les ensembles $A \cap B_i$ sont deux à deux disjoints d'union $A$, donc
+$\P(A) = \sum_i \P(A \cap B_i) = \sum_i \P(B_i)\pcond{B_i}{A}$ par la règle
+de multiplication.
+\end{proof}
+
+\begin{method}[Arbres de probabilité]\label{met:g12:condprob:tree}
+Un arbre organise les probabilités conditionnelles~: chaque branche porte
+la probabilité de l'événement suivant \emph{sachant} le chemin déjà parcouru.
+\begin{itemize}
+  \item La probabilité d'une feuille (un chemin complet) est le
+        \emph{produit} des probabilités le long de ses branches (règle de
+        multiplication).
+  \item La probabilité d'un événement est la \emph{somme} des probabilités
+        des feuilles qui le réalisent (probabilités totales).
+  \item Les probabilités des branches issues d'un nœud s'additionnent à $1$.
+\end{itemize}
+\end{method}
+
+\begin{omfigure}
+\begin{tikzpicture}[font=\small]
+  \coordinate (root) at (0,0);
+  \node (B)  at (2.6,1.2)  {$B$};
+  \node (Bc) at (2.6,-1.2) {$\bar B$};
+  \node (BA)  at (5.4,1.8)  {$A$};
+  \node (BAc) at (5.4,0.6)  {$\bar A$};
+  \node (BcA)  at (5.4,-0.6) {$A$};
+  \node (BcAc) at (5.4,-1.8) {$\bar A$};
+  \draw (root) -- (B)  node[midway, above] {$\P(B)$};
+  \draw (root) -- (Bc) node[midway, below] {$\P(\bar B)$};
+  \draw (B) -- (BA)   node[midway, above] {$\pcond{B}{A}$};
+  \draw (B) -- (BAc)  node[midway, below] {$\pcond{B}{\bar A}$};
+  \draw (Bc) -- (BcA)  node[midway, above] {$\pcond{\bar B}{A}$};
+  \draw (Bc) -- (BcAc) node[midway, below] {$\pcond{\bar B}{\bar A}$};
+  \node[anchor=west] at (6.0,1.8)  {$\P(A \cap B) = \P(B)\,\pcond{B}{A}$};
+  \node[anchor=west] at (6.0,0.6)  {$\P(\bar A \cap B)$};
+  \node[anchor=west] at (6.0,-0.6) {$\P(A \cap \bar B)$};
+  \node[anchor=west] at (6.0,-1.8) {$\P(\bar A \cap \bar B)$};
+\end{tikzpicture}
+
+{\small Un arbre à deux niveaux~: multiplier le long d'un chemin, additionner
+sur les feuilles. Par exemple $\P(A)$ est la somme des probabilités des
+première et troisième feuilles.}
+\end{omfigure}
+
+\begin{theorem}[Formule de Bayes]\label{thm:g12:condprob:bayes}
+\index{formule de Bayes}
+Soient $B_1, \dots, B_n$ une partition de $\Omega$ comme ci-dessus et $A$
+un événement avec $\P(A) > 0$. Alors
+\[
+\pcond{A}{B_j} =
+\frac{\P(B_j)\,\pcond{B_j}{A}}{\sum_{i=1}^{n} \P(B_i)\,\pcond{B_i}{A}} .
+\]
+\end{theorem}
+
+\begin{proof}
+$\pcond{A}{B_j} = \frac{\P(A \cap B_j)}{\P(A)}$~; développer le numérateur
+par la règle de multiplication et le dénominateur par les probabilités
+totales.
+\end{proof}
+
+\begin{example}[Test de dépistage]\label{ex:g12:condprob:test}
+Une maladie touche $1\%$ d'une population. Un test la détecte avec
+probabilité $0.99$ (sensibilité) et donne un faux positif avec probabilité
+$0.05$. Sachant un test positif, la probabilité d'avoir effectivement la
+maladie est
+\[
+\frac{0.01 \times 0.99}{0.01\times0.99 + 0.99\times0.05}
+= \frac{0.0099}{0.0099 + 0.0495} = \frac{1}{6} \approx 0.17 .
+\]
+Malgré le test précis, cinq positifs sur six sont des faux --- parce que la
+maladie est rare. Confondre $\pcond{A}{B}$ avec $\pcond{B}{A}$ est le
+\emph{sophisme du procureur}.
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}[font=\small]
+  \coordinate (root) at (0,0);
+  \node (D)  at (2.6,1.2)  {$D$};
+  \node (Dc) at (2.6,-1.2) {$\bar D$};
+  \node (DT)  at (5.2,1.8)  {$T$};
+  \node (DTc) at (5.2,0.6)  {$\bar T$};
+  \node (DcT)  at (5.2,-0.6) {$T$};
+  \node (DcTc) at (5.2,-1.8) {$\bar T$};
+  \draw (root) -- (D)  node[midway, above] {$0.01$};
+  \draw (root) -- (Dc) node[midway, below] {$0.99$};
+  \draw (D) -- (DT)   node[midway, above] {$0.99$};
+  \draw (D) -- (DTc)  node[midway, below] {$0.01$};
+  \draw (Dc) -- (DcT)  node[midway, above] {$0.05$};
+  \draw (Dc) -- (DcTc) node[midway, below] {$0.95$};
+  \node[omThm, anchor=west] at (5.8,1.8)  {$0.0099$ \ (vrais positifs)};
+  \node[anchor=west] at (5.8,0.6)  {$0.0001$};
+  \node[omThm, anchor=west] at (5.8,-0.6) {$0.0495$ \ (faux positifs)};
+  \node[anchor=west] at (5.8,-1.8) {$0.9405$};
+\end{tikzpicture}
+
+{\small Le test de dépistage en arbre ($D$~: malade, $T$~: test positif).
+Les deux feuilles positives (en rouge) ont un poids total $0.0594$, dont
+les faux positifs contribuent pour les cinq sixièmes.}
+\end{omfigure}
+
+\section{Indépendance}
+
+\begin{definition}[Événements indépendants]\label{def:g12:condprob:indep}
+Deux événements $A$ et $B$ sont \emph{indépendants}\index{indépendance} si
+\[
+\P(A \cap B) = \P(A)\,\P(B) .
+\]
+Lorsque $\P(B) > 0$, cela équivaut à $\pcond{B}{A} = \P(A)$~: savoir $B$ ne
+change pas la probabilité de $A$.
+\end{definition}
+
+\begin{proposition}\label{prop:g12:condprob:indepcompl}
+Si $A$ et $B$ sont indépendants, il en va de même de $A$ et $\bar B$ (et de
+$\bar A$ et $\bar B$).
+\end{proposition}
+
+\begin{proof}
+$\P(A \cap \bar B) = \P(A) - \P(A \cap B) = \P(A) - \P(A)\P(B)
+= \P(A)\bigl(1 - \P(B)\bigr) = \P(A)\,\P(\bar B)$.
+\end{proof}
+
+\begin{remark}
+Ne pas confondre \emph{indépendants} ($\P(A\cap B) = \P(A)\P(B)$) et
+\emph{incompatibles} ($A \cap B = \varnothing$). Deux événements
+incompatibles de probabilité non nulle ne sont jamais indépendants~: savoir
+que l'un s'est produit garantit que l'autre ne s'est pas produit.
+\end{remark}
+
+\begin{definition}[Répétitions indépendantes]\label{def:g12:condprob:repet}
+Lorsqu'une expérience est répétée $n$ fois de sorte que l'issue de chaque
+épreuve n'influence pas les autres, la probabilité d'une suite spécifiée
+d'issues est le produit des probabilités individuelles. C'est le modèle
+sous-jacent à la loi binomiale (\cref{ch:g12:randvar}).
+\end{definition}
+
+\section{Exercices}
+
+\begin{exercise}[$\star$]\label{exo:g12:condprob:1}
+On tire une carte d'un jeu standard de 52 cartes. Calculer la probabilité
+que ce soit un roi, sachant que c'est une figure (valet, dame ou roi). Les
+événements «~roi~» et «~cœur~» sont-ils indépendants~?
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:condprob:2}
+Une urne contient 5 boules rouges et 3 bleues. On tire deux boules à la
+suite \emph{sans} remise.
+\begin{enumerate}
+  \item Dessiner l'arbre de probabilité.
+  \item Calculer la probabilité que les deux soient rouges, et la
+        probabilité que la seconde soit rouge.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:condprob:3}
+On lance deux dés équilibrés. Soient $A$ = «~la somme vaut $7$~», $B$ =
+«~le premier dé montre $3$~», $C$ = «~la somme vaut $6$~». Déterminer si $A$
+et $B$ sont indépendants, puis si $B$ et $C$ le sont.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:condprob:4}
+Une usine a trois machines produisant respectivement $50\%$, $30\%$ et
+$20\%$ de la production totale, avec des taux de défaut $1\%$, $2\%$ et
+$4\%$.
+\begin{enumerate}
+  \item Quelle proportion de la production est défectueuse~?
+  \item Un article tiré au hasard est défectueux. Quelle est la probabilité
+        qu'il vienne de la troisième machine~?
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:condprob:5}
+Dans l'\cref{ex:g12:condprob:test}, pour quelle prévalence $p$ de la maladie
+(au lieu de $1\%$) un test positif signifierait-il au moins $90\%$ de chance
+d'être malade~? Résoudre l'inégalité et commenter.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:condprob:6}
+Une pièce biaisée tombe sur pile avec probabilité $p \in \intoo{0}{1}$. On
+la lance trois fois, les lancers étant indépendants.
+\begin{enumerate}
+  \item Calculer la probabilité de l'événement $E$ = «~exactement deux
+        piles~».
+  \item Pour quels $p$ la quantité $\P(E)$ est-elle maximale~?
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:condprob:7}
+\emph{(Monty Hall.)} Un lot se cache derrière l'une de trois portes. Vous
+choisissez une porte~; l'animateur, qui sait où est le lot, ouvre l'une des
+deux portes restantes, révélant toujours une porte vide (en choisissant au
+hasard si les deux sont vides), et vous propose de changer pour l'autre
+porte fermée. À l'aide de la formule de Bayes, calculer la probabilité de
+gagner si l'on change, et si l'on ne change pas.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:condprob:8}
+Un canal d'information transmet des bits. Chaque bit est inversé par le
+bruit avec probabilité $\varepsilon = 0.1$, indépendamment. Pour protéger un
+bit, on l'envoie trois fois et on décode par majorité.
+\begin{enumerate}
+  \item Calculer la probabilité que le bit décodé soit faux.
+  \item Le mot reçu est $101$. Quelle est la probabilité que le bit envoyé
+        ait été $1$~? (Supposer que $0$ et $1$ sont envoyés avec
+        probabilités égales.)
+\end{enumerate}
+\end{exercise}

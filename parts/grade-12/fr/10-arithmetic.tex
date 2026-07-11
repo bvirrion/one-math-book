@@ -1,0 +1,310 @@
+\chapter{Arithmétique}\label{ch:g12:arith}
+
+L'arithmétique étudie les entiers~: divisibilité, nombres premiers, restes.
+Longtemps considérée comme la plus pure des mathématiques pures, elle protège
+désormais tout paiement en ligne~: le cryptosystème RSA repose sur les
+théorèmes de Bézout, Gauss et Fermat prouvés dans ce chapitre.
+
+\section{Divisibilité et division euclidienne}
+
+\begin{definition}[Divisibilité]\label{def:g12:arith:divides}
+Soient $a, b \in \Z$. On dit que $b$ \emph{divise} $a$\index{divisibilité},
+noté $b \mid a$, s'il existe $k \in \Z$ avec $a = kb$. On dit aussi que $a$
+est un \emph{multiple} de $b$.
+\end{definition}
+
+\begin{proposition}\label{prop:g12:arith:divprops}
+Si $c \mid a$ et $c \mid b$, alors $c$ divise toute combinaison entière
+$au + bv$ ($u, v \in \Z$). Si $a \mid b$ et $b \mid a$ avec
+$a,b \in \N$, alors $a = b$. Si $a \mid b$ et $b \neq 0$, alors
+$\abs a \leq \abs b$.
+\end{proposition}
+
+\begin{proof}
+Écrire $a = kc$, $b = lc$~: alors $au + bv = (ku + lv)c$. Les autres points
+suivent de $\abs{a} = \abs{k}\,\abs{b}$ avec $\abs k \geq 1$ lorsque
+$b = ka \neq 0$.
+\end{proof}
+
+\begin{theorem}[Division euclidienne]\label{thm:g12:arith:euclid}
+\index{division euclidienne}
+Soient $a \in \Z$ et $b \in \N^*$. Il existe un unique couple
+$(q, r) \in \Z \times \N$ tel que
+\[
+a = bq + r \qquad\text{et}\qquad 0 \leq r < b .
+\]
+$q$ est le \emph{quotient} et $r$ le \emph{reste}.
+\end{theorem}
+
+\begin{proof}
+\emph{Existence.} L'ensemble des multiples de $b$ ne dépassant pas $a$ a un
+plus grand élément $bq$ (il est non vide et majoré)~; poser $r = a - bq$.
+Par maximalité, $b(q+1) > a$, donc $0 \leq r < b$.
+\emph{Unicité.} Si $bq + r = bq' + r'$ avec $0 \leq r, r' < b$, alors
+$b(q - q') = r' - r$ et $\abs{r' - r} < b$~: un multiple de $b$ de valeur
+absolue strictement inférieure à $b$ doit être $0$, donc $r = r'$ et
+$q = q'$.
+\end{proof}
+
+\section{Congruences}
+
+\begin{definition}[Congruence]\label{def:g12:arith:congruence}
+Soit $n \in \N^*$. Deux entiers $a, b$ sont \emph{congrus modulo
+$n$}\index{congruence}, noté $a \equiv b \pmod n$, si $n \mid (a - b)$
+--- de façon équivalente, si $a$ et $b$ ont le même reste dans la division
+euclidienne par $n$.
+\end{definition}
+
+\begin{proposition}[Compatibilité avec les opérations]\label{prop:g12:arith:congops}
+Si $a \equiv b \pmod n$ et $c \equiv d \pmod n$, alors
+\[
+a + c \equiv b + d, \qquad
+ac \equiv bd, \qquad
+a^k \equiv b^k \ (k \in \N) \pmod n .
+\]
+\end{proposition}
+
+\begin{proof}
+$n$ divise $(a-b) + (c-d) = (a+c) - (b+d)$, et
+$ac - bd = a(c - d) + d(a - b)$ est aussi un multiple de $n$. La règle des
+puissances suit par récurrence à partir de la règle du produit.
+\end{proof}
+
+\begin{method}[Calculer des puissances modulo $n$]\label{met:g12:arith:powers}
+Pour calculer $a^k \bmod n$, réduire la base modulo $n$, puis chercher une
+petite puissance de $a$ congrue à $\pm1$, et s'en servir pour simplifier
+l'exposant. Par exemple $2^{100} \bmod 7$~: comme $2^3 = 8 \equiv 1 \pmod 7$
+et $100 = 3\times33 + 1$,
+\[
+2^{100} = \left(2^{3}\right)^{33} \times 2 \equiv 1^{33}\times 2 = 2 \pmod 7 .
+\]
+\end{method}
+
+\section{PGCD, Bézout et Gauss}
+
+\begin{definition}[PGCD]\label{def:g12:arith:gcd}
+Soient $a, b$ des entiers non tous deux nuls. Le \emph{plus grand commun
+diviseur}\index{pgcd} $\gcd(a, b)$ est le plus grand entier divisant à la
+fois $a$ et $b$. Lorsque $\gcd(a,b) = 1$, $a$ et $b$ sont dits
+\emph{premiers entre eux}\index{premiers entre eux}.
+\end{definition}
+
+\begin{proposition}[Algorithme d'Euclide]\label{prop:g12:arith:euclidalgo}
+\index{algorithme d'Euclide}
+Si $a = bq + r$ ($b \neq 0$), alors $\gcd(a, b) = \gcd(b, r)$. Itérer la
+division euclidienne calcule donc $\gcd(a,b)$~: le pgcd est le dernier reste
+non nul.
+\end{proposition}
+
+\begin{proof}
+Tout diviseur commun de $a$ et $b$ divise $r = a - bq$
+(\cref{prop:g12:arith:divprops}), donc est un diviseur commun de $b$ et $r$~;
+et réciproquement, puisque $a = bq + r$. Les deux couples ont les mêmes
+diviseurs communs, donc le même pgcd. L'algorithme se termine car les restes
+forment une suite strictement décroissante d'entiers positifs ou nuls.
+\end{proof}
+
+\begin{example}\label{ex:g12:arith:euclidalgo}
+$\gcd(252, 198)$~: $252 = 198 + 54$~; $198 = 3\times54 + 36$~;
+$54 = 36 + 18$~; $36 = 2 \times 18 + 0$. Donc $\gcd(252,198) = 18$.
+\end{example}
+
+\begin{theorem}[Identité de Bézout]\label{thm:g12:arith:bezout}
+\index{identité de Bézout}
+Soient $a, b$ des entiers non tous deux nuls, et $d = \gcd(a,b)$. Il existe
+$u, v \in \Z$ tels que
+\[
+au + bv = d .
+\]
+En particulier, $a$ et $b$ sont premiers entre eux si et seulement s'il
+existe des entiers $u, v$ avec $au + bv = 1$.
+\end{theorem}
+
+\begin{proof}
+Remonter l'algorithme d'Euclide~: chaque reste est une combinaison entière
+des deux précédents, et les données initiales $a, b$ sont des combinaisons
+d'elles-mêmes~; par substitutions descendantes, le dernier reste non nul $d$
+est une combinaison entière de $a$ et $b$. (Dans
+\cref{ex:g12:arith:euclidalgo}~:
+$18 = 54 - 36 = 54 - (198 - 3\times54) = 4\times54 - 198 =
+4(252 - 198) - 198 = 4\times252 - 5\times198$.)
+
+Pour l'équivalence~: si $\gcd(a,b) = 1$, Bézout fournit $u, v$~;
+réciproquement, tout diviseur commun de $a$ et $b$ divise $au + bv = 1$,
+ce qui force $\gcd(a,b) = 1$.
+\end{proof}
+
+\begin{theorem}[Lemme de Gauss]\label{thm:g12:arith:gauss}
+\index{lemme de Gauss}
+Soient $a, b, c \in \Z$. Si $a \mid bc$ et $\gcd(a, b) = 1$, alors $a \mid c$.
+\end{theorem}
+
+\begin{proof}
+Bézout donne $au + bv = 1$~; multiplier par $c$~: $acu + bcv = c$. Les deux
+termes du membre de gauche sont des multiples de $a$ (le second car
+$a \mid bc$), donc $c$ l'est aussi.
+\end{proof}
+
+\begin{corollary}\label{cor:g12:arith:coprimeprod}
+Si $a \mid c$, $b \mid c$ et $\gcd(a,b) = 1$, alors $ab \mid c$.
+\end{corollary}
+
+\begin{proof}
+Écrire $c = ak$. De $b \mid ak$ et $\gcd(a,b)=1$, Gauss donne
+$b \mid k$, disons $k = bl$~; alors $c = abl$.
+\end{proof}
+
+\section{Nombres premiers}
+
+\begin{definition}[Premier]\label{def:g12:arith:prime}
+Un entier $p \geq 2$ est \emph{premier}\index{nombre premier} si ses seuls
+diviseurs positifs sont $1$ et $p$.
+\end{definition}
+
+\begin{proposition}\label{prop:g12:arith:primedivides}
+Tout entier $n \geq 2$ a un diviseur premier~; si $n$ n'est pas premier, il
+a un diviseur premier $\leq \sqrt n$. Si un premier $p$ divise un produit
+$ab$, alors $p \mid a$ ou $p \mid b$ (\emph{lemme d'Euclide}).
+\end{proposition}
+
+\begin{proof}
+Le plus petit diviseur $d \geq 2$ de $n$ est premier (tout diviseur propre
+de $d$ serait un plus petit diviseur de $n$). Si $n = de$ est composé avec
+$2 \leq d \leq e$, alors $d^2 \leq de = n$, donc $d \leq \sqrt n$. Pour le
+lemme d'Euclide~: si $p \nmid a$, alors $\gcd(p, a) = 1$ (les seuls
+diviseurs de $p$ sont $1$ et $p$), et le lemme de Gauss donne $p \mid b$.
+\end{proof}
+
+\begin{theorem}[Euclide]\label{thm:g12:arith:infiniteprimes}
+Il existe une infinité de nombres premiers.
+\end{theorem}
+
+\begin{proof}
+Étant donnée une liste finie $p_1, \dots, p_k$ de premiers, considérer
+$N = p_1 p_2 \cdots p_k + 1$. Un certain premier $p$ divise $N$~; mais aucun
+$p_i$ ne divise $N$ (le reste est $1$), donc $p$ est un premier hors de la
+liste. Aucune liste finie n'épuise les premiers.
+\end{proof}
+
+\begin{theorem}[Théorème fondamental de l'arithmétique]\label{thm:g12:arith:fta}
+\index{théorème fondamental de l'arithmétique}
+Tout entier $n \geq 2$ est un produit de premiers, et cette factorisation
+est unique à l'ordre des facteurs près~:
+\[
+n = p_1^{\alpha_1} p_2^{\alpha_2} \cdots p_r^{\alpha_r},
+\qquad p_1 < p_2 < \dots < p_r \text{ premiers},\ \alpha_i \geq 1 .
+\]
+\end{theorem}
+
+\begin{proof}
+\emph{Existence}, par récurrence forte~: $n$ premier est sa propre
+factorisation~; sinon $n = de$ avec $2 \leq d, e < n$, et les deux se
+factorisent par l'hypothèse de récurrence. \emph{Unicité}~: supposer
+$p_1\cdots p_s = q_1 \cdots q_t$ (premiers, avec répétitions autorisées).
+Par le lemme d'Euclide, $p_1$ divise un certain $q_j$, et étant premier,
+$p_1 = q_j$~; annuler et recommencer. Les deux factorisations coïncident
+terme à terme.
+\end{proof}
+
+\begin{theorem}[Petit théorème de Fermat]\label{thm:g12:arith:fermat}
+\index{petit théorème de Fermat}
+Soit $p$ premier et $a \in \Z$ avec $p \nmid a$. Alors
+\[
+a^{p-1} \equiv 1 \pmod p .
+\]
+Pour tout $a \in \Z$ (sans hypothèse de primalité relative),
+$a^p \equiv a \pmod p$.
+\end{theorem}
+
+\begin{proof}
+Considérer les $p - 1$ entiers $a, 2a, 3a, \dots, (p-1)a$ modulo $p$.
+Aucun n'est $\equiv 0$ (si $p \mid ka$ avec $1 \leq k \leq p-1$, le lemme
+d'Euclide force $p \mid k$, impossible), et ils sont deux à deux distincts
+modulo $p$ (si $ka \equiv la$, alors $p \mid (k - l)a$, donc $p \mid k - l$,
+donc $k = l$).
+D'où, modulo $p$, ce sont les nombres $1, 2, \dots, p-1$ dans un certain
+ordre. En multipliant toutes les congruences~:
+\[
+a^{p-1}\,(p-1)! \equiv (p-1)! \pmod p .
+\]
+Comme $p$ ne divise aucun de $1, \dots, p-1$, l'usage répété du lemme
+d'Euclide permet d'annuler $(p-1)!$, d'où $a^{p-1} \equiv 1$. La seconde
+forme suit en multipliant par $a$ (et est triviale lorsque $p \mid a$).
+\end{proof}
+
+\begin{example}[Application à la cryptographie]\label{ex:g12:arith:rsa}
+Le théorème de Fermat rend l'exponentiation modulo $n$ réversible lorsque
+les exposants sont bien choisis --- le cœur du cryptosystème \emph{RSA}.
+Avec $p, q$ grands premiers et $n = pq$, on publie $n$ et un exposant
+$e$~; le chiffrement est $x \mapsto x^e \bmod n$. Déchiffrer requiert un
+exposant $d$ avec $ed \equiv 1 \pmod{(p-1)(q-1)}$, que seul celui qui
+connaît $p$ et $q$ peut calculer --- et retrouver $p, q$ à partir de $n$
+signifie factoriser un nombre de centaines de chiffres, ce qu'aucun
+algorithme connu ne fait en temps raisonnable.
+\end{example}
+
+\section{Exercices}
+
+\begin{exercise}[$\star$]\label{exo:g12:arith:1}
+Calculer le quotient et le reste de la division euclidienne de $2026$ par
+$17$, et de $-2026$ par $17$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:arith:2}
+Quel est le reste de $7^{100}$ modulo $10$~? (Quel est le dernier chiffre de
+$7^{100}$~?)
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:arith:3}
+À l'aide de l'algorithme d'Euclide, calculer $\gcd(1071, 462)$, et trouver
+des entiers $u, v$ avec $1071u + 462v = \gcd(1071, 462)$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:arith:4}
+Montrer que pour tout $n \in \Z$, $n^2$ est congru à $0$ ou $1$ modulo
+$4$. En déduire qu'un entier $\equiv 3 \pmod 4$ n'est jamais somme de deux
+carrés.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:arith:5}
+Montrer que pour tout $n \in \N$, $n(n+1)(2n+1)$ est divisible par $6$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:arith:6}
+Résoudre dans $\Z$ la congruence $5x \equiv 3 \pmod{11}$.
+(Indication~: trouver l'inverse de $5$ modulo $11$.)
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:arith:7}
+Résoudre dans $\Z \times \Z$ l'équation diophantienne
+\[
+17x - 40y = 1,
+\]
+puis décrire toutes les solutions de $17x - 40y = 6$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:arith:8}
+Montrer que $\sqrt2$ est irrationnel, en utilisant l'unicité de la
+factorisation en premiers (comparer l'exposant de $2$ des deux côtés de
+$a^2 = 2b^2$).
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:arith:9}
+Soit $p$ un nombre premier.
+\begin{enumerate}
+  \item Montrer que pour $1 \leq k \leq p - 1$, $p$ divise $\dbinom{p}{k}$.
+        (Indication~: utiliser $k\binom pk = p\binom{p-1}{k-1}$,
+        \cref{exo:g12:comb:7}, et le lemme de Gauss.)
+  \item En déduire, par récurrence sur $a \geq 0$, une autre preuve du petit
+        théorème de Fermat sous la forme $a^p \equiv a \pmod p$.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:arith:10}
+\emph{(Problème chinois des restes.)} Trouver tous les entiers $n$ tels que
+\[
+n \equiv 2 \pmod 3, \qquad n \equiv 3 \pmod 5, \qquad n \equiv 2 \pmod 7 .
+\]
+(Indication~: résoudre les deux premières conditions, puis incorporer la
+troisième~; les coefficients de Bézout aident.)
+\end{exercise}

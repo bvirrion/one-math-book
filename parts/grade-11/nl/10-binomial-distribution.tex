@@ -1,0 +1,332 @@
+\chapter{De binomiale verdeling}\label{ch:g11:binom}
+
+Herhaal hetzelfde ja/nee-experiment meerdere keren, onafhankelijk, en tel
+de successen: de resulterende verdeling --- de \emph{binomiale} --- is de
+belangrijkste discrete verdeling van allemaal. Dit hoofdstuk bouwt haar
+op met bomen en padtelling; de gesloten formule voor de padtellingen
+(met factorialen) komt met de telgereedschappen van \cref{ch:g12:comb},
+en de verdeling wordt hernomen in \cref{ch:g12:randvar}.
+
+\section{Bernoulli-proeven}
+
+\begin{definition}[Bernoulli-proef]\label{def:g11:binom:bernoulli}
+Een \emph{Bernoulli-proef}\index{Bernoulli-proef} is een experiment met
+precies twee uitkomsten: \emph{succes}, met kans $p$, en \emph{mislukking},
+met kans $1 - p$. De stochastische variabele $X$ gelijk aan $1$ bij
+succes en $0$ bij mislukking volgt de \emph{Bernoulli-verdeling}
+$\mathcal B(p)$; dan
+\[
+\E(X) = p,
+\qquad
+\V(X) = p(1 - p).
+\]
+\end{definition}
+
+\begin{proof}[Bewijs van de twee formules]
+$\E(X) = p \times 1 + (1-p) \times 0 = p$; en omdat $X^2 = X$ (zowel $0$
+als $1$ is zijn eigen kwadraat), $\E(X^2) = p$, dus volgens
+\cref{prop:g11:prob:konig}, $\V(X) = p - p^2 = p(1-p)$.
+\end{proof}
+
+\begin{definition}[Herhaalde onafhankelijke proeven]\label{def:g11:binom:repeated}
+Een Bernoulli-proef $n$ keer \emph{onafhankelijk} herhalen betekent: de
+uitkomst van elke proef heeft geen invloed op de andere, en de kans van
+elke volledige reeks uitkomsten is het \emph{product} van de kansen langs
+het bijbehorende pad van de boom --- $p$ voor elk succes, $1 - p$ voor
+elke mislukking.
+\end{definition}
+
+\begin{example}\label{ex:g11:binom:threetrials}
+Drie onafhankelijke proeven met succeskans $p$. De reeks SMS (succes,
+mislukking, succes) heeft kans $p(1-p)p = p^2(1-p)$ --- en dat geldt
+\emph{voor elke} reeks met precies twee successen, ongeacht de posities:
+alleen het \emph{aantal} S's en M's telt.
+\end{example}
+
+\section{Padtellingen en binomiaalcoëfficiënten}
+
+\begin{definition}[Binomiaalcoëfficiënt]\label{def:g11:binom:coefficient}
+In de boom van $n$ onafhankelijke proeven is de
+\emph{binomiaalcoëfficiënt}\index{binomiaalcoëfficiënt} $\binom{n}{k}$
+(lees ``$n$ over $k$'') het aantal paden met precies $k$ successen.
+\end{definition}
+
+\begin{example}
+$\binom{3}{2} = 3$: de paden SSM, SMS, MSS. Evenzo $\binom{3}{0} = 1$
+(het pad MMM), $\binom{3}{1} = 3$ en $\binom{3}{3} = 1$. Per conventie
+en per de boom is $\binom n0 = \binom nn = 1$ voor elke $n$.
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}[font=\small]
+  \coordinate (root) at (0,0);
+  \node (S) at (1.5,1.5) {S};
+  \node (F) at (1.5,-1.5) {M};
+  \node (SS) at (3.0,2.25) {S};
+  \node (SF) at (3.0,0.75) {M};
+  \node (FS) at (3.0,-0.75) {S};
+  \node (FF) at (3.0,-2.25) {M};
+  \node (SSS) at (4.5,2.6) {S};
+  \node (SSF) at (4.5,1.85) {M};
+  \node (SFS) at (4.5,1.1) {S};
+  \node (SFF) at (4.5,0.35) {M};
+  \node (FSS) at (4.5,-0.35) {S};
+  \node (FSF) at (4.5,-1.1) {M};
+  \node (FFS) at (4.5,-1.85) {S};
+  \node (FFF) at (4.5,-2.6) {M};
+  \draw[omThm, thick] (root) -- (S);
+  \draw[omThm, thick] (S) -- (SS);   \draw[omThm, thick] (SS) -- (SSF);
+  \draw[omThm, thick] (S) -- (SF);   \draw[omThm, thick] (SF) -- (SFS);
+  \draw[omThm, thick] (root) -- (F);
+  \draw[omThm, thick] (F) -- (FS);   \draw[omThm, thick] (FS) -- (FSS);
+  \draw[gray] (SS) -- (SSS);
+  \draw[gray] (SF) -- (SFF);
+  \draw[gray] (FS) -- (FSF);
+  \draw[gray] (F) -- (FF);
+  \draw[gray] (FF) -- (FFS);
+  \draw[gray] (FF) -- (FFF);
+  \node[gray, anchor=west] at (5.0,2.6) {$3$ successen};
+  \node[omThm, anchor=west] at (5.0,1.85) {$2$ successen};
+  \node[omThm, anchor=west] at (5.0,1.1) {$2$ successen};
+  \node[gray, anchor=west] at (5.0,0.35) {$1$ succes};
+  \node[omThm, anchor=west] at (5.0,-0.35) {$2$ successen};
+  \node[gray, anchor=west] at (5.0,-1.1) {$1$ succes};
+  \node[gray, anchor=west] at (5.0,-1.85) {$1$ succes};
+  \node[gray, anchor=west] at (5.0,-2.6) {$0$ successen};
+\end{tikzpicture}
+
+{\small De boom van $n = 3$ proeven: $\binom{3}{2} = 3$ paden (rood)
+dragen precies twee successen, elk met kans $p^2(1-p)$.}
+\end{omfigure}
+
+\begin{proposition}[Regel van Pascal]\label{prop:g11:binom:pascal}
+\index{driehoek van Pascal}
+Voor $1 \leq k \leq n - 1$:
+\[
+\binom{n}{k} = \binom{n-1}{k-1} + \binom{n-1}{k}.
+\]
+\end{proposition}
+
+\begin{proof}
+Sorteer de paden van de $n$-proevenboom met $k$ successen volgens hun
+\emph{laatste} proef. Die eindigend in succes komen uit een pad van de
+eerste $n-1$ proeven met $k - 1$ successen: er zijn
+$\binom{n-1}{k-1}$ van. Die eindigend in mislukking verlengen een pad
+met $k$ successen onder de eerste $n-1$ proeven: $\binom{n-1}{k}$ van.
+Elk pad is van precies één van de twee soorten.
+\end{proof}
+
+De regel van Pascal genereert de coëfficiënten rij voor rij --- elke
+entry is de som van de twee erboven:
+\[
+\begin{array}{ccccccccccc}
+&&&&&1&&&&&\\
+&&&&1&&1&&&&\\
+&&&1&&2&&1&&&\\
+&&1&&3&&3&&1&&\\
+&1&&4&&6&&4&&1&\\
+1&&5&&10&&10&&5&&1
+\end{array}
+\]
+
+\begin{remark}
+Een gesloten formule, $\binom nk = \frac{n!}{k!(n-k)!}$, samen met een
+systematische teltheorie, wordt opgesteld in \cref{ch:g12:comb}. Op dit
+niveau berekent de driehoek van Pascal elke coëfficiënt die we nodig
+hebben.
+\end{remark}
+
+\section{De binomiale verdeling}
+
+\begin{theorem}[Binomiale verdeling]\label{thm:g11:binom:binomial}
+Laat $X$ de successen tellen in $n$ onafhankelijke Bernoulli-proeven van
+parameter $p$. Dan volgt $X$ de \emph{binomiale
+verdeling}\index{binomiale verdeling} $\mathcal B(n, p)$:
+\[
+\P(X = k) = \binom{n}{k}\, p^k (1-p)^{n-k},
+\qquad k = 0, 1, \dots, n .
+\]
+\end{theorem}
+
+\begin{proof}
+De gebeurtenis $X = k$ is de collectie van alle paden met precies $k$
+successen. Elk zulk pad heeft kans $p^k(1-p)^{n-k}$: het product langs
+het pad bevat $k$ factoren $p$ en $n - k$ factoren $1-p$, in zekere
+volgorde (\cref{def:g11:binom:repeated}). Er zijn $\binom nk$ zulke
+paden (\cref{def:g11:binom:coefficient}), en hun kansen tellen op.
+\end{proof}
+
+\begin{example}\label{ex:g11:binom:quiz}
+Een quiz heeft $5$ onafhankelijke vragen, elk met $4$ keuzes; een
+leerling antwoordt willekeurig, dus elke vraag is een succes met
+$p = \frac14$. Het aantal $X$ correcte antwoorden volgt
+$\mathcal B\left(5, \frac14\right)$, en, met rij $5$ van de driehoek van
+Pascal:
+\[
+\P(X = 2) = \binom52 \left(\frac14\right)^2\left(\frac34\right)^3
+= 10 \times \frac{1}{16} \times \frac{27}{64}
+= \frac{270}{1024} \approx 0.26 .
+\]
+De kans op minstens één correct antwoord gebruikt het complement:
+$\P(X \geq 1) = 1 - \P(X = 0) = 1 - \left(\frac34\right)^5 \approx
+0.76$.
+\end{example}
+
+\begin{proposition}[Verwachting en variantie]\label{prop:g11:binom:expectation}
+Als $X \sim \mathcal B(n, p)$:
+\[
+\E(X) = np,
+\qquad
+\V(X) = np(1-p).
+\]
+\end{proposition}
+
+\begin{proof}[Rechtvaardiging]
+Schrijf $X = X_1 + X_2 + \dots + X_n$, waar $X_i$ gelijk is aan $1$ als
+de $i$-de proef slaagt: elke $X_i$ is een Bernoulli-variabele van
+verwachting $p$ (\cref{def:g11:binom:bernoulli}). Gemiddelden tellen op
+--- sommeren van de $n$ bijdragen geeft $\E(X) = np$. Dat
+\emph{varianties} ook optellen voor onafhankelijke variabelen is waar
+maar delicater: de variantieformule is \emph{toegegeven op dit niveau} en
+bewezen in \cref{ch:g12:sums}.
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[
+  width=10cm, height=5cm,
+  ybar, bar width=9pt,
+  xlabel={$k$}, ylabel={$\P(X = k)$},
+  xmin=-0.8, xmax=10.8, ymin=0, ymax=0.3,
+  xtick={0,1,2,3,4,5,6,7,8,9,10},
+  ytick={0.1, 0.2},
+  tick label style={font=\small},
+  label style={font=\small},
+  title={$\mathcal B(10,\ 0.5)$}]
+  \addplot[fill=omDef!40, draw=omDef] coordinates {
+    (0,0.00098) (1,0.00977) (2,0.04395) (3,0.11719) (4,0.20508)
+    (5,0.24609) (6,0.20508) (7,0.11719) (8,0.04395) (9,0.00977)
+    (10,0.00098)};
+\end{axis}
+\end{tikzpicture}
+
+{\small De verdeling $\mathcal B(10, 0.5)$ (tien eerlijke munten):
+gecentreerd op $\E(X) = np = 5$, symmetrisch, met bijna alle kans tussen
+$2$ en $8$.}
+\end{omfigure}
+
+\begin{method}[Een binomiale situatie herkennen]\label{met:g11:binom:recognize}
+Voordat je $X \sim \mathcal B(n, p)$ schrijft, controleer drie
+ingrediënten: een \emph{vast aantal} $n$ proeven, vooraf beslist; elke
+proef heeft \emph{twee uitkomsten} met dezelfde succeskans $p$; de
+proeven zijn \emph{onafhankelijk} (met teruglegging, of aparte
+apparaten). Trekken zonder teruglegging uit een kleine populatie is
+\emph{niet} binomiaal --- de kans verandert bij elke trekking
+(\cref{exo:g11:prob:6}).
+\end{method}
+
+\section{Steekproeven: is de waarneming verrassend?}
+
+De binomiale verdeling beantwoordt een zeer praktische vraag: \emph{als
+de succeskans echt $p$ is, welke aantallen successen zijn aannemelijk?}
+
+\begin{example}\label{ex:g11:binom:decision}
+Een machine zou ten hoogste $10\%$ defecte stukken moeten produceren. In
+een batch van $10$ stukken zijn er $4$ defect. Pech of kapotte machine?
+Als de machine in orde is, volgt het aantal defecten
+$\mathcal B(10, 0.1)$, en
+\[
+\P(X \geq 4) = 1 - \P(X \leq 3) \approx 1 - 0.987 = 0.013 :
+\]
+ongeveer één kans op $80$. Een gebeurtenis zo onwaarschijnlijk
+waarnemen is een sterk signaal --- men \emph{verwerpt} de hypothese dat
+de machine nog op $10\%$ werkt, met in gedachten dat de beslissing fout
+kan zijn met kans ongeveer $0.013$.
+\end{example}
+
+\begin{method}[Beslisregel vanuit een binomiaal model]\label{met:g11:binom:decision}
+Om een waargenomen aantal $k$ successen te beoordelen tegen een
+hypothese $X \sim \mathcal B(n, p)$: bereken de kans, onder de
+hypothese, van een resultaat \emph{minstens zo extreem} als $k$. Als die
+kans zeer klein is (een gebruikelijke conventie: onder $5\%$), verwerp
+de hypothese; anders is de waarneming ermee verenigbaar. De drempel is
+een keuze, geen stelling --- statistiek kwantificeert het risico, en de
+gebruiker accepteert het.
+\end{method}
+
+\section{Oefeningen}
+
+\begin{exercise}[$\star$]\label{exo:g11:binom:1}
+Breid de driehoek van Pascal uit tot rij $7$, en geef de waarden van
+$\binom62$, $\binom{7}{3}$ en $\binom74$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g11:binom:2}
+Een eerlijke dobbelsteen wordt $4$ keer gegooid; $X$ telt de zessen.
+Rechtvaardig dat $X \sim \mathcal B\left(4, \frac16\right)$ en bereken
+$\P(X = 0)$, $\P(X = 1)$ en $\P(X \geq 2)$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g11:binom:3}
+Welke van de volgende is binomiaal? Rechtvaardig.
+\begin{enumerate}
+  \item Aantal koppen in $20$ worpen met een eerlijke munt.
+  \item Aantal azen in $5$ kaarten uit één spel.
+  \item Aantal regendagen volgende week, als elke dag regent met kans
+        $0.3$ onafhankelijk.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g11:binom:4}
+$X \sim \mathcal B(50, 0.2)$. Geef $\E(X)$, $\V(X)$ en $\sigma(X)$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:binom:5}
+Een boogschutter raakt het doel met kans $0.7$ per schot,
+onafhankelijk. In $6$ schoten, bereken de kans op precies $4$ treffers,
+en op minstens $5$ treffers.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:binom:6}
+Een waar/onwaar-toets heeft $8$ vragen; een leerling raadt elk antwoord.
+Wat is de kans om te slagen (minstens $6$ correcte antwoorden)?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:binom:7}
+Elke gekochte graandoos bevat figuurtje A of figuurtje B, met kans
+$\frac12$ elk, onafhankelijk. Een verzamelaar koopt $5$ dozen. Bereken
+de kans dat de verzamelaar minstens één figuurtje van elke soort krijgt.
+(Complement: allemaal A of allemaal B.)
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:binom:8}
+Een basketbalspeler scoort vrije worpen met kans $p$, onafhankelijk.
+Laat $X \sim \mathcal B(3, p)$ het aantal scores in drie worpen zijn.
+Druk $\P(X = 3)$ en $\P(X \geq 1)$ uit als functies van $p$, en vind
+voor welke $p$ de kans om alle drie te scoren gelijk is aan
+$\frac{27}{64}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:binom:9}
+Hoe vaak moet een eerlijke munt gegooid worden opdat de kans op minstens
+één kop $0.99$ overschrijdt? (Complement, probeer daarna opeenvolgende
+waarden van $n$.)
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:binom:10}
+Bewijs met de regel van Pascal (\cref{prop:g11:binom:pascal}) en
+$\binom n0 = \binom nn = 1$ dat de entries van elke rij van de driehoek
+van Pascal tot $2^n$ sommen: interpreteer beide kanten als het tellen
+van alle paden van de boom.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g11:binom:11}
+Een politicus claimt $60\%$ goedkeuring. In een willekeurige steekproef
+van $10$ mensen keuren slechts $3$ goed.
+\begin{enumerate}
+  \item Onder de claim, welke verdeling volgt het aantal $X$
+        goedkeuringen in de steekproef? Bereken $\P(X \leq 3)$.
+  \item Met de beslisregel van \cref{met:g11:binom:decision} met een
+        drempel van $5\%$, is de waarneming verenigbaar met de claim?
+\end{enumerate}
+\end{exercise}

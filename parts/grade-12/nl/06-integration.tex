@@ -1,0 +1,357 @@
+\chapter{Integratie}\label{ch:g12:integ}
+
+Integratie beantwoordt twee vragen tegelijk: wat is de oppervlakte onder
+een kromme, en hoe herstelt men een functie uit haar
+veranderingsverhouding? De fundamentele stelling van de analyse zegt dat
+dit dezelfde vraag is --- de diepste en nuttigste ontdekking van de
+wiskunde van de zeventiende eeuw.
+
+\section{De integraal van een continue functie}
+
+\begin{definition}[Integraal van een positieve functie]\label{def:g12:integ:area}
+Laat $f$ continu en positief zijn op $\intcc{a}{b}$. De
+\emph{integraal}\index{integraal}
+\[
+\int_a^b f(x)\,\dd x
+\]
+is de oppervlakte, in oppervlakte-eenheden, van het gebied begrensd door
+de kromme van $f$, de $x$-as, en de verticale lijnen $x = a$ en $x = b$.
+\end{definition}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[
+  width=8.4cm, height=5cm,
+  axis lines=middle, xmin=-0.4, xmax=3.4, ymin=-0.3, ymax=2.3,
+  xtick={0.5,2.7}, xticklabels={$a$,$b$}, ytick=\empty,
+  samples=100, domain=-0.2:3.3]
+  \addplot[name path=curve, omDef, thick, domain=0.2:3.2]
+    {1 + 0.5*sin(deg(2*x)) + 0.2*x};
+  \path[name path=axis] (0.5,0) -- (2.7,0);
+  \addplot[omDef!20] fill between[of=curve and axis, soft clip={domain=0.5:2.7}];
+  \node at (axis cs:1.6,0.55) {$\displaystyle\int_a^b f$};
+\end{axis}
+\end{tikzpicture}
+\end{omfigure}
+
+Voor een functie van willekeurig teken worden oppervlaktes onder de $x$-as
+negatief geteld; en men stelt
+$\int_b^a f(x)\,\dd x = -\int_a^b f(x)\,\dd x$.
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=9.6cm, height=4.8cm,
+  xmin=-0.5, xmax=7, ymin=-1.4, ymax=1.4,
+  xtick={3.1416,6.2832}, xticklabels={$\pi$,$2\pi$}, ytick={-1,1}]
+  \addplot[name path=sine, omDef, thick, domain=0:6.2832, samples=120]
+    {sin(deg(x))};
+  \path[name path=xaxis] (0,0) -- (6.2832,0);
+  \addplot[omDef!20] fill between[of=sine and xaxis,
+    soft clip={domain=0:3.1416}];
+  \addplot[omThm!20] fill between[of=sine and xaxis,
+    soft clip={domain=3.1416:6.2832}];
+  \node at (axis cs:1.57,0.4) {$+$};
+  \node at (axis cs:4.71,-0.4) {$-$};
+\end{axis}
+\end{tikzpicture}
+
+{\small Algebraïsche oppervlaktes: $\int_0^{2\pi} \sin x\,\dd x = 0$, het
+gebied onder de as (rood) heft het gebied erboven (blauw) op.}
+\end{omfigure}
+
+\begin{proposition}[Eigenschappen van de integraal]\label{prop:g12:integ:properties}
+Laat $f, g$ continu zijn op een interval dat $a, b, c$ bevat, en
+$\lambda \in \R$.
+\begin{enumerate}
+  \item \emph{Lineariteit:}
+        $\displaystyle\int_a^b (f + \lambda g) = \int_a^b f + \lambda \int_a^b g$.
+  \item \emph{Relatie van Chasles:}
+        $\displaystyle\int_a^c f = \int_a^b f + \int_b^c f$.
+  \item \emph{Positiviteit:} als $a \leq b$ en $f \geq 0$ op $\intcc{a}{b}$,
+        dan $\displaystyle\int_a^b f \geq 0$; als $f \leq g$, dan
+        $\displaystyle\int_a^b f \leq \int_a^b g$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+Chasles en positiviteit zijn onmiddellijk uit de oppervlakte-interpretatie
+(oppervlaktes tellen op wanneer gebieden naast elkaar liggen; een gebied
+van positieve hoogte heeft positieve oppervlakte). Vergelijking volgt door
+positiviteit toe te passen op $g - f$. Lineariteit is intuïtief voor de
+som van positieve functies (oppervlaktes stapelen) en wordt rigoriseerd
+op de universiteit; \emph{ze is hier toegegeven}.
+\end{proof}
+
+\section{De fundamentele stelling van de analyse}
+
+\begin{definition}[Primitieve]\label{def:g12:integ:primitive}
+Een \emph{primitieve}\index{primitieve} (of antiafgeleide) van $f$ op een
+interval $I$ is een afleidbare functie $F$ op $I$ zodat $F' = f$.
+\end{definition}
+
+\begin{proposition}\label{prop:g12:integ:primunique}
+Als $F$ een primitieve is van $f$ op een interval $I$, zijn de primitieven
+van $f$ op $I$ precies de functies $F + c$, $c \in \R$. Gegeven
+$x_0 \in I$ en $y_0 \in \R$, bestaat er een unieke primitieve met
+$F(x_0) = y_0$.
+\end{proposition}
+
+\begin{proof}
+Als $G' = F' = f$, dan $(G - F)' = 0$ op het interval $I$, dus is
+$G - F$ constant.\footnote{Dat een functie met afgeleide nul op een
+interval constant is, volgt uit \cref{thm:g12:deriv:variations}: ze is
+zowel stijgend als dalend.} Omgekeerd is elke $F + c$ een primitieve. De
+voorwaarde $F(x_0) = y_0$ legt de constante vast.
+\end{proof}
+
+\begin{theorem}[Fundamentele stelling van de analyse]\label{thm:g12:integ:ftc}
+\index{fundamentele stelling van de analyse}
+Laat $f$ continu zijn op een interval $I$ en $a \in I$. De functie
+\[
+F \colon x \longmapsto \int_a^x f(t)\,\dd t
+\]
+is de primitieve van $f$ op $I$ die in $a$ verdwijnt. Bijgevolg, voor
+elke primitieve $G$ van $f$ en $a, b \in I$:
+\[
+\int_a^b f(t)\,\dd t = \bigl[G(t)\bigr]_a^b = G(b) - G(a).
+\]
+\end{theorem}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=9.2cm, height=5.6cm,
+  xmin=-0.4, xmax=4.2, ymin=-0.4, ymax=2.9,
+  xtick={0.5,2.2,2.7}, xticklabels={$a$,$x$,\ $x+h$}, ytick=\empty]
+  \addplot[name path=curve, omDef, thick, domain=0:3.9, samples=80]
+    {1 + 0.4*x + 0.2*sin(deg(2*x))};
+  \path[name path=xaxis] (0,0) -- (3.9,0);
+  \addplot[omDef!20] fill between[of=curve and xaxis,
+    soft clip={domain=0.5:2.2}];
+  \addplot[omProp!40] fill between[of=curve and xaxis,
+    soft clip={domain=2.2:2.7}];
+  \draw[black, dashed, thin] (axis cs:2.2,1.69) -- (axis cs:2.7,1.69);
+  \draw[black, dashed, thin] (axis cs:2.2,1.925) -- (axis cs:2.7,1.925)
+    node[above right, font=\small] {$f(x+h)$};
+  \node at (axis cs:1.35,0.6) {$F(x)$};
+\end{axis}
+\end{tikzpicture}
+
+{\small Het idee van het bewijs: de toename $F(x+h) - F(x)$ is de
+oppervlakte van de smalle band (oranje), ingekadererd tussen de rechthoeken
+van hoogtes $f(x)$ en $f(x+h)$ op een basis van lengte $h$.}
+\end{omfigure}
+
+\begin{proof}[Bewijs wanneer $f$ stijgend is]
+Fixeer $x \in I$ en $h > 0$ met $x + h \in I$. Volgens Chasles,
+\[
+F(x+h) - F(x) = \int_x^{x+h} f(t)\,\dd t .
+\]
+Omdat $f$ stijgend is, $f(x) \leq f(t) \leq f(x+h)$ voor
+$t \in \intcc{x}{x+h}$, en door vergelijking van integralen (de integraal
+van een constante $c$ over een interval van lengte $h$ is $ch$):
+\[
+h\,f(x) \leq F(x+h) - F(x) \leq h\,f(x+h),
+\]
+dus
+\[
+f(x) \leq \frac{F(x+h) - F(x)}{h} \leq f(x+h).
+\]
+Als $h \to 0^+$, $f(x+h) \to f(x)$ door continuïteit, en de
+insluitstelling geeft dat het verschilquotiënt naar $f(x)$ neigt; het
+geval $h < 0$ is symmetrisch. Dus $F' = f$, en $F(a) = 0$. Het algemene
+geval (niet monotoon) continu wordt op de universiteit bewezen.
+
+Ten slotte, als $G$ een willekeurige primitieve is, $G = F + c$
+(\cref{prop:g12:integ:primunique}), dus
+$G(b) - G(a) = F(b) - F(a) = \int_a^b f$.
+\end{proof}
+
+\begin{example}
+$\displaystyle\int_0^1 x^2\,\dd x = \left[\frac{x^3}{3}\right]_0^1 =
+\frac13$: de oppervlakte onder de parabool is een derde van het
+eenheidsvierkant, zoals Archimedes wist.
+\end{example}
+
+De tabel van primitieven leest men van de tabel van afgeleiden
+($u$ is een afleidbare functie, $c$ een willekeurige constante):
+\begin{center}
+\renewcommand{\arraystretch}{1.7}
+\begin{tabular}{c|c||c|c}
+$f(x)$ & primitieve & $f$ & primitieve \\
+\hline
+$x^n \ (n \neq -1)$ & $\dfrac{x^{n+1}}{n+1} + c$ &
+$u'u^n \ (n \neq -1)$ & $\dfrac{u^{n+1}}{n+1} + c$\\
+$\dfrac1x \ (x > 0)$ & $\ln x + c$ &
+$\dfrac{u'}{u} \ (u > 0)$ & $\ln u + c$\\
+$\eu^x$ & $\eu^x + c$ &
+$u'\eu^u$ & $\eu^u + c$\\
+$\cos x$ & $\sin x + c$ &
+$\dfrac{u'}{\sqrt u} \ (u>0)$ & $2\sqrt u + c$\\
+$\sin x$ & $-\cos x + c$ & &
+\end{tabular}
+\end{center}
+
+\begin{method}[De vorm $u' \times (\text{iets in } u)$ herkennen]\label{met:g12:integ:uprime}
+Om een product te integreren, zoek een factor die de afgeleide is van een
+binnelfunctie $u$, op een multiplicatieve constante na. Bijvoorbeeld in
+$\int_0^1 x\,\eu^{x^2}\dd x$ is de factor $x$ gelijk aan $\frac12 (x^2)'$:
+\[
+\int_0^1 x\,\eu^{x^2}\dd x = \frac12\left[\eu^{x^2}\right]_0^1
+= \frac{\eu - 1}{2}.
+\]
+\end{method}
+
+\begin{theorem}[Partieel integreren]\label{thm:g12:integ:ibp}
+\index{partieel integreren}
+Laat $u, v$ afleidbaar zijn op $\intcc{a}{b}$ met continue afgeleiden. Dan
+\[
+\int_a^b u'(t)\,v(t)\,\dd t
+= \bigl[u(t)\,v(t)\bigr]_a^b - \int_a^b u(t)\,v'(t)\,\dd t .
+\]
+\end{theorem}
+
+\begin{proof}
+De productregel geeft $(uv)' = u'v + uv'$; integreren van beide kanten
+over $\intcc{a}{b}$ en de fundamentele stelling toepassen op het
+linkerlid geeft $\bigl[uv\bigr]_a^b = \int_a^b u'v + \int_a^b uv'$.
+\end{proof}
+
+\begin{example}\label{ex:g12:integ:ibp}
+$\displaystyle\int_0^1 t\,\eu^{t}\,\dd t$: neem $u' = \eu^t$, $v = t$,
+dus $u = \eu^t$, $v' = 1$:
+\[
+\int_0^1 t\,\eu^t\,\dd t = \bigl[t\,\eu^t\bigr]_0^1 - \int_0^1 \eu^t\,\dd t
+= \eu - (\eu - 1) = 1 .
+\]
+\end{example}
+
+\section{Toepassingen}
+
+\begin{definition}[Gemiddelde waarde]\label{def:g12:integ:mean}
+De \emph{gemiddelde waarde}\index{gemiddelde waarde} van een continue
+functie $f$ op $\intcc{a}{b}$ ($a<b$) is
+\[
+\mu = \frac{1}{b-a}\int_a^b f(t)\,\dd t .
+\]
+\end{definition}
+
+\begin{proposition}\label{prop:g12:integ:meanbounds}
+Als $m \leq f \leq M$ op $\intcc{a}{b}$, dan $m \leq \mu \leq M$.
+\end{proposition}
+
+\begin{proof}
+Integreer de ongelijkheden $m \leq f(t) \leq M$ over $\intcc{a}{b}$ en
+deel door $b - a > 0$.
+\end{proof}
+
+\begin{method}[Oppervlakte tussen twee krommen]\label{met:g12:integ:areabetween}
+Als $f \geq g$ op $\intcc{a}{b}$, is de oppervlakte tussen de twee
+krommen $\int_a^b \bigl(f(x) - g(x)\bigr)\dd x$. Als de krommen snijden,
+knip het interval bij de snijpunten en integreer $\abs{f - g}$ stuk voor
+stuk.
+\end{method}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=8.4cm, height=5.8cm,
+  xmin=-2.1, xmax=2.9, ymin=-1.8, ymax=5.6,
+  xtick={-1,2}, ytick=\empty]
+  \addplot[name path=line, omThm, thick, domain=-1.7:2.5] {x + 1};
+  \addplot[name path=parab, omDef, thick, domain=-1.9:2.45] {x^2 - 1};
+  \addplot[omDef!20] fill between[of=line and parab,
+    soft clip={domain=-1:2}];
+  \fill (axis cs:-1,0) circle (1.5pt);
+  \fill (axis cs:2,3) circle (1.5pt);
+\end{axis}
+\end{tikzpicture}
+
+{\small De oppervlakte tussen de lijn $y = x + 1$ (rood) en de parabool
+$y = x^2 - 1$ (blauw) is $\int_{-1}^{2}
+\bigl((x+1) - (x^2-1)\bigr)\dd x = \frac92$.}
+\end{omfigure}
+
+\section{Oefeningen}
+
+\begin{exercise}[$\star$]\label{exo:g12:integ:1}
+Bereken
+\[
+\int_1^2 \left(3x^2 - \frac{1}{x^2}\right)\dd x, \qquad
+\int_0^{\pi/2} \cos t \,\dd t, \qquad
+\int_0^{1} \frac{\dd t}{2t+1} .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:integ:2}
+Vind de primitieve $F$ van $f(x) = x\eu^{x^2}$ op $\R$ zodat
+$F(0) = 1$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:integ:3}
+Bereken de gemiddelde waarde van $f(t) = \sin t$ op $\intcc{0}{\pi}$, en
+interpreteer het resultaat op een grafiek.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:integ:4}
+Bereken met partieel integreren
+\[
+\int_1^{\eu} \ln t\,\dd t
+\qquad\text{en}\qquad
+\int_0^{\pi} t \sin t\,\dd t .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:integ:5}
+Bereken de oppervlakte van het gebied tussen de parabool $y = x^2$ en de
+lijn $y = x + 2$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:integ:6}
+Laat $I = \displaystyle\int_0^1 \frac{\dd t}{1 + t}$.
+\begin{enumerate}
+  \item Bereken $I$.
+  \item Voor $n \in \N$, laat
+        $I_n = \displaystyle\int_0^1 \frac{t^n}{1+t}\dd t$. Toon aan dat
+        $I_n + I_{n+1} = \dfrac{1}{n+1}$, en dat
+        $0 \leq I_n \leq \dfrac{1}{n+1}$.
+  \item Leid af dat
+        $1 - \frac12 + \frac13 - \dots + \frac{(-1)^{n-1}}{n}
+        \xrightarrow[n \to +\infty]{} \ln 2$.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:integ:7}
+De snelheid van een trein (in m/s) tijdens de eerste $100$ seconden na
+vertrek wordt gemodelleerd door $v(t) = 30\bigl(1 - \eu^{-t/50}\bigr)$.
+Bereken de afgelegde afstand tijdens deze $100$ seconden, en de
+gemiddelde snelheid van de trein over het interval.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:integ:8}
+Voor $n \geq 1$, laat $S_n = \dfrac1n \displaystyle\sum_{k=1}^{n} \frac{1}{1 + k/n}$.
+\begin{enumerate}
+  \item Interpreteer $S_n$ als een oppervlakte van rechthoeken die een
+        gebied onder de kromme van $t \mapsto \frac{1}{1+t}$ op
+        $\intcc{0}{1}$ benaderen.
+  \item Toon met de monotonie van $t \mapsto \frac{1}{1+t}$ aan dat
+        \[
+        S_n \leq \int_0^1 \frac{\dd t}{1+t} \leq S_n + \frac1n\left(1 - \frac12\right),
+        \]
+        en leid af $\lim\limits_{n\to+\infty} S_n = \ln 2$.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:integ:9}
+\emph{(Integralen van Wallis.)} Voor $n \in \N$, laat
+$W_n = \displaystyle\int_0^{\pi/2} \sin^n t\,\dd t$.
+\begin{enumerate}
+  \item Bereken $W_0$ en $W_1$.
+  \item Toon door $\sin^{n+2}t = \sin t \cdot \sin^{n+1} t$ te schrijven
+        en partieel te integreren aan dat
+        $W_{n+2} = \dfrac{n+1}{n+2}\,W_n$.
+  \item Leid $W_2$, $W_3$, $W_4$ af en toon aan dat $(W_n)$ dalend en
+        positief is.
+\end{enumerate}
+\end{exercise}

@@ -1,0 +1,273 @@
+\chapter{Matrices et graphes}\label{ch:g12:matrix}
+
+Une matrice est un tableau rectangulaire de nombres, additionné et multiplié
+selon des règles conçues pour que l'algèbre matricielle représente la
+composition des applications linéaires. Les matrices résolvent les systèmes
+linéaires, pilotent les suites récurrentes couplées, et comptent les
+chemins dans les réseaux --- les mathématiques derrière les moteurs de
+recherche et les algorithmes de plus court chemin.
+
+\section{Algèbre matricielle}
+
+\begin{definition}[Matrice]\label{def:g12:matrix:matrix}
+Une \emph{matrice $m \times n$}\index{matrice} est un tableau de nombres
+réels à $m$ lignes et $n$ colonnes~:
+$A = (a_{ij})$, où $a_{ij}$ est l'entrée de la ligne $i$, colonne $j$.
+Deux matrices de même taille s'additionnent entrée par entrée, et
+$\lambda A = (\lambda a_{ij})$.
+\end{definition}
+
+\begin{definition}[Produit matriciel]\label{def:g12:matrix:product}
+Soit $A$ de taille $m \times n$ et $B$ de taille $n \times p$. Le produit
+$AB$ est la matrice $m \times p$ dont l'entrée $(i,j)$ est
+\[
+(AB)_{ij} = \sum_{k=1}^{n} a_{ik} b_{kj}
+\]
+(la règle «~ligne $i$ de $A$ multipliée par colonne $j$ de $B$~»).
+\end{definition}
+
+\begin{example}
+$\begin{pmatrix} 1 & 2\\ 3 & 4\end{pmatrix}
+\begin{pmatrix} 0 & 1\\ 1 & 1\end{pmatrix}
+= \begin{pmatrix} 2 & 3\\ 4 & 7\end{pmatrix}$,
+\quad tandis que \quad
+$\begin{pmatrix} 0 & 1\\ 1 & 1\end{pmatrix}
+\begin{pmatrix} 1 & 2\\ 3 & 4\end{pmatrix}
+= \begin{pmatrix} 3 & 4\\ 4 & 6\end{pmatrix}$~:
+\emph{la multiplication matricielle n'est pas commutative}.
+\end{example}
+
+\begin{proposition}[Règles de l'algèbre matricielle]\label{prop:g12:matrix:rules}
+Dès que les tailles rendent les produits significatifs~:
+\[
+(AB)C = A(BC), \qquad A(B + C) = AB + AC, \qquad (A+B)C = AC + BC,
+\]
+et la \emph{matrice identité} $I_n$ (uns sur la diagonale, zéros ailleurs)
+satisfait $I_m A = A I_n = A$ pour $A$ de taille $m \times n$.
+\end{proposition}
+
+\begin{proof}
+Toutes se vérifient entrée par entrée à partir de
+\cref{def:g12:matrix:product}~; l'associativité, la seule non triviale,
+revient à échanger deux sommes finies~:
+$\bigl((AB)C\bigr)_{ij} = \sum_l \left(\sum_k a_{ik}b_{kl}\right) c_{lj}
+= \sum_k a_{ik} \left(\sum_l b_{kl} c_{lj}\right)
+= \bigl(A(BC)\bigr)_{ij}$.
+\end{proof}
+
+\begin{definition}[Inverse]\label{def:g12:matrix:inverse}
+Une matrice carrée $A$ de taille $n$ est \emph{inversible}\index{matrice!inverse}
+s'il existe une matrice $B$ avec $AB = BA = I_n$~; $B$ est alors unique,
+notée $A^{-1}$.
+\end{definition}
+
+\begin{proposition}[Inverse d'une matrice $2\times2$]\label{prop:g12:matrix:inverse2x2}
+Soit $A = \begin{pmatrix} a & b\\ c & d\end{pmatrix}$ et
+$\det A = ad - bc$ (le \emph{déterminant}\index{déterminant}). Alors $A$ est
+inversible si et seulement si $\det A \neq 0$, auquel cas
+\[
+A^{-1} = \frac{1}{ad - bc}\begin{pmatrix} d & -b\\ -c & a\end{pmatrix}.
+\]
+\end{proposition}
+
+\begin{proof}
+Un calcul donne
+$A \begin{pmatrix} d & -b\\ -c & a\end{pmatrix}
+= \begin{pmatrix} d & -b\\ -c & a\end{pmatrix} A = (ad - bc) I_2$~; si
+$ad - bc \neq 0$, diviser. Réciproquement, si $ad - bc = 0$, les colonnes de
+$A$ sont proportionnelles, et de même les colonnes de $AB$ pour toute $B$~;
+mais les colonnes de $I_2$ ne le sont pas, donc aucune $B$ ne peut vérifier
+$AB = I_2$.
+\end{proof}
+
+\begin{method}[Systèmes linéaires]\label{met:g12:matrix:systems}
+Le système
+$\begin{cases} ax + by = e\\ cx + dy = f \end{cases}$
+est l'équation matricielle $AX = Y$ avec
+$X = \begin{pmatrix} x \\ y\end{pmatrix}$,
+$Y = \begin{pmatrix} e \\ f\end{pmatrix}$. Si $\det A \neq 0$, sa solution
+unique est $X = A^{-1}Y$. Le même formalisme traite $n$ équations à $n$
+inconnues.
+\end{method}
+
+\section{Puissances de matrices et suites récurrentes}
+
+\begin{definition}\label{def:g12:matrix:power}
+Pour une matrice carrée $A$ et $k \in \N$, $A^k = A \times \dots \times A$
+($k$ facteurs), avec $A^0 = I$.
+\end{definition}
+
+\begin{method}[Cas diagonal-plus-nilpotent et diagonalisable]\label{met:g12:matrix:powers}
+Deux façons standards de calculer $A^k$~:
+\begin{itemize}
+  \item Si $A = \lambda I + N$ avec $N^2 = 0$, la formule du binôme
+        (valable ici car $I$ et $N$ commutent) se réduit à deux termes~:
+        $A^k = \lambda^k I + k \lambda^{k-1} N$.
+  \item Si l'on trouve une $P$ inversible avec $A = PDP^{-1}$ et $D$
+        diagonale, alors $A^k = P D^k P^{-1}$, et $D^k$ se calcule entrée
+        par entrée. (Trouver une telle $P$ de façon systématique est la
+        théorie de la \emph{diagonalisation}, développée à l'université~; à
+        ce niveau $P$ est donnée.)
+\end{itemize}
+\end{method}
+
+\begin{example}[Suites couplées]\label{ex:g12:matrix:coupled}
+Soient $u_{n+1} = 3u_n + v_n$ et $v_{n+1} = u_n + 3v_n$. En posant
+$X_n = \begin{pmatrix} u_n\\ v_n \end{pmatrix}$ et
+$A = \begin{pmatrix} 3 & 1\\ 1 & 3\end{pmatrix}$, on obtient
+$X_{n+1} = AX_n$, donc $X_n = A^n X_0$. Les suites auxiliaires
+$s_n = u_n + v_n$ et $d_n = u_n - v_n$ vérifient $s_{n+1} = 4s_n$ et
+$d_{n+1} = 2d_n$, donc $s_n = 4^n s_0$, $d_n = 2^n d_0$ et
+\[
+u_n = \frac{4^n(u_0+v_0) + 2^n(u_0-v_0)}{2}, \qquad
+v_n = \frac{4^n(u_0+v_0) - 2^n(u_0-v_0)}{2}.
+\]
+(En coulisse~: $(1,1)$ et $(1,-1)$ sont des directions propres de $A$.)
+\end{example}
+
+\section{Graphes et chemins}
+
+\begin{definition}[Graphe, matrice d'adjacence]\label{def:g12:matrix:graph}
+Un \emph{graphe}\index{graphe} est constitué de sommets $1, 2, \dots, n$ et
+d'arêtes joignant certaines paires de sommets (couples ordonnés pour un
+graphe \emph{orienté}). Sa \emph{matrice d'adjacence}\index{matrice d'adjacence}
+est la matrice $n \times n$ $M$ avec $m_{ij} = 1$ s'il y a une arête de $i$
+vers $j$, et $0$ sinon. Un \emph{chemin} de longueur $k$ de $i$ vers $j$ est
+une suite de $k$ arêtes consécutives menant de $i$ à $j$.
+\end{definition}
+
+\begin{omfigure}
+\begin{tikzpicture}[baseline=(current bounding box.center)]
+  \node[circle, draw, inner sep=2.5pt] (v1) at (0,0) {$1$};
+  \node[circle, draw, inner sep=2.5pt] (v2) at (2.6,1.2) {$2$};
+  \node[circle, draw, inner sep=2.5pt] (v3) at (2.6,-1.2) {$3$};
+  \draw[-Stealth, omDef, thick] (v1) -- (v2);
+  \draw[-Stealth, omDef, thick] (v2) -- (v3);
+  \draw[-Stealth, omDef, thick] (v1) to[bend right=18] (v3);
+  \draw[-Stealth, omDef, thick] (v3) to[bend right=18] (v1);
+\end{tikzpicture}
+\qquad\qquad
+$M = \begin{pmatrix} 0 & 1 & 1\\ 0 & 0 & 1\\ 1 & 0 & 0 \end{pmatrix}$
+
+{\small Un graphe orienté et sa matrice d'adjacence
+(\cref{exo:g12:matrix:6})~: $m_{ij} = 1$ exactement lorsqu'il y a une arête
+de $i$ vers $j$.}
+\end{omfigure}
+
+\begin{theorem}[Dénombrement des chemins]\label{thm:g12:matrix:walks}
+Le nombre de chemins de longueur $k$ du sommet $i$ au sommet $j$ est
+l'entrée $(i,j)$ de $M^k$.
+\end{theorem}
+
+\begin{proof}
+Récurrence sur $k$. Pour $k = 1$ c'est la définition de $M$. Supposer le
+résultat pour $k$. Un chemin de longueur $k+1$ de $i$ à $j$ est un chemin
+de longueur $k$ de $i$ vers un certain sommet $l$, suivi d'une arête de $l$
+vers $j$~; par les principes d'addition et de multiplication, leur nombre
+est
+\[
+\sum_{l=1}^{n} \bigl(M^k\bigr)_{il}\, m_{lj} = \bigl(M^{k+1}\bigr)_{ij}.
+\qedhere
+\]
+\end{proof}
+
+\begin{example}
+Pour le graphe triangle ($3$ sommets, toutes les paires jointes),
+$M = \begin{pmatrix} 0&1&1\\ 1&0&1\\ 1&1&0\end{pmatrix}$ et
+$M^2 = \begin{pmatrix} 2&1&1\\ 1&2&1\\ 1&1&2\end{pmatrix}$~: depuis chaque
+sommet il y a $2$ chemins de longueur $2$ vers soi-même (via l'un ou l'autre
+voisin) et $1$ vers chaque autre sommet.
+\end{example}
+
+\section{Exercices}
+
+\begin{exercise}[$\star$]\label{exo:g12:matrix:1}
+Soient $A = \begin{pmatrix} 1 & 2\\ 0 & 1 \end{pmatrix}$ et
+$B = \begin{pmatrix} 2 & 0\\ 1 & 1 \end{pmatrix}$. Calculer $A + B$, $AB$,
+$BA$ et $A^2$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:matrix:2}
+Déterminer si les matrices suivantes sont inversibles, et calculer les
+inverses lorsqu'ils existent~:
+\[
+A = \begin{pmatrix} 2 & 5\\ 1 & 3\end{pmatrix}, \qquad
+B = \begin{pmatrix} 3 & 6\\ 2 & 4\end{pmatrix}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:matrix:3}
+Résoudre par inversion matricielle le système
+$\begin{cases} 2x + 5y = 1\\ x + 3y = 2 . \end{cases}$
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:matrix:4}
+Soit $A = \begin{pmatrix} 2 & 1\\ 0 & 2\end{pmatrix} = 2I + N$ avec
+$N = \begin{pmatrix} 0 & 1\\ 0 & 0 \end{pmatrix}$.
+\begin{enumerate}
+  \item Vérifier que $N^2 = 0$ et que $I$ et $N$ commutent.
+  \item En déduire $A^k$ pour tout $k \in \N$ et vérifier la formule pour
+        $k=2$ par calcul direct.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:matrix:5}
+Soient $A = \begin{pmatrix} 0 & 1\\ 1 & 1\end{pmatrix}$ et $F_n$ la suite
+de Fibonacci ($F_0 = 0$, $F_1 = 1$, $F_{n+2} = F_{n+1} + F_n$). Montrer par
+récurrence que pour $n \geq 1$,
+\[
+A^n = \begin{pmatrix} F_{n-1} & F_n\\ F_n & F_{n+1}\end{pmatrix},
+\]
+et en déduire l'identité $F_{n+1}F_{n-1} - F_n^2 = (-1)^n$.
+(Indication~: les déterminants se multiplient~: $\det(MN) = \det M \det N$,
+ce que l'on peut vérifier pour les matrices $2\times2$.)
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:matrix:6}
+Un graphe orienté sur les sommets $\{1, 2, 3\}$ a les arêtes
+$1\to2$, $2\to3$, $3\to1$ et $1\to3$.
+\begin{enumerate}
+  \item Écrire la matrice d'adjacence $M$ et calculer $M^2$ et $M^3$.
+  \item Combien de chemins de longueur $3$ vont de $1$ à $1$~? Les lister.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:matrix:7}
+Une société d'autopartage déplace des véhicules entre deux villes $A$ et
+$B$. Chaque semaine, $80\%$ des voitures en $A$ restent en $A$ et $20\%$
+passent en $B$~; $30\%$ des voitures en $B$ passent en $A$ et $70\%$ restent.
+Soient $a_n, b_n$ les proportions de la flotte dans chaque ville.
+\begin{omfigure}
+\begin{tikzpicture}
+  \node[circle, draw, inner sep=3pt] (A) at (0,0) {$A$};
+  \node[circle, draw, inner sep=3pt] (B) at (3.2,0) {$B$};
+  \draw[-Stealth, omDef, thick] (A) to[bend left=25]
+    node[above, font=\small] {$0.2$} (B);
+  \draw[-Stealth, omDef, thick] (B) to[bend left=25]
+    node[below, font=\small] {$0.3$} (A);
+  \draw[-Stealth, omDef, thick] (A) to[loop left]
+    node[left, font=\small] {$0.8$} (A);
+  \draw[-Stealth, omDef, thick] (B) to[loop right]
+    node[right, font=\small] {$0.7$} (B);
+\end{tikzpicture}
+\end{omfigure}
+\begin{enumerate}
+  \item Écrire $X_{n+1} = MX_n$ avec
+        $X_n = \begin{pmatrix} a_n\\ b_n\end{pmatrix}$ et identifier $M$.
+  \item Trouver les proportions d'équilibre (résoudre $MX = X$ avec
+        $a + b = 1$).
+  \item Montrer que $c_n = a_n - 0.6$ vérifie $c_{n+1} = 0.5\,c_n$, et
+        conclure que la répartition de la flotte converge vers l'équilibre.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:matrix:8}
+Soient $A = \begin{pmatrix} 3 & 1\\ 1 & 3 \end{pmatrix}$,
+$P = \begin{pmatrix} 1 & 1\\ 1 & -1 \end{pmatrix}$.
+\begin{enumerate}
+  \item Calculer $P^{-1}$, puis $D = P^{-1}AP$, et vérifier que $D$ est
+        diagonale.
+  \item En déduire une formule fermée pour $A^n$ et comparer avec
+        \cref{ex:g12:matrix:coupled}.
+\end{enumerate}
+\end{exercise}

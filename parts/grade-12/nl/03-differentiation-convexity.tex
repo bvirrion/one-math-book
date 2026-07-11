@@ -1,0 +1,386 @@
+\chapter{Differentiaalrekening en convexiteit}\label{ch:g12:deriv}
+
+De afgeleide meet de ogenblikkelijke veranderingsverhouding van een
+functie; het is de richtingscoëfficiënt van de raaklijn aan haar grafiek.
+Dit hoofdstuk herhaalt en breidt de differentiatieregels uit, koppelt het
+teken van $f'$ aan de variaties van $f$, en introduceert convexiteit,
+die door de tweede afgeleide wordt gestuurd.
+
+\section{De afgeleide}
+
+\begin{definition}[Afgeleide in een punt]\label{def:g12:deriv:derivative}
+Laat $f$ gedefinieerd zijn op een interval $I$ en $a \in I$. De functie
+$f$ is \emph{afleidbaar in $a$}\index{afgeleide} als het
+verschilquotiënt
+\[
+\frac{f(a+h) - f(a)}{h}
+\]
+een eindige limiet heeft als $h \to 0$. Deze limiet heet de
+\emph{afgeleide van $f$ in $a$} en wordt genoteerd $f'(a)$. Als $f$
+afleidbaar is in elk punt van $I$, is de functie
+$f' \colon x \mapsto f'(x)$ de \emph{afgeleide} van $f$.
+\end{definition}
+
+\begin{definition}[Raaklijn]\label{def:g12:deriv:tangent}
+Als $f$ afleidbaar is in $a$, is de \emph{raaklijn}\index{raaklijn} aan
+de kromme van $f$ in het punt $(a, f(a))$ de lijn met vergelijking
+\[
+y = f(a) + f'(a)(x - a).
+\]
+\end{definition}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, clip=false,
+  width=9.6cm, height=6.8cm,
+  xmin=-0.4, xmax=3.4, ymin=-0.4, ymax=4.3,
+  xtick={1,2.5}, xticklabels={$a$,$a+h$}, ytick=\empty]
+  \addplot[omProp!40, thick, domain=0.2:2.7] {1 + 1.75*(x-1)};
+  \addplot[omProp!70, thick, domain=0.07:2.95] {1 + 1.5*(x-1)};
+  \addplot[omProp, thick, domain=-0.12:3.3] {1 + 1.25*(x-1)};
+  \addplot[omThm, thick, domain=-0.4:3.3] {x};
+  \addplot[omDef, thick, domain=-0.4:2.72] {x^2/2 + 0.5};
+  \draw[black, dashed, thin] (axis cs:1,1) -- (axis cs:2.5,1)
+    node[midway, below, font=\small] {$h$};
+  \draw[black, dashed, thin] (axis cs:2.5,1) -- (axis cs:2.5,3.625)
+    node[midway, right, font=\small] {$f(a+h)-f(a)$};
+  \fill (axis cs:2.5,3.625) circle (1.5pt);
+  \fill (axis cs:2,2.5) circle (1.5pt);
+  \fill (axis cs:1.5,1.625) circle (1.5pt);
+  \fill (axis cs:1,1) circle (1.5pt)
+    node[above left, font=\small] {$A$};
+  \node[omThm, font=\small, anchor=west] at (axis cs:3.38,3.3) {raaklijn};
+\end{axis}
+\end{tikzpicture}
+
+{\small Als $h$ afneemt, roteert de secant door $A = (a, f(a))$ en
+$(a+h, f(a+h))$ (oranje) naar de raaklijn in $A$ (rood): haar
+richtingscoëfficiënt $\frac{f(a+h)-f(a)}{h}$ neigt naar $f'(a)$.}
+\end{omfigure}
+
+\begin{proposition}\label{prop:g12:deriv:diffcont}
+Een functie afleidbaar in $a$ is continu in $a$. Het omgekeerde is
+onwaar.
+\end{proposition}
+
+\begin{proof}
+Voor $h \neq 0$ klein is
+$f(a+h) - f(a) = h \cdot \frac{f(a+h)-f(a)}{h}$. Als $h \to 0$, neigt
+het rechterlid naar $0 \times f'(a) = 0$, dus $f(a+h) \to f(a)$. Voor
+het omgekeerde is $x \mapsto \abs{x}$ continu in $0$, maar haar
+verschilquotiënt in $0$ is gelijk aan $\frac{\abs h}{h} = \pm 1$
+afhankelijk van het teken van $h$, en heeft geen limiet.
+\end{proof}
+
+\subsection{Differentiatieregels}
+
+\begin{proposition}[Bewerkingen]\label{prop:g12:deriv:operations}
+Laat $u, v$ afleidbaar zijn op $I$ en $\lambda \in \R$. Dan zijn
+$u + v$, $\lambda u$, $uv$ afleidbaar op $I$, evenals $\frac{u}{v}$ waar
+$v \neq 0$, en
+\[
+(u+v)' = u' + v', \quad (\lambda u)' = \lambda u', \quad
+(uv)' = u'v + uv', \quad
+\left(\frac{u}{v}\right)' = \frac{u'v - uv'}{v^2}.
+\]
+\end{proposition}
+
+\begin{proof}[Bewijs van de productregel]
+Schrijf het verschilquotiënt van $uv$ in $a$ als
+\[
+\frac{u(a+h)v(a+h) - u(a)v(a)}{h}
+= \frac{u(a+h) - u(a)}{h}\,v(a+h) + u(a)\,\frac{v(a+h) - v(a)}{h}.
+\]
+Als $h \to 0$, $v(a+h) \to v(a)$ door continuïteit
+(\cref{prop:g12:deriv:diffcont}), dus neigt het rechterlid naar
+$u'(a)v(a) + u(a)v'(a)$. De andere regels worden evenzo bewezen.
+\end{proof}
+
+\begin{theorem}[Kettingregel]\label{thm:g12:deriv:chain}
+\index{kettingregel}
+Laat $u$ afleidbaar zijn op $I$ met waarden in $J$, en $g$ afleidbaar op
+$J$. Dan is $g \circ u$ afleidbaar op $I$ en
+\[
+(g \circ u)' = (g' \circ u) \cdot u' .
+\]
+In het bijzonder, voor $u$ afleidbaar:
+\[
+(u^n)' = n\,u'\,u^{n-1} \ (n \in \Z), \qquad
+\left(\sqrt{u}\right)' = \frac{u'}{2\sqrt{u}} \ (u > 0), \qquad
+\left(\eu^{u}\right)' = u'\,\eu^{u}.
+\]
+\end{theorem}
+
+\begin{proof}[Bewijsschets]
+Wanneer $u(a+h) \neq u(a)$ voor $h$ klein, schrijf
+\[
+\frac{g(u(a+h)) - g(u(a))}{h}
+= \frac{g(u(a+h)) - g(u(a))}{u(a+h) - u(a)} \cdot \frac{u(a+h) - u(a)}{h}.
+\]
+Als $h \to 0$, $u(a+h) \to u(a)$, dus neigt de eerste factor naar
+$g'(u(a))$ en de tweede naar $u'(a)$. (Een volledig bewijs moet het geval
+behandelen waarin $u(a+h) = u(a)$ voor willekeurig kleine $h$; dit
+technische punt wordt op de universiteit behandeld.)
+\end{proof}
+
+\begin{example}
+De gebruikelijke afgeleiden, geldig op de natuurlijke domeinen:
+\[
+(x^n)' = nx^{n-1}, \quad
+\left(\frac{1}{x}\right)' = -\frac{1}{x^2}, \quad
+(\sqrt{x})' = \frac{1}{2\sqrt{x}}, \quad
+(\cos x)' = -\sin x, \quad
+(\sin x)' = \cos x .
+\]
+De eerste wordt door inductie bewezen uit de productregel, en de laatste
+twee in \cref{ch:g12:trigo}.
+\end{example}
+
+\section{Variaties en extrema}
+
+\begin{theorem}[Teken van de afgeleide en variaties]\label{thm:g12:deriv:variations}
+Laat $f$ afleidbaar zijn op een interval $I$.
+\begin{enumerate}
+  \item $f$ is stijgend op $I$ dan en slechts dan als $f' \geq 0$ op $I$.
+  \item $f$ is dalend op $I$ dan en slechts dan als $f' \leq 0$ op $I$.
+  \item Als $f' > 0$ op $I$ behalve in eindig veel punten waar ze
+        verdwijnt, dan is $f$ strikt stijgend op $I$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}[Gedeeltelijk bewijs]
+Als $f$ stijgend is, is elk verschilquotiënt
+$\frac{f(a+h)-f(a)}{h}$ $\geq 0$, en naar de limiet gaan geeft
+$f'(a) \geq 0$. De omgekeerde implicaties steunen op de
+middelwaardestelling, bewezen op de universiteit; ze zijn
+\emph{toegegeven op dit niveau}.
+\end{proof}
+
+\begin{definition}[Lokaal extremum]\label{def:g12:deriv:extremum}
+$f$ heeft een \emph{lokaal maximum}\index{extremum} in $a$ als
+$f(x) \leq f(a)$ voor alle $x$ nabij $a$; lokale minima worden
+symmetrisch gedefinieerd.
+\end{definition}
+
+\begin{proposition}[Eerste-orde-voorwaarde]\label{prop:g12:deriv:critical}
+Als $f$ afleidbaar is op een \emph{open} interval $I$ en een lokaal
+extremum heeft in $a \in I$, dan $f'(a) = 0$. Het omgekeerde is onwaar
+($f(x) = x^3$ in $a = 0$).
+\end{proposition}
+
+\begin{proof}
+Zeg $a$ is een lokaal maximum. Voor $h > 0$ klein,
+$\frac{f(a+h)-f(a)}{h} \leq 0$, dus $h \to 0^+$ geeft $f'(a) \leq 0$;
+voor $h < 0$ is het quotiënt $\geq 0$, wat $f'(a) \geq 0$ geeft. Dus
+$f'(a) = 0$.
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=8.4cm, height=5.6cm,
+  xmin=-2.5, xmax=2.5, ymin=-4.2, ymax=4.2,
+  xtick={-1,1}, ytick={-2,2}]
+  \addplot[omProp, thick, domain=-1.8:-0.2] {2};
+  \addplot[omProp, thick, domain=0.2:1.8] {-2};
+  \addplot[omDef, thick, domain=-2.15:2.15] {x^3 - 3*x};
+  \fill (axis cs:-1,2) circle (1.5pt);
+  \fill (axis cs:1,-2) circle (1.5pt);
+\end{axis}
+\end{tikzpicture}
+
+{\small In een lokaal extremum binnen een open interval is de raaklijn
+(oranje) horizontaal: $f'(a) = 0$. Hier $f(x) = x^3 - 3x$, met een
+lokaal maximum in $-1$ en een lokaal minimum in $1$.}
+\end{omfigure}
+
+\begin{method}[Veranderingstabel]\label{met:g12:deriv:table}
+Om een functie $f$ te bestuderen: bepaal haar domein en limieten aan de
+rand; bereken $f'$ en ontbind haar; bepaal het teken van $f'$ op elk
+deelinterval; noteer alles in een veranderingstabel, markeer extrema;
+leid het aantal oplossingen van $f(x) = k$ af met de bijectiestelling
+(\cref{thm:g12:limcont:bijection}).
+\end{method}
+
+\section{Convexiteit}
+
+\begin{definition}[Convexe functie]\label{def:g12:deriv:convex}
+Een functie $f$ gedefinieerd op een interval $I$ is
+\emph{convex}\index{convexiteit} op $I$ als elke koorde van haar grafiek
+boven de grafiek ligt: voor alle $a, b \in I$ en $t \in \intcc{0}{1}$,
+\[
+f\bigl((1-t)a + t b\bigr) \leq (1-t) f(a) + t f(b).
+\]
+Ze is \emph{concaaf} als de omgekeerde ongelijkheid geldt ($-f$ convex).
+\end{definition}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=8.8cm, height=6cm,
+  xmin=-1.9, xmax=2.5, ymin=-0.8, ymax=4.3,
+  xtick={-1,1.5}, xticklabels={$a$,$b$}, ytick=\empty]
+  \addplot[omThm, thick, domain=-1.25:1.75] {0.5*x + 1.5};
+  \addplot[omProp, thick, domain=-0.45:2.3] {x - 0.25};
+  \addplot[omDef, thick, domain=-1.6:2.0] {x^2};
+  \draw[black, dashed, thin] (axis cs:0.25,0.0625) -- (axis cs:0.25,1.625);
+  \fill (axis cs:-1,1) circle (1.5pt);
+  \fill (axis cs:1.5,2.25) circle (1.5pt);
+  \fill (axis cs:0.5,0.25) circle (1.5pt);
+  \node[omThm, font=\small, above left] at (axis cs:1.7,2.4) {koorde};
+  \node[omProp, font=\small, below right] at (axis cs:1.75,1.5) {raaklijn};
+\end{axis}
+\end{tikzpicture}
+
+{\small Een convexe functie: elke koorde (rood) ligt boven de grafiek, en
+de grafiek ligt boven elk van haar raaklijnen (oranje). Het gestippelde
+segment toont de kloof tussen $f\bigl((1-t)a+tb\bigr)$ en
+$(1-t)f(a)+tf(b)$.}
+\end{omfigure}
+
+\begin{theorem}[Convexiteit en afgeleiden]\label{thm:g12:deriv:convexity}
+Laat $f$ afleidbaar zijn op een interval $I$. De volgende zijn
+equivalent:
+\begin{enumerate}
+  \item $f$ is convex op $I$;
+  \item $f'$ is stijgend op $I$;
+  \item de grafiek van $f$ ligt boven elk van haar raaklijnen.
+\end{enumerate}
+Als $f$ tweemaal afleidbaar is, zijn deze ook equivalent met
+$f'' \geq 0$ op $I$.
+\end{theorem}
+
+\begin{proof}[Bewijs van (2) $\Rightarrow$ (3)]
+Fixeer $a \in I$ en stel
+$g(x) = f(x) - f(a) - f'(a)(x-a)$, de kloof tussen de kromme en de
+raaklijn in $a$. Dan is $g$ afleidbaar en $g'(x) = f'(x) - f'(a)$. Als
+$f'$ stijgend is, is $g' \leq 0$ op $I \cap \intoc{-\infty}{a}$ en
+$g' \geq 0$ op $I \cap \intco{a}{+\infty}$: $g$ daalt vóór $a$ en stijgt
+erna, dus bereikt $g$ haar minimum $g(a) = 0$, vandaar $g \geq 0$.
+De overige implicaties zijn toegegeven op dit niveau; de equivalentie
+met $f'' \geq 0$ volgt uit \cref{thm:g12:deriv:variations} toegepast op
+$f'$.
+\end{proof}
+
+\begin{definition}[Buigpunt]\label{def:g12:deriv:inflection}
+Een punt waar de kromme van $f$ haar raaklijn kruist is een
+\emph{buigpunt}\index{buigpunt}. Voor $f$ tweemaal afleidbaar zijn
+buigpunten de punten waar $f''$ van teken wisselt.
+\end{definition}
+
+\begin{example}\label{ex:g12:deriv:cube}
+$f(x) = x^3$ heeft $f''(x) = 6x$: $f$ is concaaf op
+$\intoc{-\infty}{0}$, convex op $\intco{0}{+\infty}$, met een buigpunt
+in de oorsprong, waar de kromme haar raaklijn (de $x$-as) kruist.
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=7.6cm, height=5.6cm,
+  xmin=-1.7, xmax=1.7, ymin=-2.9, ymax=2.9,
+  xtick={-1,1}, ytick={-1,1}]
+  \addplot[omProp, thick, domain=-1.2:1.2] {0};
+  \addplot[omDef, thick, domain=-1.4:1.4] {x^3};
+  \fill (axis cs:0,0) circle (1.5pt);
+  \node[font=\small, anchor=east] at (axis cs:-0.45,-1.7) {concaaf};
+  \node[font=\small, anchor=west] at (axis cs:0.45,1.7) {convex};
+\end{axis}
+\end{tikzpicture}
+
+{\small Het buigpunt van $x \mapsto x^3$ in de oorsprong: de kromme
+kruist haar raaklijn (oranje), concaaf links, convex rechts.}
+\end{omfigure}
+
+\begin{example}[Convexiteitsongelijkheden]\label{ex:g12:deriv:ineq}
+De exponentiële is convex op $\R$ (haar tweede afgeleide is zijzelf,
+positief). Haar raaklijn in $0$ is $y = 1 + x$, dus
+\[
+\eu^x \geq 1 + x \quad \text{voor alle } x \in \R .
+\]
+Dergelijke \emph{raaklijnongelijkheden} zijn een standaardproduct van
+convexiteit.
+\end{example}
+
+\begin{method}[Convexiteit gebruiken]\label{met:g12:deriv:convexity}
+\begin{itemize}
+  \item Om een ongelijkheid $f(x) \geq ax + b$ te bewijzen: herken de
+        lijn als een raaklijn van een convexe $f$ en roep
+        \cref{thm:g12:deriv:convexity}(3) in.
+  \item Om buigpunten te lokaliseren: los $f''(x) = 0$ op \emph{en}
+        controleer dat $f''$ daar van teken wisselt.
+  \item In een veranderingstabel verfijnt convexiteit de schets van de
+        kromme (welke kant ze buigt).
+\end{itemize}
+\end{method}
+
+\section{Oefeningen}
+
+\begin{exercise}[$\star$]\label{exo:g12:deriv:1}
+Differentieer de volgende functies op hun domeinen:
+\[
+f(x) = x^3 - 5x + 2, \quad
+g(x) = \frac{x}{x^2+1}, \quad
+h(x) = (2x+1)^5, \quad
+k(x) = \sqrt{x^2 + 1}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:deriv:2}
+Geef de vergelijking van de raaklijn aan de kromme van
+$f(x) = x^2 - 3x + 1$ in het punt met abscis $a = 2$, en bepaal de
+posities van de kromme t.o.v.\ deze raaklijn.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:deriv:3}
+Bereken met de definitie van de afgeleide
+\[
+\lim_{x \to 0} \frac{(1+x)^{100} - 1}{x}
+\qquad\text{en}\qquad
+\lim_{h \to 0} \frac{\sqrt{4+h} - 2}{h}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:deriv:4}
+Bestudeer de functie $f(x) = \dfrac{x^2 + 3}{x - 1}$ op haar domein:
+limieten, afgeleide, veranderingstabel, lokale extrema.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:deriv:5}
+Een doos zonder deksel wordt gemaakt van een vierkant kartonblad met
+zijde $30\,$cm door gelijke vierkanten van zijde $x$ uit de hoeken te
+snijden en de zijkanten omhoog te vouwen. Bepaal $x$ die de inhoud van
+de doos maximaliseert.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:deriv:6}
+Laat $f(x) = x^4 - 4x^3 + 10$.
+\begin{enumerate}
+  \item Bereken $f''$ en bepaal de convexiteitsintervallen en
+        buigpunten van $f$.
+  \item Toon aan dat de raaklijn in het buigpunt met abscis $2$ de
+        kromme daar kruist.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:deriv:7}
+Toon met een raaklijnongelijkheid aan dat voor alle $x > 0$,
+\[
+\sqrt{x} \leq \frac{x + 1}{2},
+\]
+en identificeer wanneer gelijkheid geldt. (Hint: de vierkantswortel is
+concaaf.)
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:deriv:8}
+Laat $f$ convex en afleidbaar zijn op $\R$, en stel dat $f'$ verdwijnt
+in zekere $a$. Toon aan dat $f(a)$ het \emph{globale} minimum van $f$ op
+$\R$ is.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:deriv:9}
+Toon aan dat onder alle rechthoeken met vaste omtrek $p$ het vierkant de
+grootste oppervlakte heeft. Toon daarna dat onder alle rechthoeken met
+vaste oppervlakte $A$ het vierkant de kleinste omtrek heeft, en leg uit
+hoe de twee uitspraken samenhangen.
+\end{exercise}

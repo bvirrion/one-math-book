@@ -3,14 +3,15 @@
 *The One Math Book to Rule Them All.*
 
 A series of mathematics books, written in English for readers anywhere in
-the world (with a full **French** edition of the primary & middle school
-volume), with the ambition of covering everything **from kindergarten to
+the world (with full **French** and **Dutch** editions of the school
+volumes), with the ambition of covering everything **from kindergarten to
 the end of the bachelor's degree** — as one coherent course, published in
 several volumes:
 
 1. **Primary & Middle School Mathematics** — Grades 1–9
-   (also available in French);
-2. **High School Mathematics** — Grades 10–12;
+   (also French and Dutch);
+2. **High School Mathematics** — Grades 10–12
+   (also French and Dutch);
 3. **University Mathematics — Year 1**;
 4. **University Mathematics — Year 2**;
 5. **University Mathematics — Year 3** (planned).
@@ -40,6 +41,9 @@ collected at the end of each book.
 | University — Year 1 | Bachelor Year 1 (age 18–19) | First post-secondary year (old French MPSI program) | ✅ 25 chapters, exercises + solutions |
 | University — Year 2 | Bachelor Year 2 (age 19–20) | Second post-secondary year (French MP* program) | ✅ 23 chapters, exercises + solutions |
 | Primary & Middle School (FR) | Années 1–9 | Full French translation | ✅ same chapter set as English |
+| Primary & Middle School (NL) | Jaren 1–9 | Full Dutch translation | ✅ same chapter set as English |
+| High School (FR) | Années 10–12 | Full French translation | ✅ same chapter set as English |
+| High School (NL) | Jaren 10–12 | Full Dutch translation | ✅ same chapter set as English |
 | Other | Kindergarten, University Year 3 | | 🚧 planned |
 
 The lower the grade, the younger the reader it is written for: earlier
@@ -60,18 +64,22 @@ The PDFs are produced at
 ```
 build/one_math_book_primary_middle_school.pdf
 build/one_math_book_primary_middle_school_fr.pdf
+build/one_math_book_primary_middle_school_nl.pdf
 build/one_math_book_high_school.pdf
+build/one_math_book_high_school_fr.pdf
+build/one_math_book_high_school_nl.pdf
 build/one_math_book_university_year_1.pdf
 build/one_math_book_university_year_2.pdf
 ```
 
 `make clean` removes auxiliary files, `make distclean` removes the whole
-`build/` directory. To build a single book:
-`latexmk one_math_book_high_school.tex` or
-`latexmk one_math_book_primary_middle_school_fr.tex`.
+`build/` directory. To build a single book, e.g.\
+`latexmk one_math_book_high_school_fr.tex` or
+`latexmk one_math_book_primary_middle_school_nl.tex`.
 
-French edition: install `texlive-lang-french` when available (better
-hyphenation via babel); the book still builds without it.
+Translated editions: install `texlive-lang-french` / Dutch babel support
+when available (better hyphenation); books still build without them.
+UI strings come from `styles/lang/<lang>.tex`.
 
 ## Repository layout
 

@@ -7,10 +7,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 A series of five LaTeX math books (Grades 1–9, Grades 10–12, University
 Year 1, University Year 2, University Year 3) built from **one shared `parts/` tree**, one
 entry file per book at the repo root, and a single style file. The primary
-& middle school volume also exists in a full French translation
-(`one_math_book_primary_middle_school_fr.tex` + `parts/grade-N/fr/`).
-Everything is written in English for an international audience (French
-edition translates the primary & middle school content).
+school volumes also exist in full French and Dutch translations
+(`*_fr.tex` / `*_nl.tex` entry files; bodies under `parts/grade-N/fr/`
+and `parts/grade-N/nl/` for Grades 1–12). Everything is written in
+English for an international audience; FR/NL editions translate the
+primary, middle, and high school content.
 `CONTRIBUTING.md` holds the authoritative style/structure conventions;
 `THEME.md` documents the One Course cover brand. Read both before writing
 chapters.
@@ -21,6 +22,7 @@ chapters.
 make                                       # latexmk builds all books into build/
 latexmk one_math_book_university_year_3.tex   # a single book
 latexmk one_math_book_primary_middle_school_fr.tex  # French primary volume
+latexmk one_math_book_high_school_nl.tex              # Dutch high school
 ```
 
 The build is pdflatex via `latexmkrc` (which also raises pdfTeX memory
@@ -50,8 +52,9 @@ CI (`.github/workflows/build.yml`) builds all books on every push;
 - `styles/onemath.sty` — **the only place** packages are loaded and
   macros/environments defined. Chapter files never `\usepackage` or
   `\newcommand`. Language UI strings live in `styles/lang/<lang>.tex`.
-- `styles/lang/en.tex`, `styles/lang/fr.tex` — theorem titles, solution
-  headers, cover strings, part titles (`\omstr{part.grade1}`, …).
+- `styles/lang/en.tex`, `styles/lang/fr.tex`, `styles/lang/nl.tex` —
+  theorem titles, solution headers, cover strings, part titles
+  (`\omstr{part.grade1}` … `part.grade12`).
 - Language-aware content paths:
   - English (canonical): `parts/<year>/NN-slug.tex`
   - Other languages: `parts/<year>/<lang>/NN-slug.tex` (same labels)
@@ -78,9 +81,12 @@ CI (`.github/workflows/build.yml`) builds all books on every push;
    `\newcommand{\booklang}{<lang>}` before `\usepackage{styles/onemath}`.
 4. Register the entry in `latexmkrc` and both GitHub workflows.
 
-French primary/middle school is the reference implementation
-(`one_math_book_primary_middle_school_fr.tex` →
-`build/one_math_book_primary_middle_school_fr.pdf`).
+Reference implementations:
+
+- `one_math_book_primary_middle_school_fr.tex` / `_nl.tex`
+- `one_math_book_high_school_fr.tex` / `_nl.tex`
+
+PDFs: `build/one_math_book_<slug>_<lang>.pdf`.
 
 ## Invariants to verify after writing/editing chapters
 
@@ -131,6 +137,6 @@ Content rules (from CONTRIBUTING.md, enforced in review):
 - Map overfull boxes to source files by walking the log's file-stack
   (parse `(` filename / `)` tokens around each `Overfull \hbox ... at
   lines N--M` entry).
-- French edition: install `texlive-lang-french` when possible so babel
-  loads `french.ldf` (hyphenation/spacing). Without it the FR book still
-  builds; UI strings come from `styles/lang/fr.tex`.
+- Translated editions: install `texlive-lang-french` / Dutch babel
+  packages when possible so babel loads the language `.ldf`. Without
+  them the books still build; UI strings come from `styles/lang/<lang>.tex`.

@@ -10,7 +10,10 @@ tree. Each book has its own entry file at the repository root:
 
 - `one_math_book_primary_middle_school.tex` — Grades 1–9 (English);
 - `one_math_book_primary_middle_school_fr.tex` — Grades 1–9 (French);
-- `one_math_book_high_school.tex` — Grades 10–12;
+- `one_math_book_primary_middle_school_nl.tex` — Grades 1–9 (Dutch);
+- `one_math_book_high_school.tex` — Grades 10–12 (English);
+- `one_math_book_high_school_fr.tex` — Grades 10–12 (French);
+- `one_math_book_high_school_nl.tex` — Grades 10–12 (Dutch);
 - `one_math_book_university_year_1.tex` — Bachelor Year 1;
 - `one_math_book_university_year_2.tex` — Bachelor Year 2.
 

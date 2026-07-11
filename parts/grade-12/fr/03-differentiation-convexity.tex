@@ -1,0 +1,381 @@
+\chapter{Dérivation et convexité}\label{ch:g12:deriv}
+
+La dérivée mesure le taux de variation instantané d'une fonction~; c'est le
+coefficient directeur de la tangente à son graphique. Ce chapitre revoit et
+étend les règles de dérivation, relie le signe de $f'$ aux variations de $f$,
+et introduit la convexité, gouvernée par la dérivée seconde.
+
+\section{La dérivée}
+
+\begin{definition}[Dérivée en un point]\label{def:g12:deriv:derivative}
+Soit $f$ définie sur un intervalle $I$ et $a \in I$. La fonction $f$ est
+\emph{dérivable en $a$}\index{dérivée} si le taux d'accroissement
+\[
+\frac{f(a+h) - f(a)}{h}
+\]
+a une limite finie lorsque $h \to 0$. Cette limite s'appelle la
+\emph{dérivée de $f$ en $a$} et se note $f'(a)$. Si $f$ est dérivable en
+tout point de $I$, la fonction $f' \colon x \mapsto f'(x)$ est la
+\emph{dérivée} de $f$.
+\end{definition}
+
+\begin{definition}[Tangente]\label{def:g12:deriv:tangent}
+Si $f$ est dérivable en $a$, la \emph{tangente}\index{tangente} à la courbe
+de $f$ au point $(a, f(a))$ est la droite d'équation
+\[
+y = f(a) + f'(a)(x - a).
+\]
+\end{definition}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, clip=false,
+  width=9.6cm, height=6.8cm,
+  xmin=-0.4, xmax=3.4, ymin=-0.4, ymax=4.3,
+  xtick={1,2.5}, xticklabels={$a$,$a+h$}, ytick=\empty]
+  \addplot[omProp!40, thick, domain=0.2:2.7] {1 + 1.75*(x-1)};
+  \addplot[omProp!70, thick, domain=0.07:2.95] {1 + 1.5*(x-1)};
+  \addplot[omProp, thick, domain=-0.12:3.3] {1 + 1.25*(x-1)};
+  \addplot[omThm, thick, domain=-0.4:3.3] {x};
+  \addplot[omDef, thick, domain=-0.4:2.72] {x^2/2 + 0.5};
+  \draw[black, dashed, thin] (axis cs:1,1) -- (axis cs:2.5,1)
+    node[midway, below, font=\small] {$h$};
+  \draw[black, dashed, thin] (axis cs:2.5,1) -- (axis cs:2.5,3.625)
+    node[midway, right, font=\small] {$f(a+h)-f(a)$};
+  \fill (axis cs:2.5,3.625) circle (1.5pt);
+  \fill (axis cs:2,2.5) circle (1.5pt);
+  \fill (axis cs:1.5,1.625) circle (1.5pt);
+  \fill (axis cs:1,1) circle (1.5pt)
+    node[above left, font=\small] {$A$};
+  \node[omThm, font=\small, anchor=west] at (axis cs:3.38,3.3) {tangente};
+\end{axis}
+\end{tikzpicture}
+
+{\small Lorsque $h$ diminue, la sécante par $A = (a, f(a))$ et
+$(a+h, f(a+h))$ (orange) tourne vers la tangente en $A$ (rouge)~: son
+coefficient directeur $\frac{f(a+h)-f(a)}{h}$ tend vers $f'(a)$.}
+\end{omfigure}
+
+\begin{proposition}\label{prop:g12:deriv:diffcont}
+Une fonction dérivable en $a$ est continue en $a$. La réciproque est fausse.
+\end{proposition}
+
+\begin{proof}
+Pour $h \neq 0$ petit, $f(a+h) - f(a) = h \cdot \frac{f(a+h)-f(a)}{h}$.
+Lorsque $h \to 0$, le second membre tend vers $0 \times f'(a) = 0$, donc
+$f(a+h) \to f(a)$. Pour la réciproque, $x \mapsto \abs{x}$ est continue en
+$0$, mais son taux d'accroissement en $0$ égale $\frac{\abs h}{h} = \pm 1$
+selon le signe de $h$, et n'a pas de limite.
+\end{proof}
+
+\subsection{Règles de dérivation}
+
+\begin{proposition}[Opérations]\label{prop:g12:deriv:operations}
+Soient $u, v$ dérivables sur $I$ et $\lambda \in \R$. Alors $u + v$,
+$\lambda u$, $uv$ sont dérivables sur $I$, de même que $\frac{u}{v}$ où
+$v \neq 0$, et
+\[
+(u+v)' = u' + v', \quad (\lambda u)' = \lambda u', \quad
+(uv)' = u'v + uv', \quad
+\left(\frac{u}{v}\right)' = \frac{u'v - uv'}{v^2}.
+\]
+\end{proposition}
+
+\begin{proof}[Démonstration de la règle du produit]
+Écrire le taux d'accroissement de $uv$ en $a$ comme
+\[
+\frac{u(a+h)v(a+h) - u(a)v(a)}{h}
+= \frac{u(a+h) - u(a)}{h}\,v(a+h) + u(a)\,\frac{v(a+h) - v(a)}{h}.
+\]
+Lorsque $h \to 0$, $v(a+h) \to v(a)$ par continuité
+(\cref{prop:g12:deriv:diffcont}), donc le second membre tend vers
+$u'(a)v(a) + u(a)v'(a)$. Les autres règles se démontrent de même.
+\end{proof}
+
+\begin{theorem}[Règle de la chaîne]\label{thm:g12:deriv:chain}
+\index{règle de la chaîne}
+Soit $u$ dérivable sur $I$ à valeurs dans $J$, et $g$ dérivable sur $J$.
+Alors $g \circ u$ est dérivable sur $I$ et
+\[
+(g \circ u)' = (g' \circ u) \cdot u' .
+\]
+En particulier, pour $u$ dérivable~:
+\[
+(u^n)' = n\,u'\,u^{n-1} \ (n \in \Z), \qquad
+\left(\sqrt{u}\right)' = \frac{u'}{2\sqrt{u}} \ (u > 0), \qquad
+\left(\eu^{u}\right)' = u'\,\eu^{u}.
+\]
+\end{theorem}
+
+\begin{proof}[Esquisse de démonstration]
+Lorsque $u(a+h) \neq u(a)$ pour $h$ petit, écrire
+\[
+\frac{g(u(a+h)) - g(u(a))}{h}
+= \frac{g(u(a+h)) - g(u(a))}{u(a+h) - u(a)} \cdot \frac{u(a+h) - u(a)}{h}.
+\]
+Lorsque $h \to 0$, $u(a+h) \to u(a)$, donc le premier facteur tend vers
+$g'(u(a))$ et le second vers $u'(a)$. (Une démonstration complète doit
+traiter le cas où $u(a+h) = u(a)$ pour $h$ arbitrairement petit~; ce point
+technique est traité à l'université.)
+\end{proof}
+
+\begin{example}
+Les dérivées usuelles, valables sur les domaines naturels~:
+\[
+(x^n)' = nx^{n-1}, \quad
+\left(\frac{1}{x}\right)' = -\frac{1}{x^2}, \quad
+(\sqrt{x})' = \frac{1}{2\sqrt{x}}, \quad
+(\cos x)' = -\sin x, \quad
+(\sin x)' = \cos x .
+\]
+La première se prouve par récurrence à partir de la règle du produit, et les
+deux dernières dans le \cref{ch:g12:trigo}.
+\end{example}
+
+\section{Variations et extrema}
+
+\begin{theorem}[Signe de la dérivée et variations]\label{thm:g12:deriv:variations}
+Soit $f$ dérivable sur un intervalle $I$.
+\begin{enumerate}
+  \item $f$ est croissante sur $I$ si et seulement si $f' \geq 0$ sur $I$.
+  \item $f$ est décroissante sur $I$ si et seulement si $f' \leq 0$ sur $I$.
+  \item Si $f' > 0$ sur $I$ sauf en un nombre fini de points où elle
+        s'annule, alors $f$ est strictement croissante sur $I$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}[Démonstration partielle]
+Si $f$ est croissante, tout taux d'accroissement
+$\frac{f(a+h)-f(a)}{h}$ est $\geq 0$, et en passant à la limite on obtient
+$f'(a) \geq 0$. Les implications réciproques reposent sur le théorème des
+accroissements finis, prouvé à l'université~; elles sont \emph{admises à ce
+niveau}.
+\end{proof}
+
+\begin{definition}[Extremum local]\label{def:g12:deriv:extremum}
+$f$ a un \emph{maximum local}\index{extremum} en $a$ si $f(x) \leq f(a)$ pour
+tout $x$ voisin de $a$~; les minima locaux se définissent de façon
+symétrique.
+\end{definition}
+
+\begin{proposition}[Condition du premier ordre]\label{prop:g12:deriv:critical}
+Si $f$ est dérivable sur un intervalle \emph{ouvert} $I$ et a un extremum
+local en $a \in I$, alors $f'(a) = 0$. La réciproque est fausse
+($f(x) = x^3$ en $a = 0$).
+\end{proposition}
+
+\begin{proof}
+Disons que $a$ est un maximum local. Pour $h > 0$ petit,
+$\frac{f(a+h)-f(a)}{h} \leq 0$, donc en faisant $h \to 0^+$ on obtient
+$f'(a) \leq 0$~; pour $h < 0$ le quotient est $\geq 0$, d'où
+$f'(a) \geq 0$. Donc $f'(a) = 0$.
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=8.4cm, height=5.6cm,
+  xmin=-2.5, xmax=2.5, ymin=-4.2, ymax=4.2,
+  xtick={-1,1}, ytick={-2,2}]
+  \addplot[omProp, thick, domain=-1.8:-0.2] {2};
+  \addplot[omProp, thick, domain=0.2:1.8] {-2};
+  \addplot[omDef, thick, domain=-2.15:2.15] {x^3 - 3*x};
+  \fill (axis cs:-1,2) circle (1.5pt);
+  \fill (axis cs:1,-2) circle (1.5pt);
+\end{axis}
+\end{tikzpicture}
+
+{\small En un extremum local à l'intérieur d'un intervalle ouvert, la
+tangente (orange) est horizontale~: $f'(a) = 0$. Ici $f(x) = x^3 - 3x$,
+avec un maximum local en $-1$ et un minimum local en $1$.}
+\end{omfigure}
+
+\begin{method}[Tableau de variations]\label{met:g12:deriv:table}
+Pour étudier une fonction $f$~: déterminer son ensemble de définition et les
+limites au bord~; calculer $f'$ et la factoriser~; déterminer le signe de
+$f'$ sur chaque sous-intervalle~; tout enregistrer dans un tableau de
+variations, en marquant les extrema~; en déduire le nombre de solutions de
+$f(x) = k$ à l'aide du théorème de la bijection
+(\cref{thm:g12:limcont:bijection}).
+\end{method}
+
+\section{Convexité}
+
+\begin{definition}[Fonction convexe]\label{def:g12:deriv:convex}
+Une fonction $f$ définie sur un intervalle $I$ est \emph{convexe}\index{convexité}
+sur $I$ si toute corde de son graphique est au-dessus du graphique~: pour
+tous $a, b \in I$ et $t \in \intcc{0}{1}$,
+\[
+f\bigl((1-t)a + t b\bigr) \leq (1-t) f(a) + t f(b).
+\]
+Elle est \emph{concave} si l'inégalité inverse vaut ($-f$ convexe).
+\end{definition}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=8.8cm, height=6cm,
+  xmin=-1.9, xmax=2.5, ymin=-0.8, ymax=4.3,
+  xtick={-1,1.5}, xticklabels={$a$,$b$}, ytick=\empty]
+  \addplot[omThm, thick, domain=-1.25:1.75] {0.5*x + 1.5};
+  \addplot[omProp, thick, domain=-0.45:2.3] {x - 0.25};
+  \addplot[omDef, thick, domain=-1.6:2.0] {x^2};
+  \draw[black, dashed, thin] (axis cs:0.25,0.0625) -- (axis cs:0.25,1.625);
+  \fill (axis cs:-1,1) circle (1.5pt);
+  \fill (axis cs:1.5,2.25) circle (1.5pt);
+  \fill (axis cs:0.5,0.25) circle (1.5pt);
+  \node[omThm, font=\small, above left] at (axis cs:1.7,2.4) {corde};
+  \node[omProp, font=\small, below right] at (axis cs:1.75,1.5) {tangente};
+\end{axis}
+\end{tikzpicture}
+
+{\small Une fonction convexe~: toute corde (rouge) est au-dessus du
+graphique, et le graphique est au-dessus de chacune de ses tangentes
+(orange). Le segment en pointillés montre l'écart entre
+$f\bigl((1-t)a+tb\bigr)$ et $(1-t)f(a)+tf(b)$.}
+\end{omfigure}
+
+\begin{theorem}[Convexité et dérivées]\label{thm:g12:deriv:convexity}
+Soit $f$ dérivable sur un intervalle $I$. Les assertions suivantes sont
+équivalentes~:
+\begin{enumerate}
+  \item $f$ est convexe sur $I$~;
+  \item $f'$ est croissante sur $I$~;
+  \item le graphique de $f$ est au-dessus de chacune de ses tangentes.
+\end{enumerate}
+Si $f$ est deux fois dérivable, elles sont aussi équivalentes à
+$f'' \geq 0$ sur $I$.
+\end{theorem}
+
+\begin{proof}[Démonstration de (2) $\Rightarrow$ (3)]
+Fixer $a \in I$ et poser
+$g(x) = f(x) - f(a) - f'(a)(x-a)$, l'écart entre la courbe et la tangente
+en $a$. Alors $g$ est dérivable et $g'(x) = f'(x) - f'(a)$. Si $f'$ est
+croissante, $g' \leq 0$ sur $I \cap \intoc{-\infty}{a}$ et $g' \geq 0$ sur
+$I \cap \intco{a}{+\infty}$~: $g$ décroît avant $a$ et croît après, donc
+$g$ atteint son minimum $g(a) = 0$, d'où $g \geq 0$.
+Les autres implications sont admises à ce niveau~; l'équivalence avec
+$f'' \geq 0$ suit du \cref{thm:g12:deriv:variations} appliqué à $f'$.
+\end{proof}
+
+\begin{definition}[Point d'inflexion]\label{def:g12:deriv:inflection}
+Un point où la courbe de $f$ traverse sa tangente est un \emph{point
+d'inflexion}\index{point d'inflexion}. Pour $f$ deux fois dérivable, les
+points d'inflexion sont les points où $f''$ change de signe.
+\end{definition}
+
+\begin{example}\label{ex:g12:deriv:cube}
+$f(x) = x^3$ a $f''(x) = 6x$~: $f$ est concave sur $\intoc{-\infty}{0}$,
+convexe sur $\intco{0}{+\infty}$, avec un point d'inflexion à l'origine,
+où la courbe traverse sa tangente (l'axe des $x$).
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=7.6cm, height=5.6cm,
+  xmin=-1.7, xmax=1.7, ymin=-2.9, ymax=2.9,
+  xtick={-1,1}, ytick={-1,1}]
+  \addplot[omProp, thick, domain=-1.2:1.2] {0};
+  \addplot[omDef, thick, domain=-1.4:1.4] {x^3};
+  \fill (axis cs:0,0) circle (1.5pt);
+  \node[font=\small, anchor=east] at (axis cs:-0.45,-1.7) {concave};
+  \node[font=\small, anchor=west] at (axis cs:0.45,1.7) {convexe};
+\end{axis}
+\end{tikzpicture}
+
+{\small Le point d'inflexion de $x \mapsto x^3$ à l'origine~: la courbe
+traverse sa tangente (orange), concave à gauche, convexe à droite.}
+\end{omfigure}
+
+\begin{example}[Inégalités de convexité]\label{ex:g12:deriv:ineq}
+L'exponentielle est convexe sur $\R$ (sa dérivée seconde est elle-même,
+positive). Sa tangente en $0$ est $y = 1 + x$, donc
+\[
+\eu^x \geq 1 + x \quad \text{pour tout } x \in \R .
+\]
+De telles \emph{inégalités de tangente} sont un produit standard de la
+convexité.
+\end{example}
+
+\begin{method}[Utiliser la convexité]\label{met:g12:deriv:convexity}
+\begin{itemize}
+  \item Pour prouver une inégalité $f(x) \geq ax + b$~: identifier la
+        droite comme une tangente d'une fonction convexe $f$ et invoquer le
+        \cref{thm:g12:deriv:convexity}(3).
+  \item Pour localiser les points d'inflexion~: résoudre $f''(x) = 0$
+        \emph{et} vérifier que $f''$ change de signe là.
+  \item Dans un tableau de variations, la convexité affine le croquis de
+        la courbe (de quel côté elle s'infléchit).
+\end{itemize}
+\end{method}
+
+\section{Exercices}
+
+\begin{exercise}[$\star$]\label{exo:g12:deriv:1}
+Dériver les fonctions suivantes sur leurs ensembles de définition~:
+\[
+f(x) = x^3 - 5x + 2, \quad
+g(x) = \frac{x}{x^2+1}, \quad
+h(x) = (2x+1)^5, \quad
+k(x) = \sqrt{x^2 + 1}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:deriv:2}
+Donner l'équation de la tangente à la courbe de $f(x) = x^2 - 3x + 1$ au
+point d'abscisse $a = 2$, et déterminer les positions de la courbe par
+rapport à cette tangente.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:deriv:3}
+En utilisant la définition de la dérivée, calculer
+\[
+\lim_{x \to 0} \frac{(1+x)^{100} - 1}{x}
+\qquad\text{et}\qquad
+\lim_{h \to 0} \frac{\sqrt{4+h} - 2}{h}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:deriv:4}
+Étudier la fonction $f(x) = \dfrac{x^2 + 3}{x - 1}$ sur son ensemble de
+définition~: limites, dérivée, tableau de variations, extrema locaux.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:deriv:5}
+Une boîte sans couvercle est fabriquée à partir d'une feuille de carton
+carrée de côté $30$~cm en découpant des carrés égaux de côté $x$ aux coins
+et en relevant les côtés. Déterminer $x$ maximisant le volume de la boîte.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:deriv:6}
+Soit $f(x) = x^4 - 4x^3 + 10$.
+\begin{enumerate}
+  \item Calculer $f''$ et déterminer les intervalles de convexité et les
+        points d'inflexion de $f$.
+  \item Montrer que la tangente au point d'inflexion d'abscisse $2$ traverse
+        la courbe là.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:deriv:7}
+En utilisant une inégalité de tangente, montrer que pour tout $x > 0$,
+\[
+\sqrt{x} \leq \frac{x + 1}{2},
+\]
+et identifier quand l'égalité a lieu. (Indication~: la racine carrée est
+concave.)
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:deriv:8}
+Soit $f$ convexe et dérivable sur $\R$, et supposons que $f'$ s'annule en
+un certain point $a$. Montrer que $f(a)$ est le minimum \emph{global} de
+$f$ sur~$\R$.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:deriv:9}
+Montrer que parmi tous les rectangles de périmètre fixe $p$, le carré a
+l'aire la plus grande. Puis montrer que parmi tous les rectangles d'aire
+fixe $A$, le carré a le plus petit périmètre, et expliquer comment les
+deux énoncés sont liés.
+\end{exercise}

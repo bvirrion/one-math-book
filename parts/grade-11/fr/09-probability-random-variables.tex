@@ -1,0 +1,318 @@
+\chapter{Probabilités et variables aléatoires}\label{ch:g11:prob}
+
+La probabilité modélise des expériences dont le résultat est incertain~:
+un lancer de dé, une carte tirée, un jeu joué. Ce chapitre met en place
+le vocabulaire sur des ensembles finis, puis introduit le personnage
+central de toute la théorie des probabilités~: la \emph{variable
+aléatoire} et son \emph{espérance}. Ces notions sont reprises et
+approfondies dans le \cref{ch:g12:randvar}, et les probabilités
+conditionnelles suivent dans le \cref{ch:g12:condprob}.
+
+\section{Probabilité sur un ensemble fini}
+
+\begin{definition}[Modèle probabiliste]\label{def:g11:prob:model}
+Une expérience à un nombre fini d'issues est modélisée par son
+\emph{univers}\index{univers} $\Omega = \{\omega_1, \dots, \omega_n\}$
+(l'ensemble des issues) muni d'une \emph{probabilité} $\P$ attribuant à
+chaque issue $\omega_i$ un nombre $p_i \geq 0$, avec
+$p_1 + \dots + p_n = 1$. Un \emph{événement}\index{événement} est une
+partie $A \subseteq \Omega$, et
+\[
+\P(A) = \sum_{\omega_i \in A} p_i .
+\]
+Lorsque toutes les issues sont équiprobables ($p_i = \frac1n$~: le
+\emph{modèle uniforme}\index{modèle uniforme}),
+\[
+\P(A) = \frac{\text{nombre d'issues dans } A}
+{\text{nombre d'issues dans } \Omega}.
+\]
+\end{definition}
+
+\begin{example}\label{ex:g11:prob:twodice}
+Lancer deux dés distincts~: $\Omega$ est l'ensemble des $36$ couples
+ordonnés $(i, j)$ avec $1 \leq i, j \leq 6$, tous équiprobables.
+L'événement $S$ = «~la somme est $7$~» contient les $6$ couples
+$(1,6), (2,5), (3,4), (4,3), (5,2), (6,1)$, donc
+$\P(S) = \frac{6}{36} = \frac16$. L'événement «~la somme est $12$~»
+contient seulement $(6,6)$~: probabilité $\frac{1}{36}$. Choisir le
+\emph{bon} univers --- couples ordonnés, pas non ordonnés --- est ce qui
+rend le modèle uniforme applicable.
+\end{example}
+
+\begin{proposition}[Règles de la probabilité]\label{prop:g11:prob:rules}
+Pour des événements $A, B \subseteq \Omega$~:
+\[
+\P(\emptyset) = 0, \qquad \P(\Omega) = 1, \qquad
+\P(\bar A) = 1 - \P(A),
+\]
+\[
+\P(A \cup B) = \P(A) + \P(B) - \P(A \cap B),
+\]
+où $\bar A$ est le \emph{complémentaire} de $A$ (toutes les issues hors
+de $A$). En particulier, $\P(A \cup B) = \P(A) + \P(B)$ lorsque $A$ et
+$B$ sont \emph{incompatibles} ($A \cap B = \emptyset$).
+\end{proposition}
+
+\begin{proof}
+L'événement vide ne contient aucune issue (somme vide), et $\Omega$ les
+contient toutes (somme totale $1$). Chaque issue est dans exactement
+l'un de $A$, $\bar A$, donc $\P(A) + \P(\bar A) = 1$. Pour la réunion~:
+sommer les $p_i$ sur $A$ puis sur $B$ compte deux fois les issues de
+$A \cap B$~; soustraire $\P(A \cap B)$ corrige le double comptage.
+\end{proof}
+
+\begin{example}
+Dans une classe, $60\,\%$ étudient la musique ($M$), $45\,\%$ font un
+sport ($S$), et $25\,\%$ font les deux. La proportion qui fait au moins
+l'un des deux est $\P(M \cup S) = 0.60 + 0.45 - 0.25 = 0.80$, donc
+$20\,\%$ ne font ni l'un ni l'autre (complémentaire).
+\end{example}
+
+\section{Variables aléatoires}
+
+\begin{definition}[Variable aléatoire, loi]\label{def:g11:prob:rv}
+Une \emph{variable aléatoire}\index{variable aléatoire} sur $\Omega$ est
+une fonction $X$ attribuant un nombre à chaque issue. Sa
+\emph{loi}\index{loi} est le tableau de ses valeurs possibles
+$x_1, \dots, x_k$ avec leurs probabilités
+\[
+\P(X = x_i) = \P\bigl(\{\omega : X(\omega) = x_i\}\bigr),
+\qquad
+\sum_{i=1}^k \P(X = x_i) = 1 .
+\]
+\end{definition}
+
+\begin{example}\label{ex:g11:prob:game}
+Un jeu~: payer $2$ euros, lancer un dé équilibré, recevoir la valeur
+affichée si elle est au moins $5$, rien sinon. Soit $G$ le
+\emph{gain} (reçu moins payé). Les issues $1, 2, 3, 4$ donnent
+$G = -2$~; l'issue $5$ donne $G = 3$~; l'issue $6$ donne $G = 4$. La loi
+de $G$~:
+\begin{center}
+\begin{tabular}{c|ccc}
+$g$ & $-2$ & $3$ & $4$\\
+\hline\rule{0pt}{11pt}%
+$\P(G = g)$ & $\dfrac46$ & $\dfrac16$ & $\dfrac16$
+\end{tabular}
+\end{center}
+\end{example}
+
+\begin{method}[Construire un tableau de loi]\label{met:g11:prob:table}
+Lister les valeurs possibles de $X$~; pour chaque valeur, rassembler les
+issues qui la produisent et additionner leurs probabilités~; vérifier
+que la ligne des probabilités somme à $1$.
+\end{method}
+
+\section{Espérance}
+
+\begin{definition}[Espérance]\label{def:g11:prob:expectation}
+L'\emph{espérance}\index{espérance} (ou moyenne) de $X$ est la moyenne de
+ses valeurs pondérées par leurs probabilités~:
+\[
+\E(X) = \sum_{i=1}^{k} \P(X = x_i)\; x_i .
+\]
+\end{definition}
+
+\begin{remark}
+$\E(X)$ est ce que serait la moyenne d'un grand nombre de répétitions
+indépendantes de l'expérience --- la version précise de cette affirmation
+est la loi des grands nombres, prouvée dans le \cref{ch:g12:sums}. Noter
+l'analogie formelle avec la moyenne d'un jeu de données avec effectifs
+(\cref{def:g11:stat:mean})~: les probabilités jouent le rôle des
+fréquences relatives $\frac{n_i}{n}$.
+\end{remark}
+
+\begin{example}\label{ex:g11:prob:gameexp}
+Pour le jeu de l'\cref{ex:g11:prob:game}~:
+\[
+\E(G) = \frac46 \times (-2) + \frac16 \times 3 + \frac16 \times 4
+= \frac{-8 + 3 + 4}{6} = -\frac16 \approx -0.17 .
+\]
+En moyenne le joueur perd environ $17$ centimes par partie~: le jeu est
+défavorable. Un jeu est dit \emph{équitable} lorsque le gain espéré est
+$0$.
+\end{example}
+
+\begin{proposition}[Linéarité]\label{prop:g11:prob:linearity}
+Pour tous réels $a, b$~:
+\[
+\E(aX + b) = a\,\E(X) + b .
+\]
+\end{proposition}
+
+\begin{proof}
+La variable $aX + b$ prend la valeur $a x_i + b$ avec la probabilité
+$\P(X = x_i)$, donc
+\[
+\E(aX + b) = \sum_i \P(X = x_i)(a x_i + b)
+= a \sum_i \P(X = x_i)\,x_i + b \underbrace{\sum_i \P(X =
+x_i)}_{=\,1} = a\,\E(X) + b .
+\]
+\end{proof}
+
+\section{Variance et écart type}
+
+\begin{definition}[Variance]\label{def:g11:prob:variance}
+La \emph{variance}\index{variance} de $X$ mesure la dispersion de ses
+valeurs autour de l'espérance $m = \E(X)$~:
+\[
+\V(X) = \E\bigl((X - m)^2\bigr)
+= \sum_{i=1}^{k} \P(X = x_i)\,(x_i - m)^2,
+\qquad
+\sigma(X) = \sqrt{\V(X)} .
+\]
+\end{definition}
+
+\begin{proposition}[Formule de König--Huygens]\label{prop:g11:prob:konig}
+\[
+\V(X) = \E(X^2) - \E(X)^2 .
+\]
+\end{proposition}
+
+\begin{proof}
+Développer $(x_i - m)^2 = x_i^2 - 2m\,x_i + m^2$ dans la somme~:
+\[
+\V(X) = \sum_i \P(X = x_i)\,x_i^2
+- 2m \sum_i \P(X = x_i)\,x_i + m^2\sum_i \P(X = x_i)
+= \E(X^2) - 2m^2 + m^2 ,
+\]
+qui est $\E(X^2) - m^2$. C'est la version variable aléatoire de
+l'identité prouvée pour les jeux de données dans la
+\cref{prop:g11:stat:shortcut}.
+\end{proof}
+
+\begin{proposition}[Transformation affine]\label{prop:g11:prob:affine}
+$\V(aX + b) = a^2\,\V(X)$ et $\sigma(aX + b) = \abs a\,\sigma(X)$.
+\end{proposition}
+
+\begin{proof}
+Par linéarité, $aX + b$ s'écarte de son espérance $a m + b$ de
+$(aX + b) - (am + b) = a(X - m)$~: chaque écart est multiplié par $a$,
+donc chaque écart au carré par $a^2$, et leur moyenne pondérée aussi. Le
+décalage $b$ a disparu --- décaler une variable ne change pas sa
+dispersion.
+\end{proof}
+
+\begin{example}\label{ex:g11:prob:variance}
+Pour le jeu de l'\cref{ex:g11:prob:game}~:
+$\E(G^2) = \frac46 \times 4 + \frac16 \times 9 + \frac16 \times 16
+= \frac{16 + 9 + 16}{6} = \frac{41}{6}$, donc
+\[
+\V(G) = \frac{41}{6} - \left(-\frac16\right)^2
+= \frac{41}{6} - \frac{1}{36} = \frac{245}{36} \approx 6.8,
+\qquad
+\sigma(G) \approx 2.6 .
+\]
+La perte de $0.17$ par partie en moyenne s'accompagne de fluctuations de
+taille typique $2.6$ euros --- l'espérance sans l'écart type ne raconte
+que la moitié de l'histoire.
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[
+  width=8.6cm, height=5.2cm,
+  ybar, bar width=14pt,
+  xlabel={$g$}, ylabel={$\P(G = g)$},
+  xmin=-3.5, xmax=5.5, ymin=0, ymax=0.8,
+  xtick={-2,3,4}, ytick={1/6, 4/6},
+  yticklabels={$\tfrac16$,$\tfrac46$},
+  tick label style={font=\small},
+  label style={font=\small}]
+  \addplot[fill=omDef!40, draw=omDef] coordinates {
+    (-2,0.6667) (3,0.1667) (4,0.1667)};
+  \draw[omThm, dashed, thick] (axis cs:-0.1667,0) --
+    (axis cs:-0.1667,0.75);
+  \node[omThm, font=\small, anchor=south west] at (axis cs:-0.05,0.62)
+    {$\E(G)$};
+\end{axis}
+\end{tikzpicture}
+
+{\small La loi du gain $G$ de l'\cref{ex:g11:prob:game}, et son espérance
+$\E(G) = -\frac16$ (en pointillés)~: le point d'équilibre des masses de
+probabilité.}
+\end{omfigure}
+
+\section{Exercices}
+
+\begin{exercise}[$\star$]\label{exo:g11:prob:1}
+Une carte est tirée d'un jeu standard de $52$ cartes. Calculer la
+probabilité de tirer~: un cœur~; un roi~; un cœur ou un roi~; ni un cœur
+ni un roi.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g11:prob:2}
+Deux dés équilibrés sont lancés et leur somme $S$ est enregistrée. En
+utilisant le modèle à $36$ issues de l'\cref{ex:g11:prob:twodice},
+calculer $\P(S = 6)$, $\P(S \geq 10)$ et $\P(S \text{ est pair})$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g11:prob:3}
+Une variable aléatoire a pour loi
+\begin{center}
+\begin{tabular}{c|cccc}
+$x$ & $-1$ & $0$ & $2$ & $5$\\
+\hline
+$\P(X=x)$ & $0.3$ & $0.2$ & $0.4$ & $p$
+\end{tabular}
+\end{center}
+Trouver $p$, puis calculer $\E(X)$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g11:prob:4}
+$X$ satisfait $\E(X) = 3$ et $\V(X) = 4$. Donner l'espérance, la variance
+et l'écart type de $Y = 2X - 5$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:prob:5}
+Une roue de la fortune a $10$ secteurs égaux~: $5$ affichent $0$ euro,
+$3$ affichent $2$ euros, $2$ affichent $5$ euros. Jouer coûte $2$ euros.
+Donner la loi du gain $G$ (gains moins mise), calculer $\E(G)$, et
+décider si le jeu est favorable.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:prob:6}
+Une urne contient $3$ boules rouges et $2$ bleues~; deux boules sont
+tirées \emph{sans} remise. Soit $X$ le nombre de boules rouges tirées.
+Construire la loi de $X$ (énumérer les $20$ tirages ordonnés, ou
+utiliser un arbre), et calculer $\E(X)$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:prob:7}
+Pour la roue de l'\cref{exo:g11:prob:5}, calculer $\V(G)$ et $\sigma(G)$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:prob:8}
+Une compagnie d'assurance vend une police pour $80$ euros. Avec
+probabilité $0.05$ le client réclame $1000$ euros, avec probabilité
+$0.01$ il réclame $5000$ euros, sinon rien. Soit $B$ le bénéfice de la
+compagnie sur une police. Donner la loi de $B$, calculer $\E(B)$, et
+interpréter.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:prob:9}
+Une question à choix multiples a $4$ réponses, une seule correcte. Une
+réponse correcte rapporte $+1$~; pour décourager le hasard, une réponse
+fausse rapporte $x < 0$. Un élève répond au hasard. Pour quelle valeur
+de $x$ le score espéré de l'élève est-il nul~?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:prob:10}
+Deux pièces équilibrées sont lancées. Anne propose~: «~si les deux
+pièces coïncident, je vous paie $1$ euro~; si elles diffèrent, vous me
+payez $1$ euro.~» Calculer le gain espéré de chaque joueur. Le jeu
+est-il équitable~? Même question avec trois pièces, où Anne paie
+$2$ euros si les trois coïncident.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g11:prob:11}
+Une loterie vend $1000$ billets à $5$ euros chacun. Un billet gagne
+$2000$ euros, cinq billets gagnent $200$ euros, vingt billets gagnent
+$25$ euros.
+\begin{enumerate}
+  \item Donner la loi du revenu total de l'organisateur moins les lots,
+        et du gain $G$ d'un seul joueur.
+  \item Calculer $\E(G)$ et le profit total espéré de l'organisateur.
+        Vérifier que les deux réponses sont cohérentes.
+\end{enumerate}
+\end{exercise}

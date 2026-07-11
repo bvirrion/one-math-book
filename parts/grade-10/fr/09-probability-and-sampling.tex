@@ -1,0 +1,309 @@
+\chapter{Probabilités et échantillonnage}\label{ch:g10:proba}
+
+La probabilité attribue des nombres au hasard. En partant d'expériences
+à issues équiprobables --- dés, pièces, cartes --- ce chapitre construit
+les règles de base pour calculer des probabilités d'événements, introduit
+les arbres pour les expériences à deux étapes, et se termine par le lien
+entre probabilités et fréquences observées. La théorie se poursuit dans
+le \cref{ch:g11:prob}.
+
+\section{Expériences aléatoires et événements}
+
+\begin{definition}[Issues et événements]\label{def:g10:proba:events}
+Une \emph{expérience aléatoire}\index{expérience aléatoire} est une
+expérience dont le résultat ne peut être prédit (lancer un dé).
+L'ensemble de tous les résultats possibles est l'\emph{univers}\index{univers}
+$\Omega = \{\omega_1, \dots, \omega_n\}$~; ses éléments sont les
+\emph{issues}. Un \emph{événement}\index{événement} est un ensemble
+d'issues~; un événement \emph{se réalise} lorsque le résultat de
+l'expérience lui appartient.
+\end{definition}
+
+\begin{definition}[Loi de probabilité]\label{def:g10:proba:distribution}
+Attribuer à chaque issue $\omega_i$ un nombre $p_i \geq 0$, avec
+$p_1 + \dots + p_n = 1$, définit une
+\emph{probabilité}\index{probabilité}~: la probabilité $\P(A)$ d'un
+événement $A$ est la somme des $p_i$ des issues dans $A$. En particulier
+$\P(\Omega) = 1$ et l'événement impossible $\varnothing$ a pour
+probabilité $0$.
+\end{definition}
+
+\begin{proposition}[Issues équiprobables]\label{prop:g10:proba:uniform}
+Si les $n$ issues sont équiprobables (chaque $p_i = \frac1n$), alors pour
+tout événement $A$~:
+\[
+\P(A) = \frac{\text{nombre d'issues dans } A}{n}
+= \frac{\text{cas favorables}}{\text{cas possibles}} .
+\]
+\end{proposition}
+
+\begin{proof}
+$A$ contient un certain nombre $k$ d'issues, chacune de probabilité
+$\frac1n$, donc $\P(A) = \frac kn$.
+\end{proof}
+
+\begin{example}\label{ex:g10:proba:die}
+Lancer un dé équilibré~: $\Omega = \{1, 2, 3, 4, 5, 6\}$, chaque issue
+ayant la probabilité $\frac16$. L'événement $A$~: «~le résultat est
+pair~» est $A = \{2, 4, 6\}$, donc $\P(A) = \frac36 = \frac12$.
+L'événement $B$~: «~le résultat est au moins $5$~» est $B = \{5, 6\}$,
+donc $\P(B) = \frac26 = \frac13$.
+\end{example}
+
+\section{Combiner des événements}
+
+\begin{definition}[Intersection, réunion, complémentaire]\label{def:g10:proba:operations}
+Soient $A$ et $B$ des événements.
+\begin{itemize}
+  \item $A \cap B$ («~$A$ et $B$~») se réalise lorsque les deux se
+        réalisent~;
+  \item $A \cup B$ («~$A$ ou $B$~») se réalise lorsque l'un au moins se
+        réalise~;
+  \item le \emph{complémentaire}\index{complémentaire} $\bar A$
+        («~non $A$~») se réalise exactement lorsque $A$ ne se réalise
+        pas~;
+  \item $A$ et $B$ sont \emph{incompatibles} lorsqu'ils ne peuvent se
+        réaliser ensemble~: $A \cap B = \varnothing$.
+\end{itemize}
+\end{definition}
+
+\begin{theorem}[Règles d'addition]\label{thm:g10:proba:addition}
+Pour tous événements $A$ et $B$~:
+\[
+\P(A \cup B) = \P(A) + \P(B) - \P(A \cap B),
+\qquad
+\P(\bar A) = 1 - \P(A) .
+\]
+Pour des événements incompatibles, la première règle se simplifie en
+$\P(A \cup B) = \P(A) + \P(B)$.
+\end{theorem}
+
+\begin{proof}
+Sommer $\P(A) + \P(B)$ ajoute la probabilité de chaque issue de
+$A \cup B$ une fois, \emph{sauf} celles de $A \cap B$, qui sont comptées
+deux fois --- une fois dans $A$ et une fois dans $B$. Soustraire
+$\P(A \cap B)$ répare le double comptage. Pour le complémentaire~: $A$ et
+$\bar A$ sont incompatibles et $A \cup \bar A = \Omega$, donc
+$\P(A) + \P(\bar A) = \P(\Omega) = 1$.
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=0.9]
+  \draw[omExo, thick, rounded corners] (-3.1,-1.7) rectangle (3.4,1.7);
+  \node[omExo, font=\small] at (3.0,1.45) {$\Omega$};
+  \begin{scope}
+    \clip (-0.8,0) circle (1.25);
+    \fill[omProp!25] (0.8,0) circle (1.25);
+  \end{scope}
+  \draw[omDef, thick] (-0.8,0) circle (1.25);
+  \draw[omThm, thick] (0.8,0) circle (1.25);
+  \node[omDef, font=\small] at (-1.6,0.9) {$A$};
+  \node[omThm, font=\small] at (1.7,0.9) {$B$};
+  \node[font=\small] at (0,0) {$A \cap B$};
+\end{tikzpicture}
+
+{\small Deux événements qui se chevauchent~: dans $\P(A) + \P(B)$,
+l'intersection hachurée $A \cap B$ est comptée deux fois, ce qui explique
+la soustraction dans la règle d'addition.}
+\end{omfigure}
+
+\begin{example}\label{ex:g10:proba:cards}
+Tirer une carte d'un jeu standard de $52$ cartes. Soit $A$~: «~la carte
+est un cœur~» ($13$ cartes) et $B$~: «~la carte est un roi~» ($4$
+cartes). Alors $A \cap B$ est «~le roi de cœur~» ($1$ carte), et
+\[
+\P(A \cup B) = \frac{13}{52} + \frac{4}{52} - \frac{1}{52} = \frac{16}{52}
+= \frac{4}{13}.
+\]
+La règle du complémentaire est souvent la voie la plus rapide~: la
+probabilité que la carte ne soit \emph{pas} un cœur est
+$1 - \frac{13}{52} = \frac34$.
+\end{example}
+
+\section{Arbres de probabilités}
+
+\begin{method}[Expériences à deux étapes]\label{met:g10:proba:tree}
+Pour une expérience réalisée en deux étapes~:
+\begin{enumerate}
+  \item dessiner un \emph{arbre}\index{arbre de probabilités}~: une
+        branche par résultat possible de la première étape, puis depuis
+        chacune, une branche par résultat de la seconde étape, en
+        inscrivant la probabilité sur chaque branche (les branches
+        sortant d'un nœud doivent sommer à $1$)~;
+  \item la probabilité d'un \emph{chemin} (une feuille de l'arbre) est le
+        produit des probabilités le long de ses branches~;
+  \item la probabilité d'un événement est la somme des probabilités des
+        chemins qui le réalisent.
+\end{enumerate}
+\end{method}
+
+\begin{example}\label{ex:g10:proba:tree}
+Une urne contient $3$ boules rouges et $2$ boules bleues. Tirer une
+boule, la remettre, tirer à nouveau. Chaque tirage donne rouge (R) avec
+probabilité $\frac35$ et bleu (B) avec probabilité $\frac25$.
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=1.0]
+  \coordinate (root) at (0,0);
+  \coordinate (R) at (2.3,1.1);
+  \coordinate (B) at (2.3,-1.1);
+  \coordinate (RR) at (5.0,1.7);
+  \coordinate (RB) at (5.0,0.5);
+  \coordinate (BR) at (5.0,-0.5);
+  \coordinate (BB) at (5.0,-1.7);
+  \draw (root) -- (R) node[midway, above, font=\small, sloped] {$\frac35$};
+  \draw (root) -- (B) node[midway, below, font=\small, sloped] {$\frac25$};
+  \draw (R) -- (RR) node[midway, above, font=\small, sloped] {$\frac35$};
+  \draw (R) -- (RB) node[midway, below, font=\small, sloped] {$\frac25$};
+  \draw (B) -- (BR) node[midway, above, font=\small, sloped] {$\frac35$};
+  \draw (B) -- (BB) node[midway, below, font=\small, sloped] {$\frac25$};
+  \node[omThm, font=\small] at (R) [above left=-2pt] {R};
+  \node[omDef, font=\small] at (B) [below left=-2pt] {B};
+  \node[right, font=\small] at (RR)
+    {RR:\ $\frac35 \times \frac35 = \frac{9}{25}$};
+  \node[right, font=\small] at (RB)
+    {RB:\ $\frac35 \times \frac25 = \frac{6}{25}$};
+  \node[right, font=\small] at (BR)
+    {BR:\ $\frac25 \times \frac35 = \frac{6}{25}$};
+  \node[right, font=\small] at (BB)
+    {BB:\ $\frac25 \times \frac25 = \frac{4}{25}$};
+\end{tikzpicture}
+
+{\small L'arbre de deux tirages avec remise. Les quatre probabilités de
+chemin somment à $1$.}
+\end{omfigure}
+
+La probabilité d'obtenir deux boules de la même couleur est
+$\P(\text{RR}) + \P(\text{BB}) = \frac{9}{25} + \frac{4}{25} =
+\frac{13}{25}$~; la probabilité d'au moins une bleue est
+$1 - \P(\text{RR}) = 1 - \frac{9}{25} = \frac{16}{25}$ (règle du
+complémentaire).
+\end{example}
+
+\begin{remark}
+Sans remise, les probabilités du second tirage dépendent du premier~:
+avec l'urne ci-dessus, après avoir tiré une boule rouge, il reste $2$
+rouges et $2$ bleues, donc la seconde branche porte $\frac24$ et
+$\frac24$. La méthode de l'arbre fonctionne sans changement~; seuls les
+nombres sur les branches du second niveau changent.
+\end{remark}
+
+\section{Fréquences et échantillonnage}
+
+Lorsqu'une expérience aléatoire est répétée de nombreuses fois, la
+fréquence observée d'un événement se rapproche de sa probabilité --- c'est
+pourquoi la probabilité est utile pour décrire le monde réel.
+
+\begin{definition}[Échantillon]\label{def:g10:proba:sample}
+Un \emph{échantillon}\index{échantillon} de taille $n$ est le résultat de
+la répétition de la même expérience $n$ fois indépendamment. La
+\emph{fréquence observée} d'un événement dans l'échantillon est le nombre
+d'occurrences divisé par $n$.
+\end{definition}
+
+\begin{example}\label{ex:g10:proba:sampling}
+Une pièce équilibrée donne pile avec probabilité $0.5$. La lancer $100$
+fois donne rarement exactement $50$ piles~: les échantillons
+\emph{fluctuent}. Des séries typiques de $100$ lancers donnent des
+fréquences comme $0.46$, $0.53$, $0.49$ --- proches de $0.5$, mais non
+égales. Les grands échantillons fluctuent moins~: avec $10\,000$
+lancers, les fréquences observées sont habituellement à moins de $0.01$
+de $0.5$.
+\end{example}
+
+\begin{remark}[Intervalle de fluctuation]
+Une règle pratique utile, justifiée dans le \cref{ch:g11:binom}~: pour un
+échantillon de taille $n$ d'un événement de probabilité $p$ (avec $n$
+raisonnablement grand), la fréquence observée se trouve dans l'intervalle
+\[
+\intcc{p - \frac{1}{\sqrt n}}{\,p + \frac{1}{\sqrt n}}
+\]
+dans environ $95\,\%$ des échantillons. Si une fréquence observée tombe
+loin en dehors de cet intervalle, douter de la valeur de $p$~: c'est le
+point de départ des tests statistiques.
+\end{remark}
+
+\begin{example}\label{ex:g10:proba:test}
+Une usine prétend que seulement $10\,\%$ de ses pièces sont défectueuses
+($p = 0.1$). Dans un échantillon de $n = 400$ pièces, $64$ sont
+défectueuses~: fréquence observée $\frac{64}{400} = 0.16$. L'intervalle
+de fluctuation est
+$\intcc{0.1 - \frac{1}{20}}{0.1 + \frac{1}{20}} = \intcc{0.05}{0.15}$,
+et $0.16$ tombe en dehors~: l'échantillon jette un doute sérieux sur
+l'affirmation.
+\end{example}
+
+\section{Exercices}
+
+\begin{exercise}[$\star$]\label{exo:g10:proba:1}
+Un dé équilibré est lancé. Calculer la probabilité de chaque événement~:
+«~obtenir un $6$~»~; «~obtenir un nombre impair~»~; «~obtenir au plus
+$4$~»~; «~obtenir un $7$~».
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g10:proba:2}
+Un sac contient $5$ billes vertes, $3$ jaunes et $2$ noires~; une bille
+est tirée au hasard. Calculer la probabilité qu'elle soit verte~; qu'elle
+ne soit pas noire~; qu'elle soit verte ou jaune.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g10:proba:3}
+Dans une classe de $30$ élèves, $18$ étudient l'espagnol, $10$
+l'allemand, et $4$ les deux. Un élève est choisi au hasard. En utilisant
+la règle d'addition, calculer la probabilité que cet élève étudie au
+moins l'une des deux langues, puis la probabilité qu'il n'étudie ni
+l'une ni l'autre.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g10:proba:4}
+Une pièce équilibrée est lancée deux fois. Dessiner l'arbre de
+l'expérience et calculer la probabilité d'obtenir deux faces~; exactement
+une face~; au moins une face.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g10:proba:5}
+Une urne contient $4$ boules rouges et $6$ blanches. Deux boules sont
+tirées l'une après l'autre \emph{sans} remise. Dessiner l'arbre avec les
+bonnes probabilités au second niveau, et calculer la probabilité de tirer
+deux boules rouges, puis de tirer deux boules de couleurs différentes.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g10:proba:6}
+Deux dés équilibrés sont lancés et leur somme est enregistrée.
+\begin{enumerate}
+  \item Expliquer pourquoi l'univers peut être pris comme les $36$
+        couples équiprobables $(1,1), (1,2), \dots, (6,6)$.
+  \item Calculer la probabilité que la somme soit $7$~; qu'elle soit
+        $12$~; qu'elle soit au plus $4$.
+  \item Quelle somme est la plus probable~?
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g10:proba:7}
+Une question à choix multiples propose $4$ réponses, une seule correcte.
+Un élève répond à $2$ telles questions indépendantes complètement au
+hasard. Calculer la probabilité de répondre correctement aux deux, à
+exactement une, à aucune. Vérifier que les trois probabilités somment à
+$1$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g10:proba:8}
+Un politicien prétend avoir $50\,\%$ d'approbation. Dans un sondage de
+$n = 900$ électeurs choisis au hasard, $396$ approuvent.
+\begin{enumerate}
+  \item Calculer la fréquence observée et l'intervalle de fluctuation
+        autour de $p = 0.5$ pour $n = 900$.
+  \item Le sondage jette-t-il un doute sur l'affirmation~?
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g10:proba:9}
+Un jeu coûte $2$ à jouer~: on lance un dé équilibré et on gagne $6$ si
+l'on obtient un $6$, $3$ si l'on obtient un $5$, rien sinon.
+\begin{enumerate}
+  \item Calculer la probabilité de chaque montant gagné ($6$, $3$, $0$).
+  \item Sur $600$ parties, environ combien de chaque issue attend-on~?
+        Calculer le gain et la perte totaux attendus~: le jeu vaut-il la
+        peine d'être joué~?
+\end{enumerate}
+\end{exercise}

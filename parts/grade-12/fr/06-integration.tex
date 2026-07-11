@@ -1,0 +1,357 @@
+\chapter{Intégration}\label{ch:g12:integ}
+
+L'intégration répond à deux questions à la fois~: quelle est l'aire sous une
+courbe, et comment récupérer une fonction à partir de son taux de variation~?
+Le théorème fondamental du calcul énonce que ce sont la même question --- la
+découverte la plus profonde et la plus utile des mathématiques du
+XVIIe~siècle.
+
+\section{L'intégrale d'une fonction continue}
+
+\begin{definition}[Intégrale d'une fonction positive]\label{def:g12:integ:area}
+Soit $f$ continue et positive sur $\intcc{a}{b}$. L'\emph{intégrale}\index{intégrale}
+\[
+\int_a^b f(x)\,\dd x
+\]
+est l'aire, en unités d'aire, de la région bornée par la courbe de $f$,
+l'axe des $x$, et les droites verticales $x = a$ et $x = b$.
+\end{definition}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[
+  width=8.4cm, height=5cm,
+  axis lines=middle, xmin=-0.4, xmax=3.4, ymin=-0.3, ymax=2.3,
+  xtick={0.5,2.7}, xticklabels={$a$,$b$}, ytick=\empty,
+  samples=100, domain=-0.2:3.3]
+  \addplot[name path=curve, omDef, thick, domain=0.2:3.2]
+    {1 + 0.5*sin(deg(2*x)) + 0.2*x};
+  \path[name path=axis] (0.5,0) -- (2.7,0);
+  \addplot[omDef!20] fill between[of=curve and axis, soft clip={domain=0.5:2.7}];
+  \node at (axis cs:1.6,0.55) {$\displaystyle\int_a^b f$};
+\end{axis}
+\end{tikzpicture}
+\end{omfigure}
+
+Pour une fonction de signe quelconque, les aires sous l'axe des $x$ sont
+comptées négativement~; et on pose
+$\int_b^a f(x)\,\dd x = -\int_a^b f(x)\,\dd x$.
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=9.6cm, height=4.8cm,
+  xmin=-0.5, xmax=7, ymin=-1.4, ymax=1.4,
+  xtick={3.1416,6.2832}, xticklabels={$\pi$,$2\pi$}, ytick={-1,1}]
+  \addplot[name path=sine, omDef, thick, domain=0:6.2832, samples=120]
+    {sin(deg(x))};
+  \path[name path=xaxis] (0,0) -- (6.2832,0);
+  \addplot[omDef!20] fill between[of=sine and xaxis,
+    soft clip={domain=0:3.1416}];
+  \addplot[omThm!20] fill between[of=sine and xaxis,
+    soft clip={domain=3.1416:6.2832}];
+  \node at (axis cs:1.57,0.4) {$+$};
+  \node at (axis cs:4.71,-0.4) {$-$};
+\end{axis}
+\end{tikzpicture}
+
+{\small Aires algébriques~: $\int_0^{2\pi} \sin x\,\dd x = 0$, la région
+sous l'axe (rouge) annulant la région au-dessus (bleu).}
+\end{omfigure}
+
+\begin{proposition}[Propriétés de l'intégrale]\label{prop:g12:integ:properties}
+Soient $f, g$ continues sur un intervalle contenant $a, b, c$, et
+$\lambda \in \R$.
+\begin{enumerate}
+  \item \emph{Linéarité~:}
+        $\displaystyle\int_a^b (f + \lambda g) = \int_a^b f + \lambda \int_a^b g$.
+  \item \emph{Relation de Chasles~:}
+        $\displaystyle\int_a^c f = \int_a^b f + \int_b^c f$.
+  \item \emph{Positivité~:} si $a \leq b$ et $f \geq 0$ sur $\intcc{a}{b}$,
+        alors $\displaystyle\int_a^b f \geq 0$~; si $f \leq g$, alors
+        $\displaystyle\int_a^b f \leq \int_a^b g$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+Chasles et la positivité sont immédiates d'après l'interprétation en aires
+(les aires s'additionnent lorsque les régions sont juxtaposées~; une
+région de hauteur positive a une aire positive). La comparaison suit en
+appliquant la positivité à $g - f$. La linéarité est intuitive pour la
+somme de fonctions positives (empiler les aires) et se prouve
+rigoureusement à l'université~; \emph{elle est admise ici}.
+\end{proof}
+
+\section{Le théorème fondamental du calcul}
+
+\begin{definition}[Primitive]\label{def:g12:integ:primitive}
+Une \emph{primitive}\index{primitive} (ou antédérivée) de $f$ sur un
+intervalle $I$ est une fonction dérivable $F$ sur $I$ telle que
+$F' = f$.
+\end{definition}
+
+\begin{proposition}\label{prop:g12:integ:primunique}
+Si $F$ est une primitive de $f$ sur un intervalle $I$, les primitives de
+$f$ sur $I$ sont exactement les fonctions $F + c$, $c \in \R$. Étant
+donnés $x_0 \in I$ et $y_0 \in \R$, il existe une unique primitive avec
+$F(x_0) = y_0$.
+\end{proposition}
+
+\begin{proof}
+Si $G' = F' = f$, alors $(G - F)' = 0$ sur l'intervalle $I$, donc
+$G - F$ est constante.\footnote{Qu'une fonction de dérivée nulle sur un
+intervalle soit constante suit du \cref{thm:g12:deriv:variations}~: elle
+est à la fois croissante et décroissante.} Réciproquement toute $F + c$
+est une primitive. La condition $F(x_0) = y_0$ fixe la constante.
+\end{proof}
+
+\begin{theorem}[Théorème fondamental du calcul]\label{thm:g12:integ:ftc}
+\index{théorème fondamental du calcul}
+Soit $f$ continue sur un intervalle $I$ et $a \in I$. La fonction
+\[
+F \colon x \longmapsto \int_a^x f(t)\,\dd t
+\]
+est la primitive de $f$ sur $I$ s'annulant en $a$. Par conséquent, pour
+toute primitive $G$ de $f$ et $a, b \in I$~:
+\[
+\int_a^b f(t)\,\dd t = \bigl[G(t)\bigr]_a^b = G(b) - G(a).
+\]
+\end{theorem}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=9.2cm, height=5.6cm,
+  xmin=-0.4, xmax=4.2, ymin=-0.4, ymax=2.9,
+  xtick={0.5,2.2,2.7}, xticklabels={$a$,$x$,\ $x+h$}, ytick=\empty]
+  \addplot[name path=curve, omDef, thick, domain=0:3.9, samples=80]
+    {1 + 0.4*x + 0.2*sin(deg(2*x))};
+  \path[name path=xaxis] (0,0) -- (3.9,0);
+  \addplot[omDef!20] fill between[of=curve and xaxis,
+    soft clip={domain=0.5:2.2}];
+  \addplot[omProp!40] fill between[of=curve and xaxis,
+    soft clip={domain=2.2:2.7}];
+  \draw[black, dashed, thin] (axis cs:2.2,1.69) -- (axis cs:2.7,1.69);
+  \draw[black, dashed, thin] (axis cs:2.2,1.925) -- (axis cs:2.7,1.925)
+    node[above right, font=\small] {$f(x+h)$};
+  \node at (axis cs:1.35,0.6) {$F(x)$};
+\end{axis}
+\end{tikzpicture}
+
+{\small L'idée de la démonstration~: l'incrément $F(x+h) - F(x)$ est
+l'aire de la bande étroite (orange), encadrée entre les rectangles de
+hauteurs $f(x)$ et $f(x+h)$ sur une base de longueur $h$.}
+\end{omfigure}
+
+\begin{proof}[Démonstration lorsque $f$ est croissante]
+Fixer $x \in I$ et $h > 0$ avec $x + h \in I$. Par Chasles,
+\[
+F(x+h) - F(x) = \int_x^{x+h} f(t)\,\dd t .
+\]
+Comme $f$ est croissante, $f(x) \leq f(t) \leq f(x+h)$ pour
+$t \in \intcc{x}{x+h}$, et par comparaison d'intégrales (l'intégrale
+d'une constante $c$ sur un intervalle de longueur $h$ est $ch$)~:
+\[
+h\,f(x) \leq F(x+h) - F(x) \leq h\,f(x+h),
+\]
+donc
+\[
+f(x) \leq \frac{F(x+h) - F(x)}{h} \leq f(x+h).
+\]
+Lorsque $h \to 0^+$, $f(x+h) \to f(x)$ par continuité, et le théorème des
+gendarmes donne que le taux d'accroissement tend vers $f(x)$~; le cas
+$h < 0$ est symétrique. D'où $F' = f$, et $F(a) = 0$. Le cas général
+(non monotone) continu est prouvé à l'université.
+
+Enfin, si $G$ est une primitive quelconque, $G = F + c$
+(\cref{prop:g12:integ:primunique}), donc
+$G(b) - G(a) = F(b) - F(a) = \int_a^b f$.
+\end{proof}
+
+\begin{example}
+$\displaystyle\int_0^1 x^2\,\dd x = \left[\frac{x^3}{3}\right]_0^1 =
+\frac13$~: l'aire sous la parabole est un tiers du carré unité, comme
+Archimède le savait.
+\end{example}
+
+Le tableau des primitives se lit sur le tableau des dérivées
+($u$ désigne une fonction dérivable, $c$ une constante arbitraire)~:
+\begin{center}
+\renewcommand{\arraystretch}{1.7}
+\begin{tabular}{c|c||c|c}
+$f(x)$ & primitive & $f$ & primitive \\
+\hline
+$x^n \ (n \neq -1)$ & $\dfrac{x^{n+1}}{n+1} + c$ &
+$u'u^n \ (n \neq -1)$ & $\dfrac{u^{n+1}}{n+1} + c$\\
+$\dfrac1x \ (x > 0)$ & $\ln x + c$ &
+$\dfrac{u'}{u} \ (u > 0)$ & $\ln u + c$\\
+$\eu^x$ & $\eu^x + c$ &
+$u'\eu^u$ & $\eu^u + c$\\
+$\cos x$ & $\sin x + c$ &
+$\dfrac{u'}{\sqrt u} \ (u>0)$ & $2\sqrt u + c$\\
+$\sin x$ & $-\cos x + c$ & &
+\end{tabular}
+\end{center}
+
+\begin{method}[Reconnaître la forme $u' \times (\text{quelque chose en } u)$]\label{met:g12:integ:uprime}
+Pour intégrer un produit, chercher un facteur qui est la dérivée d'une
+fonction intérieure $u$, à une constante multiplicative près. Par exemple
+dans $\int_0^1 x\,\eu^{x^2}\dd x$, le facteur $x$ est $\frac12 (x^2)'$~:
+\[
+\int_0^1 x\,\eu^{x^2}\dd x = \frac12\left[\eu^{x^2}\right]_0^1
+= \frac{\eu - 1}{2}.
+\]
+\end{method}
+
+\begin{theorem}[Intégration par parties]\label{thm:g12:integ:ibp}
+\index{intégration par parties}
+Soient $u, v$ dérivables sur $\intcc{a}{b}$ à dérivées continues. Alors
+\[
+\int_a^b u'(t)\,v(t)\,\dd t
+= \bigl[u(t)\,v(t)\bigr]_a^b - \int_a^b u(t)\,v'(t)\,\dd t .
+\]
+\end{theorem}
+
+\begin{proof}
+La règle du produit donne $(uv)' = u'v + uv'$~; en intégrant les deux
+membres sur $\intcc{a}{b}$ et en utilisant le théorème fondamental pour le
+premier membre, on obtient $\bigl[uv\bigr]_a^b = \int_a^b u'v + \int_a^b uv'$.
+\end{proof}
+
+\begin{example}\label{ex:g12:integ:ibp}
+$\displaystyle\int_0^1 t\,\eu^{t}\,\dd t$~: prendre $u' = \eu^t$, $v = t$,
+donc $u = \eu^t$, $v' = 1$~:
+\[
+\int_0^1 t\,\eu^t\,\dd t = \bigl[t\,\eu^t\bigr]_0^1 - \int_0^1 \eu^t\,\dd t
+= \eu - (\eu - 1) = 1 .
+\]
+\end{example}
+
+\section{Applications}
+
+\begin{definition}[Valeur moyenne]\label{def:g12:integ:mean}
+La \emph{valeur moyenne}\index{valeur moyenne} d'une fonction continue $f$
+sur $\intcc{a}{b}$ ($a<b$) est
+\[
+\mu = \frac{1}{b-a}\int_a^b f(t)\,\dd t .
+\]
+\end{definition}
+
+\begin{proposition}\label{prop:g12:integ:meanbounds}
+Si $m \leq f \leq M$ sur $\intcc{a}{b}$, alors $m \leq \mu \leq M$.
+\end{proposition}
+
+\begin{proof}
+Intégrer les inégalités $m \leq f(t) \leq M$ sur $\intcc{a}{b}$ et
+diviser par $b - a > 0$.
+\end{proof}
+
+\begin{method}[Aire entre deux courbes]\label{met:g12:integ:areabetween}
+Si $f \geq g$ sur $\intcc{a}{b}$, l'aire entre les deux courbes est
+$\int_a^b \bigl(f(x) - g(x)\bigr)\dd x$. Si les courbes se croisent,
+découper l'intervalle aux points de croisement et intégrer $\abs{f - g}$
+morceau par morceau.
+\end{method}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=8.4cm, height=5.8cm,
+  xmin=-2.1, xmax=2.9, ymin=-1.8, ymax=5.6,
+  xtick={-1,2}, ytick=\empty]
+  \addplot[name path=line, omThm, thick, domain=-1.7:2.5] {x + 1};
+  \addplot[name path=parab, omDef, thick, domain=-1.9:2.45] {x^2 - 1};
+  \addplot[omDef!20] fill between[of=line and parab,
+    soft clip={domain=-1:2}];
+  \fill (axis cs:-1,0) circle (1.5pt);
+  \fill (axis cs:2,3) circle (1.5pt);
+\end{axis}
+\end{tikzpicture}
+
+{\small L'aire entre la droite $y = x + 1$ (rouge) et la parabole
+$y = x^2 - 1$ (bleu) est $\int_{-1}^{2}
+\bigl((x+1) - (x^2-1)\bigr)\dd x = \frac92$.}
+\end{omfigure}
+
+\section{Exercices}
+
+\begin{exercise}[$\star$]\label{exo:g12:integ:1}
+Calculer
+\[
+\int_1^2 \left(3x^2 - \frac{1}{x^2}\right)\dd x, \qquad
+\int_0^{\pi/2} \cos t \,\dd t, \qquad
+\int_0^{1} \frac{\dd t}{2t+1} .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:integ:2}
+Trouver la primitive $F$ de $f(x) = x\eu^{x^2}$ sur $\R$ telle que
+$F(0) = 1$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:integ:3}
+Calculer la valeur moyenne de $f(t) = \sin t$ sur $\intcc{0}{\pi}$, et
+interpréter le résultat sur un graphique.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:integ:4}
+En utilisant l'intégration par parties, calculer
+\[
+\int_1^{\eu} \ln t\,\dd t
+\qquad\text{et}\qquad
+\int_0^{\pi} t \sin t\,\dd t .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:integ:5}
+Calculer l'aire de la région entre la parabole $y = x^2$ et la droite
+$y = x + 2$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:integ:6}
+Soit $I = \displaystyle\int_0^1 \frac{\dd t}{1 + t}$.
+\begin{enumerate}
+  \item Calculer $I$.
+  \item Pour $n \in \N$, soit
+        $I_n = \displaystyle\int_0^1 \frac{t^n}{1+t}\dd t$. Montrer que
+        $I_n + I_{n+1} = \dfrac{1}{n+1}$, et que
+        $0 \leq I_n \leq \dfrac{1}{n+1}$.
+  \item En déduire que
+        $1 - \frac12 + \frac13 - \dots + \frac{(-1)^{n-1}}{n}
+        \xrightarrow[n \to +\infty]{} \ln 2$.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:integ:7}
+La vitesse d'un train (en m/s) pendant les $100$ premières secondes après
+le départ est modélisée par $v(t) = 30\bigl(1 - \eu^{-t/50}\bigr)$.
+Calculer la distance parcourue pendant ces $100$ secondes, et la vitesse
+moyenne du train sur l'intervalle.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:integ:8}
+Pour $n \geq 1$, soit $S_n = \dfrac1n \displaystyle\sum_{k=1}^{n} \frac{1}{1 + k/n}$.
+\begin{enumerate}
+  \item Interpréter $S_n$ comme une aire de rectangles approximant une
+        région sous la courbe de $t \mapsto \frac{1}{1+t}$ sur
+        $\intcc{0}{1}$.
+  \item En utilisant la monotonie de $t \mapsto \frac{1}{1+t}$, montrer que
+        \[
+        S_n \leq \int_0^1 \frac{\dd t}{1+t} \leq S_n + \frac1n\left(1 - \frac12\right),
+        \]
+        et en déduire $\lim\limits_{n\to+\infty} S_n = \ln 2$.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:integ:9}
+\emph{(Intégrales de Wallis.)} Pour $n \in \N$, soit
+$W_n = \displaystyle\int_0^{\pi/2} \sin^n t\,\dd t$.
+\begin{enumerate}
+  \item Calculer $W_0$ et $W_1$.
+  \item En écrivant $\sin^{n+2}t = \sin t \cdot \sin^{n+1} t$ et en
+        intégrant par parties, montrer que
+        $W_{n+2} = \dfrac{n+1}{n+2}\,W_n$.
+  \item En déduire $W_2$, $W_3$, $W_4$ et montrer que $(W_n)$ est
+        décroissante et positive.
+\end{enumerate}
+\end{exercise}

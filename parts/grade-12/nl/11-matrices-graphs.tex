@@ -1,0 +1,271 @@
+\chapter{Matrices en grafen}\label{ch:g12:matrix}
+
+Een matrix is een rechthoekige array van getallen, opgeteld en
+vermenigvuldigd volgens regels zo ontworpen dat matrixalgebra de
+samenstelling van lineaire transformaties voorstelt. Matrices lossen
+lineaire stelsels op, drijven gekoppelde recurrente rijen, en tellen paden
+in netwerken --- de wiskunde achter zoekmachines en kortste-padalgoritmen.
+
+\section{Matrixalgebra}
+
+\begin{definition}[Matrix]\label{def:g12:matrix:matrix}
+Een \emph{$m \times n$-matrix}\index{matrix} is een tabel van reële
+getallen met $m$ rijen en $n$ kolommen: $A = (a_{ij})$, waar $a_{ij}$ de
+ingang in rij $i$, kolom $j$ is. Twee matrices van dezelfde grootte worden
+ingang voor ingang opgeteld, en $\lambda A = (\lambda a_{ij})$.
+\end{definition}
+
+\begin{definition}[Matrixproduct]\label{def:g12:matrix:product}
+Laat $A$ een $m \times n$-matrix zijn en $B$ een $n \times p$-matrix. Het
+product $AB$ is de $m \times p$-matrix waarvan de $(i,j)$-ingang is
+\[
+(AB)_{ij} = \sum_{k=1}^{n} a_{ik} b_{kj}
+\]
+(de regel ``rij $i$ van $A$ maal kolom $j$ van $B$'').
+\end{definition}
+
+\begin{example}
+$\begin{pmatrix} 1 & 2\\ 3 & 4\end{pmatrix}
+\begin{pmatrix} 0 & 1\\ 1 & 1\end{pmatrix}
+= \begin{pmatrix} 2 & 3\\ 4 & 7\end{pmatrix}$,
+\quad terwijl \quad
+$\begin{pmatrix} 0 & 1\\ 1 & 1\end{pmatrix}
+\begin{pmatrix} 1 & 2\\ 3 & 4\end{pmatrix}
+= \begin{pmatrix} 3 & 4\\ 4 & 6\end{pmatrix}$:
+\emph{matrixvermenigvuldiging is niet commutatief}.
+\end{example}
+
+\begin{proposition}[Regels van matrixalgebra]\label{prop:g12:matrix:rules}
+Wanneer de groottes de producten zinvol maken:
+\[
+(AB)C = A(BC), \qquad A(B + C) = AB + AC, \qquad (A+B)C = AC + BC,
+\]
+en de \emph{eenheidsmatrix} $I_n$ (enen op de diagonaal, nullen elders)
+voldoet aan $I_m A = A I_n = A$ voor $A$ van grootte $m \times n$.
+\end{proposition}
+
+\begin{proof}
+Alles is ingang-voor-ingang verificatie uit
+\cref{def:g12:matrix:product}; associativiteit, de enige niet-triviale,
+komt neer op het verwisselen van twee eindige sommen:
+$\bigl((AB)C\bigr)_{ij} = \sum_l \left(\sum_k a_{ik}b_{kl}\right) c_{lj}
+= \sum_k a_{ik} \left(\sum_l b_{kl} c_{lj}\right)
+= \bigl(A(BC)\bigr)_{ij}$.
+\end{proof}
+
+\begin{definition}[Inverse]\label{def:g12:matrix:inverse}
+Een vierkante matrix $A$ van grootte $n$ is
+\emph{inverteerbaar}\index{matrix!inverse} als er een matrix $B$ is met
+$AB = BA = I_n$; $B$ is dan uniek, geschreven $A^{-1}$.
+\end{definition}
+
+\begin{proposition}[Inverse van een $2\times2$-matrix]\label{prop:g12:matrix:inverse2x2}
+Laat $A = \begin{pmatrix} a & b\\ c & d\end{pmatrix}$ en
+$\det A = ad - bc$ (de \emph{determinant}\index{determinant}). Dan is $A$
+inverteerbaar dan en slechts dan als $\det A \neq 0$, en in dat geval
+\[
+A^{-1} = \frac{1}{ad - bc}\begin{pmatrix} d & -b\\ -c & a\end{pmatrix}.
+\]
+\end{proposition}
+
+\begin{proof}
+Een berekening geeft
+$A \begin{pmatrix} d & -b\\ -c & a\end{pmatrix}
+= \begin{pmatrix} d & -b\\ -c & a\end{pmatrix} A = (ad - bc) I_2$; als
+$ad - bc \neq 0$, deel. Omgekeerd, als $ad - bc = 0$, zijn de kolommen van
+$A$ evenredig, en zo ook de kolommen van $AB$ voor elke $B$; maar de
+kolommen van $I_2$ zijn niet evenredig, dus geen $B$ kan $AB = I_2$
+voldoen.
+\end{proof}
+
+\begin{method}[Lineaire stelsels]\label{met:g12:matrix:systems}
+Het stelsel
+$\begin{cases} ax + by = e\\ cx + dy = f \end{cases}$
+is de matrixvergelijking $AX = Y$ met
+$X = \begin{pmatrix} x \\ y\end{pmatrix}$,
+$Y = \begin{pmatrix} e \\ f\end{pmatrix}$. Als $\det A \neq 0$, is de
+unieke oplossing $X = A^{-1}Y$. Dezelfde formalisme behandelt $n$
+vergelijkingen in $n$ onbekenden.
+\end{method}
+
+\section{Matrixmachten en recurrente rijen}
+
+\begin{definition}\label{def:g12:matrix:power}
+Voor een vierkante matrix $A$ en $k \in \N$, $A^k = A \times \dots \times A$
+($k$ factoren), met $A^0 = I$.
+\end{definition}
+
+\begin{method}[Diagonaal-plus-nilpotent en diagonaliseerbare gevallen]\label{met:g12:matrix:powers}
+Twee standaardmanieren om $A^k$ te berekenen:
+\begin{itemize}
+  \item Als $A = \lambda I + N$ waar $N^2 = 0$, stort de binomiaalstelling
+        (geldig hier omdat $I$ en $N$ commuteren) in tot twee termen:
+        $A^k = \lambda^k I + k \lambda^{k-1} N$.
+  \item Als men een inverteerbare $P$ vindt met $A = PDP^{-1}$ en $D$
+        diagonaal, dan $A^k = P D^k P^{-1}$, en $D^k$ wordt ingang voor
+        ingang berekend. (Zulke $P$ systematisch vinden is de theorie van
+        \emph{diagonalisatie}, ontwikkeld op de universiteit; op dit
+        niveau is $P$ gegeven.)
+\end{itemize}
+\end{method}
+
+\begin{example}[Gekoppelde rijen]\label{ex:g12:matrix:coupled}
+Laat $u_{n+1} = 3u_n + v_n$ en $v_{n+1} = u_n + 3v_n$. Met
+$X_n = \begin{pmatrix} u_n\\ v_n \end{pmatrix}$ en
+$A = \begin{pmatrix} 3 & 1\\ 1 & 3\end{pmatrix}$ krijgen we
+$X_{n+1} = AX_n$, dus $X_n = A^n X_0$. De hulprijen
+$s_n = u_n + v_n$ en $d_n = u_n - v_n$ voldoen aan $s_{n+1} = 4s_n$ en
+$d_{n+1} = 2d_n$, dus $s_n = 4^n s_0$, $d_n = 2^n d_0$ en
+\[
+u_n = \frac{4^n(u_0+v_0) + 2^n(u_0-v_0)}{2}, \qquad
+v_n = \frac{4^n(u_0+v_0) - 2^n(u_0-v_0)}{2}.
+\]
+(Achter de schermen: $(1,1)$ en $(1,-1)$ zijn eigenvectorrichtingen van
+$A$.)
+\end{example}
+
+\section{Grafen en paden}
+
+\begin{definition}[Graaf, adjacentie-matrix]\label{def:g12:matrix:graph}
+Een \emph{graaf}\index{graaf} bestaat uit hoekpunten $1, 2, \dots, n$ en
+kanten die bepaalde paren hoekpunten verbinden (geordende paren voor een
+\emph{gerichte} graaf). Haar \emph{adjacentie-matrix}\index{adjacentie-matrix}
+is de $n \times n$-matrix $M$ met $m_{ij} = 1$ als er een kant van $i$
+naar $j$ is, en $0$ anders. Een \emph{pad} (of \emph{wandeling}) van lengte
+$k$ van $i$ naar $j$ is een rij van $k$ opeenvolgende kanten van $i$ naar
+$j$.
+\end{definition}
+
+\begin{omfigure}
+\begin{tikzpicture}[baseline=(current bounding box.center)]
+  \node[circle, draw, inner sep=2.5pt] (v1) at (0,0) {$1$};
+  \node[circle, draw, inner sep=2.5pt] (v2) at (2.6,1.2) {$2$};
+  \node[circle, draw, inner sep=2.5pt] (v3) at (2.6,-1.2) {$3$};
+  \draw[-Stealth, omDef, thick] (v1) -- (v2);
+  \draw[-Stealth, omDef, thick] (v2) -- (v3);
+  \draw[-Stealth, omDef, thick] (v1) to[bend right=18] (v3);
+  \draw[-Stealth, omDef, thick] (v3) to[bend right=18] (v1);
+\end{tikzpicture}
+\qquad\qquad
+$M = \begin{pmatrix} 0 & 1 & 1\\ 0 & 0 & 1\\ 1 & 0 & 0 \end{pmatrix}$
+
+{\small Een gerichte graaf en haar adjacentie-matrix
+(\cref{exo:g12:matrix:6}): $m_{ij} = 1$ precies wanneer er een kant van
+$i$ naar $j$ is.}
+\end{omfigure}
+
+\begin{theorem}[Paden tellen]\label{thm:g12:matrix:walks}
+Het aantal paden van lengte $k$ van hoekpunt $i$ naar hoekpunt $j$ is de
+$(i,j)$-ingang van $M^k$.
+\end{theorem}
+
+\begin{proof}
+Inductie op $k$. Voor $k = 1$ is dit de definitie van $M$. Neem de claim
+aan voor $k$. Een pad van lengte $k+1$ van $i$ naar $j$ is een pad van
+lengte $k$ van $i$ naar enig hoekpunt $l$, gevolgd door een kant van $l$
+naar $j$; volgens de optel- en vermenigvuldigingsprincipes is hun aantal
+\[
+\sum_{l=1}^{n} \bigl(M^k\bigr)_{il}\, m_{lj} = \bigl(M^{k+1}\bigr)_{ij}.
+\qedhere
+\]
+\end{proof}
+
+\begin{example}
+Voor de driehoeksgraaf ($3$ hoekpunten, alle paren verbonden),
+$M = \begin{pmatrix} 0&1&1\\ 1&0&1\\ 1&1&0\end{pmatrix}$ en
+$M^2 = \begin{pmatrix} 2&1&1\\ 1&2&1\\ 1&1&2\end{pmatrix}$: van elk
+hoekpunt zijn er $2$ paden van lengte $2$ terug naar zichzelf (via
+één van beide buren) en $1$ naar elk ander hoekpunt.
+\end{example}
+
+\section{Oefeningen}
+
+\begin{exercise}[$\star$]\label{exo:g12:matrix:1}
+Laat $A = \begin{pmatrix} 1 & 2\\ 0 & 1 \end{pmatrix}$ en
+$B = \begin{pmatrix} 2 & 0\\ 1 & 1 \end{pmatrix}$. Bereken $A + B$, $AB$,
+$BA$ en $A^2$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:matrix:2}
+Bepaal of de volgende matrices inverteerbaar zijn, en bereken de inverses
+wanneer ze bestaan:
+\[
+A = \begin{pmatrix} 2 & 5\\ 1 & 3\end{pmatrix}, \qquad
+B = \begin{pmatrix} 3 & 6\\ 2 & 4\end{pmatrix}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:matrix:3}
+Los door matrixinversie het stelsel op
+$\begin{cases} 2x + 5y = 1\\ x + 3y = 2 . \end{cases}$
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:matrix:4}
+Laat $A = \begin{pmatrix} 2 & 1\\ 0 & 2\end{pmatrix} = 2I + N$ met
+$N = \begin{pmatrix} 0 & 1\\ 0 & 0 \end{pmatrix}$.
+\begin{enumerate}
+  \item Controleer dat $N^2 = 0$ en dat $I$ en $N$ commuteren.
+  \item Leid $A^k$ af voor alle $k \in \N$ en verifieer de formule voor
+        $k=2$ door directe berekening.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:matrix:5}
+Laat $A = \begin{pmatrix} 0 & 1\\ 1 & 1\end{pmatrix}$ en $F_n$ de
+Fibonacci-rij ($F_0 = 0$, $F_1 = 1$, $F_{n+2} = F_{n+1} + F_n$). Toon door
+inductie dat voor $n \geq 1$,
+\[
+A^n = \begin{pmatrix} F_{n-1} & F_n\\ F_n & F_{n+1}\end{pmatrix},
+\]
+en leid de identiteit $F_{n+1}F_{n-1} - F_n^2 = (-1)^n$ af.
+(Hint: determinanten vermenigvuldigen: $\det(MN) = \det M \det N$, wat u
+voor $2\times2$-matrices mag controleren.)
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:matrix:6}
+Een gerichte graaf op hoekpunten $\{1, 2, 3\}$ heeft kanten
+$1\to2$, $2\to3$, $3\to1$ en $1\to3$.
+\begin{enumerate}
+  \item Schrijf de adjacentie-matrix $M$ en bereken $M^2$ en $M^3$.
+  \item Hoeveel paden van lengte $3$ gaan van $1$ naar $1$? Lijst ze.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:matrix:7}
+Een deelauto-bedrijf verplaatst voertuigen tussen twee steden $A$ en $B$.
+Elke week blijft $80\%$ van de auto's in $A$ in $A$ en verhuist $20\%$ naar
+$B$; $30\%$ van de auto's in $B$ verhuist naar $A$ en $70\%$ blijft. Laat
+$a_n, b_n$ de proporties van de vloot in elke stad zijn.
+\begin{omfigure}
+\begin{tikzpicture}
+  \node[circle, draw, inner sep=3pt] (A) at (0,0) {$A$};
+  \node[circle, draw, inner sep=3pt] (B) at (3.2,0) {$B$};
+  \draw[-Stealth, omDef, thick] (A) to[bend left=25]
+    node[above, font=\small] {$0.2$} (B);
+  \draw[-Stealth, omDef, thick] (B) to[bend left=25]
+    node[below, font=\small] {$0.3$} (A);
+  \draw[-Stealth, omDef, thick] (A) to[loop left]
+    node[left, font=\small] {$0.8$} (A);
+  \draw[-Stealth, omDef, thick] (B) to[loop right]
+    node[right, font=\small] {$0.7$} (B);
+\end{tikzpicture}
+\end{omfigure}
+\begin{enumerate}
+  \item Schrijf $X_{n+1} = MX_n$ met
+        $X_n = \begin{pmatrix} a_n\\ b_n\end{pmatrix}$ en identificeer $M$.
+  \item Vind de evenwichtsproporties (los $MX = X$ op met $a + b = 1$).
+  \item Toon dat $c_n = a_n - 0.6$ voldoet aan $c_{n+1} = 0.5\,c_n$, en
+        concludeer dat de vlootverdeling naar het evenwicht convergeert.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:matrix:8}
+Laat $A = \begin{pmatrix} 3 & 1\\ 1 & 3 \end{pmatrix}$,
+$P = \begin{pmatrix} 1 & 1\\ 1 & -1 \end{pmatrix}$.
+\begin{enumerate}
+  \item Bereken $P^{-1}$, daarna $D = P^{-1}AP$, en controleer dat $D$
+        diagonaal is.
+  \item Leid een gesloten formule voor $A^n$ af en vergelijk met
+        \cref{ex:g12:matrix:coupled}.
+\end{enumerate}
+\end{exercise}
