@@ -82,7 +82,7 @@ automatically within the chapter):
 | `example`, `remark`, `notation` | worked examples, comments |
 | `proof` | proofs (amsthm); a partial proof is titled `\begin{proof}[Partial proof]` |
 | `exercise` | end-of-chapter exercises, difficulty in the optional argument: `[$\star$]` to `[$\star\star\star$]` |
-| `problem` | (university volumes) one long, structured weekend problem per chapter — 15–25 numbered questions in parts, culminating in a named result; label `pb:<year>:<slug>:1` |
+| `problem` | (university volumes) one long, structured weekend problem per chapter — ~25 numbered questions in parts, culminating in a named result; label `pb:<year>:<slug>:1` |
 | `solution` | in the solutions file: `\begin{solution}{exo:...}` (or `{pb:...}`) referencing the exercise/problem label |
 
 ## Style rules

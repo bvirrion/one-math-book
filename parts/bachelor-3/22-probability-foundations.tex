@@ -159,6 +159,39 @@ F_{\mu_n}(t)$: law $\mu_n$; independence is inherited
 \cref{exo:b3:probability:3}).
 \end{proof}
 
+\begin{example}[The birthday problem, honestly]
+\label{ex:b3:probability:birthday}
+Among $n$ people with independent, uniform birthdays over
+$N = 365$ days, the probability that all birthdays differ is
+\[
+p_n = \prod_{k=1}^{n-1}\Bigl(1 - \frac kN\Bigr),
+\]
+by iterated conditioning (or directly: the favorable
+$N(N-1)\cdots(N - n + 1)$ over the total $N^n$, a counting
+argument the product formula of independence makes
+rigorous). Taking logarithms and using $-\ln(1 - x) = x +
+O(x^2)$:
+\[
+\ln p_n = -\frac{n(n-1)}{2N} +
+O\Bigl(\frac{n^3}{N^2}\Bigr),
+\qquad\text{so}\qquad
+p_n \approx \eu^{-n^2/2N} .
+\]
+The tipping point $p_n = \frac12$ sits at $n \approx
+\sqrt{2N\ln2} \approx 1.18\sqrt N$: for $N = 365$, $n = 23$
+($p_{23} = 0.4927$). Two morals. First, collisions among $n$
+items in $N$ boxes appear at the scale $n \sim \sqrt N$, not
+$n \sim N$ --- the \emph{birthday scaling} that governs hash
+collisions and the $\sqrt N$ cost of birthday attacks in
+cryptography. Second, the computation is a template: the
+$\binom n2$ pair-collision events are not independent, yet
+the answer behaves as if they were
+($\eu^{-\binom n2/N}$ is exactly the independent-pairs
+heuristic) --- a first instance of the Poisson
+approximation made rigorous in \cref{ch:b3:clt}'s weekend
+problem (Le Cam's inequality).
+\end{example}
+
 \section{Borel--Cantelli and the zero--one law}
 
 \begin{theorem}[Borel--Cantelli]
@@ -478,6 +511,47 @@ independent ones --- compare with the Peano curve
 not measure-preservation or injectivity.
 \end{exercise}
 
+\begin{exercise}[$\star\star$]\label{exo:b3:probability:11}
+(Records) Let $(X_n)_{n\geq1}$ be i.i.d.\ with continuous
+distribution function, and say a \emph{record} occurs at
+time $n$ if $X_n > \max(X_1, \dots, X_{n-1})$ (time $1$ is
+a record). Let $R_n$ be the record indicator.
+(a) Show $\P(R_n = 1) = \frac1n$ \emph{(by symmetry, each of
+the $n!$ orderings of $X_1, \dots, X_n$ is equally likely
+and ties have probability $0$)}.
+(b) Show that the $R_n$ are \emph{independent} \emph{(count
+orderings compatible with prescribed record positions, or
+argue that the relative order of $X_1, \dots, X_{n-1}$ is
+independent of the rank of $X_n$ among them)}.
+(c) Deduce from Borel--Cantelli
+(\cref{thm:b3:probability:borelcantelli}, both halves) that
+infinitely many records occur a.s., but records at
+consecutive times $n, n+1$ occur infinitely often with
+probability --- decide which! --- and compute
+$\sum_n\P(R_n = 1, R_{n+1} = 1)$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:probability:12}
+(Longest head run) Flip a fair coin infinitely often, and
+let $L_n$ be the length of the longest run of consecutive
+heads within the first $n$ flips.
+(a) Show that for every $\varepsilon > 0$, a.s.\ $L_n \leq
+(1 + \varepsilon)\log_2n$ eventually \emph{(the probability
+that some run of length $\ell$ starts among the first $n$
+flips is at most $n2^{-\ell}$; Borel--Cantelli along $n =
+2^k$)}.
+(b) Show that a.s.\ $L_n \geq (1 - \varepsilon)\log_2n$
+eventually \emph{(chop the first $n$ flips into
+$\lfloor n/\ell\rfloor$ disjoint blocks of length $\ell =
+\lceil(1 - \varepsilon)\log_2n\rceil$; the blocks are
+independent, each all-heads with probability $2^{-\ell}$,
+and the probability that none is all-heads is at most
+$\exp(-n2^{-\ell}/\ell)$; sum along $n = 2^k$ again)}.
+(c) Conclude $\frac{L_n}{\log_2n} \to 1$ a.s.: in a million
+fair flips one should expect a run of about $20$ heads ---
+and a dataset without one is probably fabricated.
+\end{exercise}
+
 \section{Problem: Etemadi's proof of the strong law}
 
 \begin{problem}[{Weekend problem --- the strong law of large
@@ -621,5 +695,219 @@ subsequences.} Fix $\alpha > 1$ and let $k_j =
         \cref{thm:b3:probability:existence} and
         \cref{exo:b3:probability:10}, and state what the
         strong law delivers.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part VI --- What full independence buys:
+maximal inequalities and random series.} Etemadi spends
+only pairwise independence; the remaining parts exploit the
+full (mutual) version. Let $(Z_n)$ be independent centered
+variables of $L^2$ and $S_k = Z_1 + \dots + Z_k$ (a fresh
+notation, unrelated to the $X_n$ above).
+\begin{enumerate}[resume]
+  \item (Kolmogorov's maximal inequality) For $\varepsilon
+        > 0$ prove
+        \[
+        \P\Bigl(\max_{1\leq k\leq n}\abs{S_k} \geq
+        \varepsilon\Bigr) \;\leq\;
+        \frac1{\varepsilon^2}\sum_{k=1}^n\V(Z_k) :
+        \]
+        Chebyshev's price buys the maximum \emph{(partition
+        the event according to the first index $k$ with
+        $\abs{S_k} \geq \varepsilon$; on that piece write
+        $S_n^2 \geq S_k^2 + 2S_k(S_n - S_k)$ and use the
+        independence of the coalitions $(Z_1, \dots, Z_k)$
+        and $(Z_{k+1}, \dots, Z_n)$,
+        \cref{thm:b3:probability:independence})}. Point out
+        the step where pairwise independence would no
+        longer suffice.
+  \item (Khinchin--Kolmogorov one-series theorem) Deduce:
+        if $\sum_n\V(Z_n) < \infty$, then $\sum_nZ_n$
+        converges almost surely \emph{(show that a.s.\ the
+        partial sums form a Cauchy sequence: let $m \to
+        \infty$ in the maximal inequality applied to
+        $Z_{N+1}, \dots, Z_{N+m}$, then let $N \to
+        \infty$)}.
+  \item (Rademacher series) Let $(\varepsilon_n)$ be
+        i.i.d.\ signs, $\P(\varepsilon_n = \pm1) =
+        \frac12$ (\cref{thm:b3:probability:existence}), and
+        let $(x_n)$ be real numbers. Show that
+        $\sum_nx_n\varepsilon_n$ converges a.s.\ as soon as
+        $\sum_nx_n^2 < \infty$; show also that, whatever
+        $(x_n)$, the probability that
+        $\sum_nx_n\varepsilon_n$ converges is $0$ or $1$
+        (\cref{thm:b3:probability:zeroone}).
+  \item The converse, elementarily. Set $T_n = \sum_{k\leq
+        n}x_k\varepsilon_k$ and $s_n^2 = \sum_{k\leq
+        n}x_k^2$, and suppose $s_n \to \infty$.
+        (a) Prove the \emph{Paley--Zygmund inequality}: for
+        $Z \geq 0$ with $\E Z^2 < \infty$ and $0 < \theta <
+        1$,
+        \[
+        \P\bigl(Z > \theta\,\E Z\bigr) \;\geq\; (1 -
+        \theta)^2\,\frac{(\E Z)^2}{\E Z^2}
+        \]
+        \emph{(split $\E Z$ at the level $\theta\E Z$ and
+        apply Cauchy--Schwarz to the upper piece)}.
+        (b) Show $\E T_n^4 \leq 3s_n^4$.
+        (c) Deduce $\P\bigl(\abs{T_n} > \frac{s_n}2\bigr)
+        \geq \frac3{16}$ and conclude that
+        $\sum_nx_n\varepsilon_n$ diverges a.s.; hence the
+        dichotomy
+        \[
+        \sum_nx_n\varepsilon_n\ \text{converges a.s.}
+        \iff \sum_nx_n^2 < \infty .
+        \]
+  \item (Random harmonic series) Conclude that
+        $\sum_n\frac{\varepsilon_n}{n^s}$ converges a.s.\
+        if and only if $s > \frac12$. For $\frac12 < s \leq
+        1$ the series converges a.s.\ while
+        $\sum_nn^{-s} = \infty$: random signs produce
+        square-root-strength cancellation --- compare with
+        the alternating series $\sum_n\frac{(-1)^n}{n^s}$,
+        which converges for \emph{every} $s > 0$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part VII --- Concentration: Hoeffding's
+inequality.} The strong law says $\frac{S_n}n \to m$;
+concentration inequalities say how unlikely a deviation is
+\emph{at each fixed $n$}.
+\begin{enumerate}[resume]
+  \item (Hoeffding's lemma)
+        (a) Show $\cosh\lambda \leq \eu^{\lambda^2/2}$ for
+        all $\lambda \in \R$, by comparing the two series
+        termwise.
+        (b) Let $Z$ be centered with $a \leq Z \leq b$,
+        $a < b$. Show
+        \[
+        \E\,\eu^{\lambda Z} \leq
+        \exp\Bigl(\frac{\lambda^2(b - a)^2}8\Bigr)
+        \]
+        \emph{(bound $\eu^{\lambda z}$ on $\intcc ab$ by
+        its chord, take expectations, and study $\varphi(t)
+        = -pt + \log(1 - p + p\eu^t)$ with $p =
+        \frac{-a}{b-a}$ and $t = \lambda(b - a)$: show
+        $\varphi(0) = \varphi'(0) = 0$ and $\varphi''
+        \leq \frac14$)}.
+  \item (Hoeffding's inequality) Let $X_1, \dots, X_n$ be
+        independent with $a_i \leq X_i \leq b_i$ and $S_n =
+        X_1 + \dots + X_n$. Prove, for $t > 0$,
+        \[
+        \P\bigl(S_n - \E S_n \geq t\bigr) \leq
+        \exp\Bigl(\frac{-2t^2}{\sum_{i=1}^n(b_i -
+        a_i)^2}\Bigr),
+        \]
+        and the same bound for the lower tail
+        \emph{(exponential Chebyshev: bound
+        $\E\,\eu^{\lambda(S_n - \E S_n)}$ using
+        independence and question 17, then optimize over
+        $\lambda > 0$)}.
+  \item (The strong law, bounded case, with a rate) Let the
+        $X_i$ be i.i.d.\ with values in $\intcc ab$ and $m
+        = \E X_1$. Show
+        \[
+        \P\Bigl(\Bigl|\frac{S_n}n - m\Bigr| \geq
+        \varepsilon\Bigr) \leq
+        2\exp\Bigl(\frac{-2n\varepsilon^2}{(b - a)^2}\Bigr)
+        \]
+        and recover $\frac{S_n}n \to m$ a.s.\ by
+        Borel--Cantelli: a second proof of the strong law
+        for bounded variables --- no truncation, an
+        exponential rate at every finite $n$, but bounded
+        summands and full independence. Compare the
+        hypotheses with Etemadi's.
+  \item (Monte Carlo, guaranteed at fixed $n$) Let $g
+        \colon \intcc01^d \to \intcc01$ be measurable and
+        $(U_k)$ the i.i.d.\ uniform sample of question 11.
+        Given $\varepsilon, \delta > 0$, show
+        \[
+        n \geq \frac{\log(2/\delta)}{2\varepsilon^2}
+        \implies
+        \P\Bigl(\Bigl|\frac1n\sum_{k=1}^ng(U_k) -
+        \int g\,\dd\lambda_d\Bigr| \geq \varepsilon\Bigr)
+        \leq \delta,
+        \]
+        and evaluate the threshold for $\varepsilon =
+        \delta = 10^{-2}$. The bound does not involve $d$:
+        compare with question 11 and with deterministic
+        grids.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part VIII --- How big is a random walk?
+Toward the iterated logarithm.} Let $S_n = \varepsilon_1 +
+\dots + \varepsilon_n$ be the simple random walk built from
+i.i.d.\ fair signs.
+\begin{enumerate}[resume]
+  \item (Sub-Gaussian tails) Show $\E\,\eu^{\lambda S_n} =
+        (\cosh\lambda)^n \leq \eu^{n\lambda^2/2}$ and
+        deduce, for $x > 0$,
+        \[
+        \P(S_n \geq x) \leq \eu^{-x^2/(2n)},
+        \qquad
+        \P(\abs{S_n} \geq x) \leq 2\,\eu^{-x^2/(2n)} .
+        \]
+  \item Deduce, via Borel--Cantelli,
+        \[
+        \limsup_{n\to\infty}\frac{\abs{S_n}}
+        {\sqrt{2n\log n}} \leq 1 \quad\text{a.s.}
+        \]
+        \emph{(for $\eta > 0$, sum the tail bounds at $x =
+        (1 + \eta)\sqrt{2n\log n}$, then intersect over
+        $\eta = \frac1p$)}. In particular the walk lives on
+        the CLT scale $\sqrt n$ up to a logarithmic factor
+        --- far below the crude bound $\abs{S_n} \leq n$.
+  \item Along the doubling subsequence $n_j = 2^j$, show
+        \[
+        \limsup_{j\to\infty}\frac{S_{n_j}}
+        {\sqrt{2n_j\log\log n_j}} \leq 1 \quad\text{a.s.},
+        \]
+        and reflect: the \emph{law of the iterated
+        logarithm} (Khinchin; Hartman--Wintner for general
+        centered $L^2$ summands) states that
+        \[
+        \limsup_{n\to\infty}\frac{S_n}
+        {\sqrt{2n\log\log n}} = 1 \quad\text{a.s.}
+        \]
+        Explain precisely what separates the subsequence
+        estimate just proved from the upper half of this
+        statement (one must control $\max_{n_j \leq n \leq
+        n_{j+1}}S_n$ inside each block, which requires a
+        maximal inequality at the \emph{exponential} scale)
+        and check quantitatively that question 12's
+        inequality is too weak for that purpose. The lower
+        half rests on the second Borel--Cantelli lemma
+        applied to independent blocks; both halves are
+        honest Year 3 material for a dedicated probability
+        course.
+
+  \item (Uniform deviation over a finite class) Let $A_1,
+        \dots, A_N$ be events in a repeatable experiment,
+        and estimate each probability by its empirical
+        frequency $\hat p_i$ over $n$ i.i.d.\ repetitions.
+        Combining Hoeffding's inequality with a union bound,
+        show
+        \[
+        \P\Bigl(\max_{i\leq N}\,\abs{\hat p_i - \P(A_i)} >
+        \varepsilon\Bigr) \;\leq\; 2N\,\eu^{-2n\varepsilon^2},
+        \]
+        and deduce the sample-size rule: $n \geq
+        \frac{\ln(2N/\delta)}{2\varepsilon^2}$ guarantees
+        all $N$ estimates simultaneously
+        $\varepsilon$-accurate with probability $\geq 1 -
+        \delta$. Compute $n$ for $N = 10^6$, $\varepsilon =
+        0.01$, $\delta = 0.05$: the logarithmic price of
+        uniformity.
+  \item (The random harmonic window) Combining the two
+        halves of the random series theory, show that for
+        i.i.d.\ signs $(\varepsilon_n)$ the series
+        $\sum_n\frac{\varepsilon_n}{n^\alpha}$ converges
+        a.s.\ if $\alpha > \frac12$ and diverges a.s.\ if
+        $\alpha \leq \frac12$; contrast with absolute
+        convergence (which requires $\alpha > 1$): on the
+        window $\alpha \in \intoc{\frac12}1$, convergence
+        is a genuinely probabilistic phenomenon ---
+        cancellation, not size.
 \end{enumerate}
 \end{problem}

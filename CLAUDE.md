@@ -104,6 +104,12 @@ grep -rn 'end{[a-z]*>' parts/<year>/                       # \end{proof> typo cl
 grep -rn '\.\.\.' parts/<year>/ | grep -v '\\dots\|\\ldots\|\\cdots\|\\foreach'  # drafty "..." prose (use \dots)
 ```
 
+Exercise→solution hyperlinks: every `solution` env emits a `sol:<key>`
+link target; a book that calls `\omsolutionlinks` in its entry file
+(currently Book 5) prints a hyperlinked "Solution p. N" pointer at the
+end of each exercise/problem. The pointer resolves to the first `\label`
+inside the environment, so keep the `exo:`/`pb:` label first.
+
 Content rules (from CONTRIBUTING.md, enforced in review):
 
 - 8–12 exercises per chapter, graded `[$\star$]` to `[$\star\star\star$]`,

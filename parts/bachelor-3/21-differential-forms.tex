@@ -1,0 +1,1182 @@
+\chapter{Differential Forms and Stokes' Theorem}\label{ch:b3:forms}
+
+One theorem of analysis has, over two centuries, absorbed all
+the others of its kind: the fundamental theorem of calculus,
+Green--Riemann (proved in the Year~2 volume), the divergence
+theorem of Gauss, the curl theorem of Kelvin--Stokes --- each
+says that the integral of some derivative over a region equals
+the integral of the original object over the boundary. The
+language of \emph{differential forms} makes them one statement,
+$\int_M\dd\omega = \int_{\partial M}\omega$, and makes that
+statement provable in one stroke. This chapter builds the
+language honestly --- alternating multilinear algebra, the
+exterior derivative, pullbacks, orientation, integration on the
+submanifolds of \cref{ch:b3:submanifolds} --- proves Stokes'
+theorem, and cashes the first cheques: the classical integral
+theorems, the winding number that secretly ran
+\cref{ch:b3:residues}, and, in the weekend problem, Brouwer's
+fixed-point theorem. Throughout, \emph{smooth} means $\mathcal
+C^\infty$; every map and form is smooth unless stated
+otherwise. This costs no generality worth having at this level
+and frees the hands.
+
+\section{Alternating multilinear algebra}
+
+\begin{definition}\label{def:b3:forms:alternating}
+Let $E$ be a real vector space of dimension $n$. A
+\emph{$k$-linear alternating form}\index{alternating form} on
+$E$ is a map $\alpha\colon E^k \to \R$, linear in each
+variable, with $\alpha(v_1, \dots, v_k) = 0$ whenever two
+arguments are equal. Their space is written $\Lambda^k E^*$;
+by convention $\Lambda^0E^* = \R$. Alternation forces
+antisymmetry: exchanging two arguments changes the sign
+(expand $\alpha(\dots, v + w, \dots, v + w, \dots) = 0$), and
+more generally $\alpha(v_{\sigma(1)}, \dots, v_{\sigma(k)}) =
+\varepsilon(\sigma)\,\alpha(v_1, \dots, v_k)$ for every
+permutation $\sigma$.
+\end{definition}
+
+\begin{example}
+On $E = \R^n$: $\Lambda^1E^* = E^*$ is the dual space; the
+determinant in the canonical basis is an $n$-linear
+alternating form, and \cref{prop:b3:forms:basis} will show it
+spans $\Lambda^nE^*$ --- the deep reason the determinant is
+unique up to scale. For $k > n$, $\Lambda^kE^* = \{0\}$:
+$k$ vectors are dependent, and expanding one along the others
+kills $\alpha$ by alternation.
+\end{example}
+
+\begin{definition}\label{def:b3:forms:wedge}
+For $\ell_1, \dots, \ell_k \in E^*$, their \emph{exterior
+product}\index{exterior product} is the $k$-linear alternating
+form
+\[
+(\ell_1 \wedge \dots \wedge \ell_k)(v_1, \dots, v_k)
+= \det\bigl(\ell_i(v_j)\bigr)_{1 \leq i, j \leq k} .
+\]
+Alternation and multilinearity are those of the determinant in
+its columns.
+\end{definition}
+
+\begin{proposition}[Basis of $\Lambda^k$]\label{prop:b3:forms:basis}
+Let $(e_1, \dots, e_n)$ be a basis of $E$ with dual basis
+$(e_1^*, \dots, e_n^*)$. The forms
+\[
+e_I^* = e_{i_1}^* \wedge \dots \wedge e_{i_k}^*,
+\qquad I = \{i_1 < \dots < i_k\} \subseteq \{1, \dots, n\},
+\]
+form a basis of $\Lambda^kE^*$; hence $\dim\Lambda^kE^* =
+\binom nk$. Explicitly, $\alpha =
+\sum_{\abs I = k}\alpha(e_{i_1}, \dots, e_{i_k})\,e_I^*$.
+\end{proposition}
+
+\begin{proof}
+\emph{Generating.} Let $\alpha \in \Lambda^kE^*$ and $\beta =
+\sum_I\alpha(e_I)\,e_I^*$, where $\alpha(e_I)$ abbreviates
+$\alpha(e_{i_1}, \dots, e_{i_k})$. Both sides are $k$-linear
+and alternating, so they agree as soon as they agree on all
+$k$-tuples $(e_{j_1}, \dots, e_{j_k})$ with $j_1 < \dots <
+j_k$ (multilinearity reduces to tuples of basis vectors,
+alternation to strictly increasing ones). And $e_I^*(e_{j_1},
+\dots, e_{j_k}) = \det(e_{i_r}^*(e_{j_s})) = \delta_{IJ}$:
+for $I = J$ the matrix is the identity; for $I \neq J$ some
+row is zero. So $\beta(e_J) = \alpha(e_J)$ for all $J$:
+$\beta = \alpha$. \emph{Freeness.} If $\sum_I c_Ie_I^* = 0$,
+evaluating on $(e_{j_1}, \dots, e_{j_k})$ gives $c_J = 0$.
+\end{proof}
+
+\begin{definition}\label{def:b3:forms:wedgegeneral}
+The exterior product extends to a bilinear map
+$\Lambda^kE^* \times \Lambda^\ell E^* \to
+\Lambda^{k+\ell}E^*$, determined by bilinearity and
+$(e_I^*) \wedge (e_J^*) = e_I^* \wedge e_J^*$ (concatenate
+and reorder; the product is $0$ if $I \cap J \neq
+\varnothing$). It is associative, and
+\emph{graded-anticommutative}:
+\[
+\beta \wedge \alpha = (-1)^{k\ell}\,\alpha \wedge \beta
+\qquad (\alpha \in \Lambda^k, \ \beta \in \Lambda^\ell).
+\]
+\end{definition}
+
+\begin{proof}[\omnameProof]
+Both properties are checked on basis elements and extended by
+bilinearity. Associativity: both parenthesisings of
+$e_I^* \wedge e_J^* \wedge e_K^*$ equal the wedge of the
+concatenated family of $1$-forms, by the determinant formula
+of \cref{def:b3:forms:wedge} (Laplace expansion by blocks).
+The sign rule: moving each of the $\ell$ factors of $\beta$
+past the $k$ factors of $\alpha$ costs a sign per adjacent
+transposition (a swap of two rows of the determinant), hence
+$(-1)^{k\ell}$ in total.
+\end{proof}
+
+\begin{proposition}[Pullback, linear case]
+\label{prop:b3:forms:linearpullback}
+A linear map $u\colon E \to F$ induces, for each $k$, the
+linear map $u^*\colon \Lambda^kF^* \to \Lambda^kE^*$,
+$(u^*\alpha)(v_1, \dots, v_k) = \alpha(u(v_1), \dots,
+u(v_k))$. It satisfies $u^*(\alpha \wedge \beta) = u^*\alpha
+\wedge u^*\beta$ and $(u \circ w)^* = w^* \circ u^*$.
+Moreover:
+\begin{enumerate}
+  \item If $\dim E = n$ and $u\colon E \to E$, then on the
+        line $\Lambda^nE^*$: $u^*\alpha = (\det u)\,\alpha$.
+  \item If $\operatorname{rk}u < k$, then $u^* = 0$ on
+        $\Lambda^kF^*$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+The functorial identities are immediate from the definitions
+(for the product rule, check on wedges of $1$-forms with the
+determinant formula --- $\det(\ell_i(uv_j)) =
+\det((u^*\ell_i)(v_j))$ --- then extend bilinearly).
+(1) $u^*$ maps the one-dimensional $\Lambda^nE^*$
+(\cref{prop:b3:forms:basis}) to itself, so $u^*\alpha =
+c\,\alpha$ with $c$ independent of $\alpha \neq 0$; testing
+on $\alpha = e_1^* \wedge \dots \wedge e_n^*$ and $(v_j) =
+(e_j)$ gives $c = \det(e_i^*(ue_j)) = \det u$.
+(2) For $v_1, \dots, v_k \in E$, the vectors $u(v_1), \dots,
+u(v_k)$ lie in the image of $u$, of dimension $< k$: they are
+linearly dependent, and an alternating form vanishes on a
+dependent family (expand the dependent vector along the
+others).
+\end{proof}
+
+\section{Differential forms and the exterior derivative}
+
+\begin{definition}\label{def:b3:forms:diffform}
+Let $U \subseteq \R^n$ be open. A \emph{differential
+$k$-form}\index{differential form} on $U$ is a smooth map
+$\omega\colon U \to \Lambda^k(\R^n)^*$; in the basis of
+\cref{prop:b3:forms:basis} (with $\dd x_i$ written for
+$e_i^*$),
+\[
+\omega = \sum_{\abs I = k} a_I\,\dd x_I,
+\qquad
+\dd x_I = \dd x_{i_1} \wedge \dots \wedge \dd x_{i_k},
+\]
+with smooth coefficients $a_I \in \mathcal C^\infty(U)$.
+Their space is $\Omega^k(U)$; $\Omega^0(U) = \mathcal
+C^\infty(U)$. A $0$-form is a function; a $1$-form is a field
+of linear forms (e.g.\ the differential $\dd f$ of a
+function); an $n$-form is $a\,\dd x_1\wedge\dots\wedge\dd
+x_n$, the natural integrand of \cref{ch:b3:product}.
+\end{definition}
+
+\begin{definition}[Exterior derivative]\label{def:b3:forms:d}
+The \emph{exterior derivative}\index{exterior derivative} is
+the linear map $\dd\colon \Omega^k(U) \to \Omega^{k+1}(U)$
+defined by
+\[
+\dd\Bigl(\sum_I a_I\,\dd x_I\Bigr)
+= \sum_I \dd a_I \wedge \dd x_I
+= \sum_I\sum_{j=1}^n \frac{\partial a_I}{\partial
+x_j}\,\dd x_j \wedge \dd x_I .
+\]
+On $0$-forms it is the usual differential.
+\end{definition}
+
+\begin{theorem}\label{thm:b3:forms:dsquare}
+(a) $\dd(\omega \wedge \eta) = \dd\omega \wedge \eta +
+(-1)^k\,\omega \wedge \dd\eta$ for $\omega \in \Omega^k$
+(the \emph{graded Leibniz rule}).
+(b) $\dd \circ \dd = 0$.\index{d squared zero@$\dd^2 = 0$}
+\end{theorem}
+
+\begin{proof}
+(a) By bilinearity it suffices to treat $\omega = a\,\dd
+x_I$, $\eta = b\,\dd x_J$. Then $\omega \wedge \eta =
+ab\,\dd x_I \wedge \dd x_J$ and
+\[
+\dd(\omega\wedge\eta) = (b\,\dd a + a\,\dd b) \wedge \dd x_I
+\wedge \dd x_J
+= (\dd a \wedge \dd x_I) \wedge (b\,\dd x_J) +
+a\,\dd b \wedge \dd x_I \wedge \dd x_J,
+\]
+and moving the $1$-form $\dd b$ past the $k$ factors of $\dd
+x_I$ costs $(-1)^k$ (\cref{def:b3:forms:wedgegeneral}): the
+second term is $(-1)^k\,\omega \wedge \dd\eta$.
+(b) For a function: $\dd(\dd a) = \sum_{i,j}
+\frac{\partial^2a}{\partial x_j\partial x_i}\,\dd x_j \wedge
+\dd x_i$. The coefficient is symmetric in $(i,j)$ by
+Schwarz's theorem on mixed partials (proved in the Year~2
+volume; $a$ is $\mathcal C^\infty$), while $\dd x_j \wedge
+\dd x_i$ is antisymmetric: pairing the terms $(i,j)$ and
+$(j,i)$, everything cancels. For a general $\omega = \sum
+a_I\dd x_I$: $\dd\dd\omega = \sum\dd(\dd a_I \wedge \dd x_I)
+= \sum(\dd\dd a_I\wedge\dd x_I - \dd a_I\wedge\dd(\dd x_I))$
+by (a), and both terms vanish ($\dd(\dd x_I) = 0$ since the
+coefficient is constant).
+\end{proof}
+
+\begin{definition}[Pullback]\label{def:b3:forms:pullback}
+Let $\varphi\colon U \to V$ be smooth ($U \subseteq \R^m$,
+$V \subseteq \R^n$ open). The \emph{pullback}\index{pullback}
+$\varphi^*\colon \Omega^k(V) \to \Omega^k(U)$ is defined
+pointwise by the linear pullback along the differential:
+$(\varphi^*\omega)_x = (D\varphi(x))^*\,\omega_{\varphi(x)}$.
+Concretely, $\varphi^*$ substitutes: $\varphi^*f = f \circ
+\varphi$ on functions, $\varphi^*(\dd y_i) =
+\dd\varphi_i = \sum_j\frac{\partial\varphi_i}{\partial
+x_j}\dd x_j$, and $\varphi^*(a\,\dd y_{i_1}\wedge\dots\wedge
+\dd y_{i_k}) =
+(a\circ\varphi)\,\dd\varphi_{i_1}\wedge\dots\wedge
+\dd\varphi_{i_k}$.
+\end{definition}
+
+\begin{theorem}\label{thm:b3:forms:pullback}
+(a) $\varphi^*(\omega \wedge \eta) = \varphi^*\omega \wedge
+\varphi^*\eta$ and $(\psi \circ \varphi)^* = \varphi^* \circ
+\psi^*$.
+(b) $\varphi^*(\dd\omega) = \dd(\varphi^*\omega)$: the
+exterior derivative commutes with every smooth substitution
+--- the identity that makes it \emph{the} derivative of the
+theory.
+(c) If $\varphi\colon U \to V$ is smooth between opens of
+$\R^n$ and $\omega = a\,\dd y_1 \wedge \dots \wedge \dd
+y_n$, then $\varphi^*\omega = (a \circ
+\varphi)\,\det\bigl(D\varphi\bigr)\,\dd x_1 \wedge \dots
+\wedge \dd x_n$.
+\end{theorem}
+
+\begin{proof}
+(a) Pointwise statements about linear pullbacks
+(\cref{prop:b3:forms:linearpullback}), plus the chain rule
+$D(\psi\circ\varphi)(x) = D\psi(\varphi(x))\,D\varphi(x)$.
+(b) For a $0$-form $f$: $\varphi^*(\dd f) = \dd f \circ
+D\varphi = \dd(f \circ \varphi)$ is the chain rule. For
+$\omega = a\,\dd y_I$: using (a), $\varphi^*\omega =
+(a\circ\varphi)\,\dd\varphi_{i_1}\wedge\dots\wedge
+\dd\varphi_{i_k}$, so by the Leibniz rule
+(\cref{thm:b3:forms:dsquare}(a)) and $\dd\dd\varphi_{i_r} =
+0$:
+\[
+\dd(\varphi^*\omega) = \dd(a\circ\varphi) \wedge
+\dd\varphi_{i_1}\wedge\dots\wedge\dd\varphi_{i_k}
+= \varphi^*(\dd a) \wedge \varphi^*(\dd y_I)
+= \varphi^*(\dd a \wedge \dd y_I) =
+\varphi^*(\dd\omega).
+\]
+(c) Pointwise this is exactly $u^*\alpha = (\det u)\alpha$
+on top-degree forms (\cref{prop:b3:forms:linearpullback}(1)
+with $u = D\varphi(x)$).
+\end{proof}
+
+\begin{example}[Polar coordinates]\label{ex:b3:forms:polar}
+For $\varphi(r, \theta) = (r\cos\theta, r\sin\theta)$:
+$\varphi^*\dd x = \cos\theta\,\dd r -
+r\sin\theta\,\dd\theta$, $\varphi^*\dd y = \sin\theta\,\dd r
++ r\cos\theta\,\dd\theta$, so
+\[
+\varphi^*(\dd x \wedge \dd y) =
+(\cos\theta\,\dd r - r\sin\theta\,\dd\theta) \wedge
+(\sin\theta\,\dd r + r\cos\theta\,\dd\theta)
+= r\,\dd r \wedge \dd\theta,
+\]
+the Jacobian of \cref{ex:b3:product:polar} appearing by pure
+algebra --- no measure theory. \cref{exo:b3:forms:9} turns
+this remark into a statement: for oriented integrals, the
+change-of-variables formula \emph{is} the pullback formula.
+\end{example}
+
+\section{Closed and exact forms; the Poincar\'e lemma}
+
+\begin{definition}\label{def:b3:forms:closedexact}
+$\omega \in \Omega^k(U)$ is \emph{closed}\index{closed form}
+if $\dd\omega = 0$, \emph{exact}\index{exact form} if
+$\omega = \dd\eta$ for some $\eta \in \Omega^{k-1}(U)$ (a
+\emph{primitive} of $\omega$). Exact $\Rightarrow$ closed by
+$\dd^2 = 0$; the converse is a question about the
+\emph{shape} of $U$.
+\end{definition}
+
+\begin{example}[The angular form]\label{ex:b3:forms:angular}
+On $U = \R^2 \setminus \{0\}$,
+\[
+\omega_\theta = \frac{x\,\dd y - y\,\dd x}{x^2 + y^2}
+\]
+is closed (direct computation:
+\cref{exo:b3:forms:4}) but not exact: its integral along the
+unit circle is $2\pi \neq 0$, while integrals of exact forms
+along closed curves vanish (\cref{prop:b3:forms:exactloop}).
+Locally, $\omega_\theta = \dd\theta$ for any smooth
+determination $\theta$ of the polar angle --- whence the
+name and the obstruction: no such determination exists on
+all of $U$. This single form runs the winding number
+(\cref{sec:b3:forms:winding}) and, through it, the residue
+theorem of \cref{ch:b3:residues}.
+\end{example}
+
+\begin{theorem}[Poincar\'e lemma]\label{thm:b3:forms:poincare}
+Let $U \subseteq \R^n$ be open and \emph{star-shaped} with
+respect to $0$. Every closed $k$-form on $U$ ($k \geq 1$) is
+exact.\index{Poincar\'e lemma}
+\end{theorem}
+
+\begin{proof}
+We build a linear \emph{homotopy operator} $h\colon
+\Omega^k(U) \to \Omega^{k-1}(U)$ with
+\begin{equation}\label{eq:b3:forms:homotopy}
+\dd(h\omega) + h(\dd\omega) = \omega
+\qquad (k \geq 1);
+\end{equation}
+if $\dd\omega = 0$, then $\omega = \dd(h\omega)$ and we are
+done. For $\omega = \sum_I a_I\,\dd x_I$ set
+\[
+h\omega = \sum_{\abs I = k}\ \sum_{r=1}^{k}(-1)^{r-1}
+\Bigl(\int_0^1 t^{k-1}a_I(tx)\,\dd t\Bigr)\,
+x_{i_r}\,\dd x_{i_1}\wedge\dots\wedge
+\widehat{\dd x_{i_r}}\wedge\dots\wedge\dd x_{i_k}
+\]
+(the hat deletes a factor; the integrals are smooth in $x$
+by differentiation under the integral,
+\cref{thm:b3:lebesgue:paramdiff}, all derivatives being
+dominated on compacts). Checking
+\eqref{eq:b3:forms:homotopy} is a computation done once in a
+lifetime, so we do it in full. Fix $I$ and take $\omega =
+a\,\dd x_I$ (linearity). First,
+\[
+\dd(h\omega) = k\Bigl(\int_0^1t^{k-1}a(tx)\dd t\Bigr)\dd x_I
++ \sum_{r=1}^k(-1)^{r-1}\sum_{j=1}^n
+\Bigl(\int_0^1t^{k}\,\partial_ja(tx)\,\dd t\Bigr)
+x_{i_r}\,\dd x_j\wedge\dd x_{I\setminus i_r} :
+\]
+the first group collects the terms in which $\dd$ hits the
+factor $x_{i_r}$ --- the wedge $\dd x_{i_r}\wedge\dd
+x_{I\setminus i_r}$ reassembles $\dd x_I$ with a sign
+$(-1)^{r-1}$ that cancels the prefactor, and the $k$ values
+of $r$ give the factor $k$ --- while the second group
+collects the terms where $\dd$ hits the integral (chain
+rule brings out $t\,\partial_ja(tx)$). Next, $\dd\omega =
+\sum_j\partial_ja\,\dd x_j\wedge\dd x_I$, and applying the
+definition of $h$ in degree $k+1$, the index $j$ occupying
+the first slot:
+\[
+h(\dd\omega) = \sum_{j=1}^n\Bigl(\int_0^1t^{k}
+\partial_ja(tx)\dd t\Bigr)x_j\,\dd x_I
+- \sum_{j=1}^n\sum_{r=1}^k(-1)^{r-1}
+\Bigl(\int_0^1t^{k}\partial_ja(tx)\dd t\Bigr)
+x_{i_r}\,\dd x_j\wedge\dd x_{I\setminus i_r} .
+\]
+The double sums cancel in $\dd(h\omega) + h(\dd\omega)$,
+which therefore equals
+\[
+\Bigl(\int_0^1\bigl(k\,t^{k-1}a(tx) +
+t^k{\textstyle\sum_j}x_j\,\partial_ja(tx)\bigr)\dd t\Bigr)
+\dd x_I
+= \Bigl(\int_0^1\frac{\dd}{\dd t}\bigl(t^ka(tx)\bigr)\dd
+t\Bigr)\dd x_I
+= a(x)\,\dd x_I = \omega,
+\]
+by the fundamental theorem of calculus. Star-shapedness
+entered where it had to: $tx \in U$ for $t \in \intcc01$,
+so that $a(tx)$ makes sense.
+\end{proof}
+
+\begin{remark}
+For $k = 1$ and $\omega = \sum_j a_j\dd x_j$, the primitive
+is $f(x) = \int_0^1\sum_ja_j(tx)\,x_j\,\dd t$ --- the line
+integral of $\omega$ along the segment $[0, x]$: the theorem
+is the several-variables ``a field with symmetric Jacobian
+is a gradient'' of Year~2, now in every degree. The angular
+form (\cref{ex:b3:forms:angular}) shows the hypothesis on
+$U$ is not decorative: $\R^2\setminus\{0\}$ is not
+star-shaped, and there closedness does not imply exactness.
+What survives on a general open set is measured by the
+\emph{de Rham cohomology} $H^k(U) =
+\ker\dd/\operatorname{im}\dd$ --- see
+\cref{exo:b3:forms:12} for the first nontrivial computation.
+\end{remark}
+
+\section{Orientation and integration on submanifolds}
+
+Integrating a $k$-form requires $k$-dimensional oriented
+territory. Recall from \cref{ch:b3:submanifolds}
+(\cref{thm:b3:submanifolds:characterizations}) that a
+$k$-submanifold $M \subseteq \R^n$ is locally the image of a
+regular parametrization $\gamma\colon V \to M \cap W$ ($V
+\subseteq \R^k$ open, $\gamma$ a homeomorphism onto its image
+with injective differential).
+
+\begin{definition}\label{def:b3:forms:orientation}
+An \emph{orientation}\index{orientation} of $M$ is a choice,
+for each $p \in M$, of one of the two orientation classes of
+bases of the tangent space $T_pM$, which is \emph{locally
+coherent}: around each point there is a parametrization
+$\gamma$ whose coordinate frame $(\partial_1\gamma, \dots,
+\partial_k\gamma)$ is positively oriented at every point of
+its domain. Such parametrizations are called \emph{direct}.
+$M$ is \emph{orientable} if an orientation exists; the
+M\"obius band shows this can fail. All submanifolds in this
+chapter are oriented.
+\end{definition}
+
+\begin{definition}[Integral of a form]\label{def:b3:forms:integral}
+Let $M$ be an oriented $k$-submanifold and $\omega$ a
+$k$-form defined on a neighborhood of $M$, with
+$\operatorname{supp}\omega \cap M$ compact.
+(a) If $\operatorname{supp}\omega \cap M \subseteq
+\gamma(V)$ for a single direct parametrization, set
+\[
+\int_M\omega = \int_V\gamma^*\omega
+\]
+--- the right side being the Lebesgue integral over $V$
+(\cref{ch:b3:product}) of the coefficient $g$ of
+$\gamma^*\omega = g\,\dd u_1\wedge\dots\wedge\dd u_k$, which
+is continuous with compact support.
+(b) In general, choose finitely many direct parametrizations
+$\gamma_i(V_i)$ covering the compact
+$\operatorname{supp}\omega \cap M$ and a subordinate
+partition of unity $(\chi_i)$
+(\cref{lem:b3:forms:partition}), and set $\int_M\omega =
+\sum_i\int_M\chi_i\,\omega$, each term computed by (a).
+For a curve ($k = 1$) parametrized by
+$\gamma\colon\intcc ab\to\R^n$ we write
+$\int_\gamma\omega = \int_a^b\gamma^*\omega$, no injectivity
+required.
+\end{definition}
+
+\begin{lemma}[Consistency]\label{lem:b3:forms:consistency}
+Definition (a) does not depend on the direct
+parametrization, and definition (b) depends neither on the
+cover nor on the partition of unity. Moreover, if
+$\Phi$ is a diffeomorphism of neighborhoods of two oriented
+submanifolds with $\Phi(M) = M'$, carrying a direct frame of
+$M$ to a direct frame of $M'$ at some point of each
+component of $M$, then $\int_{M'}\omega =
+\int_M\Phi^*\omega$.
+\end{lemma}
+
+\begin{proof}
+(a) Let $\gamma\colon V \to M$, $\delta\colon V' \to M$ be
+direct parametrizations whose images contain
+$\operatorname{supp}\omega\cap M$. The transition $\tau =
+\delta^{-1}\circ\gamma$ is a diffeomorphism between the
+relevant open subsets of $V, V'$ (smoothness of transitions:
+\cref{thm:b3:submanifolds:characterizations}, via the local
+graph description), and $\gamma = \delta\circ\tau$ there, so
+$\gamma^*\omega = \tau^*(\delta^*\omega)$
+(\cref{thm:b3:forms:pullback}(a)). Write $\delta^*\omega =
+g\,\dd u_1\wedge\dots\wedge\dd u_k$; then
+(\cref{thm:b3:forms:pullback}(c)) $\tau^*(\delta^*\omega) =
+(g\circ\tau)\,\det(D\tau)\,\dd u_1\wedge\dots\wedge\dd u_k$.
+Both frames being direct, $D\tau$ maps a positive basis to a
+positive basis: $\det D\tau > 0$, so $\det D\tau =
+\abs{\det D\tau}$ and the change-of-variables theorem
+(\cref{thm:b3:product:changeofvar}) gives
+$\int(g\circ\tau)\abs{\det D\tau} = \int g$: the two
+integrals agree. \emph{Here is the whole reason orientation
+exists}: without the sign control, the Jacobian and its
+absolute value differ and the integral is ill-defined.
+(b) If $(\chi_i)$ and $(\tilde\chi_j)$ are two admissible
+partitions (covers included), then by (a) and finite
+additivity, $\sum_i\int\chi_i\omega =
+\sum_{i,j}\int\chi_i\tilde\chi_j\omega =
+\sum_j\int\tilde\chi_j\omega$, each double term computable
+in either chart. The last statement: if $\gamma$ runs over
+direct parametrizations of $M$, then $\Phi\circ\gamma$ runs
+over direct parametrizations of $M'$ (the orientation
+comparison is locally constant, and fixed at one point per
+component), and $(\Phi\circ\gamma)^*\omega =
+\gamma^*(\Phi^*\omega)$.
+\end{proof}
+
+\begin{lemma}[Partitions of unity, compact case]
+\label{lem:b3:forms:partition}
+Let $K \subseteq \R^n$ be compact and $W_1, \dots, W_m$ open
+sets covering $K$. There exist $\chi_1, \dots, \chi_m \in
+\mathcal C^\infty(\R^n)$ with $0 \leq \chi_i \leq 1$,
+$\operatorname{supp}\chi_i \subseteq W_i$ compact, and
+$\sum\chi_i = 1$ on a neighborhood of
+$K$.\index{partition of unity}
+\end{lemma}
+
+\begin{proof}
+Each $x \in K$ lies in some $W_{i(x)}$ with a closed ball
+$\bar B(x, 2r_x) \subseteq W_{i(x)}$; compactness extracts
+$x_1, \dots, x_N$ with the balls $B(x_s, r_{x_s})$ covering
+$K$. For each $s$ take a bump $\theta_s \in \mathcal
+C^\infty$, $0 \leq \theta_s \leq 1$, $\theta_s = 1$ on
+$\bar B(x_s, r_{x_s})$, $\operatorname{supp}\theta_s
+\subseteq B(x_s, 2r_{x_s})$ (mollify the indicator of the
+ball of radius $\frac32r_{x_s}$,
+\cref{thm:b3:lp:regularization}). Assign each $s$ to one
+index $i(s)$ with $B(x_s, 2r_{x_s}) \subseteq W_{i(s)}$ and
+set $\Theta_i = \sum_{i(s) = i}\theta_s$. On the open set
+$\Omega_0 = \{\sum_j\Theta_j > \tfrac12\} \supseteq K$, the
+functions $\Theta_i/\sum_j\Theta_j$ do the job but are
+defined only there; to globalize, let $\rho \in \mathcal
+C^\infty(\R^n)$ satisfy $\rho = 0$ where $\sum_j\Theta_j
+\geq 1$ and $\rho > 0$ where $\sum_j\Theta_j \leq \tfrac12$
+(mollify a suitable cut-off of $1 - \sum_j\Theta_j$), and
+set
+\[
+\chi_i = \frac{\Theta_i}{\rho + \sum_j\Theta_j} .
+\]
+The denominator is everywhere $> 0$ and equals
+$\sum_j\Theta_j$ on $\{\sum_j\Theta_j \geq 1\}$, an open
+neighborhood of $K$ (each point of $K$ lies in some ball
+$B(x_s, r_{x_s})$ where $\theta_s = 1$); there
+$\sum_i\chi_i = 1$. Supports and bounds are clear.
+\end{proof}
+
+\section{Stokes' theorem}
+
+\begin{definition}\label{def:b3:forms:boundary}
+A \emph{$k$-submanifold with boundary}\index{submanifold with
+boundary} $M \subseteq \R^n$ is a set covered by regular
+parametrizations of two kinds: \emph{interior charts}
+$\gamma\colon V \to M \cap W$ with $V \subseteq \R^k$ open,
+and \emph{boundary charts} $\gamma\colon V \cap H^k \to M
+\cap W$, where $H^k = \{u \in \R^k : u_k \geq 0\}$ and
+$\gamma$ extends smoothly and regularly to the open $V$.
+The \emph{boundary} $\partial M$ is the set of points
+reached at $u_k = 0$; it is a $(k-1)$-submanifold without
+boundary, parametrized by the maps $u' \mapsto \gamma(u',
+0)$. An orientation of $M$ induces one on $\partial M$ by
+the \emph{outward-normal-first} rule: at $p \in \partial M$,
+a basis $(w_1, \dots, w_{k-1})$ of $T_p\partial M$ is
+positive iff $(\nu, w_1, \dots, w_{k-1})$ is a positive
+basis of $T_pM$, where $\nu \in T_pM \setminus T_p\partial M$
+points out of $M$ (in a boundary chart: $\nu =
+-\partial_k\gamma$, up to adding tangential components ---
+the orientation class does not see them).
+\end{definition}
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=1.05]
+  \fill[omDef!10] (-2,0) arc (180:0:2) -- cycle;
+  \draw[thick, omDef] (-2,0) arc (180:0:2);
+  \draw[thick, omThm] (-2,0) -- (2,0);
+  \node[omDef] at (0.1,1.35) {$M$};
+  \node[omThm, below] at (1.55,-0.05) {$\partial M$};
+  \draw[->, thick, omExo] (1.415,1.415) -- (2.05,2.05);
+  \node[omExo, right] at (2.02,2.12) {$\nu$};
+  \draw[->, thick] (1.29,1.53) arc (50:75:2);
+  \draw[->, thick, omExo] (-0.6,0) -- (-0.6,-0.65);
+  \node[omExo, below] at (-0.6,-0.65) {$\nu$};
+  \draw[->, thick] (-0.35,0) -- (0.55,0);
+  \node[below] at (0.1,-0.14) {induced};
+\end{tikzpicture}
+
+{\small The outward-normal-first rule: at each boundary
+point, put the outward vector $\nu$ first; the bases that
+complete it to a positive frame of $M$ orient $\partial M$.
+For a plane domain with the standard orientation this is the
+counterclockwise rule of Green--Riemann.}
+\end{omfigure}
+
+\begin{lemma}[Stokes on the half-space]
+\label{lem:b3:forms:halfspace}
+Let $\eta$ be a smooth $(k-1)$-form on $\R^k$ with compact
+support. Then
+\[
+\int_{H^k}\dd\eta = \int_{\partial H^k}\eta,
+\]
+where $H^k$ carries the standard orientation of $\R^k$ and
+$\partial H^k = \{u_k = 0\} \cong \R^{k-1}$ the induced one,
+which is $(-1)^k$ times the standard orientation of
+$\R^{k-1}$.
+\end{lemma}
+
+\begin{proof}
+First the orientation bookkeeping: the outward normal along
+$\partial H^k$ is $-e_k$, and
+\[
+\det(-e_k, e_1, \dots, e_{k-1}) =
+-\det(e_k, e_1, \dots, e_{k-1}) = -(-1)^{k-1}\det(e_1,
+\dots, e_k) = (-1)^k :
+\]
+the frame $(e_1, \dots, e_{k-1})$ of $\partial H^k$ is
+positive for the induced orientation exactly when $k$ is
+even, whence the stated comparison. By linearity take $\eta
+= f\,\dd u_1\wedge\dots\wedge\widehat{\dd
+u_i}\wedge\dots\wedge\dd u_k$, $f \in \mathcal
+C^\infty_c(\R^k)$; then $\dd\eta =
+(-1)^{i-1}\,\partial_if\,\dd u_1\wedge\dots\wedge\dd u_k$
+(moving $\dd u_i$ into its slot costs $i - 1$ swaps). Two
+cases, both by Tonelli--Fubini
+(\cref{thm:b3:product:fubini}) and the one-variable
+fundamental theorem of calculus.
+
+\emph{Case $i < k$.} Integrating first in $u_i$ over $\R$:
+$\int_\R\partial_if\,\dd u_i = 0$ (compact support), so
+$\int_{H^k}\dd\eta = 0$. And the restriction of $\eta$ to
+$\{u_k = 0\}$ contains the factor $\dd u_k$, which restricts
+to $0$ ($u_k$ is constant there): $\int_{\partial H^k}\eta =
+0$ too.
+
+\emph{Case $i = k$.} Integrating first in $u_k$ over
+$\intco0\infty$:
+\begin{align*}
+\int_{H^k}\dd\eta &= (-1)^{k-1}\int_{\R^{k-1}}
+\Bigl(\int_0^\infty\partial_kf\,\dd u_k\Bigr)\dd u' \\
+&= (-1)^{k-1}\int_{\R^{k-1}}\bigl(0 - f(u', 0)\bigr)\dd u'
+= (-1)^k\int_{\R^{k-1}}f(u',0)\,\dd u' .
+\end{align*}
+On the boundary side, $\eta$ restricts to $f(u',
+0)\,\dd u_1\wedge\dots\wedge\dd u_{k-1}$, and the induced
+orientation being $(-1)^k$ times the standard one,
+$\int_{\partial H^k}\eta =
+(-1)^k\int_{\R^{k-1}}f(u',0)\,\dd u'$. The two sides agree.
+\end{proof}
+
+\begin{theorem}[Stokes]\label{thm:b3:forms:stokes}
+Let $M \subseteq \R^n$ be a compact oriented $k$-submanifold
+with boundary, $\partial M$ carrying the induced
+orientation, and let $\omega$ be a smooth $(k-1)$-form on a
+neighborhood of $M$. Then\index{Stokes' theorem}
+\[
+\int_M\dd\omega = \int_{\partial M}\omega .
+\]
+In particular, if $\partial M = \varnothing$:
+$\int_M\dd\omega = 0$.
+\end{theorem}
+
+\begin{proof}
+Cover the compact $M$ by finitely many images of direct
+charts (interior or boundary), and take a partition of unity
+$(\chi_i)$ subordinate to the corresponding open sets $W_i$
+of $\R^n$ (\cref{lem:b3:forms:partition}), with $\sum\chi_i
+= 1$ on a neighborhood of $M$. On that neighborhood
+$\dd(\sum\chi_i) = 0$, so
+\[
+\int_M\dd\omega = \sum_i\int_M\dd(\chi_i\omega),
+\qquad
+\int_{\partial M}\omega =
+\sum_i\int_{\partial M}\chi_i\omega :
+\]
+both sides are additive, and it suffices to prove the
+theorem for a form supported in a single chart image.
+
+\emph{Interior chart.} If $\operatorname{supp}\omega \cap M
+\subseteq \gamma(V)$ with $V$ open in $\R^k$: extend $\eta =
+\gamma^*\omega$ by zero to $\R^k$ (smooth, compact support
+in $V$) and apply \cref{lem:b3:forms:halfspace} with the
+support away from $\partial H^k$ (translate $V$ into the
+open upper half-space --- or simply repeat the case $i < k$
+computation over all of $\R^k$): $\int_M\dd\omega =
+\int_{\R^k}\dd\eta = 0$, and $\int_{\partial M}\omega = 0$
+since $\omega$ vanishes near $\partial M$.
+
+\emph{Boundary chart.} If $\operatorname{supp}\omega\cap M
+\subseteq \gamma(V \cap H^k)$: with $\eta = \gamma^*\omega$
+extended by zero,
+$\gamma^*(\dd\omega) = \dd\eta$
+(\cref{thm:b3:forms:pullback}(b)), so by
+\cref{def:b3:forms:integral}:
+\[
+\int_M\dd\omega = \int_{H^k}\dd\eta
+\overset{\text{\cref{lem:b3:forms:halfspace}}}{=}
+\int_{\partial H^k}\eta .
+\]
+It remains to identify the right side with $\int_{\partial
+M}\omega$. The boundary is parametrized by $\beta(u') =
+\gamma(u', 0)$, and $\beta^*\omega$ is the restriction of
+$\eta$ to $\{u_k = 0\}$ (pullback under the inclusion $u'
+\mapsto (u', 0)$ composed with $\gamma$). The orientation
+comparison is the same $(-1)^k$ on both sides: the frame
+$(\partial_1\beta, \dots, \partial_{k-1}\beta)$ sits in the
+induced orientation of $\partial M$ with the sign
+$\det(-e_k, e_1, \dots, e_{k-1}) = (-1)^k$ computed in the
+chart (the outward vector pulls back to $-e_k$), which is
+exactly the sign relating $\partial H^k$'s induced
+orientation to the standard $\R^{k-1}$
+(\cref{lem:b3:forms:halfspace}). The two sign conventions
+cancel:
+$\int_{\partial H^k}\eta = \int_{\partial M}\omega$.
+\end{proof}
+
+\begin{example}[The classical theorems]
+\label{ex:b3:forms:classical}
+Let $D \subseteq \R^2$ be a compact domain with smooth
+boundary, standardly oriented. For $\omega = P\,\dd x +
+Q\,\dd y$: $\dd\omega = \bigl(\partial_xQ -
+\partial_yP\bigr)\dd x\wedge\dd y$, and Stokes reads
+\[
+\int_D\Bigl(\frac{\partial Q}{\partial x} -
+\frac{\partial P}{\partial y}\Bigr)\dd x\,\dd y
+= \oint_{\partial D}P\,\dd x + Q\,\dd y :
+\]
+\emph{Green--Riemann}, proved for elementary domains in the
+Year~2 volume and now in natural generality. In $\R^3$,
+Stokes applied to the flux $2$-form of a vector field on a
+compact domain gives the \emph{divergence theorem}
+$\int_\Omega\operatorname{div}F =
+\int_{\partial\Omega}\langle F, \nu\rangle\,\dd S$, and
+applied to a $1$-form on a surface-with-boundary, the
+classical \emph{Kelvin--Stokes} curl theorem;
+\cref{exo:b3:forms:7} spells out both dictionaries.
+\end{example}
+
+\section{The winding number}\label{sec:b3:forms:winding}
+
+\begin{definition}\label{def:b3:forms:winding}
+Let $\gamma\colon\intcc01\to\R^2\setminus\{a\}$ be a smooth
+closed curve. Its \emph{winding number}\index{winding
+number} around $a$ is
+\[
+\operatorname{Ind}_\gamma(a) =
+\frac1{2\pi}\int_\gamma\omega_\theta^a,
+\qquad
+\omega_\theta^a = \frac{(x - a_1)\,\dd y - (y - a_2)\,\dd
+x}{(x - a_1)^2 + (y - a_2)^2} .
+\]
+\end{definition}
+
+\begin{proposition}\label{prop:b3:forms:windinginteger}
+$\operatorname{Ind}_\gamma(a) \in \Z$; as a function of $a$
+it is constant on each connected component of
+$\R^2\setminus\gamma(\intcc01)$ and zero on the unbounded
+component. For $\gamma(t) = a + r(\cos2\pi t, \sin2\pi t)$:
+$\operatorname{Ind}_\gamma(a) = 1$.
+\end{proposition}
+
+\begin{proof}
+Take $a = 0$ and write $\gamma = (x, y)$, $\rho =
+\norm\gamma > 0$, $\vartheta(t) =
+\int_0^t\gamma^*\omega_\theta$, so that $\vartheta' =
+\frac{xy' - yx'}{x^2 + y^2}$. In complex notation let $u(t)
+= \gamma(t)\,\rho(t)^{-1}\eu^{-\iu\vartheta(t)}$; then
+$\abs u = 1$ and a direct computation gives
+\[
+\frac{u'}{u} = \frac{\gamma'}{\gamma} - \frac{\rho'}{\rho}
+- \iu\vartheta'
+= \frac{\bar\gamma\gamma'}{\abs\gamma^2} -
+\frac{\rho'}{\rho} - \iu\,\frac{xy' -
+yx'}{\rho^2}
+= \frac{(xx' + yy')}{\rho^2} - \frac{\rho'}{\rho} = 0,
+\]
+since $\bar\gamma\gamma' = (xx' + yy') + \iu(xy' - yx')$ and
+$\rho\rho' = xx' + yy'$. So $u$ is constant: $\gamma(t) =
+\rho(t)\,c\,\eu^{\iu\vartheta(t)}$ with $\abs c = 1$, and
+$\gamma(1) = \gamma(0)$ with $\rho(1) = \rho(0)$ forces
+$\eu^{\iu\vartheta(1)} = \eu^{\iu\vartheta(0)} = 1$:
+$\vartheta(1) \in 2\pi\Z$, i.e.\
+$\operatorname{Ind}_\gamma(0) \in \Z$. As a function of $a$
+on the open complement of the compact curve, the defining
+integral is continuous (\cref{thm:b3:lebesgue:paramcont},
+domination on a neighborhood of each $a$); a continuous
+integer-valued function is locally constant, hence constant
+on components. For $\norm a$ large the integrand is
+$O(1/\norm a)$ uniformly in $t$, so the index tends to $0$
+and vanishes on the unbounded component. For the circle:
+$\gamma^*\omega_\theta^a = 2\pi\,\dd t$ directly.
+\end{proof}
+
+\begin{remark}
+Under $\C \cong \R^2$, $\frac{\dd z}{z} = \frac{x\,\dd x +
+y\,\dd y}{x^2 + y^2} + \iu\,\omega_\theta$, so
+$\operatorname{Ind}_\gamma(a) =
+\frac1{2\iu\pi}\oint_\gamma\frac{\dd z}{z - a}$: this is the
+index of \cref{ch:b3:residues}, and
+\cref{prop:b3:forms:windinginteger} re-proves its
+integrality and local constancy by real-variable means ---
+the topological half of the residue theorem, now standing on
+Stokes.
+\end{remark}
+
+\begin{proposition}\label{prop:b3:forms:exactloop}
+If $\omega = \dd f$ is exact on the open $U$ and
+$\gamma\colon\intcc01\to U$ is a closed curve, then
+$\int_\gamma\omega = 0$.
+\end{proposition}
+
+\begin{proof}
+$\int_\gamma\dd f = \int_0^1(f\circ\gamma)'(t)\,\dd t =
+f(\gamma(1)) - f(\gamma(0)) = 0$ --- the chain rule
+identifies $\gamma^*(\dd f)$ with $(f\circ\gamma)'\,\dd t$.
+\end{proof}
+
+\begin{method}\label{met:b3:forms:method}
+Computing with forms: (1) mechanize --- wedges reorder with
+signs, $\dd$ differentiates coefficients into fresh $\dd
+x_j$'s, pullbacks substitute; trust the algebra, it encodes
+every Jacobian. (2) To integrate a form over a submanifold:
+parametrize directly, pull back, integrate the coefficient;
+orientation is the only trap --- check one frame. (3) To
+prove an integral identity, look for a Stokes shape: is the
+integrand exact? is the domain a boundary? (4) To compare
+integrals over two ``parallel'' submanifolds, apply Stokes
+to the region between them (the deformation argument,
+\cref{exo:b3:forms:10}). (5) A nonzero integral of a closed
+form certifies a topological obstruction --- no primitive,
+no retraction, no zero-free extension: this is how the
+weekend problem kills retractions of the ball.
+\end{method}
+
+\section{Exercises}
+
+\begin{exercise}[$\star$]\label{exo:b3:forms:1}
+On $\R^3$, let $\omega = x\,\dd y - z\,\dd x$ and $\eta =
+\dd x + y\,\dd z$. Compute $\omega\wedge\eta$, $\dd\omega$,
+$\dd\eta$, and $\dd(\omega\wedge\eta)$, and verify the
+graded Leibniz rule on this example.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b3:forms:2}
+Identify, on $\R^3$, the three incarnations of $\dd$: for
+$f \in \Omega^0$, $\dd f \leftrightarrow \nabla f$; for the
+work form $\omega_F = F_1\dd x + F_2\dd y + F_3\dd z$,
+$\dd\omega_F \leftrightarrow \operatorname{curl}F$; for the
+flux form $\sigma_F = F_1\,\dd y\wedge\dd z + F_2\,\dd
+z\wedge\dd x + F_3\,\dd x\wedge\dd y$, $\dd\sigma_F
+\leftrightarrow \operatorname{div}F$. Deduce from $\dd^2 =
+0$ the identities $\operatorname{curl}\nabla f = 0$ and
+$\operatorname{div}\operatorname{curl}F = 0$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:forms:3}
+Decide whether each $1$-form is closed, exact on its domain,
+and compute a primitive when one exists:
+(a) $(2xy + z^2)\,\dd x + x^2\,\dd y + 2xz\,\dd z$ on
+$\R^3$;
+(b) $\dfrac{x\,\dd x + y\,\dd y}{x^2 + y^2}$ on
+$\R^2\setminus\{0\}$;
+(c) $\dfrac{-y\,\dd x + x\,\dd y}{x^2 + y^2}$ on the
+half-plane $\{x > 0\}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:forms:4}
+(The angular form) Verify that $\omega_\theta$
+(\cref{ex:b3:forms:angular}) is closed; compute
+$\int_\gamma\omega_\theta$ for $\gamma$ the circle of radius
+$r$ around $0$; conclude that $\omega_\theta$ is not exact
+on $\R^2\setminus\{0\}$, and that $\R^2\setminus\{0\}$ is
+star-shaped with respect to none of its points (two routes:
+via \cref{thm:b3:forms:poincare}, and directly from the
+geometry).
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:forms:5}
+(Area form of a hypersurface) Let $M \subseteq \R^n$ be a
+compact oriented hypersurface whose orientation is given by
+a unit normal field $\nu$ ($(w_1, \dots, w_{n-1})$ positive
+iff $(\nu, w_1, \dots, w_{n-1})$ positive in $\R^n$). Show
+that the $(n-1)$-form $\sigma_\nu =
+\sum_i(-1)^{i-1}\nu_i\,\dd x_1\wedge\dots\wedge\widehat{\dd
+x_i}\wedge\dots\wedge\dd x_n$ restricts on $M$ to the
+\emph{area form}: for a direct parametrization $\gamma$,
+$\gamma^*\sigma_\nu = \sqrt{\det G}\,\dd u_1\wedge\dots
+\wedge\dd u_{n-1}$, where $G = ({}^t D\gamma)(D\gamma)$ is
+the Gram matrix. \emph{(Note that
+$(\gamma^*\sigma_\nu)(e_1, \dots, e_{n-1}) = \det(\nu,
+\partial_1\gamma, \dots, \partial_{n-1}\gamma)$ and square
+this determinant.)} Compute $\int_{S^2}\sigma_\nu = 4\pi$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:forms:6}
+Compute $\int_{S^2}\omega$ for $\omega = x\,\dd y\wedge\dd z
++ y\,\dd z\wedge\dd x + z\,\dd x\wedge\dd y$: (a) directly
+in spherical coordinates; (b) via Stokes on the unit ball.
+Deduce $\operatorname{vol}(B^3) = \frac{4\pi}3$ from the
+area of $S^2$, and generalize:
+$n\operatorname{vol}(B^n) = \operatorname{area}(S^{n-1})$,
+consistent with \cref{thm:b3:product:ballvolume}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:forms:7}
+(The dictionaries) Derive carefully from
+\cref{thm:b3:forms:stokes}: (a) the divergence theorem in
+$\R^3$ (combine \cref{exo:b3:forms:2} and
+\cref{exo:b3:forms:5}); (b) the Kelvin--Stokes theorem
+$\int_S\langle\operatorname{curl}F, \nu\rangle\,\dd S =
+\oint_{\partial S}\langle F, \tau\rangle\,\dd\ell$ for a
+compact oriented surface with boundary in $\R^3$. Check the
+orientation conventions agree on the upper half-sphere
+bounded by the equator.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:forms:8}
+(Green's identities) For $u, v$ smooth on a neighborhood of
+a compact domain $\Omega \subseteq \R^n$ with smooth
+boundary, prove
+\[
+\int_\Omega\bigl(u\,\Delta v + \langle\nabla u, \nabla
+v\rangle\bigr) = \int_{\partial\Omega}u\,\partial_\nu
+v\,\dd S,
+\qquad
+\int_\Omega\bigl(u\,\Delta v - v\,\Delta u\bigr) =
+\int_{\partial\Omega}\bigl(u\,\partial_\nu v -
+v\,\partial_\nu u\bigr)\dd S .
+\]
+Deduce: a harmonic function on $\Omega$ vanishing on
+$\partial\Omega$ vanishes identically, and two harmonic
+functions with the same boundary values coincide ---
+uniqueness in the Dirichlet problem of
+\cref{ch:b3:conformal}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:forms:9}
+(Change of variables, oriented form) Let $\varphi\colon U
+\to V$ be a diffeomorphism of opens of $\R^n$ with $\det
+D\varphi > 0$, and $f$ continuous with compact support in
+$V$. Show that the pullback identity
+$\int_U\varphi^*(f\,\dd x_1\wedge\dots\wedge\dd x_n) =
+\int_Vf\,\dd x_1\wedge\dots\wedge\dd x_n$ is equivalent to
+the change-of-variables theorem
+(\cref{thm:b3:product:changeofvar}) for such $\varphi$, and
+explain exactly where the absolute value on the Jacobian
+went.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:forms:10}
+(Deformation) Let $\omega$ be a \emph{closed} $2$-form on
+$\R^3\setminus\{0\}$ and $S_r$ the sphere of radius $r$
+centered at $0$. Show that $\int_{S_r}\omega$ does not
+depend on $r > 0$ \emph{(apply Stokes to the shell between
+two radii; mind the two boundary orientations)}. Apply to
+the \emph{solid-angle form}
+\[
+\omega = \frac{x\,\dd y\wedge\dd z + y\,\dd z\wedge\dd x +
+z\,\dd x\wedge\dd y}{(x^2 + y^2 + z^2)^{3/2}} :
+\]
+check it is closed, compute $\int_{S_r}\omega = 4\pi$, and
+conclude it is closed but not exact on
+$\R^3\setminus\{0\}$ --- the two-dimensional sibling of
+$\omega_\theta$, and the geometric content of Gauss's law
+in electrostatics.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:forms:11}
+Let $\gamma$ be a smooth closed curve in
+$\R^2\setminus\{0\}$ with $n = \operatorname{Ind}_\gamma(0)$.
+Show $\int_\gamma\omega = n\int_{S^1}\omega$ for
+\emph{every} closed $1$-form $\omega$ on
+$\R^2\setminus\{0\}$ \emph{(write $\omega = c\,\omega_\theta
++ \dd f$ by \cref{exo:b3:forms:12})}. Interpretation: on the
+punctured plane, the winding number is the only obstruction
+to the vanishing of periods.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:forms:12}
+(First de Rham computation) Show that every closed $1$-form
+$\omega$ on $U = \R^2\setminus\{0\}$ is uniquely
+\[
+\omega = c\,\omega_\theta + \dd f,
+\qquad c = \frac1{2\pi}\int_{S^1}\omega,\quad f \in
+\mathcal C^\infty(U) :
+\]
+define $f(p)$ by integrating $\omega - c\,\omega_\theta$
+along a path from $(1,0)$ to $p$ (radial piece then circular
+arc), show the result is independent of the choices
+precisely because the $S^1$-period vanishes, and check $\dd
+f = \omega - c\,\omega_\theta$. Conclude:
+$H^1(\R^2\setminus\{0\}) \cong \R$, generated by the
+angular form.
+\end{exercise}
+
+\section{Problem: Brouwer's fixed-point theorem}
+
+\begin{problem}[{Weekend problem --- no retraction, no
+escape}]\label{pb:b3:forms:1}
+Brouwer's theorem states that \emph{every continuous map of
+the closed unit ball $\bar B = \bar B^n \subseteq \R^n$ into
+itself has a fixed point} --- one of mathematics' great
+theorems, with consequences from game theory (Nash
+equilibria) to matrix analysis. The differential-form proof
+is the cleanest known: Stokes shows the sphere is not a
+retract of the ball, and everything follows. Throughout,
+$S = S^{n-1} = \partial\bar B$, $n \geq 2$, and
+\[
+\sigma = \sum_{i=1}^n(-1)^{i-1}x_i\,
+\dd x_1\wedge\dots\wedge\widehat{\dd x_i}\wedge\dots\wedge
+\dd x_n
+\]
+(the hat deletes the factor).
+
+\medskip
+\noindent\textbf{Part I --- The measuring instrument.}
+\begin{enumerate}
+  \item Compute $\dd\sigma$, and deduce from Stokes
+        (\cref{thm:b3:forms:stokes}) that $\int_S\sigma =
+        n\operatorname{vol}(\bar B) > 0$, where $S$ carries
+        the boundary orientation of the ball.
+  \item For $n = 2$ and $n = 3$, identify the restriction of
+        $\sigma$ to $S$ with the arclength and area forms
+        (\cref{exo:b3:forms:5} with $\nu(x) = x$) and
+        recompute $\int_S\sigma$ directly.
+  \item Let $W \subseteq \R^N$ be open and $\varphi\colon W
+        \to \R^n$ smooth with $\norm{\varphi(x)} = 1$ for
+        all $x \in W$. Show that
+        $\varphi^*(\dd\sigma) = 0$. \emph{(Differentiate
+        $\norm\varphi^2 = 1$: the image of $D\varphi(x)$
+        lies in the hyperplane $\varphi(x)^\perp$, of
+        dimension $n - 1$; then apply
+        \cref{prop:b3:forms:linearpullback}(2).)}
+  \item Where is the flaw in the following ``proof'' that
+        $\int_S\sigma = 0$: ``$S$ is compact without
+        boundary, and $\sigma$ restricted to $S$ is a top
+        form on it, hence closed, hence $\int_S\sigma =
+        \int_S\dd(\text{something}) = 0$ by Stokes''?
+        (Pinpoint the wrong word.)
+  \item Explain in one paragraph the strategy of Part II:
+        what will be integrated, over what, and where the
+        contradiction will come from.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part II --- No smooth retraction.} Suppose,
+for contradiction, that $r$ is a \emph{smooth retraction} of
+the ball onto its sphere: $r$ is smooth on a neighborhood of
+$\bar B$, $r(\bar B) \subseteq S$, and $r(x) = x$ for all
+$x \in S$.
+\begin{enumerate}[resume]
+  \item Justify $\int_Sr^*\sigma = \int_S\sigma$
+        \emph{(on $S$, $r$ restricts to the identity: if
+        $\gamma$ is a direct parametrization of a piece of
+        $S$, then $r\circ\gamma = \gamma$)}.
+  \item Using Stokes on $\bar B$, show $\int_Sr^*\sigma =
+        \int_{\bar B}\dd(r^*\sigma)$.
+  \item Show $\dd(r^*\sigma) = r^*(\dd\sigma) = 0$ (question
+        3 applied to $\varphi = r$), and conclude:
+        \emph{there is no smooth retraction $\bar B \to S$.}
+  \item Settle the excluded case $n = 1$ by hand: show
+        directly that no continuous map $\intcc{-1}1 \to
+        \{-1, 1\}$ fixes both endpoints, and name the
+        theorem you used.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part III --- Smooth Brouwer.} Let $g$ be
+smooth on a neighborhood of $\bar B$ with $g(\bar B)
+\subseteq \bar B$ and \emph{no} fixed point in $\bar B$.
+\begin{enumerate}[resume]
+  \item Show $\delta = \min_{x\in\bar B}\norm{g(x) - x} >
+        0$.
+  \item For $x \in \bar B$ let $u(x) = \frac{x -
+        g(x)}{\norm{x - g(x)}}$ and let $r(x) = x +
+        t(x)\,u(x)$ be the intersection of the ray
+        $\{x + tu(x) : t \geq 0\}$ with $S$. Solve the
+        quadratic $\norm{x + tu}^2 = 1$ and obtain
+        \[
+        t(x) = -\langle x, u(x)\rangle +
+        \sqrt{1 - \norm x^2 + \langle x, u(x)\rangle^2}
+        \;\geq\; 0 .
+        \]
+  \item Show that the radicand is \emph{strictly} positive
+        on $\bar B$: if $1 - \norm x^2 + \langle x,
+        u(x)\rangle^2 = 0$ then $\norm x = 1$ and $\langle
+        x, u(x)\rangle = 0$, i.e.\ $\langle x, x -
+        g(x)\rangle = 0$, i.e.\ $\langle x, g(x)\rangle =
+        1$; by Cauchy--Schwarz with $\norm x = 1$,
+        $\norm{g(x)} \leq 1$, this forces $g(x) = x$ ---
+        excluded. Deduce that $r$ is smooth on a
+        neighborhood of $\bar B$.
+  \item Show $r(\bar B) \subseteq S$ and $r(x) = x$ for $x
+        \in S$ \emph{(for $\norm x = 1$, check $t(x) = 0$
+        using $\langle x, u(x)\rangle \geq 0$, which itself
+        follows from $\langle x, x - g(x)\rangle = 1 -
+        \langle x, g(x)\rangle \geq 0$)}. Conclude with
+        Part II: \emph{every smooth self-map of $\bar B$ has
+        a fixed point.}
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part IV --- Continuous Brouwer.} Let
+$f\colon\bar B\to\bar B$ be continuous without fixed point.
+\begin{enumerate}[resume]
+  \item Show $\varepsilon = \min_{\bar B}\norm{f - x} > 0$,
+        and produce a \emph{polynomial} map $p\colon\R^n\to
+        \R^n$ with $\sup_{\bar B}\norm{p - f} <
+        \varepsilon/2$ (Stone--Weierstrass,
+        \cref{thm:b3:complete:stoneweierstrass}, coordinate
+        by coordinate --- justify the passage from scalar to
+        vector approximation).
+  \item The map $p$ may leave the ball; set $g = \frac{p}{1
+        + \varepsilon/2}$. Show $g(\bar B) \subseteq \bar B$
+        and $\sup_{\bar B}\norm{g - f} < \varepsilon$.
+  \item Derive a contradiction with Part III and conclude:
+        \emph{every continuous map $\bar B^n \to \bar B^n$
+        has a fixed point.}
+  \item Show by example that the theorem fails on: the open
+        ball; the sphere $S$; a closed annulus. Which
+        property of $\bar B$ does each counterexample lose?
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part V --- Dividends.}
+\begin{enumerate}[resume]
+  \item (Perron--Frobenius, existence) Let $A$ be an
+        $n\times n$ matrix with all entries $> 0$, and
+        $\Delta = \{x \in \R^n : x_i \geq 0,\ \sum x_i =
+        1\}$. Show the map $x \mapsto Ax/\norm{Ax}_1$ is
+        well defined and continuous on $\Delta$, that
+        $\Delta$ is homeomorphic to a closed ball of
+        $\R^{n-1}$ (radial homeomorphism from a convex
+        compact with nonempty interior in its affine span),
+        and conclude that $A$ has an eigenvector with
+        strictly positive entries and eigenvalue $> 0$.
+  \item Deduce that every stochastic matrix with positive
+        entries (columns summing to $1$) has a stationary
+        probability vector $\pi = A\pi$ --- the
+        PageRank-type vector. (Uniqueness holds too but
+        needs other tools.)
+  \item (Hairy ball, setup) Let $v$ be smooth on a
+        neighborhood of $S = S^{n-1}$ with $\langle v(x),
+        x\rangle = 0$ and $\norm{v(x)} = 1$ for $x \in S$
+        (a \emph{unit tangent field}). For $t \in \R$ set
+        $F_t(x) = x + t\,v(x)$. Show
+        $\norm{F_t(x)} = \sqrt{1 + t^2}$ on $S$: $F_t$ maps
+        $S$ into the sphere $\sqrt{1+t^2}\,S$.
+  \item Show that $P(t) = \int_SF_t^*\sigma$ is a
+        \emph{polynomial} in $t$ \emph{(each coefficient
+        function of $F_t^*\sigma$ in a chart is polynomial
+        in $t$, with coefficients smooth in the chart
+        variable; integration is linear)}.
+  \item Show that for $\abs t$ small, $F_t$ is a
+        diffeomorphism from $S$ onto $\sqrt{1+t^2}\,S$:
+        injectivity for $t\operatorname{Lip}(v) < 1$; local
+        diffeomorphism by the inverse function theorem
+        (\cref{thm:b3:submanifolds:ift} in charts); image
+        open and closed in the connected target sphere.
+        Deduce, using \cref{lem:b3:forms:consistency} and
+        the scaling $\sigma_{\lambda x} =
+        \lambda^{n}\,\sigma_x$ under $x \mapsto \lambda x$
+        (check it), that
+        \[
+        P(t) = \pm(1 + t^2)^{n/2}\int_S\sigma,
+        \qquad\text{with the sign } + \text{ for small } t
+        \]
+        (orientation preserved by continuity from $t = 0$).
+  \item Conclude (Milnor): if $n$ is \emph{odd}, $(1 +
+        t^2)^{n/2}$ is not a polynomial in $t$, yet it
+        agrees with the polynomial $P(t)/\int_S\sigma$ near
+        $0$ --- contradiction. Hence \emph{the
+        even-dimensional spheres $S^{n-1}$ ($n$ odd) carry
+        no unit tangent field}, and, by normalizing and
+        smoothing (convolve componentwise and project ---
+        justify both steps), no continuous nowhere-vanishing
+        tangent field at all: every wind on Earth leaves a
+        calm point.
+
+  \item (Odd spheres comb freely) Exhibit on $S^{2m-1}
+        \subseteq \R^{2m} \cong \C^m$ an explicit smooth
+        unit tangent field: $v(x) = \iu x$ in complex
+        notation, i.e.
+        \[
+        v(x_1, y_1, \dots, x_m, y_m) =
+        (-y_1, x_1, \dots, -y_m, x_m) .
+        \]
+        Verify tangency and unit length, and conclude that
+        the parity dichotomy of question 23 is sharp: a
+        sphere is combable exactly when its dimension is
+        odd. Where does the polynomial argument of question
+        22 break for even $n$?
+  \item (Zeros from boundary behavior) Let $f \colon \bar
+        B^n \to \R^n$ be continuous with $\langle f(x),
+        x\rangle \geq 0$ for every $x \in S^{n-1}$. Show
+        that $f$ vanishes somewhere in $\bar B^n$.
+        \emph{(If not, $g(x) = -f(x)/\norm{f(x)}$ maps
+        $\bar B$ continuously into $S \subseteq \bar B$;
+        apply Brouwer to $g$ and contradict the boundary
+        hypothesis.)} Deduce the \emph{surjectivity
+        criterion}: a continuous $F\colon\R^n\to\R^n$ with
+        $\frac{\langle F(x), x\rangle}{\norm x} \to
+        +\infty$ as $\norm x \to \infty$ is surjective ---
+        the finite-dimensional ancestor of the coercivity
+        arguments of nonlinear analysis.
+\end{enumerate}
+\end{problem}

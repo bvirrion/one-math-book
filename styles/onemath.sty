@@ -262,11 +262,47 @@
 % Solutions appendix
 % Usage: \begin{solution}{exo:tle:seq:1} ... \end{solution}
 % Prints "Solution of Exercise <n> (page <p>)." / French equivalent.
+% Every solution is also a hyperlink target labelled sol:<key>, so that
+% exercises can link forward to their solutions (see \omsolutionlinks).
 % ----------------------------------------------------------------------------
 \newenvironment{solution}[1]{%
-  \par\medskip\noindent\textbf{\omsolutionof~\cref{#1}} (\ompage~\pageref{#1}).\par\nopagebreak\smallskip
+  \par\medskip\phantomsection\label{sol:#1}%
+  \noindent\textbf{\omsolutionof~\cref{#1}} (\ompage~\pageref{#1}).\par\nopagebreak\smallskip
   \noindent\ignorespaces
 }{\par\medskip}
+
+% ----------------------------------------------------------------------------
+% Forward links exercise -> solution (opt-in per book)
+% A book whose entry file calls \omsolutionlinks (after loading this
+% package, before any chapter) gets, at the end of every exercise and
+% problem, a right-aligned pointer "Solution p. <n>" hyperlinked to the
+% sol:<key> target above, where <key> is the first \label written inside
+% the environment. Books that do not opt in are typeset unchanged.
+% ----------------------------------------------------------------------------
+\RequirePackage{etoolbox}
+\newif\ifomsollinks
+\newcommand{\omsolutionlinks}{\omsollinkstrue}
+\gdef\omsollink@key{}
+\newcommand{\omsollink@arm}{%
+  \gdef\omsollink@key{}%
+  \let\omsollink@origlabel\label
+  \renewcommand{\label}[1]{%
+    \omsollink@origlabel{##1}%
+    \ifdefempty{\omsollink@key}{\gdef\omsollink@key{##1}}{}%
+  }%
+}
+\newcommand{\omsollink@emit}{%
+  \ifdefempty{\omsollink@key}{}{%
+    \par\nopagebreak\smallskip
+    \noindent\hfill{\footnotesize\itshape
+      \hyperref[sol:\omsollink@key]{\omnameGotoSolution~\pageref{sol:\omsollink@key}}}%
+    \par
+  }%
+}
+\AtBeginEnvironment{exercise}{\ifomsollinks\omsollink@arm\fi}
+\AtEndEnvironment{exercise}{\ifomsollinks\omsollink@emit\fi}
+\AtBeginEnvironment{problem}{\ifomsollinks\omsollink@arm\fi}
+\AtEndEnvironment{problem}{\ifomsollinks\omsollink@emit\fi}
 
 % ----------------------------------------------------------------------------
 % Math macros
