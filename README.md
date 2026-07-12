@@ -14,7 +14,7 @@ several volumes:
    (also French and Dutch);
 3. **University Mathematics — Year 1**;
 4. **University Mathematics — Year 2**;
-5. **University Mathematics — Year 3** (planned).
+5. **University Mathematics — Year 3**.
 
 The style is concise and rigorous: courses built from **definitions,
 examples, propositions, theorems and methods**, with proofs whenever they
@@ -40,11 +40,12 @@ collected at the end of each book.
 | High School | Grade 12 (age 17–18) | Final year of secondary school, advanced track | ✅ 16 chapters, exercises + solutions |
 | University — Year 1 | Bachelor Year 1 (age 18–19) | First post-secondary year (old French MPSI program) | ✅ 25 chapters, exercises + solutions |
 | University — Year 2 | Bachelor Year 2 (age 19–20) | Second post-secondary year (French MP* program) | ✅ 23 chapters, exercises + solutions |
+| University — Year 3 | Bachelor Year 3 (age 20–21) | Third post-secondary year (French math L3 program) | ✅ 21 chapters, exercises + weekend problems + solutions |
 | Primary & Middle School (FR) | Années 1–9 | Full French translation | ✅ same chapter set as English |
 | Primary & Middle School (NL) | Jaren 1–9 | Full Dutch translation | ✅ same chapter set as English |
 | High School (FR) | Années 10–12 | Full French translation | ✅ same chapter set as English |
 | High School (NL) | Jaren 10–12 | Full Dutch translation | ✅ same chapter set as English |
-| Other | Kindergarten, University Year 3 | | 🚧 planned |
+| Other | Kindergarten | | 🚧 planned |
 
 The lower the grade, the younger the reader it is written for: earlier
 parts use more figures, more detailed worked steps, and gentler
@@ -70,6 +71,7 @@ build/one_math_book_2_high_school_fr.pdf
 build/one_math_book_2_high_school_nl.pdf
 build/one_math_book_3_university_year_1.pdf
 build/one_math_book_4_university_year_2.pdf
+build/one_math_book_5_university_year_3.pdf
 ```
 
 `make clean` removes auxiliary files, `make distclean` removes the whole

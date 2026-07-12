@@ -90,16 +90,18 @@ PDFs: `build/one_math_book_<N>_<slug>[_<lang>].pdf`.
 
 ## Invariants to verify after writing/editing chapters
 
-Every exercise has exactly one solution, keyed by label. Per chapter:
+Every exercise (and every university-volume weekend `problem`, label
+`pb:...`) has exactly one solution, keyed by label. Per chapter:
 
 ```sh
-diff <(grep -o 'label{exo:[^}]*}' parts/<year>/NN-slug.tex | sed 's/label{//;s/}//') \
+diff <(grep -o 'label{\(exo\|pb\):[^}]*}' parts/<year>/NN-slug.tex | sed 's/label{//;s/}//') \
      <(grep -o 'begin{solution}{[^}]*}' parts/<year>/solutions/NN-slug.tex | sed 's/begin{solution}{//;s/}//')
 # French edition:
 diff <(grep -o 'label{exo:[^}]*}' parts/<year>/fr/NN-slug.tex | sed 's/label{//;s/}//') \
      <(grep -o 'begin{solution}{[^}]*}' parts/<year>/solutions/fr/NN-slug.tex | sed 's/begin{solution}{//;s/}//')
 grep -rho 'label{[^}]*}' parts/<year>/ | sort | uniq -d   # duplicate labels
 grep -rn 'end{[a-z]*>' parts/<year>/                       # \end{proof> typo class
+grep -rn '\.\.\.' parts/<year>/ | grep -v '\\dots\|\\ldots\|\\cdots\|\\foreach'  # drafty "..." prose (use \dots)
 ```
 
 Content rules (from CONTRIBUTING.md, enforced in review):

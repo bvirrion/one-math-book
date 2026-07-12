@@ -1,0 +1,531 @@
+\chapter{The Fourier Transform}\label{ch:b3:fouriertransform}
+
+Fourier series decompose periodic signals into discrete
+harmonics; the Fourier \emph{transform} does the same for
+signals on the whole line, with a continuum of frequencies. It
+converts differentiation into multiplication, convolution into
+products, and Gaussians into Gaussians --- the reasons it
+solves differential equations, drives signal processing, and
+will prove the central limit theorem in \cref{ch:b3:clt}. This
+chapter develops the $L^1$ theory (Riemann--Lebesgue,
+inversion, injectivity), the Schwartz class where the
+transform is a perfect bijection, and the $L^2$ theory
+(Plancherel: the transform is, up to a constant, a unitary
+operator), with two showpiece applications: the heat equation,
+solved end to end in the weekend problem, and the Poisson
+summation formula. Convention:
+\[
+\hat f(\xi) = \int_\R f(x)\,\eu^{-\iu\xi x}\,\dd x .
+\]
+
+\section{The transform on \texorpdfstring{$L^1$}{L1}}
+
+\begin{proposition}\label{prop:b3:fouriertransform:basic}
+For $f \in L^1(\R)$: $\hat f$ is well defined, bounded
+($\norm{\hat f}_\infty \leq \norm f_1$), continuous, and:
+\begin{enumerate}
+  \item $\widehat{\tau_af}(\xi) = \eu^{-\iu a\xi}\hat f(\xi)$
+        and $\widehat{\eu^{\iu ax}f}(\xi) = \hat f(\xi - a)$;
+  \item $\widehat{f(\cdot/\lambda)}(\xi) = \lambda\hat
+        f(\lambda\xi)$ for $\lambda > 0$;
+  \item if $xf \in L^1$, then $\hat f$ is $\mathcal C^1$ with
+        $(\hat f)'(\xi) = \widehat{(-\iu x)f}(\xi)$;
+  \item if $f \in \mathcal C^1$ with $f' \in L^1$ (and $f \to
+        0$ at $\pm\infty$, automatic here), then
+        $\widehat{f'}(\xi) = \iu\xi\hat f(\xi)$;
+  \item $\widehat{f * g} = \hat f\,\hat g$ for $f, g \in L^1$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+Boundedness: $\abs{\hat f} \leq \int\abs f$. Continuity: DCT
+with dominator $\abs f$ (\cref{thm:b3:lebesgue:paramcont}).
+(1), (2): substitutions
+(\cref{thm:b3:product:linearchange}). (3): differentiation
+under the integral, dominator $\abs{xf}$
+(\cref{thm:b3:lebesgue:paramdiff}). (4): first, $f(x) = f(0)
++ \int_0^xf'$ has a limit at $\pm\infty$ ($f' \in L^1$), which
+must be $0$ ($f \in L^1$); then integrate by parts on $[-A,
+A]$ and let $A \to \infty$. (5): Fubini, legitimate since
+$(x,y)\mapsto f(x - y)g(y)\eu^{-\iu\xi x}$ is absolutely
+integrable (\cref{thm:b3:product:convolution}):
+\[
+\widehat{f*g}(\xi) = \iint f(x - y)g(y)\eu^{-\iu\xi(x - y)}
+\eu^{-\iu\xi y}\dd x\,\dd y = \hat f(\xi)\,\hat g(\xi).
+\]
+\end{proof}
+
+\begin{example}\label{ex:b3:fouriertransform:gaussian}
+The Gaussian: for $a > 0$,\index{Gaussian, Fourier transform}
+\[
+\widehat{\eu^{-ax^2}}(\xi) =
+\sqrt{\frac\pi a}\;\eu^{-\xi^2/4a} :
+\]
+by \cref{exo:b3:lebesgue:7} (the ODE $F' = -\frac\xi{2}F$
+trick, rescaled), or by (3): $g = \widehat{\eu^{-ax^2}}$
+satisfies $g'(\xi) = -\frac{\xi}{2a}g(\xi)$ (integrate by
+parts), $g(0) = \sqrt{\pi/a}$. Gaussians are fixed points of
+the transform up to scaling --- the deep reason they rule the
+central limit theorem.
+\end{example}
+
+\begin{theorem}[Riemann--Lebesgue]
+\label{thm:b3:fouriertransform:riemannlebesgue}
+For $f \in L^1(\R)$: $\hat f(\xi) \to 0$ as $\abs\xi \to
+\infty$. Thus $\widehat{\phantom f} \colon L^1 \to \mathcal
+C_0(\R)$ (continuous functions vanishing at
+infinity).\index{Riemann--Lebesgue lemma}
+\end{theorem}
+
+\begin{proof}
+For an indicator of an interval, $\widehat{\mathbf 1_{\intcc
+ab}}(\xi) = \frac{\eu^{-\iu a\xi} - \eu^{-\iu b\xi}}{\iu\xi}
+\to 0$; hence for step functions. Step functions are dense in
+$L^1$ (\cref{thm:b3:lp:density}(1) plus approximation of
+finite-measure sets by finite unions of intervals,
+\cref{exo:b3:measure:7}), and the transform is
+$\norm\cdot_\infty$-$\norm\cdot_1$ continuous: for $\norm{f -
+s}_1 < \varepsilon$, $\limsup_{\abs\xi\to\infty}\abs{\hat
+f(\xi)} \leq \varepsilon$.
+\end{proof}
+
+\section{Inversion and injectivity}
+
+\begin{lemma}[Multiplication formula]
+\label{lem:b3:fouriertransform:multiplication}
+For $f, g \in L^1(\R)$: $\displaystyle\int \hat f\,g =
+\int f\,\hat g$.
+\end{lemma}
+
+\begin{proof}
+Both sides equal $\iint f(x)g(\xi)\eu^{-\iu x\xi}\dd
+x\,\dd\xi$ (Tonelli--Fubini: the double integral of the
+absolute value is $\norm f_1\norm g_1$).
+\end{proof}
+
+\begin{theorem}[Inversion]\label{thm:b3:fouriertransform:inversion}
+Let $f \in L^1(\R)$.\index{Fourier inversion theorem}
+\begin{enumerate}
+  \item (Gaussian summability) For every $x$,
+        \[
+        (f * g_\varepsilon)(x) =
+        \frac1{2\pi}\int_\R \hat f(\xi)\,
+        \eu^{-\varepsilon\xi^2}\,\eu^{\iu x\xi}\,\dd\xi,
+        \qquad\text{where } g_\varepsilon(y) =
+        \frac{1}{2\sqrt{\pi\varepsilon}}\,
+        \eu^{-y^2/4\varepsilon},
+        \]
+        and $f * g_\varepsilon \to f$ in $L^1$ as $\varepsilon
+        \to 0$.
+  \item If moreover $\hat f \in L^1$, then for almost every
+        $x$
+        \[
+        f(x) = \frac{1}{2\pi}\int_\R \hat
+        f(\xi)\,\eu^{\iu x\xi}\,\dd\xi ,
+        \]
+        and $f$ has a continuous representative.
+  \item (Injectivity) If $\hat f = 0$ then $f = 0$ a.e.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) Fix $x$ and apply
+\cref{lem:b3:fouriertransform:multiplication} to $f$ and
+$g(\xi) = \frac1{2\pi}\eu^{-\varepsilon\xi^2}\eu^{\iu x\xi}$:
+by \cref{ex:b3:fouriertransform:gaussian} (with the modulation
+rule),
+\[
+\hat g(y) = \frac1{2\pi}\sqrt{\frac\pi\varepsilon}\,
+\eu^{-(y - x)^2/4\varepsilon} = g_\varepsilon(x - y),
+\]
+so $\frac1{2\pi}\int\hat f(\xi)\eu^{-\varepsilon\xi^2}
+\eu^{\iu x\xi}\dd\xi = \int f(y)g_\varepsilon(x - y)\dd y =
+(f*g_\varepsilon)(x)$. The $g_\varepsilon$ are an
+approximate identity: $g_\varepsilon \geq 0$,
+$\int g_\varepsilon = 1$ (Gaussian integral), concentrating at
+$0$; the proof of \cref{thm:b3:lp:regularization}(2) applies
+verbatim (only $\int g_\varepsilon = 1$ and concentration were
+used: for the tail, $\int_{\abs y > \delta}g_\varepsilon \to
+0$): $\norm{f * g_\varepsilon - f}_1 \to 0$.
+
+(2) If $\hat f \in L^1$: the right side of (1) converges, by
+DCT (dominator $\abs{\hat f}$), to $\frac1{2\pi}\int\hat
+f(\xi)\eu^{\iu x\xi}\dd\xi$ for \emph{every} $x$, and this
+limit function is continuous (DCT again). On the other hand $f
+* g_\varepsilon \to f$ in $L^1$, so along a subsequence a.e.\
+(\cref{thm:b3:lp:complete}): the two limits agree a.e.
+
+(3) $\hat f = 0$ makes the right side of (1) vanish: $f *
+g_\varepsilon = 0$ for all $\varepsilon$, and $f *
+g_\varepsilon \to f$ in $L^1$: $f = 0$ a.e.
+\end{proof}
+
+\section{The Schwartz class}
+
+\begin{definition}\label{def:b3:fouriertransform:schwartz}
+The \emph{Schwartz class}\index{Schwartz class} $\mathcal
+S(\R)$ consists of the $\mathcal C^\infty$ functions $f$ with
+$\sup_x\abs{x^m f^{(n)}(x)} < \infty$ for all $m, n \geq 0$
+(all derivatives decay faster than any power). Examples:
+$\eu^{-ax^2}$, $\mathcal C_c^\infty$. Clearly $\mathcal S
+\subseteq L^p$ for every $p$ (bound by $C(1 + x^2)^{-1}$), and
+$\mathcal S$ is stable under derivatives, multiplication by
+polynomials, and products.
+\end{definition}
+
+\begin{theorem}\label{thm:b3:fouriertransform:schwartz}
+The Fourier transform maps $\mathcal S(\R)$ bijectively onto
+itself, with inverse $\check g(x) = \frac1{2\pi}\int
+g(\xi)\eu^{\iu x\xi}\dd\xi$.
+\end{theorem}
+
+\begin{proof}
+Let $f \in \mathcal S$. Iterating
+\cref{prop:b3:fouriertransform:basic}(3), $(\hat f)^{(n)} =
+\widehat{(-\iu x)^nf}$ (each $x^kf \in L^1$); iterating (4)
+with $h = (-\iu x)^nf \in \mathcal S$ (all of whose
+derivatives are integrable), $(\iu\xi)^m\hat h =
+\widehat{h^{(m)}}$. Combining,
+\[
+\abs{\xi^m\,(\hat f)^{(n)}(\xi)}
+= \bigl|\widehat{\,h^{(m)}}(\xi)\bigr|
+\leq \bigl\|\bigl((-\iu x)^nf\bigr)^{(m)}\bigr\|_1 < \infty
+\]
+uniformly in $\xi$: $\hat f \in \mathcal S$. Since $\hat f \in L^1$, inversion
+(\cref{thm:b3:fouriertransform:inversion}(2)) holds
+everywhere (both sides continuous): $\check{\hat f} = f$, and
+symmetrically $\widehat{\check g} = g$ (the check transform
+is $g \mapsto \frac1{2\pi}\hat g(-\cdot)$, again preserving
+$\mathcal S$): bijection.
+\end{proof}
+
+\section{Plancherel and \texorpdfstring{$L^2$}{L2}}
+
+\begin{theorem}[Plancherel]\label{thm:b3:fouriertransform:plancherel}
+For $f \in L^1 \cap L^2(\R)$:\index{Plancherel's theorem}
+\[
+\norm{\hat f}_2^2 = 2\pi\,\norm f_2^2 .
+\]
+Consequently $\widehat{\phantom f}$ extends uniquely to a
+continuous linear map $\mathcal F \colon L^2(\R) \to L^2(\R)$
+with $\norm{\mathcal Ff}_2 = \sqrt{2\pi}\norm f_2$; $\mathcal
+F$ is bijective, with $\mathcal F^{-1} =
+\frac1{2\pi}\,\mathcal F\circ\sigma$ where $\sigma f =
+f(-\cdot)$, and it preserves inner products up to the factor
+$2\pi$.
+\end{theorem}
+
+\begin{proof}
+Let $f \in L^1\cap L^2$ and $h = f * \tilde f$ with
+$\tilde f(x) = \overline{f(-x)}$. Then $h \in L^1$
+(\cref{thm:b3:product:convolution}), $h$ is continuous and
+bounded (\cref{exo:b3:lp:6}: $f, \tilde f \in L^2$), $h(0) =
+\int f\bar f = \norm f_2^2$, and $\hat h = \hat
+f\,\widehat{\tilde f} = \hat f\,\overline{\hat f} =
+\abs{\hat f}^2 \geq 0$ (compute $\widehat{\tilde f} =
+\overline{\hat f}$). Apply
+\cref{thm:b3:fouriertransform:inversion}(1) to $h$ at $x = 0$:
+\[
+(h * g_\varepsilon)(0) = \frac1{2\pi}\int \hat
+h(\xi)\,\eu^{-\varepsilon\xi^2}\dd\xi .
+\]
+As $\varepsilon \to 0$: the left side tends to $h(0)$ ($h$
+continuous bounded: $(h*g_\varepsilon)(0) - h(0) = \int(h(-y)
+- h(0))g_\varepsilon(y)\dd y \to 0$ by splitting small/large
+$y$); the right side increases to $\frac1{2\pi}\int\hat h$ by
+MCT ($\hat h \geq 0$). Hence $\frac1{2\pi}\int\abs{\hat f}^2 =
+\norm f_2^2$, finite or not \emph{a priori} --- and finite,
+proving both membership and the identity.
+
+Extension: $L^1\cap L^2 \supseteq \mathcal C_c$ is dense in
+$L^2$ (\cref{thm:b3:lp:density}); the transform is
+$\sqrt{2\pi}$-isometric there, so extends uniquely to an
+isometry-up-to-constant $\mathcal F$ on $L^2$
+(\cref{thm:b3:complete:extension}). Inversion for $\mathcal S$
+(\cref{thm:b3:fouriertransform:schwartz}) transfers by the
+same density (both sides $L^2$-continuous): $\mathcal
+F\bigl(\frac1{2\pi}\mathcal F(\sigma f)\bigr) = f$ on
+$\mathcal S$, hence on $L^2$: bijectivity. Inner products:
+polarization from the norm identity.
+\end{proof}
+
+\begin{theorem}[Poisson summation]
+\label{thm:b3:fouriertransform:poisson}
+Let $f \in \mathcal S(\R)$ (continuous $f$ with $\abs{f} +
+\abs{\hat f} \leq C(1 + \abs\cdot)^{-2}$
+suffices). Then\index{Poisson summation formula}
+\[
+\sum_{n\in\Z} f(n) \;=\; \sum_{k\in\Z}\hat f(2\pi k) .
+\]
+\end{theorem}
+
+\begin{proof}
+Let $F(x) = \sum_{n\in\Z}f(x + n)$: the series converges
+normally on compacts (decay of $f$), so $F$ is continuous, and
+it is $1$-periodic. Its Fourier coefficients (period $1$:
+$c_k(F) = \int_0^1F(t)\eu^{-2\iu\pi kt}\dd t$):
+\[
+c_k(F) = \sum_n\int_0^1 f(t + n)\,\eu^{-2\iu\pi kt}\dd t
+= \int_\R f(t)\,\eu^{-2\iu\pi kt}\dd t = \hat f(2\pi k)
+\]
+(normal convergence justifies the interchange; the phase is
+$1$-periodic). The series $\sum_k\abs{c_k(F)}$ converges
+(decay of $\hat f$), so the Fourier series of $F$ converges
+normally; its sum is a continuous function with the same
+Fourier coefficients as $F$, hence equals $F$ (injectivity on
+the circle: the difference has zero coefficients, and
+\cref{thm:b3:hilbert:fourier} gives zero in $L^2$, hence
+everywhere by continuity). Evaluate at $x = 0$.
+\end{proof}
+
+\begin{example}[The theta identity]
+\label{ex:b3:fouriertransform:theta}
+Applying Poisson to $f(x) = \eu^{-\pi tx^2}$ ($t > 0$), whose
+transform is $\hat f(\xi) = t^{-1/2}\eu^{-\xi^2/4\pi t}$
+(\cref{ex:b3:fouriertransform:gaussian} with $a = \pi t$):
+\[
+\sum_{n\in\Z}\eu^{-\pi n^2t}
+= \frac1{\sqrt t}\sum_{k\in\Z}\eu^{-\pi k^2/t} :
+\]
+the functional equation of Jacobi's theta function, key to the
+functional equation of Riemann's $\zeta$ --- and a spectacular
+numerical accelerator: for $t$ small, the left side converges
+slowly, the right side blazingly fast.
+\end{example}
+
+\begin{method}\label{met:b3:fouriertransform:method}
+Working ranges: $L^1$ --- transform defined pointwise,
+inversion needs $\hat f \in L^1$; $\mathcal S$ --- everything
+is legal, prove here first; $L^2$ --- transform defined by
+density (not by the integral!), perfect symmetry, Parseval
+bookkeeping. To compute a transform: reduce to the table
+(indicator, exponential, Gaussian) by the rules of
+\cref{prop:b3:fouriertransform:basic}; to prove an identity:
+establish it on $\mathcal S$ (or $\mathcal C_c^\infty$) and
+extend by density and continuity
+(\cref{met:b3:lp:toolkit}); to solve a linear PDE or ODE with
+constant coefficients: transform, divide, invert.
+\end{method}
+
+\section{Exercises}
+
+\begin{exercise}[$\star$]\label{exo:b3:fouriertransform:1}
+Compute the Fourier transforms of: $\mathbf 1_{\intcc{-a}a}$;
+$\eu^{-a\abs x}$ ($a > 0$); the tent function $\max(0, 1 -
+\abs x)$; $\frac1{x^2 + a^2}$ \emph{(use inversion on the
+second)}. Record the emerging table.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b3:fouriertransform:2}
+Let $f \in L^1$. Express in terms of $\hat f$ the transforms
+of: $f(x - a)$, $f(x)\cos(bx)$, $f(ax + b)$,
+$\overline{f(-x)}$, $(f * f)(x)$. Verify each rule on the
+Gaussian.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:fouriertransform:3}
+(a) Show that $\mathbf 1_{\intcc{-1}1} * \mathbf
+1_{\intcc{-1}1}$ has transform $\bigl(\frac{2\sin\xi}\xi
+\bigr)^2$, and deduce
+$\int_\R\bigl(\frac{\sin\xi}\xi\bigr)^2\dd\xi = \pi$ by
+Plancherel --- or by inversion at $0$. Compare
+\cref{pb:b3:lebesgue:1}.
+(b) Compute $\int_\R\frac{\dd x}{(x^2+1)^2}$ via Plancherel
+applied to $\eu^{-\abs x}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:fouriertransform:4}
+(Heat kernel algebra) With $g_t(x) =
+\frac1{2\sqrt{\pi t}}\eu^{-x^2/4t}$:
+(a) verify $\hat g_t(\xi) = \eu^{-t\xi^2}$;
+(b) deduce the semigroup law $g_t * g_s = g_{t+s}$ without any
+integral computation;
+(c) show $\norm{g_t}_1 = 1$ and $\norm{g_t}_2^2 =
+(8\pi t)^{-1/2}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:fouriertransform:5}
+Show that if $f \in L^1$ is even and real, $\hat f$ is even
+and real; if $f$ is odd and real, $\hat f$ is odd and purely
+imaginary. What does $\hat f(0)$ compute? Deduce that $f \geq
+0$ forces $\norm{\hat f}_\infty = \hat f(0) = \int f$, and
+interpret for probability densities (\cref{ch:b3:clt}: a
+characteristic function has modulus $\leq 1$, attained at
+$0$).
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:fouriertransform:6}
+(Non-surjectivity) Show that $\widehat{\phantom f}\colon L^1
+\to \mathcal C_0$ is injective and continuous, but \emph{not}
+surjective, in three steps.
+(i) Injectivity (\cref{thm:b3:fouriertransform:inversion}) and
+continuity ($\norm{\hat f}_\infty \leq \norm f_1$), and
+$\mathcal C_0$ is a Banach space (closed in
+$\norm\cdot_\infty$).
+(ii) If the map were surjective, it would be bijective, and
+the open mapping theorem (\cref{thm:b3:banach:openmapping})
+would give a constant $C$ with $\norm f_1 \leq C\norm{\hat
+f}_\infty$ for all $f \in L^1$.
+(iii) Contradict this with $f_n(x) = \frac{\sin
+x}{x}\cdot\frac{\sin(x/n)}{x/n}$: its transform is (up to
+constants) the convolution $\mathbf 1_{\intcc{-1}1} *
+\mathbf 1_{\intcc{-1/n}{1/n}}$-type trapezoid --- show
+$\norm{\hat f_n}_\infty \leq \pi$ uniformly, while
+$\norm{f_n}_1 \geq c\ln n$ by counting the arches of
+$\frac{\abs{\sin x}}x$ on $[1, n]$ (where the second factor is
+bounded below), as in \cref{thm:b3:banach:fourierdiverge}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:fouriertransform:7}
+(Smoothness $\leftrightarrow$ decay dictionary) Prove: $f \in
+L^1$ with $\hat f(\xi) = O(\abs\xi^{-k-1-\delta})$ for some
+$\delta > 0$ implies $f$ has a $\mathcal C^k$ representative.
+Conversely $f \in \mathcal C^k_c$ implies $\hat f(\xi) =
+O(\abs\xi^{-k})$. Illustrate both directions on the tent
+function.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:fouriertransform:8}
+(Heisenberg's inequality) For $f \in \mathcal S(\R)$ real with
+$\norm f_2 = 1$, prove
+\[
+\Bigl(\int x^2f(x)^2\dd x\Bigr)\cdot
+\Bigl(\frac1{2\pi}\int \xi^2\abs{\hat f(\xi)}^2\dd\xi\Bigr)
+\;\geq\; \frac14 ,
+\]
+with equality for Gaussians. \emph{(Write $1 = \int f^2 =
+-\int x\,(f^2)'$ by parts, bound by Cauchy--Schwarz, and
+convert $\norm{f'}_2$ by Plancherel.)} Interpretation: a
+signal and its spectrum cannot both be concentrated.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:fouriertransform:9}
+Justify \cref{ex:b3:fouriertransform:theta} in detail
+(hypotheses of Poisson for the Gaussian), and use the identity
+to evaluate $\sum_{n\in\Z}\eu^{-\pi n^2}$ to six decimals with
+three terms. How many terms of the \emph{defining} series
+would the same accuracy require at $t = 10^{-2}$, versus the
+transformed series?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:fouriertransform:10}
+(Band-limited functions) Let $f \in L^2(\R)$ with $\mathcal Ff$
+supported in $\intcc{-\pi}\pi$. Show that $f$ has a
+representative extending each of whose values is recoverable
+from samples: prove the \emph{Shannon interpolation} at the
+integers,
+\[
+f(x) = \sum_{n\in\Z} f(n)\,
+\frac{\sin\bigl(\pi(x - n)\bigr)}{\pi(x - n)}
+\quad\text{in } L^2,
+\]
+by expanding $\mathcal Ff$ in the Fourier basis of
+$L^2(\intcc{-\pi}\pi)$ (\cref{thm:b3:hilbert:fourier}) and
+transforming back term by term.
+\end{exercise}
+
+\section{Problem: the heat equation on the line}
+
+\begin{problem}[{Weekend problem --- $\partial_tu =
+\partial^2_{xx}u$, solved end to end}]
+\label{pb:b3:fouriertransform:1}
+Heat spreads; the equation $\partial_tu = \partial_{xx}^2u$
+says its density diffuses at a rate given by the local
+curvature of the temperature profile. We solve the Cauchy
+problem on $\R$ --- given $f$, find $u(t, x)$ for $t > 0$ with
+$u(0, \cdot) = f$ --- prove the solution's remarkable
+properties, and see why time cannot be reversed. Throughout,
+$g_t(x) = \frac1{2\sqrt{\pi t}}\eu^{-x^2/4t}$ is the
+\emph{heat kernel}\index{heat kernel} and $u(t, \cdot) = g_t *
+f$.
+
+\medskip
+\noindent\textbf{Part I --- Deriving the kernel.} Work
+formally first: suppose $u(t, \cdot) \in \mathcal S$ solves
+the equation, and let $\hat u(t, \xi)$ be the transform in
+$x$.
+\begin{enumerate}
+  \item Show (formally) $\partial_t\hat u = -\xi^2\hat u$,
+        hence $\hat u(t,\xi) = \eu^{-t\xi^2}\hat f(\xi)$, and
+        recognize $u(t) = g_t * f$
+        (\cref{exo:b3:fouriertransform:4}). This motivates the
+        \emph{definition} of $u$; everything is now proved
+        directly, for $f \in \mathcal C_b(\R)$ (bounded
+        continuous) or $f \in L^p$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part II --- Verification.}
+\begin{enumerate}[resume]
+  \item Show that for $t > 0$, $u(t, x) = \int
+        g_t(x-y)f(y)\dd y$ is well defined for $f \in \mathcal
+        C_b$, and that $u$ is $\mathcal C^\infty$ in $(t, x)$
+        on $\intoo0\infty\times\R$ \emph{(differentiate under
+        the integral; dominate Gaussian derivatives locally
+        uniformly in $(t,x)$)}.
+  \item Verify $\partial_tg_t = \partial^2_{xx}g_t$ by direct
+        computation, and deduce $\partial_tu =
+        \partial^2_{xx}u$ for $t > 0$.
+  \item (Initial condition) Show that for $f \in \mathcal
+        C_b$, $u(t, x) \to f(x)$ as $t \to 0^+$, uniformly on
+        compacts \emph{(approximate identity: split $\abs y
+        \leq \delta$, $\abs y > \delta$)}; for $f \in L^p$
+        ($p < \infty$), show $\norm{u(t) - f}_p \to 0$.
+  \item (Instant smoothing) Conclude: even for merely bounded
+        continuous $f$, the solution is $\mathcal C^\infty$
+        for every $t > 0$ --- heat instantly erases
+        roughness. Compute $u(t, \cdot)$ explicitly for $f =
+        \mathbf 1_{\intoo0\infty}$ (an error function) and
+        sketch its profile for three values of $t$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part III --- Structural properties.}
+\begin{enumerate}[resume]
+  \item (Positivity and comparison) If $f \geq 0$ then $u > 0$
+        for all $t > 0$ (strictly, unless $f = 0$ a.e.); if
+        $f_1 \leq f_2$ then $u_1 \leq u_2$. A cold spot warms
+        instantly: comment.
+  \item (Conservation) For $f \in L^1$: $\int u(t, x)\dd x =
+        \int f$ for all $t$ \emph{(Tonelli)} --- total heat is
+        conserved.
+  \item (Dissipation) For $f \in L^1\cap L^2$, show via
+        Plancherel that $t \mapsto \norm{u(t)}_2$ is
+        nonincreasing, strictly unless $f = 0$, and compute
+        its limit as $t \to \infty$. Show moreover
+        $\norm{u(t)}_\infty \leq \frac{\norm
+        f_1}{2\sqrt{\pi t}} \to 0$: heat spreads and dies.
+  \item (Uniqueness, $L^2$ class) Let $u$ be a solution with
+        $u(t) \in L^2$ for all $t$, $u \in \mathcal
+        C^1(\intoo0\infty, L^2)$ in the natural sense and
+        $u(t) \to f$ in $L^2$ as $t\to0$; admitting that the
+        transform converts it to $\partial_t\hat u =
+        -\xi^2\hat u$ pointwise a.e.\ in $\xi$ for a.e.\ $t$
+        \emph{(justified by testing against $\mathcal
+        C_c^\infty$ in $\xi$ --- outline this)}, show
+        $\hat u(t,\xi) = \eu^{-t\xi^2}\hat f(\xi)$, hence
+        uniqueness in this class.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part IV --- The arrow of time.}
+\begin{enumerate}[resume]
+  \item Show that the \emph{backward} problem is ill-posed:
+        for the solution to exist at time $-s$ ($s > 0$) with
+        data $f$ at time $0$ --- i.e.\ for $f = g_s * h$ to
+        have a solution $h \in L^2$ --- it is necessary that
+        $\eu^{s\xi^2}\hat f(\xi) \in L^2$: an extreme decay
+        condition on $\hat f$. Exhibit an explicit smooth $f
+        \in L^2$ for which no backward solution exists on any
+        time interval: take the function with $\hat f(\xi) =
+        \eu^{-\abs\xi}$ --- identify $f$
+        (\cref{exo:b3:fouriertransform:1}) and show
+        $\eu^{s\xi^2}\eu^{-\abs\xi} \notin L^2$ for every $s >
+        0$.
+  \item (Smoothing vs.\ information) Explain in a short
+        paragraph, using questions 5, 9 and 10, why the heat
+        semigroup $(f \mapsto g_t * f)_{t\geq0}$ is injective
+        but not surjective on $L^2$, and why this expresses
+        the irreversibility of diffusion.
+\end{enumerate}
+\end{problem}

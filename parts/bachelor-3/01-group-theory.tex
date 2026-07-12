@@ -1,0 +1,994 @@
+\chapter{Group Theory}\label{ch:b3:groups}
+
+The Year 2 volume met groups as bookkeeping devices: Lagrange's
+theorem, cyclic groups, the symmetric group and its signature. This
+chapter turns group theory into a \emph{method}. The engine is the
+notion of a group \emph{acting} on a set: counting orbits and fixed
+points yields the class equation, Cauchy's theorem and the three
+Sylow theorems --- the fundamental local-to-global principle of
+finite group theory. We then learn to assemble groups (direct and
+semidirect products) and to disassemble them (composition series,
+solvable groups), and we prove the theorem that, in
+\cref{ch:b3:galois}, will close a three-century-old question about
+polynomial equations: the alternating group $A_n$ is simple for $n
+\geq 5$.
+
+\section{Quotient groups and the isomorphism theorems}
+
+Throughout, $G$ is a group written multiplicatively, $e$ its
+identity. Recall from the Year 2 volume: subgroups, cosets $gH$,
+Lagrange's theorem ($\abs G = [G:H]\,\abs H$ for finite $G$), the
+order of an element, cyclic groups, and the symmetric group $S_n$
+with its signature morphism $\varepsilon \colon S_n \to \{\pm1\}$.
+
+\begin{definition}\label{def:b3:groups:normal}
+A subgroup $N$ of $G$ is \emph{normal}\index{normal subgroup}
+(written $N \trianglelefteq G$) when $gNg^{-1} = N$ for every $g
+\in G$ --- equivalently, when left and right cosets coincide: $gN =
+Ng$ for all $g$.
+\end{definition}
+
+\begin{theorem}[Quotient group]\label{thm:b3:groups:quotient}
+Let $N \trianglelefteq G$. The set $G/N$ of cosets, with the
+multiplication $(gN)(hN) = ghN$, is a well-defined group, the
+\emph{quotient group}\index{quotient group}, and the
+\emph{canonical projection} $\pi \colon G \to G/N$, $g \mapsto gN$,
+is a surjective morphism with kernel $N$. Conversely, every kernel
+of a group morphism is normal: normal subgroups are exactly the
+kernels.
+\end{theorem}
+
+\begin{proof}
+Well-definedness is the whole point. If $gN = g'N$ and $hN = h'N$,
+write $g' = gn$, $h' = hm$ with $n, m \in N$. Then $g'h' = gnhm =
+gh\,(h^{-1}nh)\,m \in ghN$ since $h^{-1}nh \in N$ by normality: the
+product of cosets does not depend on the representatives.
+Associativity, identity $eN = N$ and inverses $(gN)^{-1} = g^{-1}N$
+are inherited from $G$. Clearly $\pi$ is a surjective morphism and
+$\pi(g) = N \iff g \in N$.
+
+If $f \colon G \to H$ is a morphism and $k \in \ker f$, then
+$f(gkg^{-1}) = f(g)f(k)f(g)^{-1} = e$: kernels are normal.
+\end{proof}
+
+\begin{theorem}[Universal property; first isomorphism theorem]
+\label{thm:b3:groups:firstiso}
+Let $f \colon G \to H$ be a morphism and $N \trianglelefteq G$ with
+$N \subseteq \ker f$. There is a unique morphism $\bar f \colon G/N
+\to H$ with $f = \bar f \circ \pi$. In particular, taking $N = \ker
+f$:\index{isomorphism theorems}
+\[
+G/\ker f \;\xrightarrow{\;\sim\;}\; \operatorname{im} f,
+\qquad gN \mapsto f(g).
+\]
+\end{theorem}
+
+\begin{proof}
+Uniqueness: $\bar f(gN)$ must be $f(g)$. Existence: if $gN = g'N$
+then $g^{-1}g' \in N \subseteq \ker f$, so $f(g) = f(g')$ and $\bar
+f(gN) = f(g)$ is well defined; it is a morphism because $f$ is. For
+$N = \ker f$: $\bar f$ is injective, since $\bar f(gN) = e$ means
+$g \in \ker f$, i.e.\ $gN = N$; its image is that of $f$.
+\end{proof}
+
+\begin{theorem}[Second and third isomorphism theorems]
+\label{thm:b3:groups:secondiso}
+Let $H \leq G$ and $N \trianglelefteq G$.
+\begin{enumerate}
+  \item $HN = \{hn : h \in H,\, n \in N\}$ is a subgroup, $N
+        \trianglelefteq HN$, $H \cap N \trianglelefteq H$, and
+        \[
+        H/(H \cap N) \;\cong\; HN/N .
+        \]
+  \item If moreover $N \subseteq K \trianglelefteq G$, then $K/N
+        \trianglelefteq G/N$ and $(G/N)\big/(K/N) \cong G/K$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) $HN$ is a subgroup: $(hn)(h'n') = hh'\,(h'^{-1}nh')n' \in HN$
+and $(hn)^{-1} = h^{-1}(hn^{-1}h^{-1}) \in HN$, using normality of
+$N$. Compose $H \hookrightarrow HN \xrightarrow{\pi} HN/N$: this
+morphism is surjective ($hnN = hN$) with kernel $\{h \in H : h \in
+N\} = H \cap N$; apply \cref{thm:b3:groups:firstiso}.
+
+(2) The projection $G/N \to G/K$, $gN \mapsto gK$, is well defined
+($N \subseteq K$), surjective, with kernel $K/N$; apply
+\cref{thm:b3:groups:firstiso} again.
+\end{proof}
+
+\begin{theorem}[Correspondence theorem]\label{thm:b3:groups:correspondence}
+Let $N \trianglelefteq G$. The map $H \mapsto H/N$ is a bijection
+between subgroups of $G$ containing $N$ and subgroups of $G/N$,
+preserving inclusions, indices and normality (in both directions).
+\end{theorem}
+
+\begin{proof}
+Its inverse is $\bar H \mapsto \pi^{-1}(\bar H)$. Both maps send
+subgroups to subgroups, and are mutually inverse: $\pi^{-1}(H/N) =
+HN = H$ since $N \subseteq H$, and $\pi(\pi^{-1}(\bar H)) = \bar H$
+by surjectivity of $\pi$. Inclusions are clearly preserved;
+$[G:H] = [G/N : H/N]$ because $gH \mapsto (gN)(H/N)$ is a
+well-defined bijection between coset spaces; and $gHg^{-1} = H$ for
+all $g$ iff $(gN)(H/N)(gN)^{-1} = H/N$ for all $gN$, again by
+surjectivity of $\pi$.
+\end{proof}
+
+\begin{example}\label{ex:b3:groups:firstiso}
+$\varepsilon \colon S_n \to \{\pm 1\}$ gives $S_n/A_n \cong
+\{\pm1\}$; $\det \colon GL_n(K) \to K^\times$ gives
+$GL_n(K)/SL_n(K) \cong K^\times$; $t \mapsto \eu^{2\iu\pi t}$ gives
+$\R/\Z \cong \mathbb U$, the circle group. The first isomorphism
+theorem is how quotients are \emph{computed} in practice: find a
+surjection with the right kernel.
+\end{example}
+
+\begin{method}\label{met:b3:groups:normal}
+To prove $N \trianglelefteq G$, in decreasing order of elegance:
+exhibit $N$ as the kernel of a morphism defined on $G$; check
+$gNg^{-1} \subseteq N$ for all $g$ (this suffices: applying it to
+$g^{-1}$ and conjugating gives the reverse inclusion); verify that
+$N$ is a union of conjugacy classes; or note that $[G:N] = 2$
+(then $gN = Ng$ is forced --- \cref{exo:b3:groups:1}).
+\end{method}
+
+\section{Group actions}
+
+\begin{definition}\label{def:b3:groups:action}
+An \emph{action}\index{group action} of $G$ on a set $X$ is a
+morphism $\varphi \colon G \to \mathfrak{S}(X)$ into the group of
+bijections of $X$; one writes $g \cdot x$ for $\varphi(g)(x)$.
+Equivalently: a map $G \times X \to X$ with $e \cdot x = x$ and $g
+\cdot (h \cdot x) = (gh) \cdot x$. The \emph{orbit}\index{orbit} of
+$x$ is $\mathcal O_x = \{g \cdot x : g \in G\}$, its
+\emph{stabilizer}\index{stabilizer} is the subgroup $G_x = \{g :
+g\cdot x = x\}$, and $X^G = \{x : \forall g,\ g \cdot x = x\}$ is
+the set of \emph{fixed points}. The action is \emph{transitive} if
+there is exactly one orbit, \emph{faithful} if $\varphi$ is
+injective, \emph{free} if all stabilizers are trivial.
+\end{definition}
+
+\begin{example}\label{ex:b3:groups:actions}
+Five actions run all of finite group theory:
+\begin{enumerate}
+  \item $G$ on itself by \emph{left translation} $g \cdot x = gx$:
+        free and transitive.
+  \item $G$ on itself by \emph{conjugation} $g \cdot x = gxg^{-1}$:
+        orbits are the \emph{conjugacy classes}\index{conjugacy
+        class}, stabilizers the \emph{centralizers}
+        \index{centralizer} $Z_G(x) = \{g : gx = xg\}$, fixed
+        points the \emph{center}\index{center} $Z(G)$.
+  \item $G$ on the coset space $G/H$ by $g \cdot xH = gxH$:
+        transitive, with stabilizer of the coset $H$ equal to $H$.
+        Every transitive action is of this form
+        (\cref{exo:b3:groups:8}).
+  \item $G$ on its set of subgroups by conjugation: the stabilizer
+        of $H$ is the \emph{normalizer}\index{normalizer} $N_G(H) =
+        \{g : gHg^{-1} = H\}$, the largest subgroup of $G$ in which
+        $H$ is normal.
+  \item $S_n$ on $\intint{1}{n}$: the mother of all examples.
+\end{enumerate}
+\end{example}
+
+\begin{theorem}[Orbit--stabilizer]\label{thm:b3:groups:orbitstab}
+The map $gG_x \mapsto g \cdot x$ is a well-defined bijection
+$G/G_x \to \mathcal O_x$. In particular, for $G$
+finite,\index{orbit--stabilizer theorem}
+\[
+\abs{\mathcal O_x} = [G : G_x] \quad\text{divides } \abs G,
+\]
+and, the orbits partitioning $X$ (they are the classes of the
+equivalence $x \sim y \iff y \in \mathcal O_x$),
+\[
+\abs X = \sum_{i} \,[G : G_{x_i}]
+\qquad (x_i\colon \text{one point per orbit}).
+\]
+\end{theorem}
+
+\begin{proof}
+Well defined and injective: $gG_x = hG_x \iff h^{-1}g \in G_x \iff
+h^{-1}g \cdot x = x \iff g \cdot x = h \cdot x$; read the chain in
+both directions. Surjectivity is the definition of the orbit. The
+counting statements follow from Lagrange's theorem and the
+partition of $X$ into orbits.
+\end{proof}
+
+\begin{corollary}[Class equation]\label{cor:b3:groups:classeq}
+For a finite group $G$, picking one representative $x_i$ in each
+conjugacy class with more than one element:\index{class equation}
+\[
+\abs G = \abs{Z(G)} + \sum_i \,[G : Z_G(x_i)],
+\qquad\text{each } [G : Z_G(x_i)] > 1 \text{ dividing } \abs G.
+\]
+\end{corollary}
+
+\begin{proof}
+Apply \cref{thm:b3:groups:orbitstab} to the conjugation action:
+singleton orbits are exactly the elements of $Z(G)$.
+\end{proof}
+
+\begin{theorem}[Fixed points of $p$-groups]\label{thm:b3:groups:pfixed}
+Let $p$ be prime. A \emph{$p$-group}\index{p-group@$p$-group} is a
+finite group whose order is a power of $p$. If a $p$-group $G$ acts
+on a finite set $X$, then
+\[
+\abs{X^G} \equiv \abs X \pmod p .
+\]
+Consequences: a nontrivial $p$-group has nontrivial center, and
+every group of order $p^2$ is abelian.
+\end{theorem}
+
+\begin{proof}
+Each orbit has cardinality $[G:G_x]$, a power of $p$; this power is
+$1$ exactly on fixed points and otherwise divisible by $p$. Summing
+over orbits gives the congruence. For the center: conjugation
+action of $G$ on itself has $X^G = Z(G)$, so $\abs{Z(G)} \equiv
+\abs G \equiv 0 \pmod p$, and $Z(G) \ni e$ forces $\abs{Z(G)} \geq
+p$. Order $p^2$: if $Z(G) \neq G$ then $\abs{Z(G)} = p$ and
+$G/Z(G)$ is cyclic of order $p$, which forces $G$ abelian
+(\cref{exo:b3:groups:2}) --- contradiction.
+\end{proof}
+
+\begin{theorem}[Cauchy]\label{thm:b3:groups:cauchy}
+If a prime $p$ divides $\abs G$, then $G$ contains an element of
+order $p$.\index{Cauchy's theorem}
+\end{theorem}
+
+\begin{proof}[Proof (McKay)]
+Let $X = \{(g_1, \dots, g_p) \in G^p : g_1 g_2 \cdots g_p = e\}$.
+Choosing $g_1, \dots, g_{p-1}$ freely determines $g_p$: $\abs X =
+\abs G^{p-1}$, divisible by $p$. The cyclic group $\Z/p\Z$ acts on
+$X$ by cyclic shift $(g_1, \dots, g_p) \mapsto (g_2, \dots, g_p,
+g_1)$ --- this preserves $X$, since $g_2 \cdots g_p g_1 =
+g_1^{-1}(g_1 \cdots g_p)g_1 = e$. By \cref{thm:b3:groups:pfixed},
+$\abs{X^{\Z/p\Z}} \equiv \abs X \equiv 0 \pmod p$. Fixed points are
+the constant tuples $(g, \dots, g)$ with $g^p = e$; the tuple $(e,
+\dots, e)$ is one of them, so there are at least $p$ of them, hence
+at least one $g \neq e$ with $g^p = e$: its order is exactly $p$.
+\end{proof}
+
+\begin{theorem}[Cayley]\label{thm:b3:groups:cayley}
+Every group of order $n$ embeds in $S_n$.\index{Cayley's theorem}
+\end{theorem}
+
+\begin{proof}
+Left translation $\varphi \colon G \to \mathfrak S(G) \cong S_n$ is
+a morphism; $\varphi(g) = \mathrm{id}$ forces $g = ge = e$: it is
+faithful.
+\end{proof}
+
+\begin{method}\label{met:b3:groups:counting}
+Fixed-point counting is the universal opening move of finite group
+theory. To prove that something \emph{exists} (a central element,
+an element of order $p$, a normal subgroup, a fixed point), make a
+well-chosen group act on a well-chosen finite set, then compare
+$\abs{X^G}$ with $\abs X$ modulo $p$, or let orbit sizes divide the
+group order. The proofs of
+\cref{thm:b3:groups:pfixed,thm:b3:groups:cauchy} and of all three
+Sylow theorems below are five variations on this single idea.
+\end{method}
+
+\section{The Sylow theorems}
+
+Lagrange's theorem says the order of a subgroup divides $\abs G$;
+the converse fails ($A_4$, of order $12$, has no subgroup of order
+$6$ --- \cref{exo:b3:groups:1}). The Sylow theorems salvage the
+converse for prime powers, and their counting clause is the
+sharpest general tool we have for producing normal subgroups.
+
+\begin{definition}\label{def:b3:groups:sylow}
+Write $\abs G = p^a m$ with $p \nmid m$. A \emph{Sylow
+$p$-subgroup}\index{Sylow subgroup} of $G$ is a subgroup of order
+$p^a$ --- a $p$-subgroup of the largest conceivable order. The
+number of Sylow $p$-subgroups of $G$ is denoted $n_p$.
+\end{definition}
+
+\begin{lemma}\label{lem:b3:groups:binom}
+If $\abs G = p^a m$ with $p \nmid m$, then $\dbinom{p^a m}{p^a}
+\equiv m \pmod p$.
+\end{lemma}
+
+\begin{proof}
+In $\mathbb F_p[X]$, the freshman's dream $(1+X)^p = 1 + X^p$ (the
+coefficients $\binom pk$, $0<k<p$, are divisible by $p$: $p$
+divides the numerator of $\frac{p!}{k!(p-k)!}$ but not the
+denominator) iterates to $(1+X)^{p^a} = 1 + X^{p^a}$, whence
+\[
+(1+X)^{p^a m} = \bigl(1 + X^{p^a}\bigr)^m
+= \sum_{k=0}^{m} \binom mk X^{k p^a} \quad\text{in } \mathbb
+F_p[X].
+\]
+Identify the coefficient of $X^{p^a}$: on the left $\binom{p^a
+m}{p^a} \bmod p$, on the right $\binom m1 = m$.
+\end{proof}
+
+\begin{theorem}[Sylow I: existence]\label{thm:b3:groups:sylow1}
+For every prime $p$, Sylow $p$-subgroups of $G$ exist.
+\end{theorem}
+
+\begin{proof}[Proof (Wielandt)]
+Let $\Omega$ be the set of \emph{subsets} of $G$ of cardinality
+$p^a$; $G$ acts on $\Omega$ by left translation $g \cdot S = gS$.
+By \cref{lem:b3:groups:binom}, $\abs\Omega = \binom{p^a m}{p^a}
+\equiv m \not\equiv 0 \pmod p$, so some orbit $\mathcal O_S$ has
+size prime to $p$ (if $p$ divided every orbit size, it would divide
+$\abs\Omega$). Let $H = G_S$ be the stabilizer of such an $S$.
+Since $[G : H] = \abs{\mathcal O_S}$ is prime to $p$ and $p^a \mid
+\abs G = [G:H]\,\abs H$, we get $p^a \mid \abs H$. Conversely, fix
+$s \in S$: the map $H \to S$, $h \mapsto hs$, is injective and
+lands in $S$ because $hS = S$; hence $\abs H \leq \abs S = p^a$.
+So $\abs H = p^a$.
+\end{proof}
+
+\begin{theorem}[Sylow II: domination and conjugacy]\label{thm:b3:groups:sylow2}
+Let $P$ be a Sylow $p$-subgroup and $Q$ any $p$-subgroup of $G$.
+Then $Q \subseteq gPg^{-1}$ for some $g \in G$. In particular all
+Sylow $p$-subgroups are conjugate, and $P \trianglelefteq G \iff
+n_p = 1$.
+\end{theorem}
+
+\begin{proof}
+Let $Q$ act on the coset space $X = G/P$, of cardinality $m
+\not\equiv 0 \pmod p$. By \cref{thm:b3:groups:pfixed} applied to
+the $p$-group $Q$, $\abs{X^Q} \equiv m \not\equiv 0 \pmod p$: there
+is a fixed coset $gP$, i.e.\ $QgP = gP$, i.e.\ $g^{-1}Qg \subseteq
+P$. If $Q$ is itself a Sylow subgroup, equality of orders turns
+$Q \subseteq gPg^{-1}$ into an equality. Finally $P
+\trianglelefteq G$ iff its conjugates $\{gPg^{-1}\}$ --- which by
+the above are \emph{all} the Sylow $p$-subgroups --- reduce to
+$\{P\}$.
+\end{proof}
+
+\begin{theorem}[Sylow III: counting]\label{thm:b3:groups:sylow3}
+$n_p \equiv 1 \pmod p$, and $n_p = [G : N_G(P)]$, which divides
+$m$.
+\end{theorem}
+
+\begin{proof}
+Let $\mathrm{Syl}_p$ be the set of Sylow $p$-subgroups; $G$ acts on
+it transitively by conjugation (\cref{thm:b3:groups:sylow2}), with
+stabilizer of $P$ the normalizer $N_G(P) \supseteq P$: $n_p = [G :
+N_G(P)]$, and $m = [G:P] = [G:N_G(P)]\,[N_G(P):P]$ shows $n_p \mid
+m$.
+
+Now restrict the action to $P$ and count fixed points. If $Q \in
+\mathrm{Syl}_p$ is fixed by $P$, then $P \subseteq N_G(Q)$; both
+$P$ and $Q$ are Sylow $p$-subgroups of the group $N_G(Q)$, hence
+conjugate in it (\cref{thm:b3:groups:sylow2} applied to $N_G(Q)$);
+but $Q \trianglelefteq N_G(Q)$, so $Q$ is its only conjugate there:
+$P = Q$. Thus the only fixed point is $P$ itself, and
+\cref{thm:b3:groups:pfixed} gives $n_p = \abs{\mathrm{Syl}_p}
+\equiv \abs{\mathrm{Syl}_p^P} = 1 \pmod p$.
+\end{proof}
+
+\begin{method}\label{met:b3:groups:sylowmethod}
+To analyse a group of given order $n = p^a m$: list the divisors
+of $m$ congruent to $1$ mod $p$ --- these are the candidates for
+$n_p$. If the only candidate is $1$, the Sylow $p$-subgroup is
+normal. If $n_p > 1$ is forced to be small, act by conjugation on
+$\mathrm{Syl}_p$ to obtain a morphism $G \to S_{n_p}$ with small
+kernel. And count elements: distinct Sylow $p$-subgroups of
+\emph{prime} order $p$ intersect trivially, so they carry
+$n_p(p-1)$ elements of order exactly $p$; overlapping counts for
+different primes often force a contradiction
+(\cref{exo:b3:groups:7}).
+\end{method}
+
+\begin{example}\label{ex:b3:groups:pq}
+Let $\abs G = pq$ with $p < q$ primes and $p \nmid q - 1$. Then
+$n_q \mid p$ and $n_q \equiv 1 \bmod q$ force $n_q = 1$ (as $p <
+q$); $n_p \mid q$ and $n_p \equiv 1 \bmod p$ force $n_p = 1$ (as $q
+\not\equiv 1 \bmod p$). Let $P, Q$ be the two normal Sylows: $P
+\cap Q = \{e\}$ (coprime orders), so $\abs{PQ} = pq$
+(\cref{exo:b3:groups:4}) and $G \cong P \times Q \cong \Z/p\Z
+\times \Z/q\Z \cong \Z/pq\Z$ by
+\cref{prop:b3:groups:direct} below. Every group of order $15$,
+$33$, $35$, \dots\ is cyclic. The excluded case $p \mid q - 1$
+produces exactly one more group, nonabelian --- see the weekend
+problem (\cref{pb:b3:groups:1}).
+\end{example}
+
+\section{Products, direct and semidirect}
+
+\begin{proposition}[Recognizing a direct product]\label{prop:b3:groups:direct}
+Let $H, K \trianglelefteq G$ with $H \cap K = \{e\}$ and $HK = G$.
+Then $(h,k) \mapsto hk$ is an isomorphism $H \times K \to
+G$.\index{direct product}
+\end{proposition}
+
+\begin{proof}
+For $h \in H$, $k \in K$, the commutator $hkh^{-1}k^{-1}$ lies in
+$K$ (read it as $(hkh^{-1})k^{-1}$, using normality of $K$) and in
+$H$ (read it as $h(kh^{-1}k^{-1})$): it is $e$, so $H$ and $K$
+commute elementwise and the map is a morphism. It is surjective
+since $HK = G$, and injective since $hk = e$ gives $h = k^{-1} \in
+H \cap K = \{e\}$.
+\end{proof}
+
+Normality of \emph{both} factors is what fails most often: in $S_3
+= \langle (1\,2\,3)\rangle \,\langle(1\,2)\rangle$ both factors
+intersect trivially and generate, yet $S_3 \not\cong \Z/3\Z \times
+\Z/2\Z$. The right notion when only one factor is normal:
+
+\begin{definition}\label{def:b3:groups:semidirect}
+Let $H$, $K$ be groups and $\varphi \colon K \to
+\operatorname{Aut}(H)$ a morphism. The \emph{semidirect
+product}\index{semidirect product} $H \rtimes_\varphi K$ is the
+set $H \times K$ equipped with
+\[
+(h, k)\,(h', k') = \bigl(h\,\varphi(k)(h'),\; kk'\bigr).
+\]
+\end{definition}
+
+\begin{proposition}\label{prop:b3:groups:semidirect}
+$H \rtimes_\varphi K$ is a group; $H \times \{e\}$ is a normal
+subgroup isomorphic to $H$, $\{e\} \times K$ a subgroup isomorphic
+to $K$; they intersect trivially and generate. Conversely, if $G =
+NK$ with $N \trianglelefteq G$, $K \leq G$ and $N \cap K = \{e\}$,
+then $G \cong N \rtimes_\varphi K$ for $\varphi(k) = (n \mapsto
+knk^{-1})$.
+\end{proposition}
+
+\begin{proof}
+Direct verification: associativity reduces to $\varphi(kk') =
+\varphi(k)\circ\varphi(k')$ and each $\varphi(k)$ being a morphism;
+the identity is $(e,e)$ and $(h,k)^{-1} =
+\bigl(\varphi(k^{-1})(h^{-1}), k^{-1}\bigr)$. The projection $(h,k)
+\mapsto k$ is a morphism onto $K$ with kernel $H \times \{e\}$,
+which is therefore normal. For the converse: every $g \in G$ writes
+\emph{uniquely} as $nk$ with $n \in N$, $k \in K$ (existence: $G =
+NK$; uniqueness: $nk = n'k'$ gives $n'^{-1}n = k'k^{-1} \in N \cap
+K$), and
+\[
+(nk)(n'k') = n\,(kn'k^{-1})\;kk'
+\]
+shows that $nk \mapsto (n, k)$ transports the law of $G$ to that
+of $N \rtimes_\varphi K$.
+\end{proof}
+
+\begin{example}\label{ex:b3:groups:semidirectexamples}
+(a) The \emph{dihedral group}\index{dihedral group} $D_n$ ($n \geq
+3$) of the $2n$ symmetries of a regular $n$-gon: the rotations form
+a normal subgroup of index $2$, any reflection generates a
+complement, and conjugating a rotation by a reflection inverts it:
+$D_n \cong \Z/n\Z \rtimes_\varphi \Z/2\Z$ with $\varphi(1) = (x
+\mapsto -x)$.
+(b) The affine group of a line, $\{x \mapsto ax + b : a \in
+K^\times,\, b \in K\} \cong K \rtimes K^\times$: translations
+normal, homotheties a complement.
+(c) $S_n \cong A_n \rtimes \Z/2\Z$ (complement: any
+transposition).
+(d) The quaternion group $Q_8$ is \emph{not} a semidirect product
+of proper subgroups: every nontrivial subgroup contains $-1$
+(\cref{pb:b3:groups:1}), so no two proper subgroups intersect
+trivially.
+\end{example}
+
+\section{Solvable groups; simplicity of \texorpdfstring{$A_n$}{An}}
+
+\begin{definition}\label{def:b3:groups:derived}
+The \emph{commutator}\index{commutator} of $x, y \in G$ is $[x,y]
+= xyx^{-1}y^{-1}$; the \emph{derived subgroup}\index{derived
+subgroup} $D(G)$ is the subgroup generated by all commutators. The
+\emph{derived series} is $D^0(G) = G$, $D^{i+1}(G) = D(D^i(G))$,
+and $G$ is \emph{solvable}\index{solvable group} if $D^n(G) =
+\{e\}$ for some $n$.
+\end{definition}
+
+\begin{proposition}\label{prop:b3:groups:derived}
+$D(G)$ is normal (indeed stable under every automorphism), $G/D(G)$
+is abelian, and for $N \trianglelefteq G$: $G/N$ abelian $\iff
+D(G) \subseteq N$. Moreover $G$ is solvable iff there is a chain
+$G = G_0 \trianglerighteq G_1 \trianglerighteq \dots
+\trianglerighteq G_n = \{e\}$ with each $G_{i+1} \trianglelefteq
+G_i$ and each quotient $G_i/G_{i+1}$ abelian. Subgroups and
+quotients of solvable groups are solvable; conversely, if $N$ and
+$G/N$ are solvable, so is $G$.
+\end{proposition}
+
+\begin{proof}
+An automorphism $\alpha$ maps $[x,y]$ to $[\alpha x, \alpha y]$: it
+permutes the commutators, so preserves the subgroup they generate;
+conjugations are automorphisms, whence normality. In $G/D(G)$,
+$\bar x\bar y \bar x^{-1}\bar y^{-1} = \overline{[x,y]} = \bar e$:
+the quotient is abelian. If $G/N$ is abelian then every $[x,y] \in
+N$, so $D(G) \subseteq N$; conversely if $D(G) \subseteq N$ then
+$G/N$, a quotient of the abelian $G/D(G)$ by the third isomorphism
+theorem, is abelian.
+
+If $G$ is solvable, the derived series is such a chain. Conversely,
+given a chain, $D^i(G) \subseteq G_i$ by induction: $G_i/G_{i+1}$
+abelian gives $D(G_i) \subseteq G_{i+1}$, so $D^{i+1}(G) = D(D^i G)
+\subseteq D(G_i) \subseteq G_{i+1}$; hence $D^n(G) = \{e\}$.
+
+Heredity: $D^i(H) \subseteq D^i(G)$ for $H \leq G$ (induction),
+and $D^i(G/N) = \pi(D^i(G))$ since $\pi$ maps commutators onto
+commutators; this gives the statements for subgroups and quotients.
+Extension: if $D^m(G/N) = \{e\}$ then $D^m(G) \subseteq N$, and
+$D^n(N) = \{e\}$ gives $D^{m+n}(G) = D^n(D^m(G)) \subseteq D^n(N)
+= \{e\}$.
+\end{proof}
+
+\begin{example}\label{ex:b3:groups:solvableexamples}
+Abelian groups are solvable. $p$-groups are solvable, by induction
+on the order: $Z(G) \neq \{e\}$ and $G/Z(G)$ is a smaller
+$p$-group. $S_3$ and $S_4$ are solvable: $S_4 \trianglerighteq A_4
+\trianglerighteq V \trianglerighteq \{e\}$, where $V = \{e,
+(1\,2)(3\,4), (1\,3)(2\,4), (1\,4)(2\,3)\}$ is the Klein group of
+double transpositions (normal in $S_4$: a union of conjugacy
+classes), with abelian quotients $\Z/2\Z$, $\Z/3\Z$, $V$. In
+\cref{ch:b3:galois}, ``the general equation of degree $n$ is
+solvable by radicals'' will literally \emph{mean} ``$S_n$ is a
+solvable group''. Whence the importance of the next definition.
+\end{example}
+
+\begin{definition}\label{def:b3:groups:simple}
+A group $G \neq \{e\}$ is \emph{simple}\index{simple group} if its
+only normal subgroups are $\{e\}$ and $G$. A nonabelian simple
+group is not solvable: $D(G) \trianglelefteq G$ is not $\{e\}$
+(else $G$ abelian), so $D(G) = G$ and the derived series is
+constant. The abelian simple groups are exactly the $\Z/p\Z$, $p$
+prime (an abelian group is simple iff it has no proper nontrivial
+subgroup, iff it is cyclic of prime order by Lagrange).
+\end{definition}
+
+\begin{lemma}\label{lem:b3:groups:threecycles}
+For $n \geq 3$, $A_n$ is generated by $3$-cycles; for $n \geq 5$,
+all $3$-cycles are conjugate \emph{in $A_n$}.
+\end{lemma}
+
+\begin{proof}
+An element of $A_n$ is a product of an even number of
+transpositions; pair them up and use (composition right to left)
+\[
+(a\,b)(c\,d) = (a\,c\,b)(a\,c\,d), \qquad
+(a\,b)(b\,c) = (a\,b\,c), \qquad
+(a\,b)(a\,b) = e
+\]
+for disjoint, overlapping and equal pairs respectively: each pair
+of transpositions is a product of $3$-cycles.
+
+Conjugacy: $\sigma(a\,b\,c)\sigma^{-1} = (\sigma a\; \sigma b\;
+\sigma c)$, so any two $3$-cycles are conjugate by some $\sigma \in
+S_n$. If $\sigma$ is odd, replace it by $\sigma' = \sigma (d\,e)$
+where $d, e$ are two points outside $\{a, b, c\}$ --- they exist
+since $n \geq 5$; then $\sigma'$ is even and $\sigma'(a\,b\,c)
+\sigma'^{-1} = \sigma(a\,b\,c)\sigma^{-1}$, since $(d\,e)$ commutes
+with $(a\,b\,c)$.
+\end{proof}
+
+\begin{theorem}[Simplicity of the alternating group]\label{thm:b3:groups:ansimple}
+$A_n$ is simple for $n \geq 5$.\index{alternating group}
+\end{theorem}
+
+\begin{proof}
+Let $N \trianglelefteq A_n$, $N \neq \{e\}$. By
+\cref{lem:b3:groups:threecycles} it suffices to show that $N$
+contains \emph{one} $3$-cycle: normality and conjugacy of
+$3$-cycles in $A_n$ then put all $3$-cycles in $N$, so $N = A_n$.
+
+For $\rho \in S_n$ let $F(\rho) = \{x : \rho(x) \neq x\}$ be its
+\emph{support} and $f(\rho) = \abs{F(\rho)}$. Choose $\sigma \in N
+\setminus \{e\}$ with $f(\sigma)$ \emph{minimal}. Note that a
+nontrivial even permutation has $f \geq 3$, and that $f(\sigma) =
+4$ is impossible for $\sigma \in A_n$ unless $\sigma$ is a double
+transposition (a $4$-cycle is odd). We show $\sigma$ is a
+$3$-cycle.
+
+\emph{Case A: $\sigma$ is a product of disjoint transpositions},
+say $\sigma = (a\,b)(c\,d)\cdots$ with $f(\sigma) \geq 4$. Pick $e'
+\notin \{a, b, c, d\}$ (possible: $n \geq 5$), set $\tau =
+(c\,d\,e')$ and
+\[
+\sigma' = \tau\sigma\tau^{-1}\,\sigma^{-1} \in N
+\qquad (\tau\sigma\tau^{-1} \in N \text{ by normality}).
+\]
+Since $\sigma\tau^{-1}\sigma^{-1} = (\sigma c\;\sigma e'\;\sigma
+d) = (d\;\sigma e'\;c)$ (using $\sigma c = d$, $\sigma d = c$), we
+get $\sigma' = (c\,d\,e')(d\;\sigma e'\;c)$.
+
+If $\sigma e' = e'$ (which holds in particular when $f(\sigma) =
+4$, i.e.\ $\sigma = (a\,b)(c\,d)$): then $(d\,e'\,c) =
+(c\,d\,e')$ and $\sigma' = (c\,d\,e')^2 = (c\,e'\,d)$, a
+$3$-cycle lying in $N$, with $f(\sigma') = 3 < 4 \leq f(\sigma)$
+--- contradicting minimality.
+
+If $\sigma e' \neq e'$: then $\sigma e' \notin \{a, b, c, d,
+e'\}$ ($\sigma$ swaps $a,b$ and $c,d$, and $e' \notin \{a,b,c,d\}$
+with $\sigma$ injective), so $\sigma$ moves the six points $a, b,
+c, d, e', \sigma e'$: $f(\sigma) \geq 6$. On the other hand
+$\sigma'$, a product of two $3$-cycles with supports in $\{c, d,
+e', \sigma e'\}$, satisfies $f(\sigma') \leq 4$; and $\sigma' \neq
+e$, since $\sigma'(d) = \tau\sigma\tau^{-1}(c) = \tau\sigma(e') =
+\sigma e' \neq d$ ($\tau$ fixes $\sigma e' \notin \{c,d,e'\}$).
+So $\sigma' \in N \setminus\{e\}$ with $f(\sigma') \leq 4 <
+f(\sigma)$: minimality is contradicted.
+
+\emph{Case B: some cycle of $\sigma$ has length $\geq 3$}, say
+$\sigma(a) = b$, $\sigma(b) = c$ with $a, b, c$ distinct. If
+$\sigma$ is exactly this $3$-cycle, we are done. Otherwise
+$f(\sigma) \geq 5$ (the case $f(\sigma) = 4$ with a $\geq3$-cycle
+is the odd $4$-cycle, excluded), so we may pick $d, e' \in
+F(\sigma) \setminus \{a, b, c\}$. Set $\tau = (c\,d\,e')$ and
+$\sigma' = \tau\sigma\tau^{-1}\sigma^{-1} \in N$. As before
+$\sigma' = (c\,d\,e')\,(\sigma c\;\sigma e'\;\sigma d)$ moves only
+points of
+\[
+M = \{c, d, e'\} \cup \{\sigma c, \sigma d, \sigma e'\}
+\subseteq F(\sigma)
+\]
+(images of moved points are moved: $\sigma(x) \ne x$ implies
+$\sigma(\sigma x) \neq \sigma x$, $\sigma$ being injective). Also
+$b \notin M$: the five points $a, b, c, d, e'$ are distinct, so $b
+\notin \{c, d, e'\}$; and $b \in \{\sigma c, \sigma d, \sigma
+e'\}$ would force $a \in \{c, d, e'\}$ (apply $\sigma^{-1}$, using
+$\sigma a = b$), which is false. Hence $\sigma'$ fixes $b$, while
+$\sigma$ moves $b$; and
+$F(\sigma') \subseteq F(\sigma)$. Finally $\sigma' \neq e$:
+$\sigma^{-1}(c) = b$, $\tau^{-1}(b) = b$, $\sigma(b) = c$,
+$\tau(c) = d$, so $\sigma'(c) = d \neq c$. Thus $\sigma' \in N
+\setminus \{e\}$ with $f(\sigma') \leq f(\sigma) - 1$,
+contradicting minimality.
+
+Both cases being impossible, $\sigma$ is a $3$-cycle.
+\end{proof}
+
+\begin{corollary}\label{cor:b3:groups:snnotsolvable}
+For $n \geq 5$: $A_n$ and $S_n$ are not solvable, and the only
+normal subgroups of $S_n$ are $\{e\}$, $A_n$ and $S_n$.
+\end{corollary}
+
+\begin{proof}
+$A_n$ is nonabelian simple, hence not solvable
+(\cref{def:b3:groups:simple}); a group containing a non-solvable
+subgroup is not solvable (\cref{prop:b3:groups:derived}). Let $N
+\trianglelefteq S_n$: then $N \cap A_n \trianglelefteq A_n$ equals
+$\{e\}$ or $A_n$. If $N \cap A_n = A_n$, then $A_n \subseteq N$
+and $N \in \{A_n, S_n\}$ by the index. If $N \cap A_n = \{e\}$,
+the restriction to $N$ of the projection $S_n \to S_n/A_n \cong
+\Z/2\Z$ is injective, so $\abs N \leq 2$; if $N = \{e, \sigma\}$,
+normality makes the conjugacy class of $\sigma$ equal to
+$\{\sigma\}$, i.e.\ $\sigma \in Z(S_n)$. But $Z(S_n) = \{e\}$ for
+$n \geq 3$: if $\sigma \ne e$ moves $a$ to $b \neq a$, pick $c
+\notin \{a, b\}$; then $(b\,c)\sigma(b\,c)^{-1}$ sends $a$ to $c
+\ne b$, so it differs from $\sigma$. Hence $N = \{e\}$.
+\end{proof}
+
+\begin{theorem}[Jordan--H\"older]\label{thm:b3:groups:jordanholder}
+Every finite group $G \neq \{e\}$ admits a \emph{composition
+series}\index{composition series}
+\[
+\{e\} = G_0 \trianglelefteq G_1 \trianglelefteq \cdots
+\trianglelefteq G_r = G,
+\qquad G_{i}/G_{i-1} \text{ simple},
+\]
+and the multiset of \emph{composition factors} $G_i/G_{i-1}$, up
+to isomorphism, does not depend on the chosen series. A finite
+group is solvable iff all its composition factors are cyclic of
+prime order.\index{Jordan--H\"older theorem}
+\end{theorem}
+
+\begin{proof}
+\emph{Existence}: induction on $\abs G$. If $G$ is simple, take
+$\{e\} \trianglelefteq G$. Otherwise pick a maximal proper normal
+subgroup $N$ (there are finitely many subgroups); $G/N$ is simple
+by the correspondence theorem (a proper nontrivial normal subgroup
+of $G/N$ would lift to a normal subgroup of $G$ strictly between
+$N$ and $G$). Append $N \trianglelefteq G$ to a composition series
+of $N$.
+
+\emph{Uniqueness}: induction on $\abs G$, the case $G$ simple
+being clear. Take two composition series, with penultimate terms
+$M \trianglelefteq G$ and $N \trianglelefteq G$ (so $G/M$, $G/N$
+are simple). If $M = N$, conclude by induction applied to $M$.
+Otherwise $MN$, normal in $G$ and strictly containing $M$, equals
+$G$ ($M$ is maximal normal: any normal $M \subsetneq L
+\subsetneq G$ would map to a proper nontrivial normal subgroup of
+the simple $G/M$). The second isomorphism theorem gives
+\[
+G/M = MN/M \cong N/(M \cap N),
+\qquad
+G/N = MN/N \cong M/(M \cap N).
+\]
+Set $K = M \cap N$ ($\trianglelefteq G$) and fix a composition
+series of $K$. Then $M$ carries two composition series: its
+original one, and the series of $K$ followed by $K \trianglelefteq
+M$ (the quotient $M/K \cong G/N$ is simple). By induction (applied
+to $M$), the factors of the original series of $M$ are
+$\{\text{factors of } K\} \cup \{G/N\}$; likewise for $N$. Hence
+both series of $G$ have factors
+\[
+\{\text{factors of } K\} \;\cup\; \{\,G/N,\; G/M\,\},
+\]
+the same multiset.
+
+Solvability: if all factors are $\Z/p_i\Z$, the series is a chain
+with abelian quotients, so $G$ is solvable
+(\cref{prop:b3:groups:derived}). Conversely, a composition factor
+of a solvable group is solvable (a quotient of a subgroup) and
+simple; a solvable simple group is abelian ($D(G) \ne G$ forces
+$D(G) = \{e\}$), hence some $\Z/p\Z$.
+\end{proof}
+
+\begin{remark}\label{rem:b3:groups:jhmeaning}
+Jordan--H\"older says every finite group is built from simple
+groups, with a well-defined parts list --- an arithmetic of groups
+in which the simple groups are the primes, and where \emph{how the
+parts are glued} (extension data, as in the semidirect product)
+replaces mere multiplication. The classification of the finite
+simple groups --- the cyclic $\Z/p\Z$, the alternating $A_{n \geq
+5}$, sixteen families of Lie type, and $26$ sporadic groups --- is
+one of the monuments of twentieth-century mathematics; its proof,
+spread over some ten thousand journal pages, is very far beyond
+this course.
+\end{remark}
+
+\begin{omfigure}
+\begin{tikzpicture}[xscale=1.55, yscale=1.4]
+  \tikzset{sg/.style={draw, rounded corners=2pt, inner sep=3pt,
+      fill=omDef!6, font=\small}}
+  \node[sg, fill=omThm!10] (G)   at (0, 3)    {$D_4$};
+  \node[sg] (K1)  at (-1.6, 2)   {$\langle r^2, s\rangle$};
+  \node[sg] (R)   at (0, 2)      {$\langle r\rangle$};
+  \node[sg] (K2)  at (1.6, 2)    {$\langle r^2, rs\rangle$};
+  \node[sg] (S1)  at (-2.4, 1)   {$\langle s\rangle$};
+  \node[sg] (S2)  at (-1.2, 1)   {$\langle r^2 s\rangle$};
+  \node[sg, fill=omProp!12] (Z) at (0, 1) {$\langle r^2\rangle$};
+  \node[sg] (S3)  at (1.2, 1)    {$\langle rs\rangle$};
+  \node[sg] (S4)  at (2.4, 1)    {$\langle r^3 s\rangle$};
+  \node[sg] (E)   at (0, 0)      {$\{e\}$};
+  \draw (G) -- (K1); \draw (G) -- (R); \draw (G) -- (K2);
+  \draw (K1) -- (S1); \draw (K1) -- (S2); \draw (K1) -- (Z);
+  \draw (R) -- (Z);
+  \draw (K2) -- (Z); \draw (K2) -- (S3); \draw (K2) -- (S4);
+  \draw (S1) -- (E); \draw (S2) -- (E); \draw (Z) -- (E);
+  \draw (S3) -- (E); \draw (S4) -- (E);
+\end{tikzpicture}
+
+{\small The ten subgroups of the dihedral group $D_4 = \langle r,
+s \mid r^4 = s^2 = e,\ srs^{-1} = r^{-1}\rangle$. The three
+subgroups of index $2$ (middle row) are normal, as is the center
+$\langle r^2\rangle$ (highlighted); the four reflection subgroups
+fall into two conjugacy classes of two. Chains from bottom to top
+give composition series, e.g.\ $\{e\} \trianglelefteq \langle
+r^2\rangle \trianglelefteq \langle r\rangle \trianglelefteq D_4$:
+factors $\Z/2\Z, \Z/2\Z, \Z/2\Z$ --- always the same multiset, as
+Jordan--H\"older demands.}
+\end{omfigure}
+
+\section{Exercises}
+
+\begin{exercise}[$\star$]\label{exo:b3:groups:1}
+(a) Show that every subgroup of index $2$ is normal.
+(b) Show that if $[G : H] = 2$, then $x^2 \in H$ for every $x \in
+G$.
+(c) Deduce that $A_4$ has no subgroup of order $6$: Lagrange's
+converse fails. \emph{(Count the squares of $3$-cycles.)}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b3:groups:2}
+Show that if $G/Z(G)$ is cyclic then $G$ is abelian. Deduce again
+that every group of order $p^2$ is abelian, and exhibit, for each
+prime $p$, a nonabelian group of order $p^3$. \emph{(Think of
+upper triangular matrices with unit diagonal over $\mathbb F_p$.)}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b3:groups:3}
+(a) Show that $\operatorname{Aut}(\Z/n\Z) \cong (\Z/n\Z)^\times$.
+(b) Show that the inner automorphisms $\iota_g \colon x \mapsto
+gxg^{-1}$ form a normal subgroup $\operatorname{Inn}(G)
+\trianglelefteq \operatorname{Aut}(G)$, with
+$\operatorname{Inn}(G) \cong G/Z(G)$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:groups:4}
+Let $H, K$ be subgroups of a finite group $G$.
+(a) Prove the \emph{product formula} $\abs{HK}\,\abs{H\cap K} =
+\abs H\, \abs K$, by counting the fibers of the map $H \times K
+\to HK$, $(h,k) \mapsto hk$.
+(b) Show that $HK$ is a subgroup iff $HK = KH$ (automatic when one
+of the two is normal).
+(c) If $H, K \trianglelefteq G$ and $H \cap K = \{e\}$, show that
+$hk = kh$ for all $h \in H$, $k \in K$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:groups:5}
+(Burnside's counting lemma) A finite group $G$ acts on a finite
+set $X$. Show that the number of orbits is the \emph{average
+number of fixed points}:
+\[
+\#\{\text{orbits}\} = \frac{1}{\abs G}\sum_{g \in G}
+\abs{\operatorname{Fix}(g)},
+\qquad \operatorname{Fix}(g) = \{x \in X : g \cdot x = x\},
+\]
+by counting the set $\{(g,x) : g\cdot x = x\}$ in two ways.
+Application: $\Z/p\Z$ ($p$ prime) acts by rotation on necklaces of
+$p$ beads with $a$ available colors; deduce Fermat's little
+theorem $a^p \equiv a \pmod p$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b3:groups:6}
+Using the Sylow theorems, show that every group of order $15$ is
+cyclic and that every group of order $45$ is abelian.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:groups:7}
+Show that no group of order $30$, and none of order $56$, is
+simple. \emph{(For $30$: if $n_3 \neq 1$ and $n_5 \neq 1$, count
+the elements of orders $3$ and $5$. For $56$: count the elements
+of order $7$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:groups:8}
+(a) Let $H \leq G$ of index $n$. Show that the action of $G$ on
+$G/H$ yields a morphism $G \to S_n$ whose kernel $\bigcap_{g \in
+G} gHg^{-1}$ is the largest normal subgroup of $G$ contained in
+$H$.
+(b) Deduce: if $G$ is finite and $p$ is the \emph{smallest} prime
+divisor of $\abs G$, every subgroup of index $p$ is normal.
+(c) Show that every transitive action of $G$ on a set $X$ is
+isomorphic to the action on a coset space: there is a bijection $X
+\to G/G_x$ commuting with the actions.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:groups:9}
+(a) Show that $D(G)$ is the smallest normal subgroup of $G$ with
+abelian quotient, and that every morphism from $G$ to an abelian
+group factors uniquely through the \emph{abelianization}
+$G^{\mathrm{ab}} = G/D(G)$.
+(b) Compute $D(S_n)$ and $S_n^{\mathrm{ab}}$ for $n \geq 2$, and
+$D(Q_8)$ and $Q_8^{\mathrm{ab}}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:groups:10}
+Let $G$ be a $p$-group and $H \subsetneq G$ a proper subgroup.
+Show that $H \subsetneq N_G(H)$ (``normalizers grow''), and deduce
+that every maximal subgroup of a $p$-group is normal of index $p$.
+\emph{(Induction on $\abs G$, using $Z(G) \neq \{e\}$: treat
+separately $Z(G) \subseteq H$ and $Z(G) \not\subseteq H$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:groups:11}
+(Simplicity of $A_5$, hands on)
+(a) Show that the conjugacy classes of $A_5$ have cardinalities
+$1$, $15$, $20$, $12$, $12$. Pay attention to the splitting of the
+$S_5$-class of $5$-cycles: for a $5$-cycle $\sigma$, compare the
+centralizers of $\sigma$ in $S_5$ and in $A_5$.
+(b) Deduce that $A_5$ is simple: a normal subgroup is a union of
+conjugacy classes, contains $e$, and has cardinality dividing
+$60$.
+(c) Show that a simple group of order $60$ necessarily has $n_5 =
+6$.
+\end{exercise}
+
+\section{Problem: the groups of order at most 15}
+
+\begin{problem}[{Weekend problem --- classification of small
+groups}]\label{pb:b3:groups:1}
+The aim is a complete classification, with full proofs, of the
+groups of order $\leq 15$ up to isomorphism. Orders $1, 2, 3, 5,
+7, 11, 13$ are settled by Lagrange (cyclic), and orders $4$ and
+$9$ by \cref{thm:b3:groups:pfixed} plus the analysis below of
+$p^2$: there remain $6, 8, 10, 12, 14, 15$.
+
+\medskip
+\noindent\textbf{Part I --- Tools.}
+\begin{enumerate}
+  \item Show that a group in which every element satisfies $x^2 =
+        e$ is abelian; deduce that such a finite group has order
+        $2^k$ and is isomorphic to $(\Z/2\Z)^k$. \emph{(View it as
+        a vector space over $\mathbb F_2$.)}
+  \item Show that a group of order $p^2$ is isomorphic to
+        $\Z/p^2\Z$ or $(\Z/p\Z)^2$. List the abelian groups of
+        order $8$ up to isomorphism: $\Z/8\Z$, $\Z/4\Z \times
+        \Z/2\Z$, $(\Z/2\Z)^3$ --- prove the list is complete and
+        irredundant \emph{without} the structure theorem of
+        \cref{ch:b3:modules} (discuss by the maximal order of an
+        element).
+  \item Let $\varphi, \varphi' \colon K \to \operatorname{Aut}(H)$
+        be two actions. Show that if $\varphi' = \varphi \circ
+        \alpha$ with $\alpha \in \operatorname{Aut}(K)$, then $H
+        \rtimes_{\varphi} K \cong H \rtimes_{\varphi'} K$.
+  \item Determine $\operatorname{Aut}(\Z/n\Z)$ for $n = 3, 4, 5,
+        7$ explicitly, and show $\operatorname{Aut}\bigl((\Z/2\Z)^2
+        \bigr) \cong S_3$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part II --- Orders $2p$ ($6$, $10$, $14$) and
+$pq$.}
+\begin{enumerate}[resume]
+  \item Let $\abs G = 2p$ with $p$ an odd prime. Show that $G$ has
+        a normal subgroup $N = \langle r \rangle$ of order $p$ and
+        an element $s$ of order $2$ outside $N$.
+  \item Deduce $G \cong \Z/p\Z \rtimes_\varphi \Z/2\Z$, where
+        $\varphi(1) \in \operatorname{Aut}(\Z/p\Z)$ is an
+        involution, and conclude: $G \cong \Z/2p\Z$ or $G \cong
+        D_p$; check these two are not isomorphic. This settles
+        orders $6$, $10$, $14$.
+  \item More generally, let $\abs G = pq$ with $p < q$ primes.
+        Show that if $p \nmid q-1$ then $G$ is cyclic
+        (\cref{ex:b3:groups:pq}), and that if $p \mid q - 1$ there
+        is, besides $\Z/pq\Z$, \emph{exactly one} nonabelian group
+        $\Z/q\Z \rtimes \Z/p\Z$ up to isomorphism --- use question
+        3 and the fact that $\operatorname{Aut}(\Z/q\Z) \cong
+        (\Z/q\Z)^\times$ is cyclic of order $q - 1$, admitted here
+        and proved in \cref{ch:b3:galois} (cyclicity of
+        $\mathbb F_q^\times$). Conclude for order $15$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part III --- Order $8$.} Let $G$ be nonabelian of
+order $8$.
+\begin{enumerate}[resume]
+  \item Show that $G$ has an element $r$ of order $4$ (use
+        question 1) and that $N = \langle r\rangle$ is normal.
+  \item Let $s \notin N$. Show that $s^2 \in N$
+        (\cref{exo:b3:groups:1}(b)), that $srs^{-1} = r^{-1}$
+        (examine the possible images of $r$ under conjugation,
+        which must have order 4, and exclude $srs^{-1} = r$), and
+        that $s^2 \in \{e, r^2\}$ \emph{(what happens if $s^2 = r$
+        or $r^3$? and why must $s^2$ commute with $s$?)}.
+  \item In the case $s^2 = e$, show $G \cong D_4$.
+  \item In the case $s^2 = r^2$, show that the multiplication
+        table is entirely determined; the resulting group is the
+        \emph{quaternion group}\index{quaternion group} $Q_8 =
+        \{\pm 1, \pm \mathrm i, \pm \mathrm j, \pm \mathrm k\}$,
+        $\mathrm i^2 = \mathrm j^2 = \mathrm k^2 = \mathrm i\,
+        \mathrm j\,\mathrm k = -1$ (set $r = \mathrm i$, $s =
+        \mathrm j$). Verify that $Q_8$ exists, e.g.\ inside
+        $GL_2(\C)$ via
+        \[
+        \mathrm i \mapsto \begin{pmatrix} \iu & 0\\ 0 & -\iu
+        \end{pmatrix},
+        \qquad
+        \mathrm j \mapsto \begin{pmatrix} 0 & 1\\ -1 & 0
+        \end{pmatrix}.
+        \]
+  \item Show that every nontrivial subgroup of $Q_8$ contains
+        $-1$; deduce that every subgroup of $Q_8$ is normal, that
+        $D_4 \not\cong Q_8$ (count elements of order $2$), and
+        that $Q_8$ is not a semidirect product of two proper
+        subgroups.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part IV --- Order $12$.} Let $\abs G = 12$, $P_3
+\in \mathrm{Syl}_3(G)$, $P_2 \in \mathrm{Syl}_2(G)$.
+\begin{enumerate}[resume]
+  \item Show $n_3 \in \{1, 4\}$, $n_2 \in \{1, 3\}$, and that $n_3
+        = 4$ forces $n_2 = 1$ \emph{(count elements of order
+        $3$)}.
+  \item Suppose $n_3 = 4$. The conjugation action on
+        $\mathrm{Syl}_3$ gives $\rho \colon G \to S_4$. Show that
+        $\ker \rho$, contained in every $N_G(P_3)$ and hence of
+        order dividing $3$, is trivial \emph{(why can it not have
+        order $3$?)}; that the image, a subgroup of order $12$ of
+        $S_4$, is necessarily $A_4$ \emph{(index 2 subgroups are
+        normal and contain all squares ---
+        \cref{exo:b3:groups:1}; count the squares in $S_4$)}; and
+        conclude $G \cong A_4$.
+  \item Suppose $n_3 = 1$, so $G \cong \Z/3\Z \rtimes_\varphi P_2$
+        with $\varphi \colon P_2 \to \operatorname{Aut}(\Z/3\Z)
+        \cong \Z/2\Z$. Enumerate the cases: $\varphi$ trivial
+        yields $\Z/12\Z$ and $\Z/6\Z \times \Z/2\Z$; $P_2 =
+        \Z/4\Z$ with $\varphi$ surjective yields the
+        \emph{dicyclic group} $\mathrm{Dic}_3 = \Z/3\Z \rtimes
+        \Z/4\Z$; $P_2 = (\Z/2\Z)^2$ with $\varphi$ surjective
+        yields, up to the equivalence of question 3, a single
+        group --- show it is $D_6$, e.g.\ by exhibiting an element
+        of order $6$ and a reflection-like involution.
+  \item Show that $\Z/12\Z$, $\Z/6\Z \times \Z/2\Z$, $D_6$, $A_4$,
+        $\mathrm{Dic}_3$ are pairwise non-isomorphic \emph{(count
+        elements of order $2$, or use $n_3$)}. This settles order
+        $12$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part V --- Synthesis.}
+\begin{enumerate}[resume]
+  \item Assemble the classification table: for each order $n \leq
+        15$, the complete list of groups up to isomorphism, with
+        the counts $1, 1, 1, 2, 1, 2, 1, 5, 2, 2, 1, 5, 1, 2, 1$.
+\end{enumerate}
+\end{problem}

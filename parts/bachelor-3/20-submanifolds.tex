@@ -1,0 +1,518 @@
+\chapter{Submanifolds of \texorpdfstring{$\R^n$}{Rn}}
+\label{ch:b3:submanifolds}
+
+Spheres, tori, rotation groups: the natural habitats of
+geometry and mechanics are not vector spaces but \emph{curved
+sets that look flat up close}. This chapter gives that phrase
+a precise meaning --- submanifolds of $\R^n$ --- and the
+calculus to work on them. The foundation is the inverse
+function theorem, proved here by the Banach fixed point;
+everything else is change of coordinates: the four equivalent
+descriptions of a submanifold (local straightening, level
+sets, graphs, parametrizations), tangent spaces, and
+constrained optimization by Lagrange multipliers --- which,
+as a parting demonstration, re-proves the spectral theorem
+for symmetric matrices in three lines of geometry. The
+weekend problem builds the rotation group $SO(3)$ and its
+quaternionic double cover: algebra (\cref{ch:b3:groups}'s
+$Q_8$ grown up) meeting geometry.
+
+\section{The inverse function theorem}
+
+\begin{theorem}[Inverse function theorem]
+\label{thm:b3:submanifolds:ift}
+Let $U \subseteq \R^n$ be open, $f \colon U \to \R^n$ of
+class $\mathcal C^1$, and $a \in U$ with $Df(a)$ invertible.
+Then there are open sets $V \ni a$, $W \ni f(a)$ such that
+$f \colon V \to W$ is a bijection with $\mathcal C^1$ inverse,
+and\index{inverse function theorem}
+\[
+D(f^{-1})(y) = \bigl(Df(f^{-1}(y))\bigr)^{-1}
+\qquad (y \in W).
+\]
+If $f$ is $\mathcal C^k$, so is $f^{-1}$.
+\end{theorem}
+
+\begin{proof}
+Normalize: replacing $f$ by $x \mapsto Df(a)^{-1}\bigl(f(a +
+x) - f(a)\bigr)$, we may assume $a = 0$, $f(0) = 0$, $Df(0) =
+I$ (the general statement follows by composing with the
+affine bijections). Write $f(x) = x + g(x)$: $Dg(0) = 0$, and
+by continuity of $Dg$ choose $r > 0$ with
+$\vertiii{Dg(x)} \leq \frac12$ on $\bar B(0, r)$; the mean
+value inequality gives $\norm{g(x) - g(x')} \leq \frac12
+\norm{x - x'}$ there.
+
+\emph{Bijectivity onto a neighborhood.} For $y \in B(0,
+\frac r2)$, solving $f(x) = y$ means finding a fixed point of
+$\Phi_y(x) = y - g(x)$; $\Phi_y$ maps $\bar B(0, r)$ into
+itself ($\norm{\Phi_y(x)} \leq \norm y + \frac12\norm x \leq
+r$) and is $\frac12$-Lipschitz: Banach
+(\cref{thm:b3:complete:banach}) gives a unique solution
+$x = \varphi(y) \in \bar B(0,r)$. Moreover $f$ is injective
+on $\bar B(0,r)$:
+\[
+\norm{f(x) - f(x')} \geq \norm{x - x'} - \norm{g(x) - g(x')}
+\geq \tfrac12\norm{x - x'} .
+\tag{$*$}
+\]
+Set $W = B(0, \frac r2)$ and $V = f^{-1}(W)\cap B(0, r)$:
+open (continuity), with $f \colon V \to W$ bijective.
+
+\emph{Continuity and differentiability of the inverse.} $(*)$
+says $\varphi = f^{-1}$ is $2$-Lipschitz. Fix $y_0 = f(x_0)
+\in W$; invertibility of $A = Df(x_0)$ (its distance to $I$
+is $\leq \frac12$: Neumann,
+\cref{prop:b3:banach:neumann}) and differentiability of $f$
+give, for $y = f(x)$ near $y_0$:
+\[
+\varphi(y) - \varphi(y_0) - A^{-1}(y - y_0)
+= -A^{-1}\bigl(f(x) - f(x_0) - A(x - x_0)\bigr)
+= -A^{-1}\,o(\norm{x - x_0}) = o(\norm{y - y_0}),
+\]
+using $(*)$ to convert $\norm{x - x_0} \leq 2\norm{y - y_0}$:
+$\varphi$ is differentiable at $y_0$ with the inverse
+differential. Continuity of $y \mapsto D\varphi(y) =
+Df(\varphi(y))^{-1}$: composition of continuous maps
+(inversion is continuous,
+\cref{prop:b3:banach:neumann}): $\varphi \in \mathcal C^1$;
+bootstrapping the same formula gives $\mathcal C^k$.
+\end{proof}
+
+\begin{theorem}[Implicit function theorem]
+\label{thm:b3:submanifolds:implicit}
+Let $F \colon U \subseteq \R^p\times\R^q \to \R^q$ be
+$\mathcal C^1$ near $(a, b)$, $F(a,b) = 0$, and suppose the
+partial differential $D_yF(a,b) \in \mathcal L(\R^q)$ is
+invertible. Then there are neighborhoods $A \ni a$, $B \ni b$
+and a $\mathcal C^1$ map $\psi \colon A \to B$ with
+\[
+\bigl\{(x, y)\in A\times B : F(x,y) = 0\bigr\}
+= \{(x, \psi(x)) : x \in A\},
+\]
+and $D\psi(x) = -D_yF(x, \psi(x))^{-1}\,D_xF(x,
+\psi(x))$.\index{implicit function theorem}
+\end{theorem}
+
+\begin{proof}
+Apply \cref{thm:b3:submanifolds:ift} to $\Theta(x, y) = (x,
+F(x,y))$: its differential at $(a,b)$, block-triangular with
+invertible diagonal blocks $I$ and $D_yF$, is invertible. The
+local inverse has the form $\Theta^{-1}(x, z) = (x, h(x,
+z))$; set $\psi(x) = h(x, 0)$: then $F(x, y) = 0$ iff
+$\Theta(x,y) = (x, 0)$ iff $y = \psi(x)$, locally. The
+formula: differentiate $F(x, \psi(x)) = 0$ by the chain
+rule.
+\end{proof}
+
+\section{Submanifolds: four definitions}
+
+\begin{theorem}[Equivalent characterizations]
+\label{thm:b3:submanifolds:characterizations}
+Let $M \subseteq \R^n$, $d \in \{0, \dots, n\}$, and $k \geq
+1$. The following are equivalent, for each point $a \in M$
+(and $M$ is a \emph{$d$-dimensional submanifold of class
+$\mathcal C^k$}\index{submanifold} if they hold at every $a
+\in M$):
+\begin{enumerate}
+  \item (\emph{Straightening}) There is a $\mathcal C^k$
+        diffeomorphism $\Phi$ from an open $\Omega \ni a$
+        onto an open $\Omega' \subseteq \R^n$ with
+        \[
+        \Phi(M\cap\Omega) = \Omega' \cap
+        \bigl(\R^d\times\{0\}\bigr).
+        \]
+  \item (\emph{Level set}) There is a $\mathcal C^k$
+        \emph{submersion} $F \colon \Omega \to \R^{n-d}$
+        (i.e.\ $DF(x)$ surjective) on an open $\Omega \ni a$
+        with $M\cap\Omega = F^{-1}(0)$.
+  \item (\emph{Graph}) Up to permuting coordinates, $M$ is
+        locally the graph of a $\mathcal C^k$ map $\psi
+        \colon A \subseteq \R^d \to \R^{n-d}$.
+  \item (\emph{Parametrization}) There is a $\mathcal C^k$
+        \emph{immersion} $\varphi \colon A \subseteq \R^d \to
+        \R^n$ ($D\varphi(u)$ injective) with $A$ open,
+        $\varphi$ a homeomorphism from $A$ onto $M \cap
+        \Omega$ for some open $\Omega \ni a$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1)$\Rightarrow$(2): $F = (\Phi_{d+1}, \dots, \Phi_n)$ (last
+coordinates of $\Phi$): a submersion ($D\Phi$ invertible).
+(2)$\Rightarrow$(3): $DF(a)$ surjective: some $q \times q$
+minor of the Jacobian is invertible ($q = n - d$); after
+permuting coordinates, $D_yF(a)$ is invertible, and the
+implicit function theorem (\cref{thm:b3:submanifolds:implicit})
+expresses $M$ locally as a graph $y = \psi(x)$.
+(3)$\Rightarrow$(4): $\varphi(x) = (x, \psi(x))$: an
+immersion (differential $\bigl(\begin{smallmatrix}I\\
+D\psi\end{smallmatrix}\bigr)$ injective), a homeomorphism onto
+the graph (inverse: the projection, continuous).
+(4)$\Rightarrow$(1): let $\varphi(u_0) = a$; complete
+$\operatorname{im}D\varphi(u_0)$ by a supplement $E$
+($\dim E = n - d$) and define $\Theta(u, v) = \varphi(u) + v$
+on $A\times E$: $D\Theta(u_0, 0)$ is bijective (image
+contains $\operatorname{im}D\varphi(u_0)$ and $E$), so
+$\Theta$ is a local diffeomorphism
+(\cref{thm:b3:submanifolds:ift}); its inverse $\Phi$
+straightens: near $a$, points of $M$ are exactly the
+$\varphi(u) = \Theta(u, 0)$ --- for this, the homeomorphism
+hypothesis in (4) guarantees that $M\cap\Omega$, for small
+$\Omega$, contains no other sheets ($\varphi(u') + v = m \in
+M$ close to $a$ with small $v \neq 0$ must be excluded:
+$m = \varphi(u'')$ for some $u''$ near $u_0$ by the
+homeomorphism property, and local injectivity of $\Theta$
+forces $v = 0$). Then $\Phi(M\cap\Omega) = (A\times\{0\})
+\cap\Phi(\Omega)$ up to shrinking.
+\end{proof}
+
+\begin{example}\label{ex:b3:submanifolds:examples}
+The sphere $S^{n-1} = \{\norm x^2 = 1\}$: level set of the
+submersion $F(x) = \norm x_2^2 - 1$ on
+$\R^n\setminus\{0\}$ ($DF(x) = 2x^{\mathsf T} \ne 0$):
+a $\mathcal C^\infty$ submanifold of dimension $n - 1$. The
+torus in $\R^3$: level set of $\bigl(\sqrt{x^2 + y^2} -
+R\bigr)^2 + z^2 - r^2$ ($0 < r < R$). The cone $\{x^2 + y^2 =
+z^2\}$ is \emph{not} a submanifold at $0$
+(\cref{exo:b3:submanifolds:1}). Matrix groups: $SL_n$ and
+$O_n$ are submanifolds of $M_n(\R)$
+(\cref{exo:b3:submanifolds:5,exo:b3:submanifolds:6}) --- the
+starting point of Lie theory.
+\end{example}
+
+\section{Tangent spaces}
+
+\begin{definition}\label{def:b3:submanifolds:tangent}
+Let $M$ be a $d$-submanifold and $a \in M$. The \emph{tangent
+space}\index{tangent space} $T_aM$ is the set of velocity
+vectors $\gamma'(0)$ of $\mathcal C^1$ curves $\gamma \colon
+\intoo{-\varepsilon}\varepsilon \to M$ with $\gamma(0) = a$.
+\end{definition}
+
+\begin{proposition}\label{prop:b3:submanifolds:tangent}
+$T_aM$ is a $d$-dimensional vector subspace of $\R^n$, and:
+\begin{enumerate}
+  \item if $M = F^{-1}(0)$ locally with $F$ a submersion:
+        $T_aM = \ker DF(a)$;
+  \item if $M$ is parametrized by the immersion $\varphi$
+        ($\varphi(u_0) = a$): $T_aM =
+        \operatorname{im}D\varphi(u_0)$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+Curves in $M$ satisfy $F(\gamma(t)) = 0$; the chain rule at
+$0$ gives $DF(a)\gamma'(0) = 0$: $T_aM \subseteq \ker DF(a)$.
+Conversely, straightening (\cref{thm:b3:submanifolds:%
+characterizations}(1)) transports lines of
+$\R^d\times\{0\}$ to curves of $M$: every vector of a
+$d$-dimensional subspace is realized; comparing dimensions
+($\dim\ker DF(a) = n - (n - d) = d$) forces equality in (1),
+and the same transport argument gives (2) ($D\varphi(u_0)$
+applied to straight lines in $A$; dimensions again).
+\end{proof}
+
+\begin{theorem}[Lagrange multipliers]
+\label{thm:b3:submanifolds:lagrange}
+Let $M = F^{-1}(0)$ with $F = (F_1, \dots, F_q) \colon \Omega
+\to \R^q$ a $\mathcal C^1$ submersion, and let $f \colon
+\Omega \to \R$ be $\mathcal C^1$. If the restriction
+$f\restriction_M$ has a local extremum at $a \in M$, then
+there are unique reals $\lambda_1, \dots, \lambda_q$
+(\emph{Lagrange multipliers}) with\index{Lagrange multipliers}
+\[
+\nabla f(a) = \lambda_1\nabla F_1(a) + \dots +
+\lambda_q\nabla F_q(a) .
+\]
+\end{theorem}
+
+\begin{proof}
+For every curve $\gamma$ in $M$ through $a$: $t \mapsto
+f(\gamma(t))$ has a local extremum at $0$, so $0 =
+\frac{\dd}{\dd t}f(\gamma(t))\big|_0 = \langle\nabla f(a),
+\gamma'(0)\rangle$: $\nabla f(a) \perp T_aM = \ker DF(a)$
+(\cref{prop:b3:submanifolds:tangent}). Now $\ker DF(a)^\perp
+= \operatorname{im}DF(a)^{\mathsf T}$ (the rank/orthogonality
+identity of Year 2, or \cref{exo:b3:hilbert:8} in finite
+dimension: $(\ker T)^\perp = \operatorname{im}T^*$), which is
+spanned by the gradients $\nabla F_i(a)$ --- independent, as
+$DF(a)$ is surjective: the multipliers exist and are unique.
+\end{proof}
+
+\begin{example}[The spectral theorem, geometrically]
+\label{ex:b3:submanifolds:rayleigh}
+Let $A$ be a real symmetric $n\times n$ matrix and maximize
+$f(x) = \langle Ax, x\rangle$ on the sphere $S^{n-1}$
+(compact: the maximum is attained, at some $v_1$). Lagrange
+with $F(x) = \norm x^2 - 1$: $\nabla f = 2Ax$ and $\nabla F =
+2x$ give $Av_1 = \lambda_1v_1$ --- an eigenvector, with
+$\lambda_1 = \max_{S^{n-1}}\langle Ax, x\rangle$. Restrict
+$A$ to $v_1^\perp$ (invariant: $\langle Av, v_1\rangle =
+\langle v, Av_1\rangle = \lambda_1\langle v, v_1\rangle = 0$)
+and iterate: an orthonormal basis of eigenvectors. The
+spectral theorem of Year 2, re-proved by pure optimization
+--- and the infinite-dimensional shadow of the same argument
+proved \cref{lem:b3:spectral:existence}.
+\end{example}
+
+\begin{method}\label{met:b3:submanifolds:method}
+To prove a set is a submanifold: exhibit it locally as
+$F^{-1}(0)$ with $DF$ surjective \emph{on the set} (the most
+common route), or as a graph. To compute its dimension and
+tangent space: $d = n - q$ and $T_a = \ker DF(a)$. To
+optimize on it: Lagrange --- always check compactness (or
+coercivity) first, so an extremum exists to which the theorem
+can apply, and remember that the multiplier equation is only
+\emph{necessary}: collect all critical points, then compare
+values. For matrix groups, differentiate curves at the
+identity to identify tangent spaces.
+\end{method}
+
+\section{Exercises}
+
+\begin{exercise}[$\star$]\label{exo:b3:submanifolds:1}
+(a) Verify that the following are $\mathcal C^\infty$
+submanifolds and give their dimensions: $S^{n-1}$; the
+hyperboloid $\{x^2 + y^2 - z^2 = 1\}$; the torus of
+\cref{ex:b3:submanifolds:examples}.
+(b) Show that the cone $C = \{x^2 + y^2 = z^2\} \subseteq
+\R^3$ is not a $2$-submanifold at $0$: determine the number
+of connected components of
+$\bigl(C\setminus\{0\}\bigr)\cap B(0,\varepsilon)$, and
+compare with the number a straightening
+(\cref{thm:b3:submanifolds:characterizations}(1)) would
+force for a plane minus a point.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b3:submanifolds:2}
+Compute the tangent spaces:
+(a) $T_aS^{n-1}$ for any $a$ (answer: $a^\perp$);
+(b) the tangent plane to the torus of
+\cref{ex:b3:submanifolds:examples} at an arbitrary point of
+the outer equator $\{z = 0,\ x^2 + y^2 = (R + r)^2\}$;
+(c) the tangent line to the helix $\varphi(t) = (\cos t,
+\sin t, t)$ at $\varphi(t_0)$, checking
+\cref{prop:b3:submanifolds:tangent}(2).
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:submanifolds:3}
+Let $f(x, y) = (x^2 - y^2,\ 2xy)$ (i.e.\ $z \mapsto z^2$).
+(a) At which points does \cref{thm:b3:submanifolds:ift} apply?
+(b) Show that $f$ is locally but not globally invertible on
+$\R^2\setminus\{0\}$, and exhibit explicitly the two local
+inverses defined on a neighborhood of $(1, 0)$ (the two
+square-root branches).
+(c) Same discussion for the polar coordinates map $(r,
+\theta) \mapsto (r\cos\theta, r\sin\theta)$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:submanifolds:4}
+(Folium) Let $F(x,y) = x^3 + y^3 - 3xy$ and $\mathcal C =
+F^{-1}(0)$.
+(a) Show that near every point of $\mathcal C$ other than the
+origin, $\mathcal C$ is a $1$-submanifold, locally a graph in
+$x$ or in $y$ (which, where?).
+(b) Compute the tangent line at $(\frac32, \frac32)$.
+(c) What happens at the origin? (Two branches cross:
+exhibit two $\mathcal C^1$ curves in $\mathcal C$ through $0$
+with independent velocities, and conclude that no
+straightening exists.)
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:submanifolds:5}
+Let $F(M) = M^{\mathsf T}M$ from $M_n(\R)$ to the space
+$S_n$ of symmetric matrices.
+(a) Show $DF(M)(H) = M^{\mathsf T}H + H^{\mathsf T}M$ and
+that $DF(M)$ is surjective onto $S_n$ at every $M \in O_n$
+\emph{(given $S \in S_n$, try $H = \frac12MS$)}.
+(b) Conclude that $O_n = F^{-1}(I)$ is a compact
+$\mathcal C^\infty$ submanifold of dimension
+$\frac{n(n-1)}2$, with $T_IO_n = \{H : H^{\mathsf T} = -H\}$,
+the antisymmetric matrices.
+(c) Show that $\eu^{tH} \in O_n$ for every antisymmetric $H$:
+the tangent directions integrate to curves in the group.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:submanifolds:6}
+(a) Show that $\det \colon M_n(\R) \to \R$ has differential
+$D\det(M)(H) = \operatorname{tr}\bigl(\operatorname{com}(M)
+^{\mathsf T}H\bigr)$, nonzero at every $M \in SL_n$.
+(b) Conclude that $SL_n(\R)$ is a submanifold of dimension
+$n^2 - 1$ with $T_ISL_n = \{H : \operatorname{tr}H = 0\}$.
+(c) Is $GL_n(\R)$ a submanifold? Of what dimension?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:submanifolds:7}
+By Lagrange multipliers:
+(a) find the extrema of $f(x,y) = xy$ on the circle $x^2 +
+y^2 = 1$;
+(b) show that among all probability vectors $(p_1, \dots,
+p_n)$ (positive, summing to $1$), the entropy $-\sum
+p_i\ln p_i$ is maximized exactly at the uniform distribution;
+(c) find the point of the ellipse $\{x^2/4 + y^2 = 1\}$
+closest to $(1, 0)$, and check the multiplier equation
+geometrically (normal alignment).
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:submanifolds:8}
+Write out \cref{ex:b3:submanifolds:rayleigh} in full: prove
+by induction that a real symmetric matrix admits an
+orthonormal basis of eigenvectors, with
+$\lambda_1 \geq \dots \geq \lambda_n$ the successive
+constrained maxima of the Rayleigh quotient. Then deduce the
+Courant--Fischer formulas of \cref{exo:b3:spectral:8} in
+finite dimension directly from this construction.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:submanifolds:9}
+(Hadamard's inequality) For $M \in GL_n(\R)$ with columns
+$c_1, \dots, c_n$:
+\[
+\abs{\det M} \;\leq\; \prod_{i=1}^n\norm{c_i}_2 ,
+\]
+with equality iff the columns are orthogonal. \emph{(Reduce
+to columns of norm $1$ by scaling; maximize $\det$ on the
+compact product of spheres $(S^{n-1})^n$; at a maximizer,
+Lagrange in each column separately gives $\nabla_{c_i}\det =
+\lambda_ic_i$, and $\nabla_{c_i}\det$ is the $i$-th column of
+$\operatorname{com}(M)$: deduce $M^{\mathsf T}M$ diagonal,
+hence $= I$, hence $\det = \pm1$.)} Geometric reading: the
+volume of a parallelepiped is at most the product of its edge
+lengths.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:submanifolds:10}
+Near which of its points is the circle $S^1$ a graph $y =
+\psi(x)$? A graph $x = \chi(y)$? Verify the graph
+characterization (\cref{thm:b3:submanifolds:%
+characterizations}(3)) explicitly at $(1, 0)$, and explain
+in one sentence why \emph{some} coordinate permutation is
+always sufficient but no single one always works.
+\end{exercise}
+
+\section{Problem: \texorpdfstring{$SO(3)$}{SO(3)} and the
+quaternions}
+
+\begin{problem}[{Weekend problem --- rotations, the group
+$S^3$, and the double cover}]\label{pb:b3:submanifolds:1}
+The quaternions $\mathbb H = \{t + x\mathrm i + y\mathrm j +
+z\mathrm k\}$ --- the algebra whose unit group contains
+\cref{pb:b3:groups:1}'s $Q_8$ --- parametrize
+three-dimensional rotations twice over: the map ``conjugate
+by a unit quaternion'' is a surjective morphism $S^3 \to
+SO(3)$ with kernel $\{\pm1\}$. We build everything.
+Recall/define: multiplication is $\R$-bilinear with
+$\mathrm i^2 = \mathrm j^2 = \mathrm k^2 =
+\mathrm{ijk} = -1$; the conjugate of $q = t + x\mathrm i +
+y\mathrm j + z\mathrm k$ is $\bar q = t - x\mathrm i -
+y\mathrm j - z\mathrm k$; $N(q) = q\bar q = t^2 + x^2 + y^2
++ z^2$.
+
+\medskip
+\noindent\textbf{Part I --- The algebra $\mathbb H$ and the
+group $S^3$.}
+\begin{enumerate}
+  \item Verify that $\mathbb H$ is an associative
+        $\R$-algebra with center $\R$, that $\overline{pq} =
+        \bar q\,\bar p$, and that $N(pq) = N(p)N(q)$
+        \emph{(one clean route: represent $q$ as the
+        $2\times2$ complex matrix
+        $\bigl(\begin{smallmatrix}\alpha & \beta\\
+        -\bar\beta & \bar\alpha\end{smallmatrix}\bigr)$, $q =
+        \alpha + \beta\mathrm j$, and use $\det$)}.
+  \item Deduce that every $q \neq 0$ is invertible ($q^{-1} =
+        \bar q/N(q)$): $\mathbb H$ is a (noncommutative)
+        field, and $S^3 = \{N(q) = 1\}$ is a group ---
+        and a compact $3$-submanifold of $\R^4$
+        (\cref{ex:b3:submanifolds:examples}).
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part II --- The rotation morphism.} Identify
+$\R^3$ with the \emph{pure quaternions} $P = \{x\mathrm i +
+y\mathrm j + z\mathrm k\}$, and for $q \in S^3$ define
+$\rho_q(v) = q\,v\,\bar q$.
+\begin{enumerate}[resume]
+  \item Show that $\rho_q$ maps $P$ to $P$ \emph{(pure
+        quaternions are those with $\bar v = -v$)}, is
+        $\R$-linear, preserves the norm, and that $\rho
+        \colon q \mapsto \rho_q$ is a group morphism $S^3
+        \to O(3)$.
+  \item Compute the kernel: $\rho_q = \mathrm{id}$ iff $q$
+        commutes with $\mathrm i, \mathrm j, \mathrm k$ iff
+        $q \in \R\cap S^3 = \{\pm1\}$.
+  \item Write $q = \cos\frac\theta2 + \sin\frac\theta2\,u$
+        with $u \in P$, $N(u) = 1$ (why is this always
+        possible for $q \in S^3$?). Show that $\rho_q$ fixes
+        $u$ and, on the plane $u^\perp\cap P$, acts as the
+        rotation of angle $\theta$ \emph{(compute
+        $\rho_q(w)$ for $w \perp u$ using $uw = -wu$ for
+        orthogonal pure units --- prove this identity from
+        the multiplication table, or from $uw + wu =
+        -2\langle u, w\rangle$)}.
+  \item Conclude: $\operatorname{im}\rho \subseteq SO(3)$
+        (each $\rho_q$ is a rotation with axis and angle as
+        computed --- determinant $+1$ by continuity of $q
+        \mapsto \det\rho_q$ on the connected $S^3$, or
+        directly), and $\rho$ is \emph{onto} $SO(3)$: every
+        rotation of $\R^3$ has an axis (prove: a real
+        $3\times3$ orthogonal matrix with $\det = 1$ has
+        eigenvalue $1$ --- consider the characteristic
+        polynomial) and is therefore some $\rho_q$. Summary:
+        \[
+        SO(3) \;\cong\; S^3/\{\pm 1\} .
+        \]
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part III --- $SO(3)$ as a submanifold;
+Rodrigues.}
+\begin{enumerate}[resume]
+  \item Show that $SO(3)$ is a compact $3$-dimensional
+        submanifold of $M_3(\R)$ with $T_ISO(3) =$
+        antisymmetric matrices
+        (\cref{exo:b3:submanifolds:5}; the determinant
+        condition selects a union of components).
+  \item For the antisymmetric matrix $A_u$ associated with
+        $u \in \R^3$ ($A_uv = u\wedge v$, the cross
+        product), prove \emph{Rodrigues' formula}:
+        \[
+        \eu^{\theta A_u} = I + \sin\theta\,A_u + (1 -
+        \cos\theta)\,A_u^2 \qquad (\norm u = 1)
+        \]
+        \emph{(from $A_u^3 = -A_u$: split the exponential
+        series along $A_u$'s powers)}, and identify it as the
+        rotation of axis $u$ and angle $\theta$. Deduce that
+        $\exp$ maps the antisymmetric matrices \emph{onto}
+        $SO(3)$.
+  \item Relate the two parametrizations: show that $t
+        \mapsto \rho_{q(t)}$ with $q(t) = \cos\frac t2 +
+        \sin\frac t2\,u$ is a one-parameter group of
+        rotations whose derivative at $t = 0$ is $A_u$
+        --- the quaternionic and matrix exponentials tell
+        the same story at half and full speed respectively.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part IV --- The double cover, felt.}
+\begin{enumerate}[resume]
+  \item Show that the path $q(t) = \cos\frac t2 + \sin\frac
+        t2\,\mathrm k$, $t \in \intcc0{2\pi}$, is a loop in
+        $SO(3)$ (its image $\rho_{q(t)}$ returns to the
+        identity) whose quaternionic lift is \emph{not} a
+        loop: $q(2\pi) = -q(0)$. Continuing to $t = 4\pi$
+        closes the lift. Explain in a short paragraph what
+        this says: a $2\pi$ rotation is not continuously
+        undoable while a $4\pi$ rotation is (the belt
+        trick), because $SO(3)$'s loops are detected in its
+        double cover $S^3$.
+  \item Deduce also the practical dividend: composition of
+        rotations = multiplication of quaternions
+        ($4$ multiplications' worth of data instead of $9$,
+        no drift from orthogonality) --- verify on the
+        composition of two quarter-turns about $\mathrm i$
+        and $\mathrm j$: compute the axis and angle of the
+        product.
+\end{enumerate}
+\end{problem}

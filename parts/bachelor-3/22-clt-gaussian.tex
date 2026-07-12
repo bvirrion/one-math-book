@@ -1,0 +1,658 @@
+\chapter{Characteristic Functions and the Central Limit
+Theorem}\label{ch:b3:clt}
+
+The law of large numbers says averages converge; the central
+limit theorem says \emph{how they fluctuate}: the error,
+magnified by $\sqrt n$, is asymptotically Gaussian ---
+whatever the law one started from. This universality is the
+deepest fact of elementary probability, and its natural proof
+is Fourier-analytic: the \emph{characteristic function}
+(the Fourier transform of a law) converts independent sums
+into products, and \cref{ch:b3:fouriertransform}'s machinery
+--- injectivity, Gaussian fixed points --- converts pointwise
+convergence of these products into convergence of laws
+(L\'evy's theorem, proved in full). The chapter ends with
+Gaussian vectors and the honest derivation of the confidence
+intervals used everywhere in statistics; the weekend problem
+gives Lindeberg's second proof of the CLT, with an explicit
+error rate.
+
+\section{Characteristic functions}
+
+\begin{definition}\label{def:b3:clt:cf}
+The \emph{characteristic function}\index{characteristic
+function} of a real random variable $X$ is
+\[
+\varphi_X(\xi) = \E\bigl[\eu^{\iu\xi X}\bigr]
+= \int_\R \eu^{\iu\xi x}\,\dd\P_X(x)
+\qquad (\xi \in \R)
+\]
+(the transfer theorem computes it from the law; for a density
+$f$, $\varphi_X(\xi) = \hat f(-\xi)$ in
+\cref{ch:b3:fouriertransform}'s convention).
+\end{definition}
+
+\begin{proposition}\label{prop:b3:clt:cfbasics}
+(a) $\varphi_X(0) = 1$, $\abs{\varphi_X} \leq 1$, and
+$\varphi_X$ is uniformly continuous;
+$\varphi_{aX + b}(\xi) = \eu^{\iu b\xi}\varphi_X(a\xi)$.
+(b) If $X, Y$ are \emph{independent}:
+$\varphi_{X+Y} = \varphi_X\,\varphi_Y$.
+(c) If $\E\abs X^k < \infty$, then $\varphi_X \in \mathcal
+C^k$ with $\varphi_X^{(j)}(0) = \iu^j\,\E[X^j]$ for $j \leq
+k$; in particular, for centered $X \in L^2$ with variance
+$\sigma^2$:
+\[
+\varphi_X(\xi) = 1 - \frac{\sigma^2\xi^2}{2} +
+o(\xi^2) \qquad (\xi \to 0).
+\]
+(d) Gaussian: $X \sim \mathcal N(m, \sigma^2)$ has
+$\varphi_X(\xi) = \eu^{\iu m\xi - \sigma^2\xi^2/2}$.
+\end{proposition}
+
+\begin{proof}
+(a) Bounds are immediate; continuity: $\abs{\varphi(\xi + h)
+- \varphi(\xi)} \leq \E\abs{\eu^{\iu hX} - 1} \to 0$ as $h
+\to 0$ by dominated convergence, uniformly in $\xi$. The
+affine rule is a substitution. (b) $\eu^{\iu\xi(X+Y)} =
+\eu^{\iu\xi X}\eu^{\iu\xi Y}$, and expectations of products
+of independent variables factor
+(\cref{thm:b3:probability:independence}, applied to real and
+imaginary parts). (c) Differentiation under the expectation,
+dominated by $\E\abs X^j$
+(\cref{thm:b3:lebesgue:paramdiff}); the Taylor expansion at
+$0$ is then Taylor--Young for the $\mathcal C^2$ function
+$\varphi$. (d) For $\mathcal N(0,1)$: the Gaussian transform
+(\cref{ex:b3:fouriertransform:gaussian} with $a = \frac12$)
+gives $\int\eu^{\iu\xi x}\frac{\eu^{-x^2/2}}{\sqrt{2\pi}}\dd
+x = \eu^{-\xi^2/2}$; the general case by the affine rule.
+\end{proof}
+
+\begin{theorem}[Injectivity]\label{thm:b3:clt:injectivity}
+If $\varphi_X = \varphi_Y$, then $X$ and $Y$ have the same
+law. More precisely, for $N \sim \mathcal N(0,1)$ independent
+of $X$ and $\varepsilon > 0$, the smoothed variable $X +
+\varepsilon N$ has the density
+\[
+p_\varepsilon(x) = \frac1{2\pi}\int_\R
+\varphi_X(-\xi)\,\eu^{-\varepsilon^2\xi^2/2}\,
+\eu^{\iu\xi x}\,\dd\xi ,
+\]
+determined by $\varphi_X$ alone; letting $\varepsilon \to 0$
+recovers the law of $X$.\index{characteristic function,
+injectivity}
+\end{theorem}
+
+\begin{proof}
+$X + \varepsilon N$ has the density $p_\varepsilon(x) =
+\E\bigl[g_\varepsilon(x - X)\bigr]$, where $g_\varepsilon$ is
+the $\mathcal N(0, \varepsilon^2)$ density: indeed for Borel
+$B$, independence and Tonelli give $\P(X + \varepsilon N \in
+B) = \int\!\!\int\mathbf 1_B(x + \varepsilon
+n)g_1(n)\,\dd n\,\dd\P_X(x) = \int_B\E[g_\varepsilon(t -
+X)]\dd t$ (substitute, then Tonelli again). Writing
+$g_\varepsilon$ by Fourier inversion of its transform
+(\cref{exo:b3:fouriertransform:4}, rescaled):
+$g_\varepsilon(u) = \frac1{2\pi}\int
+\eu^{-\varepsilon^2\xi^2/2}\eu^{\iu\xi u}\dd\xi$, and Fubini
+(everything dominated by the Gaussian factor):
+\[
+p_\varepsilon(x) = \frac1{2\pi}\int_\R
+\varphi_X(-\xi)\,\eu^{-\varepsilon^2\xi^2/2}\,
+\eu^{\iu\xi x}\,\dd\xi ,
+\]
+a functional of $\varphi_X$ alone. If $\varphi_X =
+\varphi_Y$: $X + \varepsilon N$ and $Y + \varepsilon N$ have
+equal laws for every $\varepsilon$; for bounded continuous
+$f$, $\E f(X + \varepsilon N) \to \E f(X)$ as $\varepsilon
+\to 0$ (dominated convergence, $X + \varepsilon N \to X$
+pointwise on the product space), so $\E f(X) = \E f(Y)$ for
+all such $f$ --- and this determines the law: for each $t$,
+squeeze $\mathbf 1_{\intoc{-\infty}t}$ between the bounded
+continuous ramps $f_k^\pm$ (equal to $1$ on
+$\intoc{-\infty}{t \mp \frac1k}$, to $0$ beyond $t \pm
+\frac1k$, affine between); passing to the limit in $\E
+f_k^-(X) \leq F_X(t) \leq \E f_k^+(X)$ gives $F_X(t) =
+F_Y(t)$ at every $t$ where both are continuous, hence
+everywhere by right-continuity and density of common
+continuity points (both $F$'s have countably many jumps);
+equal distribution functions force equal laws
+(\cref{exo:b3:measure:3}, resting on
+\cref{thm:b3:measure:uniqueness}).
+\end{proof}
+
+\section{Convergence in distribution}
+
+\begin{definition}\label{def:b3:clt:cid}
+$X_n$ \emph{converges in distribution} (or in law) to $X$,
+written $X_n \Rightarrow X$, if\index{convergence in
+distribution}
+\[
+\E\bigl[f(X_n)\bigr] \longrightarrow \E\bigl[f(X)\bigr]
+\qquad\text{for every bounded continuous } f\colon\R\to\R .
+\]
+Equivalently (\cref{exo:b3:clt:4}): $F_{X_n}(t) \to F_X(t)$
+at every continuity point $t$ of $F_X$. The $X_n$ need not
+live on a common probability space: only laws matter.
+\end{definition}
+
+\begin{theorem}[Helly's selection theorem]
+\label{thm:b3:clt:helly}
+Every sequence $(F_n)$ of distribution functions has a
+subsequence converging pointwise, at every continuity point
+of the limit, to a nondecreasing right-continuous $G \colon
+\R \to \intcc01$ --- possibly with $G(+\infty) - G(-\infty) <
+1$ (mass may escape to infinity).\index{Helly's theorem}
+\end{theorem}
+
+\begin{proof}
+Diagonal extraction gives $F_{n_k}(q) \to \ell(q)$ for every
+rational $q$ (values in the compact $\intcc01$). Define
+$G(t) = \inf\{\ell(q) : q \in \Q, q > t\}$: nondecreasing;
+right-continuous (an infimum over shrinking rational
+neighborhoods from the right). At a continuity point $t$ of
+$G$: for rationals $q_1 < t < q_2$,
+\[
+\ell(q_1) \leq \liminf F_{n_k}(t) \leq \limsup F_{n_k}(t)
+\leq \ell(q_2),
+\]
+by monotonicity of each $F_{n_k}$. From the definition of
+$G$ as an infimum and monotonicity of $\ell$ on the
+rationals: $G(s) \leq \ell(q) \leq G(q)$ whenever $s < q$.
+Taking $s < q_1 < t$ gives $\ell(q_1) \geq G(s)$, and
+$\ell(q_2) \leq G(q_2)$; letting $s \uparrow t$ and $q_2
+\downarrow t$, continuity of $G$ at $t$ squeezes both the
+$\liminf$ and the $\limsup$ to $G(t)$.
+\end{proof}
+
+\begin{lemma}[Tightness from the characteristic function]
+\label{lem:b3:clt:tightness}
+For any random variable $X$ and $u > 0$:
+\[
+\P\Bigl(\abs X \geq \frac2u\Bigr) \;\leq\;
+\frac1u\int_{-u}^{u}\bigl(1 -
+\operatorname{Re}\varphi_X(\xi)\bigr)\,\dd\xi .
+\]
+\end{lemma}
+
+\begin{proof}
+By Tonelli--Fubini (integrand bounded, region finite in
+$\xi$):
+\[
+\frac1u\int_{-u}^u\bigl(1 -
+\operatorname{Re}\varphi_X(\xi)\bigr)\dd\xi
+= \E\Bigl[\frac1u\int_{-u}^u(1 - \cos(\xi X))\,\dd\xi\Bigr]
+= 2\,\E\Bigl[1 - \frac{\sin(uX)}{uX}\Bigr]
+\]
+(interpret the bracket as its limit $0$ at $X = 0$). The
+integrand is nonnegative ($\abs{\sin t} \leq \abs t$), and
+for $\abs{uX} \geq 2$: $1 - \frac{\sin(uX)}{uX} \geq 1 -
+\frac1{\abs{uX}} \geq \frac12$. Keeping only the event
+$\{\abs{uX} \geq 2\}$ inside the expectation therefore
+leaves at least $2 \cdot \frac12\,\P(\abs X \geq \frac2u)$,
+which is the claim.
+\end{proof}
+
+\begin{theorem}[L\'evy's continuity theorem]
+\label{thm:b3:clt:levy}
+Let $(X_n)$ be random variables whose characteristic
+functions converge pointwise: $\varphi_{X_n}(\xi) \to
+\varphi(\xi)$ for every $\xi$, where $\varphi =
+\varphi_X$ is the characteristic function of some random
+variable $X$. Then $X_n \Rightarrow X$.\index{L\'evy's
+continuity theorem}
+\end{theorem}
+
+\begin{proof}
+\emph{Tightness.} Fix $\varepsilon > 0$. Since $\varphi$ is
+continuous at $0$ with $\varphi(0) = 1$, choose $u > 0$ with
+$\frac1u\int_{-u}^u(1 - \operatorname{Re}\varphi) <
+\varepsilon$; by dominated convergence (integrand bounded by
+$2$ on the fixed $[-u,u]$), the same integral for
+$\varphi_{X_n}$ is $< 2\varepsilon$ for $n$ large:
+\cref{lem:b3:clt:tightness} gives $\P(\abs{X_n} \geq \frac2u)
+\leq 2\varepsilon$ for large $n$, and enlarging the constant
+handles the finitely many others: the laws are \emph{tight}
+--- no mass escapes.
+
+\emph{Subsequences.} Let $(F_{n_k})$ be any subsequence; by
+Helly (\cref{thm:b3:clt:helly}) extract $F_{n_{k_j}} \to G$
+at continuity points. Tightness forces $G(-\infty) = 0$,
+$G(+\infty) = 1$ ($G(\frac2u) - G(-\frac2u) \geq 1 -
+2\varepsilon$ at continuity points): $G$ is a genuine
+distribution function, of some random variable $Y$. Then
+$X_{n_{k_j}} \Rightarrow Y$ (\cref{exo:b3:clt:4},
+distributional convergence from $F$'s), so
+$\varphi_{X_{n_{k_j}}} \to \varphi_Y$ \emph{pointwise} ($x
+\mapsto \eu^{\iu\xi x}$ is bounded continuous, real and
+imaginary parts separately); comparing with the hypothesis:
+$\varphi_Y = \varphi = \varphi_X$, and injectivity
+(\cref{thm:b3:clt:injectivity}) gives $Y \sim X$, i.e.\ $G =
+F_X$.
+
+\emph{Conclusion.} Every subsequence of $(F_n)$ has a
+sub-subsequence converging to the \emph{same} $F_X$ (at its
+continuity points); hence $F_n(t) \to F_X(t)$ at every
+continuity point $t$ (a real sequence all of whose
+subsequences have subsubsequences with the same limit
+converges): $X_n \Rightarrow X$.
+\end{proof}
+
+\section{The central limit theorem}
+
+\begin{theorem}[Central limit theorem]\label{thm:b3:clt:clt}
+Let $(X_n)$ be i.i.d.\ with $\E X_1 = m$ and $\V(X_1) =
+\sigma^2 \in \intoo0\infty$. Then\index{central limit
+theorem}
+\[
+\frac{S_n - nm}{\sigma\sqrt n} \;\Longrightarrow\; \mathcal
+N(0, 1) :
+\qquad
+\P\Bigl(a \leq \frac{S_n - nm}{\sigma\sqrt n} \leq
+b\Bigr) \longrightarrow
+\frac{1}{\sqrt{2\pi}}\int_a^b\eu^{-x^2/2}\,\dd x
+\]
+for all $a < b$.
+\end{theorem}
+
+\begin{proof}
+Center and normalize: $Z_i = \frac{X_i - m}{\sigma}$
+(i.i.d., mean $0$, variance $1$) and $T_n =
+\frac1{\sqrt n}\sum_{i\leq n}Z_i$. By independence and the
+affine rule (\cref{prop:b3:clt:cfbasics}):
+\[
+\varphi_{T_n}(\xi) =
+\varphi_{Z}\Bigl(\frac{\xi}{\sqrt n}\Bigr)^{n},
+\qquad
+\varphi_Z(\eta) = 1 - \frac{\eta^2}2 + \eta^2\rho(\eta),\quad
+\rho(\eta)\to0 .
+\]
+Fix $\xi$ and let $a_n = \varphi_Z(\xi/\sqrt n)$, $b_n = 1 -
+\frac{\xi^2}{2n}$: both have modulus $\leq 1$ for $n$ large
+($\abs{b_n} \leq 1$ once $\xi^2 \leq 4n$; $\abs{a_n} \leq 1$
+always). The elementary inequality $\abs{a^n - b^n} \leq
+n\abs{a - b}$ for $\abs a, \abs b \leq 1$ (telescoping
+$a^n - b^n = \sum a^k(a - b)b^{n-1-k}$) gives
+\[
+\Bigl|\varphi_{T_n}(\xi) - \Bigl(1 -
+\frac{\xi^2}{2n}\Bigr)^{n}\Bigr|
+\leq n\,\Bigl|\varphi_Z\Bigl(\frac\xi{\sqrt n}\Bigr) - 1 +
+\frac{\xi^2}{2n}\Bigr|
+= \xi^2\,\Bigl|\rho\Bigl(\frac{\xi}{\sqrt n}\Bigr)\Bigr|
+\longrightarrow 0,
+\]
+while $\bigl(1 - \frac{\xi^2}{2n}\bigr)^n \to
+\eu^{-\xi^2/2}$ (real logarithm). So $\varphi_{T_n}(\xi) \to
+\eu^{-\xi^2/2} = \varphi_{\mathcal N(0,1)}(\xi)$
+(\cref{prop:b3:clt:cfbasics}(d)) for every $\xi$: L\'evy
+(\cref{thm:b3:clt:levy}) concludes $T_n \Rightarrow \mathcal
+N(0,1)$. The interval probabilities follow since $F_{\mathcal
+N}$ is continuous everywhere.
+\end{proof}
+
+\begin{example}[Confidence intervals, honestly derived]
+\label{ex:b3:clt:confidence}
+Poll $n$ independent voters; $\hat p_n = S_n/n$ estimates the
+true $p$, with $\sigma^2 = p(1-p) \leq \frac14$. The CLT
+gives, for large $n$,
+\[
+\P\Bigl(\abs{\hat p_n - p} \leq
+\frac{z}{2\sqrt n}\Bigr)
+\;\geq\; \P\Bigl(\Bigl|\frac{S_n - np}{\sigma\sqrt n}\Bigr|
+\leq z\Bigr)
+\longrightarrow \Phi(z) - \Phi(-z),
+\]
+where $\Phi$ is the standard Gaussian distribution function.
+With $z = 1.96$: asymptotic confidence $95\%$, and margin
+$\frac{1.96}{2\sqrt n} \leq 3\%$ requires $n \geq
+\bigl(\frac{1.96}{0.06}\bigr)^2 \approx 1068$ --- the number
+behind every ``$\pm3$ points, $95\%$'' one reads; compare
+Chebyshev's $5556$ (\cref{exo:b3:probability:7}). The
+$\sqrt n$ is universal: to halve the error, quadruple the
+sample --- the same law that fixes Monte Carlo's cost
+(\cref{exo:b3:clt:7}).
+\end{example}
+
+\section{Gaussian vectors}
+
+\begin{definition}\label{def:b3:clt:gaussianvector}
+A random vector $X = (X_1, \dots, X_d)$ is
+\emph{Gaussian}\index{Gaussian vector} if every linear
+combination $\langle t, X\rangle = \sum t_iX_i$ is a
+(possibly degenerate) real Gaussian variable. Its law is
+determined by the mean vector $m = (\E X_i)$ and the
+\emph{covariance matrix} $\Sigma = \bigl(\operatorname{Cov}
+(X_i, X_j)\bigr)$: indeed the characteristic function of the
+vector, $\varphi_X(t) = \E\eu^{\iu\langle t, X\rangle}$, is
+the value at $1$ of the cf of $\langle t, X\rangle$:
+\[
+\varphi_X(t) = \exp\Bigl(\iu\langle t, m\rangle -
+\tfrac12\,t^{\mathsf T}\Sigma\,t\Bigr),
+\]
+and $d$-dimensional characteristic functions are injective
+(same smoothing proof as \cref{thm:b3:clt:injectivity},
+coordinatewise Gaussians).
+\end{definition}
+
+\begin{theorem}\label{thm:b3:clt:gaussianvector}
+Let $X$ be a Gaussian vector.
+\begin{enumerate}
+  \item Every affine image $AX + b$ is a Gaussian vector.
+  \item The components $X_i$ are \emph{independent} if and
+        only if $\Sigma$ is diagonal: for jointly Gaussian
+        variables, uncorrelated $=$ independent.
+  \item If $\Sigma$ is invertible, $X$ has the density
+        $\frac{1}{(2\pi)^{d/2}\sqrt{\det\Sigma}}
+        \exp\bigl(-\frac12(x - m)^{\mathsf T}\Sigma^{-1}(x -
+        m)\bigr)$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) Linear combinations of components of $AX + b$ are affine
+functions of linear combinations of $X$: Gaussian (an affine
+image of a Gaussian variable is Gaussian).
+(2) If $\Sigma$ is diagonal, the characteristic function
+factorizes: $\varphi_X(t) = \prod_i\exp(\iu t_im_i -
+\frac12\Sigma_{ii}t_i^2) = \prod\varphi_{X_i}(t_i)$, which is
+the characteristic function of the product law
+(\cref{thm:b3:probability:independence} read through
+$d$-dimensional injectivity): the components are independent.
+The converse is the vanishing of covariances of independent
+$L^2$ variables.
+(3) Diagonalize $\Sigma = P D P^{\mathsf T}$ ($P$ orthogonal,
+$D > 0$ diagonal --- \cref{exo:b3:submanifolds:8}); the
+vector $Y = P^{\mathsf T}(X - m)$ is Gaussian with
+covariance $D$: by (2) its components are independent
+$\mathcal N(0, d_i)$, so $Y$ has the product density; push
+forward by the volume-preserving $x = m + PY$
+(\cref{thm:b3:product:linearchange}, $\abs{\det P} = 1$) and
+rewrite the exponent invariantly.
+\end{proof}
+
+\begin{theorem}[Multidimensional CLT]
+\label{thm:b3:clt:multiclt}
+Let $(X_n)$ be i.i.d.\ square-integrable random
+\emph{vectors} of $\R^d$ with mean $m$ and covariance matrix
+$\Sigma$. Then $\frac{S_n - nm}{\sqrt n}$ converges in
+distribution to the Gaussian vector $\mathcal N(0,
+\Sigma)$.\index{central limit theorem!multidimensional}
+\admitted
+\end{theorem}
+
+\begin{remark}\label{rem:b3:clt:multiclt}
+Almost everything is already in our hands. For each
+direction $t \in \R^d$, the real variable $\langle t,
+\frac{S_n - nm}{\sqrt n}\rangle$ is a normalized sum of
+i.i.d.\ real variables of variance $t^{\mathsf T}\Sigma t$,
+so \cref{thm:b3:clt:clt}'s computation gives pointwise
+convergence of the $d$-dimensional characteristic functions
+to $\eu^{-t^{\mathsf T}\Sigma t/2}$, the characteristic
+function of $\mathcal N(0, \Sigma)$
+(\cref{def:b3:clt:gaussianvector}). What we have not
+re-proved is L\'evy's continuity theorem \emph{in $\R^d$}:
+Helly's selection and the tightness estimate generalize
+routinely (coordinatewise), and this Cram\'er--Wold
+reduction is carried out honestly in any graduate
+probability course; nothing beyond this chapter's methods is
+needed.
+\end{remark}
+
+\begin{method}\label{met:b3:clt:method}
+To identify a limit law: compute characteristic functions,
+take the pointwise limit, recognize it (Gaussian
+$\eu^{-\sigma^2\xi^2/2}$, Poisson
+$\eu^{\lambda(\eu^{\iu\xi}-1)}$, exponential $\frac{\lambda}
+{\lambda - \iu\xi}$, \dots) and invoke L\'evy. The three-step
+ritual (independence $\to$ product; Taylor at $0$ $\to$
+exponential limit; L\'evy $\to$ convergence in law) proves
+the CLT, the Poisson law of rare events
+(\cref{exo:b3:clt:5}), and every classical limit theorem of
+this course. For a.s.\ statements, go back to
+\cref{ch:b3:probability}'s toolkit: the two chapters answer
+different questions about the same $S_n$.
+\end{method}
+
+\section{Exercises}
+
+\begin{exercise}[$\star$]\label{exo:b3:clt:1}
+Compute the characteristic functions: uniform on
+$\intcc{-1}1$; exponential $\mathcal E(\lambda)$; Poisson
+$\mathcal P(\lambda)$; binomial $\mathcal B(n, p)$. Deduce
+via \cref{thm:b3:clt:injectivity} that the sum of independent
+Poisson variables ($\lambda, \mu$) is Poisson $(\lambda +
+\mu)$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:2}
+(a) Show that $\varphi_X$ is real-valued if and only if $X$
+and $-X$ have the same law (a \emph{symmetric} variable).
+(b) Suppose $\abs{\varphi_X(\xi_0)} = 1$ for some $\xi_0 \neq
+0$. Show that $X$ is almost surely supported on an arithmetic
+progression $a + \frac{2\pi}{\xi_0}\Z$ \emph{(write
+$\varphi_X(\xi_0) = \eu^{\iu\theta}$ and compute $\E[1 -
+\cos(\xi_0X - \theta)]$)}. Deduce that if $X$ has a density,
+then $\abs{\varphi_X(\xi)} < 1$ for all $\xi \neq 0$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:3}
+Let $X \sim \mathcal N(m_1, \sigma_1^2)$ and $Y \sim
+\mathcal N(m_2, \sigma_2^2)$ be independent. Show $X + Y
+\sim \mathcal N(m_1 + m_2, \sigma_1^2 + \sigma_2^2)$, and
+more generally that the Gaussian family is stable under
+independent sums and affine maps. Contrast: is the sum of
+two \emph{dependent} Gaussians always Gaussian?
+(\cref{exo:b3:clt:9}.)
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:4}
+(a) Prove the equivalence in \cref{def:b3:clt:cid}: if
+$\E f(X_n) \to \E f(X)$ for all bounded continuous $f$,
+then $F_{X_n}(t) \to F_X(t)$ at continuity points
+\emph{(squeeze $\mathbf 1_{\intoc{-\infty}t}$ between two
+continuous staircase-ramps)}; and conversely
+\emph{(approximate a bounded continuous $f$ by sums of ramp
+functions, or condition on a fine grid of continuity
+points)} --- the converse may be treated for $f$ uniformly
+continuous first, then in general.
+(b) Show that $X_n \Rightarrow c$ (a constant) implies $X_n
+\to c$ in probability.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:5}
+(Law of rare events) Let $X_n \sim \mathcal B(n, p_n)$ with
+$np_n \to \lambda > 0$. Show, via characteristic functions
+and \cref{thm:b3:clt:levy}, that $X_n \Rightarrow \mathcal
+P(\lambda)$. Numerical sanity check: compare $\P(X = 0)$ for
+$\mathcal B(100, 0.02)$ and $\mathcal P(2)$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:6}
+(a) A fair die is rolled $n = 1000$ times; approximate the
+probability that the total exceeds $3600$ (mean $3500$,
+variance per roll $\frac{35}{12}$).
+(b) For $S \sim \mathcal B(100, \frac12)$, approximate
+$\P(45 \leq S \leq 55)$ by the CLT with the continuity
+correction ($\pm\frac12$), and comment on the correction's
+effect.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:7}
+(Monte Carlo error) In the setting of
+\cref{pb:b3:probability:1}, question 11, with $g \in
+L^2(\intcc01^d)$, let $\sigma^2 = \V(g(U_1))$ and $I = \int
+g$. Show
+\[
+\sqrt n\,\Bigl(\frac1n\sum_{k\leq n}g(U_k) - I\Bigr)
+\Longrightarrow \mathcal N(0, \sigma^2),
+\]
+and deduce the asymptotic $95\%$ error bar $\pm
+1.96\,\sigma/\sqrt n$ --- independent of the dimension $d$.
+Compare with the deterministic midpoint rule in dimension
+$d$ (error $\sim n^{-2/d}$ for $\mathcal C^2$ integrands):
+from which dimension on does random sampling win?
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:clt:8}
+(Slutsky) Suppose $X_n \Rightarrow X$ and $Y_n \to c$ in
+probability ($c$ constant). Show $X_n + Y_n \Rightarrow X +
+c$ and $Y_nX_n \Rightarrow cX$. \emph{(Work with
+characteristic functions and the bound $\abs{\E\eu^{\iu\xi
+(X_n+Y_n)} - \eu^{\iu\xi c}\E\eu^{\iu\xi X_n}} \leq
+\E\abs{\eu^{\iu\xi(Y_n - c)} - 1}$, split on $\abs{Y_n - c}
+\leq \delta$.)} Application: in
+\cref{ex:b3:clt:confidence}, justify replacing the unknown
+$\sigma = \sqrt{p(1-p)}$ by $\sqrt{\hat p_n(1 - \hat
+p_n)}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:clt:9}
+Let $X \sim \mathcal N(0,1)$ and $\varepsilon$ independent
+with $\P(\varepsilon = \pm1) = \frac12$; set $Y =
+\varepsilon X$.
+(a) Show $Y \sim \mathcal N(0,1)$ and
+$\operatorname{Cov}(X, Y) = 0$.
+(b) Show $X$ and $Y$ are \emph{not} independent, and that
+$(X, Y)$ is not a Gaussian vector \emph{(compute $\P(X + Y =
+0)$)}.
+(c) Moral: \cref{thm:b3:clt:gaussianvector}(2) requires
+joint Gaussianity --- ``uncorrelated Gaussians'' alone
+proves nothing.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:10}
+The Cauchy law has density $\frac1{\pi(1 + x^2)}$.
+(a) Show its characteristic function is $\eu^{-\abs\xi}$
+(\cref{exo:b3:fouriertransform:1} and inversion).
+(b) Show that if $X_1, \dots, X_n$ are i.i.d.\ Cauchy, then
+$\frac{S_n}n$ is again Cauchy --- the \emph{same} law: the
+average never concentrates.
+(c) Reconcile with the laws of large numbers and the CLT:
+which hypotheses fail? (Compute $\E\abs{X_1}$.)
+\end{exercise}
+
+\section{Problem: Lindeberg's proof of the CLT, with a
+rate}
+
+\begin{problem}[{Weekend problem --- the replacement method}]
+\label{pb:b3:clt:1}
+Lindeberg (1922) proved the central limit theorem by an idea
+of disarming simplicity: \emph{swap the summands one at a
+time for Gaussians} and control each swap by a Taylor
+expansion. The method needs no Fourier analysis, produces an
+explicit error rate, and today powers universality proofs
+across probability theory. Let $(X_i)$ be i.i.d., centered,
+$\V(X_1) = 1$, with $\beta = \E\abs{X_1}^3 < \infty$; let
+$(N_i)$ be i.i.d.\ $\mathcal N(0,1)$, independent of the
+$X_i$ (existence: \cref{thm:b3:probability:existence}). Set
+\[
+T_n = \frac{X_1 + \dots + X_n}{\sqrt n},
+\qquad
+G_n = \frac{N_1 + \dots + N_n}{\sqrt n} \sim \mathcal N(0,1).
+\]
+
+\medskip
+\noindent\textbf{Part I --- The swapping identity.} Fix $f
+\in \mathcal C^3_b(\R)$ (three bounded continuous
+derivatives; $M_3 = \sup\abs{f'''}$). For $0 \leq i \leq n$
+define the hybrid sums
+\[
+H_i = \frac{X_1 + \dots + X_i + N_{i+1} + \dots +
+N_n}{\sqrt n},
+\]
+so $H_n = T_n$ and $H_0 = G_n$.
+\begin{enumerate}
+  \item Write $H_i = W_i + \frac{X_i}{\sqrt n}$ and $H_{i-1}
+        = W_i + \frac{N_i}{\sqrt n}$ with $W_i =
+        \frac{1}{\sqrt n}\bigl(\sum_{j<i}X_j +
+        \sum_{j>i}N_j\bigr)$, and note that $W_i$ is
+        independent of the pair $(X_i, N_i)$. Justify.
+  \item Taylor with integral or Lagrange remainder: for any
+        real $w, h$:
+        \[
+        \Bigl|f(w + h) - f(w) - f'(w)h -
+        \tfrac12f''(w)h^2\Bigr| \leq
+        \frac{M_3\,\abs h^3}{6} .
+        \]
+  \item Apply question 2 twice ($h = \frac{X_i}{\sqrt n}$ and
+        $h = \frac{N_i}{\sqrt n}$ at $w = W_i$), take
+        expectations, and use independence plus the matching
+        of the first two moments of $X_i$ and $N_i$ to show
+        \[
+        \bigl|\E f(H_i) - \E f(H_{i-1})\bigr|
+        \leq \frac{M_3}{6}\cdot
+        \frac{\beta + \gamma}{n^{3/2}},
+        \qquad \gamma = \E\abs{N_1}^3 =
+        \frac{2\sqrt2}{\sqrt\pi} .
+        \]
+  \item Telescope over $i$ and conclude the \emph{Lindeberg
+        bound}:
+        \[
+        \bigl|\E f(T_n) - \E f(G_n)\bigr| \leq
+        \frac{M_3\,(\beta + \gamma)}{6\,\sqrt n} .
+        \]
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part II --- From smooth $f$ to the CLT.}
+\begin{enumerate}[resume]
+  \item Show that $\E f(T_n) \to \E f(N)$ for every $f \in
+        \mathcal C_b^3$, and upgrade to all bounded
+        continuous $f$: given such $f$ and $\varepsilon$,
+        construct $f_\varepsilon \in \mathcal C^3_b$ with
+        $\norm{f - f_\varepsilon}_\infty \leq \varepsilon$
+        on a large interval --- e.g.\ convolve $f$ with a
+        $\mathcal C^\infty$ bump
+        (\cref{thm:b3:lp:regularization}) --- and handle the
+        tails by tightness ($\V(T_n) = 1$ and Chebyshev).
+        Conclude $T_n \Rightarrow \mathcal N(0, 1)$: the
+        central limit theorem, re-proved.
+  \item Where did the proof use that the $X_i$ are
+        \emph{identically} distributed? Show that it barely
+        did: state and prove the version for independent,
+        centered, non-identical $X_i$ with
+        $\sum_i\V(X_i) = s_n^2$ and third moments, obtaining
+        the error $\frac{M_3}{6s_n^3}\sum_i\bigl(\E\abs{X_i}^3
+        + \V(X_i)^{3/2}\gamma\bigr)$ --- Lindeberg's true
+        theorem in its Lyapunov form.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part III --- Quantitative dividends.}
+\begin{enumerate}[resume]
+  \item (Distribution functions) Let $t \in \R$ and
+        approximate $\mathbf 1_{\intoc{-\infty}t}$ above and
+        below by $\mathcal C^3_b$ ramps of width $\delta$
+        (construct them, with $M_3 = O(\delta^{-3})$).
+        Combining with Part I, derive the two-term bound
+        \[
+        \sup_{t\in\R}\,\bigl|\P(T_n \leq t) -
+        \Phi(t)\bigr| \;\leq\;
+        \frac{C_1(\beta + \gamma)}{\delta^3\sqrt n} +
+        C_2\,\delta
+        \qquad (\text{every } \delta > 0),
+        \]
+        with explicit constants (the $C_2\delta$ term uses
+        that $\Phi$ has density bounded by
+        $\frac1{\sqrt{2\pi}}$), and optimize $\delta \sim
+        n^{-1/8}$ to obtain a uniform rate of order
+        $n^{-1/8}$.
+        (The optimal $n^{-1/2}$ --- Berry--Esseen ---
+        needs finer tools; the point is an \emph{explicit}
+        rate from elementary swapping.)
+  \item (De Moivre--Laplace, quantified) Specialize to
+        $X_i = 2B_i - 1$ (signs of fair coins): compare the
+        conclusion with the local estimate of
+        \cref{pb:b3:product:1}, question 7 --- what does
+        each method give that the other does not?
+  \item (Universality) Explain in a paragraph why the
+        replacement method shows more than the CLT: any
+        statistic of the form $\E f(\text{sum})$ with $f$
+        smooth is insensitive, at order $n^{-1/2}$, to the
+        \emph{entire law} of the summands beyond its first
+        two moments --- the ``invariance principle'' that
+        underlies modern universality results (random
+        matrices, random polynomials), of which the CLT is
+        the first instance.
+\end{enumerate}
+\end{problem}

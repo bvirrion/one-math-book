@@ -1,0 +1,575 @@
+\chapter{The Lebesgue Integral}\label{ch:b3:lebesgue}
+
+Riemann's integral slices the \emph{domain} into small
+intervals; Lebesgue's slices the \emph{range}: to integrate
+$f$, measure the sets $\{f > t\}$. The change looks innocent
+and is revolutionary. Limits and integrals, forever quarreling
+in the Riemann theory (uniform convergence required!), are
+reconciled by three convergence theorems --- monotone
+convergence, Fatou, dominated convergence --- whose hypotheses
+are almost embarrassingly weak. This chapter constructs the
+integral over an arbitrary measure space $(X, \mathcal A,
+\mu)$, proves the three theorems, settles the exact
+relationship with Riemann's integral (a bounded function is
+Riemann-integrable iff it is continuous almost everywhere), and
+industrializes the differentiation of parameter-dependent
+integrals --- the technique that the weekend problem uses to
+compute $\int_0^\infty\frac{\sin x}x\,\dd x$ and
+$\int_\R \eu^{-x^2}\dd x$.
+
+\section{Measurable functions}
+
+\begin{definition}\label{def:b3:lebesgue:measurable}
+Let $(X, \mathcal A)$, $(Y, \mathcal B)$ be measurable spaces.
+$f \colon X \to Y$ is \emph{measurable}\index{measurable
+function} if $f^{-1}(B) \in \mathcal A$ for every $B \in
+\mathcal B$. For real (or $[-\infty,+\infty]$-valued)
+functions, $Y = \R$ carries its Borel $\sigma$-algebra, and it
+suffices to check $f^{-1}(\intoo t{+\infty}) = \{f > t\} \in
+\mathcal A$ for all $t \in \R$: the good sets $\{B :
+f^{-1}(B) \in \mathcal A\}$ form a $\sigma$-algebra
+(preimages commute with set operations) containing the
+generating rays (\cref{def:b3:measure:borel},
+\cref{met:b3:measure:goodsets}).
+\end{definition}
+
+\begin{proposition}\label{prop:b3:lebesgue:stability}
+(a) Compositions of measurable maps are measurable; continuous
+maps are Borel-measurable.
+(b) If $f, g \colon X \to \R$ are measurable, so are $f + g$,
+$fg$, $\max(f,g)$, $\abs f$, $\lambda f$.
+(c) If $(f_n)$ are measurable with values in
+$[-\infty, +\infty]$, then $\sup_nf_n$, $\inf_nf_n$,
+$\limsup f_n$, $\liminf f_n$ are measurable; if $f_n \to f$
+pointwise, $f$ is measurable.
+\end{proposition}
+
+\begin{proof}
+(a) $(g\circ f)^{-1}(B) = f^{-1}(g^{-1}(B))$; continuity gives
+measurability via the generating open sets
+(\cref{pb:b3:measure:1}, question 10, in general form).
+(b) $(f, g) \colon X \to \R^2$ is measurable for the Borel
+$\sigma$-algebra of $\R^2$ --- check on open boxes, which
+generate ($\R^2$'s opens are countable unions of rational
+boxes): $(f,g)^{-1}(U\times V) = f^{-1}(U)\cap g^{-1}(V)$ ---
+and $+, \times, \max$ are continuous $\R^2 \to \R$: compose.
+(c) $\{\sup f_n > t\} = \bigcup_n\{f_n > t\}$; $\inf = -\sup(-)$;
+$\limsup = \inf_N\sup_{n \geq N}$; a pointwise limit is its own
+$\limsup$.
+\end{proof}
+
+\begin{definition}\label{def:b3:lebesgue:simple}
+A \emph{simple function}\index{simple function} is a measurable
+function with finitely many values: $s = \sum_{i=1}^n
+c_i\,\mathbf 1_{A_i}$, $A_i \in \mathcal A$ disjoint, $c_i \geq
+0$ (for the nonnegative theory). Its integral is
+\[
+\int s\,\dd\mu = \sum_i c_i\,\mu(A_i) \in [0, +\infty]
+\]
+(convention $0\cdot\infty = 0$); the value does not depend on
+the representation (refine two partitions).
+\end{definition}
+
+\begin{theorem}[Approximation by simple functions]
+\label{thm:b3:lebesgue:approximation}
+Every measurable $f \colon X \to [0, +\infty]$ is the pointwise
+limit of an \emph{increasing} sequence of simple functions:
+\[
+s_n = \sum_{k=1}^{n2^n} \frac{k-1}{2^n}\,
+\mathbf 1_{\{\frac{k-1}{2^n} \leq f < \frac k{2^n}\}}
++ n\,\mathbf 1_{\{f \geq n\}} \nearrow f .
+\]
+\end{theorem}
+
+\begin{proof}
+Each $s_n$ is simple (the sets are preimages of Borel sets).
+Monotonicity: passing from $n$ to $n+1$ splits each dyadic
+level in two and never decreases the assigned value (a point
+with $\frac{k-1}{2^n} \leq f(x) < \frac k{2^n}$ gets either
+$\frac{2k-2}{2^{n+1}}$ or $\frac{2k-1}{2^{n+1}}$, both $\geq
+\frac{k-1}{2^n}$; the cap $n$ rises too). Convergence: if
+$f(x) < \infty$, for $n > f(x)$ we have $f(x) - s_n(x) \leq
+2^{-n}$; if $f(x) = \infty$, $s_n(x) = n \to \infty$.
+\end{proof}
+
+\section{The integral and the convergence theorems}
+
+\begin{definition}\label{def:b3:lebesgue:integral}
+For measurable $f \geq 0$:
+\[
+\int f \,\dd\mu = \sup\Bigl\{\int s\,\dd\mu : s \text{ simple},
+\ 0 \leq s \leq f\Bigr\} \in [0, +\infty].
+\]
+It is monotone in $f$ by construction, and extends the simple
+case (for simple $f$, the sup is attained at $f$: comparison of
+simple integrals via common refinements).
+\end{definition}
+
+\begin{theorem}[Monotone convergence, Beppo Levi]
+\label{thm:b3:lebesgue:mct}
+If $0 \leq f_n \nearrow f$ pointwise (measurable), then
+\[
+\int f_n\,\dd\mu \nearrow \int f\,\dd\mu .
+\]
+\index{monotone convergence theorem}
+\end{theorem}
+
+\begin{proof}
+$f$ is measurable (\cref{prop:b3:lebesgue:stability}(c)) and
+$\int f_n$ increases to some $L \leq \int f$ (monotonicity).
+Conversely, fix a simple $s = \sum c_i\mathbf 1_{A_i} \leq f$
+and $\theta \in (0,1)$; the sets $E_n = \{f_n \geq \theta s\}$
+are measurable and increase to $X$ (where $s(x) > 0$: $f(x)
+\geq s(x) > \theta s(x)$, so eventually $f_n(x) \geq \theta
+s(x)$; where $s(x) = 0$: trivially). Then
+\[
+\int f_n \geq \int_{E_n}\theta s\,\dd\mu
+= \theta\sum_i c_i\,\mu(A_i \cap E_n)
+\xrightarrow[n\to\infty]{} \theta\sum_ic_i\,\mu(A_i)
+= \theta\int s
+\]
+by continuity from below (\cref{prop:b3:measure:basics}(c)).
+So $L \geq \theta\int s$ for all $\theta < 1$ and all simple $s
+\leq f$: $L \geq \int f$.
+\end{proof}
+
+\begin{corollary}\label{cor:b3:lebesgue:additivity}
+For measurable $f, g \geq 0$ and $c \geq 0$: $\int(f + g) =
+\int f + \int g$ and $\int cf = c\int f$; for a series of
+nonnegative measurable functions, $\int\sum_nf_n =
+\sum_n\int f_n$.
+\end{corollary}
+
+\begin{proof}
+For simple functions, additivity is a computation on a common
+refinement. In general take $s_n \nearrow f$, $t_n \nearrow g$
+(\cref{thm:b3:lebesgue:approximation}): $s_n + t_n \nearrow f +
+g$, and MCT passes additivity to the limit. The series
+statement is MCT applied to the partial sums.
+\end{proof}
+
+\begin{theorem}[Fatou's lemma]\label{thm:b3:lebesgue:fatou}
+For measurable $f_n \geq 0$:
+\[
+\int \liminf_n f_n \,\dd\mu \;\leq\; \liminf_n \int
+f_n\,\dd\mu .
+\]
+\index{Fatou's lemma}
+\end{theorem}
+
+\begin{proof}
+Let $g_N = \inf_{n\geq N}f_n$: measurable, $0 \leq g_N \nearrow
+\liminf f_n$, and $g_N \leq f_n$ for every $n \geq N$, so
+$\int g_N \leq \inf_{n \geq N}\int f_n$. Apply MCT to the left
+side: $\int\liminf f_n = \lim_N\int g_N \leq
+\lim_N\inf_{n\geq N}\int f_n = \liminf\int f_n$.
+\end{proof}
+
+\begin{definition}\label{def:b3:lebesgue:l1}
+A measurable $f \colon X \to \R$ (or $\C$) is
+\emph{integrable}\index{integrable function} if $\int\abs
+f\,\dd\mu < \infty$; then $\int f = \int f^+ - \int f^-$
+(positive and negative parts; real and imaginary parts in the
+complex case). The integral is linear on integrable functions
+(decompose and recombine positive parts; the complex case
+reduces to the real one) and satisfies $\abs{\int f} \leq
+\int\abs f$ (real case: $\pm\int f = \int(\pm f) \leq
+\int\abs f$; complex case: multiply by a unimodular constant
+to make the integral real). A property holds \emph{almost
+everywhere} (a.e.)\index{almost everywhere} if it fails only on
+a $\mu$-null set; modifying $f$ on a null set changes no
+integral (the difference is dominated by $\infty\cdot\mathbf
+1_N$, of integral $0$).
+\end{definition}
+
+\begin{theorem}[Dominated convergence]\label{thm:b3:lebesgue:dct}
+Let $f_n \to f$ a.e., with $\abs{f_n} \leq g$ a.e.\ for a fixed
+\emph{integrable} $g$. Then $f$ is integrable and
+\[
+\int f_n\,\dd\mu \longrightarrow \int f\,\dd\mu,
+\qquad\text{indeed}\quad \int\abs{f_n - f}\,\dd\mu \to 0 .
+\]
+\index{dominated convergence theorem}
+\end{theorem}
+
+\begin{proof}
+Discard a null set to make the hypotheses pointwise. $\abs f
+\leq g$: $f$ is integrable. The functions $h_n = 2g - \abs{f_n
+- f} \geq 0$ satisfy $\liminf h_n = 2g$; Fatou gives
+\[
+\int 2g \leq \liminf\int\bigl(2g - \abs{f_n - f}\bigr)
+= \int 2g - \limsup\int\abs{f_n - f},
+\]
+so $\limsup\int\abs{f_n - f} \leq 0$ (the subtraction is legal:
+$\int 2g < \infty$). Finally $\abs{\int f_n - \int f} \leq
+\int\abs{f_n - f} \to 0$.
+\end{proof}
+
+\begin{method}\label{met:b3:lebesgue:convergence}
+Faced with $\lim_n\int f_n$: try, in order --- (1) is the
+sequence monotone (or a series of nonnegative terms)? MCT, no
+integrability needed. (2) Is there a single integrable
+dominator $g \geq \abs{f_n}$, found by crude bounds
+(``$\sup_n$'' the estimates)? DCT. (3) No domination, no
+monotonicity? Fatou still bounds one side, and equality may
+genuinely fail: the escaping bump $f_n = n\mathbf
+1_{\intoo0{1/n}}$ has $\int f_n = 1$ but $f_n \to 0$ a.e.
+Domination is exactly what forbids mass from escaping to
+infinity, vertically or horizontally.
+\end{method}
+
+\section{Riemann versus Lebesgue}
+
+\begin{theorem}[Lebesgue's criterion]
+\label{thm:b3:lebesgue:riemann}
+Let $f \colon \intcc ab \to \R$ be \emph{bounded}. Then $f$ is
+Riemann-integrable iff $f$ is continuous $\lambda$-almost
+everywhere; in that case $f$ is Lebesgue-integrable and the two
+integrals coincide.\index{Riemann vs Lebesgue integral}
+\end{theorem}
+
+\begin{proof}
+For a subdivision $\sigma = (a = x_0 < \dots < x_N = b)$, let
+$L_\sigma$ and $U_\sigma$ be the step functions equal, on each
+$\intoo{x_{i-1}}{x_i}$, to $m_i = \inf_{[x_{i-1}, x_i]}f$ and
+$M_i = \sup$; the Darboux sums are their integrals (Riemann and
+Lebesgue agree on step functions, both giving $\sum
+m_i\Delta x_i$). Take a sequence of subdivisions $\sigma_n$,
+each refining the last, of mesh $\to 0$, with Darboux sums
+converging to the lower and upper Darboux integrals of $f$.
+The refinements make $L_{\sigma_n}$ nondecreasing and
+$U_{\sigma_n}$ nonincreasing pointwise off the countable set
+$D$ of all division points; call the limits $\ell$ and $u$
+(measurable, \cref{prop:b3:lebesgue:stability}). For $x \notin
+D$, writing $I_n(x)$ for the open $\sigma_n$-interval
+containing $x$: $\ell(x) = \sup_n\inf_{I_n(x)}f$ and $u(x) =
+\inf_n\sup_{I_n(x)}f$; since the meshes shrink to $0$, these
+are the lower and upper \emph{envelopes} of $f$ at $x$
+--- $u(x) - \ell(x)$ is the oscillation of $f$ at $x$ --- so
+that \emph{$\ell(x) = u(x)$ iff $f$ is continuous at $x$}. By MCT/DCT (bounded, finite interval):
+\[
+\int_{\intcc ab}\ell\,\dd\lambda = \lim_n\int L_{\sigma_n}
+= \underline{\int}f,
+\qquad
+\int_{\intcc ab}u\,\dd\lambda = \overline{\int}f .
+\]
+$f$ Riemann-integrable $\iff$ $\underline\int f =
+\overline\int f$ $\iff$ $\int(u - \ell) = 0$ $\iff$ $u = \ell$
+a.e.\ ($u - \ell \geq 0$; \cref{exo:b3:lebesgue:5}) $\iff$ $f$
+continuous a.e. In that case $\ell \leq f \leq u$ with $\ell =
+u$ a.e.: $f$ equals the measurable $\ell$ a.e., hence is
+Lebesgue-measurable (completeness of $\lambda$) with
+$\int f\,\dd\lambda = \int\ell\,\dd\lambda = \underline\int f =
+\int_a^bf$.
+\end{proof}
+
+\begin{example}\label{ex:b3:lebesgue:riemannexamples}
+$\mathbf 1_\Q$ is nowhere continuous: not Riemann-integrable
+--- but Lebesgue-trivial: $\int\mathbf 1_\Q\,\dd\lambda =
+\lambda(\Q) = 0$. Thomae's function (\,$\frac1q$ at rationals
+$\frac pq$, $0$ elsewhere) is continuous exactly at the
+irrationals: Riemann-integrable with integral $0$. And
+\emph{improper} Riemann integrals are a different notion:
+$\int_0^\infty\frac{\sin x}x\,\dd x$ converges as a limit of
+$\int_0^A$ (the weekend problem computes it $= \frac\pi2$),
+but $\frac{\sin x}x \notin L^1(\intoo0{+\infty})$: the absolute
+integral diverges like the harmonic series
+(\cref{exo:b3:lebesgue:6}). Lebesgue's theory trades
+conditional convergence for robust limit theorems.
+\end{example}
+
+\section{Integrals with parameters}
+
+Throughout, $(X, \mathcal A, \mu)$ is a measure space, $T$ a
+metric space (the parameter), and $f \colon T \times X \to \C$
+with $f(t, \cdot)$ integrable for each $t$; set $F(t) = \int_X
+f(t, x)\,\dd\mu(x)$.
+
+\begin{theorem}[Continuity]\label{thm:b3:lebesgue:paramcont}
+Suppose: $t \mapsto f(t,x)$ is continuous at $t_0$ for a.e.\
+$x$, and there is an integrable $g$ with $\abs{f(t,x)} \leq
+g(x)$ for all $t$ in a neighborhood of $t_0$ and a.e.\ $x$.
+Then $F$ is continuous at $t_0$.\index{parameter integrals}
+\end{theorem}
+
+\begin{proof}
+For any sequence $t_n \to t_0$: $f(t_n, \cdot) \to f(t_0,
+\cdot)$ a.e., dominated by $g$: DCT gives $F(t_n) \to F(t_0)$;
+sequential continuity suffices in metric spaces
+(\cref{rem:b3:topology:sequences}).
+\end{proof}
+
+\begin{theorem}[Differentiation under the integral]
+\label{thm:b3:lebesgue:paramdiff}
+Let $T$ be an open interval of $\R$. Suppose: for a.e.\ $x$,
+$t \mapsto f(t,x)$ is differentiable on $T$, with
+\[
+\Bigl|\frac{\partial f}{\partial t}(t, x)\Bigr| \leq g(x)
+\quad \text{for all } t \in T,\ \text{a.e. } x,
+\]
+$g$ integrable. Then $F$ is differentiable on $T$ with $F'(t)
+= \int_X \frac{\partial f}{\partial t}(t, x)\,\dd\mu(x)$.
+\end{theorem}
+
+\begin{proof}
+Fix $t$ and $h_n \to 0$: the difference quotients
+\[
+\varphi_n(x) = \frac{f(t + h_n, x) - f(t, x)}{h_n}
+\longrightarrow \frac{\partial f}{\partial t}(t,x)
+\quad\text{a.e.},
+\]
+and the mean value inequality bounds $\abs{\varphi_n(x)} \leq
+\sup_{s}\abs{\partial_tf(s,x)} \leq g(x)$: DCT applies, and
+$\frac{F(t + h_n) - F(t)}{h_n} = \int\varphi_n \to
+\int\partial_t f(t, \cdot)$.
+\end{proof}
+
+\begin{example}[The Gamma function]\label{ex:b3:lebesgue:gamma}
+For $t > 0$ let\index{Gamma function}
+\[
+\Gamma(t) = \int_0^{+\infty} x^{t-1}\eu^{-x}\,\dd x .
+\]
+The integral converges: near $0$, $x^{t-1}$ is integrable ($t >
+0$); at infinity, $x^{t-1}\eu^{-x} \leq C\eu^{-x/2}$.
+Integration by parts (on $[\varepsilon, A]$, then limits via
+MCT) gives the functional equation $\Gamma(t + 1) =
+t\,\Gamma(t)$, whence $\Gamma(n+1) = n!$: the factorial
+interpolated. On every $\intcc ab \subseteq \intoo0{+\infty}$,
+$\partial_t\bigl(x^{t-1}\eu^{-x}\bigr) = \ln
+x\cdot x^{t-1}\eu^{-x}$ is dominated by $\abs{\ln x}(x^{a-1} +
+x^{b-1})\eu^{-x}$, integrable: $\Gamma$ is $\mathcal C^1$, and
+by induction $\mathcal C^\infty$, with $\Gamma^{(k)}(t) =
+\int_0^\infty(\ln x)^kx^{t-1}\eu^{-x}\dd x$. The value
+$\Gamma(\frac12) = \sqrt\pi$ is the Gaussian integral in
+disguise (\cref{pb:b3:lebesgue:1}).
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=10.6cm, height=5.4cm,
+    xmin=0, xmax=25, ymin=-0.25, ymax=1.05,
+    xtick={0, 3.1416, 6.2832, 9.4248, 12.566, 15.708, 18.850,
+      21.991, 25.133},
+    xticklabels={$0$, $\pi$, $2\pi$, $3\pi$, $4\pi$, $5\pi$,
+      $6\pi$, $7\pi$, $8\pi$},
+    ytick={0, 1}]
+  \addplot[omDef!40] coordinates {(0,0) (25,0)};
+  \addplot[omThm, thick, domain=0.02:25, samples=600]
+    {sin(deg(x))/x};
+  \addplot[omDef, dashed, domain=0.02:25, samples=200]
+    {1/x};
+  \addplot[omDef, dashed, domain=0.02:25, samples=200]
+    {-1/x};
+\end{axis}
+\end{tikzpicture}
+
+{\small The integrand $\frac{\sin x}x$: the improper integral
+$\int_0^\infty$ converges by alternating cancellation between
+the arches, but the areas $\abs{\cdot}$ of the arches behave
+like $\frac2{\pi k}$ --- a harmonic series: $\frac{\sin x}x
+\notin L^1$. Lebesgue integrability is absolute integrability.}
+\end{omfigure}
+
+\section{Exercises}
+
+\begin{exercise}[$\star$]\label{exo:b3:lebesgue:1}
+(a) Show that a monotone function $\R \to \R$ is
+Borel-measurable, and that a derivative (of an everywhere
+differentiable function) is Borel-measurable.
+(b) Show that $f \colon X \to \R$ is measurable iff $\{f > q\}
+\in \mathcal A$ for every \emph{rational} $q$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b3:lebesgue:2}
+Compute, with full justification:
+\[
+\lim_{n\to\infty}\int_0^{+\infty}
+\frac{\cos x}{(1 + x/n)^{n}}\,\dd x,
+\qquad
+\lim_{n\to\infty}\int_0^1 \frac{n\,x^{n-1}}{1 + x}\,\dd x .
+\]
+\emph{(For the second: substitute $u = x^n$ before dominating.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:lebesgue:3}
+(a) Exhibit strict inequality in Fatou's lemma.
+(b) Exhibit $f_n \to 0$ pointwise with $\int f_n = 1$ in three
+ways: escape in height, in width, to infinity. Which single
+hypothesis of DCT does each violate?
+(c) Show that in Fatou's lemma one cannot replace $\liminf$ by
+$\limsup$ on either side.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:lebesgue:4}
+(a) Show $\displaystyle\int_0^{+\infty}\frac{x}{\eu^x -
+1}\,\dd x = \sum_{n\geq1}\frac1{n^2} = \frac{\pi^2}6$
+\emph{(expand $\frac1{\eu^x - 1}$ in a geometric series and
+integrate term by term --- which theorem permits it?)}.
+(b) (Sophomore's dream) Show
+$\displaystyle\int_0^1 x^{-x}\,\dd x = \sum_{n\geq1}n^{-n}$.
+\emph{(Write $x^{-x} = \eu^{-x\ln x} = \sum_k\frac{(-x\ln
+x)^k}{k!}$ and compute $\int_0^1(-x\ln x)^k\dd x$ by
+substituting $x = \eu^{-u/(k+1)}$, recognizing $\Gamma$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:lebesgue:5}
+(a) Show that $f \geq 0$ measurable with $\int f\,\dd\mu = 0$
+satisfies $f = 0$ a.e. \emph{(Consider $\{f \geq 1/n\}$ and
+Markov's inequality: $\mu(\{f \geq a\}) \leq \frac1a\int f$ ---
+prove it.)}
+(b) Show that an integrable $f$ is finite a.e.
+(c) Show that if $\int_A f\,\dd\mu = 0$ for \emph{every}
+measurable $A$, then $f = 0$ a.e.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:lebesgue:6}
+(a) Apply \cref{thm:b3:lebesgue:riemann} to decide Riemann
+integrability of: $\mathbf 1_\Q$; Thomae's function; $\mathbf
+1_K$ for $K$ a fat Cantor set (\cref{exo:b3:measure:5}).
+(b) Show that $\int_1^{+\infty}\abs{\frac{\sin x}x}\,\dd x =
++\infty$, while $\lim_{A\to\infty}\int_1^A\frac{\sin
+x}x\,\dd x$ exists \emph{(integrate by parts)}: improper
+convergence without integrability.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:lebesgue:7}
+Justify that $F(t) = \int_0^{+\infty}\eu^{-x^2}\cos(tx)\,\dd x$
+is $\mathcal C^1$ on $\R$ and satisfies $F'(t) = -\frac t2F(t)$
+\emph{(integrate by parts)}; deduce $F(t) =
+F(0)\,\eu^{-t^2/4}$. (With $F(0) = \frac{\sqrt\pi}2$ from the
+weekend problem: the Gaussian is essentially its own Fourier
+transform --- \cref{ch:b3:fouriertransform} will systematize
+this.)
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:lebesgue:8}
+(Frullani) Let $0 < a < b$. Show
+\[
+\int_0^{+\infty}\frac{\eu^{-ax} - \eu^{-bx}}{x}\,\dd x =
+\ln\frac ba,
+\]
+by writing the integrand as $\int_a^b \eu^{-xt}\,\dd t$ and
+justifying the interchange via the nonnegative theory
+(\cref{cor:b3:lebesgue:additivity} in continuous form ---
+anticipate Tonelli, or slice $[a,b]$ into $n$ equal parts and
+pass to the limit).
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:lebesgue:9}
+Let $f \geq 0$ be measurable on $(X, \mathcal A, \mu)$. Show
+that $\nu(A) = \int_A f\,\dd\mu$ defines a measure
+(\emph{density}\index{density of a measure} $f$ with respect to
+$\mu$), and that $\int g\,\dd\nu = \int gf\,\dd\mu$ for all
+measurable $g \geq 0$ \emph{(prove it for indicators, then
+simple functions, then MCT --- the standard machine)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:lebesgue:10}
+(A Weierstrass-style failure) Define $f(t) =
+\int_0^{+\infty}\frac{\sin(tx)}{x(1 + x^2)}\,\dd x$.
+(a) Show that $f$ is well defined and continuous on $\R$, and
+$\mathcal C^1$ with $f'(t) = \int_0^\infty\frac{\cos(tx)}{1 +
+x^2}\dd x$ for every $t$ --- but that differentiating
+\emph{again} under the integral is illegitimate.
+(b) Admitting $f'(t) = \frac\pi2\eu^{-t}$ for $t > 0$ (proved
+in \cref{ch:b3:residues}), what is
+$\int_0^\infty\frac{x\sin(tx)}{1+x^2}\dd x$ for $t > 0$, and
+why does its formula confirm the failure in (a)?
+\end{exercise}
+
+\section{Problem: two celebrated integrals}
+
+\begin{problem}[{Weekend problem --- the Gaussian integral and
+Dirichlet's integral, by parameters alone}]
+\label{pb:b3:lebesgue:1}
+Two integrals rule applied analysis:
+\[
+G = \int_{-\infty}^{+\infty}\eu^{-x^2}\dd x = \sqrt\pi,
+\qquad
+D = \int_0^{+\infty}\frac{\sin x}{x}\,\dd x = \frac\pi2
+\]
+(the second as an improper integral,
+\cref{ex:b3:lebesgue:riemannexamples}). We prove both using
+only this chapter's tools.
+
+\medskip
+\noindent\textbf{Part I --- The Gaussian.} For $t \geq 0$ set
+\[
+A(t) = \Bigl(\int_0^t\eu^{-x^2}\dd x\Bigr)^{2},
+\qquad
+B(t) = \int_0^1\frac{\eu^{-t^2(1 + x^2)}}{1 + x^2}\,\dd x .
+\]
+\begin{enumerate}
+  \item Justify that $A$ and $B$ are $\mathcal C^1$ on
+        $\intoo0{+\infty}$ and compute $A'$ and $B'$; show
+        $A'(t) + B'(t) = 0$. \emph{(In $B'$, substitute $u =
+        tx$.)}
+  \item Compute $A(0) + B(0)$ and $\lim_{t\to+\infty}(A + B)(t)$
+        --- justify the limit under the integral in $B$.
+  \item Conclude $\int_0^\infty \eu^{-x^2}\dd x =
+        \frac{\sqrt\pi}2$, hence $G = \sqrt\pi$, and deduce
+        $\Gamma(\tfrac12) = \sqrt\pi$ \emph{(substitute $x =
+        u^2$ in $\Gamma(\frac12)$)}.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part II --- Dirichlet's integral.} For $t
+\geq 0$ set
+\[
+F(t) = \int_0^{+\infty}\eu^{-tx}\,\frac{\sin x}{x}\,\dd x .
+\]
+\begin{enumerate}[resume]
+  \item Show that the integral defining $F(t)$ converges for
+        every $t > 0$ as a Lebesgue integral, and for $t = 0$
+        as an improper integral; show that $D =
+        \lim_{A\to\infty}\int_0^A\frac{\sin x}x\dd x$ exists
+        \emph{(integrate by parts on $[\pi, A]$)}.
+  \item Show that $F$ is $\mathcal C^1$ on
+        $\intoo0{+\infty}$ with
+        \[
+        F'(t) = -\int_0^{+\infty}\eu^{-tx}\sin x\,\dd x
+        = -\frac{1}{1 + t^2}
+        \]
+        \emph{(domination on $[t_0, \infty)$ for each $t_0 >
+        0$; the last integral by two integrations by parts or
+        complex exponentials)}.
+  \item Show $F(t) \to 0$ as $t \to +\infty$, and deduce $F(t)
+        = \frac\pi2 - \arctan t$ on $\intoo0{+\infty}$.
+  \item The delicate point: $D = \lim_{t\to0^+}F(t)$. Prove it
+        by uniform control of the tail: for $0 \leq t \leq 1$
+        and $A \geq \pi$, integrate by parts to show
+        \[
+        \Bigl|\int_A^{+\infty}\eu^{-tx}\frac{\sin
+        x}x\,\dd x\Bigr| \leq \frac{C}{A}
+        \]
+        with $C$ independent of $t$ \emph{(differentiate
+        $\frac{\eu^{-tx}}x$ and bound $\abs{\cos}$ by $1$;
+        note $t\eu^{-tx} \leq 1/x\cdot(tx\eu^{-tx})$ with
+        $\sup_{u\geq0}u\eu^{-u} < 1$)}; then split $F(t) - D$
+        into $[0, A]$ (where DCT applies as $t \to 0$) and
+        $[A, \infty)$.
+  \item Conclude: $D = \frac\pi2$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part III --- Dividends.}
+\begin{enumerate}[resume]
+  \item Compute $\int_0^{+\infty}\frac{\sin^2x}{x^2}\,\dd x$
+        \emph{(integrate by parts and reduce to $D$ via $\sin
+        2x = 2\sin x\cos x$)}.
+  \item Compute $\int_0^{+\infty}\frac{1 -
+        \cos x}{x^2}\,\dd x$, and check the consistency of the
+        two results.
+  \item For $a > 0$, compute
+        $\int_0^{+\infty}\frac{\sin(ax)}x\dd x$ and
+        $\int_{-\infty}^{+\infty}\eu^{-ax^2}\dd x$, and record
+        the scaling rules (they will be the workhorses of
+        \cref{ch:b3:fouriertransform}).
+  \item Explain precisely why $D$ could not have been treated
+        by DCT directly at $t = 0$ (no integrable dominator on
+        $[0,1]\times[0,\infty)$), and why the tail-splitting of
+        question 7 is the honest substitute --- this pattern
+        (``uniform integrability of tails'') recurs throughout
+        analysis.
+\end{enumerate}
+\end{problem}

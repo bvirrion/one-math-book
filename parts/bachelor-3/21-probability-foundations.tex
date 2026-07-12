@@ -1,0 +1,625 @@
+\chapter{Probability: Foundations and the Law of Large
+Numbers}\label{ch:b3:probability}
+
+Year 2 built probability on countable spaces; measure theory
+now removes every restriction. A probability space is a
+measure space of total mass $1$, random variables are
+measurable maps, expectation is the Lebesgue integral --- and
+at once the whole analytic arsenal
+(\cref{ch:b3:measure,ch:b3:lebesgue,ch:b3:product}) applies to
+chance. This chapter installs the dictionary, constructs
+infinite sequences of independent random variables (on
+$\intcc01$, from binary digits: randomness is hiding inside
+Lebesgue measure), proves the Borel--Cantelli lemmas and
+Kolmogorov's zero--one law, sorts out the modes of
+convergence, and proves the law of large numbers --- the
+theorem that makes frequencies converge to probabilities and
+statistics possible. The weekend problem gives Etemadi's proof
+of the strong law in its definitive $L^1$ form.
+
+\section{The dictionary}
+
+\begin{definition}\label{def:b3:probability:space}
+A \emph{probability space}\index{probability space} is a
+measure space $(\Omega, \mathcal A, \P)$ with $\P(\Omega) =
+1$; elements of $\mathcal A$ are \emph{events}, and a property
+holds \emph{almost surely} (a.s.) if its event has
+probability $1$. A \emph{random variable}\index{random
+variable} is a measurable map $X \colon \Omega \to \R$ (or
+$\R^d$: a random vector); its \emph{law}\index{law of a random
+variable} is the pushforward probability measure $\P_X =
+X_*\P$ on $\R$ (\cref{exo:b3:product:9}), determined by the
+\emph{distribution function} $F_X(t) = \P(X \leq t)$
+(\cref{exo:b3:measure:3}). $X$ has \emph{density} $f$ if
+$\P_X = f\,\dd\lambda$; it is \emph{discrete} if $\P_X$ is a
+countable combination of Dirac masses. The
+\emph{expectation}\index{expectation} is
+\[
+\E[X] = \int_\Omega X\,\dd\P
+\qquad (X \geq 0 \text{ or } X \in L^1(\P)),
+\]
+and the \emph{transfer theorem} (\cref{exo:b3:product:9})
+computes it in the law: $\E[g(X)] = \int_\R g\,\dd\P_X$ ---
+$= \sum g(x_k)p_k$ in the discrete case, $= \int
+g(x)f(x)\dd x$ in the density case: Year 2's formulas, now
+theorems of one theory. The \emph{variance} is $\V(X) =
+\E[(X - \E X)^2] = \E[X^2] - (\E X)^2$ for $X \in L^2$.
+\end{definition}
+
+\begin{example}\label{ex:b3:probability:laws}
+The standard laws and their transforms of note: Bernoulli
+$\mathcal B(p)$, binomial $\mathcal B(n, p)$, geometric,
+Poisson $\mathcal P(\lambda)$ (discrete: Year 2's tables
+remain valid); uniform on $\intcc01$ (Lebesgue measure
+itself); exponential $\mathcal E(\lambda)$ (density
+$\lambda\eu^{-\lambda x}\mathbf 1_{x>0}$); the
+\emph{Gaussian}\index{Gaussian law} $\mathcal N(m, \sigma^2)$
+with density $\frac1{\sigma\sqrt{2\pi}}\exp\bigl(-\frac{(x -
+m)^2}{2\sigma^2}\bigr)$ --- a probability density by
+\cref{pb:b3:lebesgue:1}, with mean $m$ and variance
+$\sigma^2$ (Gaussian moments, \cref{exo:b3:product:10}).
+\end{example}
+
+\begin{proposition}[Markov and Chebyshev]
+\label{prop:b3:probability:markov}
+For $X \geq 0$ and $a > 0$: $\P(X \geq a) \leq \frac{\E
+X}{a}$; for $X \in L^2$: $\P\bigl(\abs{X - \E X} \geq
+a\bigr) \leq \frac{\V(X)}{a^2}$.\index{Markov's
+inequality}\index{Chebyshev's inequality}
+\end{proposition}
+
+\begin{proof}
+\cref{exo:b3:lebesgue:5}(a); Chebyshev is Markov applied to
+$(X - \E X)^2$.
+\end{proof}
+
+\section{Independence}
+
+\begin{definition}\label{def:b3:probability:independence}
+Sub-$\sigma$-algebras $\mathcal A_1, \dots, \mathcal A_n
+\subseteq \mathcal A$ are \emph{independent}\index{independence}
+if $\P(A_1\cap\dots\cap A_n) = \prod\P(A_i)$ for all $A_i \in
+\mathcal A_i$; events are independent if the $\sigma$-algebras
+$\{\varnothing, A_i, A_i^c, \Omega\}$ are; random variables
+$X_1, \dots, X_n$ if the $\sigma$-algebras $\sigma(X_i) =
+X_i^{-1}(\mathcal B(\R))$ are. An infinite family is
+independent if every finite subfamily is.
+\end{definition}
+
+\begin{theorem}\label{thm:b3:probability:independence}
+$X_1, \dots, X_n$ are independent iff the law of the vector
+$(X_1, \dots, X_n)$ is the product measure
+$\P_{X_1}\otimes\cdots\otimes\P_{X_n}$. In that case, for
+$g_i \geq 0$ (or such that the products are integrable):
+\[
+\E\Bigl[\prod_ig_i(X_i)\Bigr] = \prod_i\E[g_i(X_i)],
+\]
+in particular $\E[XY] = \E X\,\E Y$ and $\V(X_1 + \dots +
+X_n) = \sum\V(X_i)$ for independent $L^2$ variables.
+\end{theorem}
+
+\begin{proof}
+If the $X_i$ are independent, the two probability measures
+$\P_{(X_1,\dots,X_n)}$ and $\bigotimes\P_{X_i}$ agree on all
+products $B_1\times\dots\times B_n$ of Borel sets --- a
+$\pi$-system generating $\mathcal B(\R^n)$
+(\cref{prop:b3:product:sections}(b)) --- hence everywhere
+(\cref{thm:b3:measure:uniqueness}). Conversely, a product law
+factorizes all events $\bigcap_iX_i^{-1}(B_i)$: independence. The expectation formula is then
+Tonelli/Fubini (\cref{thm:b3:product:tonelli}) through the
+transfer theorem; $\E[XY] = \E X\E Y$ is the case $g_i =
+\mathrm{id}$, and expanding the square gives the additivity
+of variances (cross terms $\E[(X_i - \E X_i)(X_j - \E X_j)]
+= 0$).
+\end{proof}
+
+\begin{theorem}[Existence of independent sequences]
+\label{thm:b3:probability:existence}
+On $\bigl(\intcc01, \mathcal L, \lambda\bigr)$ there exists a
+sequence $(U_n)_{n\geq1}$ of independent random variables,
+each uniform on $\intcc01$. Consequently, for any prescribed
+laws $(\mu_n)$ on $\R$ there exist independent $(X_n)$ with
+$\P_{X_n} = \mu_n$.\index{independent sequences, existence}
+\end{theorem}
+
+\begin{proof}
+\emph{Digits.} For $\omega \in \intcc01$, let $(b_k(\omega))$
+be its binary digits ($\omega = \sum b_k2^{-k}$; choose the
+expansion not ending in all $1$'s --- ambiguity concerns only
+a countable, hence null, set). Each $b_k$ is a random
+variable ($\{b_k = 1\}$ is a finite union of dyadic
+intervals) and the vector $(b_1, \dots, b_m)$ takes each
+value in $\{0,1\}^m$ on a dyadic interval of length $2^{-m}$:
+the $b_k$ are independent Bernoulli$(\frac12)$.
+
+\emph{Regrouping.} Split $\N^*$ into infinitely many disjoint
+infinite sets $(I_n)$ (e.g.\ by prime powers, or diagonals);
+let $(k^n_j)_j$ enumerate $I_n$ and set
+\[
+U_n = \sum_{j\geq1} b_{k^n_j}\,2^{-j} .
+\]
+Each $U_n$ is uniform: its binary digits are independent fair
+bits, so $\P(U_n \in [l2^{-m}, (l+1)2^{-m})) = 2^{-m}$ for
+every dyadic interval, and dyadic intervals determine the law
+(\cref{thm:b3:measure:uniqueness}). The $U_n$ are independent:
+they are functions of disjoint blocks of the independent
+family $(b_k)$ --- formally, events $\{U_n \in D_n\}$ for
+dyadic $D_n$ depend on finitely many digits from disjoint
+sets, and factorize; the $\pi$-system argument upgrades to
+all Borel sets.
+
+\emph{Arbitrary laws.} Let $G_n(u) = \inf\{t : F_{\mu_n}(t)
+\geq u\}$ (the \emph{quantile function} of the distribution
+function $F_{\mu_n}$); the key equivalence $G_n(u) \leq t
+\iff u \leq F_{\mu_n}(t)$ (right-continuity of $F$,
+monotonicity) shows $X_n = G_n(U_n)$ is measurable with
+$\P(X_n \leq t) = \P(U_n \leq F_{\mu_n}(t)) =
+F_{\mu_n}(t)$: law $\mu_n$; independence is inherited
+(functions of independent variables,
+\cref{exo:b3:probability:3}).
+\end{proof}
+
+\section{Borel--Cantelli and the zero--one law}
+
+\begin{theorem}[Borel--Cantelli]
+\label{thm:b3:probability:borelcantelli}
+Let $(A_n)$ be events and $\limsup A_n = \bigcap_N
+\bigcup_{n\geq N}A_n$ (``$A_n$ occurs infinitely
+often'').\index{Borel--Cantelli lemmas}
+\begin{enumerate}
+  \item If $\sum\P(A_n) < \infty$, then $\P(\limsup A_n) =
+        0$.
+  \item If $\sum\P(A_n) = \infty$ \emph{and the $A_n$ are
+        independent}, then $\P(\limsup A_n) = 1$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) is \cref{exo:b3:measure:4}. (2): for $N \leq M$,
+independence of complements (\cref{exo:b3:probability:3})
+gives
+\[
+\P\Bigl(\bigcap_{n=N}^{M}A_n^c\Bigr) = \prod_{n=N}^M\bigl(1
+- \P(A_n)\bigr) \leq
+\exp\Bigl(-\sum_{n=N}^M\P(A_n)\Bigr) \xrightarrow[M \to
+\infty]{} 0
+\]
+($1 - x \leq \eu^{-x}$; the series diverges). So
+$\P\bigl(\bigcup_{n\geq N}A_n\bigr) = 1$ for every $N$, and
+the decreasing intersection over $N$ still has probability
+$1$ (continuity from above, \cref{prop:b3:measure:basics}).
+\end{proof}
+
+\begin{theorem}[Kolmogorov's zero--one law]
+\label{thm:b3:probability:zeroone}
+Let $(X_n)$ be independent and $\mathcal T =
+\bigcap_N\sigma(X_N, X_{N+1}, \dots)$ the \emph{tail
+$\sigma$-algebra}\index{tail $\sigma$-algebra} (events
+insensitive to any finite number of the $X_n$: convergence of
+$\sum X_n$, of $\frac{S_n}n$, values of $\limsup$'s, \dots).
+Then every $T \in \mathcal T$ has $\P(T) \in \{0,
+1\}$.\index{zero--one law}
+\end{theorem}
+
+\begin{proof}
+Fix $N$. The $\sigma$-algebras $\sigma(X_1, \dots, X_N)$ and
+$\sigma(X_{N+1}, \dots)$ are independent: events depending on
+disjoint blocks factorize on the generating $\pi$-systems
+(cylinders $\bigcap_{i\leq N}\{X_i \in B_i\}$, resp.\ finite
+conditions on later variables), and Dynkin
+(\cref{thm:b3:measure:dynkin}, applied twice, one side at a
+time) extends the factorization. A tail event $T$ lies in
+$\sigma(X_{N+1}, \dots)$ for every $N$: $T$ is independent of
+every $\sigma(X_1, \dots, X_N)$, hence of the $\sigma$-algebra
+they generate, $\sigma(X_1, X_2, \dots)$ (Dynkin once more:
+the union of the $\sigma(X_1,\dots,X_N)$ is a $\pi$-system
+generating it). But $T \in \sigma(X_1, X_2, \dots)$ too: $T$
+is independent \emph{of itself}, $\P(T) = \P(T\cap T) =
+\P(T)^2$: $\P(T) \in \{0, 1\}$.
+\end{proof}
+
+\section{Modes of convergence}
+
+\begin{definition}\label{def:b3:probability:modes}
+$X_n \to X$ \emph{almost surely} if $\P(X_n \to X) = 1$;
+\emph{in probability} if $\P(\abs{X_n - X} \geq \varepsilon)
+\to 0$ for every $\varepsilon > 0$; \emph{in $L^p$} if
+$\E\abs{X_n - X}^p \to 0$.\index{convergence of random
+variables}
+\end{definition}
+
+\begin{proposition}\label{prop:b3:probability:modes}
+(a) a.s.\ convergence implies convergence in probability;
+(b) $L^p$ convergence implies convergence in probability;
+(c) convergence in probability implies a.s.\ convergence
+\emph{along a subsequence};
+(d) no other implication holds in general.
+\end{proposition}
+
+\begin{proof}
+(a) $\P(\abs{X_n - X} \geq \varepsilon) \leq
+\P\bigl(\sup_{m\geq n}\abs{X_m - X} \geq \varepsilon\bigr)
+\downarrow \P\bigl(\limsup\{\abs{X_m - X} \geq
+\varepsilon\}\bigr) = 0$ under a.s.\ convergence (continuity
+from above; the limsup event excludes convergence). (b)
+Markov: $\P(\abs{X_n - X} \geq \varepsilon) \leq
+\varepsilon^{-p}\,\E\abs{X_n - X}^p$. (c) Pick $n_k$ with
+$\P(\abs{X_{n_k} - X} \geq 2^{-k}) \leq 2^{-k}$;
+Borel--Cantelli (1) makes $\abs{X_{n_k} - X} < 2^{-k}$
+eventually, a.s. (d) The typewriter (\cref{exo:b3:lp:3}) on
+$(\intcc01, \lambda)$ converges in $L^1$ and in probability
+but nowhere pointwise; $n\mathbf 1_{\intoo0{1/n}} \to 0$
+a.s.\ but not in $L^1$; details and the remaining
+counterexamples in \cref{exo:b3:probability:6}.
+\end{proof}
+
+\section{The law of large numbers}
+
+Throughout, $(X_n)$ are independent with the same law
+(\emph{i.i.d.}), $S_n = X_1 + \dots + X_n$.
+
+\begin{theorem}[Weak law of large numbers]
+\label{thm:b3:probability:wlln}
+If $X_1 \in L^2$, with $m = \E X_1$:
+\[
+\P\Bigl(\Bigl|\frac{S_n}{n} - m\Bigr| \geq
+\varepsilon\Bigr) \leq
+\frac{\V(X_1)}{n\,\varepsilon^2}
+\xrightarrow[n\to\infty]{} 0 :
+\]
+$\frac{S_n}n \to m$ in probability (and in $L^2$).\index{law
+of large numbers (weak)}
+\end{theorem}
+
+\begin{proof}
+$\E\frac{S_n}n = m$ and $\V\bigl(\frac{S_n}n\bigr) =
+\frac{n\V(X_1)}{n^2}$
+(\cref{thm:b3:probability:independence}); Chebyshev.
+\end{proof}
+
+\begin{theorem}[Strong law of large numbers]
+\label{thm:b3:probability:slln}
+If $X_1 \in L^1$, then\index{law of large numbers (strong)}
+\[
+\frac{S_n}{n} \xrightarrow[n\to\infty]{\text{a.s.}} \E[X_1].
+\]
+We prove it here under the stronger hypothesis $X_1 \in
+L^4$; the general case ($L^1$: Etemadi's proof) is the
+weekend problem.
+\end{theorem}
+
+\begin{proof}[Proof under $\E X_1^4 < \infty$]
+Centering ($X_i \mapsto X_i - m$), assume $m = 0$. Expand:
+\[
+\E[S_n^4] = \sum_{i,j,k,l}\E[X_iX_jX_kX_l]
+= n\,\E[X_1^4] + 3n(n-1)\,\bigl(\E[X_1^2]\bigr)^2 \leq
+C\,n^2 ,
+\]
+since independence and centering kill every term containing
+an isolated factor ($\E[X_iX_jX_kX_l] =
+\E[X_i]\E[\cdots] = 0$ unless the indices pair up: the only
+survivors are the $n$ terms $i=j=k=l$ and the $3n(n-1)$
+terms with two distinct pairs). Markov:
+\[
+\P\Bigl(\Bigl|\frac{S_n}n\Bigr| \geq \varepsilon\Bigr)
+= \P\bigl(S_n^4 \geq n^4\varepsilon^4\bigr)
+\leq \frac{Cn^2}{n^4\varepsilon^4} =
+\frac{C}{\varepsilon^4n^2},
+\]
+summable: Borel--Cantelli (1) gives, for each rational
+$\varepsilon$, that $\abs{S_n/n} < \varepsilon$ eventually,
+a.s.; intersecting over $\varepsilon \in \Q_+^*$ (countably
+many probability-$1$ events): $S_n/n \to 0$ a.s.
+\end{proof}
+
+\begin{example}[What the strong law buys]
+\label{ex:b3:probability:sllnapps}
+(a) \emph{Frequencies}: for i.i.d.\ coin flips, the observed
+frequency of heads converges a.s.\ to $p$ --- the empirical
+justification of probability itself.
+(b) \emph{Monte Carlo}\index{Monte Carlo method}: for $g \in
+L^1(\intcc01)$ and $(U_n)$ i.i.d.\ uniform
+(\cref{thm:b3:probability:existence}),
+$\frac1n\sum_{k\leq n}g(U_k) \to \int_0^1g$ a.s.: integrals
+by sampling, in any dimension, at the dimension-independent
+rate $\sim n^{-1/2}$ made precise in \cref{ch:b3:clt}.
+(c) \emph{Normal numbers}: almost every real number has, in
+its binary expansion, asymptotic frequency $\frac12$ of ones
+(apply the strong law to the digit variables of
+\cref{thm:b3:probability:existence}) --- Borel's theorem, a
+statement about \emph{every}day numbers proved by measure:
+\cref{pb:b3:probability:1} completes it in all bases.
+\end{example}
+
+\begin{method}\label{met:b3:probability:toolkit}
+The working order for asymptotic statements about random
+sequences: (1) \emph{Is the event a tail event?} Then its
+probability is $0$ or $1$
+(\cref{thm:b3:probability:zeroone}) and one only has to
+decide which. (2) \emph{To prove a.s.\ statements}:
+Borel--Cantelli --- summable probabilities for the
+``bad'' events, via Markov/Chebyshev-type bounds on
+whatever moments exist; independence only needed for the
+converse direction. (3) \emph{Subsequence + sandwich}: prove
+convergence along a manageable subsequence, control the
+oscillation in between by monotonicity or maximal
+inequalities --- the skeleton of Etemadi's proof. (4) For
+distributional limits, wait for \cref{ch:b3:clt}.
+\end{method}
+
+\section{Exercises}
+
+\begin{exercise}[$\star$]\label{exo:b3:probability:1}
+(a) Let $X$ have continuous strictly increasing distribution
+function $F$. Show that $F(X)$ is uniform on $\intcc01$, and
+that $G(U) \sim F$ for $U$ uniform, $G = F^{-1}$: simulation
+by inversion.
+(b) Compute the distribution function and density of $X^2$
+for $X$ uniform on $\intcc{-1}1$, and of $-\frac1\lambda\ln
+U$ for $U$ uniform on $\intoo01$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b3:probability:2}
+(a) Compute mean and variance of the Poisson $\mathcal
+P(\lambda)$ and geometric laws via the transfer theorem.
+(b) Show that a positive random variable $T$ with $\P(T > t)
+> 0$ for all $t$ satisfies the \emph{memoryless} property $\P(T > t + s \mid
+T > t) = \P(T > s)$ for all $s, t \geq 0$ iff $T$ is
+exponential. \emph{(The survival function satisfies Cauchy's
+functional equation; monotonicity replaces continuity.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:probability:3}
+(a) Show that if $X_1, \dots, X_n$ are independent and $f_i$
+are Borel functions, the $f_i(X_i)$ are independent.
+(b) Show that events $A_1, \dots, A_n$ are independent iff
+their complements are, iff the indicators $\mathbf 1_{A_i}$
+are independent random variables.
+(c) (Pairwise is weaker) Two fair coins: $A = $ first is
+heads, $B = $ second is heads, $C = $ the two agree. Show
+$A, B, C$ are pairwise independent but not independent.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:probability:4}
+(a) (Infinite monkey) An i.i.d.\ sequence of uniform
+keystrokes on a finite alphabet a.s.\ contains every finite
+text infinitely often: prove it with Borel--Cantelli (2) on
+disjoint blocks.
+(b) (Runs) For i.i.d.\ fair bits, let $R_n$ be the length of
+the run of ones starting at position $n$. Show that a.s.\
+$R_n \geq (1+\varepsilon)\log_2n$ finitely often, and $R_n
+\geq \log_2 n$ infinitely often \emph{(both halves of
+Borel--Cantelli; for the second, pass to disjoint blocks to
+gain independence)}: the longest run in the first $n$ digits
+grows like $\log_2n$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:probability:5}
+Let $(X_n)$ be independent.
+(a) Show that the radius of convergence of $\sum X_n z^n$ is
+an a.s.\ constant (possibly $0$ or $\infty$).
+(b) Show that $\P(\sum X_n \text{ converges}) \in \{0, 1\}$
+and $\P(S_n/n \to m) \in \{0,1\}$.
+(c) Give an event about $(X_n)$ that is \emph{not} a tail
+event, and check that the zero--one law can fail for it.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:probability:6}
+On $(\intcc01, \lambda)$, exhibit --- with proofs --- random
+variables such that:
+(a) $X_n \to 0$ in probability and in every $L^p$, but
+nowhere a.s.;
+(b) $X_n \to 0$ a.s.\ but in no $L^p$;
+(c) $X_n \to 0$ in $L^1$ but not in $L^2$;
+(d) and show: if $X_n \to X$ in probability and $\abs{X_n}
+\leq Y \in L^1$, then $X_n \to X$ in $L^1$
+\emph{(subsequences + dominated convergence +
+the subsubsequence trick)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:probability:7}
+An opinion poll estimates an unknown proportion $p$ by the
+empirical frequency $\hat p_n$ of $n$ independent draws.
+(a) Chebyshev: show $\P(\abs{\hat p_n - p} \geq \varepsilon)
+\leq \frac1{4n\varepsilon^2}$ (use $p(1-p) \leq \frac14$).
+(b) How many draws guarantee an error $\leq 3\%$ with
+probability $\geq 95\%$ by this bound? (The true answer,
+via \cref{ch:b3:clt}, is about $1070$: Chebyshev is honest
+but crude.)
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:probability:8}
+(Bernstein) For $f \in \mathcal C(\intcc01)$ define the
+Bernstein polynomial $B_nf(x) =
+\sum_{k=0}^n\binom nkx^k(1-x)^{n-k}f\bigl(\frac kn\bigr)$.
+(a) Recognize $B_nf(x) = \E\bigl[f\bigl(\frac
+{S_n}n\bigr)\bigr]$ for $S_n$ binomial $\mathcal B(n, x)$.
+(b) Prove $B_nf \to f$ \emph{uniformly} on $\intcc01$: split
+on $\{\abs{\frac{S_n}n - x} \leq \delta\}$ and its
+complement, using uniform continuity and Chebyshev with the
+uniform bound $\V(\frac{S_n}n) \leq \frac1{4n}$.
+(c) Conclude: a second, probabilistic proof of the
+Weierstrass approximation theorem
+(\cref{cor:b3:complete:weierstrass}), with the explicit rate
+$\norm{B_nf - f}_\infty \leq \frac32\,\omega_f(n^{-1/2})$
+for the modulus of continuity $\omega_f$ --- prove at least
+the $O(\omega_f(n^{-1/2}))$ form.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:probability:9}
+(Coupon collector) Cards of $n$ types are drawn uniformly
+with replacement; let $T_n$ be the number of draws until all
+types are seen.
+(a) Write $T_n = \sum_{k=1}^{n}\tau_k$ with $\tau_k$
+geometric of parameter $\frac{n - k + 1}n$, the $\tau_k$
+independent, and deduce $\E T_n = n\,H_n \sim n\ln n$
+($H_n$ the harmonic number) and $\V(T_n) \leq
+\frac{\pi^2}6n^2$.
+(b) Chebyshev: $\frac{T_n}{n\ln n} \to 1$ in probability.
+(c) Refine with Borel--Cantelli: show directly $\P(T_n >
+\beta n\ln n) \leq n^{1 - \beta}$ for $\beta > 1$
+\emph{(union bound on the event that some type is missed
+after $\beta n\ln n$ draws, using $1 - x \leq \eu^{-x}$)},
+and deduce that along $n = 2^m$, a.s.\ $T_n \leq \beta n\ln
+n$ eventually, for every $\beta > 2$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:probability:10}
+Using the digit construction
+(\cref{thm:b3:probability:existence}):
+(a) verify by direct computation that $U = \sum b_{2k}2^{-k}$
+(even-indexed digits of a uniform $\omega$) is uniform and
+independent of $V = \sum b_{2k-1}2^{-k}$;
+(b) deduce a measurable bijection-up-to-null-sets between
+$\intcc01$ and $\intcc01^2$ preserving measure, and comment:
+one uniform random number contains two (and countably many)
+independent ones --- compare with the Peano curve
+(\cref{pb:b3:topology:1}), which achieved surjectivity but
+not measure-preservation or injectivity.
+\end{exercise}
+
+\section{Problem: Etemadi's proof of the strong law}
+
+\begin{problem}[{Weekend problem --- the strong law of large
+numbers for i.i.d.\ integrable variables}]
+\label{pb:b3:probability:1}
+Kolmogorov's strong law --- $\frac{S_n}n \to \E X_1$ a.s.\
+for i.i.d.\ $X_n \in L^1$ --- long had only intricate proofs;
+in 1981 N.~Etemadi found one of striking economy, using
+nothing beyond this chapter (and even weakening independence
+to pairwise independence). We follow it. Let $(X_n)$ be
+pairwise independent, identically distributed, integrable;
+$m = \E X_1$, $S_n = X_1 + \dots + X_n$.
+
+\medskip
+\noindent\textbf{Part I --- Reductions.}
+\begin{enumerate}
+  \item Show that it suffices to treat $X_n \geq 0$
+        \emph{(split $X_n = X_n^+ - X_n^-$: check the two
+        halves are again pairwise independent i.i.d.\
+        integrable)}. Assume henceforth $X_n \geq 0$.
+  \item (Truncation) Let $Y_n = X_n\,\mathbf 1_{X_n \leq n}$
+        and $S_n^* = Y_1 + \dots + Y_n$. Show
+        \[
+        \sum_{n\geq1}\P(X_n \neq Y_n) =
+        \sum_{n\geq1}\P(X_1 > n) \leq \E[X_1] < \infty
+        \]
+        (\cref{exo:b3:product:3}), and deduce via
+        Borel--Cantelli that $\frac{S_n - S_n^*}{n} \to 0$
+        a.s.: it suffices to prove $\frac{S^*_n}n \to m$
+        a.s.
+  \item Show $\E Y_n = \E\bigl[X_1\mathbf 1_{X_1\leq
+        n}\bigr] \to m$ (monotone convergence), hence
+        $\frac1n\sum_{k\leq n}\E Y_k \to m$ (Ces\`aro): it
+        suffices to prove $\frac{S_n^* - \E S_n^*}{n} \to 0$
+        a.s.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part II --- The variance estimate.}
+\begin{enumerate}[resume]
+  \item Show
+        \[
+        \V(Y_n) \leq \E[Y_n^2] = \E\bigl[X_1^2\,\mathbf
+        1_{X_1 \leq n}\bigr]
+        \]
+        and, using the layer cake
+        (\cref{prop:b3:product:layercake}), the key bound
+        \[
+        \sum_{n\geq1}\frac{\V(Y_n)}{n^2}
+        \leq \sum_{n\geq1}\frac1{n^2}\,
+        \E\bigl[X_1^2\mathbf 1_{X_1\leq n}\bigr]
+        \leq C\,\E[X_1] < \infty
+        \]
+        \emph{(exchange the sum and the expectation ---
+        Tonelli for series --- and bound $\sum_{n \geq
+        x}\frac1{n^2} \leq \frac2{\max(x,1)}$ for the inner
+        estimate $x^2\sum_{n\geq x}n^{-2} \leq 2x$)}.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part III --- Convergence along geometric
+subsequences.} Fix $\alpha > 1$ and let $k_j =
+\lfloor\alpha^j\rfloor$.
+\begin{enumerate}[resume]
+  \item Using pairwise independence (variances add,
+        \cref{thm:b3:probability:independence} --- check that
+        additivity of variances needs only pairwise
+        independence) and Chebyshev, show for every
+        $\varepsilon > 0$:
+        \[
+        \sum_{j\geq1}\P\Bigl(\Bigl|
+        \frac{S^*_{k_j} - \E S^*_{k_j}}{k_j}\Bigr| \geq
+        \varepsilon\Bigr)
+        \leq
+        \frac1{\varepsilon^2}\sum_{j\geq1}\frac1{k_j^2}
+        \sum_{n\leq k_j}\V(Y_n)
+        = \frac1{\varepsilon^2}\sum_{n\geq1}\V(Y_n)
+        \sum_{j\,:\,k_j\geq n}\frac1{k_j^2} .
+        \]
+  \item Show $\sum_{j : k_j \geq n}k_j^{-2} \leq
+        \frac{C_\alpha}{n^2}$ \emph{(geometric series;
+        beware the floor: $k_j \geq \frac{\alpha^j}2$ for
+        $\alpha^j \geq 2$-type care)}, and conclude with
+        question 4 and Borel--Cantelli:
+        \[
+        \frac{S^*_{k_j} - \E S^*_{k_j}}{k_j}
+        \xrightarrow[j\to\infty]{\text{a.s.}} 0,
+        \qquad\text{hence}\qquad
+        \frac{S^*_{k_j}}{k_j} \to m \ \text{a.s.}
+        \]
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part IV --- Sandwich and conclusion.}
+\begin{enumerate}[resume]
+  \item For $k_j \leq n \leq k_{j+1}$, use the monotonicity
+        of $S^*_n$ (nonnegative summands!) to show
+        \[
+        \frac{k_j}{k_{j+1}}\,\frac{S^*_{k_j}}{k_j}
+        \;\leq\; \frac{S^*_n}{n} \;\leq\;
+        \frac{k_{j+1}}{k_j}\,\frac{S^*_{k_{j+1}}}{k_{j+1}},
+        \]
+        and deduce, a.s.:
+        \[
+        \frac m\alpha \leq \liminf\frac{S^*_n}n \leq
+        \limsup\frac{S^*_n}n \leq \alpha\,m .
+        \]
+  \item Let $\alpha \downarrow 1$ along a sequence and
+        conclude $\frac{S_n^*}n \to m$ a.s., hence (Part I)
+        the \emph{strong law of large numbers}:
+        \[
+        \boxed{\ \frac{S_n}{n}
+        \xrightarrow[n\to\infty]{\text{a.s.}} \E[X_1].\ }
+        \]
+  \item Where exactly was pairwise independence (rather than
+        full independence) sufficient? List the three places
+        where independence-type hypotheses were invoked.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part V --- Dividends.}
+\begin{enumerate}[resume]
+  \item (Borel's normal numbers) Show that
+        $\lambda$-almost every $x \in \intcc01$ is
+        \emph{normal in every base} $b \geq 2$: each digit
+        $0, \dots, b-1$ appears with asymptotic frequency
+        $\frac1b$ \emph{(fix $b$ and a digit, apply the
+        strong law to the indicator variables --- justify
+        that base-$b$ digits of a uniform variable are
+        i.i.d.\ uniform on $\{0,\dots,b-1\}$ as in
+        \cref{thm:b3:probability:existence} --- then
+        intersect the countably many probability-one
+        events)}. Exhibit one explicit non-normal number,
+        and reflect: the theorem asserts normality of almost
+        all numbers, yet proving normality of $\sqrt2$ or
+        $\pi$ remains open.
+  \item (Monte Carlo, guaranteed) Justify completely the
+        method of \cref{ex:b3:probability:sllnapps}(b) for
+        $g \in L^1(\intcc01^d)$: construct the i.i.d.\
+        uniform sample on $\intcc01^d$ from
+        \cref{thm:b3:probability:existence} and
+        \cref{exo:b3:probability:10}, and state what the
+        strong law delivers.
+\end{enumerate}
+\end{problem}

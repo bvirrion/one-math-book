@@ -15,7 +15,8 @@ tree. Each book has its own entry file at the repository root:
 - `one_math_book_2_high_school_fr.tex` — Book 2 (French);
 - `one_math_book_2_high_school_nl.tex` — Book 2 (Dutch);
 - `one_math_book_3_university_year_1.tex` — Book 3, Bachelor Year 1;
-- `one_math_book_4_university_year_2.tex` — Book 4, Bachelor Year 2.
+- `one_math_book_4_university_year_2.tex` — Book 4, Bachelor Year 2;
+- `one_math_book_5_university_year_3.tex` — Book 5, Bachelor Year 3.
 
 Naming: `one_math_book_<N>_<slug>[_<lang>].tex` → PDF
 `build/one_math_book_<N>_<slug>[_<lang>].pdf`.
@@ -81,7 +82,8 @@ automatically within the chapter):
 | `example`, `remark`, `notation` | worked examples, comments |
 | `proof` | proofs (amsthm); a partial proof is titled `\begin{proof}[Partial proof]` |
 | `exercise` | end-of-chapter exercises, difficulty in the optional argument: `[$\star$]` to `[$\star\star\star$]` |
-| `solution` | in the solutions file: `\begin{solution}{exo:...}` referencing the exercise label |
+| `problem` | (university volumes) one long, structured weekend problem per chapter — 15–25 numbered questions in parts, culminating in a named result; label `pb:<year>:<slug>:1` |
+| `solution` | in the solutions file: `\begin{solution}{exo:...}` (or `{pb:...}`) referencing the exercise/problem label |
 
 ## Style rules
 
@@ -92,7 +94,9 @@ automatically within the chapter):
    theorem; a `method` box for each standard technique.
 3. **Exercises**: 8–12 per chapter, graded `$\star$` (direct application) to
    `$\star\star\star$` (challenging); **every exercise must have a full
-   solution** in the matching solutions file.
+   solution** in the matching solutions file. University chapters add one
+   `problem` (weekend problem set) whose full solution likewise lives in
+   the solutions file, keyed by the `pb:` label.
 4. **English text** (canonical edition), written for readers anywhere in
    the world: avoid references to any particular country's educational
    system or curriculum-specific terminology. Translated editions keep
@@ -117,6 +121,8 @@ All labels are namespaced: `<type>:<year>:<chapter-slug>:<name>`.
   `prop:...`, `lem:...`, `cor:...`, `met:...`, `ex:...` (examples)
 - Exercises and solutions: `exo:g12:seq:3` — the solution references this
   same label via `\begin{solution}{exo:g12:seq:3}`.
+- Weekend problems: `pb:b3:galois:1` — solved via
+  `\begin{solution}{pb:b3:galois:1}`.
 
 Year prefixes: `g12` for Grade 12; other years will use `k` (kindergarten),
 `g1`–`g11`, and `b1`–`b3` (bachelor years).

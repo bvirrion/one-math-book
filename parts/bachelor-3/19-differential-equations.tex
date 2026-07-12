@@ -1,0 +1,661 @@
+\chapter{Ordinary Differential Equations}\label{ch:b3:ode}
+
+Year 2 solved linear differential equations and stated the
+Cauchy--Lipschitz theorem; this chapter proves it --- twice
+over: existence and uniqueness by the Banach fixed point,
+global structure by the theory of maximal solutions and the
+escape-from-compacts theorem. The linear theory is then
+rebuilt on honest foundations (resolvent, Wronskian, matrix
+exponential, Duhamel), and the chapter's second half opens
+the \emph{qualitative} theory --- flows, equilibria,
+Lyapunov functions, and stability by linearization: how to
+understand solutions one will never compute. The pendulum, in
+the weekend problem, is the eternal case study. Throughout,
+$U \subseteq \R\times\R^d$ is open and $f \colon U \to \R^d$
+is continuous; a \emph{solution} of $x' = f(t, x)$ is a
+$\mathcal C^1$ map $x \colon I \to \R^d$ ($I$ an interval)
+with graph in $U$ satisfying the equation.
+
+\section{Cauchy--Lipschitz}
+
+\begin{definition}\label{def:b3:ode:lipschitz}
+$f$ is \emph{locally Lipschitz in $x$}\index{locally Lipschitz}
+if every point of $U$ has a neighborhood $V$ and a constant
+$L$ with $\norm{f(t, x_1) - f(t, x_2)} \leq L\norm{x_1 -
+x_2}$ for $(t, x_1), (t, x_2) \in V$. If $f$ is $\mathcal
+C^1$ (or merely $\partial_xf$ exists and is continuous), it
+is locally Lipschitz in $x$: on a compact convex
+neighborhood, the mean value inequality with $L =
+\sup\vertiii{\partial_xf}$.
+\end{definition}
+
+\begin{theorem}[Cauchy--Lipschitz, local]
+\label{thm:b3:ode:cauchylipschitz}
+Let $f$ be continuous and locally Lipschitz in $x$, and $(t_0,
+x_0) \in U$. There is $T > 0$ such that the Cauchy problem
+\[
+x' = f(t, x), \qquad x(t_0) = x_0
+\]
+has exactly one solution on $[t_0 - T, t_0 +
+T]$.\index{Cauchy--Lipschitz theorem}
+\end{theorem}
+
+\begin{proof}
+Choose $a, b > 0$ with $Q = [t_0 - a, t_0 + a]\times\bar
+B(x_0, b) \subseteq U$, on which $\norm f \leq M$ and $f$ is
+$L$-Lipschitz in $x$. A $\mathcal C^1$ function is a solution
+iff it satisfies the integral equation
+\[
+x(t) = x_0 + \int_{t_0}^{t}f\bigl(s, x(s)\bigr)\,\dd s
+\]
+(fundamental theorem of calculus, both ways). Let $T =
+\min\bigl(a, \frac bM, \frac1{2L}\bigr)$, $I = [t_0 - T, t_0
++ T]$, and
+\[
+\mathcal E = \{x \in \mathcal C(I, \R^d) : \norm{x(t) - x_0}
+\leq b\ \text{on } I\},
+\]
+a closed subset of the Banach space $(\mathcal C(I, \R^d),
+\norm\cdot_\infty)$: complete
+(\cref{def:b3:complete:complete}). Define $\Phi(x)(t) = x_0 +
+\int_{t_0}^tf(s, x(s))\dd s$: for $x \in \mathcal E$,
+$\norm{\Phi(x)(t) - x_0} \leq M\abs{t - t_0} \leq MT \leq b$
+--- $\Phi$ maps $\mathcal E$ to itself --- and for $x, y \in
+\mathcal E$:
+\[
+\norm{\Phi(x)(t) - \Phi(y)(t)} \leq \Bigl|\int_{t_0}^t
+L\,\norm{x(s) - y(s)}\,\dd s\Bigr| \leq LT\,\norm{x -
+y}_\infty \leq \tfrac12\norm{x - y}_\infty :
+\]
+a contraction. The Banach fixed point
+(\cref{thm:b3:complete:banach}) gives a unique fixed point in
+$\mathcal E$: existence, and uniqueness among solutions
+staying in $\bar B(x_0, b)$ --- but any solution on $I$ stays
+there ($\norm{x(t) - x_0} \leq M\abs{t - t_0} \leq b$ as long
+as the graph remains in $Q$, a continuity argument):
+uniqueness on $I$.
+\end{proof}
+
+\begin{lemma}[Gr\"onwall]\label{lem:b3:ode:gronwall}
+Let $u \colon I \to \intco0\infty$ be continuous, $t_0 \in
+I$, and suppose\index{Gr\"onwall's lemma}
+\[
+u(t) \leq \alpha + \beta\,\Bigl|\int_{t_0}^{t}u(s)\,\dd
+s\Bigr| \qquad (t \in I)
+\]
+with $\alpha \geq 0$, $\beta > 0$. Then $u(t) \leq
+\alpha\,\eu^{\beta\abs{t - t_0}}$ on $I$.
+\end{lemma}
+
+\begin{proof}
+For $t \geq t_0$: let $v(t) = \alpha +
+\beta\int_{t_0}^tu(s)\dd s$, so $u \leq v$, $v' = \beta u
+\leq \beta v$, and $(v\eu^{-\beta(t - t_0)})' \leq 0$: $v(t)
+\leq v(t_0)\eu^{\beta(t-t_0)} = \alpha\eu^{\beta(t - t_0)}$.
+For $t \leq t_0$, apply the same to $\tilde u(t) = u(2t_0 -
+t)$.
+\end{proof}
+
+\begin{corollary}[Uniqueness and continuous dependence]
+\label{cor:b3:ode:uniqueness}
+Under the hypotheses of \cref{thm:b3:ode:cauchylipschitz},
+two solutions of $x' = f(t,x)$ that agree at one point agree
+on their common interval of definition. Quantitatively, if
+$x, y$ are two solutions with graphs in a region where $f$ is
+$L$-Lipschitz in $x$, then
+\[
+\norm{x(t) - y(t)} \leq \norm{x(t_0) -
+y(t_0)}\,\eu^{L\abs{t - t_0}} .
+\]
+\end{corollary}
+
+\begin{proof}
+The estimate: $u = \norm{x - y}$ satisfies $u(t) \leq u(t_0)
++ L\abs{\int_{t_0}^tu}$ (subtract the integral equations);
+Gr\"onwall. Global uniqueness: the agreement set $\{t : x(t)
+= y(t)\}$ is closed in the common interval, nonempty, and
+open --- around any agreement point, cover a compact piece of
+the common graph by finitely many Lipschitz boxes and apply
+the estimate with $u(t_1) = 0$ on each: locally $x \equiv y$.
+A nonempty open closed subset of an interval is everything.
+\end{proof}
+
+\section{Maximal solutions}
+
+\begin{theorem}[Maximal solutions; escape from compacts]
+\label{thm:b3:ode:maximal}
+Assume $f$ continuous, locally Lipschitz in $x$.
+\begin{enumerate}
+  \item Every Cauchy problem has a unique \emph{maximal}
+        solution $x \colon \intoo{T_-}{T_+} \to \R^d$: every
+        other solution through $(t_0, x_0)$ is its
+        restriction. The interval is open.
+  \item (\emph{Escape}) For every compact $K \subseteq U$
+        there is $\varepsilon > 0$ such that $(t, x(t)) \notin
+        K$ for all $t \in \intoo{T_+ - \varepsilon}{T_+}$ (and
+        symmetrically at $T_-$): \emph{the graph of a maximal
+        solution eventually leaves every compact subset of
+        $U$}. In particular,
+        for $U = \R\times\R^d$ and $T_+ < +\infty$:
+        $\norm{x(t)} \to +\infty$ as $t \to T_+^-$
+        (\emph{blow-up}).\index{maximal solution}\index{escape
+        from compacts}\index{blow-up}
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) Let $\mathcal S$ be the set of all solutions through
+$(t_0, x_0)$; by \cref{cor:b3:ode:uniqueness} any two agree on
+the intersection of their intervals, so they glue: on $J =
+\bigcup_{y \in \mathcal S}I_y$, define $x(t) = y(t)$ for any
+$y$ defined at $t$: a well-defined solution, evidently
+maximal and unique. $J$ is open: a solution defined at an
+endpoint could be prolonged by
+\cref{thm:b3:ode:cauchylipschitz} at that endpoint.
+
+(2) Suppose the claim fails at $T_+$: there are $t_n \to
+T_+$ with $(t_n, x(t_n)) \in K$; note this forces $T_+ <
+\infty$ or, if $T_+ = \infty$, there is nothing to prove ($K$
+is bounded in time). So let $T_+ < \infty$. Compactness: uniform constants $M, L, a,
+b$ work for all Cauchy data in a neighborhood of $K$
+--- concretely, cover $K$ by finitely many boxes $Q_i$ as in
+the local theorem's proof and let $T^* > 0$ be the minimum of
+the corresponding existence times: any Cauchy datum in $K$
+launches a solution living at least $T^*$ beyond its initial
+time. Applying this at $(t_n, x(t_n))$ with $t_n > T_+ -
+T^*/2$ extends $x$ past $T_+$ (the extension agrees with $x$
+by uniqueness, then prolongs it): contradiction with
+maximality. So the graph leaves $K$ definitively before
+$T_+$. For $U = \R\times\R^d$: if $\norm{x(t)}\not\to\infty$,
+a sequence $t_n \to T_+$ keeps $(t_n, x(t_n))$ in the compact
+$[t_0, T_+]\times\bar B(0, R)$: excluded.
+\end{proof}
+
+\begin{corollary}[Global existence under linear growth]
+\label{cor:b3:ode:globallinear}
+If $U = I\times\R^d$ ($I$ open interval) and $\norm{f(t, x)}
+\leq \alpha(t)\norm x + \beta(t)$ with $\alpha, \beta$
+continuous, then every maximal solution is defined on all of
+$I$.
+\end{corollary}
+
+\begin{proof}
+On a compact $[t_0, T] \subseteq I$: $\norm{x(t)} \leq
+\norm{x_0} + \int_{t_0}^t(\alpha\norm x + \beta)$, so by
+Gr\"onwall (with $\alpha, \beta$ bounded by $A, B$ there)
+$\norm{x(t)} \leq (\norm{x_0} + B(T - t_0))\eu^{A(T - t_0)}$:
+bounded. If $T_+ < \sup I$, the graph stays in a compact of
+$I\times\R^d$ near $T_+$: contradicts escape
+(\cref{thm:b3:ode:maximal}).
+\end{proof}
+
+\section{Linear systems}
+
+Throughout this section $A \colon I \to M_d(\R)$ and $b
+\colon I \to \R^d$ are continuous; the system is $x' = A(t)x
++ b(t)$ --- linear growth: all maximal solutions live on all
+of $I$ (\cref{cor:b3:ode:globallinear}).
+
+\begin{theorem}[Structure]\label{thm:b3:ode:linearstructure}
+The solutions of the homogeneous system $x' = A(t)x$ form a
+$d$-dimensional vector space $S_H$; for each $t_0$, the
+evaluation $x \mapsto x(t_0)$ is an isomorphism $S_H \to
+\R^d$. The \emph{resolvent}\index{resolvent of a linear
+system} $R(t, s) \in GL_d(\R)$, defined by: $t \mapsto R(t,
+s)v$ is the solution with value $v$ at $s$, satisfies
+\[
+R(s,s) = I,\quad R(t, u)R(u, s) = R(t, s),\quad
+\partial_tR(t,s) = A(t)R(t,s),
+\]
+and the inhomogeneous problem is solved by \emph{Duhamel's
+formula}\index{Duhamel's formula}:
+\[
+x(t) = R(t, t_0)\,x_0 + \int_{t_0}^{t}R(t, s)\,b(s)\,\dd s .
+\]
+Finally the \emph{Wronskian}\index{Wronskian} $w(t) = \det
+R(t, s)$ obeys Liouville's formula $w' =
+\operatorname{tr}A(t)\,w$, so $w(t) =
+\exp\bigl(\int_s^t\operatorname{tr}A\bigr) > 0$.
+\end{theorem}
+
+\begin{proof}
+Linearity of the equation makes solutions a vector space;
+evaluation is linear, injective (uniqueness: a solution
+vanishing at $t_0$ is $\equiv 0$) and surjective (existence):
+dimension $d$. The resolvent properties restate uniqueness
+(both sides of each identity solve the same Cauchy problem);
+invertibility from $R(s,t)R(t,s) = I$. Duhamel: differentiate
+the formula --- $x'(t) = A(t)R(t,t_0)x_0 + R(t,t)b(t) +
+\int_{t_0}^tA(t)R(t,s)b(s)\dd s = A(t)x(t) + b(t)$
+(differentiation under the integral is legitimate: the
+integrand is $\mathcal C^1$ in $t$ with continuous derivative
+in $(t,s)$; or verify by the integral equation). Liouville:
+$w(t + h) = \det\bigl(R(t+h, t)\bigr)w(t)$ and $R(t + h, t) =
+I + hA(t) + o(h)$ (from the integral equation), so $\det = 1
++ h\operatorname{tr}A(t) + o(h)$ (expansion of $\det$ at
+$I$): $w'(t) = \operatorname{tr}A(t)\,w(t)$; integrate the
+scalar linear ODE.
+\end{proof}
+
+\begin{theorem}[Matrix exponential]\label{thm:b3:ode:matrixexp}
+For $A \in M_d(\C)$, the series $\eu^{A} =
+\sum_{n\geq0}\frac{A^n}{n!}$ converges (absolutely, in any
+submultiplicative norm), $\eu^{A+B} = \eu^A\eu^B$ whenever
+$AB = BA$, and $t \mapsto \eu^{tA}$ is the resolvent of the
+constant system: $R(t,s) = \eu^{(t-s)A}$; it is $\mathcal
+C^\infty$ with $\frac{\dd}{\dd t}\eu^{tA} = A\eu^{tA}$.
+Moreover: if $\operatorname{Re}\lambda < -\alpha < 0$ for
+every eigenvalue $\lambda$ of $A$, then $\vertiii{\eu^{tA}}
+\leq C\eu^{-\alpha t}$ for $t \geq 0$.\index{matrix
+exponential}
+\end{theorem}
+
+\begin{proof}
+Convergence: $\vertiii{A^n/n!} \leq \vertiii A^n/n!$, summable
+(\cref{exo:b3:complete:1}(b) in the Banach algebra
+$M_d$). For commuting $A, B$: the Cauchy product of the two
+absolutely convergent series rearranges, via the binomial
+theorem (valid when $AB = BA$), into
+$\sum_n\frac{(A+B)^n}{n!}$. Differentiability, directly:
+$\frac{\eu^{(t+h)A} - \eu^{tA}}h = \eu^{tA}\frac{\eu^{hA} -
+I}{h} \to \eu^{tA}A$ since $\norm{\frac{\eu^{hA} - I}h - A}
+\leq \sum_{n\geq2}\frac{\abs h^{n-1}\vertiii A^n}{n!} =
+O(h)$. Hence $t \mapsto \eu^{(t - s)A}v$ solves the Cauchy
+problem defining $R(t,s)v$. Spectral bound: by the Jordan form
+(\cref{thm:b3:modules:jordan}), $A = P(D + N)P^{-1}$ with $D$
+diagonal carrying the eigenvalues, $N$ nilpotent, and $DN =
+ND$. Then $\eu^{tA} = P\,\eu^{tD}\eu^{tN}P^{-1}$ with
+$\vertiii{\eu^{tD}} \leq \eu^{-(\alpha + \delta)t}$ for some
+$\delta > 0$ ($t \geq 0$) and $\eu^{tN}$ polynomial in $t$
+(nilpotence): the product is $\leq C\eu^{-\alpha t}$
+(polynomial beaten by $\eu^{-\delta t}$).
+\end{proof}
+
+\section{Flows, equilibria, stability}
+
+Consider now the \emph{autonomous} equation $x' = F(x)$, $F
+\colon \Omega \to \R^d$ locally Lipschitz on the open $\Omega
+\subseteq \R^d$. Write $\varphi_t(x_0) = x(t)$ for the
+maximal solution with $x(0) = x_0$ (the
+\emph{flow}\index{flow of a vector field}); autonomy gives
+the group property $\varphi_{t+s} =
+\varphi_t\circ\varphi_s$ where defined (both sides solve the
+same problem at time $s$).
+
+\begin{definition}\label{def:b3:ode:stability}
+An \emph{equilibrium} is a point $\bar x$ with $F(\bar x) =
+0$ (so $\varphi_t(\bar x) = \bar x$). It is
+\emph{stable}\index{stability (Lyapunov)} if for every
+$\varepsilon > 0$ there is $\delta > 0$ such that
+$\norm{x_0 - \bar x} < \delta$ implies that the solution
+exists for all $t \geq 0$ with $\norm{\varphi_t(x_0) - \bar
+x} < \varepsilon$; \emph{asymptotically stable} if moreover
+$\varphi_t(x_0) \to \bar x$ for all $x_0$ near $\bar x$.
+\end{definition}
+
+\begin{theorem}[Lyapunov functions]\label{thm:b3:ode:lyapunov}
+Let $\bar x$ be an equilibrium and $V \colon \mathcal V \to
+\R$ a $\mathcal C^1$ function on a neighborhood of $\bar x$
+with:\index{Lyapunov function}
+\[
+V(\bar x) = 0,\qquad V(x) > 0 \text{ for } x \neq \bar x,
+\qquad \dot V(x) = \nabla V(x)\cdot F(x) \leq 0 .
+\]
+Then $\bar x$ is stable. If moreover $\dot V < 0 $ off $\bar
+x$, then $\bar x$ is asymptotically stable.
+\end{theorem}
+
+\begin{proof}
+Along a solution, $\frac{\dd}{\dd t}V(x(t)) = \dot V(x(t))
+\leq 0$: $V$ decreases. Given $\varepsilon$ (small enough
+that $\bar B(\bar x, \varepsilon) \subseteq \mathcal V$), let
+$m = \min\{V(x) : \norm{x - \bar x} = \varepsilon\} > 0$
+(compactness, positivity) and pick $\delta < \varepsilon$
+with $V < m$ on $B(\bar x, \delta)$ (continuity). A solution
+starting in $B(\bar x, \delta)$ has $V(x(t)) < m$ for all
+later times, so it can never reach the sphere $\norm{x -
+\bar x} = \varepsilon$ (where $V \geq m$): it stays in the
+ball --- and then exists for all $t \geq 0$: the solution
+remains in the compact $\bar B$, so
+\cref{thm:b3:ode:maximal}(2) (escape from compacts) forces
+$T_+ = +\infty$. Stability.
+
+Asymptotic case: let $x(t)$ start in $B(\bar x, \delta)$;
+$V(x(t))$ decreases to some $c \geq 0$. If $c > 0$: the
+trajectory stays in $K = \{x \in \bar B(\bar x,
+\varepsilon): V(x) \geq c\}$, a compact set that excludes a
+neighborhood of $\bar x$ ($V$ is continuous with $V(\bar x)
+= 0 < c$). On $K$, the function $\dot V$ is continuous,
+strictly negative, hence $\mu = \max_K\dot V < 0$
+(compactness); then $V(x(t)) \leq V(x(0)) + \mu t \to
+-\infty$: absurd, $V \geq 0$. So
+$c = 0$, and $x(t) \to \bar x$ (points at distance $\geq
+\rho$ from $\bar x$ within the ball have $V \geq m_\rho >
+0$).
+\end{proof}
+
+\begin{theorem}[Stability by linearization]
+\label{thm:b3:ode:linearization}
+Let $F$ be $\mathcal C^1$, $F(\bar x) = 0$, $A = DF(\bar x)$.
+If every eigenvalue of $A$ has $\operatorname{Re}\lambda <
+0$, then $\bar x$ is asymptotically stable.\index{stability by
+linearization}
+\end{theorem}
+
+\begin{proof}
+Translate $\bar x$ to $0$ and write $F(x) = Ax + g(x)$ with
+$g(x) = o(\norm x)$ ($\mathcal C^1$ differentiability). Pick
+$\alpha > 0$ with $\vertiii{\eu^{tA}} \leq C\eu^{-\alpha t}$
+($t \geq 0$; \cref{thm:b3:ode:matrixexp}) and $r > 0$ with
+$\norm{g(x)} \leq \frac{\alpha}{2C}\norm x$ for $\norm x \leq
+r$. Duhamel with $b(s) = g(x(s))$:
+\[
+x(t) = \eu^{tA}x_0 + \int_0^t\eu^{(t-s)A}g(x(s))\,\dd s,
+\]
+valid as long as $\norm{x(s)} \leq r$. Then $u(t) =
+\eu^{\alpha t}\norm{x(t)}$ satisfies
+\[
+u(t) \leq C\norm{x_0} +
+\int_0^{t}C\,\frac{\alpha}{2C}\,u(s)\,\dd s ,
+\]
+so Gr\"onwall gives $u(t) \leq C\norm{x_0}\eu^{\alpha t/2}$,
+i.e.\ $\norm{x(t)} \leq C\norm{x_0}\eu^{-\alpha t/2}$. If
+$\norm{x_0} < r/C$, the a priori bound keeps $\norm{x(t)} <
+r$ for all $t$ (a continuity/bootstrap argument: the set of
+times where $\norm x \leq r$ is open and closed in
+$\intco0{T_+}$ given the strict estimate), the solution is
+global, and it converges to $0$ exponentially: asymptotic
+stability.
+\end{proof}
+
+\begin{method}\label{met:b3:ode:strategy}
+Facing an ODE: (1) existence/uniqueness --- check local
+Lipschitz (usually $\mathcal C^1$); (2) globality --- linear
+growth, boundedness, or an invariant compact via a Lyapunov
+function or first integral; failing that, suspect blow-up
+and test on the scalar caricature $x' = x^2$; (3) linear
+systems --- resolvent, Duhamel, and for constant
+coefficients the eigenstructure of $A$; (4) qualitative
+questions --- equilibria, linearize, and hunt for a Lyapunov
+function (energy, when the system is mechanical) or a first
+integral whose level sets trap trajectories. The weekend
+problem walks the whole method through the pendulum.
+\end{method}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=11cm, height=6cm,
+    xmin=-7.2, xmax=7.2, ymin=-2.9, ymax=2.9,
+    xtick={-6.2832, -3.1416, 0, 3.1416, 6.2832},
+    xticklabels={$-2\pi$, $-\pi$, $0$, $\pi$, $2\pi$},
+    ytick={-2,0,2}]
+  % oscillations: E<1 : y = ±sqrt(2(E+cos x)), E = -0.3, 0.5
+  \foreach \E in {-0.3, 0.5}{
+    \addplot[omDef, samples=200, domain=-7.2:7.2]
+      {sqrt(max(0, 2*(\E + cos(deg(x)))))};
+    \addplot[omDef, samples=200, domain=-7.2:7.2]
+      {-sqrt(max(0, 2*(\E + cos(deg(x)))))};
+  }
+  % separatrix E = 1
+  \addplot[omThm, thick, samples=300, domain=-7.2:7.2]
+    {sqrt(max(0, 2*(1 + cos(deg(x)))))};
+  \addplot[omThm, thick, samples=300, domain=-7.2:7.2]
+    {-sqrt(max(0, 2*(1 + cos(deg(x)))))};
+  % rotations E > 1
+  \foreach \E in {1.6, 2.4}{
+    \addplot[omProp, samples=200, domain=-7.2:7.2]
+      {sqrt(2*(\E + cos(deg(x))))};
+    \addplot[omProp, samples=200, domain=-7.2:7.2]
+      {-sqrt(2*(\E + cos(deg(x))))};
+  }
+\end{axis}
+\end{tikzpicture}
+
+{\small Phase portrait of the pendulum $x'' = -\sin x$ in the
+$(x, x')$-plane: level curves of the energy $E = \frac{x'^2}2
+- \cos x$. Closed curves (blue): oscillations, $E < 1$;
+running curves (orange): full rotations, $E > 1$; between
+them the \emph{separatrix} (red), $E = 1$, connecting the
+unstable equilibria $(\pm\pi, 0)$. The weekend problem proves
+everything this picture suggests.}
+\end{omfigure}
+
+\section{Exercises}
+
+\begin{exercise}[$\star$]\label{exo:b3:ode:1}
+Solve explicitly and determine the maximal interval:
+(a) $x' = x^2$, $x(0) = 1$; (b) $x' = 1 + x^2$, $x(0) = 0$;
+(c) $x' = x(1-x)$, $x(0) = \frac12$. Reconcile each answer
+with \cref{thm:b3:ode:maximal}(2) and
+\cref{cor:b3:ode:globallinear}.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b3:ode:2}
+Let $x, y$ solve $x' = f(t,x)$ with $f$ globally
+$L$-Lipschitz in $x$ on $\R\times\R^d$.
+(a) Prove $\norm{x(t) - y(t)} \leq \norm{x(0) -
+y(0)}\eu^{L\abs t}$, and show by example (linear!) that the
+factor $\eu^{L\abs t}$ is attained.
+(b) Deduce that the flow map $x_0 \mapsto x(t; x_0)$ is
+continuous, in fact Lipschitz on bounded sets.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:ode:3}
+Show that each of the following has all maximal solutions
+global on $\R$, quoting the right theorem:
+(a) $x' = \sin(tx)$;
+(b) $x' = \frac{t\,x}{1 + x^2}$;
+(c) $x'' + q(t)x = 0$ with $q$ continuous (convert to a
+first-order system);
+(d) $x' = A(t)x$ with $A$ continuous and bounded --- and give
+the Gr\"onwall bound on $\norm{x(t)}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:ode:4}
+(a) Compute $\eu^{tA}$ for
+$A = \bigl(\begin{smallmatrix}0 & -1\\ 1 &
+0\end{smallmatrix}\bigr)$,
+$\bigl(\begin{smallmatrix}\lambda & 1\\ 0 &
+\lambda\end{smallmatrix}\bigr)$, and
+$\bigl(\begin{smallmatrix}0 & 1\\ 1 &
+0\end{smallmatrix}\bigr)$.
+(b) Solve the forced oscillator $x'' + x = \cos(\omega t)$
+by Duhamel (system form), for $\omega \neq 1$ and $\omega =
+1$: resonance appears as the secular term $t\sin t$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:ode:5}
+For the scalar equation $x'' + p(t)x' + q(t)x = 0$:
+(a) Show that the Wronskian $w = x_1x_2' - x_1'x_2$ of two
+solutions satisfies $w' = -p\,w$ (Abel), and deduce that two
+solutions with $w \neq 0$ somewhere form a basis.
+(b) Given one nonvanishing solution $x_1$, find the general
+solution by \emph{reduction of order}: set $x_2 = x_1\int
+\frac{\eu^{-\int p}}{x_1^2}$ and verify. Apply to $t^2x'' -
+2x = 0$ on $\intoo0{+\infty}$ with $x_1(t) = t^2$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:ode:6}
+(Logistic) For $x' = x(1 - x)$: determine all equilibria and
+their stability (by \cref{thm:b3:ode:linearization} and
+directly); show every solution with $x(0) \in \intoo01$ is
+increasing, global, with limits $0$ and $1$ at $\mp\infty$;
+and solve explicitly to confirm. Show more generally that
+scalar autonomous solutions are monotone, and conclude:
+no nonconstant periodic solutions in dimension $1$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:ode:7}
+(First integrals) Let $H \colon \Omega \to \R$ be $\mathcal
+C^1$ and consider the planar Hamiltonian system $x' =
+\partial_yH$, $y' = -\partial_xH$.
+(a) Show that $H$ is constant along solutions.
+(b) For $H = \frac{y^2}2 + \frac{x^4}4$: show all solutions
+are global and bounded, and that the origin is stable
+(Lyapunov: $H$) though the linearization
+($\bigl(\begin{smallmatrix}0&1\\0&0\end{smallmatrix}\bigr)$)
+is \emph{not} asymptotically stable: linearization can be
+inconclusive.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:ode:8}
+(Damped pendulum) $x'' + cx' + \sin x = 0$, $c > 0$; system:
+$x' = y$, $y' = -\sin x - cy$.
+(a) Show $V(x, y) = \frac{y^2}2 + 1 - \cos x$ satisfies $\dot
+V = -cy^2 \leq 0$: the origin is stable.
+(b) $\dot V$ vanishes on the whole axis $y = 0$: Lyapunov's
+strict criterion fails. Prove asymptotic stability anyway,
+by linearization (\cref{thm:b3:ode:linearization}): compute
+the eigenvalues of the linearized matrix at $(0,0)$ and check
+$\operatorname{Re} < 0$ for every $c > 0$.
+(c) What happens at the equilibrium $(\pi, 0)$? Compute the
+linearization and conclude (one eigenvalue positive:
+instability --- you may use the instability statement
+informally or produce an explicit escaping solution of the
+linear system).
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:ode:9}
+(Uniqueness frontier) For $\alpha \in \intoo01$, show that
+the problem $x' = \abs x^{\alpha}$, $x(0) = 0$ has infinitely
+many solutions (adapt \cref{pb:b3:complete:1}, Part III).
+Show on the contrary that for $\alpha = 1$ (i.e.\ $x' = \abs
+x$) the solution through $0$ is unique, and identify
+precisely which hypothesis of
+\cref{thm:b3:ode:cauchylipschitz} distinguishes the two
+cases.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:ode:10}
+(A priori bounds trap solutions) Let $F \colon \R^d \to \R^d$
+be locally Lipschitz with $\langle F(x), x\rangle \leq 0$
+whenever $\norm x \geq R$.
+(a) Show that the closed ball $\bar B(0, R)$ is positively
+invariant: solutions starting inside stay inside for $t \geq
+0$. \emph{(If $\norm{x(t_2)} > R$, consider the last time
+$t_1 < t_2$ with $\norm{x(t_1)} = R$ and study
+$\frac{\dd}{\dd t}\norm{x(t)}^2$ on $\intcc{t_1}{t_2}$.)}
+(b) Deduce global forward existence for data in the ball.
+Then treat the gradient system $x' = -\nabla G(x)$, $G \in
+\mathcal C^2$ with $G(x) \to +\infty$ as $\norm x \to
+\infty$: show $G$ decreases along solutions, that each
+solution stays in the (bounded) sublevel set $\{G \leq
+G(x_0)\}$, and conclude global forward existence.
+\end{exercise}
+
+\section{Problem: the pendulum, completely solved}
+
+\begin{problem}[{Weekend problem --- oscillations, rotations,
+separatrix, and the period}]\label{pb:b3:ode:1}
+The pendulum equation $x'' = -\sin x$ --- as a system: $x' =
+y$, $y' = -\sin x$ on $\R^2$ --- is the drosophila of
+dynamics: simple to write, impossible to solve by elementary
+formulas, yet completely understandable by the qualitative
+method. Let $E(x, y) = \frac{y^2}2 - \cos x$ (the
+\emph{energy}).
+
+\medskip
+\noindent\textbf{Part I --- Global structure.}
+\begin{enumerate}
+  \item Show that all maximal solutions are global
+        ($\R$-defined): use $\dot E = 0$ and
+        \cref{thm:b3:ode:maximal}. Equilibria: $(k\pi, 0)$;
+        classify their linearizations (center-type for even
+        $k$, saddle for odd $k$).
+  \item Show that the trajectories are contained in the level
+        sets $\{E = E_0\}$, and sketch/describe them by the
+        value of $E_0 \in \intco{-1}{+\infty}$: $E_0 = -1$
+        (equilibria), $-1 < E_0 < 1$ (closed curves around
+        $(2k\pi, 0)$), $E_0 = 1$ (the separatrix through
+        $(\pm\pi, 0)$), $E_0 > 1$ (graphs over $x$:
+        rotations).
+  \item Prove that the bottom equilibrium $(0,0)$ is stable
+        but \emph{not} asymptotically stable. \emph{(Lyapunov
+        with $V = E + 1$; non-asymptotic: energy conservation
+        traps orbits on level curves away from the
+        origin.)}
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part II --- Oscillations and their period.}
+Fix $-1 < E_0 < 1$ and write $E_0 = -\cos a$ with $a \in
+\intoo0\pi$ (the amplitude).
+\begin{enumerate}[resume]
+  \item Show that the solution with $x(0) = a$, $y(0) = 0$
+        oscillates: $x(t) \in \intcc{-a}a$, and the orbit is
+        the closed curve $y^2 = 2(\cos x - \cos a)$. Justify
+        that the solution is periodic: the orbit is a compact
+        curve without equilibria, traversed at speed bounded
+        below --- make this an argument (the solution returns
+        to its initial point in finite time, then uniqueness
+        forces periodicity).
+  \item Establish the period formula
+        \[
+        T(a) = 4\int_0^{a}\frac{\dd x}{\sqrt{2(\cos x -
+        \cos a)}}
+        \]
+        \emph{(on a quarter-orbit, $y = \frac{\dd x}{\dd t} >
+        0$ and separate variables; justify the improper
+        convergence at $x = a$)}.
+  \item (Small oscillations) Substitute $\sin\frac x2 =
+        \sin\frac a2\,\sin\varphi$ and show
+        \[
+        T(a) = 4\int_0^{\pi/2}\frac{\dd\varphi}{\sqrt{1 -
+        k^2\sin^2\varphi}},
+        \qquad k = \sin\frac a2
+        \]
+        (a complete elliptic integral). Deduce by dominated
+        convergence that $T(a) \to 2\pi$ as $a \to 0^+$: the
+        harmonic limit, independent of amplitude ---
+        Galileo's approximate isochronism, with its exact
+        correction $T(a) = 2\pi\bigl(1 + \frac{k^2}4 +
+        O(k^4)\bigr)$ (expand the integrand and integrate
+        term by term, justifying by normal convergence).
+  \item Show that $T(a) \to +\infty$ as $a \to \pi^-$
+        \emph{(bound the integrand below near $\varphi =
+        \frac\pi2$ when $k \to 1$, or apply monotone
+        convergence)}: approaching the separatrix, the
+        pendulum slows without bound.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part III --- The separatrix.}
+\begin{enumerate}[resume]
+  \item For $E_0 = 1$, $y = 2\cos\frac x2$ on the upper
+        branch: separate variables and integrate to find the
+        explicit solution
+        \[
+        x(t) = 4\arctan\bigl(\eu^{t}\bigr) - \pi
+        \]
+        (with $x(0) = 0$, $y(0) = 2$). Verify directly that
+        it solves the pendulum equation, and compute its
+        limits and the limits of $y(t)$ as $t \to
+        \pm\infty$.
+  \item Conclude: the separatrix orbit connects the saddle
+        $(-\pi, 0)$ (as $t \to -\infty$) to the saddle
+        $(\pi, 0)$ (as $t \to +\infty$) but reaches neither
+        in finite time --- consistent with uniqueness (why
+        would reaching a saddle in finite time contradict
+        \cref{cor:b3:ode:uniqueness}?).
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part IV --- Rotations, and the full
+picture.}
+\begin{enumerate}[resume]
+  \item For $E_0 > 1$: show $y$ never vanishes, $x$ is
+        strictly monotone and global with $x(t) \to
+        \pm\infty$, and $t \mapsto y(t)$ is periodic with
+        period
+        \[
+        \tau(E_0) = \int_{-\pi}^{\pi}
+        \frac{\dd x}{\sqrt{2(E_0 + \cos x)}} .
+        \]
+  \item Assemble the complete phase portrait (the chapter's
+        figure) with full justification of each feature, and
+        write a ten-line summary of the method: energy,
+        level sets, compactness, uniqueness --- how each
+        theorem of the chapter entered. Where did we ever
+        need a formula for the general solution?
+\end{enumerate}
+\end{problem}

@@ -12,6 +12,7 @@ $out_dir = 'build';
     'one_math_book_2_high_school_nl.tex',
     'one_math_book_3_university_year_1.tex',
     'one_math_book_4_university_year_2.tex',
+    'one_math_book_5_university_year_3.tex',
 );
 # The books' many TikZ/pgfplots figures exceed pdfTeX's default main
 # memory (5M words); raise the runtime limits.

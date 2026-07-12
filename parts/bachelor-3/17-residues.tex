@@ -1,0 +1,627 @@
+\chapter{Laurent Series and the Residue Theorem}
+\label{ch:b3:residues}
+
+What happens to a holomorphic function near a point where it
+is \emph{not} defined? The answer is a complete trichotomy ---
+removable point, pole, or essential singularity --- read off a
+two-sided power series, the Laurent expansion. One coefficient
+of that expansion, the \emph{residue}, controls every contour
+integral around the singularity: the residue theorem converts
+hard definite integrals into finite algebra, counts zeros of
+functions (argument principle, Rouch\'e), and proves the open
+mapping theorem. We first upgrade Cauchy's theorem from
+star-shaped domains to its definitive, homology-free form ---
+Dixon's elegant argument --- so that all contours with
+winding number zero around the complement become available.
+
+\section{The global Cauchy theorem}
+
+A \emph{cycle}\index{cycle} $\Gamma$ is a finite formal sum of
+closed paths $\gamma_1, \dots, \gamma_m$; integrals and
+indices along $\Gamma$ are the corresponding sums, and
+$\operatorname{im}\Gamma = \bigcup\operatorname{im}\gamma_j$.
+
+\begin{theorem}[Cauchy, global form]
+\label{thm:b3:residues:globalcauchy}
+Let $\Omega \subseteq \C$ be open, $f \in \mathcal H(\Omega)$,
+and $\Gamma$ a cycle in $\Omega$ such that
+\[
+\operatorname{Ind}_\Gamma(w) = 0
+\qquad\text{for every } w \notin \Omega .
+\]
+Then, for all $z \in \Omega\setminus\operatorname{im}\Gamma$,
+\[
+\frac1{2\iu\pi}\int_\Gamma\frac{f(w)}{w - z}\,\dd w =
+\operatorname{Ind}_\Gamma(z)\,f(z),
+\qquad\text{and}\qquad
+\int_\Gamma f(w)\,\dd w = 0 .
+\]
+\index{Cauchy's theorem (global)}
+\end{theorem}
+
+\begin{proof}[Proof (Dixon)]
+Define $g \colon \Omega\times\Omega \to \C$ by
+\[
+g(z, w) = \begin{cases}
+\dfrac{f(w) - f(z)}{w - z} & w \neq z,\\[4pt]
+f'(z) & w = z .
+\end{cases}
+\]
+\emph{$g$ is continuous}: off the diagonal, clear. Near a
+diagonal point $(a, a)$, expand $f$ in a power series at $a$
+(\cref{thm:b3:holomorphic:analytic}): $f(w) - f(z) =
+\sum_{n\geq1}c_n\bigl((w-a)^n - (z-a)^n\bigr)$, and dividing
+each term by $w - z$ (factorization of $u^n - v^n$) gives, for
+$z, w \in D(a, r)$,
+\[
+g(z, w) =
+\sum_{n\geq1}c_n\sum_{j=0}^{n-1}(w-a)^{\,j}(z-a)^{\,n-1-j},
+\]
+valid also on the diagonal (each inner sum becomes
+$n(z-a)^{n-1}$, summing to $f'(z)$). For $r$ small the series
+converges uniformly on $D(a,r)^2$
+($\abs{\text{term}} \leq n\abs{c_n}r^{n-1}$, summable inside
+the radius): the sum is continuous.
+
+Set $h(z) = \frac1{2\iu\pi}\int_\Gamma g(z, w)\,\dd w$ on
+$\Omega$: continuous (uniform continuity of $g$ on compacts),
+and holomorphic --- by Morera
+(\cref{thm:b3:holomorphic:weierstrassconv}'s criterion): for a
+triangle $T \subseteq \Omega$, Fubini gives $\int_{\partial
+T}h = \frac1{2\iu\pi}\int_\Gamma\bigl(\int_{\partial T}g(z,
+w)\dd z\bigr)\dd w = 0$, the inner integral vanishing because
+$z \mapsto g(z, w)$ is holomorphic on $\Omega$ (at $z = w$ the
+singularity is removable: $g$ is continuous there and
+holomorphic elsewhere --- the extension argument of
+\cref{thm:b3:holomorphic:formula}'s proof).
+
+On the open set $\Omega' = \{z \notin \operatorname{im}\Gamma
+: \operatorname{Ind}_\Gamma(z) = 0\}$, define $h_1(z) =
+\frac1{2\iu\pi}\int_\Gamma\frac{f(w)}{w - z}\dd w$:
+holomorphic on $\Omega'$ (Morera or differentiation under the
+integral). For $z \in \Omega\cap\Omega'$:
+\[
+h(z) = \frac1{2\iu\pi}\int_\Gamma\frac{f(w)}{w-z}\dd w
+- f(z)\operatorname{Ind}_\Gamma(z) = h_1(z) .
+\]
+By hypothesis $\Omega\cup\Omega' = \C$ ($w \notin \Omega
+\Rightarrow \operatorname{Ind}_\Gamma(w) = 0$), so $h$ and
+$h_1$ glue to an entire function $H$. Since the unbounded
+component of the complement of $\operatorname{im}\Gamma$ lies
+in $\Omega'$ and $h_1(z) \to 0$ as $\abs z \to \infty$ (ML
+bound), $H$ is bounded and tends to $0$: Liouville
+(\cref{cor:b3:holomorphic:liouville}) gives $H \equiv 0$. Thus
+$h \equiv 0$ on $\Omega$, which is the integral formula.
+Applying it, for fixed $a \in
+\Omega\setminus\operatorname{im}\Gamma$, to $\tilde f(w) =
+(w - a)f(w)$ at $z = a$:
+\[
+\frac1{2\iu\pi}\int_\Gamma f(w)\dd w =
+\frac1{2\iu\pi}\int_\Gamma \frac{\tilde f(w)}{w - a}\dd w =
+\operatorname{Ind}_\Gamma(a)\,\tilde f(a) = 0 .
+\]
+\end{proof}
+
+\section{Laurent series and isolated singularities}
+
+\begin{theorem}[Laurent expansion]\label{thm:b3:residues:laurent}
+Let $f$ be holomorphic on the annulus $A = \{r < \abs{z - a} <
+R\}$ ($0 \leq r < R \leq \infty$). Then\index{Laurent series}
+\[
+f(z) = \sum_{n\in\Z}c_n\,(z - a)^n
+\qquad\text{on } A,
+\qquad
+c_n = \frac1{2\iu\pi}\int_{C_\rho}\frac{f(w)}{(w -
+a)^{n+1}}\,\dd w
+\]
+for any $r < \rho < R$ (independent of $\rho$), the two
+half-series converging normally on compact subannuli. The
+expansion is unique.
+\end{theorem}
+
+\begin{proof}
+Fix $r < \rho_1 < \abs{z - a} < \rho_2 < R$ and let $\Gamma =
+C_{\rho_2} - C_{\rho_1}$ (outer counterclockwise, inner
+clockwise): a cycle in $A$ with
+$\operatorname{Ind}_\Gamma(w) = 0$ for all $w \notin A$
+(points inside the small disc: $1 - 1 = 0$; outside the big
+one: $0 - 0$). By \cref{thm:b3:residues:globalcauchy},
+$\operatorname{Ind}_\Gamma(z) = 1 - 0 = 1$ gives
+\[
+f(z) = \frac1{2\iu\pi}\int_{C_{\rho_2}}\frac{f(w)}{w - z}\dd
+w - \frac1{2\iu\pi}\int_{C_{\rho_1}}\frac{f(w)}{w - z}\dd w .
+\]
+Expand the first kernel as in
+\cref{thm:b3:holomorphic:analytic} (powers of $\frac{z -
+a}{w - a}$, modulus $< 1$): the nonnegative part
+$\sum_{n\geq0}c_n(z-a)^n$. In the second, expand the other
+way: $\frac{-1}{w - z} = \frac1{(z-a)(1 - \frac{w - a}{z -
+a})} = \sum_{m\geq0}\frac{(w-a)^m}{(z - a)^{m+1}}$, normally
+convergent on $C_{\rho_1}$: the negative part
+$\sum_{n\leq-1}c_n(z-a)^n$ with the stated coefficients (index
+$n = -m-1$). Independence of $\rho$: the coefficient integrals
+over $C_{\rho}$ and $C_{\rho'}$ differ by
+$\int_\Gamma$ over a null-index cycle of the holomorphic
+$\frac{f(w)}{(w-a)^{n+1}}$ in $A$: zero, by
+\cref{thm:b3:residues:globalcauchy} again. Uniqueness:
+integrate $\sum c_n(z-a)^n$ against $(z - a)^{-m-1}$ over
+$C_\rho$ term by term (normal convergence): only $n = m$
+survives.
+\end{proof}
+
+\begin{definition}\label{def:b3:residues:singularities}
+If $f$ is holomorphic on a punctured disc $D(a, R)\setminus
+\{a\}$, expand by Laurent ($r = 0$). Three exclusive
+cases:\index{isolated singularity}
+\begin{itemize}
+  \item all $c_n = 0$ for $n < 0$: \emph{removable
+        singularity} (the nonnegative series extends $f$
+        holomorphically to $a$);
+  \item $c_n \neq 0$ for finitely many, at least one, $n < 0$:
+        a \emph{pole} of order $m = -\min\{n : c_n \neq 0\}$;
+        equivalently $f = g/(z-a)^m$, $g$ holomorphic, $g(a)
+        \neq 0$; equivalently $\abs{f(z)} \to \infty$ as $z\to
+        a$;
+  \item infinitely many negative $c_n \neq 0$:
+        \emph{essential singularity}.
+\end{itemize}
+The \emph{residue}\index{residue} is
+$\operatorname{Res}(f, a) = c_{-1}$. A function holomorphic on
+$\Omega$ minus a set of poles is
+\emph{meromorphic}\index{meromorphic function} on $\Omega$.
+\end{definition}
+
+\begin{theorem}[Riemann; Casorati--Weierstrass]
+\label{thm:b3:residues:riemanncw}
+Let $f$ be holomorphic on $D(a,R)\setminus\{a\}$.
+\begin{enumerate}
+  \item (Riemann) If $f$ is \emph{bounded} near $a$, the
+        singularity is removable.\index{removable singularity}
+  \item (Casorati--Weierstrass) If $a$ is essential, then
+        $f\bigl(D(a,\varepsilon)\setminus\{a\}\bigr)$ is dense
+        in $\C$ for every $\varepsilon$.
+        \index{Casorati--Weierstrass theorem}
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) For $n < 0$ and $\rho \to 0$: $\abs{c_n} \leq
+M\rho^{-n-1}\cdot\rho\cdot\rho^{-\,n}\dots$ by ML on
+$C_\rho$: $\abs{c_n} \leq \frac{1}{2\pi}\,2\pi\rho\cdot
+M\rho^{-(n+1)} = M\rho^{-n} \to 0$ (as $-n > 0$): all
+negative coefficients vanish.
+(2) If some value $b$ were not approached: $\abs{f - b} \geq
+\delta$ near $a$, so $g = 1/(f - b)$ is holomorphic and
+bounded near $a$: removable (1), $g$ extends with value $c$.
+If $c \neq 0$, $f = b + 1/g$ is bounded near $a$: removable
+--- excluded. If $c = 0$, $g$ has a zero of finite order $m$
+at $a$ (\cref{thm:b3:holomorphic:identity}; $g \not\equiv 0$),
+and $f = b + 1/g$ has a pole of order $m$: excluded again.
+\end{proof}
+
+\section{The residue theorem}
+
+\begin{theorem}[Residue theorem]\label{thm:b3:residues:residue}
+Let $\Omega$ be open, $S \subseteq \Omega$ finite, $f \in
+\mathcal H(\Omega\setminus S)$, and $\Gamma$ a cycle in
+$\Omega\setminus S$ with $\operatorname{Ind}_\Gamma(w) = 0$
+for every $w \notin \Omega$. Then\index{residue theorem}
+\[
+\frac{1}{2\iu\pi}\int_\Gamma f(z)\,\dd z
+= \sum_{a\in S}\operatorname{Ind}_\Gamma(a)\,
+\operatorname{Res}(f, a) .
+\]
+\end{theorem}
+
+\begin{proof}
+For each $a \in S$, let $P_a(z) = \sum_{n\leq-1}c_n^{(a)}(z -
+a)^n$ be the principal part of $f$ at $a$: a series
+converging on $\C\setminus\{a\}$ (its radius in $1/(z-a)$ is
+infinite: the Laurent tail converges for all small $\abs{z-a}$
+hence, being a power series in $(z-a)^{-1}$, everywhere), and
+holomorphic there. Then $g = f - \sum_{a\in S}P_a$ has
+removable singularities at each point of $S$ (its Laurent
+expansion at $a$ has no negative part: the other $P_{a'}$ are
+holomorphic at $a$), so $g$ extends holomorphically to
+$\Omega$, and \cref{thm:b3:residues:globalcauchy} gives
+$\int_\Gamma g = 0$. It remains to integrate each $P_a$:
+term-by-term (normal convergence on the compact
+$\operatorname{im}\Gamma$, which avoids $a$),
+\[
+\frac1{2\iu\pi}\int_\Gamma(z - a)^n\,\dd z = 0 \ (n \leq -2:
+\text{primitive } \tfrac{(z-a)^{n+1}}{n+1}),
+\qquad
+\frac1{2\iu\pi}\int_\Gamma\frac{\dd z}{z - a} =
+\operatorname{Ind}_\Gamma(a),
+\]
+so $\frac1{2\iu\pi}\int_\Gamma P_a =
+c_{-1}^{(a)}\operatorname{Ind}_\Gamma(a)$. Sum over $a$.
+\end{proof}
+
+\begin{method}[Computing residues]\label{met:b3:residues:compute}
+Simple pole: $\operatorname{Res}(f, a) = \lim_{z\to a}(z -
+a)f(z)$; for $f = g/h$ with $g(a) \neq 0$, $h(a) = 0$, $h'(a)
+\neq 0$: $\operatorname{Res} = g(a)/h'(a)$. Pole of order $m$:
+$\operatorname{Res}(f, a) = \frac1{(m-1)!}\lim_{z\to
+a}\bigl((z-a)^mf(z)\bigr)^{(m-1)}$. Essential singularities:
+expand and read $c_{-1}$ (e.g.\ from known series). Always
+verify which poles the contour actually encircles, and with
+which index.
+\end{method}
+
+\begin{example}[The four classical integral types]
+\label{ex:b3:residues:integrals}
+(a) \emph{Rational over $\R$}: for $\int_\R\frac{\dd x}{1 +
+x^4}$, close with a large semicircle $S_R$ in the upper
+half-plane: the integrand is $O(R^{-4})$ there, so
+$\int_{S_R} \to 0$ (ML), and the residue theorem with the
+poles $\eu^{\iu\pi/4}, \eu^{3\iu\pi/4}$ (simple, residues
+$\frac1{4z^3} = \frac{z}{4z^4} = -\frac z4$ at a pole) gives
+\[
+\int_\R\frac{\dd x}{1 + x^4}
+= 2\iu\pi\Bigl(-\frac{\eu^{\iu\pi/4}}4 -
+\frac{\eu^{3\iu\pi/4}}4\Bigr)
+= \frac{\pi}{\sqrt2} .
+\]
+(b) \emph{Fourier type}: for $t \geq 0$,
+$\int_\R\frac{\eu^{\iu tx}}{1 + x^2}\dd x =
+2\iu\pi\operatorname{Res}\bigl(\tfrac{\eu^{\iu tz}}{1+z^2},
+\iu\bigr) = 2\iu\pi\frac{\eu^{-t}}{2\iu} = \pi\eu^{-t}$ ---
+the upper semicircle works because $\abs{\eu^{\iu tz}} =
+\eu^{-t\operatorname{Im}z} \leq 1$ there; taking real parts:
+$\int_\R\frac{\cos(tx)}{1+x^2}\dd x = \pi\eu^{-\abs t}$,
+settling \cref{exo:b3:lebesgue:10}'s admitted formula.
+(c) \emph{Trigonometric over a period}: substitute $z =
+\eu^{\iu t}$, $\cos t = \frac{z + z^{-1}}2$, $\dd t =
+\frac{\dd z}{\iu z}$: $\int_0^{2\pi}\frac{\dd t}{a + \cos t}$
+($a > 1$) becomes a residue count inside the unit circle
+(\cref{exo:b3:residues:2}).
+(d) \emph{Series}: pair $f$ with $\pi\cot(\pi z)$, whose poles
+are the integers with residue $1$: the weekend problem sums
+$\sum n^{-2}$ and $\sum n^{-4}$ this way.
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=1.15]
+  \draw[->] (-2.5,0) -- (2.6,0) node[right, font=\small]
+    {$\operatorname{Re}$};
+  \draw[->] (0,-0.5) -- (0,2.5) node[above, font=\small]
+    {$\operatorname{Im}$};
+  \draw[omThm, very thick, ->] (-2,0) -- (0.3,0);
+  \draw[omThm, very thick] (0.3,0) -- (2,0);
+  \draw[omThm, very thick] (2,0) arc (0:90:2);
+  \draw[omThm, very thick, ->] (2,0) arc (0:50:2);
+  \draw[omThm, very thick] (0,2) arc (90:180:2);
+  \node[omThm, font=\small] at (1.75,1.55) {$S_R$};
+  \node[font=\small] at (2.2,-0.25) {$R$};
+  \node[font=\small] at (-2.15,-0.25) {$-R$};
+  \fill[omDef] (45:1.19) circle (1.6pt)
+    node[above right, font=\small] {$\eu^{\iu\pi/4}$};
+  \fill[omDef] (135:1.19) circle (1.6pt)
+    node[above left, font=\small] {$\eu^{3\iu\pi/4}$};
+  \fill[black!40] (-45:1.19) circle (1.6pt);
+  \fill[black!40] (-135:1.19) circle (1.6pt);
+\end{tikzpicture}
+
+{\small The semicircle contour for $\int_\R\frac{\dd x}{1 +
+x^4}$: as $R \to \infty$ the arc contributes $O(R^{-3})$, and
+the residue theorem counts the two enclosed poles (blue). The
+two lower poles (gray) are outside: index $0$.}
+\end{omfigure}
+
+\section{The argument principle and Rouch\'e's theorem}
+
+\begin{theorem}[Argument principle]
+\label{thm:b3:residues:argument}
+Let $f$ be meromorphic on $\Omega$, with zeros $z_j$ (orders
+$m_j$) and poles $p_k$ (orders $\mu_k$), and $\gamma$ a closed
+path in $\Omega$ avoiding them all, with
+$\operatorname{Ind}_\gamma = 0$ off $\Omega$. Then
+\index{argument principle}
+\[
+\frac1{2\iu\pi}\int_\gamma\frac{f'(z)}{f(z)}\,\dd z
+= \sum_j m_j\operatorname{Ind}_\gamma(z_j)
+- \sum_k \mu_k\operatorname{Ind}_\gamma(p_k)
+\]
+(finitely many terms are nonzero). For a simple
+counterclockwise contour, the integral counts zeros minus
+poles inside, with multiplicity --- and equals the winding
+number of the image path $f\circ\gamma$ around $0$.
+\end{theorem}
+
+\begin{proof}
+Near a zero of order $m$: $f = (z-a)^mg$, $g(a) \neq 0$, so
+$\frac{f'}f = \frac m{z - a} + \frac{g'}g$ with the second
+term holomorphic near $a$: a simple pole of residue $m$. Near
+a pole of order $\mu$: $f = (z-a)^{-\mu}g$ gives residue
+$-\mu$. Elsewhere $\frac{f'}f$ is holomorphic. (The zeros and
+poles with nonzero index lie in a compact region encircled by
+$\gamma$; by the identity theorem they are finite in number
+there, $f \not\equiv 0$.) Apply
+\cref{thm:b3:residues:residue}. The last remark:
+$\frac1{2\iu\pi}\int_\gamma\frac{f'}f =
+\frac1{2\iu\pi}\int_{f\circ\gamma}\frac{\dd w}w =
+\operatorname{Ind}_{f\circ\gamma}(0)$ (substitute $w =
+f(\gamma(t))$).
+\end{proof}
+
+\begin{theorem}[Rouch\'e]\label{thm:b3:residues:rouche}
+Let $f, g$ be holomorphic on $\Omega$, and $\gamma$ a closed
+path with $\operatorname{Ind}_\gamma \in \{0,1\}$, zero off
+$\Omega$ (a simple contour). If\index{Rouch\'e's theorem}
+\[
+\abs{g(z)} < \abs{f(z)} \qquad \text{on }
+\operatorname{im}\gamma,
+\]
+then $f$ and $f + g$ have the same number of zeros (with
+multiplicity) in the region $\{\operatorname{Ind}_\gamma =
+1\}$.
+\end{theorem}
+
+\begin{proof}
+For $t \in \intcc01$, $f_t = f + tg$ has no zero on
+$\operatorname{im}\gamma$ ($\abs{f_t} \geq \abs f - \abs g >
+0$), so
+\[
+N(t) = \frac1{2\iu\pi}\int_\gamma
+\frac{f_t'(z)}{f_t(z)}\,\dd z
+\]
+is well defined; it counts the zeros in the enclosed region
+(\cref{thm:b3:residues:argument}; no poles). $N$ is
+continuous in $t$ (the integrand is jointly continuous, the
+denominators uniformly bounded below --- dominated
+convergence) and integer-valued: constant. $N(0) = N(1)$.
+\end{proof}
+
+\begin{corollary}[Open mapping theorem]
+\label{cor:b3:residues:openmapping}
+A nonconstant holomorphic function on a connected open set is
+an open map. In particular (again) the maximum principle
+holds, and a holomorphic bijection has holomorphic
+inverse.\index{open mapping theorem (holomorphic)}
+\end{corollary}
+
+\begin{proof}
+Let $f(a) = b$; $f - b$ has a zero of some finite order $m
+\geq 1$ at $a$ (identity theorem: $f \not\equiv b$). Choose
+$r$ with $f - b$ zero-free on $\bar D(a, r)\setminus\{a\}$
+(isolated zeros) and let $\delta = \min_{\abs{z - a} =
+r}\abs{f(z) - b} > 0$. For $\abs{w - b} < \delta$: on the
+circle, $\abs{(b - w)} < \delta \leq \abs{f - b}$, so
+Rouch\'e ($f - b$ versus constant $b - w$) says $f - w$ has
+exactly $m$ zeros in $D(a, r)$: every such $w$ is attained
+--- $f(D(a,r)) \supseteq D(b, \delta)$: open. Maximum
+principle: an interior maximum of $\abs f$ is impossible for
+a nonconstant $f$, its image around $f(a)$ containing points
+of larger modulus. Inverse: a holomorphic bijection $f$ is
+open, so $f^{-1}$ is continuous; the zero of $f - f(a)$ at
+$a$ is simple ($m \geq 2$ would give $m$ preimages of nearby
+values --- distinct ones, since $f'$ vanishes only at
+isolated points, so near $a$ the $m$ zeros of $f - w$ are
+simple and distinct for generic small $w$: contradiction
+with injectivity); then $f'(a) \neq 0$ and the difference
+quotient of $f^{-1}$ converges: $\bigl(f^{-1}\bigr)'(b) =
+1/f'(a)$.
+\end{proof}
+
+\section{Exercises}
+
+\begin{exercise}[$\star$]\label{exo:b3:residues:1}
+Classify the singularity at $0$ and compute the residue:
+\[
+\frac{\sin z}{z},\qquad
+\frac{\eu^z - 1}{z^2},\qquad
+\frac{1}{z(z-1)^2},\qquad
+\frac{\cos z}{z^3},\qquad
+\eu^{1/z},\qquad
+\frac1{\sin z} .
+\]
+Also give the residue of the third at $z = 1$ and of the last
+at $z = \pi$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b3:residues:2}
+For $a > 1$ compute, via $z = \eu^{\iu t}$:
+\[
+\int_0^{2\pi}\frac{\dd t}{a + \cos t}
+= \frac{2\pi}{\sqrt{a^2 - 1}} .
+\]
+Check the limit behaviors $a \to 1^+$ and $a \to \infty$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:residues:3}
+Compute with semicircle contours, justifying the arc estimates:
+\[
+\int_\R\frac{x^2}{1 + x^6}\,\dd x = \frac\pi3,
+\qquad
+\int_\R\frac{\dd x}{(1 + x^2)^{2}} = \frac\pi2
+\quad\text{(re-deriving \cref{exo:b3:fouriertransform:3})}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:residues:4}
+Prove, for $t \geq 0$ and $a > 0$:
+\[
+\int_\R\frac{\cos(tx)}{x^2 + a^2}\,\dd x =
+\frac{\pi}{a}\,\eu^{-at},
+\]
+and deduce the Fourier transform of $x \mapsto \eu^{-a\abs
+x}$ by inversion --- comparing with
+\cref{exo:b3:fouriertransform:1}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:residues:5}
+Expand $f(z) = \dfrac1{(z-1)(z-2)}$ in Laurent series in each
+of the three regions $\abs z < 1$, $1 < \abs z < 2$, $\abs z >
+2$. Why do the three expansions differ? Explain why the
+coefficient of $z^{-1}$ in the second and third expansions is
+\emph{not} a residue of $f$ at $0$ ($f$ has no singularity
+there), and compute the actual residues of $f$, at $1$ and at
+$2$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:residues:6}
+(a) Show that $\eu^{1/z}$ has an essential singularity at $0$
+and verify Casorati--Weierstrass by hand: solve $\eu^{1/z} =
+w$ explicitly for any $w \neq 0$, exhibiting solutions
+arbitrarily close to $0$.
+(b) Show that $\abs{\eu^{1/z}}$ is unbounded on every
+punctured neighborhood of $0$ yet $\eu^{1/z}$ has no pole:
+which limit fails?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:residues:7}
+Count with Rouch\'e:
+(a) the zeros of $z^7 - 4z^3 + z - 1$ in $\abs z < 1$;
+(b) the zeros of $z^4 + 5z + 1$ in $\abs z < 1$ and in $1 <
+\abs z < 2$;
+(c) re-prove d'Alembert--Gauss: a monic degree-$n$ polynomial
+has $n$ zeros in some large disc \emph{(compare with
+$z^n$)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:residues:8}
+(Hurwitz) Let $f_n \to f$ uniformly on compacts, $f_n \in
+\mathcal H(\Omega)$, $\Omega$ connected, $f \not\equiv 0$.
+(a) Show that if all $f_n$ are zero-free, so is $f$.
+\emph{(If $f(a) = 0$: argument principle on a small circle
+around $a$, and \cref{thm:b3:holomorphic:weierstrassconv} to
+pass to the limit in $\int f_n'/f_n$.)}
+(b) Show that if all $f_n$ are injective, $f$ is injective or
+constant. \emph{(Apply (a) to $z \mapsto f_n(z) - f_n(w)$ on
+$\Omega\setminus\{w\}$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:residues:9}
+For $n \geq 2$, integrate $\frac1{1 + z^n}$ over the boundary
+of the sector $\{0 \leq \arg z \leq \frac{2\pi}n,\ \abs z
+\leq R\}$ and deduce
+\[
+\int_0^{+\infty}\frac{\dd x}{1 + x^n} =
+\frac{\pi}{n\,\sin(\pi/n)} .
+\]
+Verify $n = 2$ against $\arctan$, and the limit $n \to
+\infty$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:residues:10}
+Let $f$ be a rational function with $\deg(\text{denominator})
+\geq \deg(\text{numerator}) + 2$. Show that the sum of
+\emph{all} residues of $f$ is zero \emph{(integrate over
+larger and larger circles)}. Use this to recompute the partial
+fraction decomposition of $\frac1{z(z-1)(z-2)}$ with no linear
+algebra.
+\end{exercise}
+
+\section{Problem: \texorpdfstring{$\zeta(2k)$}{zeta(2k)} by the
+cotangent}
+
+\begin{problem}[{Weekend problem --- summing $\sum n^{-2k}$
+with residues}]\label{pb:b3:residues:1}
+The residue theorem sums series: pairing a rational function
+with $\pi\cot(\pi z)$, whose poles sit at the integers, turns
+$\sum_{n}f(n)$ into a residue count. We prove the method and
+compute $\zeta(2) = \frac{\pi^2}{6}$ and $\zeta(4) =
+\frac{\pi^4}{90}$ --- the values found by Fourier series in
+Year 2 and by operator traces in \cref{ch:b3:spectral}, now by
+contour integration.
+
+\medskip
+\noindent\textbf{Part I --- The cotangent kernel.}
+\begin{enumerate}
+  \item Show that $\pi\cot(\pi z)$ is meromorphic on $\C$ with
+        simple poles exactly at $z = n \in \Z$, each of
+        residue $1$ \emph{(compute
+        $\lim_{z\to n}(z-n)\pi\cot\pi z$)}.
+  \item Compute the beginning of the Laurent expansion at $0$:
+        \[
+        \pi\cot(\pi z) = \frac1z - \frac{\pi^2}{3}\,z -
+        \frac{\pi^4}{45}\,z^3 + O(z^5) ,
+        \]
+        by dividing the power series of $\cos$ by that of
+        $\sin$ (justify the division: $\frac{\sin\pi z}{\pi z}$
+        is holomorphic and nonzero near $0$, so its
+        reciprocal is holomorphic; identify coefficients
+        through order $3$).
+  \item Let $C_N$ be the boundary of the square with vertices
+        $(\pm1\pm\iu)(N + \frac12)$. Show that
+        $\abs{\cot(\pi z)} \leq 2$ on $C_N$ for every $N \geq
+        1$. \emph{(On vertical sides, $\cot(\pi(\pm(N +
+        \frac12) + \iu y)) = \mp\tan(\iu\pi y)$, of modulus
+        $\abs{\tanh(\pi y)} \leq 1$; on horizontal sides
+        $\abs y = N + \frac12$, bound
+        $\abs{\cot(\pi(x\pm\iu y))} \leq \coth(\pi y) \leq
+        \coth(\pi/2) < 1.1$.)}
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part II --- The summation theorem.}
+\begin{enumerate}[resume]
+  \item Let $f$ be rational, holomorphic at the integers,
+        with $\deg(\text{denom}) \geq \deg(\text{num}) + 2$.
+        Using the residue theorem on $C_N$ and the bound of
+        question 3, prove:
+        \[
+        \lim_{N\to\infty}\ \sum_{n = -N}^{N} f(n)
+        = -\sum_{p\ \text{pole of}\ f}
+        \operatorname{Res}\bigl(\pi\cot(\pi z)f(z),\,p\bigr).
+        \]
+  \item Where does the argument need the degree condition?
+        Show by example (take $f(z) = 1/(z + \frac12)$)
+        that for slower decay the symmetric limit
+        may still exist while the two-sided series diverges
+        --- and that the formula then computes the
+        \emph{principal value}.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part III --- The values.}
+\begin{enumerate}[resume]
+  \item Apply the method to $f(z) = 1/z^2$: here $f$ has its
+        pole \emph{at} an integer, so run the argument
+        directly --- integrate $g(z) = \frac{\pi\cot(\pi
+        z)}{z^2}$ over $C_N$, show the integral $\to 0$, and
+        compute $\operatorname{Res}(g, 0)$ from question 2.
+        Conclude:
+        \[
+        2\sum_{n\geq1}\frac1{n^2} = \frac{\pi^2}{3},
+        \qquad \zeta(2) = \frac{\pi^2}6 .
+        \]
+  \item Same with $g(z) = \frac{\pi\cot(\pi z)}{z^4}$:
+        compute $\operatorname{Res}(g, 0)$ and deduce
+        $\zeta(4) = \frac{\pi^4}{90}$.
+  \item Explain the general pattern: for every $k \geq 1$,
+        $\zeta(2k)$ is $-\frac12$ times the coefficient of
+        $z^{2k-1}$ in the Laurent expansion of $\pi\cot(\pi
+        z)$ at $0$ --- a rational multiple of $\pi^{2k}$.
+        Compute $\zeta(6)$ by pushing question 2's division
+        one step further. What does the method say about
+        $\zeta(3)$ --- and why does it say nothing?
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part IV --- The partial fraction expansion
+of the cotangent.}
+\begin{enumerate}[resume]
+  \item Fix $w \in \C\setminus\Z$ and apply the method of
+        Part II to $f(z) = \dfrac{1}{(z - w)(z + w)}$ ---
+        noting that $\pi\cot(\pi z)f(z)$ now has additional
+        simple poles at $\pm w$, whose residues must join the
+        count. Deduce the partial fraction expansion
+        \[
+        \pi\cot(\pi w) = \frac1w +
+        \sum_{n\geq1}\frac{2w}{w^2 - n^2},
+        \]
+        the series converging normally on compact subsets of
+        $\C\setminus\Z$.
+  \item Recover from this expansion, by expanding each term
+        in powers of $w$ (justify the interchange), the
+        \emph{same} Laurent coefficients as in question 2 ---
+        the circle closes: Euler's formula
+        $\sum\frac1{n^2} = \frac{\pi^2}6$ is the coefficient
+        of $w$ in the cotangent's two faces. Compare with the
+        Fourier-series proof (Year 2) and the trace proof
+        (\cref{pb:b3:spectral:1}): three theories, one
+        number.
+\end{enumerate}
+\end{problem}

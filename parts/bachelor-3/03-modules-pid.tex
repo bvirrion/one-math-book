@@ -1,0 +1,674 @@
+\chapter{Modules over a Principal Ideal Domain}\label{ch:b3:modules}
+
+Linear algebra over a \emph{ring} instead of a field: this small
+change of hypothesis produces one of algebra's great unification
+theorems. A module over $\Z$ is an abelian group; a module over
+$K[X]$ is a vector space equipped with an endomorphism. The
+structure theorem for finitely generated modules over a PID
+therefore classifies, in one stroke, all finitely generated
+abelian groups \emph{and} all endomorphisms up to similarity ---
+Jordan's reduction, which Year 2 obtained by delicate inductions,
+falls out as a corollary, together with its subtler sibling, the
+\emph{rational} canonical form, valid over every field. The
+computational engine is the Smith normal form, an arithmetic of
+matrices worthy of Euclid.
+
+Throughout, $A$ is a commutative ring, soon a PID; ``module''
+means $A$-module.
+
+\section{Modules, free modules}
+
+\begin{definition}\label{def:b3:modules:module}
+An \emph{$A$-module}\index{module} is an abelian group $(M, +)$
+with a scalar multiplication $A \times M \to M$ satisfying the
+vector-space axioms: $a(x + y) = ax + ay$, $(a + b)x = ax + bx$,
+$(ab)x = a(bx)$, $1x = x$. Submodules, quotients $M/N$, morphisms
+($A$-linear maps), direct sums $\bigoplus_i M_i$, and the
+isomorphism theorems are defined and proved word for word as for
+vector spaces and abelian groups; in particular $M/\ker f \cong
+\operatorname{im} f$ for a morphism $f$.
+\end{definition}
+
+\begin{example}\label{ex:b3:modules:examples}
+The three motivating cases.
+\begin{enumerate}
+  \item $A = K$ a field: modules are vector spaces.
+  \item $A = \Z$: modules are exactly abelian groups ($nx$ is
+        forced to be $x + \dots + x$), submodules are subgroups.
+  \item $A = K[X]$: a module is a $K$-vector space $V$ together
+        with the $K$-linear map $u\colon x \mapsto X\cdot x$ ---
+        conversely, every pair $(V, u)$ with $u \in \mathcal L(V)$
+        becomes a $K[X]$-module by $P \cdot x = P(u)(x)$. The
+        submodules are precisely the $u$-stable subspaces.
+\end{enumerate}
+An ideal of $A$ is exactly a submodule of $A$; a quotient ring
+$A/I$ is an $A$-module. Unlike vector spaces, modules can have
+\emph{torsion}: in $\Z/6\Z$, the element $\bar 3 \ne 0$ is killed
+by $2 \neq 0$.
+\end{example}
+
+\begin{definition}\label{def:b3:modules:free}
+$M$ is \emph{finitely generated}\index{finitely generated module}
+if $M = Ax_1 + \dots + Ax_n$ for some $x_i$. $M$ is
+\emph{free}\index{free module} of rank $n$ if $M \cong A^n$,
+i.e.\ if it has a \emph{basis} (a generating family that is
+$A$-linearly independent). Every finitely generated $M$ is a
+quotient of a free module: $(a_1, \dots, a_n) \mapsto \sum a_ix_i$
+maps $A^n$ onto $M$.
+\end{definition}
+
+\begin{proposition}[Invariance of rank]\label{prop:b3:modules:rank}
+If $A \neq 0$ and $A^m \cong A^n$, then $m = n$.
+\end{proposition}
+
+\begin{proof}
+Pick a maximal ideal $\mathfrak m$ of $A$ (\cref{thm:b3:rings:krull})
+and set $k = A/\mathfrak m$, a field. An isomorphism $f \colon A^m
+\to A^n$ maps $\mathfrak m A^m$ into $\mathfrak m A^n$
+(linearity), hence induces an isomorphism of quotients
+\[
+A^m/\mathfrak m A^m \;\cong\; A^n/\mathfrak m A^n,
+\qquad\text{i.e.}\qquad k^m \cong k^n
+\]
+as $k$-vector spaces (the quotient $A^m/\mathfrak m A^m$ is
+killed by $\mathfrak m$, so the $A$-action factors through $k$;
+the images of the standard basis form a $k$-basis). Dimension
+theory over the field $k$ gives $m = n$.
+\end{proof}
+
+\begin{theorem}[Submodules of free modules]\label{thm:b3:modules:submodule}
+Let $A$ be a PID and $M \subseteq A^n$ a submodule. Then $M$ is
+free of rank $\leq n$.
+\end{theorem}
+
+\begin{proof}
+Induction on $n$. For $n = 1$: $M$ is an ideal, so $M = (0)$
+(free of rank $0$) or $M = dA \cong A$ ($x \mapsto dx$ is
+injective: domain). For $n > 1$: let $\pi \colon A^n \to A$ be the
+last coordinate. Then $\pi(M)$ is an ideal, $(0)$ or $dA$. If
+$(0)$: $M \subseteq A^{n-1} \times \{0\}$ and induction applies.
+Otherwise choose $x_0 \in M$ with $\pi(x_0) = d$. Every $x \in M$
+writes uniquely
+\[
+x = \underbrace{\frac{\pi(x)}{d}}_{\in A}\, x_0 +
+\Bigl(x - \tfrac{\pi(x)}d x_0\Bigr),
+\qquad x - \tfrac{\pi(x)}d x_0 \in M \cap \ker\pi
+\]
+($\pi(x) \in dA$, so the coefficient is in $A$). Thus $M = Ax_0
+\oplus (M \cap \ker \pi)$: the sum is direct since $\pi(ax_0) =
+ad = 0$ forces $a = 0$. By induction $M \cap \ker\pi \subseteq
+\ker \pi \cong A^{n-1}$ is free of rank $\leq n - 1$; adjoining
+$x_0$ (independent from $\ker\pi$ as just seen) gives a basis of
+$M$ of cardinality $\leq n$.
+\end{proof}
+
+\begin{remark}\label{rem:b3:modules:presentation}
+Consequently, over a PID every finitely generated module $M$ has a
+\emph{finite presentation}: a surjection $\varphi\colon A^n \to M$
+has free kernel with basis $c_1, \dots, c_k$ ($k \leq n$), and $M
+\cong A^n / \operatorname{im}(C)$ where $C \in M_{n,k}(A)$ is the
+matrix whose columns are the $c_j$. Understanding $M$ means
+understanding a \emph{matrix over $A$} up to change of bases in
+source and target --- the subject of the next section.
+\end{remark}
+
+\section{Smith normal form}
+
+\begin{definition}\label{def:b3:modules:equivalence}
+Two matrices $B, C \in M_{n,k}(A)$ are \emph{equivalent} if $C =
+QBP$ with $Q \in GL_n(A)$, $P \in GL_k(A)$ (invertible
+\emph{over $A$}: determinant in $A^\times$). Equivalent
+presentation matrices define isomorphic modules $A^n/
+\operatorname{im}$ (change bases in $A^n$ and $A^k$).
+\end{definition}
+
+\begin{theorem}[Smith normal form]\label{thm:b3:modules:smith}
+Let $A$ be a PID and $B \in M_{n,k}(A)$. Then $B$ is equivalent to
+a diagonal matrix\index{Smith normal form}
+\[
+\operatorname{diag}(d_1, d_2, \dots, d_r, 0, \dots, 0),
+\qquad d_1 \mid d_2 \mid \cdots \mid d_r \neq 0 ,
+\]
+and the $d_i$ are unique up to associates: $d_1 \cdots d_i$ is a
+gcd of the $i \times i$ minors of $B$ (in particular that gcd is
+an invariant of equivalence). The $d_i$ are the \emph{invariant
+factors}\index{invariant factors} of $B$.
+\end{theorem}
+
+\begin{proof}
+\emph{Existence.} If $B = 0$, done. Otherwise, consider the set of
+ideals $(b)$ generated by entries of matrices equivalent to $B$;
+since $A$ is Noetherian, choose a matrix $B'$ equivalent to $B$
+and an entry $d$ of $B'$ with $(d)$ \emph{maximal} in this set.
+Move $d$ to position $(1,1)$ by row and column swaps.
+
+\emph{Claim: $d$ divides every entry of $B'$.} First, column 1: if
+$b_{i1}$ is not a multiple of $d$, let $e = \gcd(d, b_{i1}) = ud +
+vb_{i1}$ (B\'ezout), so $(e) \supsetneq (d)$. The $2 \times 2$
+matrix trick: acting on rows $1$ and $i$ by
+\[
+\begin{pmatrix} u & v \\ -\dfrac{b_{i1}}e & \dfrac de
+\end{pmatrix}
+\in GL_2(A)
+\qquad
+\Bigl(\det = \tfrac{ud + v b_{i1}}e = 1\Bigr)
+\]
+produces an equivalent matrix with entry $e$ in position $(1,1)$:
+this contradicts maximality of $(d)$. So $d$ divides column $1$,
+and symmetrically row $1$. Subtracting multiples of row 1 and
+column 1 clears them: $B'$ is equivalent to $\begin{pmatrix} d &
+0\\ 0 & B''\end{pmatrix}$. Next, $d$ divides every entry $b$ of
+$B''$: add the row of $b$ to row 1 (an elementary operation; the
+new first row contains $d$ and $b$-entries), and repeat the
+column-clearing argument: a non-multiple would again improve
+$(d)$. Now induct on the size: $B''$, all of whose entries are
+divisible by $d$, has a Smith form $\operatorname{diag}(d_2,
+\dots)$ whose entries remain divisible by $d$ (every entry of any
+$QB''P$ is an $A$-combination of entries of $B''$); set $d_1 =
+d$.
+
+\emph{Uniqueness.} Let $D_i(B)$ denote a gcd of all $i \times i$
+minors. Row and column operations, and more generally
+multiplication by \emph{any} matrix, cannot shrink the gcd: the
+$i \times i$ minors of $QB$ are $A$-combinations of those of $B$
+(Cauchy--Binet expansion; or directly: each row of $QB$ is a
+combination of rows of $B$, and minors are multilinear in rows).
+So $D_i(QBP)$ and $D_i(B)$ divide each other: $D_i$ is an
+equivalence invariant. On the diagonal form, the nonzero $i
+\times i$ minors are the products of $i$ of the $d_j$'s, and
+divisibility $d_1 \mid \dots \mid d_r$ makes $d_1 \cdots d_i$ the
+gcd. Hence $d_1 \cdots d_i = D_i(B)$ up to units, and $d_i =
+D_i/D_{i-1}$ is determined.
+\end{proof}
+
+\begin{method}\label{met:b3:modules:smith}
+Over a Euclidean domain ($\Z$, $K[X]$), Smith reduction is an
+algorithm --- no maximality argument needed: bring the entry of
+smallest Euclidean size to position $(1,1)$; if it fails to divide
+some entry of its row or column, a Euclidean division leaves a
+strictly smaller remainder there --- swap it in and restart
+(termination: sizes decrease); when it divides its whole row and
+column, clear them; if it fails to divide an inner entry, add that
+row to row $1$ and restart; recurse on the inner block. In
+practice on integer matrices: compute $D_1 = \gcd$ of entries,
+$D_2$, \dots\ via minors for small sizes, or run the algorithm.
+\end{method}
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=0.72]
+  \clip (-3.4,-1.3) rectangle (4.4,4.3);
+  \foreach \x in {-3,...,4}
+    \foreach \y in {-1,...,4}
+      \fill[black!40] (\x,\y) circle (1.6pt);
+  \fill[omDef!12, opacity=0.7] (0,0) -- (1,3) -- (3,3) -- (2,0)
+    -- cycle;
+  \foreach \a/\b in {0/0, 2/0, 4/0, -2/0, 1/3, 3/3, -1/3, -3/3,
+                     2/6, -2/-6, 0/6}
+    \fill[omThm] (\a,\b) circle (2.6pt);
+  \draw[omThm, thick, ->] (0,0) -- (2,0)
+    node[midway, below, font=\small] {$(2,0)$};
+  \draw[omThm, thick, ->] (0,0) -- (1,3)
+    node[midway, left, font=\small] {$(1,3)$};
+\end{tikzpicture}
+
+{\small The sublattice $L = \Z(2,0) + \Z(1,3)$ of $\Z^2$ (red
+points). The Smith normal form of $\bigl(\begin{smallmatrix} 2 &
+1\\ 0 & 3\end{smallmatrix}\bigr)$ is
+$\operatorname{diag}(1, 6)$: in the adapted basis $f_1 = (1,3)$,
+$f_2 = (0,1)$ of $\Z^2$, one has $L = \Z f_1 \oplus \Z\,6f_2$, so
+$\Z^2/L \cong \Z/6\Z$ --- the index equals $\abs{\det} = 6$, the
+area of the shaded fundamental domain.}
+\end{omfigure}
+
+\section{The structure theorem}
+
+\begin{definition}\label{def:b3:modules:torsion}
+Let $A$ be a domain and $M$ an $A$-module. The
+\emph{torsion}\index{torsion} submodule is
+\[
+T(M) = \{x \in M : ax = 0 \text{ for some } a \neq 0\}
+\]
+(a submodule: if $ax = by = 0$ then $ab(x + y) = 0$, $ab \ne 0$).
+$M$ is \emph{torsion-free} if $T(M) = 0$, a \emph{torsion module}
+if $T(M) = M$.
+\end{definition}
+
+\begin{theorem}[Structure of finitely generated modules over a
+PID]\label{thm:b3:modules:structure}
+Let $A$ be a PID and $M$ a finitely generated $A$-module. There
+exist a unique $r \in \N$ and nonzero nonunits $d_1 \mid d_2 \mid
+\cdots \mid d_s$, unique up to associates, with\index{structure
+theorem for modules}
+\[
+M \;\cong\; A^r \,\oplus\, A/(d_1) \oplus \cdots \oplus A/(d_s).
+\]
+Moreover $T(M) \cong A/(d_1)\oplus\dots\oplus A/(d_s)$ and $M/T(M)
+\cong A^r$: a finitely generated \emph{torsion-free} module over a
+PID is free.
+\end{theorem}
+
+\begin{proof}
+\emph{Existence.} Present $M \cong A^n/\operatorname{im}(C)$
+(\cref{rem:b3:modules:presentation}) and put $C$ in Smith form:
+after the two base changes, $M \cong A^n / (d_1A \times \dots
+\times d_rA \times 0 \times \dots \times 0) \cong A/(d_1) \oplus
+\dots \oplus A/(d_r) \oplus A^{\,n - r}$. Discard the factors
+where $d_i$ is a unit ($A/(d_i) = 0$); the divisibility chain
+survives.
+
+\emph{The torsion identification.} In the decomposition, $A^r$ is
+torsion-free (a domain has no zero divisors) and each $A/(d_i)$
+is torsion (killed by $d_i \ne 0$); a direct sum splits torsion
+accordingly: $T(M) = \bigoplus_i A/(d_i)$ and $M/T(M) \cong A^r$.
+
+\emph{Uniqueness of $r$}: $M/T(M) \cong A^r$ depends only on $M$,
+and \cref{prop:b3:modules:rank} pins $r$ down.
+
+\emph{Uniqueness of the $d_i$}: it suffices to treat the torsion
+module $T = T(M)$. Decompose each $d_i$ into primes and split by
+the Chinese remainder theorem (\cref{thm:b3:rings:crt}; distinct
+primes generate comaximal ideals):
+\[
+A/(d) \cong \bigoplus_{p \mid d} A/\bigl(p^{v_p(d)}\bigr):
+\qquad
+T \cong \bigoplus_{p} \bigoplus_{j} A/\bigl(p^{k_{p,j}}\bigr),
+\]
+the \emph{elementary divisors}\index{elementary divisors}
+$p^{k_{p,j}}$. Conversely the $d_i$ are reconstructed from the
+multiset of elementary divisors ($d_s$ = product of the highest
+power of each prime, etc.), so it suffices to prove the
+multiset $\{k_{p,j}\}_j$ is determined by $T$, for each prime
+$p$. Fix $p$; for $j \geq 1$ consider the $A/(p)$-vector spaces
+$p^{j-1}T/p^jT$. On a cyclic factor $A/(p^k)$:
+\[
+p^{j-1}\bigl(A/(p^k)\bigr)\big/p^{j}\bigl(A/(p^k)\bigr)
+\cong
+\begin{cases}
+A/(p) & \text{if } j \leq k,\\
+0 & \text{if } j > k,
+\end{cases}
+\]
+and on a factor $A/(q^k)$, $q \neq p$: multiplication by $p$ is
+bijective there ($p$ invertible mod $q^k$: B\'ezout), so the
+quotient is $0$. Direct sums pass through: $\dim_{A/(p)}
+p^{j-1}T/p^jT = \#\{i : k_{p,i} \geq j\}$. These intrinsic
+dimensions determine the multiset of exponents.
+\end{proof}
+
+\begin{corollary}[Finitely generated abelian groups]
+\label{cor:b3:modules:abelian}
+Every finitely generated abelian group is $\Z^r \times
+\Z/d_1\Z\times\dots\times\Z/d_s\Z$ with $d_1 \mid \dots \mid
+d_s$, uniquely. Every \emph{finite} abelian group is a product of
+cyclic groups of prime-power order, unique as a
+multiset.\index{abelian group, structure}
+\end{corollary}
+
+\begin{example}\label{ex:b3:modules:abelian}
+The abelian groups of order $p^n$ correspond to \emph{partitions}
+of $n$: for $p^4$: $\Z/p^4$, $\Z/p^3\times\Z/p$,
+$(\Z/p^2)^2$, $\Z/p^2 \times (\Z/p)^2$, $(\Z/p)^4$ --- five
+groups, as $4$ has five partitions. Mixed orders multiply the
+counts prime by prime (CRT): there are $5 \times 2$ abelian
+groups of order $2^4 \cdot 3^2 = 144$.
+\end{example}
+
+\section{Application: canonical forms of endomorphisms}
+
+Let $K$ be a field, $V$ a $K$-vector space of finite dimension
+$n$, and $u \in \mathcal L(V)$; make $V$ a $K[X]$-module via $P
+\cdot x = P(u)(x)$ (\cref{ex:b3:modules:examples}). This module
+is finitely generated (a $K$-basis generates) and torsion: for
+each $x$, the $n+1$ vectors $x, u(x), \dots, u^n(x)$ are
+$K$-dependent, providing a nonzero annihilating polynomial.
+
+\begin{definition}\label{def:b3:modules:companion}
+For $P = X^m + a_{m-1}X^{m-1} + \dots + a_0$ monic, the
+\emph{companion matrix}\index{companion matrix} is
+\[
+C_P = \begin{pmatrix}
+0 & & & -a_0\\
+1 & \ddots & & -a_1\\
+& \ddots & 0 & \vdots\\
+& & 1 & -a_{m-1}
+\end{pmatrix} :
+\]
+the matrix of ``multiplication by $X$'' on $K[X]/(P)$ in the
+basis $1, \bar X, \dots, \bar X^{m-1}$.
+\end{definition}
+
+\begin{theorem}[Frobenius: rational canonical form]
+\label{thm:b3:modules:frobenius}
+There is a unique sequence of monic nonconstant polynomials $P_1
+\mid P_2 \mid \dots \mid P_s$ (the \emph{similarity
+invariants}\index{similarity invariants} of $u$) such that, as
+$K[X]$-modules,
+\[
+V \cong K[X]/(P_1) \oplus \cdots \oplus K[X]/(P_s):
+\]
+in a suitable basis, $u$ has block-diagonal matrix
+$\operatorname{diag}(C_{P_1}, \dots, C_{P_s})$. Moreover:
+\begin{enumerate}
+  \item $P_s = \mu_u$ (minimal polynomial) and $P_1\cdots P_s =
+        \chi_u$ (characteristic polynomial); in particular $\mu_u
+        \mid \chi_u$ \emph{(Cayley--Hamilton re-proved)} and
+        $\chi_u \mid \mu_u^{\,s}$, so $\chi_u$ and $\mu_u$ have
+        the same irreducible factors.
+  \item Two endomorphisms (or square matrices) are similar iff
+        they have the same similarity invariants.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+The structure theorem (\cref{thm:b3:modules:structure}) applied
+to the PID $K[X]$: the torsion module $V$ decomposes with
+invariant factors $P_i$, normalized monic (units of $K[X]$ are
+$K^\times$); no free part occurs ($V$ is torsion). On each cyclic
+factor $K[X]/(P_i)$, multiplication by $X$ has matrix $C_{P_i}$
+in the basis of powers of $\bar X$: concatenating bases gives the
+block form.
+
+(1) The annihilator of $V = \bigoplus K[X]/(P_i)$ is $(P_1)\cap
+\dots\cap(P_s) = (P_s)$ (divisibility chain: $P_s$ is a common
+multiple, and the class of $1$ in the last factor is killed
+exactly by $(P_s)$): $\mu_u = P_s$. For $\chi_u$: on a cyclic
+factor, $\chi_{C_P} = P$, by induction on $m = \deg P$. Expanding
+$\det(XI_m - C_P)$ along the first row (whose entries are $X$, then
+zeros, then $a_0$ in the last column):
+\[
+\det(XI_m - C_P) = X\,\det\bigl(XI_{m-1} - C_{\tilde P}\bigr)
++ (-1)^{1+m}\,a_0\,\det L ,
+\]
+where $\tilde P = X^{m-1} + a_{m-1}X^{m-2} + \dots + a_1$ (same
+shape, one size down) and $L$ is triangular with diagonal
+$(-1, \dots, -1)$, so $\det L = (-1)^{m-1}$. By induction the
+first term is $X\tilde P$, and the second is $a_0$: the total is
+$X\tilde P + a_0 = P$ (base case $m=1$: $\det(X + a_0) = P$).
+Determinants multiply over blocks:
+$\chi_u = \prod P_i$. Cayley--Hamilton: $\chi_u \in (\mu_u)$
+since $P_s \mid$ each\dots\ conversely each $P_i \mid P_s$, so
+$\chi_u = \prod P_i$ divides $P_s^{\,s} = \mu_u^s$; and $\mu_u =
+P_s$ divides $\chi_u$ as one of its factors.
+
+(2) Similar endomorphisms are conjugate module structures, hence
+have equal invariants (uniqueness in
+\cref{thm:b3:modules:structure}); conversely equal invariants
+give isomorphic $K[X]$-modules, and a module isomorphism is
+exactly a linear bijection intertwining the two endomorphisms: a
+similarity.
+\end{proof}
+
+\begin{corollary}[Similarity is insensitive to field extension]
+\label{cor:b3:modules:descent}
+Let $K \subseteq L$ be fields and $M, N \in M_n(K)$. If $M$ and
+$N$ are similar over $L$, they are similar over $K$.
+\end{corollary}
+
+\begin{proof}
+The similarity invariants of $M$ are computed by Smith's minor
+formula (\cref{thm:b3:modules:smith}) applied to the presentation
+matrix $XI_n - M$ over $K[X]$ --- indeed the $K[X]$-module
+$V_M = K^n$ has presentation $XI_n - M$: the map $K[X]^n \to V_M$,
+$(Q_i) \mapsto \sum Q_i(M)e_i$, is onto with kernel generated by
+the columns of $XI_n - M$ (a direct verification: modulo those
+columns, every element of $K[X]^n$ reduces to a constant vector,
+and constant vectors map bijectively; the weekend problem spells
+this out). Gcds of polynomials do not change under field
+extension: if $d$ is the monic gcd in $K[X]$ of a family $(f_j)$,
+B\'ezout gives $d = \sum u_jf_j$ with $u_j \in K[X]$, so every
+common divisor of the $f_j$ \emph{in $L[X]$} divides $d$; as $d$
+is itself a common divisor, it is the gcd in $L[X]$ too. Hence
+the invariant factors of $XI_n - M$, quotients of successive
+minor gcds, are the same over $K$ and over $L$: $M, N$ have the
+same similarity invariants over $L$ iff over $K$; conclude by
+\cref{thm:b3:modules:frobenius}(2).
+\end{proof}
+
+\begin{theorem}[Jordan form, re-derived]\label{thm:b3:modules:jordan}
+Suppose $\chi_u$ splits over $K$ (e.g.\ $K = \C$). Applying to
+$V$ the elementary-divisor decomposition (proof of
+\cref{thm:b3:modules:structure}) instead of invariant factors:
+\[
+V \cong \bigoplus_{\lambda, j} K[X]\big/\bigl((X -
+\lambda)^{k_{\lambda,j}}\bigr),
+\]
+and in the basis $\bigl(\overline{(X-\lambda)^{k-1}}, \dots,
+\overline{(X - \lambda)}, \bar 1\bigr)$ of each factor, $u$ acts
+as the Jordan block $J_k(\lambda)$: every endomorphism with split
+characteristic polynomial has a Jordan basis, and the multiset of
+blocks $(\lambda, k)$ is unique.\index{Jordan form}
+\end{theorem}
+
+\begin{proof}
+The elementary divisors of the torsion module $V$ are the
+$(X - \lambda)^k$ with $X - \lambda$ ranging over the irreducible
+factors of $\mu_u$ (which splits, since $\chi_u$ does and both
+have the same irreducible factors,
+\cref{thm:b3:modules:frobenius}). In $W = K[X]/((X-\lambda)^k)$,
+put $f_j = \overline{(X - \lambda)^{k-j}}$ for $j = 1, \dots, k$:
+then $(X - \lambda)f_j = f_{j-1}$ (with $f_0 = 0$), i.e.\ $u(f_j)
+= \lambda f_j + f_{j-1}$: the matrix of $u$ on $(f_1, \dots,
+f_k)$ is exactly $J_k(\lambda)$ (ones above the diagonal).
+Uniqueness of the multiset of elementary divisors is
+\cref{thm:b3:modules:structure}.
+\end{proof}
+
+\begin{remark}\label{rem:b3:modules:overview}
+The hierarchy of canonical forms is now transparent: the
+\emph{rational} form exists over every field and detects
+similarity absolutely (\cref{cor:b3:modules:descent}); the
+\emph{Jordan} form is its refinement when $\chi_u$ splits.
+Year 2's dimension-counting proofs of Jordan's theorem are
+subsumed: all the combinatorics was the arithmetic of the PID
+$K[X]$.
+\end{remark}
+
+\section{Exercises}
+
+\begin{exercise}[$\star$]\label{exo:b3:modules:1}
+(a) Show that $\Q$ is not finitely generated as a $\Z$-module.
+(b) Show that $\Q$ is torsion-free but not free.
+(c) Why does neither statement contradict
+\cref{thm:b3:modules:structure}?
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b3:modules:2}
+List the abelian groups of order $360$ up to isomorphism, in both
+elementary-divisor and invariant-factor forms. How many abelian
+groups of order $p^5$ are there?
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b3:modules:3}
+Compute the Smith normal form over $\Z$ of
+\[
+B = \begin{pmatrix} 2 & 4\\ 6 & 8 \end{pmatrix},
+\qquad
+C = \begin{pmatrix} 2 & 0 & 0\\ 0 & 3 & 0\\ 0 & 0 & 12
+\end{pmatrix},
+\]
+and identify the abelian groups $\Z^2/B\Z^2$ and $\Z^3/C\Z^3$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:modules:4}
+Let $L \subseteq \Z^n$ be a subgroup of rank $n$ with basis the
+columns of $B \in M_n(\Z)$, $\det B \neq 0$. Show that
+$\Z^n/L$ is finite of cardinality $\abs{\det B}$, and that $\Z^n/L
+\cong \prod_i \Z/d_i\Z$ for the invariant factors $d_i$ of $B$.
+Illustrate with $L = \Z(2,0) + \Z(1,3)$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:modules:5}
+Let $A$ be a domain. (a) Verify that $T(M)$ is a submodule and
+that $M/T(M)$ is torsion-free. (b) Show that the ideal $(X, Y)$
+of $K[X,Y]$, as a $K[X,Y]$-module, is torsion-free but not free:
+the structure theorem genuinely needs the PID hypothesis.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:modules:6}
+(a) Show that $2\Z$ has no direct complement in the $\Z$-module
+$\Z$: submodules of free modules are free
+(\cref{thm:b3:modules:submodule}), but direct summands they need
+not be. (b) Show that if $M \subseteq A^n$ ($A$ a PID) satisfies:
+$A^n/M$ is torsion-free, then $M$ \emph{is} a direct summand.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:modules:7}
+Solve in $\Z^2$ the system
+\[
+\begin{cases}
+2x + 4y \equiv b_1 \pmod{20},\\
+6x + 8y \equiv b_2 \pmod{20},
+\end{cases}
+\]
+for which pairs $(b_1, b_2)$ solutions exist, using the Smith
+form of \cref{exo:b3:modules:3} (invertible changes of variables
+on both sides).
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:modules:8}
+(a) Determine all similarity invariants and possible Jordan forms
+of a nilpotent $4 \times 4$ matrix, sorted by the partition of
+$4$ they realize.
+(b) Exhibit two $4\times4$ complex matrices with the same
+characteristic \emph{and} minimal polynomials that are not
+similar, and prove that for $n \leq 3$ this cannot happen.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:modules:9}
+Let $u \in \mathcal L(V)$, $\dim V = n$. Show that the following
+are equivalent: (i) $V$ is a cyclic $K[X]$-module (there is $x$
+with $V = K[u]x$, a \emph{cyclic vector}); (ii) $\mu_u = \chi_u$;
+(iii) $s = 1$ in \cref{thm:b3:modules:frobenius}. Deduce that a
+companion matrix has a cyclic vector, and determine when a
+diagonal matrix has one.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:modules:10}
+For $M \in M_n(\Z)$ viewed as an endomorphism of $\Z^n$, prove
+the index formula: if $\det M \ne 0$, then
+$[\Z^n : M\Z^n] = \abs{\det M}$, and deduce that $M \in GL_n(\Z)$
+iff $\det M = \pm 1$. Application: the group $\Z^2$ has exactly
+$\sigma_1(m) = \sum_{d \mid m} d$ subgroups of index $m$.
+\emph{(Count matrices in Hermite form $\bigl(\begin{smallmatrix}
+a & b\\ 0 & d\end{smallmatrix}\bigr)$, $ad = m$, $0 \leq b <
+d$.)}
+\end{exercise}
+
+\section{Problem: the commutant and the double commutant}
+
+\begin{problem}[{Weekend problem --- rational form, commutant,
+bicommutant}]\label{pb:b3:modules:1}
+Let $K$ be a field, $V$ a $K$-vector space of dimension $n \geq
+1$, and $u \in \mathcal L(V)$. We study the \emph{commutant}
+\[
+\mathcal C(u) = \{v \in \mathcal L(V) : uv = vu\},
+\]
+a subalgebra of $\mathcal L(V)$ containing $K[u] = \{P(u) : P \in
+K[X]\}$, and we prove Frobenius' dimension formula and the double
+commutant theorem: $\mathcal C(\mathcal C(u)) = K[u]$. Throughout,
+$V$ is the $K[X]$-module defined by $u$, with invariant factors
+$P_1 \mid \cdots \mid P_s$ and cyclic decomposition $V =
+\bigoplus_{i=1}^s V_i$, $V_i = K[u]\,x_i \cong K[X]/(P_i)$, $n_i
+= \deg P_i$ (\cref{thm:b3:modules:frobenius}).
+
+\medskip
+\noindent\textbf{Part I --- The presentation matrix $XI - M$, and
+warm-ups.}
+\begin{enumerate}
+  \item Let $M \in M_n(K)$ and let $\varphi \colon K[X]^n \to V_M
+        = K^n$ send $(Q_1, \dots, Q_n)$ to $\sum_i Q_i(M)e_i$.
+        Show that $\varphi$ is a surjective morphism of
+        $K[X]$-modules and that every column of $XI_n - M$ lies
+        in $\ker\varphi$.
+  \item Show that, modulo the columns of $XI_n - M$, every
+        element of $K[X]^n$ is congruent to a constant vector
+        \emph{(reduce degrees using $Xe_i \equiv \sum_j m_{ji}e_j$)},
+        and deduce $\ker\varphi = (XI_n - M)\,K[X]^n$: the module
+        $V_M$ has presentation matrix $XI_n - M$. Recover
+        \cref{cor:b3:modules:descent}'s starting point: the
+        similarity invariants of $M$ are the nonunit invariant
+        factors of $XI_n - M$.
+  \item Compute the similarity invariants of: a scalar matrix
+        $\lambda I_n$; a diagonal matrix with distinct diagonal
+        entries; the $n \times n$ Jordan block $J_n(0)$;
+        $\operatorname{diag}(J_2(0), J_1(0))$ for $n = 3$.
+  \item Show that $\dim K[u] = \deg \mu_u = n_s$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part II --- Morphisms between cyclic modules.}
+\begin{enumerate}[resume]
+  \item Let $P, Q$ be monic nonconstant. Show that a
+        $K[X]$-morphism $f \colon K[X]/(P) \to K[X]/(Q)$ is
+        determined by $f(\bar 1)$, and that $\bar c \in K[X]/(Q)$
+        can serve as $f(\bar 1)$ iff $P\bar c = 0$ in $K[X]/(Q)$.
+  \item Deduce
+        \[
+        \operatorname{Hom}_{K[X]}\bigl(K[X]/(P),\, K[X]/(Q)\bigr)
+        \;\cong\; K[X]\big/\bigl(\gcd(P, Q)\bigr),
+        \]
+        of dimension $\deg \gcd(P, Q)$ over $K$. \emph{(Show that
+        the solutions $\bar c$ of $P\bar c = 0$ in $K[X]/(Q)$
+        form the cyclic submodule generated by
+        $\overline{Q/\gcd(P,Q)}$.)}
+  \item Prove \emph{Frobenius' formula}:
+        \[
+        \dim_K \mathcal C(u) = \sum_{i,j=1}^{s} \deg\gcd(P_i,
+        P_j) = \sum_{i=1}^{s} (2s - 2i + 1)\, n_i .
+        \]
+        \emph{(A commuting $v$ is exactly a $K[X]$-endomorphism of
+        $V$; decompose $\operatorname{End}(\bigoplus_i V_i)$ as
+        matrices of morphisms $V_j \to V_i$ and use the
+        divisibility chain.)}
+  \item Deduce $\dim \mathcal C(u) \geq n$, with equality iff $u$
+        is cyclic ($s = 1$), and compute $\dim\mathcal C(u)$ for
+        $u = \lambda\,\mathrm{id}$: both extremes of the formula.
+  \item Verify Frobenius' formula directly for
+        $\operatorname{diag}(J_2(0), J_1(0))$ by computing the
+        commutant explicitly as $3\times3$ matrices.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part III --- The double commutant theorem.}
+Let $w \in \mathcal C(\mathcal C(u))$; we prove $w \in K[u]$.
+\begin{enumerate}[resume]
+  \item Show $K[u] \subseteq \mathcal C(\mathcal C(u))$, and that
+        every $w \in \mathcal C(\mathcal C(u))$ commutes with $u$
+        --- so the inclusion to be proved,
+        $\mathcal C(\mathcal C(u)) \subseteq K[u]$, is a genuine
+        sharpening of $w \in \mathcal C(u)$.
+  \item Suppose first that $u$ is \emph{cyclic}, $V = K[u]x$.
+        Show directly that $\mathcal C(u) = K[u]$
+        \emph{(evaluate a commuting $v$ on $x$: $v(x) = P(u)x$
+        for some $P$, and compare $v$ with $P(u)$ on the basis
+        $u^k x$)}, and conclude the theorem in this case.
+  \item Back to the general case. For each $i$, let $\pi_i\colon
+        V \to V_i$ be the projection along the other summands.
+        Show $\pi_i \in \mathcal C(u)$, and deduce that $w$
+        preserves each $V_i$ and commutes with $u_i =
+        u\restriction_{V_i}$; conclude via question 11 applied to
+        the cyclic $u_i$: there are polynomials $Q_i$ with
+        $w\restriction_{V_i} = Q_i(u)\restriction_{V_i}$.
+  \item It remains to glue the $Q_i$ into one polynomial. For $i
+        \leq j$ (so $P_i \mid P_j$), show that $\eta_{ij} \colon
+        V_j \to V_i$, $R(u)x_j \mapsto R(u)x_i$, is a
+        well-defined $K[X]$-morphism \emph{(what must be checked
+        is that $R(u)x_j = 0$ implies $R(u)x_i = 0$)}, and that
+        $\tilde\eta_{ij} = \eta_{ij}\circ\pi_j$, extended by $0$
+        on the other summands, lies in $\mathcal C(u)$.
+  \item Using $w\tilde\eta_{ij} = \tilde\eta_{ij}w$, show $Q_i
+        \equiv Q_j \pmod{P_i}$ for $i \leq j$. Deduce that $Q =
+        Q_s$
+        satisfies $Q \equiv Q_i \pmod {P_i}$ for all $i$, hence
+        $w = Q(u)$ on every $V_i$, hence on $V$:
+        \[
+        \boxed{\ \mathcal C(\mathcal C(u)) = K[u].\ }
+        \]
+  \item (Coda) Deduce from the theorem: if $v$ commutes with
+        \emph{every} matrix commuting with $u$, and $u$ is
+        cyclic, then $v$ is a polynomial in $u$; and give an
+        example showing $\mathcal C(u) = K[u]$ fails for $u =
+        \mathrm{id}$, $n \geq 2$ --- where exactly does
+        cyclicity enter?
+\end{enumerate}
+\end{problem}
