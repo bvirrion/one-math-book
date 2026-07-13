@@ -49,6 +49,42 @@ of Lagrange polynomials $L_i$ (Year 1 volume), since $L_i(x_j) =
 \delta_{ij}$. Interpolation \emph{is} duality.
 \end{example}
 
+\begin{method}[Dual and antedual bases in practice]\label{met:b2:linalg:dualbasis}
+To expand a form $\varphi$ on a basis $(e_i)$ of $E$: the
+coordinates are the \emph{values} $\varphi(e_i)$ --- no system to
+solve. To find the basis $(u_j)$ of $E$ whose dual is a given
+basis $(\varphi_1, \dots, \varphi_n)$ of $E^*$ (the
+\emph{antedual}): solve the $n$ linear systems
+\[
+\varphi_i(u_j) = \delta_{ij} \qquad (1 \leq i \leq n),
+\]
+one column $u_j$ at a time; in matrix terms, if the rows of $M$
+list the coefficients of the $\varphi_i$ in a known basis of
+$E^*$, the columns of $M^{-1}$ are the $u_j$. Existence and
+uniqueness of the antedual are proved in this chapter's weekend
+problem; the computation is always this inversion.
+\end{method}
+
+\begin{example}[A dual basis of $\R^2$, fully computed]\label{ex:b2:linalg:dualbasis2d}
+For the basis $b_1 = (1, 1)$, $b_2 = (1, -1)$ of $\R^2$: the
+dual basis $(b_1^*, b_2^*)$ must satisfy $b_i^*(b_j) =
+\delta_{ij}$. Writing $b_1^*(x, y) = \alpha x + \beta y$, the
+conditions $\alpha + \beta = 1$ and $\alpha - \beta = 0$ give
+\[
+b_1^*(x, y) = \frac{x + y}{2},
+\qquad\text{and likewise}\qquad
+b_2^*(x, y) = \frac{x - y}{2} .
+\]
+Sanity checks: $b_1^*$ is \emph{not} $e_1^* + e_2^*$ evaluated
+naively --- the dual basis depends on the whole basis, not on
+each vector separately (replacing $b_2$ by $(0, 1)$ changes
+$b_1^*$ into $x \mapsto x$). And the expansion formula works:
+$(x, y) = \frac{x+y}2\,b_1 + \frac{x-y}2\,b_2$, the even/odd
+decomposition of a pair --- dual bases are coordinate
+extractors, and this one extracts symmetric and antisymmetric
+parts.
+\end{example}
+
 \begin{definition}[Annihilator]\label{def:b2:linalg:annihilator}
 For a subspace $F \subseteq E$, the
 \emph{annihilator}\index{annihilator} is
@@ -83,6 +119,26 @@ basis $(\varphi_1, \dots, \varphi_{n-p})$ of $F^\circ$: then $F =
 hyperplanes.
 \end{proof}
 
+\begin{example}[An annihilator, both directions]\label{ex:b2:linalg:annihilatorwork}
+Let $F = \operatorname{Vect}\bigl((1, 2, 1),\ (1, 0, -1)\bigr)
+\subseteq \R^3$. A form $\varphi = a\,e_1^* + b\,e_2^* + c\,e_3^*$
+annihilates $F$ iff
+\[
+a + 2b + c = 0
+\qquad\text{and}\qquad
+a - c = 0 ,
+\]
+i.e.\ $c = a$ and $b = -a$: $F^\circ = \R\,(e_1^* - e_2^* +
+e_3^*)$, of dimension $3 - 2 = 1$ as
+\cref{thm:b2:linalg:annihilator} requires. Reading it backwards:
+$F = \{(x, y, z) : x - y + z = 0\}$ --- the plane recovered as
+the kernel of the single form spanning $F^\circ$. Going from a
+spanning family to equations \emph{is} computing an annihilator;
+going from equations to a parametrization is computing a
+pre-annihilator. (Check: both spanning vectors satisfy $x - y +
+z = 0$.)
+\end{example}
+
 \begin{definition}[Transpose map]\label{def:b2:linalg:transpose}
 For $u \in \mathcal{L}(E, F)$, the \emph{transpose}\index{transpose
 map} $u^{\mathsf T} \in \mathcal{L}(F^*, E^*)$ is
@@ -94,6 +150,31 @@ T}$, and in dual bases, the matrix of $u^{\mathsf T}$ is the
 transposed matrix of $u$ --- which finally \emph{explains} the
 transpose of Year 1.
 \end{definition}
+
+\begin{example}[The transpose, entry by entry]\label{ex:b2:linalg:transposework}
+Let $u \colon \R^2 \to \R^3$ have matrix $A =
+\begin{psmallmatrix} 1 & 2\\ 0 & 1\\ 3 & 0\end{psmallmatrix}$ in
+the canonical bases. For $\psi = b_1f_1^* + b_2f_2^* + b_3f_3^*
+\in (\R^3)^*$, compute $u^{\mathsf T}(\psi) = \psi \circ u$ on
+the basis of $\R^2$:
+\[
+(\psi \circ u)(e_1) = \psi(1, 0, 3) = b_1 + 3b_3,
+\qquad
+(\psi \circ u)(e_2) = \psi(2, 1, 0) = 2b_1 + b_2 .
+\]
+So $u^{\mathsf T}(\psi) = (b_1 + 3b_3)\,e_1^* + (2b_1 +
+b_2)\,e_2^*$, and in the dual bases the matrix of $u^{\mathsf T}$
+is
+\[
+\begin{pmatrix} 1 & 0 & 3\\ 2 & 1 & 0\end{pmatrix}
+= A^{\mathsf T} :
+\]
+the abstract transpose \emph{is} the flipped matrix, with no
+computation left to believe on faith. Note the mechanism: the
+$j$-th \emph{column} of $A$ became the $j$-th \emph{row} of the
+new matrix because $\psi \circ u$ reads $u$'s outputs through
+$\psi$'s coefficients.
+\end{example}
 
 \begin{proposition}\label{prop:b2:linalg:transposerank}
 $\ker u^{\mathsf T} = (\operatorname{im} u)^{\circ}$ and
@@ -116,6 +197,48 @@ dimensions match by rank--nullity and
 = \dim (\ker u)^{\circ} . \qedhere
 \]
 \end{proof}
+
+\begin{example}[Rank read on both sides]\label{ex:b2:linalg:rankbothsides}
+Let
+\[
+A = \begin{pmatrix}
+1 & 2 & 0 & 1\\
+0 & 1 & 1 & 1\\
+1 & 3 & 1 & 2
+\end{pmatrix} .
+\]
+\emph{Column rank:} the third row is the sum of the first two, so
+$\operatorname{rk} A \leq 2$; columns $1$ and $2$ are free:
+$\operatorname{rk} A = 2$. \emph{The transpose's kernel:} solving
+$A^{\mathsf T}y = 0$ gives $y \in \R\,(1, 1, -1)$, so $\ker
+A^{\mathsf T}$ has dimension $1 = 3 - 2$: exactly
+$(\operatorname{im} A)^\circ$ under the identification of
+$(\R^3)^*$ with row vectors, as
+\cref{prop:b2:linalg:transposerank} asserts --- the single
+relation ``row$_3$ = row$_1$ + row$_2$'' \emph{is} the
+annihilator of the column space. Row rank ($2$ free rows) and
+column rank agree not by accident but because both equal
+$\operatorname{rk} A = \operatorname{rk} A^{\mathsf T}$.
+\end{example}
+
+\begin{example}[Duality reads a quadrature rule]\label{ex:b2:linalg:quadratureread}
+Why does a rule like Simpson's (\cref{exo:b2:linalg:4}) exist
+and why is it unique? Duality answers before any computation.
+On $E = \R_2[X]$, the integral $P \mapsto \int_0^1 P$ is one
+specific vector of the three-dimensional dual $E^*$; the
+evaluations at $0$, $\frac12$, $1$ form a \emph{basis} of
+$E^*$; hence the integral expands uniquely on them --- that
+expansion \emph{is} Simpson's rule, coefficients included. A
+dimension count also calibrates expectations: on $\R_3[X]$,
+four dimensions of forms cannot in general be spanned by three
+evaluations, so exactness on cubics is not owed by duality;
+that Simpson integrates cubics exactly anyway is a bonus
+symmetry (odd-degree cancellation around $\frac12$), to be
+checked by hand. Rules with $n + 1$ nodes are expansions of the
+integration form in an evaluation basis of $\R_n[X]^*$:
+existence and uniqueness cost one dual-basis theorem; only the
+bonus degrees cost work.
+\end{example}
 
 \section{Multilinear alternating forms}
 
@@ -170,11 +293,46 @@ $\det_{\mathcal{B}}$ itself (the displayed sum) \emph{is}
 alternating $n$-linear and takes value $1$ on $\mathcal B$.
 Multilinearity is clear (each summand is linear in each column).
 Value on $\mathcal B$: the only nonzero term is $\sigma =
-\mathrm{id}$. Alternating: if $x_j = x_k$ ($j \neq k$), pair each
-$\sigma$ with $\sigma' = \sigma \circ (j\,k)$; the two terms have
-equal products (the arguments $j$ and $k$ carry the same
-coordinates) and opposite signatures, so the sum cancels in pairs.
+\mathrm{id}$. Alternating: suppose $x_j = x_k$ ($j \neq k$), so
+that the coordinate columns satisfy $a_{i j} = a_{i k}$ for all
+$i$. Pair each $\sigma$ with $\sigma' = \sigma\circ(j\,k)$ ---
+an involution without fixed points on $\mathfrak{S}_n$. The
+paired products coincide:
+\[
+\prod_i a_{\sigma'(i),\,i}
+= a_{\sigma(k),\,j}\; a_{\sigma(j),\,k}
+\prod_{i \neq j,k} a_{\sigma(i),\,i}
+= a_{\sigma(k),\,k}\; a_{\sigma(j),\,j}
+\prod_{i \neq j,k} a_{\sigma(i),\,i}
+= \prod_i a_{\sigma(i),\,i},
+\]
+using the equality of the columns $j$ and $k$; while
+$\varepsilon(\sigma') = -\varepsilon(\sigma)$. Each pair
+contributes zero: the sum vanishes.
 \end{proof}
+
+\begin{example}[Sarrus, derived and demolished]\label{ex:b2:linalg:sarrus}
+For $n = 3$ the permutation formula has exactly $3! = 6$ terms.
+Listing $\mathfrak{S}_3$ by signature ---
+$\mathrm{id}$, $(1\,2\,3)$, $(1\,3\,2)$ even;
+$(1\,2)$, $(1\,3)$, $(2\,3)$ odd --- gives
+\[
+\det A = a_{11}a_{22}a_{33} + a_{21}a_{32}a_{13} +
+a_{31}a_{12}a_{23}
+- a_{21}a_{12}a_{33} - a_{31}a_{22}a_{13} -
+a_{11}a_{32}a_{23} :
+\]
+precisely the ``diagonals'' rule of Sarrus taught in school ---
+now a theorem, with the mysterious signs identified as
+signatures. The demolition: for $n = 4$ there are $24$
+permutations, of which only $8$ are picked up by any
+diagonal-drawing scheme; Sarrus has no degree-$4$ version, and
+cofactor expansion (\cref{thm:b2:linalg:detrules}~(4)) takes
+over. Counting terms is also a warning: the permutation formula
+has $n!$ summands, so it is a \emph{definition}, not an
+algorithm --- row reduction computes $\det$ in $O(n^3)$
+operations instead.
+\end{example}
 
 \begin{definition}[Determinants]\label{def:b2:linalg:det}
 The \emph{determinant of a family} in a basis is
@@ -215,11 +373,23 @@ through the others and expanding, $\det_{\mathcal B}(u(e_i)) = 0$
 (alternating kills repeated directions), so $\det u = 0$. The basis
 criterion is the same statement for families.
 
-(3) In the permutation formula, reindex by $\tau = \sigma^{-1}$:
-$\prod_i a_{\sigma(i), i} = \prod_j a_{j, \tau(j)}$, and
-$\varepsilon(\tau) = \varepsilon(\sigma)^{-1} =
-\varepsilon(\sigma)$ (values are $\pm1$): the sum becomes the
-formula for $A^{\mathsf T}$.
+(3) In the permutation formula, reindex each product by $j =
+\sigma(i)$, i.e.\ $i = \tau(j)$ with $\tau = \sigma^{-1}$: the
+factors are the same numbers in a different order, so
+\[
+\prod_{i=1}^{n} a_{\sigma(i),\,i} = \prod_{j=1}^{n}
+a_{j,\,\tau(j)} ,
+\]
+and $\varepsilon(\tau) = \varepsilon(\sigma)^{-1} =
+\varepsilon(\sigma)$ (values are $\pm1$; $\varepsilon$ is a
+morphism). Summing over $\sigma$ is the same as summing over
+$\tau$ (inversion is a bijection of $\mathfrak{S}_n$):
+\[
+\det A = \sum_{\tau}\varepsilon(\tau)\prod_j a_{j,\tau(j)}
+= \det(A^{\mathsf T}),
+\]
+the last sum being the permutation formula applied to the
+transposed entries $(A^{\mathsf T})_{ij} = a_{ji}$.
 
 (4) Fix column $j$ and split $x_j = \sum_i a_{ij} e_i$ by
 linearity: $\det A = \sum_i a_{ij}\, \det(\dots, e_i, \dots)$, and
@@ -229,6 +399,50 @@ $n - j$ of columns, via (3)) identifies $\det(\dots, e_i, \dots) =
 rule. Similarity: $\det(P^{-1}AP) = \det P^{-1}\det A \det P =
 \det A$ by (1).
 \end{proof}
+
+\begin{example}[Cofactor expansion, executed]\label{ex:b2:linalg:cofactorwork}
+Compute
+\[
+\det\begin{pmatrix}
+2 & 1 & 3\\
+0 & 4 & 1\\
+1 & 2 & 0
+\end{pmatrix}
+\]
+along the first column (two zeros' worth of laziness: one).
+Signs follow the checkerboard $(-1)^{i+j}$:
+\[
+2\,\det\begin{pmatrix}4 & 1\\ 2 & 0\end{pmatrix}
+- 0
++ 1\cdot\det\begin{pmatrix}1 & 3\\ 4 & 1\end{pmatrix}
+= 2(0 - 2) + (1 - 12) = -15 .
+\]
+Cross-check by Sarrus (\cref{ex:b2:linalg:sarrus}): $0 + 1 + 0
+- 12 - 0 - 4 = -15$. Strategy, not doctrine: expand along the
+line with the most zeros, and when none has any, make some
+first by row operations --- one round of elimination costs
+less than two cofactor layers.
+\end{example}
+
+\begin{example}[A determinant by the rules]\label{ex:b2:linalg:onesmatrix}
+Let $J \in \mathcal{M}_n(K)$ be the all-ones matrix and $a \in K$;
+we compute $\det(aI_n + J)$ with the tools just proved. Every
+column of $aI_n + J$ sums the same way: add all rows to the first
+(the determinant is unchanged --- adding a multiple of one row to
+another adds a repeated-direction term, killed by alternation).
+The first row becomes $(a + n, a + n, \dots, a + n)$; factor out
+$a + n$ by linearity in that row, then subtract the first column
+from every other column: what remains is triangular with diagonal
+$(1, a, \dots, a)$. Hence
+\[
+\det(aI_n + J) = (a + n)\,a^{\,n-1}.
+\]
+The closing insight: the roots $a = 0$ (multiplicity $n - 1$) and
+$a = -n$ say that $J$ has eigenvalue $0$ with multiplicity $n - 1$
+and eigenvalue $n$ once --- the spectrum of the rank-one matrix
+$J$, one chapter early (\cref{ch:b2:reduction} will make this
+systematic).
+\end{example}
 
 \begin{example}[A determinant by the permutation formula]\label{ex:b2:linalg:permexample}
 For a matrix with many zeros the formula is practical by itself:
@@ -245,6 +459,26 @@ the only permutation picking nonzero entries is the $4$-cycle
 $\sigma = (1\,2\,3\,4)$ mapping column $1 \to$ row $4$, etc.;
 $\varepsilon(\sigma) = (-1)^3 = -1$, so $\det A = -abcd$. (Check
 via three column swaps to reach a diagonal matrix.)
+\end{example}
+
+\begin{example}[A Vandermonde by the product formula]\label{ex:b2:linalg:vandermondework}
+For the nodes $0, 1, 2$ (used by quadrature rules like
+\cref{exo:b2:linalg:4}'s), the Vandermonde determinant of
+\cref{exo:b2:linalg:11} evaluates in one glance:
+\[
+\det\begin{pmatrix}
+1 & 1 & 1\\
+0 & 1 & 2\\
+0 & 1 & 4
+\end{pmatrix}
+= (1 - 0)(2 - 0)(2 - 1) = 2 ,
+\]
+and by direct expansion along the first column: $1\cdot(4 - 2)
+= 2$: agreement. Nonvanishing for distinct nodes is the whole
+theory of interpolation in one determinant: the evaluation
+forms $P \mapsto P(a_i)$ are a basis of the dual exactly when
+this determinant is nonzero, i.e.\ always for distinct $a_i$
+--- \cref{ex:b2:linalg:dualexamples} quantified.
 \end{example}
 
 \section{Trace, revisited}
@@ -264,14 +498,101 @@ in any basis --- duality writes the trace basis-freely.
 \begin{proof}
 $\operatorname{tr}(AB) = \operatorname{tr}(BA)$ and basis-invariance
 were proved in Year 1. Uniqueness: a linear form $t$ with $t(AB) =
-t(BA)$ kills every commutator $AB - BA$; the commutators span the
-subspace of trace-zero matrices (its dimension is $n^2 - 1$; the
-matrices $E_{ij} = E_{ik}E_{kj} - E_{kj}E_{ik}$ for $i \neq j$, and
-$E_{ii} - E_{jj} = E_{ij}E_{ji} - E_{ji}E_{ij}$, are commutators and
-span it). So $t$ factors through the trace: $t = c\operatorname{tr}$,
-and $t(I) = n$ forces $c = 1$. The display: the $i$-th diagonal
-entry of the matrix of $u$ is precisely $e_i^*(u(e_i))$.
+t(BA)$ kills every commutator $AB - BA$. We claim the commutators
+span the trace-zero hyperplane, of dimension $n^2 - 1$. Two
+families of commutators suffice. The multiplication rule of the
+elementary matrices is $E_{ab}E_{cd} = \delta_{bc}E_{ad}$. For
+$i \neq j$ it gives
+\[
+E_{ii}E_{ij} - E_{ij}E_{ii} = E_{ij} - 0 = E_{ij}
+\]
+(the second product is $E_{ij}E_{ii} = \delta_{ji}E_{ii} = 0$
+since $j \neq i$): every off-diagonal $E_{ij}$ is a commutator.
+And
+\[
+E_{ij}E_{ji} - E_{ji}E_{ij} = E_{ii} - E_{jj} .
+\]
+The $E_{ij}$ ($i \neq j$, $n^2 - n$ of them) together with the
+$E_{11} - E_{jj}$ ($j \geq 2$, $n - 1$ of them) are $n^2 - 1$
+linearly independent trace-zero matrices: they span the
+hyperplane $\ker\operatorname{tr}$. So $t$ vanishes where
+$\operatorname{tr}$ does and factors through it: $t =
+c\operatorname{tr}$; then $t(I) = n$ forces $c = 1$. The display:
+the $i$-th diagonal entry of the matrix of $u$ is precisely
+$e_i^*(u(e_i))$.
 \end{proof}
+
+\begin{remark}[Common pitfalls]\label{rem:b2:linalg:pitfalls}
+(i) The determinant is $n$-linear in the \emph{columns}, not
+linear in the matrix: $\det(A + B) \neq \det A + \det B$ in
+general, and $\det(\lambda A) = \lambda^n\det A$, not
+$\lambda\det A$. (ii) Transposition reverses products:
+$(vu)^{\mathsf T} = u^{\mathsf T}v^{\mathsf T}$; forgetting the
+reversal wrecks every computation involving inverses. (iii) The
+annihilator $F^\circ$ lives in $E^*$, not in $E$: it becomes the
+familiar ``orthogonal complement'' only after an inner product
+identifies $E$ with $E^*$ (\cref{ch:b2:quadratic}); no such
+identification is canonical. (iv) ``Row rank equals column
+rank'' does not mean row \emph{space} equals column space ---
+the two live in different spaces ($K^n$ and $K^m$) and are
+related through \cref{prop:b2:linalg:transposerank}, not equal.
+(v) The permutation formula is a proof device: for numbers, use
+row operations and cofactors (\cref{ex:b2:linalg:sarrus}).
+\end{remark}
+
+\begin{example}[The trace pairing splits the matrix space]\label{ex:b2:linalg:tracepairing}
+On $\mathcal{M}_2(\R)$ with the pairing $\langle A, B\rangle =
+\operatorname{tr}(AB)$ of \cref{exo:b2:linalg:9}: decompose $M =
+\begin{psmallmatrix}1 & 4\\ 2 & 3\end{psmallmatrix}$ into
+symmetric and antisymmetric parts,
+\[
+M = S + A, \qquad
+S = \tfrac12(M + M^{\mathsf T}) =
+\begin{pmatrix}1 & 3\\ 3 & 3\end{pmatrix},
+\qquad
+A = \tfrac12(M - M^{\mathsf T}) =
+\begin{pmatrix}0 & 1\\ -1 & 0\end{pmatrix}.
+\]
+Then $\operatorname{tr}(SA) = \operatorname{tr}
+\begin{psmallmatrix}-3 & 1\\ -3 & 3\end{psmallmatrix} = 0$: the
+two parts are ``orthogonal'' for the trace pairing --- an
+instance of the general fact (proved in the weekend problem of
+this chapter) that antisymmetric matrices form exactly the
+annihilator of the symmetric ones. Duality sees the
+decomposition $\mathcal{M}_n = \mathcal{S}_n \oplus
+\mathcal{A}_n$ before any inner product is chosen.
+\end{example}
+
+\begin{remark}[Perspectives within this volume]\label{rem:b2:linalg:perspectives}
+Watch the three constructions of this chapter change costume
+ahead. The \emph{transpose} returns in
+\cref{ch:b2:reduction}: $u$ and $u^{\mathsf T}$ share
+eigenvalues with equal geometric multiplicities (this chapter's
+weekend problem, question 15), which is why row and column
+analyses of a matrix never disagree. The \emph{determinant}
+becomes a function of a parameter in \cref{ch:b2:reduction}
+($\chi_u(X) = \det(X\,\mathrm{id} - u)$) and a Jacobian in
+\cref{ch:b2:multint}, where its multilinearity turns into the
+change-of-variables factor. The \emph{trace} seeds the
+similarity invariants: it is the second coefficient of
+$\chi_u$, the sum of eigenvalues, and eventually the integral
+of the diagonal in \cref{ch:b2:fourier}-style identities. One
+linear-algebra chapter, three long shadows.
+\end{remark}
+
+\begin{remark}[Where this chapter is used]
+The dual space is not an abstraction for its own sake: annihilators
+and transposes run the solvability theory of linear systems (this
+chapter's weekend problem proves the finite-dimensional Fredholm
+alternative from them), nondegenerate pairings reappear as the
+polar form in \cref{ch:b2:quadratic} and the adjoint in
+\cref{ch:b2:hermitian}, and the determinant built here powers the
+whole of \cref{ch:b2:reduction}. In the Year 3 volume the same
+duality, transported to infinite dimension, becomes the
+Riesz representation theorem and Fredholm theory on Hilbert
+spaces --- with compactness replacing the dimension counts used
+here.
+\end{remark}
 
 \section{Exercises}
 
@@ -374,3 +695,201 @@ Newton's identities or by induction on the dimension: an
 endomorphism of a $\C$-vector space all of whose powers have zero
 trace is nilpotent. Work over $\C$.}
 \end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:linalg:11}
+(Vandermonde) For $a_0, \dots, a_n \in K$, prove
+\[
+\det\begin{pmatrix}
+1 & 1 & \cdots & 1\\
+a_0 & a_1 & \cdots & a_n\\
+\vdots & \vdots & & \vdots\\
+a_0^n & a_1^n & \cdots & a_n^n
+\end{pmatrix}
+= \prod_{0 \leq i < j \leq n} (a_j - a_i).
+\]
+\emph{(View the determinant as a polynomial in $a_n$: identify its
+degree, its roots, and its leading coefficient; induct.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:linalg:12}
+Let $A, B, C, D \in \mathcal{M}_n(K)$ with $K$ infinite, and
+suppose $CD = DC$. Prove that
+\[
+\det\begin{pmatrix} A & B\\ C & D\end{pmatrix}
+= \det(AD - BC).
+\]
+\emph{(Treat first $D$ invertible, multiplying on the right by
+$\begin{psmallmatrix} I & 0\\ -D^{-1}C & I\end{psmallmatrix}$;
+then replace $D$ by $D + tI$ and compare two polynomials in $t$.)}
+\end{exercise}
+
+\section{Problem: The Fredholm Alternative}
+
+When does the linear system $u(x) = b$ have a solution? The
+complete answer is a duality statement: \emph{exactly when $b$ is
+annihilated by every linear form that annihilates the image of
+$u$} --- and those forms are computable, being the kernel of the
+transpose. This weekend problem builds the full dictionary of
+finite-dimensional duality (factorization of forms, biduality,
+annihilator calculus, the transpose), proves the
+finite-dimensional \emph{Fredholm alternative}, and closes with
+the trace form and a characterization: the trace is the only
+linear invariant of similarity. Throughout, $E$ and $F$ are
+finite-dimensional $K$-vector spaces, $n = \dim E$.
+
+\begin{problem}[{Weekend problem --- duality in finite dimension
+and the Fredholm alternative}]
+\label{pb:b2:linalg:1}
+Notation: for $S \subseteq E^*$, the \emph{pre-annihilator} is
+$S_\circ = \{x \in E : \varphi(x) = 0 \text{ for all } \varphi
+\in S\}$; annihilators $F^\circ$ and transposes $u^{\mathsf T}$
+are those of \cref{def:b2:linalg:annihilator} and
+\cref{def:b2:linalg:transpose}.
+
+\medskip
+\noindent\textbf{Part I --- The factorization lemma.} Let
+$\varphi_1, \dots, \varphi_p, \varphi \in E^*$.
+\begin{enumerate}
+  \item Let $\Phi \colon E \to K^p$, $x \mapsto (\varphi_1(x),
+        \dots, \varphi_p(x))$. Identify $\ker\Phi$, show
+        $\Phi^{\mathsf T}$ maps the coordinate forms of $K^p$ to
+        the $\varphi_i$, and deduce
+        \[
+        \dim \bigl(\ker\varphi_1 \cap \dots \cap
+        \ker\varphi_p\bigr) = n - \dim
+        \operatorname{Vect}(\varphi_1, \dots, \varphi_p).
+        \]
+  \item (Factorization lemma) Prove the equivalence:
+        \[
+        \varphi \in \operatorname{Vect}(\varphi_1, \dots,
+        \varphi_p)
+        \iff
+        \ker\varphi_1 \cap \dots \cap \ker\varphi_p \subseteq
+        \ker\varphi .
+        \]
+  \item Deduce: $(\varphi_1, \dots, \varphi_p)$ is free iff
+        $\bigcap_i \ker\varphi_i$ has dimension $n - p$; and a
+        subspace of codimension $p$ is an intersection of $p$
+        hyperplanes, never fewer.
+  \item In $\R^4$, let $\varphi_1 = x + y - z$, $\varphi_2 = y +
+        z - t$, $\psi = x + 2y - t$ and $\psi' = x + y + t$.
+        Decide, by the factorization lemma, whether $\psi$ and
+        $\psi'$ belong to $\operatorname{Vect}(\varphi_1,
+        \varphi_2)$.
+  \item On $E = \R_2[X]$, show that $\psi_0 \colon P \mapsto
+        P(0)$, $\psi_1 \colon P \mapsto P(1)$, $\psi_2 \colon P
+        \mapsto \int_0^1 P(t)\dd t$ form a basis of $E^*$,
+        compute the basis $(P_0, P_1, P_2)$ of $E$ of which it is
+        the dual, and find the unique $P \in \R_2[X]$ with $P(0)
+        = 1$, $P(1) = 2$, $\int_0^1 P = \frac32$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part II --- Biduality and the annihilator
+calculus.}
+\begin{enumerate}[resume]
+  \item Show that the \emph{evaluation map} $J \colon E \to
+        E^{**}$, $J(x)(\varphi) = \varphi(x)$, is linear and
+        injective, hence an isomorphism in finite dimension.
+  \item (Double annihilator) Show $J(F) = F^{\circ\circ} :=
+        (F^\circ)^\circ$ for every subspace $F \subseteq E$: under
+        the identification $J$, the annihilator of the annihilator
+        is the subspace itself.
+  \item Prove the annihilator calculus: $(F + G)^\circ = F^\circ
+        \cap G^\circ$ and $(F \cap G)^\circ = F^\circ + G^\circ$.
+  \item Deduce (and reprove directly): two nonzero forms with the
+        same kernel are proportional.
+  \item (Antedual basis) Show that for every basis $(\varphi_1,
+        \dots, \varphi_n)$ of $E^*$ there is a unique basis
+        $(u_1, \dots, u_n)$ of $E$ with $\varphi_i(u_j) =
+        \delta_{ij}$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part III --- The transpose calculus.}
+\begin{enumerate}[resume]
+  \item Show that $u \mapsto u^{\mathsf T}$ is a linear bijection
+        from $\mathcal{L}(E, F)$ onto $\mathcal{L}(F^*, E^*)$,
+        and that $(u^{-1})^{\mathsf T} = (u^{\mathsf T})^{-1}$
+        when $u$ is invertible.
+  \item (Naturality) Show that $u^{\mathsf T\mathsf T} \circ J_E
+        = J_F \circ u$: under the evaluation isomorphisms, the
+        double transpose \emph{is} $u$.
+  \item Show: $u$ is surjective iff $u^{\mathsf T}$ is injective;
+        $u$ is injective iff $u^{\mathsf T}$ is surjective.
+  \item For $u \in \mathcal{L}(E)$: a subspace $F$ is stable
+        under $u$ if and only if $F^\circ$ is stable under
+        $u^{\mathsf T}$.
+  \item Show that $\ker(u^{\mathsf T} - \lambda\,
+        \mathrm{id}_{E^*}) = \bigl(\operatorname{im}(u - \lambda\,
+        \mathrm{id}_E)\bigr)^\circ$, and deduce that $u$ and
+        $u^{\mathsf T}$ have the same eigenvalues with the same
+        geometric multiplicities.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part IV --- The Fredholm alternative.}
+\begin{enumerate}[resume]
+  \item Prove that $\operatorname{im} u = (\ker u^{\mathsf
+        T})_\circ$ for $u \in \mathcal{L}(E, F)$, and deduce the
+        \emph{Fredholm alternative} in finite dimension: the
+        equation $u(x) = b$ has a solution if and only if every
+        $\psi \in F^*$ with $u^{\mathsf T}\psi = 0$ satisfies
+        $\psi(b) = 0$.
+  \item Matrix form: for $A \in \mathcal{M}_{m,n}(K)$ and $b \in
+        K^m$, exactly one of the following holds: (i) $Ax = b$
+        has a solution; (ii) there is $y \in K^m$ with
+        $A^{\mathsf T}y = 0$ and $y^{\mathsf T}b = 1$. Prove both
+        the ``at most one'' and the ``at least one''.
+  \item Find all $b \in \R^3$ for which the system
+        \[
+        x + y = b_1, \qquad y + z = b_2, \qquad x + 2y + z = b_3
+        \]
+        has a solution, by computing the kernel of the transposed
+        matrix.
+  \item (A discrete Neumann problem) On $E = \R^n$ ($n \geq 3$),
+        define $L$ by $(Lx)_k = x_k - \frac12(x_{k-1} +
+        x_{k+1})$, indices modulo $n$. Show $L^{\mathsf T} = L$
+        (canonical identifications), show $\ker L$ is the line of
+        constant vectors \emph{(look at a maximal coordinate)},
+        and conclude: $Lx = b$ is solvable iff $\sum_k b_k = 0$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part V --- The trace form and the invariance
+theorem.} Recall from \cref{exo:b2:linalg:9} that $A \mapsto
+\operatorname{tr}(A\,\cdot)$ identifies $\mathcal{M}_n(K)$ with
+its dual. Assume $\operatorname{char} K = 0$ (e.g.\ $K = \Q, \R,
+\C$).
+\begin{enumerate}[resume]
+  \item Under this identification, show that the annihilator of
+        the subspace $\mathcal{S}_n$ of symmetric matrices is the
+        subspace $\mathcal{A}_n$ of antisymmetric matrices, and
+        conversely.
+  \item Show that the annihilator of the hyperplane
+        $\mathfrak{sl}_n = \{M : \operatorname{tr} M = 0\}$ is
+        the line $K I_n$; equivalently, a linear form vanishing
+        on all trace-zero matrices is a multiple of the trace.
+  \item Show that every matrix of $\mathcal{M}_n(K)$ is the sum
+        of two invertible matrices.
+  \item (The trace is the only linear similarity invariant) Let
+        $t$ be a linear form on $\mathcal{M}_n(K)$ with
+        $t(PMP^{-1}) = t(M)$ for every $M$ and every invertible
+        $P$. Show first $t(PX) = t(XP)$ for $P$ invertible, then
+        $t(BX) = t(XB)$ for \emph{all} $B$, and conclude $t = c
+        \operatorname{tr}$ for some $c \in K$.
+  \item Show that $\operatorname{rk} u \leq r$ if and only if $u$
+        is a sum of $r$ maps of rank $\leq 1$, i.e.\ $u =
+        \sum_{i=1}^{r} \psi_i(\cdot)\,f_i$ with $\psi_i \in E^*$,
+        $f_i \in F$; deduce $\operatorname{rk}(u + v) \leq
+        \operatorname{rk} u + \operatorname{rk} v$.
+  \item (Synthesis) Draw up the dictionary proved in this
+        problem: subspaces versus annihilators, sums versus
+        intersections, maps versus transposes, solvability versus
+        orthogonality to the transposed kernel, trace versus
+        similarity. For each entry, cite the question that proved
+        it, and state in one sentence what replaces the dimension
+        counts when dimension becomes infinite (the Year 3 volume
+        makes this precise on Hilbert spaces).
+\end{enumerate}
+\end{problem}

@@ -29,6 +29,24 @@ limit is unique when it exists (same proof as
 \cref{prop:b1:seq:first}).
 \end{definition}
 
+\begin{example}[A limit through the squeeze]\label{ex:b1:continuity:floorlimit}
+Compute $\lim_{x \to 0} x\,\bigl\lfloor \frac1x \bigr\rfloor$.
+The floor bracketing $\frac1x - 1 < \lfloor \frac1x \rfloor \leq
+\frac1x$ gives, after multiplying by $x$ (mind the sign!):
+\[
+1 - x < x\Bigl\lfloor \frac1x \Bigr\rfloor \leq 1 \quad (x > 0),
+\qquad
+1 \leq x\Bigl\lfloor \frac1x \Bigr\rfloor < 1 - x \quad (x < 0),
+\]
+and both one-sided squeezes close on $1$: the limit is $1$. Note
+what happened: $\lfloor \frac1x\rfloor$ alone has wild jumps near
+$0$, but the factor $x$ tames each jump ($x$ times a unit jump is
+small), and only the bracketing survives. The closing insight:
+limits of products of a small factor with a bounded-oscillation
+factor are squeeze problems, never operation-theorem problems ---
+the operations theorem needs \emph{both} factors to converge.
+\end{example}
+
 \begin{theorem}[Sequential characterization]\label{thm:b1:continuity:seqchar}
 $f(x) \to \ell$ as $x \to x_0$ if and only if: for \emph{every}
 sequence $(u_n)$ of points of $I$ with $u_n \to x_0$, one has
@@ -59,9 +77,38 @@ inequalities, and the squeeze theorem holds.
 \begin{proof}
 Each statement transfers through
 \cref{thm:b1:continuity:seqchar} to its sequence analogue
-(\cref{thm:b1:seq:operations,thm:b1:seq:order}). (Composition can
-also be checked directly by chaining the two definitions.)
+(\cref{thm:b1:seq:operations,thm:b1:seq:order}). For composition,
+the direct chaining is worth writing once: given $\varepsilon >
+0$, the limit of $g$ at $\ell$ provides $\eta > 0$ with
+\[
+\abs{y - \ell} \leq \eta \implies \abs{g(y) - m} \leq
+\varepsilon \quad (y \text{ in the domain of } g),
+\]
+where the case $y = \ell$ is covered because $g(\ell) = m$; then
+the limit of $f$ at $x_0$ provides $\delta > 0$ with $\abs{x -
+x_0} \leq \delta \implies \abs{f(x) - \ell} \leq \eta$; chaining,
+$\abs{x - x_0} \leq \delta$ gives $\abs{g(f(x)) - m} \leq
+\varepsilon$. In the alternative hypothesis ($f \neq \ell$ near
+$x_0$), the value $y = \ell$ is never fed to $g$ and its value
+there is irrelevant.
 \end{proof}
+
+\begin{example}[Why the composition proviso exists]\label{ex:b1:continuity:compositiontrap}
+Let $g(y) = 0$ for $y \neq 0$ and $g(0) = 1$, and let $f$ be
+identically $0$. Then $f(x) \to 0$ as $x \to 0$, and $g(y) \to 0$
+as $y \to 0$; yet $g(f(x)) = g(0) = 1$ for every $x$, so $g
+\circ f \to 1 \neq 0$. The inner function sits \emph{exactly on}
+the forbidden value $\ell = 0$ forever, and $g$'s limit at $0$
+ignores what $g$ does at $0$. The proviso of
+\cref{cor:b1:continuity:operations} --- either $g(\ell) = m$
+(i.e.\ $g$ continuous at $\ell$), or $f \neq \ell$ near $x_0$ ---
+is precisely what rules this out. The closing insight: in
+practice one composes \emph{continuous} functions and the
+proviso is free; it bites only when limits are taken along
+punctured neighborhoods, which is why the definition of
+$\lim_{x \to x_0}$ used in this book includes the point when it
+is in the domain.
+\end{example}
 
 \section{Continuity}
 
@@ -73,6 +120,24 @@ continuous at every point. By
 $f(u_n) \to f(x_0)$ for every sequence $u_n \to x_0$ in $I$.
 \end{definition}
 
+\begin{example}[A taxonomy of discontinuities]\label{ex:b1:continuity:taxonomy}
+Three ways to fail at a point, in increasing severity.
+\emph{Removable}: $f(x) = \frac{\sin x}{x}$ on $\R^*$ has limit
+$1$ at $0$; defining $f(0) = 1$ repairs it --- the discontinuity
+was a hole, not a feature. \emph{Jump}: $\lfloor x \rfloor$ at
+an integer has distinct one-sided limits ($n - 1$ and $n$); no
+choice of value can reconcile them, but both half-limits exist.
+\emph{Essential}: $\sin\frac1x$ at $0$ has no one-sided limit at
+all (\cref{exo:b1:continuity:1}) --- oscillation without
+settlement. Monotone functions can only produce the middle kind
+(their one-sided limits always exist, being suprema and infima),
+which is why their discontinuity sets are at most countable ---
+one rational per jump. Derivatives, by Darboux's theorem
+(\cref{exo:b1:derivative:10}), can only produce the last kind:
+a function with a jump discontinuity is never the derivative of
+anything.
+\end{example}
+
 \begin{proposition}\label{prop:b1:continuity:algebra}
 Sums, products, quotients (where defined) and compositions of
 continuous functions are continuous. Polynomials, rational fractions
@@ -82,12 +147,35 @@ trigonometric and hyperbolic functions and their inverses
 \end{proposition}
 
 \begin{proof}
-Operations: \cref{cor:b1:continuity:operations}. Constants and the
-identity are continuous, hence polynomials and rational fractions.
-$\abs{\,\cdot\,}$: reverse triangle inequality. For the classical
+Operations: \cref{cor:b1:continuity:operations}. Constants and
+the identity are continuous directly from the definition
+($\delta = \varepsilon$ serves the identity, any $\delta$ the
+constants); products of continuous functions being continuous,
+each monomial $a_k x^k$ follows by induction on $k$, and sums
+finish the polynomials; a rational fraction is a quotient of two
+polynomials, continuous wherever the denominator does not
+vanish. $\abs{\,\cdot\,}$: reverse triangle inequality,
+$\bigl|\abs{f(x)} - \abs{f(x_0)}\bigr| \leq \abs{f(x) -
+f(x_0)}$, so the same $\delta$ works. For the classical
 functions we grant continuity here; differentiability (proved in
 \cref{ch:b1:derivative}) is stronger.
 \end{proof}
+
+\begin{example}[Max and min of continuous functions]\label{ex:b1:continuity:maxmin}
+If $f, g$ are continuous, so are $\max(f, g)$ and $\min(f, g)$:
+no case analysis needed, thanks to the identities
+\[
+\max(f, g) = \frac{f + g + \abs{f - g}}{2},
+\qquad
+\min(f, g) = \frac{f + g - \abs{f - g}}{2},
+\]
+and the continuity of sums and of $\abs{\,\cdot\,}$
+(\cref{prop:b1:continuity:algebra}). In particular $f^+ =
+\max(f, 0)$ and $f^- = \max(-f, 0)$ are continuous with $f =
+f^+ - f^-$: the sign-splitting used for series
+(\cref{ch:b1:series}) and, at full scale, in the integration
+theory of the Year 3 volume, costs nothing in regularity.
+\end{example}
 
 \begin{theorem}[Intermediate value theorem]\label{thm:b1:continuity:ivt}
 Let $f$ be continuous on $\intcc{a}{b}$ with $f(a) \leq 0 \leq
@@ -132,6 +220,43 @@ axis: the dichotomy proof of \cref{thm:b1:continuity:ivt} traps a
 crossing point between adjacent sequences.}
 \end{omfigure}
 
+\begin{example}[One equation, the full protocol]\label{ex:b1:continuity:protocol}
+Solve $\eu^x = 3 - x$ over $\R$: existence, uniqueness,
+location. Set $g(x) = \eu^x + x - 3$, continuous. Location and
+existence: $g(0) = -2 < 0$ and $g(1) = \eu - 2 > 0$, so the
+intermediate value theorem plants a solution in
+$\intoo{0}{1}$. Uniqueness: $g$ is a sum of the strictly
+increasing $\eu^x$ and $x - 3$, hence strictly increasing on
+$\R$; a strictly monotone function takes each value at most
+once, so the solution is unique on all of $\R$ (not just in the
+interval probed). The protocol --- rearrange to $g = 0$, sign
+change for existence, monotonicity for uniqueness --- settles
+most ``how many solutions'' questions in three lines, and
+\cref{ch:b1:derivative}'s variation tables
+extend it to non-monotone $g$ by cutting $\R$ into monotone
+branches.
+\end{example}
+
+\begin{example}[Dichotomy as an algorithm]\label{ex:b1:continuity:dichotomy}
+The proof of \cref{thm:b1:continuity:ivt} computes. Take $f(x) =
+x^3 + x - 1$: $f(0) = -1 < 0 < 1 = f(1)$, so a root lies in
+$\intoo{0}{1}$. Halving:
+\[
+f(0.5) = -0.375 < 0, \qquad
+f(0.75) = 0.171875 > 0, \qquad
+f(0.625) = -0.130859375 < 0 ,
+\]
+so the root is successively trapped in $\intoo{0.5}{1}$, then
+$\intoo{0.5}{0.75}$, then $\intoo{0.625}{0.75}$ (true value:
+$c \approx 0.6823$). After $n$ steps the error is at most
+$\frac{b - a}{2^n}$: ten steps give three decimals, twenty give
+six. The closing insight: the intermediate value theorem is not
+only an existence statement --- its dichotomy proof is a
+guaranteed, if slow, root-finding algorithm, against which the
+fast but local Newton method of \cref{ch:b1:derivative} should
+be measured.
+\end{example}
+
 \begin{theorem}[Extreme value theorem]\label{thm:b1:continuity:evt}
 A continuous function on a segment $\intcc{a}{b}$ is bounded and
 attains its bounds: there are $c, d \in \intcc{a}{b}$ with
@@ -159,6 +284,47 @@ f(v_{\varphi(n)}) = M$ by the squeeze. The infimum is handled by
 $-f$.
 \end{proof}
 
+\begin{example}[Positive minimum on a segment]\label{ex:b1:continuity:posmin}
+Let $f$ be continuous on $\intcc{0}{1}$ with $f(x) > 0$ for
+every $x$. Then $\inf f > 0$: by the extreme value theorem the
+infimum is a \emph{value} $f(c)$, and $f(c) > 0$ by hypothesis.
+So a continuous positive function on a segment is bounded away
+from $0$ --- a two-line argument used a dozen times in the
+coming chapters (denominators under control, step-function
+framings, error bounds). On a non-compact interval this fails
+spectacularly: $f(x) = x$ on $\intoc{0}{1}$ is continuous and
+positive with $\inf f = 0$, not attained. The closing insight:
+``positive'' upgrades to ``uniformly positive'' exactly when the
+domain is compact; every hypothesis of the extreme value theorem
+is load-bearing.
+\end{example}
+
+\begin{remark}[Common pitfalls around the three theorems]
+(i) \emph{Continuous images}: only \emph{segments} are robust.
+The continuous image of an open interval need not be open
+($x \mapsto x^2$ maps $\intoo{-1}{1}$ onto $\intco{0}{1}$), the
+image of a closed set need not be closed ($\arctan$ maps the
+closed $\R$ onto the open
+$\intoo{-\frac\pi2}{\frac\pi2}$); but the image of a segment is
+a segment (\cref{thm:b1:continuity:evt}). (ii) \emph{The
+intermediate value theorem needs an interval}: the function $x
+\mapsto \frac1x$, continuous on $\intco{-1}{0} \cup
+\intoc{0}{1}$, takes the values $-1$ and $1$ yet never
+vanishes --- its domain is two disjoint pieces, and the value
+$0$ falls into the gap; always name the interval on which the
+theorem is applied. (iii) \emph{Uniform continuity is a property of the
+pair (function, set)}: $x^2$ is uniformly continuous on every
+segment yet not on $\R$
+(\cref{ex:b1:continuity:notuniform}) --- the words ``uniformly
+continuous'' without a domain are meaningless. (iv)
+\emph{Continuity of the inverse is not formal}: it holds on
+intervals via monotonicity
+(\cref{thm:b1:continuity:bijection}), but a continuous bijection
+between unions of intervals can have a discontinuous inverse ---
+the remark after that theorem is there because students quote it
+without the interval hypothesis.
+\end{remark}
+
 \section{Monotone functions and inverse functions}
 
 \begin{theorem}[Monotone bijection theorem]\label{thm:b1:continuity:bijection}
@@ -178,13 +344,20 @@ is an interval by \cref{thm:b1:continuity:ivt}.
 (2) $f^{-1}$ is strictly increasing: if $y < y'$ in $J$ but $f^{-1}(y)
 \geq f^{-1}(y')$, applying the increasing $f$ gives $y \geq y'$,
 absurd. Continuity of $f^{-1}$ at $y_0 = f(x_0) \in J$: let
-$\varepsilon > 0$. The points $x_0 \pm \varepsilon$ (intersected with
-$I$; treat interior points --- endpoints are similar, one-sided) have
-images $f(x_0 - \varepsilon) < y_0 < f(x_0 + \varepsilon)$. Take
+$\varepsilon > 0$. Suppose first $x_0$ interior to $I$, and
+shrink $\varepsilon$ so that $x_0 \pm \varepsilon \in I$: their
+images satisfy $f(x_0 - \varepsilon) < y_0 < f(x_0 +
+\varepsilon)$. Take
 $\delta = \min\bigl(y_0 - f(x_0 - \varepsilon),\, f(x_0 +
 \varepsilon) - y_0\bigr) > 0$: for $\abs{y - y_0} \leq \delta$,
 monotonicity of $f^{-1}$ squeezes $f^{-1}(y)$ between $x_0 -
-\varepsilon$ and $x_0 + \varepsilon$. (Note: continuity of $f^{-1}$
+\varepsilon$ and $x_0 + \varepsilon$. If $x_0$ is, say, the left
+endpoint of $I$, only $x_0 + \varepsilon$ is available: then
+$y_0 = \min J$ (monotonicity), every $y \in J$ with $y - y_0
+\leq f(x_0 + \varepsilon) - y_0$ satisfies $x_0 \leq f^{-1}(y)
+\leq x_0 + \varepsilon$, and the one-sided estimate is exactly
+continuity at an endpoint; the right endpoint is symmetric.
+(Note: continuity of $f^{-1}$
 was \emph{not} deduced from that of $f$ by symmetry --- it is
 monotonicity on an interval that does the work.)
 \end{proof}
@@ -197,6 +370,26 @@ complement (\cref{exo:b1:continuity:10}): a continuous
 \emph{injective} function on an interval is automatically strictly
 monotonic, so the monotonicity hypothesis costs nothing.
 \end{remark}
+
+\begin{example}[Roots of all orders]\label{ex:b1:continuity:nthroot}
+For $n \in \N^*$, the function $f(x) = x^n$ is continuous and
+strictly increasing on $\intco{0}{+\infty}$, with $f(0) = 0$ and
+$f(x) \to +\infty$: its image is $\intco{0}{+\infty}$
+(\cref{thm:b1:continuity:ivt} for the interval structure). The
+monotone bijection theorem then delivers, in one stroke, a
+strictly increasing \emph{continuous} inverse
+\[
+x \mapsto x^{1/n} \colon \intco{0}{+\infty} \to
+\intco{0}{+\infty} :
+\]
+existence, uniqueness and continuity of $n$-th roots, with no
+computation. Compare with \cref{exo:b1:reals:12}, which built
+$\sqrt y$ by hand from the supremum: one chapter of theory has
+compressed that page of work into two lines, and the same two
+lines legitimized $\arcsin$, $\arctan$ and
+$\operatorname{arsinh}$ before them. The closing insight: a good
+theorem is stored labor.
+\end{example}
 
 \section{Uniform continuity}
 
@@ -222,6 +415,25 @@ bounded interval it is Lipschitz, hence uniformly continuous ---
 consistent with Heine's theorem below.
 \end{example}
 
+\begin{example}[Uniform moduli, explicitly]\label{ex:b1:continuity:moduli}
+On a segment, Heine guarantees a uniform $\delta$; often one can
+also \emph{compute} it. For $f(x) = x^2$ on $\intcc{0}{10}$:
+\[
+\abs{x^2 - y^2} = \abs{x + y}\,\abs{x - y} \leq 20\,\abs{x - y},
+\]
+so $\delta = \frac{\varepsilon}{20}$ works uniformly (a
+Lipschitz modulus, linear in $\varepsilon$). For $\sqrt x$ on
+$\intcc{0}{1}$: $\abs{\sqrt x - \sqrt y} \leq \sqrt{\abs{x -
+y}}$ (\cref{exo:b1:continuity:9}), so $\delta = \varepsilon^2$
+works --- uniform but \emph{not} linear: near $0$ the square
+root is steep, and the price appears in the exponent of
+$\varepsilon$, not in a failure of uniformity. The closing
+insight: uniform continuity is a spectrum, not a yes/no ---
+the function $\delta(\varepsilon)$, called the modulus, measures
+how expensive the uniformity is, and Lipschitz is simply its
+best grade.
+\end{example}
+
 \begin{theorem}[Heine]\label{thm:b1:continuity:heine}
 A continuous function on a \emph{segment} $\intcc{a}{b}$ is uniformly
 continuous.\index{Heine's theorem}
@@ -238,6 +450,85 @@ y}$). Continuity at $c$ gives $f(x_{\varphi(n)}) \to f(c)$ and
 $f(y_{\varphi(n)}) \to f(c)$, so $\abs{f(x_{\varphi(n)}) -
 f(y_{\varphi(n)})} \to 0 < \varepsilon_0$: contradiction.
 \end{proof}
+
+\begin{example}[Bounded, continuous, yet not uniformly so]\label{ex:b1:continuity:sinx2}
+The function $f(x) = \sin(x^2)$ is continuous and bounded on
+$\R$, but not uniformly continuous. Take
+\[
+x_n = \sqrt{2\pi n}, \qquad y_n = \sqrt{2\pi n + \tfrac\pi2}:
+\qquad
+y_n - x_n = \frac{\pi/2}{\sqrt{2\pi n + \frac\pi2} +
+\sqrt{2\pi n}} \longrightarrow 0 ,
+\]
+yet $f(y_n) - f(x_n) = \sin\bigl(2\pi n + \frac\pi2\bigr) -
+\sin(2\pi n) = 1 - 0 = 1$ for every $n$: no single $\delta$ can
+serve $\varepsilon = \frac12$ everywhere. Geometrically, the
+oscillations of $\sin(x^2)$ \emph{accelerate}: the graph
+completes a full wave over shorter and shorter windows, so the
+horizontal scale a given $\varepsilon$ requires shrinks to zero
+as $x$ grows. The closing insight: boundedness does not buy
+uniformity (this example), and unboundedness does not preclude
+it ($\sqrt x$, \cref{exo:b1:continuity:9}); what decides is the
+\emph{modulus of oscillation}, and Heine's theorem says compact
+domains discipline it automatically.
+\end{example}
+
+\begin{example}[The calculator experiment, explained]\label{ex:b1:continuity:cositeration}
+Type any number into a calculator and press $\cos$ repeatedly:
+the display locks onto $0.7390851\dots$ Why? After one press the
+value lies in $\intcc{-1}{1}$, after two in $\intcc{\cos 1}{1}
+\subseteq \intcc{0.54}{1}$, a stable interval for $\cos$. On it,
+$\abs{\cos a - \cos b} \leq \sin(1)\,\abs{a - b}$ with $\sin 1 =
+0.841\dots < 1$ (the product-to-sum bound of
+\cref{pb:b1:seq:1}, or the mean value inequality of
+\cref{ch:b1:derivative}): the iteration contracts, so by the
+error-control step of \cref{met:b1:seq:recurrent},
+\[
+\abs{u_n - c} \leq (0.842)^{\,n-2}\,\abs{u_2 - c}
+\longrightarrow 0 ,
+\]
+where $c$ is the unique fixed point $\cos c = c$
+(\cref{exo:b1:continuity:6}). About $40$ presses buy three
+decimals ($0.842^{40} \approx 10^{-3}$) --- a geometric rate,
+milder than dichotomy's $2^{-n}$ per step, but each press costs
+one keystroke while each dichotomy step costs a full sign
+evaluation. The closing insight: the fixed-point picture of
+\cref{ch:b1:seq} and the existence theorems of this chapter are
+two halves of one story --- IVT finds $c$, contraction reaches
+it.
+\end{example}
+
+\begin{remark}[Where these theorems work next]
+The three pillars of this chapter each power a later one. The
+intermediate value theorem feeds every existence-of-solutions
+argument and the monotone bijection theorem; the extreme value
+theorem turns optimization problems into theorems (Rolle and the
+mean value theorem in \cref{ch:b1:derivative} start exactly
+there); Heine's theorem is the reason continuous functions on
+segments can be integrated in \cref{ch:b1:integration} --- the
+uniform $\delta$ is what makes Riemann sums converge. In the Year
+2 volume the same trio reappears in normed vector spaces, with
+compactness doing the work that segments do here.
+\end{remark}
+
+\begin{remark}[Perspectives inside this volume]
+Continuity is about to be outranked but never retired.
+\Cref{ch:b1:derivative} strengthens it to differentiability and
+returns the favor (differentiable implies continuous);
+\cref{ch:b1:integration} rests on it twice, through Heine for
+the construction and through the fundamental theorem, whose
+central object $x \mapsto \int_a^x f$ upgrades a merely
+continuous $f$ to a $C^1$ primitive. In
+\cref{ch:b1:multivar}, continuity in two variables holds a trap
+worth previewing: the function $\frac{xy}{x^2 + y^2}$ (extended
+by $0$) is continuous in $x$ for each fixed $y$ and in $y$ for
+each fixed $x$, yet not continuous at the origin --- along the
+diagonal $x = y$ it is constantly $\frac12$. Separate continuity
+is strictly weaker than continuity: the sequential
+characterization survives the move to $\R^2$, but sequences must
+be allowed to approach from \emph{every} direction, not only
+along the axes.
+\end{remark}
 
 \section{Exercises}
 
@@ -318,3 +609,201 @@ $f(x) \to \ell \in \R$ as $x \to +\infty$. Prove that $f$ is
 large $A$: Heine on $\intcc{0}{A+1}$, the limit beyond $A$; make the
 two regimes overlap.)}
 \end{exercise}
+
+\section{Problem: Cauchy's functional equation and its sisters}
+
+\begin{problem}[{Weekend problem --- $f(x + y) = f(x) + f(y)$:
+regularity forces linearity, and the portrait of the monsters}]
+\label{pb:b1:continuity:1}
+Which functions satisfy $f(x + y) = f(x) + f(y)$ for all real $x,
+y$? Cauchy raised the question in 1821; the answer is a paradigm.
+\Cref{exo:b1:continuity:11} shows that such an \emph{additive}
+function is linear on $\Q$ and that full continuity forces $f(x)
+= cx$. This problem sharpens the hypothesis dramatically ---
+continuity at a \emph{single} point, or monotonicity, or mere
+boundedness on one small interval, each suffices --- then paints
+the portrait of a hypothetical nonlinear solution (its graph
+fills the plane), solves the sister equations characterizing
+$\eu^{cx}$, $c\ln x$, $x^c$ and $cx^2$, and closes with Jensen's
+equation and the theorem \emph{midpoint-convex $+$ continuous
+$\implies$ convex}.\index{Cauchy's functional
+equation}\index{functional equation} Throughout, \emph{additive}
+means: $f(x + y) = f(x) + f(y)$ for all $x, y \in \R$.
+
+\medskip
+\noindent\textbf{Part I --- $\Q$-linearity, and one point of
+continuity.}
+\begin{enumerate}
+  \item Let $f$ be additive. From \cref{exo:b1:continuity:11},
+        $f(r) = f(1)\,r$ for rational $r$. Prove the finer
+        statement used below: for \emph{every} $x \in \R$ and $r
+        \in \Q$, $f(rx) = r\,f(x)$ ($f$ is
+        $\Q$-\emph{linear}).
+  \item Suppose the additive $f$ is continuous at one single
+        point $x_0$. Show that $f$ is continuous everywhere
+        \emph{(compute $f(x + h) - f(x)$ in terms of $f(x_0 + h)
+        - f(x_0)$)}, hence $f(x) = f(1)\,x$.
+  \item Show that an additive function is determined by its
+        restriction to any dense subgroup: if two additive
+        functions agree on $\Z + \sqrt2\,\Z$ and both are
+        continuous, they are equal --- while without continuity,
+        prescribing $f(1) = 0$ and $f(\sqrt 2) = 1$ is consistent
+        with $\Q$-linearity on the subgroup. Compute $f(m +
+        n\sqrt2)$ for this prescription.
+  \item Let $f$ be additive and bounded above by $M$ on some
+        interval $\intcc{a}{b}$ with $a < b$. Show that $f$ is
+        bounded above on $\intcc{0}{\ell}$, $\ell = b - a$
+        \emph{(translate by $a$)}.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part II --- The regularity ladder.}
+\begin{enumerate}[resume]
+  \item Continuing question 4: using $f(\ell - t) + f(t) =
+        f(\ell)$, show that $f$ is also bounded \emph{below} on
+        $\intcc{0}{\ell}$: $\abs f \leq C$ there.
+  \item Show that $\abs{f(t)} \leq \frac{C}{n}$ for $t \in
+        \intcc{0}{\ell/n}$, and deduce that $f$ is continuous at
+        $0$ \emph{(oddness handles the left side)}, hence
+        everywhere (question 2): an additive function bounded on
+        one interval is linear.
+  \item Deduce the monotone case: an additive function
+        nondecreasing on some $\intcc{a}{b}$ ($a < b$) is $f(x)
+        = cx$ with $c \geq 0$.
+  \item Assemble the \emph{regularity ladder}: for an additive
+        $f$, the following are equivalent --- (a) $f(x) = cx$;
+        (b) $f$ continuous; (c) $f$ continuous at one point; (d)
+        $f$ monotone on some nondegenerate interval; (e) $f$
+        bounded on some nondegenerate interval. Arrange the
+        implications so that each is either trivial or already
+        proved.
+  \item Verify that questions 4--6 consumed only a bound
+        \emph{above}: an additive function bounded above on one
+        nondegenerate interval is already linear. Deduce the
+        mirror statement for a bound below, and record the
+        strongest form of the ladder's rung (e) thus obtained.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part III --- Portrait of a monster.} Suppose
+now $f$ is additive but \emph{not} linear.
+\begin{enumerate}[resume]
+  \item Show there are nonzero reals $u, v$ with
+        $\dfrac{f(u)}{u} \neq \dfrac{f(v)}{v}$, and that the
+        vectors $(u, f(u))$ and $(v, f(v))$ span the plane (their
+        determinant $u f(v) - v f(u)$ is nonzero).
+  \item Show that the graph of $f$ contains all points
+        \[
+        r\,(u, f(u)) + s\,(v, f(v)), \qquad r, s \in \Q ,
+        \]
+        and deduce that the graph is \emph{dense in $\R^2$}: for
+        every point $(x_0, y_0)$ of the plane and every
+        $\varepsilon > 0$, some $(x, f(x))$ is within
+        $\varepsilon$ of it \emph{(solve the $2\times2$ real
+        system, then approximate the real coefficients by
+        rationals)}.
+  \item Deduce from question 11 the full portrait: a nonlinear
+        additive function is unbounded on every nondegenerate
+        interval, discontinuous at every point, monotone on no
+        interval, and its image of any interval is dense in
+        $\R$. Reconcile with question 8.
+  \item Monsters exist --- on a dense subgroup, constructively:
+        on $G = \Z + \sqrt2\,\Z$ define $f(m + n\sqrt2) = n$.
+        Show $f$ is well defined and additive on $G$, and that
+        $f$ is unbounded on $G \cap \intoo{0}{\varepsilon}$ for
+        every $\varepsilon > 0$ \emph{(for fixed $N$, only
+        finitely many $g = m + n\sqrt2 \in \intoo{0}{1}$ have
+        $\abs n \leq N$; yet $G \cap \intoo{0}{\varepsilon}$ is
+        infinite)}. Explain in one paragraph why extending such
+        an $f$ to all of $\R$ requires a basis of $\R$ as a
+        $\Q$-vector space (a \emph{Hamel basis}), whose
+        existence is an axiom-of-choice matter beyond this
+        volume.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part IV --- The sister equations.} All
+functions here are continuous.
+\begin{enumerate}[resume]
+  \item Let $f \colon \R \to \R$ be continuous, not identically
+        $0$, with $f(x + y) = f(x)f(y)$. Show $f(x) =
+        f\bigl(\frac x2\bigr)^2 \geq 0$, then $f > 0$ everywhere,
+        then $f(x) = \eu^{cx}$ for some $c$: the exponentials
+        are exactly the continuous morphisms from $(\R, +)$ to
+        $(\R^*, \times)$.
+  \item Let $f \colon \intoo{0}{+\infty} \to \R$ be continuous
+        with $f(xy) = f(x) + f(y)$. Show $f(x) = c\ln x$
+        \emph{(transport by $\exp$)}.
+  \item Let $f \colon \intoo{0}{+\infty} \to \intoo{0}{+\infty}$
+        be continuous with $f(xy) = f(x)f(y)$. Show $f(x) = x^c$.
+  \item Find all continuous $f \colon \R \to \R$ with
+        \[
+        f(x + y) = f(x) + f(y) + f(x)f(y) .
+        \]
+        \emph{(Study $h = 1 + f$; treat the degenerate case
+        separately.)}
+  \item (Parallelogram) Find all continuous $f \colon \R \to \R$
+        with $f(x + y) + f(x - y) = 2f(x) + 2f(y)$: show $f$ is
+        even, $f(0) = 0$, $f(nx) = n^2 f(x)$ by induction, then
+        $f(x) = f(1)\,x^2$. (This equation is the fingerprint of
+        quadratic forms --- the parallelogram law that detects,
+        in the Year 2 volume, which norms come from an inner
+        product.)
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part V --- Jensen and midpoint convexity.}
+\begin{enumerate}[resume]
+  \item (Jensen's equation) Let $f \colon \R \to \R$ be
+        continuous with $f\bigl(\frac{x+y}{2}\bigr) = \frac{f(x)
+        + f(y)}{2}$. Show that $g = f - f(0)$ satisfies
+        $g\bigl(\frac x2\bigr) = \frac{g(x)}{2}$, deduce that
+        $g$ is additive, and conclude $f(x) = cx + d$.
+  \item Suppose now only the \emph{inequality}: $f$ continuous
+        with
+        \[
+        f\Bigl(\frac{x + y}{2}\Bigr) \leq \frac{f(x) +
+        f(y)}{2} \qquad (x, y \in \R).
+        \]
+        Prove by induction on $n$ that for all dyadic weights
+        $\lambda = \frac{k}{2^n} \in \intcc{0}{1}$:
+        \[
+        f\bigl(\lambda x + (1 - \lambda)y\bigr) \leq \lambda
+        f(x) + (1 - \lambda) f(y) .
+        \]
+  \item Extend by continuity and density of the dyadics
+        (\cref{exo:b1:reals:8}) to every $\lambda \in
+        \intcc{0}{1}$: a continuous midpoint-convex function
+        satisfies the full convexity inequality (the notion
+        studied systematically in \cref{ch:b1:derivative}).
+  \item Show continuity cannot be dropped: a nonlinear additive
+        $f$ satisfies the \emph{midpoint equality} of question
+        19 yet no convexity inequality on any interval (question
+        12). Moral: midpoint convexity is a countable-stage
+        property (dyadics), convexity a continuum one;
+        continuity is the bridge --- exactly as in Parts I--II.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part VI --- Last variations and synthesis.}
+\begin{enumerate}[resume]
+  \item Find all continuous $f \colon \R \to \R$ with $f(x + y)
+        = f(x) + f(y) + xy$ \emph{(subtract the particular
+        solution $\frac{x^2}{2}$)}.
+  \item Prove: if $f \colon \R \to \R$ is continuous and
+        additive merely on a \emph{dense subgroup} $G$ (i.e.\
+        $f(g + g') = f(g) + f(g')$ for $g, g' \in G$), then $f$
+        is additive on $\R$. More generally, two continuous
+        functions that agree on a dense subset of $\R$ are
+        equal.
+  \item Synthesis, one sentence each: (i) state the regularity
+        ladder of question 8 from memory; (ii) explain why
+        ``graph dense in the plane'' is the right mental image
+        for the failure of regularity; (iii) list the five
+        classical functions characterized in Part IV--V and the
+        single method that caught them all; (iv) name the two
+        places where density of $\Q$ (or of the dyadics) in $\R$
+        carried the argument, and the place where it could not
+        (question 13).
+\end{enumerate}
+\end{problem}

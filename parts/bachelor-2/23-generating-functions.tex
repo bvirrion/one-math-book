@@ -22,6 +22,18 @@ G_X(t) = \E\bigl(t^X\bigr) = \sum_{n=0}^{\infty} p_n\,t^n .
 \]
 \end{definition}
 
+\begin{example}[First reflexes]\label{ex:b2:genfun:firstreflexes}
+A constant variable $X = c$ has $G_X(t) = t^c$; a shift obeys
+$G_{X+c}(t) = t^c\,G_X(t)$; and evaluating at special points
+reads off information without any expansion: $G_X(0) = \P(X
+= 0)$, $G_X(1) = 1$, and $G_X(-1) = \P(X\text{ even}) -
+\P(X\text{ odd})$, the parity balance exploited in
+\cref{exo:b2:genfun:10}. These one-liners are used silently
+everywhere below --- and the evaluation $G_X(0)$ is exactly
+how extinction probabilities will be extracted from iterated
+generating functions at the end of the chapter.
+\end{example}
+
 \begin{proposition}[Radius and first properties]\label{prop:b2:genfun:radius}
 The series defining $G_X$ has radius of convergence $\geq 1$;
 $G_X$ is defined and continuous on $\intcc{-1}{1}$,
@@ -37,9 +49,15 @@ p_n = \frac{G_X^{(n)}(0)}{n!} .
 Since $\sum p_n = 1$ converges, the terms $p_n\,1^n$ are bounded,
 so the radius is $\geq 1$ (Abel's lemma,
 \cref{ch:b2:powerseries}); at $t = \pm1$ the series converges
-absolutely ($\sum p_n = 1$ dominates), and normal convergence on
-$\intcc{-1}{1}$ gives continuity there
-(\cref{ch:b2:funcseq}). Smoothness inside and the coefficient
+absolutely ($\sum p_n = 1$ dominates); better, on the whole
+interval $\intcc{-1}1$,
+\[
+\sup_{\abs t\leq1}\,\abs{p_nt^n} = p_n
+\quad\text{with}\quad \sum_np_n < \infty :
+\]
+the series converges \emph{normally} on $\intcc{-1}1$, so
+its sum is continuous there
+(\cref{thm:b2:funcseq:weierstrass,thm:b2:funcseq:continuity}). Smoothness inside and the coefficient
 formula are the general theory of power series; the coefficients
 being recoverable, two variables with the same generating function
 have the same law.
@@ -58,6 +76,51 @@ $\frac{1}{1-p} > 1$).
 \sum_k e^{-\lambda}\frac{(\lambda t)^k}{k!} = e^{\lambda(t - 1)}$
 (radius $\infty$).
 \end{itemize}
+\end{example}
+
+\begin{example}[Integrating the generating
+function]\label{ex:b2:genfun:integraltrick}
+Derivatives of $G_X$ at $1$ give positive moments; the
+\emph{integral} gives a negative one. From $\int_0^1t^k\dd t
+= \frac1{k+1}$ and term-by-term integration (normal
+convergence on $\intcc01$):
+\[
+\int_0^1G_X(t)\,\dd t = \sum_{k\geq0}\frac{\P(X =
+k)}{k+1} = \E\Bigl(\frac1{1+X}\Bigr).
+\]
+For $X \sim \mathcal P(\lambda)$:
+\[
+\E\Bigl(\frac1{1+X}\Bigr) =
+\int_0^1\eu^{\lambda(t-1)}\,\dd t = \frac{1 -
+\eu^{-\lambda}}{\lambda},
+\]
+recovering in one line the series computation of
+\cref{ex:b2:randomvar:transferex}. The generating function
+is a two-way instrument: differentiate at $1$ for the
+moments $\E(X)$, $\E(X(X-1))$, integrate over $\intcc01$
+for $\E\bigl(\frac1{1+X}\bigr)$ --- one analytic object,
+queried in whichever direction the problem needs.
+\end{example}
+
+\begin{example}[A law with radius exactly
+one]\label{ex:b2:genfun:heavytail}
+Let $\P(X = k) = \dfrac{6}{\pi^2k^2}$ for $k \geq 1$ --- a
+probability law by Basel's identity
+(\cref{ex:b2:fourier:basel}). Its generating function
+$G(t) = \frac6{\pi^2}\sum_{k\geq1}\frac{t^k}{k^2}$ has radius
+of convergence exactly $1$: the general bound ``radius $\geq
+1$'' of \cref{prop:b2:genfun:radius} cannot be improved. And
+the mean is
+\[
+\sum_{k\geq1}k\,\P(X = k) =
+\frac6{\pi^2}\sum_{k\geq1}\frac1k = \infty :
+\]
+$G$ is continuous on $\intcc{-1}1$, smooth inside, but its
+derivative blows up at $1^-$ --- the graph arrives at the
+point $(1, 1)$ with a vertical tangent. Heavy tails are
+visible \emph{geometrically} on the generating function, at
+the single point $t = 1$; the moments theorem below makes
+this correspondence exact.
 \end{example}
 
 \begin{theorem}[Moments from the generating
@@ -88,9 +151,16 @@ each side finite exactly when the other is. When finite, the mean
 value theorem squeezes the difference quotients $\frac{G_X(1) -
 G_X(t)}{1 - t}$ between values of $G_X'$, so $G_X$ is
 differentiable at $1^-$ with $G_X'(1) = \sum np_n = \E(X)$ (by
-transfer). The second-order statement is identical with $G''_X(t)
-= \sum n(n-1)p_nt^{n-2}$, and König--Huygens turns
-$\E(X(X-1))$ into the variance formula.
+transfer). The second-order statement repeats the argument one level
+up: $G''_X(t) = \sum_{n\geq2}n(n-1)p_nt^{n-2}$ is
+nondecreasing on $\intoo01$ with monotone limit
+$\sum_nn(n-1)p_n = \E(X(X-1))$, finite exactly when $X$ has
+a second moment. The variance formula then follows from
+K\"onig--Huygens:
+\[
+V(X) = \E(X^2) - \E(X)^2 = \E\bigl(X(X-1)\bigr) + \E(X) -
+\E(X)^2 = G''_X(1) + G'_X(1) - G'_X(1)^2 .
+\]
 \end{proof}
 
 \begin{example}
@@ -98,6 +168,24 @@ Poisson: $G'(t) = \lambda e^{\lambda(t-1)}$, so $\E(X) = \lambda$;
 $G''(1) = \lambda^2$, so $V(X) = \lambda^2 + \lambda - \lambda^2 =
 \lambda$ --- the computations of \cref{ch:b2:randomvar} in one
 line each.
+\end{example}
+
+\begin{example}[The mode of a Poisson law]
+\label{ex:b2:genfun:poissonmode}
+Where is $\P(X = k)$ largest for $X \sim \mathcal
+P(\lambda)$? Consecutive weights compare through the ratio
+\[
+\frac{\P(X = k+1)}{\P(X = k)} = \frac{\lambda}{k + 1} ,
+\]
+which exceeds $1$ while $k < \lambda - 1$ and drops below
+$1$ once $k > \lambda - 1$: the weights rise then fall, with
+mode $\floor\lambda$ (and a tie between $\lambda - 1$ and
+$\lambda$ when $\lambda$ is an integer: for $\lambda = 3$,
+$\P(X = 2) = \P(X = 3) = \frac92\eu^{-3} \approx 0.224$).
+Ratio tests on the coefficients are often the fastest route
+to qualitative facts about a discrete law --- no generating
+function needed, but the coefficients \emph{are} the
+generating function, read term by term.
 \end{example}
 
 \section{Sums of independent variables}
@@ -140,6 +228,106 @@ $\mathcal{P}(\lambda) + \mathcal{P}(\mu) = \mathcal{P}(\lambda +
 \cref{exo:b2:randomvar:2}, now without computation.
 \end{example}
 
+\begin{example}[Two dice, one polynomial
+squared]\label{ex:b2:genfun:twodice}
+For one fair die, $G(t) = \frac{t + t^2 + \dots + t^6}{6}$;
+for the sum of two,
+\[
+G(t)^2 = \frac{1}{36}\bigl(t^2 + 2t^3 + 3t^4 + 4t^5 + 5t^6 +
+6t^7 + 5t^8 + 4t^9 + 3t^{10} + 2t^{11} + t^{12}\bigr) :
+\]
+the triangular law of dice sums ($7$ is the mode, with
+probability $\frac6{36} = \frac16$), read off a polynomial
+square that one multiplies out once in a lifetime. The
+convolution formula would have required eleven separate
+counting arguments; the generating function does them all
+simultaneously, because multiplying polynomials \emph{is}
+convolving coefficients. This mechanical translation ---
+laws to coefficients, sums to products --- is the whole
+business model of the chapter, and
+\cref{exo:b2:genfun:11} pushes it to the surprising
+Sicherman dice.
+\end{example}
+
+\begin{example}[Three dice and a coefficient
+extraction]\label{ex:b2:genfun:threedice}
+For the sum $S$ of three fair dice, $\P(S = 10)$ is the
+coefficient of $t^{10}$ in $\bigl(\frac{t + \dots +
+t^6}6\bigr)^3$. Factor and expand with the binomial and
+geometric series:
+\[
+\Bigl(\frac{t(1 - t^6)}{6(1 - t)}\Bigr)^{\!3}
+= \frac{t^3}{216}\,\bigl(1 - 3t^6 + 3t^{12} -
+t^{18}\bigr)\sum_{j\geq0}\binom{j+2}2t^j .
+\]
+The coefficient of $t^{10}$ requires $t^7$ from the product:
+$j = 7$ with the term $1$, and $j = 1$ with the term
+$-3t^6$:
+\[
+\P(S = 10) = \frac{1}{216}\Bigl(\binom92 -
+3\binom32\Bigr) = \frac{36 - 9}{216} = \frac{27}{216} =
+\frac18 .
+\]
+Direct enumeration of the $27$ triples is error-prone; the
+algebra is mechanical and scales to any number of dice ---
+the inclusion--exclusion visible in $(1 - t^6)^3$ is doing
+the case analysis automatically.
+\end{example}
+
+\begin{example}[Reading a law off its generating
+function]\label{ex:b2:genfun:identify}
+Which law has $G(t) = \dfrac1{2 - t}$? Expand into a power
+series:
+\[
+\frac{1}{2 - t} = \frac12\cdot\frac1{1 - t/2}
+= \sum_{k\geq0}\frac{t^k}{2^{k+1}} :
+\]
+nonnegative coefficients summing to $G(1) = 1$, so this is a
+genuine law, $\P(X = k) = 2^{-(k+1)}$ on $\N$ --- a
+geometric law starting at $0$. By uniqueness
+(\cref{prop:b2:genfun:radius}), no other law shares this
+$G$. Recognizing laws from their generating functions is a
+skill worth drilling: it is how the critical branching
+iterate $G_n(t) = \frac{n - (n-1)t}{n+1 - nt}$ of the
+weekend problem is unmasked as a geometric law conditioned
+on survival.
+\end{example}
+
+\begin{remark}
+Stability goes one way only: sums of independent Poissons are
+Poisson, but differences are not --- $X - Y$ takes negative
+values, so it has no generating function at all, and its law
+(the Skellam distribution) lies outside this chapter's
+toolkit. Likewise $\mathcal B(m, p) + \mathcal B(n, p')$ with
+$p \neq p'$ is \emph{not} binomial: the product $(1 - p +
+pt)^m(1 - p' + p't)^n$ has two distinct root locations, while
+every binomial pgf has a single repeated root. Reading
+stability off root patterns is a small preview of how much
+structure the polynomial encodes.
+\end{remark}
+
+\begin{remark}[The roots-of-unity filter]
+Evaluating at $-1$ separates even from odd; evaluating at all
+$m$-th roots of unity separates every residue class: with
+$\omega = \eu^{2\iu\pi/m}$,
+\[
+\P(X \equiv r \bmod m)
+= \frac1m\sum_{j=0}^{m-1}\omega^{-jr}\,G_X(\omega^j),
+\]
+since averaging $\omega^{j(k-r)}$ over $j$ yields $1$ if $k
+\equiv r$ and $0$ otherwise. Sample dividend: for the sum $S$
+of two fair dice, each $G(\omega^j) = \frac16\sum_{k=1}^6
+\omega^{jk} = -\frac16$ for $j \neq 0$ (the seven seventh
+roots of unity sum to zero), so
+\[
+\P(7 \mid S) = \frac17\Bigl(1 +
+6\cdot\frac1{36}\Bigr) = \frac16 ,
+\]
+confirming the count from \cref{ex:b2:genfun:twodice} ---
+and the method scales to questions where direct counting
+does not.
+\end{remark}
+
 \begin{theorem}[Random sums: Wald's identity for generating
 functions]\label{thm:b2:genfun:compound}
 Let $(X_k)_{k\geq1}$ be independent $\N$-valued variables with the
@@ -170,6 +358,47 @@ summations is Fubini for summable families
 and \cref{thm:b2:genfun:moments}: $\E(S) = G_N'(G_X(1))\,G_X'(1)
 = G_N'(1)G_X'(1) = \E(N)\E(X_1)$.
 \end{proof}
+
+\begin{example}[Compound Poisson: yearly insurance
+losses]\label{ex:b2:genfun:compoundpoisson}
+An insurer receives $N \sim \mathcal P(\lambda)$ claims in a
+year, each claim costing $X_k$ (integer units, i.i.d., pgf
+$G_X$, mean $\mu$, independent of $N$). By
+\cref{thm:b2:genfun:compound}, the total loss $S$ has
+\[
+G_S(t) = \eu^{\lambda(G_X(t) - 1)},
+\qquad
+\E(S) = \lambda\mu ,
+\]
+and differentiating twice at $1^-$:
+\[
+V(S) = \lambda\,G_X''(1) + \lambda^2\mu^2 + \lambda\mu -
+(\lambda\mu)^2 = \lambda\,\E(X^2) .
+\]
+The variance involves the \emph{second} moment of a single
+claim, not its variance: a compound Poisson sum feels the
+occasional large claim twice --- once through how many, once
+through how big. For $\lambda = 10$ claims of geometric law
+with mean $2$ ($\E X^2 = 6$): $\E S = 20$, $V(S) = 60$, and
+Chebyshev (\cref{ch:b2:randomvar}) already yields usable
+solvency margins. This ``randomly stopped sum'' pattern is the
+same one that will drive the branching recursion of
+\cref{prop:b2:genfun:branching}: composition of generating
+functions is the algebra of random populations.
+\end{example}
+
+\begin{remark}
+The independence of $N$ from the summands is not decorative.
+Take $X_k \in \{0, 2\}$ with equal probabilities and let $N =
+X_1$ (flagrantly dependent): then $S = X_1 + \dots + X_N$ is
+$0$ when $X_1 = 0$, and $2 + X_2$ when $X_1 = 2$, so $\E(S) =
+\frac12(2 + 1) = \frac32$, while $\E(N)\E(X_1) = 1\cdot1 =
+1$: Wald's identity fails. When the number of terms is
+allowed to \emph{react} to the terms themselves, the clean
+product structure collapses --- the full theory of such
+``stopping'' rules is the martingale chapter of the Year 3
+volume.
+\end{remark}
 
 \section{Poisson approximation}
 
@@ -217,6 +446,27 @@ crossing: each opportunity is nearly negligible, opportunities are
 many, and only the mean rate $\lambda$ survives in the limit.
 \end{remark}
 
+\begin{example}[Watching the Poisson limit
+converge]\label{ex:b2:genfun:poissonnumerics}
+Fix $\lambda = 2$ and let $X_n \sim \mathcal B(n, 2/n)$. The
+no-event probability is exactly $\P(X_n = 0) = (1 - 2/n)^n$:
+\[
+n = 10:\ 0.107, \qquad
+n = 20:\ 0.122, \qquad
+n = 50:\ 0.130, \qquad
+n = 100:\ 0.133,
+\]
+against the limit $\eu^{-2} \approx 0.135$. The convergence
+is monotone and of speed $O(1/n)$ --- expanding, $(1 -
+2/n)^n = \eu^{-2}\bigl(1 - \tfrac2n + O(n^{-2})\bigr)$ ---
+so for $n$ in the hundreds the Poisson model is already
+accurate to the third digit. This is the practical content
+of the law of rare events: the modeller never knows $n$ and
+$p$ separately (how many micro-opportunities for a typo does
+a page hold?), but only their product $\lambda$, and the
+limit law mercifully depends on nothing else.
+\end{example}
+
 \section{Branching processes}
 
 Consider a population starting from one ancestor; each individual,
@@ -250,6 +500,28 @@ by monotone continuity (\cref{thm:b2:proba:continuity}), and
 continuity of $G$ on $[0, 1]$ turns $q_{n+1} = G(q_n)$ into $q =
 G(q)$ at the limit.
 \end{proof}
+
+\begin{example}[Watching extinction converge]
+\label{ex:b2:genfun:cobwebnumerics}
+For the offspring law $(p_0, p_1, p_2) = (\tfrac14,
+\tfrac14, \tfrac12)$ of \cref{ex:b2:genfun:branchingexample},
+$G(t) = \tfrac14 + \tfrac14t + \tfrac12t^2$ and the iteration
+$q_{n+1} = G(q_n)$ gives
+\[
+q_1 = 0.25, \quad q_2 = 0.34375, \quad q_3 \approx 0.39502,
+\quad q_4 \approx 0.42678, \quad q_5 \approx 0.44776,
+\]
+climbing toward the extinction probability $q = \tfrac12$.
+The gaps $q - q_n$ are $0.25$, $0.156$, $0.105$, $0.073$,
+$0.052$: each is roughly $\tfrac34$ of the previous, and
+indeed the mean value theorem gives $q - q_{n+1} = G'(c_n)(q
+- q_n)$ with $G'(q) = \tfrac14 + q = \tfrac34$. Two morals: a
+family line still alive at generation $n$ has, built into
+the same computation, probability $q - q_n$ of being doomed
+later; and the convergence rate of the staircase in the
+figure below is the derivative at the fixed point --- the
+weekend problem turns both observations into theorems.
+\end{example}
 
 \begin{theorem}[Extinction criterion]\label{thm:b2:genfun:extinction}
 Assume $p_1 \neq 1$. The extinction probability $q$ is the
@@ -344,6 +616,22 @@ q > 0$.}
 \label{fig:b2:genfun:branching}
 \end{figure}
 
+\begin{remark}[How to read the cobweb]
+In the figure, a vertical move applies $G$ (from $(q_n, q_n)$
+up to $(q_n, G(q_n))$), a horizontal move to the diagonal
+converts output into input: the staircase \emph{is} the
+recursion $q_{n+1} = G(q_n)$. Convexity of $G$ and $G(1) = 1$
+leave only two geometries. Either the curve stays above the
+diagonal on $\intco01$ (mean $m \leq 1$): the staircase has
+nowhere to stop before $1$. Or the curve crosses at some $q <
+1$ ($m > 1$): the staircase is trapped below the crossing
+and converges to it, at the geometric rate $G'(q) < 1$
+quantified in \cref{ex:b2:genfun:cobwebnumerics}. All the
+analysis of the extinction theorem is visible in this one
+picture --- which is why it is worth drawing before
+computing.
+\end{remark}
+
 \begin{example}\label{ex:b2:genfun:branchingexample}
 Offspring law: no child, one child, two children with
 probabilities $\frac14, \frac14, \frac12$. Then $m = \frac14 + 1 =
@@ -353,6 +641,42 @@ points: $\frac12 t^2 - \frac34 t + \frac14 = 0$, i.e.\ $2t^2 - 3t
 out with probability $\frac12$ --- and with probability $\frac12$
 it lives forever.
 \end{example}
+
+\begin{remark}[Perspectives within this volume]
+The chapter is the book's crossroads, and each ingredient
+arrived from a named place: the series algebra from
+\cref{ch:b2:series} and \cref{ch:b2:powerseries}, the
+probability from \cref{ch:b2:proba} (monotone continuity
+proves $q_n \uparrow q$) and \cref{ch:b2:randomvar} ($G_X =
+\E(t^X)$ is an expectation, multiplicativity is the product
+theorem), the convexity from \cref{ch:b2:realfun} through
+\cref{ch:b2:affine}. Even the heavy-tail pathologies connect:
+the St Petersburg variable of the previous chapter has
+$G(t) = \sum_k2^{-k}t^{2^k}$, a perfectly convergent series
+on $\intcc01$ whose derivative at $1^-$ diverges ---
+infinite mean, visible at a glance. One object, every tool
+of the year: a fitting last chapter.
+\end{remark}
+
+\begin{remark}[Common pitfalls]
+(i) Generating functions apply to $\N$-valued variables only:
+for signed or non-integer variables the object $\E(t^X)$
+loses its power-series structure (Year 3 replaces it with
+transforms adapted to $\R$). (ii) The first sanity check of
+any computed $G$ is $G(1) = 1$; the second is that the
+coefficients are nonnegative --- a negative coefficient
+means an algebra slip, not a new law. (iii) In random sums,
+the composition order matters: $G_S = G_N \circ G_X$, the
+\emph{outer} function counting the terms; composing the
+other way is meaningless ($G_X \circ G_N$ would count items
+of items). (iv) Multiplicativity needs independence and
+distinct sources of randomness: $G_{2X}(t) = G_X(t^2)$, not
+$G_X(t)^2$. (v) Differentiating at $1$ is a boundary
+operation: when the radius is exactly $1$, as in
+\cref{ex:b2:genfun:heavytail}, $G'(1^-)$ may be infinite,
+and the moments theorem's monotone-limit formulation is not
+a pedantic nicety but the honest statement.
+\end{remark}
 
 \section*{Closing the volume}
 
@@ -459,3 +783,260 @@ carefully: fix $t$ small, use $\abs{\P(X_n = 0) - G_{X_n}(t)}
 consider $\frac{G(t) - \P(X = 0)}{t}$, the generating function of
 a shifted law.)}
 \end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:genfun:10}
+(Parity trick) Show that for an $\N$-valued variable $X$,
+\[
+\P(X \text{ even}) = \frac{1 + G_X(-1)}{2} ,
+\]
+and compute this probability for $X \sim \mathcal P(\lambda)$
+and $X \sim \mathcal B(n, p)$. What does $G_X(-1) \to 0$ mean
+probabilistically?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:genfun:11}
+(Sicherman dice) Verify the factorization of the fair-die
+generating function
+\[
+\frac{t + t^2 + \dots + t^6}{6}
+= \frac{t\,(1 + t)(1 + t + t^2)(1 - t + t^2)}{6},
+\]
+and show that the two dice with faces $\{1, 2, 2, 3, 3, 4\}$
+and $\{1, 3, 4, 5, 6, 8\}$ have generating functions
+$\frac{t(1+t)(1+t+t^2)}6$ and
+$\frac{t(1+t)(1+t+t^2)(1-t+t^2)^2}6$, whose product is that of
+two standard dice: these exotic dice produce every total $2,
+\dots, 12$ with exactly the standard probabilities.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:genfun:12}
+(Waiting for two heads in a row) A coin with head probability
+$p$ is tossed until two consecutive heads appear; let $T$ be
+the number of tosses (the game of \cref{exo:b2:proba:6}).
+Conditioning on the first tosses, derive a linear system for
+the generating functions from the states ``no current head''
+and ``one current head'', and conclude
+\[
+G_T(t) = \frac{p^2t^2}{1 - qt - pqt^2}
+\qquad (q = 1 - p);
+\]
+check $G_T(1) = 1$ and $\E(T) = \dfrac{1 + p}{p^2}$ ($= 6$
+for a fair coin).
+\end{exercise}
+
+\section{Problem: the Galton--Watson process, solved}
+
+\begin{problem}[{Weekend problem --- growth rates, exact
+solutions, total progeny, and Kolmogorov's critical
+estimate}]\label{pb:b2:genfun:1}
+The extinction criterion (\cref{thm:b2:genfun:extinction})
+splits branching processes\index{branching process} into
+subcritical, critical and supercritical --- but it says
+nothing about \emph{rates}: how fast a doomed line dies, how
+big a surviving one grows. This problem computes them. We keep
+the chapter's notation: offspring law $(p_k)$ with pgf $G$,
+mean $m = G'(1)$, generation sizes $Z_n$ ($Z_0 = 1$), iterates
+$G_n = G_{Z_n}$, extinction probabilities $q_n = \P(Z_n = 0)
+\uparrow q$; we always assume $p_1 \neq 1$ and, where second
+moments appear, $G''(1) < \infty$, and we write $\sigma^2 =
+V(Z_1)$.
+
+\medskip
+\noindent\textbf{Part I --- Moments of the generations.}
+\begin{enumerate}
+  \item Show $\E(Z_n) = m^n$ \emph{(chain rule on $G_n = G
+        \circ G_{n-1}$ at $1^-$, using $G_{n-1}(1) = 1$ and
+        \cref{thm:b2:genfun:moments})}.
+  \item Establish the recursion $G_n''(1) =
+        G''(1)\,m^{2(n-1)} + m\,G_{n-1}''(1)$ and solve it:
+        $G_n''(1) = G''(1)\,m^{n-1}\dfrac{m^n - 1}{m - 1}$
+        for $m \neq 1$, and $G_n''(1) = n\,G''(1)$ for $m =
+        1$.
+  \item Deduce
+        \[
+        V(Z_n) = \sigma^2m^{n-1}\,\frac{m^n - 1}{m - 1}
+        \quad (m \neq 1),
+        \qquad
+        V(Z_n) = n\,\sigma^2 \quad (m = 1).
+        \]
+  \item (Subcritical rate, upper bound) For $m < 1$, show
+        $\P(Z_n > 0) \leq m^n$ \emph{(Markov on the
+        integer-valued $Z_n$)}: extinction is certain with a
+        geometric rate --- a quantitative refinement of the
+        chapter's criterion.
+  \item (Subcritical rate, lower bound) Using
+        Cauchy--Schwarz on $Z_n\mathbf 1_{Z_n > 0}$, show
+        \[
+        \P(Z_n > 0) \geq \frac{\E(Z_n)^2}{\E(Z_n^2)}
+        \geq c\,m^{n}
+        \quad\text{with}\quad
+        c = \Bigl(\frac{\sigma^2}{m(1-m)} + 1\Bigr)^{-1} :
+        \]
+        the geometric rate $m^n$ is exact up to constants.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part II --- The geometric family, solved
+exactly.} Let the offspring law be geometric on $\N$: $p_k =
+qp^k$ ($k \geq 0$), with $0 < p < 1$, $q = 1 - p$.
+\begin{enumerate}[resume]
+  \item Compute $G(t) = \dfrac{q}{1 - pt}$ and $m = \dfrac
+        pq$; locate the three regimes in terms of $p$.
+  \item Solve $G(t) = t$: show the fixed points are $1$ and
+        $q/p = 1/m$, and recover the extinction probability
+        $q_{\mathrm{ext}} = \min(1, 1/m)$.
+  \item Prove by induction the closed forms
+        \[
+        q_n = \frac{m^n - 1}{m^{n+1} - 1} \quad (m \neq 1),
+        \qquad
+        q_n = \frac{n}{n+1} \quad (m = 1).
+        \]
+  \item Deduce the exact rates: $1 - q_n \sim (1 - m)\,m^n$
+        in the subcritical case, and $q_{\mathrm{ext}} - q_n
+        \sim \dfrac{m - 1}{m^{2}}\cdot m^{-n}$ in the
+        supercritical case; check that the supercritical
+        contraction ratio is $G'(q_{\mathrm{ext}}) = 1/m$.
+  \item Critical case ($p = \tfrac12$): compute $\sigma^2 =
+        2$ and note $1 - q_n = \frac1{n+1}$: survival decays
+        like $\frac1n$ --- neither geometric nor summable.
+  \item Still critical: prove by induction the full iterate
+        \[
+        G_n(t) = \frac{n - (n-1)t}{n + 1 - nt},
+        \]
+        and deduce that conditioned on survival, $Z_n$ is
+        geometric on $\N^*$ with parameter $\frac1{n+1}$:
+        \[
+        \P(Z_n = k \mid Z_n > 0) = \frac1{n+1}
+        \Bigl(\frac{n}{n+1}\Bigr)^{k-1},
+        \qquad
+        \E(Z_n \mid Z_n > 0) = n + 1 .
+        \]
+        The average line dies, but the surviving lines have
+        size of order $n$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part III --- Total progeny.} Let $Y =
+\sum_{n\geq0}Z_n \in \N^* \cup \{\infty\}$ be the total number
+of individuals ever born, and $H(t) =
+\sum_{k\geq1}\P(Y = k)t^k$.
+\begin{enumerate}[resume]
+  \item Justify $\P(Y < \infty) = q_{\mathrm{ext}}$, and
+        recall from \cref{exo:b2:genfun:7} the functional
+        equation $H(t) = t\,G(H(t))$ (whose derivation did
+        not use $m < 1$).
+  \item (Binary branching) For $p_0 = p_2 = \frac12$
+        (critical), solve the functional equation:
+        \[
+        H(t) = \frac{1 - \sqrt{1 - t^2}}{t},
+        \]
+        and expand with \cref{ex:b2:powerseries:catalan} to
+        get
+        \[
+        \P(Y = 2k + 1) = \frac{C_k}{2^{2k+1}},
+        \qquad C_k = \frac1{k+1}\binom{2k}k ;
+        \]
+        check the values $\P(Y = 1) = \frac12$ and $\P(Y = 3)
+        = \frac18$ by direct counting.
+  \item Differentiating the functional equation at $1^-$,
+        show that $\E(Y) = \frac{1}{1-m}$ for $m < 1$, while
+        criticality forces $\E(Y) = \infty$: the critical
+        total progeny is finite almost surely with infinite
+        mean.
+  \item With the central binomial asymptotics
+        (\cref{ex:b2:comparison:centralbinomial}), show
+        \[
+        \P(Y = 2k+1) \sim \frac{1}{2\sqrt\pi\,k^{3/2}},
+        \]
+        a heavy $k^{-3/2}$ tail, and deduce $\P(Y > n)
+        \asymp n^{-1/2}$ (upper and lower bounds of this
+        order suffice).
+  \item Compare with the fair random walk (the weekend
+        problem of \cref{ch:b2:proba}): certain but
+        infinite-mean return times there, certain but
+        infinite-mean total progeny here, both with
+        $n^{-3/2}$ local laws. One paragraph on why
+        criticality produces this signature.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part IV --- Kolmogorov's estimate at
+criticality.} Assume $m = 1$, $0 < \sigma^2 = G''(1) <
+\infty$.
+\begin{enumerate}[resume]
+  \item Show that $G''$ extends continuously to $\intcc01$
+        \emph{(nonnegative increasing with finite limit)} and
+        deduce the Taylor expansion at $1$:
+        \[
+        G(t) = t + b\,(1-t)^2 + o\bigl((1-t)^2\bigr),
+        \qquad b = \frac{G''(1)}2 = \frac{\sigma^2}2 .
+        \]
+  \item For $t \in \intco01$, set $h(t) = \dfrac1{1 - G(t)} -
+        \dfrac1{1 - t}$. Show
+        \[
+        h(t) = \frac{G(t) - t}{(1 - G(t))(1 - t)}
+        \xrightarrow[t\to1^-]{} b .
+        \]
+  \item Telescope along the iteration $q_{j+1} = G(q_j)$:
+        \[
+        \frac1{1 - q_n} = 1 + \sum_{j=0}^{n-1}h(q_j),
+        \]
+        and conclude with a Cesaro argument that
+        \[
+        \P(Z_n > 0) = 1 - q_n \sim \frac{2}{\sigma^2\,n}
+        \]
+        --- \emph{Kolmogorov's estimate}: every critical
+        branching process dies at the universal rate $1/n$,
+        with only the constant remembering the offspring law.
+  \item Check the estimate against the critical geometric
+        case of question 10.
+  \item Deduce $\E(Z_n \mid Z_n > 0) = \dfrac{1}{1 - q_n}
+        \sim \dfrac{\sigma^2 n}{2}$ \emph{(note $\E(Z_n
+        \mathbf 1_{Z_n>0}) = \E(Z_n) = 1$)}, and check it
+        against question 11: conditioned on survival, the
+        population grows \emph{linearly} --- the critical
+        tightrope between death and explosion.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part V --- Applications and synthesis.}
+\begin{enumerate}[resume]
+  \item (Epidemics, chain reactions) For a Poisson offspring
+        law $\mathcal P(\lambda)$ --- each case infects
+        $\mathcal P(\lambda)$ new cases --- write the
+        extinction equation $q = \eu^{\lambda(q-1)}$ and
+        solve it numerically for $\lambda = 1.5$ ($q \approx
+        0.417$) and $\lambda = 2$ ($q \approx 0.203$):
+        starting from one case, a major outbreak is
+        \emph{not} certain even when $\lambda > 1$. Explain
+        why the iteration $q_{n+1} = \eu^{\lambda(q_n - 1)}$
+        from $q_0 = 0$ converges to the right root.
+  \item Starting from $k$ ancestors instead of one, show that
+        the extinction probability is $q^k$. Application:
+        with $\lambda = 1.5$, how many initial cases make an
+        outbreak at least $99\%$ likely?
+  \item (Conditioning a supercritical process on extinction)
+        For $m > 1$ with extinction probability $q \in
+        \intoo01$: first prove by convexity that $G'(q) < 1$
+        at the smallest fixed point, and deduce
+        $q_{\mathrm{ext}} - q_n = O\bigl(G'(q)^n\bigr)$
+        (geometric convergence, as question 9 exemplified).
+        Then show that $\widehat G(t) = G(qt)/q$ is the pgf
+        of a bona fide offspring law, with mean $\widehat m =
+        G'(q) < 1$: a subcritical companion process. Verify
+        on the geometric family: conditioning the
+        supercritical $(p, q)$-process on extinction swaps
+        $p$ and $q$. (The full statement --- the conditioned
+        process \emph{is} the companion process --- is proved
+        in the Year 3 volume; here you have verified its
+        generating-function shadow.)
+  \item Synthesis: draw up the trichotomy table --- for $m <
+        1$, $m = 1$, $m > 1$: value of $q$; rate of $\P(Z_n >
+        0)$ or of $q - q_n$; $\E(Y)$; size of a surviving
+        generation. State in one sentence per tool how
+        composition of pgfs, convexity, Taylor at $1^-$, and
+        Cesaro averaging carried the whole problem, and what
+        the Year 3 volume adds (the martingale $Z_n/m^n$ and
+        Yaglom's exponential limit law).
+\end{enumerate}
+\end{problem}

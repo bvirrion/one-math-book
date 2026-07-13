@@ -43,6 +43,33 @@ If $\abs{E} > \abs{F}$, no map $f \colon E \to F$ is injective: some
 two elements of $E$ share their image\index{pigeonhole principle}.
 \end{corollary}
 
+\begin{proof}
+Write $\abs E = m$, $\abs F = n$ with $m > n$, and choose bijections
+$u \colon \intint1m \to E$ and $v \colon F \to \intint1n$. If $f$
+were injective, $v \circ f \circ u$ would be an injection from
+$\intint1m$ into $\intint1n$ (a composition of injections,
+\cref{prop:b1:logic:comp}), contradicting
+\cref{thm:b1:counting:welldef}.
+\end{proof}
+
+\begin{remark}[Interlude: why the swap in the theorem's proof?]\label{rem:b1:counting:swapinterlude}
+The proof of \cref{thm:b1:counting:welldef} contains the
+chapter's first genuinely clever move, worth replaying slowly.
+The obstacle: to apply the induction hypothesis one wants to
+delete the last point $m$ of the source \emph{and} the last point
+$n+1$ of the target, but $f$ may send some other point $a$ to $n
++ 1$, and then deleting the target point damages the map
+elsewhere. The cure: compose $f$ with the transposition of the
+two \emph{values} $f(a)$ and $f(m)$ --- a bijection of the
+target, so injectivity is preserved --- after which the
+troublesome value $n + 1$ sits at the harmless position $m$, and
+both deletions are clean. This ``normalize first, then cut''
+pattern recurs: it is how the derangement recurrence redirects
+$\sigma^{-1}(n+1)$ in the weekend problem of this chapter, and
+how permutations are patched throughout
+\cref{ch:b1:structures}'s problem on the symmetric group.
+\end{remark}
+
 \begin{proposition}[Injections, surjections and cardinality]\label{prop:b1:counting:injsur}
 Let $E, F$ be finite sets with $\abs{E} = \abs{F}$, and $f \colon E
 \to F$. Then
@@ -67,6 +94,40 @@ Suppose $f$ surjective. Choose for each $y \in F$ one preimage $s(y)
 $f$ is bijective. Finally, a bijective map is by definition both
 injective and surjective, which closes the cycle of implications.
 \end{proof}
+
+\begin{example}[Finiteness is essential]\label{ex:b1:counting:finiteonly}
+On a \emph{finite} set, \cref{prop:b1:counting:injsur} is a powerful
+shortcut: any injective map from $E$ to itself is automatically a
+permutation of $E$ --- half of bijectivity comes for free. Both
+implications collapse on infinite sets: $n \mapsto n + 1$ is
+injective from $\N$ to $\N$ but misses $0$, and the map $\N \to \N$
+sending $0 \mapsto 0$ and $n \mapsto n - 1$ for $n \geq 1$ is
+surjective but not injective. Whenever this proposition is invoked,
+the finiteness hypothesis is doing real work --- a theme that the
+weekend problem of \cref{ch:b1:logic} explores from the other side,
+where infinite sets are precisely those admitting such self-maps.
+\end{example}
+
+\begin{example}[Half the work, for free]\label{ex:b1:counting:mod7}
+Consider the map $f$ on $\{0, 1, \dots, 6\}$ sending $k$ to the
+remainder of $3k$ upon division by $7$; its table of values is
+\[
+0,\ 3,\ 6,\ 2,\ 5,\ 1,\ 4 .
+\]
+Is $f$ a bijection? Injectivity alone suffices
+(\cref{prop:b1:counting:injsur}): if $3k$ and $3k'$ have the same
+remainder, $7$ divides $3(k - k')$, and since $7$ is prime and
+does not divide $3$, it divides $k - k'$ (Euclid's lemma, used at
+High School level here and proved in \cref{ch:b1:arith}); with
+$\abs{k - k'} \leq 6$ this forces $k = k'$. Surjectivity comes
+free --- no need to solve $3k \equiv c$ for each $c$, though the
+table confirms every value appears exactly once. The shortcut is
+a workhorse: it proves the invertibility of modular
+multiplication (\cref{ch:b1:arith}), powers the pairing in
+Wilson's theorem, and returns in linear algebra as ``an
+endomorphism of a finite-dimensional space is injective iff
+surjective'' (\cref{ch:b1:findim}).
+\end{example}
 
 \section{The counting principles}
 
@@ -108,6 +169,66 @@ induction.
 (send $A$ to its indicator function); apply (4).
 \end{proof}
 
+\begin{example}[Complement counting]\label{ex:b1:counting:complement}
+How many $4$-digit PIN codes (digits $0$--$9$, order matters,
+repetition allowed) contain \emph{at least one} repeated digit?
+Counting them directly means juggling the cases ``exactly one pair,
+two pairs, a triple, a quadruple'' --- five overlapping
+configurations. Count the complement instead: all codes number
+$10^4 = 10\,000$ (product rule), the codes with four distinct
+digits number $10 \times 9 \times 8 \times 7 = 5\,040$
+($4$-arrangements), so the answer is
+\[
+10^4 - 10 \cdot 9 \cdot 8 \cdot 7 = 10\,000 - 5\,040 = 4\,960 .
+\]
+Nearly half of all PINs repeat a digit. The insight: whenever a
+count is phrased with ``at least'' or ``not all'', try the
+complement first --- the sum rule guarantees that
+$\abs{A} = \abs{E} - \abs{\overline A}$, and the complement is
+often a single clean configuration.
+\end{example}
+
+\begin{example}[Lattice paths]\label{ex:b1:counting:paths}
+Count the shortest paths from the corner $(0,0)$ to the corner
+$(4, 3)$ of a grid, moving only one step right (R) or one step up
+(U) at a time. Every such path takes exactly $7$ steps, of which
+$4$ are R and $3$ are U; conversely, any word of length $7$ in the
+letters R, U with four R's describes exactly one path. The paths
+therefore correspond bijectively to the choices of the positions
+of the R's:
+\[
+\binom{7}{4} = 35 .
+\]
+The insight is the \emph{encoding}: the count became trivial the
+moment each path was translated into a word, i.e.\ a subset of
+positions --- one more instance of the slogan that a correct count
+is a disguised bijection (\cref{met:b1:counting:which}).
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=0.85]
+  \draw[gray!60] (0,0) grid (4,3);
+  \draw[->, thin] (-0.4,0) -- (4.6,0);
+  \draw[->, thin] (0,-0.4) -- (0,3.6);
+  \draw[omDef, very thick]
+    (0,0) -- (1,0) -- (1,1) -- (3,1) -- (3,2) -- (4,2) -- (4,3);
+  \fill (0,0) circle (0.07) node[below left] {$(0,0)$};
+  \fill (4,3) circle (0.07) node[above right] {$(4,3)$};
+  \node[omDef, below] at (0.5,0) {\small R};
+  \node[omDef, left] at (1,0.5) {\small U};
+  \node[omDef, below] at (1.5,1) {\small R};
+  \node[omDef, below] at (2.5,1) {\small R};
+  \node[omDef, left] at (3,1.5) {\small U};
+  \node[omDef, below] at (3.5,2) {\small R};
+  \node[omDef, left] at (4,2.5) {\small U};
+\end{tikzpicture}
+
+{\small One of the $\binom74 = 35$ shortest paths from $(0,0)$ to
+$(4,3)$: the path shown encodes the word RURRURU, i.e.\ the choice
+of positions $\{1,3,4,6\}$ for the letter R among the seven
+steps.}
+\end{omfigure}
+
 \section{Lists, permutations, subsets}
 
 \begin{definition}[Arrangements, permutations, combinations]\label{def:b1:counting:objects}
@@ -137,9 +258,18 @@ With $n = \abs{E}$ and $0 \leq k \leq n$:
 \begin{proof}
 (1) Choose the first coordinate ($n$ ways), then the second ($n - 1$
 remaining choices), \dots, then the $k$-th ($n - k + 1$ choices).
-Formally, induct on $k$: the set of $k$-arrangements is the disjoint
-union, over the $(k-1)$-arrangements, of the sets of possible last
-coordinates, each of size $n - k + 1$; apply the sum rule.
+Formally, induct on $k$. For $k = 1$ there are $n$ one-term
+injective tuples. Assume the count for $k - 1$. Each
+$k$-arrangement $(x_1, \dots, x_k)$ is obtained from exactly one
+$(k-1)$-arrangement --- its truncation $(x_1, \dots, x_{k-1})$
+--- by appending a last coordinate outside $\{x_1, \dots,
+x_{k-1}\}$, for which exactly $n - (k - 1)$ values are available.
+The $k$-arrangements are thus partitioned, by truncation, into
+classes of common size $n - k + 1$ indexed by the
+$(k-1)$-arrangements, and the sum rule gives
+\[
+\frac{n!}{(n-k+1)!}\;(n - k + 1) = \frac{n!}{(n-k)!} .
+\]
 
 (2) is (1) with $k = n$.
 
@@ -147,6 +277,46 @@ coordinates, each of size $n - k + 1$; apply the sum rule.
 every $k$-arrangement arises from exactly one subset: so
 $\frac{n!}{(n-k)!} = \binom nk \cdot k!$.
 \end{proof}
+
+\begin{example}[Round tables: quotienting by symmetry]\label{ex:b1:counting:roundtable}
+In how many ways can $n$ guests sit around a round table, two
+seatings being identical when each guest has the same left and
+right neighbors --- i.e.\ up to rotation? Each circular seating
+corresponds to exactly $n$ linear seatings (cut the circle at any
+of the $n$ places), so the $n!$ linear orders collapse in groups
+of $n$:
+\[
+\frac{n!}{n} = (n-1)! \quad\text{circular seatings.}
+\]
+Equivalently: seat one distinguished guest anywhere (killing the
+rotational freedom), then order the remaining $n - 1$ guests
+clockwise. For $n = 6$: $120$ tables. The two solutions illustrate
+the two standard cures for overcounting: divide by the exact
+number of repetitions, or \emph{break the symmetry} by pinning one
+object down. Both require the group-of-repetitions size to be the
+same for every configuration --- which the proof of the formula
+$\binom nk = \frac{n!}{k!\,(n-k)!}$ above used as well, with
+$k!$ in place of $n$.
+\end{example}
+
+\begin{example}[Adding a constraint]\label{ex:b1:counting:constraint}
+Continuing the round table: among the $(n-1)!$ tables of $n \geq
+3$ guests, how many seat two given guests $A$ and $B$ \emph{apart}
+(not adjacent)? Count the complement. Tables where $A$ and $B$
+sit together: glue them into a single block --- $n - 1$ objects
+around the table, i.e.\ $(n-2)!$ circular arrangements --- then
+order the pair inside its block ($2$ ways): $2\,(n-2)!$ adjacent
+tables. Hence
+\[
+(n-1)! - 2\,(n-2)! = (n-2)!\,\bigl((n - 1) - 2\bigr)
+= (n-3)\,(n-2)!
+\]
+tables keep them apart. Sanity checks: $n = 3$ gives $0$ (around
+a triangle, everyone touches everyone) and $n = 4$ gives $2$,
+easily listed by hand. The gluing trick --- treat a forced block
+as one object, then count its internal arrangements --- is the
+standard cure for adjacency constraints, linear or circular.
+\end{example}
 
 \begin{proposition}[Basic identities]\label{prop:b1:counting:identities}
 For $0 \leq k \leq n$:
@@ -192,6 +362,25 @@ $n \geq 1$: among the subsets of a nonempty set, exactly half have
 even cardinality.
 \end{example}
 
+\begin{example}[One identity, two proofs]\label{ex:b1:counting:threen}
+The specialization $a = 2$, $b = 1$ of the binomial theorem reads
+\[
+\sum_{k=0}^{n} \binom nk\,2^k = 3^n .
+\]
+Here is the same identity with no algebra at all. The right side
+counts the words of length $n$ over the alphabet $\{0, 1, 2\}$
+(product rule). Classify each word by the set $K$ of positions
+carrying a nonzero letter: choosing $K$ with $\abs K = k$ costs
+$\binom nk$, then each position of $K$ independently carries $1$
+or $2$: $2^k$ ways. The sum rule over $k$ gives the left side.
+Beyond the pleasure of agreement, the two proofs have different
+virtues: the algebraic one generalizes to any value of $a$, the
+combinatorial one \emph{explains} the formula and adapts to
+constraints (forbid the letter $2$ in the last position, say) that
+no substitution captures. Keeping both techniques active is the
+practical skill this chapter trains.
+\end{example}
+
 \begin{method}[Which count applies?]\label{met:b1:counting:which}
 Before computing, answer two questions about the selection: does the
 \emph{order} matter, and are \emph{repetitions} allowed?
@@ -208,12 +397,74 @@ Then hunt for a bijection or a partition reducing the problem to these
 model counts; a correct count is a disguised bijection.
 \end{method}
 
+\begin{remark}[Common pitfalls in counting]\label{rem:b1:counting:pitfalls}
+\begin{enumerate}
+  \item \emph{Summing non-disjoint cases.} The sum rule requires a
+        partition; if configurations can satisfy two cases at
+        once, they are counted twice --- the cure is
+        inclusion--exclusion (\cref{thm:b1:counting:inclexcl}) or
+        a finer case split.
+  \item \emph{Ordered versus unordered.} Choosing ``a committee of
+        two'' is $\binom n2$, not $n(n-1)$: decide \emph{before
+        computing} whether the selection carries an order, and if
+        an ordered count is easier, divide by the number of
+        orderings at the end --- but only when every unordered
+        object arises from the \emph{same} number of ordered ones.
+  \item \emph{Multi-stage choices that are not independent.}
+        The product rule needs the number of options at each stage
+        to be independent of the previous choices. ``Choose a
+        captain, then a different vice-captain'' is fine ($n(n-1)$);
+        ``choose two players who get along'' is not a two-stage
+        product at all.
+  \item \emph{Double-counting by construction.} Building each
+        object twice --- e.g.\ counting hands with \emph{at least}
+        one ace as (choose an ace) $\times$ (choose $4$ more
+        cards) --- overcounts hands with two aces. ``At least''
+        almost always calls for the complement
+        (\cref{ex:b1:counting:complement}).
+\end{enumerate}
+\end{remark}
+
 \begin{example}[Poker-style count]\label{ex:b1:counting:poker}
 From a $52$-card deck, the number of $5$-card hands is
 $\binom{52}{5} = 2\,598\,960$. Hands containing exactly one ace:
 choose the ace ($4$ ways) then $4$ cards among the $48$ non-aces:
 $4 \binom{48}{4} = 778\,320$. The product rule applies because the
 choice splits into independent stages.
+\end{example}
+
+\begin{method}[Double counting]\label{met:b1:counting:doublecount}
+To prove an identity between two counting expressions, find a single
+finite set that both sides count --- typically a set of \emph{pairs}
+--- and evaluate its cardinality in two different orders. The
+prototype is the \emph{handshake lemma}: at a party, count the pairs
+(person, hand shaken). Summing over people gives $\sum_p d_p$ (each
+person $p$'s number of handshakes); summing over handshakes gives
+twice the number of handshakes (each involves two people). Hence
+$\sum_p d_p$ is even --- so the number of people who shook an odd
+number of hands is always even, a nontrivial conclusion obtained
+with no formula at all. The same engine runs
+\cref{exo:b1:counting:12} and several questions of the weekend
+problem below.
+\end{method}
+
+\begin{example}[The average subset]\label{ex:b1:counting:averagesubset}
+What is the average cardinality of a subset of an $n$-element set
+$E$, all $2^n$ subsets being equally likely? Double count the
+pairs $(A, a)$ with $a \in A$: summing over subsets gives
+$\sum_A \abs A$, the total we want; summing over elements gives
+$n \cdot 2^{n-1}$ (each of the $n$ elements lies in exactly half
+of the subsets --- pair each $A$ containing $a$ with $A
+\setminus \{a\}$). Hence
+\[
+\frac{1}{2^n}\sum_{A \subseteq E} \abs A
+= \frac{n\,2^{n-1}}{2^n} = \frac n2 :
+\]
+subsets are, on average, half-full --- as the symmetry $A
+\leftrightarrow \overline A$ (which pairs sizes $k$ and $n - k$)
+also predicts. Two proofs, one answer, and both avoid the direct
+computation $\sum_k k\binom nk$ of \cref{exo:b1:counting:5}: a
+well-chosen pairing often replaces an identity.
 \end{example}
 
 \section{Inclusion--exclusion}
@@ -244,6 +495,32 @@ by \cref{ex:b1:counting:binomial}. So each element of the union is
 counted exactly once.
 \end{proof}
 
+\begin{example}[Counting coprime integers]\label{ex:b1:counting:coprime}
+How many integers of $\intint1{120}$ are coprime to $120 = 2^3
+\times 3 \times 5$? An integer shares a factor with $120$ exactly
+when it is divisible by $2$, $3$ or $5$, so count the complement
+of $A_2 \cup A_3 \cup A_5$, where $A_d$ collects the multiples of
+$d$. Within $\intint1{120}$, the multiples of $d$ number $120/d$
+whenever $d$ divides $120$ --- no floor functions needed --- and
+$A_2 \cap A_3 = A_6$, etc. Inclusion--exclusion:
+\[
+\abs{A_2 \cup A_3 \cup A_5}
+= 60 + 40 + 24 - 20 - 12 - 8 + 4 = 88 ,
+\]
+so $120 - 88 = 32$ integers are coprime to $120$. It is
+instructive to regroup the computation as a product:
+\[
+120 - 88 = 120\Bigl(1 - \frac12\Bigr)\Bigl(1 -
+\frac13\Bigr)\Bigl(1 - \frac15\Bigr) = 120 \cdot \frac12 \cdot
+\frac23 \cdot \frac45 = 32 :
+\]
+expanding the three parentheses reproduces exactly the eight
+signed terms of inclusion--exclusion, one per subset of $\{2, 3,
+5\}$. This product form defines Euler's totient function, whose
+arithmetic role appears with \cref{ch:b1:arith}'s congruences and
+is developed in the Year 2 volume.
+\end{example}
+
 \begin{example}[Derangements]\label{ex:b1:counting:derangement}
 A \emph{derangement} is a permutation with no fixed point. Let $A_i$
 be the set of permutations of $\intint{1}{n}$ fixing $i$;
@@ -256,6 +533,21 @@ D_n = n! \sum_{k=0}^{n} \frac{(-1)^k}{k!} .
 Since $\sum (-1)^k / k! \to \eu^{-1}$ (see \cref{ch:b1:series}), about
 $37\%$ of all permutations are derangements, whatever $n$ is.
 \end{example}
+
+\begin{remark}[Where this chapter is used]\label{rem:b1:counting:whereused}
+Binomial coefficients are the most heavily reused objects of this
+chapter: they drive the binomial theorem in \cref{ch:b1:poly}
+(expansion of $(X + a)^n$), the Leibniz formula for the $n$-th
+derivative of a product in \cref{ch:b1:derivative}, and the
+coefficients of Taylor expansions in \cref{ch:b1:taylor}.
+Permutations return as a group --- with the signature built from
+counting inversions --- in \cref{ch:b1:structures}, and the
+signature in turn defines determinants in \cref{ch:b1:det}.
+Inclusion--exclusion and the counting principles are the finite
+backbone of discrete probability, developed in the Year 2 volume;
+the derangement numbers of \cref{ex:b1:counting:derangement} are
+studied in depth in the weekend problem below.
+\end{remark}
 
 \section{Exercises}
 
@@ -339,3 +631,182 @@ element):
 \]
 \emph{For the second: count pairs of marked elements, equal or not.}
 \end{exercise}
+
+\section{Problem: Derangements, or the misaddressed letters}
+
+\begin{problem}\label{pb:b1:counting:1}
+A secretary puts $n$ letters into $n$ addressed envelopes at random:
+what is the chance that \emph{nobody} receives the right letter?
+This classical question (Montmort, 1708) leads to the derangement
+numbers $D_n$ of \cref{ex:b1:counting:derangement}. The
+inclusion--exclusion formula is only the opening move: this problem
+develops the recurrences that compute $D_n$, two further independent
+proofs of the formula, the striking theorem that $D_n$ is the
+integer nearest to $n!/\eu$, the full distribution of fixed points
+of a random permutation, and the curious arithmetic of the sequence
+$(D_n)$.\index{derangement}
+Throughout, $D_n$ denotes the number of derangements (fixed-point
+free permutations) of $\intint1n$, with the convention $D_0 = 1$
+(the empty permutation has no fixed point).
+
+\medskip
+\noindent\textbf{Part I --- Small cases and the fixed-point
+census.}
+\begin{enumerate}
+  \item Compute $D_1, D_2, D_3$ directly, and $D_4$ by listing the
+        derangements of $\{1, 2, 3, 4\}$ grouped by the value of
+        $\sigma(1)$. (You should find $D_4 = 9$.)
+  \item For $0 \leq k \leq n$, show that the number $P_k(n)$ of
+        permutations of $\intint1n$ with \emph{exactly} $k$ fixed
+        points is $\binom nk D_{n-k}$.
+  \item Verify the census for $n = 4$: compute $P_0(4), \dots,
+        P_4(4)$ and check that they sum to $4! = 24$. Which is more
+        likely for four letters: no match, or exactly one match?
+  \item By double counting (\cref{met:b1:counting:doublecount})
+        the pairs $(\sigma, i)$ with $\sigma(i) = i$, show that
+        \[
+        \sum_{\sigma} \abs{\mathrm{Fix}(\sigma)} = n! :
+        \]
+        on average, a random permutation has \emph{exactly one}
+        fixed point, whatever $n \geq 1$ is.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part II --- Two recurrences and two new proofs of
+the formula.}
+\begin{enumerate}[resume]
+  \item Prove combinatorially, for $n \geq 1$:
+        \[
+        D_{n+1} = n\,(D_n + D_{n-1}) .
+        \]
+        (Classify the derangements $\sigma$ of $\intint1{n+1}$ by
+        $j = \sigma(n+1)$, then by whether $\sigma(j) = n + 1$; in
+        the case $\sigma(j) \neq n+1$, build a bijection with the
+        derangements of $\intint1n$ by redirecting the preimage of
+        $n + 1$ to $j$.) Check the recurrence numerically up to
+        $D_6$.
+  \item Setting $u_n = D_n - n D_{n-1}$, deduce from question 5
+        that $u_{n+1} = -u_n$, and conclude the second recurrence:
+        \[
+        D_n = n D_{n-1} + (-1)^n \qquad (n \geq 1).
+        \]
+  \item From question 6, prove by induction the formula of
+        \cref{ex:b1:counting:derangement},
+        \[
+        D_n = n! \sum_{k=0}^{n} \frac{(-1)^k}{k!},
+        \]
+        --- a proof wholly independent of inclusion--exclusion.
+  \item (Binomial inversion) Let $(a_n)$ and $(b_n)$ be two
+        sequences such that $a_n = \sum_{k=0}^n \binom nk b_k$ for
+        all $n$. Prove that
+        \[
+        b_n = \sum_{k=0}^{n} (-1)^{n-k} \binom nk a_k
+        \qquad (n \in \N).
+        \]
+        (First establish the \emph{trinomial revision}
+        $\binom nk \binom kj = \binom nj \binom{n-j}{k-j}$, then
+        use the alternating row sum of
+        \cref{ex:b1:counting:binomial}.)
+  \item Apply question 8 to the identity $n! = \sum_k \binom nk
+        D_{n-k}$ of \cref{exo:b1:counting:11} to obtain a
+        \emph{third} proof of the formula for $D_n$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part III --- The nearest integer to
+$n!/\eu$.} Admit for this part --- the theory is built in
+\cref{ch:b1:series} --- that
+$\eu^{-1} = \lim_{n \to \infty} s_n$ where $s_n = \sum_{k=0}^{n}
+\frac{(-1)^k}{k!}$, with the strict alternating-series bound
+$\abs{\eu^{-1} - s_n} < \frac1{(n+1)!}$ for every $n$.
+\begin{enumerate}[resume]
+  \item Show that $\bigl| D_n - n!/\eu \bigr| < \frac1{n+1}$ for
+        all $n \in \N$.
+  \item Deduce the headline theorem: \emph{for every $n \geq 1$,
+        $D_n$ is the integer nearest to $n!/\eu$}. Why does the
+        argument need $n \geq 1$?
+  \item Determine the sign of the error: show that $D_n > n!/\eu$
+        exactly when $n$ is even. (Locate the first neglected term
+        of the alternating series.)
+  \item Compute $D_7$ through $D_{10}$ with the recurrence of
+        question 5, then check $D_{10}$ against $10!/\eu$
+        ($10! = 3\,628\,800$, $\eu \approx 2.718281828$).
+  \item (The hat-check probability) Let $p_n = D_n/n!$ be the
+        probability that a uniformly random permutation is a
+        derangement. Show $\abs{p_n - \eu^{-1}} < \frac1{(n+1)!}$
+        and compute $p_6$ to five decimal places. Comment: why is
+        the answer to Montmort's question essentially independent
+        of $n$ --- already for a dozen letters?
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part IV --- The distribution of fixed points.}
+\begin{enumerate}[resume]
+  \item Fix $k \in \N$. Show that the proportion of permutations
+        of $\intint1n$ with exactly $k$ fixed points satisfies
+        \[
+        \frac{P_k(n)}{n!} = \frac{s_{n-k}}{k!}
+        \;\xrightarrow[n \to \infty]{}\; \frac{\eu^{-1}}{k!} .
+        \]
+        (These limiting values, summing to $1$, form the
+        \emph{Poisson distribution} of parameter $1$, a central
+        object of the probability course in the Year 2 volume.)
+  \item By double counting the triples $(\sigma, i, j)$ where $i
+        \neq j$ are both fixed by $\sigma$, show that
+        $\sum_\sigma \abs{\mathrm{Fix}(\sigma)}\,
+        (\abs{\mathrm{Fix}(\sigma)} - 1) = n!$ for $n \geq 2$.
+        Combined with question 4: the average of
+        $\abs{\mathrm{Fix}}^2$ is $2$, so the ``spread'' (variance)
+        of the number of fixed points equals $1$ --- again
+        independent of $n$, again matching the Poisson law.
+  \item Compute the proportion of permutations having at least one
+        fixed point for $n = 4, 5, 6$ (as fractions and to four
+        decimal places), and compare with $1 - \eu^{-1} \approx
+        0.6321$.
+  \item Show directly --- no limits needed --- that $s_{n+2} - s_n
+        = (-1)^{n+1}\bigl(\frac1{(n+1)!} - \frac1{(n+2)!}\bigr)$,
+        and deduce that the probabilities $p_n = s_n$ of
+        question 14 oscillate: $p_0 > p_2 > p_4 > \dots$ and
+        $p_1 < p_3 < p_5 < \dots$, the even (resp.\ odd) values
+        decreasing (resp.\ increasing) toward the common limit
+        $\eu^{-1}$.
+  \item (Secret Santa) $n$ people each draw one name from a hat;
+        if anyone draws their own name, the \emph{whole} drawing is
+        restarted from scratch. Using the standard fact that an
+        event of probability $p$ takes on average $1/p$ attempts,
+        estimate the average number of complete drawings needed,
+        and conclude that the procedure costs about $\eu \approx
+        2.72$ drawings on average, essentially independently of
+        $n$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part V --- The arithmetic of $D_n$, and a
+synthesis.}
+\begin{enumerate}[resume]
+  \item Refine question 5: show that for fixed $j \in
+        \intint2n$, the derangements of $\intint1n$ with
+        $\sigma(1) = j$ number exactly $D_{n-1} + D_{n-2}$,
+        independently of $j$. Deduce that $n - 1$ divides $D_n$
+        for every $n \geq 2$.
+  \item Prove that $D_n$ is odd if and only if $n$ is even. (Work
+        modulo $2$ in the recurrence of question 6.)
+  \item Prove that $D_n \equiv (-1)^n \pmod n$ for $n \geq 1$, and
+        check the congruence on the last digit of $D_{10}$.
+  \item Show from question 6 that $\dfrac{D_n}{D_{n-1}} = n +
+        \dfrac{(-1)^n}{D_{n-1}}$ for $n \geq 3$, so the ratio of
+        consecutive derangement numbers is \emph{almost exactly}
+        $n$; explain in one sentence why this is consistent with
+        $D_n \approx n!/\eu$.
+  \item Where exactly did this problem use: (i) the product and
+        sum rules; (ii) double counting; (iii) the binomial
+        theorem; (iv) the admitted alternating-series bound? One
+        sentence each.
+  \item Synthesis. The formula for $D_n$ now has three proofs
+        (inclusion--exclusion, recurrence plus induction, binomial
+        inversion). In a short paragraph, compare what each proof
+        \emph{explains}: which one computes fastest, which one
+        generalizes to other fixed-point counts, and which one
+        reveals why $\eu$ appears in a problem about envelopes.
+\end{enumerate}
+\end{problem}

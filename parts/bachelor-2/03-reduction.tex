@@ -41,6 +41,33 @@ so by induction each $(\lambda_i - \lambda_r)x_i = 0$, i.e.\ $x_i =
 space of dimension $n$ have at most $n$ summands.
 \end{proof}
 
+\begin{omfigure}
+\begin{tikzpicture}[scale=0.9, >={Stealth}]
+  \draw[gray!40] (-2.6,-2.2) grid (2.6,2.2);
+  \draw[->] (-2.6,0) -- (2.7,0) node[below, font=\small] {$x$};
+  \draw[->] (0,-2.2) -- (0,2.3) node[left, font=\small] {$y$};
+  \draw[omDef, very thick, ->] (0,0) -- (0.7,0.7)
+    node[above, font=\small] {$v_1$};
+  \draw[omDef, thick, ->, dashed] (0,0) -- (2.1,2.1)
+    node[above right, font=\small] {$Av_1 = 3v_1$};
+  \draw[omThm, very thick, ->] (0,0) -- (0.9,-0.9)
+    node[below, font=\small] {$v_2$};
+  \draw[omThm, thick, ->, dashed] (0,0) -- (0.9,-0.9);
+  \draw[omProp, very thick, ->] (0,0) -- (1,0)
+    node[below right, font=\small] {$e_1$};
+  \draw[omProp, thick, ->, dashed] (0,0) -- (2,1)
+    node[right, font=\small] {$Ae_1$};
+\end{tikzpicture}
+
+{\small The matrix $A = \begin{psmallmatrix}2 & 1\\ 1 &
+2\end{psmallmatrix}$ acting on the plane: the generic vector
+$e_1$ is knocked off its line, but the eigendirections $v_1 =
+(1,1)$ and $v_2 = (1,-1)$ are merely stretched --- by $3$ and by
+$1$ (so $Av_2 = v_2$: the dashed image coincides with $v_2$).
+Diagonalization is the change to the basis $(v_1, v_2)$, where
+$A$ becomes $\operatorname{diag}(3, 1)$.}
+\end{omfigure}
+
 \begin{definition}[Characteristic polynomial]\label{def:b2:reduction:charpoly}
 $\chi_u(X) = \det(X\,\mathrm{id} - u)$\index{characteristic
 polynomial} --- computed in any basis as $\det(XI_n - A)$, a monic
@@ -73,6 +100,24 @@ upper-triangular with top-left block $\lambda I_d$, so $\chi_u(X) =
 of $\lambda$ is at least $d$.
 \end{proof}
 
+\begin{example}[Same $\chi$, different geometry]\label{ex:b2:reduction:samechi}
+The matrices
+\[
+\begin{pmatrix}2 & 0\\ 0 & 2\end{pmatrix}
+\qquad\text{and}\qquad
+\begin{pmatrix}2 & 1\\ 0 & 2\end{pmatrix}
+\]
+share the characteristic polynomial $(X - 2)^2$, the trace, the
+determinant, the spectrum --- yet are not similar: the first has
+$E_2$ of dimension $2$ (geometric multiplicity $2$), the second
+of dimension $1$. The characteristic polynomial sees only
+algebraic multiplicities; the eigenspace dimensions are the
+finer invariant, and the minimal polynomial arbitrates ($X - 2$
+versus $(X - 2)^2$). Moral for all diagonalizability
+discussions: $\chi$ shortlists the candidates, but kernels cast
+the votes.
+\end{example}
+
 \begin{definition}[Diagonalizable, trigonalizable]\label{def:b2:reduction:diag}
 $u$ is \emph{diagonalizable}\index{diagonalizable} when $E$ has a
 basis of eigenvectors (matrix: similar to a diagonal matrix);
@@ -100,14 +145,60 @@ summands gives a basis of $E$
 of dimensions makes it everything).
 
 (2 $\iff$ 3): in the diagonal basis, $\chi_u = \prod (X -
-\lambda)^{\dim E_\lambda}$ splits with matching multiplicities;
-conversely, $\sum_\lambda \dim E_\lambda = \sum_\lambda m_\lambda =
-\deg\chi_u = n$ when $\chi$ splits with equalities, so the direct
-sum has full dimension.
+\lambda)^{\dim E_\lambda}$ splits with matching multiplicities.
+Conversely, suppose $\chi_u$ splits with $\dim E_\lambda =
+m_\lambda$ throughout; then the direct sum of the eigenspaces
+(direct by \cref{thm:b2:reduction:independence}) has dimension
+\[
+\sum_{\lambda}\dim E_\lambda = \sum_{\lambda} m_\lambda =
+\deg\chi_u = n ,
+\]
+the middle equality because a split polynomial's degree is the
+sum of its root multiplicities: the sum is all of $E$. Note
+where each hypothesis worked: splitting filled the degree,
+equality of multiplicities filled the dimensions.
 
 (4 $\Rightarrow$ 1): $n$ distinct eigenvalues give $n$ independent
 eigenvectors (\cref{thm:b2:reduction:independence}): a basis.
 \end{proof}
+
+\begin{method}[Deciding diagonalizability]\label{met:b2:reduction:decide}
+In practice, test in this order --- each step may finish the
+job. (1) Does an annihilating polynomial with simple split
+roots present itself ($u^2 = \mathrm{id}$, $u^2 = u$, $u^k =
+\mathrm{id}$)? If yes: diagonalizable, no computation
+(\cref{cor:b2:reduction:minpolycrit} below). (2) Compute
+$\chi_u$; if it has $n$ distinct roots in $K$: diagonalizable
+(\cref{thm:b2:reduction:diagcrit}~(4)). (3) Otherwise, for each
+multiple root $\lambda$ only, compare $\dim\ker(u -
+\lambda\,\mathrm{id})$ with the multiplicity $m_\lambda$: any
+deficit kills diagonalizability; equality everywhere proves it.
+Never compute eigenspaces of simple roots (their dimension is
+forced to be $1$), and never trigonalize just to decide.
+\end{method}
+
+\begin{example}[Diagonalization put to work]\label{ex:b2:reduction:diagwork}
+$A = I + J = \begin{psmallmatrix}2 & 1 & 1\\ 1 & 2 & 1\\ 1 & 1 &
+2\end{psmallmatrix}$, with $J$ the all-ones matrix: from
+$\operatorname{Sp}(J) = \{3, 0\}$
+(\cref{ex:b2:linalg:onesmatrix}), $\operatorname{Sp}(A) = \{4,
+1\}$, with eigenspaces $\R(1,1,1)$ and the plane $\{x + y + z =
+0\}$: dimensions $1 + 2 = 3$, diagonalizable
+(\cref{thm:b2:reduction:diagcrit}~(2)). Powers without any
+change-of-basis matrix: with $\Pi = J/3$ the projector onto
+$\R(1,1,1)$,
+\[
+A = 4\,\Pi + 1\cdot(I - \Pi)
+\quad\Longrightarrow\quad
+A^k = 4^k\,\Pi + (I - \Pi)
+= \frac{4^k - 1}{3}\,J + I .
+\]
+(Check $k = 1$: $\frac{4-1}3 J + I = A$.) The closing insight:
+when the eigenspaces are visible, spectral \emph{projectors}
+compute powers faster than $PDP^{-1}$ ever will --- and the
+formula displays the dynamics: $A^k$ grows like $4^k$ along
+$(1,1,1)$ and stays put on the orthogonal plane.
+\end{example}
 
 \begin{theorem}[Trigonalization]\label{thm:b2:reduction:trigonalization}
 $u$ is trigonalizable over $K$ if and only if $\chi_u$ splits over
@@ -128,6 +219,28 @@ too. By the induction hypothesis applied to the $(n-1) \times
 triangular; conjugating the whole matrix by $\begin{pmatrix}1 & 0\\
 0 & Q\end{pmatrix}$ triangularizes it.
 \end{proof}
+
+\begin{example}[Trigonalizing by hand]\label{ex:b2:reduction:trigwork}
+$B = \begin{pmatrix}3 & -1\\ 1 & 1\end{pmatrix}$: $\chi_B = X^2 -
+4X + 4 = (X - 2)^2$, and $\ker(B - 2I) =
+\ker\begin{psmallmatrix}1 & -1\\ 1 & -1\end{psmallmatrix}$ is
+the line spanned by $e_1' = (1, 1)$: one eigenvalue, a
+one-dimensional eigenspace --- not diagonalizable, but
+trigonalizable (\cref{thm:b2:reduction:trigonalization}).
+Complete the basis with $e_2' = (1, 0)$ and compute:
+\[
+u(e_1') = (2, 2) = 2e_1',
+\qquad
+u(e_2') = (3, 1) = 1\cdot e_1' + 2\, e_2' ,
+\]
+so in the basis $(e_1', e_2')$ the matrix is $T =
+\begin{psmallmatrix}2 & 1\\ 0 & 2\end{psmallmatrix}$. The
+closing insight: the diagonal of $T$ was forced (both entries
+must be the double eigenvalue $2$); only the corner entry
+depended on the choice of $e_2'$, and rescaling $e_2'$ can make
+it any nonzero value --- the resistant ``$1$'' is the shadow of
+the nilpotent part that Dunford will isolate.
+\end{example}
 
 \section{Polynomials of an endomorphism}
 
@@ -164,6 +277,26 @@ $y$ with $Q(u)(y) \neq 0$; then $(u - \lambda)(Q(u)(y)) = \mu_u(u)(y)
 (2) $\mu_u(u|_F) = \mu_u(u)|_F = 0$, and apply (1) to $u|_F$.
 \end{proof}
 
+\begin{example}[Minimal polynomials found by hand]\label{ex:b2:reduction:minpolyhand}
+The minimal polynomial is computed by testing successive
+degrees. For the all-ones matrix $J \in \mathcal{M}_3(\R)$:
+$J \neq \lambda I$ (degree $1$ is out), and $J^2 = 3J$, so
+\[
+\mu_J = X^2 - 3X = X(X - 3) :
+\]
+degree $2$, split, simple roots --- $J$ is diagonalizable with
+spectrum $\{0, 3\}$ (\cref{cor:b2:reduction:minpolycrit} below),
+confirming \cref{ex:b2:linalg:onesmatrix} without a single
+determinant. For the swap matrix $A$ of
+\cref{ex:b2:reduction:projectorswork}: $A \neq \pm I$ and $A^2
+= I$ give $\mu_A = X^2 - 1$. In both cases the pattern is the
+same: guess a low-degree identity from the structure
+(rank one forces $J^2 = (\operatorname{tr}J)\,J$; an involution
+forces $A^2 = I$), then check that no proper divisor
+annihilates. Minimal polynomials are usually \emph{found}, not
+computed from $\chi$.
+\end{example}
+
 \begin{theorem}[Kernel decomposition lemma]\label{thm:b2:reduction:kernels}
 If $P = P_1 P_2 \cdots P_r$ with the $P_i$ pairwise coprime,
 then\index{kernel decomposition lemma}
@@ -190,6 +323,54 @@ formulas for $x_1, x_2$ exhibit the projections as $V(u)P_2(u)$ and
 $U(u)P_1(u)$.
 \end{proof}
 
+\begin{example}[The kernel lemma with explicit projectors]\label{ex:b2:reduction:projectorswork}
+Let $A = \begin{psmallmatrix}0 & 1 & 0\\ 1 & 0 & 0\\ 0 & 0 &
+1\end{psmallmatrix}$ (swap the first two coordinates). Then $A^2
+= I$: the polynomial $X^2 - 1 = (X - 1)(X + 1)$ annihilates $A$,
+its factors are coprime, and B\'ezout is explicit:
+\[
+\frac{1}{2}(X + 1) - \frac12(X - 1) = 1 .
+\]
+Following the proof of \cref{thm:b2:reduction:kernels}, the
+projections onto $\ker(A - I)$ and $\ker(A + I)$ are the
+polynomials in $A$
+\[
+\pi_+ = \frac{A + I}{2} = \frac12\begin{pmatrix}
+1 & 1 & 0\\ 1 & 1 & 0\\ 0 & 0 & 2\end{pmatrix},
+\qquad
+\pi_- = \frac{I - A}{2} = \frac12\begin{pmatrix}
+1 & -1 & 0\\ -1 & 1 & 0\\ 0 & 0 & 0\end{pmatrix}.
+\]
+Check: $\pi_+ + \pi_- = I$, $\pi_+\pi_- = 0$, $\pi_\pm^2 =
+\pi_\pm$, and the images are the plane $\{x = y\}$ (symmetric
+vectors, eigenvalue $1$) and the line $\R(1, -1, 0)$
+(antisymmetric, eigenvalue $-1$). The kernel lemma is not an
+existence statement: B\'ezout coefficients \emph{are} the
+projector formulas.
+\end{example}
+
+\begin{example}[Projectors compute the exponential too]\label{ex:b2:reduction:expprojectors}
+The same swap matrix, one dividend further. Since $A = \pi_+ -
+\pi_-$ with orthogonal-in-the-algebraic-sense projectors
+($\pi_+\pi_- = 0$), every power obeys $A^k = \pi_+ +
+(-1)^k\pi_-$, and the exponential series regroups by projector:
+\[
+\eu^{tA} = \sum_k \frac{t^k}{k!}\bigl(\pi_+ +
+(-1)^k\pi_-\bigr)
+= \eu^{t}\,\pi_+ + \eu^{-t}\,\pi_- =
+\begin{pmatrix}
+\cosh t & \sinh t & 0\\
+\sinh t & \cosh t & 0\\
+0 & 0 & \eu^{t}
+\end{pmatrix}.
+\]
+(Check $t = 0$: the identity; derivative at $0$: $A$.) The
+eigendecomposition converts a matrix series into two scalar
+series --- the exact mechanism that \cref{ch:b2:diffeq} will
+run on every diagonalizable system, and the reason hyperbolic
+functions govern symmetric couplings.
+\end{example}
+
 \begin{corollary}[Diagonalizability via the minimal polynomial]\label{cor:b2:reduction:minpolycrit}
 $u$ is diagonalizable $\iff$ $\mu_u$ splits over $K$ with
 \emph{simple} roots $\iff$ some annihilating polynomial of $u$
@@ -209,7 +390,7 @@ roots; and $\mu_u$ divides it while having the same roots
 
 \begin{example}\label{ex:b2:reduction:projections}
 Projections satisfy $p^2 = p$: annihilated by $X(X-1)$, split simple
-roots — diagonalizable with spectrum $\subseteq \{0, 1\}$, and $E =
+roots --- diagonalizable with spectrum $\subseteq \{0, 1\}$, and $E =
 \ker p \oplus \ker(p - \mathrm{id})$: Year 1's geometric analysis,
 re-proved in one line. Symmetries ($s^2 = \mathrm{id}$,
 annihilator $X^2 - 1$): diagonalizable when $\operatorname{char} K
@@ -218,6 +399,45 @@ u^2$ and $u^2 \neq u$: annihilated by $X^2(X - 1)$, \emph{not}
 necessarily diagonalizable --- the criterion detects it (double root
 $0$ must be tested: diagonalizable iff moreover $\ker u^2 = \ker
 u$).
+\end{example}
+
+\begin{example}[The field decides: a rotation in $\R^3$]\label{ex:b2:reduction:rotation3d}
+Let $R$ be the quarter-turn around the $z$-axis:
+\[
+R = \begin{pmatrix}
+0 & -1 & 0\\
+1 & 0 & 0\\
+0 & 0 & 1
+\end{pmatrix},
+\qquad
+\chi_R = (X - 1)(X^2 + 1).
+\]
+Over $\R$: the only eigenvalue is $1$, with eigenspace the axis
+$\R e_3$ --- one line of fixed vectors, and no further
+reduction: $R$ is neither diagonalizable nor trigonalizable in
+$\mathcal{M}_3(\R)$ ($\chi_R$ does not split). Over $\C$: three
+distinct eigenvalues $1, \iu, -\iu$, so $R$ is diagonalizable,
+with eigenvectors $e_3$ and $e_1 \mp \iu e_2$. The geometry was
+audible in the algebra: rotations in the plane have no real
+invariant directions, and the complex eigenvalues $\pm\iu$ of
+modulus $1$ store the angle ($\pm\frac\pi2$) that the real
+matrix can only express by mixing coordinates.
+\end{example}
+
+\begin{example}[Minimal versus characteristic]\label{ex:b2:reduction:minvschar}
+For $D = \operatorname{diag}(2, 2, 3)$: $\chi_D = (X - 2)^2(X -
+3)$ but $\mu_D = (X - 2)(X - 3)$, since $(D - 2I)(D - 3I) = 0$
+(check on the canonical basis) while neither factor alone kills
+$D$. For the shift block $N = \begin{psmallmatrix}0 & 1\\ 0 &
+0\end{psmallmatrix} \oplus (3)$, i.e.\ $N' =
+\begin{psmallmatrix}0 & 1 & 0\\ 0 & 0 & 0\\ 0 & 0 &
+3\end{psmallmatrix}$: $\chi_{N'} = X^2(X - 3)$ \emph{and}
+$\mu_{N'} = X^2(X - 3)$ --- the double root is genuinely needed
+because $N'$ is not diagonalizable on $\ker$-side ($N'e_2 =
+e_1 \neq 0$). Rule of thumb: $\mu$ and $\chi$ share their roots
+(\cref{prop:b2:reduction:minpoly}); the multiplicity in $\mu$
+measures the size of the largest nilpotent block, the one in
+$\chi$ the total dimension of the characteristic subspace.
 \end{example}
 
 \begin{theorem}[Cayley--Hamilton]\label{thm:b2:reduction:cayleyhamilton}
@@ -243,6 +463,63 @@ $d$). Hence $\chi_u = P_x \cdot \chi_D$, and
 The argument holds for every $x$: $\chi_u(u) = 0$.
 \end{proof}
 
+\begin{example}[Cayley--Hamilton at work]\label{ex:b2:reduction:chwork}
+$A = \begin{pmatrix} 1 & 2\\ 3 & 4\end{pmatrix}$: $\chi_A = X^2 -
+5X - 2$, so $A^2 = 5A + 2I$. Every power of $A$ collapses to a
+combination of $I$ and $A$:
+\[
+A^4 = (5A + 2I)^2 = 25A^2 + 20A + 4I = 145A + 54I =
+\begin{pmatrix} 199 & 290\\ 435 & 634\end{pmatrix},
+\]
+and the inverse comes free: $A(A - 5I) = 2I$ gives
+\[
+A^{-1} = \tfrac12(A - 5I)
+= \begin{pmatrix} -2 & 1\\ 3/2 & -1/2\end{pmatrix}.
+\]
+The closing insight: Cayley--Hamilton compresses the whole algebra
+$K[A]$ into $\operatorname{Vect}(I, A, \dots, A^{n-1})$ ---
+$\dim K[A] = \deg\mu_A \leq n$, however large the powers you need.
+\end{example}
+
+\begin{remark}[Common pitfalls]\label{rem:b2:reduction:pitfalls}
+(i) Eigenvalues do not add: $\operatorname{Sp}(A + B)$ is not
+$\operatorname{Sp}A + \operatorname{Sp}B$, and a sum of
+diagonalizable matrices need not be diagonalizable ---
+$\begin{psmallmatrix}1 & 1\\ 0 & 0\end{psmallmatrix} +
+\begin{psmallmatrix}0 & 0\\ 0 & 1\end{psmallmatrix} =
+\begin{psmallmatrix}1 & 1\\ 0 & 1\end{psmallmatrix}$ is a sum of
+two diagonalizable matrices (each has distinct eigenvalues) and
+is not diagonalizable; only \emph{commuting} families behave
+(\cref{exo:b2:reduction:9}). (ii) ``$\chi_u$ splits'' is a
+hypothesis about the \emph{field}: a plane rotation has $\chi =
+X^2 - 2\cos\theta\,X + 1$, split over $\C$, not over $\R$ ---
+diagonalizable in $\mathcal{M}_2(\C)$, not trigonalizable in
+$\mathcal{M}_2(\R)$. (iii) The inequality runs geometric $\leq$
+algebraic, never the reverse; testing only $\dim E_\lambda \geq
+1$ proves nothing about diagonalizability. (iv) $\mu_u$ is not
+$\chi_u$: equality holds exactly when each eigenvalue has a
+single block chain (e.g.\ companion matrices, this chapter's
+weekend problem); using $\chi$ where $\mu$ is needed inflates
+every power computation. (v) Dunford's $d$ and $\nu$ are
+polynomials in $u$ --- a decomposition $u = d' + \nu'$ with the
+right properties but $d'\nu' \neq \nu'd'$ is \emph{not} Dunford
+and is never unique.
+\end{remark}
+
+\begin{remark}[Where this chapter is used]
+Reduction is the workhorse of the rest of the book: powers and
+exponentials of matrices drive the linear differential systems of
+\cref{ch:b2:diffeq}; the spectral theorem of \cref{ch:b2:quadratic}
+is diagonalization made orthogonal; generating functions
+(\cref{ch:b2:genfun}) re-derive the recurrence asymptotics of this
+chapter's weekend problem analytically. In the Year 3 volume the
+same program runs in infinite dimension: the spectral theory of
+compact self-adjoint operators, where eigenvalue sequences replace
+finite spectra, and the Perron--Frobenius theory of positive
+matrices, which explains \emph{why} dominant eigenvalues of
+counting problems are positive and simple.
+\end{remark}
+
 \section{Nilpotents and the Dunford decomposition}
 
 \begin{proposition}[Nilpotent endomorphisms]\label{prop:b2:reduction:nilpotent}
@@ -259,10 +536,22 @@ $u^k = 0$ makes every eigenvalue a root of $X^k$: spectrum $\{0\}$
 X^n$ (all roots zero) and Cayley--Hamilton gives $u^n = 0$;
 trigonalization (\cref{thm:b2:reduction:trigonalization}) puts
 zeros on the diagonal (the diagonal carries the eigenvalues).
-Conversely strictly upper triangular matrices satisfy $A^n = 0$
-(each power pushes the nonzero band one step up: prove $A^k$ has
-zeros on the first $k$ diagonals by induction). The minimal
-polynomial divides $X^n$ and annihilation defines the index.
+Conversely, let $A$ be strictly upper triangular: $a_{ij} = 0$
+for $j \leq i$. We show by induction that
+\[
+(A^k)_{ij} = 0 \qquad \text{whenever } j \leq i + k - 1,
+\]
+i.e.\ each power pushes the zero region one diagonal higher. For
+$k = 1$ this is the hypothesis. For the step,
+\[
+(A^{k+1})_{ij} = \sum_{\ell} (A^k)_{i\ell}\,a_{\ell j} ,
+\]
+and each term vanishes: either $\ell \leq i + k - 1$ (the first
+factor is $0$ by induction) or $\ell \geq i + k$, in which case
+$j \leq i + k \leq \ell$ kills the second factor. At $k = n$ the
+condition $j \leq i + n - 1$ holds for all $i, j \leq n$: $A^n =
+0$. The minimal polynomial divides $X^n$ and annihilation
+defines the index.
 \end{proof}
 
 \begin{theorem}[Dunford decomposition]\label{thm:b2:reduction:dunford}
@@ -299,9 +588,18 @@ $d'$ and $\nu'$ commute with each other, they commute with $u = d' +
 and $\nu$. Then $d - d'$ is diagonalizable (two commuting
 diagonalizable maps are simultaneously diagonalizable:
 \cref{exo:b2:reduction:9}) and equals $\nu' - \nu$, which is
-nilpotent (commuting nilpotents: binomial expansion of $(\nu' -
-\nu)^{k+k'}$). A diagonalizable nilpotent is zero (its spectrum is
-$\{0\}$ and it is diagonal in some basis): $d = d'$, $\nu = \nu'$.
+nilpotent: if $\nu^k = 0$ and $\nu'^{k'} = 0$, commutation
+licenses the binomial expansion
+\[
+(\nu' - \nu)^{k + k' - 1}
+= \sum_{j=0}^{k+k'-1}\binom{k + k' - 1}{j}
+\,\nu'^{\,j}\,(-\nu)^{k + k' - 1 - j} ,
+\]
+in which every term dies: either $j \geq k'$ (first factor
+zero) or $k + k' - 1 - j \geq k$ (second factor zero), and one
+of the two always holds. A diagonalizable nilpotent is zero (its
+spectrum is $\{0\}$ and it is diagonal in some basis): $d = d'$,
+$\nu = \nu'$.
 \end{proof}
 
 \begin{example}[Powers and exponentials]\label{ex:b2:reduction:powers}
@@ -318,6 +616,24 @@ by the commuting binomial theorem, resp.\ the exponential series
 (\cref{ch:b2:diffeq}) split on commuting summands. Reduction turns
 matrix dynamics into scalar dynamics.
 \end{example}
+
+\begin{remark}[Perspectives within this volume]\label{rem:b2:reduction:perspectives}
+Reduction is a hub; here are the four spokes to watch. In
+\cref{ch:b2:nvs}, adapted norms turn ``all eigenvalues of
+modulus $< 1$'' into ``some operator norm $< 1$'', making
+spectra govern convergence of powers and series. In
+\cref{ch:b2:diffeq}, the recipe of
+\cref{ex:b2:reduction:powers} becomes the general solution of
+$X' = AX$: Dunford splits $\eu^{tA}$ into
+polynomial-times-exponential blocks, and stability reads off
+the real parts of eigenvalues. In \cref{ch:b2:quadratic}, a
+scalar product forces what mere linear algebra cannot: symmetric
+matrices become \emph{orthogonally} diagonalizable, with no
+nilpotent part at all. And in \cref{ch:b2:genfun}, the
+dominant-eigenvalue asymptotics of this chapter's weekend
+problem reappear analytically, as the smallest singularity of a
+generating function --- two languages for one growth rate.
+\end{remark}
 
 \section{Exercises}
 
@@ -408,3 +724,227 @@ modulus $< 1$. Prove that $A^k \to 0$ entrywise as $k \to \infty$.
 compute $T^k$ explicitly --- distinguish equal and distinct
 eigenvalues --- and bound.)}
 \end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:12}
+Let $u \in \mathcal{L}(\C^n)$ with $\operatorname{rk} u = 1$ ($n
+\geq 2$). Show that $\chi_u = X^{n-1}(X - \operatorname{tr} u)$,
+and that $u$ is diagonalizable if and only if $\operatorname{tr} u
+\neq 0$. \emph{(Recall from \cref{exo:b2:linalg:5} that $u^2 =
+(\operatorname{tr} u)\,u$.)}
+\end{exercise}
+
+\section{Problem: Linear Recurrences and Companion Matrices}
+
+A linear recurrence $u_{n+k} = a_{k-1}u_{n+k-1} + \dots + a_0 u_n$
+is a matrix power in disguise, and reduction converts it into
+closed formulas, growth rates, and error estimates. This weekend
+problem develops the dictionary --- companion matrices on one
+side, the shift operator on the space of sequences on the other
+--- proves the \emph{fundamental theorem of linear recurrences}
+(the general solution is $\sum_i Q_i(n)\lambda_i^n$ over the roots
+of the characteristic polynomial), and spends the dividends on
+Diophantine approximation of $\sqrt2$, on the counting of walks
+and words, and on a ring of coupled sequences that only
+simultaneous diagonalization can untangle.
+
+\begin{problem}[{Weekend problem --- the fundamental theorem of
+linear recurrences}]
+\label{pb:b2:reduction:1}
+Fix $k \geq 1$, scalars $a_0, \dots, a_{k-1} \in \C$ with $a_0
+\neq 0$, the monic polynomial $P = X^k - a_{k-1}X^{k-1} - \dots -
+a_1 X - a_0$, and the recurrence
+\[
+(\mathcal R)\colon\quad u_{n+k} = a_{k-1}u_{n+k-1} + \dots +
+a_1 u_{n+1} + a_0 u_n \qquad (n \geq 0).
+\]
+The \emph{companion matrix} of $P$ is
+\[
+C =
+\begin{pmatrix}
+0 & 1 & & \\
+ & \ddots & \ddots & \\
+ & & 0 & 1\\
+a_0 & a_1 & \cdots & a_{k-1}
+\end{pmatrix}
+\in \mathcal{M}_k(\C).
+\]
+
+\medskip
+\noindent\textbf{Part I --- The companion dictionary.}
+\begin{enumerate}
+  \item Show that a sequence $(u_n)$ satisfies $(\mathcal R)$ if
+        and only if the vectors $v_n = (u_n, u_{n+1}, \dots,
+        u_{n+k-1})^{\mathsf T}$ satisfy $v_{n+1} = Cv_n$, hence
+        $v_n = C^n v_0$.
+  \item Prove that $\chi_C = P$ (expand $\det(XI - C)$ along the
+        first column and induct on $k$), then that $\mu_C = P$
+        as well \emph{(pass to $C^{\mathsf T}$, for which $e_1$
+        is cyclic, and note that a matrix and its transpose have
+        the same minimal polynomial)}.
+  \item Show that for each root $\lambda$ of $P$, the vector
+        $(1, \lambda, \dots, \lambda^{k-1})^{\mathsf T}$ spans
+        the eigenspace of $C$ for $\lambda$; deduce that
+        \emph{every} eigenspace of $C$ has dimension $1$, and
+        that $C$ is diagonalizable if and only if $P$ has $k$
+        distinct roots.
+  \item Suppose $P$ has distinct roots $\lambda_1, \dots,
+        \lambda_k$. Show that the geometric sequences
+        $(\lambda_i^n)_n$ form a basis of the space of solutions
+        of $(\mathcal R)$, so every solution is $u_n = \sum_i
+        c_i\lambda_i^n$ for unique constants $c_i$.
+  \item Solve completely: $u_{n+2} = u_{n+1} + 6u_n$, $u_0 = 1$,
+        $u_1 = 8$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part II --- The shift operator and the
+fundamental theorem.} Let $\mathcal{S}$ be the $\C$-vector space
+of all complex sequences and $S \in
+\mathcal{L}(\mathcal{S})$ the shift, $S\bigl((u_n)_n\bigr) =
+(u_{n+1})_n$.
+\begin{enumerate}[resume]
+  \item Show that the solution set of $(\mathcal R)$ is $\ker
+        P(S)$, and that it has dimension exactly $k$ \emph{(map a
+        solution to its initial values)}.
+  \item Explain why the kernel decomposition lemma
+        (\cref{thm:b2:reduction:kernels}) applies to $S$ on the
+        infinite-dimensional $\mathcal{S}$ without any change,
+        and write the resulting decomposition of $\ker P(S)$ for
+        $P = \prod_{i=1}^{r}(X - \lambda_i)^{m_i}$ (distinct
+        $\lambda_i$, all nonzero since $a_0 \neq 0$).
+  \item For $\lambda \neq 0$ and $m \geq 1$, show
+        \[
+        \ker\,(S - \lambda\,\mathrm{id})^m
+        = \bigl\{\,\bigl(Q(n)\,\lambda^n\bigr)_n : Q \in
+        \C_{m-1}[X]\,\bigr\},
+        \]
+        of dimension $m$. \emph{(Compute $(S -
+        \lambda)\bigl(Q(n)\lambda^n\bigr) =
+        \lambda^{n+1}(\Delta Q)(n)$ with $\Delta Q = Q(X + 1) -
+        Q(X)$, and use that $\Delta$ drops the degree; for the
+        dimension, bound it by $m$ via initial values.)}
+  \item (The fundamental theorem of linear recurrences) Conclude:
+        if $P = \prod_{i=1}^{r}(X - \lambda_i)^{m_i}$ with the
+        $\lambda_i$ distinct and nonzero, the solutions of
+        $(\mathcal R)$ are exactly the sequences
+        \[
+        u_n = \sum_{i=1}^{r} Q_i(n)\,\lambda_i^n,
+        \qquad Q_i \in \C_{m_i - 1}[X],
+        \]
+        with uniquely determined polynomials $Q_i$.
+  \item Solve completely: $u_{n+2} = 4u_{n+1} - 4u_n$, $u_0 =
+        1$, $u_1 = 0$, and check the answer on $u_2$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part III --- Dominant roots and Diophantine
+dividends.}
+\begin{enumerate}[resume]
+  \item Suppose the roots are simple with $\abs{\lambda_1} >
+        \abs{\lambda_i}$ for $i \geq 2$, and $u_n = \sum_i c_i
+        \lambda_i^n$ with $c_1 \neq 0$. Show $u_n \sim
+        c_1\lambda_1^n$ and $u_{n+1}/u_n \to \lambda_1$.
+  \item (Pell) Define $a_{n+1} = a_n + 2b_n$, $b_{n+1} = a_n +
+        b_n$, $a_0 = b_0 = 1$. Show that $q(a, b) = a^2 - 2b^2$
+        satisfies $q(a_{n+1}, b_{n+1}) = -q(a_n, b_n)$, hence
+        $a_n^2 - 2b_n^2 = (-1)^{n+1}$; relate this to the
+        determinant of $M = \begin{psmallmatrix}1 & 2\\ 1 &
+        1\end{psmallmatrix}$.
+  \item Deduce the error estimate
+        \[
+        \Bigl|\frac{a_n}{b_n} - \sqrt2\Bigr|
+        = \frac{1}{b_n\,(a_n + \sqrt2\,b_n)}
+        \leq \frac{1}{2b_n^2},
+        \]
+        and show it decays geometrically with ratio $3 -
+        2\sqrt2$ \emph{(find the eigenvalues of $M$ and the
+        growth of $b_n$)}.
+  \item (General growth) From question 9, prove: (a) if every
+        root satisfies $\abs{\lambda_i} \leq \rho$, then
+        $\abs{u_n} \leq C\,n^{m-1}\rho^n$ with $m = \max_i m_i$;
+        (b) if there is a unique root $\lambda_1$ of maximal
+        modulus and $Q_1 \neq 0$, then $u_{n+1}/u_n \to
+        \lambda_1$ --- check it on question 10's solution.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part IV --- Counting walks and words.} For a
+finite graph with vertex set $\{1, \dots, N\}$, the
+\emph{adjacency matrix} $A$ has $A_{ij} = 1$ if $ij$ is an edge,
+else $0$.
+\begin{enumerate}[resume]
+  \item Prove that $(A^n)_{ij}$ is the number of walks of length
+        $n$ from $i$ to $j$ (sequences of $n$ edges, each step
+        along an edge).
+  \item (The triangle) For the complete graph on $3$ vertices,
+        $A = J - I$: using the spectrum of $J$
+        (\cref{ex:b2:linalg:onesmatrix}), show
+        \[
+        (A^n)_{ii} = \frac{2^n + 2(-1)^n}{3},
+        \qquad
+        (A^n)_{ij} = \frac{2^n - (-1)^n}{3} \quad (i \neq j),
+        \]
+        and check both at $n = 2$ by listing walks.
+  \item (Words without $11$) Let $w_n$ be the number of binary
+        words of length $n$ with no two consecutive $1$'s.
+        Encode words by their last letter to get a transfer
+        matrix, show $w_{n+2} = w_{n+1} + w_n$, deduce $w_n =
+        F_{n+2}$ (Fibonacci, \cref{exo:b2:reduction:5}), and
+        give the growth rate $\lim w_{n+1}/w_n$.
+  \item (The path) For the path graph $1 - 2 - 3$, show the
+        eigenvalues of $A$ are $\sqrt2, 0, -\sqrt2$ with
+        eigenvectors $(1, \pm\sqrt2, 1)$ and $(1, 0, -1)$, and
+        deduce that the number of walks of length $n$ from end
+        to end is $\bigl((\sqrt2)^n + (-\sqrt2)^n\bigr)/4$:
+        zero for odd $n$, and $2^{\,n/2 - 1}$ for even $n$.
+        Check at $n = 4$.
+  \item (Trace formula) Show that the total number of closed
+        walks of length $n$ (all starting points) is
+        $\operatorname{tr}(A^n) = \sum_i \lambda_i^n$, and
+        verify it on the triangle.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part V --- A ring of sequences: simultaneous
+diagonalization.} Fix $k \geq 3$, let $\omega = \eu^{2\iu\pi/k}$,
+and let $W \in \mathcal{M}_k(\C)$ be the cyclic shift: $W e_i =
+e_{i+1}$ (indices mod $k$, columns indexed $0, \dots, k-1$).
+\begin{enumerate}[resume]
+  \item Show that $W^{\mathsf T}$ is the companion matrix of
+        $X^k - 1$, deduce $\chi_W = \mu_W = X^k - 1$, and that $W$ is
+        diagonalizable with the $k$ simple eigenvalues
+        $\omega^j$ and eigenvectors $f_j = (1, \omega^{-j},
+        \omega^{-2j}, \dots, \omega^{-(k-1)j})^{\mathsf T}$.
+  \item A \emph{circulant} matrix is $C = c_0 I + c_1 W + \dots
+        + c_{k-1}W^{k-1}$. Show that all circulants commute,
+        that the basis $(f_0, \dots, f_{k-1})$ diagonalizes
+        \emph{all} of them simultaneously, and that the
+        eigenvalues of $C$ are $\widehat c(\omega^j) = \sum_m
+        c_m \omega^{jm}$, $j = 0, \dots, k-1$.
+  \item Deduce $\det C = \prod_{j=0}^{k-1} \widehat
+        c(\omega^j)$, and check that $k = 3$ recovers the
+        factorization of \cref{exo:b2:linalg:8}.
+  \item (The necklace average) Let $x^{(n+1)} = Mx^{(n)}$ with
+        $M = \frac12(W + W^{-1})$: each of $k$ numbers arranged
+        in a ring is replaced by the average of its two
+        neighbours. Show the eigenvalues of $M$ are
+        $\cos(2\pi j/k)$, and that the coefficient of $x^{(0)}$
+        on $f_0$ is the mean $\frac1k\sum_m x^{(0)}_m$
+        \emph{(sum the coordinates of the $f_j$)}.
+  \item Conclude: for odd $k$, $x^{(n)}$ converges to the
+        constant vector whose value is the mean of the initial
+        values; for $k = 4$, exhibit the eigenvalue responsible
+        for non-convergence and the exact obstruction
+        (an alternating-mean coefficient that must vanish).
+  \item (Synthesis) In one sentence each: how the companion
+        matrix converts analysis of $(\mathcal R)$ into
+        reduction; where the kernel decomposition lemma needed
+        no finite dimension; why dominant eigenvalues govern
+        growth rates and Diophantine error; why powers of the
+        adjacency matrix count walks; and what commuting
+        matrices buy. Name the two summits: the fundamental
+        theorem of linear recurrences, and --- for the positive
+        matrices of Part IV, in the Year 3 volume --- the
+        Perron--Frobenius theorem.
+\end{enumerate}
+\end{problem}

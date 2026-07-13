@@ -43,11 +43,63 @@ As $x \to x_0$:
 \end{proposition}
 
 \begin{proof}
-Each is a one-line manipulation of the definitions; for instance
+Each is a short manipulation of the definitions; for instance
 $f_1 f_2 = (1+\varepsilon_1)(1+\varepsilon_2) g_1 g_2$ and $(1 +
-\varepsilon_1)(1+\varepsilon_2) \to 1$. The counterexample in (3) is
-the proof of (3).
+\varepsilon_1)(1+\varepsilon_2) \to 1$. Two items of (4) deserve
+their line. $u\cdot o(g) = o(ug)$: if $f = \varepsilon g$ with
+$\varepsilon \to 0$, then $uf = \varepsilon\,(ug)$ with the same
+$\varepsilon$. $o(o(g)) = o(g)$: if $f = \varepsilon_1 h$ and
+$h = \varepsilon_2 g$ with both $\varepsilon_i \to 0$, then $f =
+(\varepsilon_1\varepsilon_2) g$ and the product of the two
+infinitesimals is one. The equivalence $f \sim g \iff f = g +
+o(g)$ is the definition read twice: $f - g = \varepsilon g$.
+The counterexample in (3) is the proof of (3).
 \end{proof}
+
+\begin{example}[The comparison scale]\label{ex:b1:taylor:scale}
+As $x \to +\infty$, the standard scale reads, in increasing
+order of strength:
+\[
+1 \;=\; o(\ln x), \quad
+\ln x = o(x^{0.01}), \quad
+x^{0.01} = o(\sqrt x), \quad
+\sqrt x = o(x^{10}), \quad
+x^{10} = o(\eu^{x}), \quad
+\eu^x = o(\eu^{2x}) ,
+\]
+every step being an instance of the growth comparisons of
+\cref{prop:b1:functions:powerrules} (powers beat logarithms,
+exponentials beat powers, and within one family the exponent
+decides). Two habits worth forming: first, an $O(\cdot)$ landing
+in a smaller class upgrades silently ($O(\ln x)$ is also
+$o(x^{0.01})$); second, at $x \to 0^+$ the whole ladder
+reverses through the substitution $x \mapsto \frac1x$ ---
+$\ln x = o(x^{-0.01})$ there, so ``$x^\alpha \ln x \to 0$''
+holds for every $\alpha > 0$. Keeping the scale straight is
+half of every asymptotic argument in
+\cref{ch:b1:series}.
+\end{example}
+
+\begin{example}[Uniqueness of expansions, and a parity dividend]\label{ex:b1:taylor:uniqueness}
+If a function admits two expansions at $0$ to the same order,
+\[
+a_0 + a_1 x + \dots + a_n x^n + o(x^n)
+= b_0 + b_1 x + \dots + b_n x^n + o(x^n),
+\]
+then $a_k = b_k$ for every $k$: subtracting and setting $c_k =
+a_k - b_k$, evaluate the identity $c_0 + c_1 x + \dots + c_n x^n
+= o(x^n)$ at $x \to 0$ to get $c_0 = 0$; divide by $x$ and
+repeat --- each division is legitimate because the remaining
+expression is again $o(x^{n-k})$. Coefficients are therefore
+intrinsic, and one may compute them by \emph{any} route (Taylor
+derivatives, algebra on known expansions, integration): all
+routes must agree. Dividend: an \emph{even} function has only
+even powers in its expansion --- replace $x$ by $-x$ and invoke
+uniqueness; likewise odd functions have odd powers. This is why
+$\cos$ carries $o(x^{2p+1})$ rather than $o(x^{2p})$ in the
+table below: the absent odd term is free information, one order
+of precision for nothing.
+\end{example}
 
 \section{The three Taylor formulas}
 
@@ -73,6 +125,24 @@ the bracket contributing the term $\frac{f^{(n+1)}(a)}{(n+1)!}(x -
 a)^{n+1}$.
 \end{proof}
 
+\begin{example}[An exact expansion with its remainder]\label{ex:b1:taylor:lnexact}
+For $\ln(1 + x)$ the integral remainder can be made completely
+explicit without differentiating anything $n$ times: integrate
+the finite geometric identity $\frac{1}{1+t} =
+\sum_{k=0}^{n-1}(-t)^k + \frac{(-t)^n}{1+t}$ from $0$ to $x$:
+\[
+\ln(1 + x) = \sum_{k=1}^{n} \frac{(-1)^{k-1}x^k}{k}
++ (-1)^n \int_0^x \frac{t^n}{1 + t}\,\dd t ,
+\]
+and for $0 \leq x \leq 1$ the remainder is bounded by $\int_0^x
+t^n\,\dd t = \frac{x^{n+1}}{n+1}$. This is stronger than
+Taylor--Young in two ways: it is an \emph{identity} valid for a
+fixed $x$ (not only $x \to 0$), and the error bound is numerical.
+The weekend problem (\cref{pb:b1:taylor:1}) lives on such exact
+forms; Taylor--Young below is the lighter tool for limits, where
+only the shape of the error matters.
+\end{example}
+
 \begin{theorem}[Taylor--Lagrange inequality]\label{thm:b1:taylor:lagrange}
 Let $f$ be $C^{n+1}$ with $\abs{f^{(n+1)}} \leq M$ between $a$ and
 $x$. Then
@@ -87,6 +157,26 @@ Bound the integral remainder: $\bigl|\int_a^x \frac{(x-t)^n}{n!}
 f^{(n+1)}(t)\,\dd t\bigr| \leq M \bigl|\int_a^x
 \frac{\abs{x-t}^n}{n!}\dd t\bigr| = M\frac{\abs{x-a}^{n+1}}{(n+1)!}$.
 \end{proof}
+
+\begin{example}[Certified numerics]\label{ex:b1:taylor:certified}
+What is $\sqrt{1.02}$? Apply Taylor--Lagrange to $f(t) =
+\sqrt{1 + t}$ at $a = 0$, order $2$, $x = 0.02$:
+\[
+\sqrt{1.02} \approx 1 + \frac{0.02}{2} - \frac{0.02^2}{8}
+= 1.00995 ,
+\qquad
+\abs{f'''(t)} = \frac{3}{8}(1+t)^{-5/2} \leq \frac 38 ,
+\]
+so the error is at most $\frac38 \cdot \frac{0.02^3}{6} =
+5\cdot10^{-7}$: $\sqrt{1.02} = 1.00995$ with six certified
+decimals (true value $1.0099504938\dots$ --- the bound is nearly
+sharp). The closing insight: Taylor--Young says only \emph{how
+fast} the error vanishes; Taylor--Lagrange converts the same
+polynomial into a \emph{certificate}, a number plus a proven
+error bar. Whenever a decimal claim is made in this book, a
+Lagrange-type bound is standing behind it; the weekend problem
+(\cref{pb:b1:taylor:1}) industrializes the idea.
+\end{example}
 
 \begin{theorem}[Taylor--Young]\label{thm:b1:taylor:young}
 Let $f$ be $n$ times differentiable at $a$. Then, as $x \to a$:
@@ -116,9 +206,26 @@ $\abs{g(x)} \leq \varepsilon\abs{x - a}^n$: exactly $g(x) =
 o((x-a)^n)$.
 \end{proof}
 
-\begin{proposition}[Standard expansions at $0$]\label{prop:b1:taylor:standard}
-As $x \to 0$, for every fixed order $n$:\index{Taylor
-expansion!standard}
+\begin{remark}[Three formulas, three prices, three products]
+The hypotheses grade exactly with the conclusions.
+Taylor--Young asks the least ($n$ derivatives \emph{at the
+point} only) and yields the least: a qualitative $o((x-a)^n)$,
+perfect for limits, useless for certified digits. The Lagrange
+inequality asks for $C^{n+1}$ \emph{on the interval} and a bound
+$M$ there, and returns a numerical error bar. The integral form
+asks the same regularity and returns the most: the error as an
+explicit object one can transform (integrate by parts, bound
+piecewise, change variables) --- it is the form that powered the
+irrationality machine of \cref{pb:b1:integration:1}. Choosing
+the weakest formula that supports the goal is not pedantry: the
+flat function of \cref{pb:b1:taylor:1} satisfies Taylor--Young
+at every order while every stronger conclusion about it is
+false away from $0$.
+\end{remark}
+
+\begin{proposition}[Standard expansions at $0$]
+As $x \to 0$, for every fixed order $n$:
+\index{Taylor expansion!standard}
 \begin{align*}
 \eu^x &= 1 + x + \frac{x^2}{2!} + \dots + \frac{x^n}{n!} + o(x^n),\\
 \cos x &= 1 - \frac{x^2}{2!} + \frac{x^4}{4!} - \dots
@@ -134,6 +241,7 @@ x^{2p+1}}{(2p+1)!} + o(x^{2p+2}),\\
 where $\binom{\alpha}{n} = \frac{\alpha(\alpha - 1)\cdots(\alpha - n
 + 1)}{n!}$ for real $\alpha$. ($\cosh$ and $\sinh$: same as $\cos$,
 $\sin$ without the alternating signs.)
+\label{prop:b1:taylor:standard}
 \end{proposition}
 
 \begin{proof}
@@ -163,6 +271,32 @@ $\frac{1}{1-x} - \sum_0^n x^k = \frac{x^{n+1}}{1 - x} = o(x^n)$.)
 \end{enumerate}
 \end{method}
 
+\begin{example}[Composition, with the bookkeeping shown]\label{ex:b1:taylor:esin}
+Expand $\eu^{\sin x}$ to order $3$. Inner expansion: $u = \sin x
+= x - \frac{x^3}{6} + o(x^3)$, which indeed tends to $0$. Outer:
+$\eu^u = 1 + u + \frac{u^2}{2} + \frac{u^3}{6} + o(u^3)$, and
+$o(u^3) = o(x^3)$ since $u \sim x$. Powers of $u$, truncated at
+$x^3$:
+\[
+u^2 = x^2 + o(x^3), \qquad u^3 = x^3 + o(x^3)
+\]
+(the cross term $2x\cdot(-\frac{x^3}{6})$ is already $x^4$).
+Assemble:
+\[
+\eu^{\sin x} = 1 + \Bigl(x - \frac{x^3}{6}\Bigr) + \frac{x^2}{2}
++ \frac{x^3}{6} + o(x^3)
+= 1 + x + \frac{x^2}{2} + o(x^3) :
+\]
+the two $x^3$ contributions cancel exactly. The closing insight:
+$\eu^{\sin x}$ and $\eu^x$ agree to order $3$ --- not
+because $\sin x \approx x$ crudely, but because the first
+disagreement of the exponents ($-\frac{x^3}{6}$) enters
+multiplied by $\eu^0 = 1$ and is then met by the cubic term of
+the outer exponential; order-by-order bookkeeping detects such
+conspiracies, eyeballing never does. (The next term is
+$-\frac{x^4}{8}$: the truce ends at order $4$.)
+\end{example}
+
 \begin{example}\label{ex:b1:taylor:tan}
 Expansion of $\tan$ at order $5$. Write $\tan x =
 \sin x \cdot \frac{1}{\cos x}$:
@@ -180,6 +314,44 @@ then
 = x + \frac{x^3}{3} + \frac{2x^5}{15} + o(x^5) .
 \]
 \end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}[x=1.15cm, y=1.05cm]
+  \draw[-Stealth] (-3.5,0) -- (3.6,0) node[below, font=\small]
+    {$x$};
+  \draw[-Stealth] (0,-2.15) -- (0,2.2);
+  \draw (3.1416,-0.05) -- (3.1416,0.05)
+    node[below=3pt, font=\small] {$\pi$};
+  \draw (-3.1416,-0.05) -- (-3.1416,0.05)
+    node[below=3pt, font=\small] {$-\pi$};
+  \draw (-0.05,1) -- (0.05,1) node[above left, font=\small,
+    inner sep=1pt] {$1$};
+  \draw (-0.05,-1) -- (0.05,-1) node[below right, font=\small,
+    inner sep=1pt] {$-1$};
+  \draw[omThm, very thick, smooth]
+    plot[domain=-3.3:3.3, samples=120] (\x, {sin(\x r)});
+  \draw[omDef, thick]
+    plot[domain=-2.0:2.0] (\x, \x)
+    node[right, font=\small] {$T_1$};
+  \draw[omDef, thick, dashed, smooth]
+    plot[domain=-2.7:2.7, samples=80] (\x, {\x - \x^3/6})
+    node[below right, font=\small, inner sep=1pt] {$T_3$};
+  \draw[omDef, thick, dotted, smooth]
+    plot[domain=-3.25:3.25, samples=90]
+    (\x, {\x - \x^3/6 + \x^5/120})
+    node[above right, font=\small, inner sep=1pt] {$T_5$};
+\end{tikzpicture}
+
+{\small The sine (dark) against its Taylor polynomials at $0$:
+$T_1 = x$, $T_3 = x - \frac{x^3}{6}$ (dashed), $T_5 = x -
+\frac{x^3}{6} + \frac{x^5}{120}$ (dotted). Each new pair of terms
+hugs the curve over a visibly wider window, but every polynomial
+eventually tears away: a Taylor expansion is a \emph{local}
+contract, sharpened at $0$ and silent far away. The
+Taylor--Lagrange bound $\frac{\abs{x}^{n+1}}{(n+1)!}$ quantifies
+the window; the flat function of \cref{pb:b1:taylor:1} shows the
+contract can even be empty beyond the point itself.}
+\end{omfigure}
 
 \section{Applications}
 
@@ -201,6 +373,33 @@ x}{x}\Bigr)^{1/x^2}$: the logarithm is
 \]
 \end{example}
 
+\begin{remark}[Common pitfalls with expansions]
+(i) \emph{Never add or subtract equivalents}: from $\tan x \sim
+x$ and $\sin x \sim x$ one may \emph{not} conclude $\tan x -
+\sin x \sim 0$ (meaningless) --- the honest route is
+expansions:
+\[
+\tan x - \sin x
+= \Bigl(x + \frac{x^3}{3}\Bigr) - \Bigl(x - \frac{x^3}{6}\Bigr)
++ o(x^3) = \frac{x^3}{2} + o(x^3) \sim \frac{x^3}{2} .
+\]
+(ii) \emph{Expand past the massacre}: in the same computation,
+order $1$ sees only $x - x = 0$; whenever leading terms cancel,
+raise the order until a nonzero coefficient survives, and only
+then convert back to an equivalent. (iii) \emph{Equivalents do
+not pass through exponentials}: $n^2 + n \sim n^2$, yet
+$\eu^{n^2+n} = \eu^{n}\,\eu^{n^2}$ is \emph{not} equivalent to
+$\eu^{n^2}$ --- exponentiate only \emph{expansions of the
+exponent} whose error tends to $0$, never equivalents of the
+exponent. (Logarithms are safer: if $u_n \sim v_n \to \ell \neq
+1$, $\ell > 0$, then $\ln u_n \sim \ln v_n$.) (iv) \emph{The
+$o(\cdot)$ calculus is one-directional}: $o(x^2) + o(x^2) =
+o(x^2)$, $5\,o(x^2) = o(x^2)$, $x\cdot o(x^2) = o(x^3)$ --- but
+an $o(x^2)$ is not a specific function, so never cancel two of
+them against each other: $o(x^2) - o(x^2)$ is $o(x^2)$, not
+$0$.
+\end{remark}
+
 \begin{proposition}[Local behavior]\label{prop:b1:taylor:local}
 Suppose $f(x) = f(a) + c\,(x - a)^p + o\bigl((x-a)^p\bigr)$ with $c
 \neq 0$ (first nonzero term after the constant; $p \geq 2$ at a
@@ -219,6 +418,74 @@ Near $a$, $f(x) - f(a) = (x-a)^p\bigl(c + o(1)\bigr)$ has the sign
 of $c\,(x-a)^p$: constant sign for $p$ even, changing for $p$ odd.
 \end{proof}
 
+\begin{example}[Exponents must be expanded to $o(1)$]\label{ex:b1:taylor:expdiscipline}
+Find an equivalent of $u_n = \bigl(1 + \frac1n\bigr)^{n^2}$.
+Expand the \emph{exponent} until its error tends to $0$:
+\[
+n^2 \ln\Bigl(1 + \frac1n\Bigr)
+= n^2\Bigl(\frac1n - \frac{1}{2n^2} +
+O\Bigl(\frac{1}{n^3}\Bigr)\Bigr)
+= n - \frac12 + O\Bigl(\frac1n\Bigr),
+\]
+so $u_n = \eu^{\,n - 1/2}\,\eu^{O(1/n)}$ with $\eu^{O(1/n)} \to
+1$:
+\[
+u_n \;\sim\; \eu^{\,n - \frac12} .
+\]
+Note what would have gone wrong with less care: stopping the
+exponent at $n^2\cdot\frac1n = n + O(1)$ leaves an
+$\eu^{O(1)}$ factor --- bounded but not tending to $1$ --- and
+no equivalent can be asserted. The rule of
+the pitfalls above, in positive form: an equivalent of
+$\eu^{a_n}$ requires the expansion of $a_n$ \emph{up to a term
+tending to zero}, every coefficient before that being kept
+exactly.
+\end{example}
+
+\begin{example}[Classifying a flat critical point]\label{ex:b1:taylor:flatmin}
+Study $f(x) = \cos x + \frac{x^2}{2}$ near $0$. Both $f'(0) =
+0$ and $f''(0) = -\cos 0 + 1 = 0$: the second-derivative test is
+mute. Expand instead:
+\[
+f(x) = \Bigl(1 - \frac{x^2}{2} + \frac{x^4}{24} +
+o(x^4)\Bigr) + \frac{x^2}{2}
+= 1 + \frac{x^4}{24} + o(x^4) :
+\]
+first nonzero term $c\,x^p$ with $p = 4$ even and $c =
+\frac{1}{24} > 0$: a local minimum, of unusual flatness (the
+graph leaves its minimum value like $x^4$, not $x^2$). The
+closing insight: the expansion sees in one line what iterated
+differentiation obscures --- and \cref{prop:b1:taylor:local} is
+the systematic dictionary from ``first surviving term'' to
+``local shape''.
+\end{example}
+
+\begin{example}[Expansions at infinity]\label{ex:b1:taylor:atinfinity}
+Two computations where the variable runs to $+\infty$ and the
+substitution $h = \frac1x \to 0^+$ imports the whole toolbox.
+First,
+\[
+x - x^2\ln\Bigl(1 + \frac1x\Bigr)
+= x - x^2\Bigl(\frac1x - \frac{1}{2x^2} +
+O\Bigl(\frac{1}{x^3}\Bigr)\Bigr)
+= \frac12 + O\Bigl(\frac1x\Bigr) \longrightarrow \frac12 .
+\]
+Second, the arctangent at infinity: from $\arctan x +
+\arctan\frac1x = \frac\pi2$ for $x > 0$
+(\cref{prop:b1:functions:arcidentities}) and the expansion of
+$\arctan$ at $0$ (\cref{exo:b1:taylor:3}),
+\[
+\arctan x = \frac\pi2 - \arctan\frac1x
+= \frac\pi2 - \frac1x + \frac{1}{3x^3} +
+o\Bigl(\frac{1}{x^3}\Bigr) :
+\]
+the graph approaches its asymptote $y = \frac\pi2$ from below at
+speed $\frac1x$. The closing insight: there is no separate
+theory of expansions at infinity --- one reciprocal substitution
+reduces them to expansions at $0$, provided every intermediate
+$O$ and $o$ is carried along honestly.
+\end{example}
+
 \begin{example}[Asymptote by expansion]\label{ex:b1:taylor:asymptote}
 As $x \to +\infty$,
 \[
@@ -229,6 +496,39 @@ As $x \to +\infty$,
 the line $y = x + \frac12$ is an asymptote, approached \emph{from
 below} (the next term $-\frac{1}{8x}$ is negative).
 \end{example}
+
+\begin{remark}[Where expansions work next]
+Asymptotic expansions are the standing language of the rest of
+the book: in \cref{ch:b1:series} they decide convergence
+(equivalents feed the comparison tests, and the study of $\sum
+\frac{1}{n^\alpha}$ is an expansion in disguise); in the Year 2
+volume they become \emph{power series}, where the Taylor
+polynomial acquires infinitely many terms and a radius of
+convergence; and every linearization in physics --- the pendulum,
+first-order perturbation --- is a Taylor--Young statement with
+the $o(\cdot)$ silently dropped. The one warning worth engraving:
+an expansion describes a function only \emph{near one point} ---
+see the flat function of the weekend problem, whose expansion at
+$0$ is identically zero without the function being so.
+\end{remark}
+
+\begin{remark}[Perspectives inside this volume]
+Expansions are the working language of the remaining analysis
+and of the geometry to come. \Cref{ch:b1:series} converts them
+into convergence verdicts: an equivalent of the general term is
+an expansion truncated at its first term, and the finer tests
+(alternating with error control) consume the second term too.
+\Cref{ch:b1:curves} reads local geometry from expansions of the
+two coordinate functions: whether a parametrized curve crosses,
+kisses, or cusps at a point is decided by which powers of $t$
+survive in $x(t)$ and $y(t)$ --- the plane version of
+\cref{prop:b1:taylor:local}. And \cref{ch:b1:multivar} stops at
+order one on purpose: the tangent plane is a two-variable
+Taylor--Young statement, with the full second-order theory
+(Hessians, saddle points) deferred to the Year 2 volume. The
+common thread: every ``local'' question in this book is answered
+by writing down the first surviving term of an expansion.
+\end{remark}
 
 \section{Exercises}
 
@@ -314,8 +614,286 @@ decreases to $0$ (justify briefly). To find its speed, consider $v_n
 \begin{enumerate}
   \item using the expansion of $\sin$, prove $v_{n+1} - v_n \to
         \frac13$;
-  \item with Cesàro (\cref{exo:b1:seq:10}), deduce $\frac{v_n}{n}
+  \item with Ces\`aro (\cref{exo:b1:seq:10}), deduce $\frac{v_n}{n}
         \to \frac13$, then the equivalent $u_n \sim
         \sqrt{\dfrac{3}{n}}$.
 \end{enumerate}
 \end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:taylor:11}
+(Differences of infinities) Compute
+\[
+\lim_{x \to 0} \Bigl(\frac{1}{x^2} - \frac{1}{\sin^2 x}\Bigr)
+\qquad\text{and}\qquad
+\lim_{x \to 0^+} \Bigl(\frac 1x - \frac{1}{\ln(1 + x)}\Bigr)
+\]
+by reducing to a common denominator and expanding numerator and
+denominator separately.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:taylor:12}
+(Asymptotics of implicit roots) Show that for every $k \in
+\N^*$ the equation $\tan x = x$ has exactly one solution $x_k$
+in $\intoo{k\pi - \frac\pi2}{k\pi + \frac\pi2}$, that $x_k = k\pi
++ \frac\pi2 - \varepsilon_k$ with $\varepsilon_k =
+\arctan\frac{1}{x_k}$, and deduce the expansion
+\[
+x_k = k\pi + \frac\pi2 - \frac{1}{k\pi} + o\Bigl(\frac
+1k\Bigr) \qquad (k \to \infty).
+\]
+\end{exercise}
+
+\section{Problem: Alternating sums, certified digits, and the
+irrationality of $\cos 1$}
+
+\begin{problem}[{Weekend problem --- the alternating estimate
+$\abs{S - S_n} \leq a_{n+1}$: $\ln 2$ and $\pi$ with proven
+decimals, Machin's formula, and $\cos 1 \notin \Q$}]
+\label{pb:b1:taylor:1}
+An alternating sum with decreasing terms is the friendliest
+object in numerical analysis: its error is bounded by the first
+omitted term, \emph{with known sign}. This problem proves that
+principle with the adjacent-sequences theorem, then spends it
+three ways: certified decimals for $\ln 2$ (three competing
+routes) and for $\pi$ (Leibniz, then Machin's 1706 formula, still
+the idea behind record computations for centuries), the
+irrationality of $\cos 1$, $\sin 1$ and $\cosh 1$, and, as a
+counterweight, the Taylor--Lagrange \emph{equality} and the flat
+function whose Taylor expansion lies.\index{alternating series
+estimate}\index{Machin's formula}\index{irrationality!of cos 1@of
+$\cos 1$} Throughout, ``series'' language is informal: every sum
+here is a \emph{sequence of partial sums}, as in
+\cref{ex:b1:seq:e}; the theory proper opens in
+\cref{ch:b1:series}.
+
+\medskip
+\noindent\textbf{Part I --- The alternating estimate.} Let
+$(a_k)_{k \geq 0}$ decrease to $0$ and $S_n = \sum_{k=0}^{n}
+(-1)^k a_k$.
+\begin{enumerate}
+  \item Show that $(S_{2n+1})$ is nondecreasing, $(S_{2n})$
+        nonincreasing, and that they are adjacent
+        (\cref{thm:b1:seq:adjacent}): both converge to a common
+        $S$ with, for every $n$,
+        \[
+        S_{2n+1} \leq S \leq S_{2n},
+        \qquad
+        \abs{S - S_n} \leq a_{n+1} ,
+        \]
+        the error having the sign of the first omitted term.
+        Show moreover that if the decrease is \emph{strict}, all
+        these inequalities are strict.
+  \item First dividend: for $x = 1$ in the exponential series,
+        compare with \cref{thm:b1:taylor:lagrange} at $a = 0$:
+        show that $T_n = \sum_{k=0}^{n} \frac{(-1)^k}{k!}$
+        converges to $\eu^{-1}$ with $\abs{\eu^{-1} - T_n} <
+        \frac{1}{(n+1)!}$.
+  \item (Leibniz, 1674) From the \emph{exact} finite identity
+        \[
+        \frac{1}{1 + t^2} = \sum_{k=0}^{n} (-1)^k t^{2k}
+        + \frac{(-1)^{n+1} t^{2n+2}}{1 + t^2} ,
+        \]
+        integrated over $\intcc{0}{1}$, prove
+        \[
+        \frac\pi4 = \sum_{k=0}^{n} \frac{(-1)^k}{2k+1} + \rho_n,
+        \qquad \abs{\rho_n} \leq \frac{1}{2n+3} .
+        \]
+  \item Slowness: how many terms of Leibniz guarantee six exact
+        decimals of $\pi$? (About two million.) Evaluate $4 S_4
+        = 4\bigl(1 - \frac13 + \frac15 - \frac17 +
+        \frac19\bigr)$ and its distance to $\pi$, to feel the
+        pain.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part II --- $\ln 2$ three ways.}
+\begin{enumerate}[resume]
+  \item (Way 1: alternating harmonic) From $\frac{1}{1+t} =
+        \sum_{k=0}^{n-1}(-1)^k t^k + \frac{(-1)^n t^n}{1+t}$
+        integrated over $\intcc{0}{1}$:
+        \[
+        \ln 2 = \sum_{k=1}^{n} \frac{(-1)^{k-1}}{k} + (-1)^n
+        R_n, \qquad \frac{1}{2(n+1)} \leq R_n \leq
+        \frac{1}{n+1} :
+        \]
+        the error is of exact order $\frac 1n$ --- a million
+        terms for six decimals.
+  \item (Way 2: the fast series) Integrate $\frac{1}{1 - t^2} =
+        \sum_{k=0}^{n} t^{2k} + \frac{t^{2n+2}}{1-t^2}$ from $0$
+        to $x \in \intoo{0}{1}$ and evaluate at $x = \frac13$
+        (note $\frac{1 + 1/3}{1 - 1/3} = 2$):
+        \[
+        \ln 2 = 2\sum_{k=0}^{n} \frac{(1/3)^{2k+1}}{2k+1} +
+        \tilde\rho_n,
+        \qquad
+        0 < \tilde\rho_n \leq \frac{9}{4}\cdot
+        \frac{(1/3)^{2n+3}}{2n+3} :
+        \]
+        geometric convergence, roughly one digit per term.
+  \item (Way 3: Riemann sums and a hidden identity) Prove by
+        induction the identity
+        \[
+        \sum_{k=1}^{2n} \frac{(-1)^{k-1}}{k} = H_{2n} - H_n =
+        \sum_{k=1}^{n} \frac{1}{n + k} ,
+        \]
+        and recover $\ln 2$ as the Riemann-sum limit of
+        \cref{ex:b1:integration:riemannexample}: Ways 1 and 3
+        are secretly the same number seen twice.
+  \item Shootout at six terms: compare $\sum_{k=1}^{6}
+        \frac{(-1)^{k-1}}{k} = 0.6167$ with Way 2 at $n = 5$,
+        which already gives $\ln 2 = 0.693147$ with error $\leq
+        1.1\cdot10^{-7}$. Explain the structural reason
+        (evaluation point deep inside the interval of
+        convergence versus on its boundary).
+  \item How many terms of Way 2 certify \emph{ten} decimals of
+        $\ln 2$? Show $n = 10$ suffices.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part III --- Machin's formula.}
+\begin{enumerate}[resume]
+  \item Compute $(5 + \iu)^4$ and verify the complex identity
+        \[
+        (5 + \iu)^4 = 2\,(1 + \iu)\,(239 + \iu) .
+        \]
+        Taking arguments (\cref{ch:b1:complex} conventions),
+        deduce Machin's formula
+        \[
+        \frac\pi4 = 4\arctan\frac15 - \arctan\frac{1}{239} .
+        \]
+        (Check that no argument leaves
+        $\intoo{-\frac\pi2}{\frac\pi2}$.)
+  \item As in question 3, establish for $0 < x < 1$:
+        \[
+        \arctan x = \sum_{k=0}^{n} \frac{(-1)^k
+        x^{2k+1}}{2k+1} + r_n(x), \qquad \abs{r_n(x)} \leq
+        \frac{x^{2n+3}}{2n+3} .
+        \]
+  \item Certify $\pi$ to seven decimals with six terms: bound
+        the total error of
+        \[
+        \pi \approx 16\sum_{k=0}^{4}
+        \frac{(-1)^k (1/5)^{2k+1}}{2k+1}
+        - 4\Bigl(\frac{1}{239} - \frac{1}{3\cdot239^3}\Bigr)
+        \]
+        by $16\,\frac{(1/5)^{11}}{11} +
+        4\,\frac{(1/239)^5}{5} < 5\cdot10^{-8}$, and give the
+        resulting value $3.1415926\dots$
+  \item Compare the three routes to $\pi$ now available ---
+        Leibniz (question 4), the Dalzell integrals of
+        \cref{pb:b1:integration:1} (error $4^{1-5m}$), Machin
+        (error $\approx 16\cdot 5^{-(2n+3)}$) --- in digits per
+        term, and explain why shrinking the evaluation point
+        beats everything.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part IV --- The integer trap, alternating
+edition.}
+\begin{enumerate}[resume]
+  \item Suppose $\cos 1 = \frac pq$. Multiply the strict
+        alternating bracketing of $\sum_{k}
+        \frac{(-1)^k}{(2k)!}$ (question 1) by $(2n)!$ with $2n
+        \geq q$, and derive a contradiction: $\cos 1$ is
+        irrational.
+  \item Adapt to $\sin 1 = \sum_k \frac{(-1)^k}{(2k+1)!}$
+        (multiply by $(2n+1)!$): $\sin 1 \notin \Q$. Both
+        irrational, yet $\cos^2 1 + \sin^2 1 = 1$: irrationality
+        is not stable under algebra.
+  \item The non-alternating cousin: $\cosh 1 = \sum_k
+        \frac{1}{(2k)!}$ (in the partial-sum sense, with the
+        two-sided tail bound $0 < \cosh 1 - \sum_{k \leq n}
+        \frac{1}{(2k)!} < \frac{2}{(2n+2)!}$, to be proved).
+        Conclude $\cosh 1 \notin \Q$ by the same trap.
+  \item Push to $\cos\frac 1m$ for every integer $m \geq 1$:
+        multiply by $m^{2n}(2n)!$ and conclude $\cos\frac1m
+        \notin \Q$. Where does the same attempt break for
+        $\cos\frac ab$ with $b > 1$ general? (Identify the
+        denominator that no longer clears.)
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part V --- Sharper and darker: the equality
+form, and a function that fools Taylor.}
+\begin{enumerate}[resume]
+  \item (Taylor--Lagrange, equality form) Let $f$ be $n + 1$
+        times differentiable between $a$ and $x$. Define $g(t) =
+        f(x) - \sum_{k=0}^{n} \frac{f^{(k)}(t)}{k!}(x - t)^k -
+        A\,\frac{(x-t)^{n+1}}{(n+1)!}$ with the constant $A$
+        chosen so that $g(a) = 0$. Compute $g'$ (the sum
+        telescopes), apply Rolle on $\intcc{a}{x}$, and conclude
+        that there exists $c$ strictly between $a$ and $x$ with
+        \[
+        f(x) = \sum_{k=0}^{n} \frac{f^{(k)}(a)}{k!}(x-a)^k
+        + \frac{f^{(n+1)}(c)}{(n+1)!}\,(x-a)^{n+1} .
+        \]
+  \item Dividend of the equality: for $x > 0$ show
+        \[
+        \eu^x > 1 + x + \frac{x^2}{2!} + \dots +
+        \frac{x^n}{n!}
+        \]
+        (strictly, for every $n$), and locate where the
+        inequality reverses for $x < 0$ according to the parity
+        of $n$.
+  \item Benchmark the remainders on $\sin(0.5)$ at order $3$:
+        Young gives only $o(x^3)$ (no number); Lagrange gives
+        $\abs{\sin 0.5 - (0.5 - \frac{0.5^3}{6})} \leq
+        \frac{0.5^5}{120} = 2.61\cdot10^{-4}$; the alternating
+        estimate gives the same bound \emph{plus} the sign
+        information $\sin 0.5 > 0.5 - \frac{0.5^3}{6}$. Compare
+        with the true error $2.59\cdot10^{-4}$: the bound is
+        nearly attained. Which tool would you reach for, and
+        when?
+  \item (The flat function) Let $f(x) = \eu^{-1/x^2}$ for $x
+        \neq 0$, $f(0) = 0$. Show $f$ is continuous at $0$, that
+        $f'(0) = 0$, and more generally --- by proving that
+        every derivative has the form $f^{(k)}(x) =
+        P_k\bigl(\frac1x\bigr)\eu^{-1/x^2}$ for a polynomial
+        $P_k$ (induction) --- that $f^{(k)}(0) = 0$ for all $k$
+        \emph{(growth comparison
+        \cref{prop:b1:functions:powerrules})}. Conclude: all
+        Taylor polynomials of $f$ at $0$ vanish, yet $f(x) > 0$
+        for $x \neq 0$: Taylor--Young holds at every order, and
+        says nothing about $f$ away from $0$. Expansions
+        describe \emph{germs}, not functions.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part VI --- Synthesis.}
+\begin{enumerate}[resume]
+  \item Run the trap once more, on $\eu^{-1} = \sum_k
+        \frac{(-1)^k}{k!}$: multiply the strict alternating
+        bracketing by $n!$ and conclude $\eu^{-1} \notin \Q$,
+        hence $\eu \notin \Q$ --- the third proof of this fact
+        in the volume. List the three (adjacent sequences,
+        \cref{exo:b1:seq:9}; integrals,
+        \cref{pb:b1:integration:1}; alternating sums, here) and
+        what each needed.
+  \item The fine print: monotonicity is not decorative. Let
+        $b_k = \frac1k$ for odd $k$ and $b_k = \frac{1}{k^2}$
+        for even $k$: the $b_k$ are positive and tend to $0$,
+        yet the partial sums of $\sum (-1)^k b_k$ diverge to
+        $-\infty$. Prove it \emph{(split the partial sum into
+        the even part, bounded via
+        \cref{ex:b1:seq:basel}, and the odd part, which
+        dominates half the harmonic series,
+        \cref{exo:b1:seq:5})}, and say exactly which step of
+        question 1 used monotonicity.
+  \item Verify Euler's simpler identity $\arctan\frac12 +
+        \arctan\frac13 = \frac\pi4$ via $(2 + \iu)(3 + \iu) =
+        5(1 + \iu)$, estimate the terms needed for six decimals
+        of $\pi$ by this route ($n = 10$ suffices), and place it
+        between Leibniz and Machin in the ranking of question
+        13.
+  \item Synthesis, one sentence each: (i) state the alternating
+        estimate and its two outputs (bound and sign); (ii) why
+        exact finite identities with explicit remainders beat
+        limit statements for certified numerics; (iii) inventory
+        of the problem ($\pi$ to $10^{-7}$ by hand, $\ln 2$ to
+        ten decimals, four irrationality proofs, one equality
+        theorem, one warning example); (iv) which of these
+        threads \cref{ch:b1:series} will pick up (the alternating
+        series test, absolute versus conditional convergence,
+        and the rearrangement drama of its weekend problem).
+\end{enumerate}
+\end{problem}

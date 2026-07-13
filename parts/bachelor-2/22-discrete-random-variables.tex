@@ -44,6 +44,19 @@ measure by the exponential series. The law of rare events
 \end{itemize}
 \end{example}
 
+\begin{remark}[Which law models what]
+The four laws answer four primitive questions: Bernoulli,
+``did it happen?''; binomial, ``how many times in $n$
+tries?''; geometric, ``how long until the first time?'';
+Poisson, ``how many events at a given rate, when tries are
+many and individually unlikely?''. Recognizing the question
+is nine tenths of the modelling: sums of indicators point to
+the binomial, waiting times to the geometric, rare-event
+counts to the Poisson --- with the passage from binomial to
+Poisson made precise by the law of rare events in
+\cref{ch:b2:genfun}.
+\end{remark}
+
 \begin{proposition}[Memorylessness of the geometric
 law]\label{prop:b2:randomvar:memoryless}
 If $X \sim \mathcal{G}(p)$, then for all $m, n \in \N$:
@@ -67,6 +80,22 @@ G(1) \in \intco{0}{1}$, and $q = 0$ or the law is
 $\mathcal{G}(1 - q)$: $\P(X = k) = G(k-1) - G(k) =
 q^{k-1}(1 - q)$.
 \end{proof}
+
+\begin{example}[No number is ever ``due'']
+Roll a die, waiting for a six: the waiting time is $X \sim
+\mathcal G(1/6)$. Memorylessness says that after $10$
+fruitless rolls, the \emph{remaining} wait $X - 10$, given
+$X > 10$, is again $\mathcal G(1/6)$: the conditional
+expected wait is still $6$ rolls, exactly as at the start.
+The die does not remember, and no six is ever ``due'' --- the
+gambler's fallacy is the belief that the conditional law
+should have shifted. Conversely, the proposition's uniqueness
+half says this indifference \emph{characterizes} geometric
+waiting times: any waiting time whose forecast never updates
+is geometric. Real queues and lifetimes usually do update,
+which is precisely how one detects that they are not
+geometric.
+\end{example}
 
 \section{Expectation}
 
@@ -99,9 +128,13 @@ $(X(\omega)\P(\{\omega\}))_\omega$ is summable iff each packet is
 (automatic: $\sum_{\omega \in \Omega_x}\abs{x}\P(\{\omega\}) =
 \abs x\,\P(X = x)$) \emph{and} the family of packet sums
 $\bigl(x\,\P(X = x)\bigr)_x$ is summable --- and then the total
-sums agree. The statement for $f(X)$ is the same argument applied
-to the variable $f \circ X$, whose level sets refine along the
-values of $f$.
+sums agree. For $f(X)$: apply the proven statement to the variable $Y =
+f \circ X$, whose level sets are $\{Y = y\} =
+\bigsqcup_{x : f(x) = y}\{X = x\}$; a second summation by
+packets converts $\sum_y y\,\P(Y = y)$ into $\sum_x
+f(x)\,\P(X = x)$, the packets now grouping the values $x$
+by their image $f(x)$, with absolute summability of one
+family equivalent to that of the other.
 \end{proof}
 
 \begin{theorem}[Properties of expectation]\label{thm:b2:randomvar:linearity}
@@ -136,6 +169,34 @@ no binomial coefficients needed. $X \sim \mathcal{G}(p)$: $\E(X) =
 e^{-\lambda}\sum_{j\geq0}\frac{\lambda^j}{j!} = \lambda$.
 \end{example}
 
+\begin{example}[Transfer in action]\label{ex:b2:randomvar:transferex}
+For $X \sim \mathcal P(\lambda)$, compute
+$\E\bigl(\frac1{1+X}\bigr)$ --- the law of $\frac1{1+X}$
+itself is awkward, but transfer never asks for it:
+\[
+\E\Bigl(\frac1{1+X}\Bigr)
+= \sum_{k\geq0}\frac{1}{k+1}\,\eu^{-\lambda}
+\frac{\lambda^k}{k!}
+= \frac{\eu^{-\lambda}}{\lambda}\sum_{k\geq0}
+\frac{\lambda^{k+1}}{(k+1)!}
+= \frac{\eu^{-\lambda}}{\lambda}\bigl(\eu^\lambda - 1\bigr)
+= \frac{1 - \eu^{-\lambda}}{\lambda} .
+\]
+Two lessons. Computationally: recognizing a shifted
+exponential series is the whole work --- transfer reduces
+expectations of $f(X)$ to series manipulation. Structurally:
+the naive plug-in value would be $\frac1{1 + \E X} =
+\frac1{1 + \lambda}$, and the true answer is larger,
+\[
+\frac{1 - \eu^{-\lambda}}{\lambda} \geq
+\frac{1}{1 + \lambda},
+\]
+exactly as Jensen's inequality for the convex function $t
+\mapsto \frac1{1+t}$ demands. Expectations of
+convex images sit above the naive plug-in value, and transfer
+plus a series check makes the abstract inequality concrete.
+\end{example}
+
 \begin{theorem}[Independence and products]\label{thm:b2:randomvar:product}
 Random variables $X, Y$ are \emph{independent} if $\P(X = x, Y =
 y) = \P(X = x)\P(Y = y)$ for all $x, y$ --- equivalently, the
@@ -164,6 +225,23 @@ variable $(X, Y) \mapsto xy$; Fubini again evaluates the unsigned
 sum as the product $\E(X)\E(Y)$.
 \end{proof}
 
+\begin{example}[Products, with and without
+independence]\label{ex:b2:randomvar:productcontrast}
+Roll two fair dice. If $Y$ is the second die (independent of
+the first), $\E(XY) = \E(X)\E(Y) = 3.5^2 = 12.25$. If instead
+$Y = X$ (the ``product'' of a die with itself),
+\[
+\E(X^2) = \frac{1 + 4 + 9 + 16 + 25 + 36}{6} = \frac{91}{6}
+\approx 15.17 \neq 12.25 :
+\]
+same marginal laws in both scenarios, different joint laws,
+different product expectations. The moral, worth engraving:
+$\E(XY)$ is a functional of the \emph{pair}, not of the two
+marginals --- and the gap $\E(X^2) - \E(X)^2 \approx 2.92$
+is, by K\"onig--Huygens, precisely the variance
+$\frac{35}{12}$ of the die.
+\end{example}
+
 \section{Variance, covariance, and the classical inequalities}
 
 \begin{definition}[Moments, variance]\label{def:b2:randomvar:variance}
@@ -177,8 +255,14 @@ V(X) = \E\bigl((X - \E(X))^2\bigr)
 \qquad
 \sigma(X) = \sqrt{V(X)} ,
 \]
-(the second form by expanding the square and linearity: the
-\emph{König--Huygens} formula). For $X, Y$ with second moments,
+(the second form --- the \emph{K\"onig--Huygens} formula --- by
+expanding the square and using linearity:
+\[
+\E\bigl((X - \E X)^2\bigr)
+= \E\bigl(X^2 - 2X\,\E X + \E(X)^2\bigr)
+= \E(X^2) - 2\,\E(X)^2 + \E(X)^2 ,
+\]
+the middle term using that $\E X$ is a constant). For $X, Y$ with second moments,
 the \emph{covariance} is
 \[
 \operatorname{Cov}(X, Y)
@@ -243,6 +327,62 @@ X)^2$ at level $a = \varepsilon^2$: the event $\{(X - \E X)^2
 \varepsilon\}$.
 \end{proof}
 
+\begin{example}[Uncorrelated but glued
+together]\label{ex:b2:randomvar:sumdiff}
+Roll two fair dice, $X$ and $Y$ independent, and set $S = X +
+Y$, $D = X - Y$. By bilinearity of the covariance,
+\[
+\operatorname{Cov}(S, D) = V(X) - V(Y) +
+\operatorname{Cov}(Y, X) - \operatorname{Cov}(X, Y) = V(X) -
+V(Y) = 0 :
+\]
+sum and difference are uncorrelated. Independent? Certainly
+not: $S = 12$ forces $D = 0$, while $\P(D = 0) =
+\frac16$ unconditionally. Correlation only tests the
+\emph{linear} part of a dependence; here the dependence is
+carried by the constraint that $S$ and $D$ have the same
+parity, invisible to covariance. (For this pair, zero
+covariance needed $V(X) = V(Y)$: identical distributions,
+not independence, did the work.)
+\end{example}
+
+\begin{example}[When Markov is exact]\label{ex:b2:randomvar:markovsharp}
+Markov's inequality is an equality precisely when nothing is
+wasted in the bound $a\,\mathbf 1_{X\geq a} \leq X$: the
+variable must take only the values $0$ and $a$. Concretely,
+if $\P(X = a) = \pi$ and $\P(X = 0) = 1 - \pi$, then $\E(X)
+= a\pi$ and
+\[
+\P(X \geq a) = \pi = \frac{\E(X)}{a} .
+\]
+A realistic reading: in a population where average wealth is
+$100$ and wealth is either $0$ or $10^6$, the proportion of
+millionaires is exactly $10^{-4}$ --- Markov's bound, hit
+exactly by maximal inequality. Whenever $X$ spreads over
+intermediate values the bound is strict, often wildly so;
+but as the extreme case shows, no better inequality can be
+extracted from the mean alone.
+\end{example}
+
+\begin{example}[Chebyshev is sharp --- without further
+hypotheses]\label{ex:b2:randomvar:chebsharp}
+Fix $\varepsilon > 0$, $q \in \intoc01$, and let $X$ take the
+values $\pm\varepsilon$ with probability $\frac q2$ each and
+$0$ with probability $1 - q$. Then $\E(X) = 0$, $V(X) =
+q\varepsilon^2$, and
+\[
+\P\bigl(\abs{X - \E X} \geq \varepsilon\bigr) = q
+= \frac{V(X)}{\varepsilon^2} :
+\]
+equality in Chebyshev. So the inequality cannot be improved
+using only the variance --- the $1/\varepsilon^2$ decay is
+the exact price of second-moment information. Faster decay
+requires stronger hypotheses: boundedness of the variable
+buys \emph{exponential} concentration, as
+\cref{exo:b2:randomvar:7} previews and this chapter's weekend
+problem develops systematically.
+\end{example}
+
 \begin{theorem}[Cauchy--Schwarz and Jensen]\label{thm:b2:randomvar:jensen}
 \leavevmode
 \begin{enumerate}
@@ -288,6 +428,94 @@ $\intoo{0}{\infty}$: $\frac{1}{\E X} \leq \E\bigl(\frac1X\bigr)$
 form.
 \end{example}
 
+\begin{remark}[Common pitfalls]
+(i) $\E(XY) = \E(X)\E(Y)$ \emph{requires} independence (or at
+least zero covariance): taking $Y = X$ gives $\E(X^2) \neq
+\E(X)^2$ whenever $V(X) > 0$. (ii) Likewise $V(X + X) =
+4V(X)$, not $2V(X)$: variances add only across independent
+(or uncorrelated) summands. (iii) $\E(f(X))$ is not
+$f(\E(X))$; for convex $f$ Jensen even tells you the
+direction of the error, as in
+\cref{ex:b2:randomvar:transferex}. (iv) Existence is a real
+hypothesis: for the St Petersburg variable $X = 2^K$ with
+$\P(K = k) = 2^{-k}$ ($k \geq 1$),
+\[
+\sum_{k\geq1}2^k\cdot2^{-k} = \sum_{k\geq1}1 = \infty :
+\]
+$X$ is finite almost surely yet has no expectation, and no
+fair entry price for the game exists. Summability in the
+definition of $\E$ is not bookkeeping pedantry --- it is
+where heavy tails are detected. (v) Finally, the transfer
+theorem needs \emph{absolute} summability before any
+rearrangement of the sum over values is legitimate
+(\cref{ch:b2:series}).
+\end{remark}
+
+
+\begin{example}[Chebyshev on one hundred
+tosses]\label{ex:b2:randomvar:hundredtosses}
+For $X \sim \mathcal B(100, \frac12)$: $\E X = 50$, $V(X) =
+25$. Chebyshev with $\varepsilon = 6$:
+\[
+\P(45 \leq X \leq 55) = \P(\abs{X - 50} < 6)
+\geq 1 - \frac{25}{36} \approx 0.31 ,
+\]
+while the exact binomial sum gives $\approx 0.73$. The
+guaranteed $31\%$ is far from the truth, but it required
+\emph{only} the mean and variance --- the same certificate
+applies verbatim to any variable with $\E = 50$, $V = 25$,
+however exotic, and \cref{ex:b2:randomvar:chebsharp} shows
+some such variable saturates it. Universality has a price;
+when the distribution is genuinely binomial, the exponential
+tools of the weekend problem close most of the gap.
+\end{example}
+
+\begin{example}[The correlation of a part with its
+whole]\label{ex:b2:randomvar:partwhole}
+For independent identically distributed $X, Y$ with variance
+$\sigma^2 > 0$, how correlated is one summand with the sum
+$S = X + Y$? Compute
+\[
+\operatorname{Cov}(X, S) = \operatorname{Cov}(X, X) +
+\operatorname{Cov}(X, Y) = \sigma^2 + 0 = \sigma^2,
+\qquad V(S) = 2\sigma^2,
+\]
+so the correlation coefficient is
+\[
+\rho(X, S) = \frac{\operatorname{Cov}(X,
+S)}{\sigma(X)\,\sigma(S)}
+= \frac{\sigma^2}{\sigma\cdot\sigma\sqrt2}
+= \frac{1}{\sqrt2} \approx 0.707 ,
+\]
+whatever the common law --- dice, coins, Poisson counts. With
+$n$ summands the same computation gives $\rho(X_1, S_n) =
+1/\sqrt n$: each individual term's influence on the total
+dilutes like a square root, which is the correlational shadow
+of the $\sqrt n$ scale of fluctuations. Cauchy--Schwarz
+guarantees $\abs\rho \leq 1$ always; here the bound is met
+exactly in the degenerate case $n = 1$ and decays predictably
+after.
+\end{example}
+
+\begin{example}[Weighted AM--GM from
+Jensen]\label{ex:b2:randomvar:amgm}
+Let $Y$ take the positive values $a_1, \dots, a_k$ with
+probabilities $\lambda_1, \dots, \lambda_k$. The function
+$-\ln$ is convex on $\intoo0\infty$, so Jensen gives
+$-\ln\E(Y) \leq \E(-\ln Y)$, i.e.
+\[
+a_1^{\lambda_1}a_2^{\lambda_2}\cdots a_k^{\lambda_k}
+\;\leq\; \lambda_1a_1 + \lambda_2a_2 + \dots + \lambda_ka_k :
+\]
+the weighted arithmetic--geometric inequality, with equality
+iff $Y$ is constant. Equal weights $\lambda_i = \frac1k$
+recover the classical AM--GM. Probability has quietly proved
+a purely algebraic theorem: choosing a probability law is
+just a bookkeeping device for convex combinations --- the
+barycentric viewpoint of \cref{ch:b2:affine} once more, now
+with Jensen as the engine.
+\end{example}
+
 \section{The weak law of large numbers}
 
 \begin{theorem}[Weak law of large numbers]\label{thm:b2:randomvar:lln}
@@ -322,6 +550,89 @@ Chebyshev estimate powered the Bernstein-polynomial proof of the
 Weierstrass approximation theorem in \cref{ch:b2:funcseq} --- the
 counting lemma there \emph{was} the weak law of large numbers in
 disguise.
+\end{remark}
+
+\begin{example}[Collecting fifty coupons]
+\label{ex:b2:randomvar:couponnumeric}
+The coupon collector of \cref{exo:b2:randomvar:3} with $n =
+50$ distinct toys: the expected total is
+\[
+\E(T_{50}) = 50\,H_{50} = 50\sum_{k=1}^{50}\frac1k
+\approx 50 \times 4.499 \approx 225
+\]
+boxes --- four and a half times the naive guess $50$. The
+harmonic growth is the whole story: the first $25$ toys
+arrive in about $50\ln2 \approx 35$ boxes, while the
+\emph{last} toy alone costs $50$ boxes on average (a
+geometric wait of parameter $\frac1{50}$). Completion
+problems are dominated by their endgame, which is why
+\cref{exo:b2:randomvar:12} finds fluctuations of order $n$
+--- the size of that final geometric wait --- around the
+mean $n\ln n$.
+\end{example}
+
+\begin{example}[How large must $n$ be?]\label{ex:b2:randomvar:llnnumeric}
+To pin the observed frequency within $\varepsilon = 0.01$ of
+$\P(A)$ with confidence $95\%$, Chebyshev's bound demands
+\[
+\frac{p(1-p)}{n\varepsilon^2} \leq \frac{1}{4n\varepsilon^2}
+\leq 0.05,
+\qquad\text{i.e.}\qquad
+n \geq \frac{1}{4\cdot0.05\cdot(0.01)^2} = 50\,000 .
+\]
+The dependence is brutal in $\varepsilon$ (quadratic) and
+mild in the confidence (linear in $1/\alpha$). Both features
+are properties of the \emph{bound}, not of the truth: the
+weekend problem's exponential inequalities lower the price of
+confidence from $1/\alpha$ to $\ln(1/\alpha)$ --- the same
+specification will cost about $18\,500$ samples there ---
+while the $1/\varepsilon^2$ scale is genuine and
+unimprovable. Knowing which part of a bound is loose is as
+useful as the bound itself.
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}[x=5.5cm, y=1.05cm]
+  \draw[->] (-0.05,0) -- (1.1,0) node[below] {$S_n/n$};
+  \draw[->] (0,-0.1) -- (0,2.35);
+  \draw[dashed] (0.4,0) -- (0.4,2.15);
+  \draw[dashed] (0.6,0) -- (0.6,2.15);
+  \node[below, font=\scriptsize] at (0.4,0)
+    {$m{-}\varepsilon$};
+  \node[below, font=\scriptsize] at (0.5,0) {$m$};
+  \node[below, font=\scriptsize] at (0.6,0)
+    {$m{+}\varepsilon$};
+  \draw[omDef, thick] plot[domain=0.06:0.94, samples=80]
+    (\x, {0.8*exp(-(\x-0.5)^2/0.0288)});
+  \draw[omThm, very thick] plot[domain=0.32:0.68, samples=80]
+    (\x, {2.0*exp(-(\x-0.5)^2/0.0032)});
+  \node[omDef, font=\small] at (0.16, 0.85) {small $n$};
+  \node[omThm, font=\small] at (0.71, 1.95) {large $n$};
+\end{tikzpicture}
+
+{\small The law of large numbers as a picture: the law of
+$S_n/n$ (schematically drawn) keeps its center $m$ but
+narrows as $n$ grows, so the probability outside the band
+$\intcc{m-\varepsilon}{m+\varepsilon}$ --- the two tails ---
+shrinks to zero. Chebyshev bounds the tails by
+$V(X_1)/(n\varepsilon^2)$; the weekend problem shows they are
+in fact exponentially small.}
+\end{omfigure}
+
+\begin{remark}[Perspectives within this volume]
+Forward, everything here feeds \cref{ch:b2:genfun}: the
+expectation $\E(t^X)$ of one cunning function of $X$ packs
+the whole law into a power series, moments become
+derivatives at $1$, and Wald-type identities for random sums
+carry the branching-process theory; the product theorem for
+independent variables becomes multiplicativity of generating
+functions. Backward, expectation is a barycenter with
+probability weights (\cref{ch:b2:affine}), Jensen's
+inequality is the support-line geometry of convex functions
+(\cref{ch:b2:realfun}), and the exponential-moment method of
+this chapter's weekend problem is Markov applied to
+$\eu^{tX}$ --- one inequality, upgraded by one good change
+of variable, spanning three chapters.
 \end{remark}
 
 \section{Exercises}
@@ -427,3 +738,275 @@ $S_n/n \to 0$ almost surely along a suitable formulation: the
 event $\bigcap_{j}\bigcup_N\bigcap_{n \geq N}\{\abs{S_n/n} <
 \frac1j\}$ has probability $1$.
 \end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:randomvar:10}
+Two fair dice are thrown; let $M$ be the larger of the two
+results. Using the tail formula of \cref{exo:b2:randomvar:4}
+(finite version), show
+\[
+\E(M) = \sum_{k=1}^{6}\P(M \geq k)
+= 6 - \sum_{j=0}^5\Bigl(\frac j6\Bigr)^2 = \frac{161}{36}
+\approx 4.47 .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:randomvar:11}
+Let $F_n$ be the number of fixed points of a uniformly random
+permutation of $\{1, \dots, n\}$ ($n \geq 2$). Writing $F_n =
+\sum_i\mathbf 1_{\sigma(i) = i}$, compute $\E(F_n) = 1$,
+$\operatorname{Cov}(\mathbf 1_{\sigma(i)=i}, \mathbf
+1_{\sigma(j)=j}) = \frac1{n^2(n-1)}$ for $i \neq j$, and
+conclude $V(F_n) = 1$: on average one letter is fixed, with
+variance exactly $1$, whatever $n$.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:randomvar:12}
+(Coupon collector, concentration) In the setting of
+\cref{exo:b2:randomvar:3}, show
+\[
+V(T_n) = \sum_{k=1}^n\frac{1 - k/n}{(k/n)^2}
+\leq n^2\sum_{k=1}^n\frac{1}{k^2} \leq \frac{\pi^2}{6}n^2,
+\]
+using independence of the geometric stages and $V(\mathcal
+G(p)) = \frac{1-p}{p^2}$ (\cref{exo:b2:randomvar:1}; the value
+$\pi^2/6$ is \cref{ex:b2:fourier:basel}). Deduce with
+Chebyshev that $\dfrac{T_n}{n\ln n} \to 1$ \emph{in
+probability}: the collector's total time is $n\ln n$ up to
+fluctuations of order $n$.
+\end{exercise}
+
+\section{Problem: the concentration toolbox, from Markov to
+Hoeffding}
+
+\begin{problem}[{Weekend problem --- exponential concentration
+by hand, and how many people a poll must ask}]
+\label{pb:b2:randomvar:1}
+Markov's inequality costs one moment and buys a $1/a$ decay;
+Chebyshev costs two moments and buys $1/\varepsilon^2$ ---
+and \cref{ex:b2:randomvar:chebsharp} shows that is all those
+moments can buy. This problem climbs the rest of the ladder:
+the exponential (Chernoff) method with its \emph{exact} rate
+for coin flips, Hoeffding's inequality for all bounded
+variables, and the payoff --- explicit, honest sample sizes
+for polls, election calls and coin testing.
+\index{concentration inequalities}\index{Hoeffding's
+inequality}\index{Chernoff bound} Throughout, $S_n \sim
+\mathcal B(n, p)$ is a sum of $n$ independent Bernoulli
+variables and $\widehat p_n = S_n/n$ the empirical frequency.
+
+\medskip
+\noindent\textbf{Part I --- Calibration on the fair coin.}
+Here $p = \frac12$ and $a \in \intoo{\frac12}{1}$.
+\begin{enumerate}
+  \item Markov at level $an$: show $\P(S_n \geq an) \leq
+        \frac1{2a}$, a bound that does not even tend to $0$.
+        Where does Markov lose so much?
+  \item Chebyshev: using the symmetry of the fair binomial
+        about $n/2$, show
+        \[
+        \P(S_n \geq an) = \tfrac12\,
+        \P\bigl(\abs{S_n - \tfrac n2} \geq n(a -
+        \tfrac12)\bigr)
+        \leq \frac{1}{8n(a - 1/2)^2},
+        \]
+        i.e.\ $\frac2n$ at $a = \frac34$: polynomial decay at
+        last.
+  \item (Chernoff, general level) Compute
+        $\E(\eu^{tS_n}) = \bigl(\frac{1 + \eu^t}2\bigr)^n$ and
+        optimize $\P(S_n \geq an) \leq
+        \E(\eu^{tS_n})\eu^{-tan}$ over $t > 0$: show the
+        optimal $t$ is $\ln\frac{a}{1-a}$ and
+        \[
+        \P(S_n \geq an) \leq \eu^{-n\,I(a)},
+        \qquad
+        I(a) = \ln 2 + a\ln a + (1-a)\ln(1-a) > 0 .
+        \]
+        Check that $a = \frac34$ recovers the bound
+        $\bigl(2\cdot3^{-3/4}\bigr)^n$ of
+        \cref{exo:b2:randomvar:7}.
+  \item (The exponent is exact) Let $k = an$ be an integer.
+        From the fact that $\binom nk a^k(1-a)^{n-k}$ is the
+        largest of the $n + 1$ terms of a probability
+        distribution, prove $\binom nk \geq
+        \frac{\eu^{nH(a)}}{n+1}$ with $H(a) = -a\ln a -
+        (1-a)\ln(1-a)$, and deduce the matching lower bound
+        \[
+        \P(S_n \geq an) \geq \binom{n}{an}2^{-n}
+        \geq \frac{\eu^{-n\,I(a)}}{n + 1} .
+        \]
+  \item Tabulate the three bounds at $n = 100$, $a =
+        \frac34$: Markov $\frac23$, Chebyshev $0.02$,
+        Chernoff $\approx 2.1\cdot10^{-6}$ (the true value is
+        $\approx 2.8\cdot10^{-7}$). Moral, in one sentence?
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part II --- Hoeffding's inequality.}
+\begin{enumerate}[resume]
+  \item (Rademacher case) For $\varepsilon = \pm1$ with
+        probability $\frac12$ each, prove
+        \[
+        \E(\eu^{t\varepsilon}) = \cosh t \leq \eu^{t^2/2}
+        \qquad (t \in \R)
+        \]
+        by comparing the two series term by term ($(2k)! \geq
+        2^kk!$).
+  \item Deduce, for independent Rademacher variables
+        $\varepsilon_1, \dots, \varepsilon_n$ and every $s >
+        0$:
+        \[
+        \P\Bigl(\sum_{i=1}^n\varepsilon_i \geq s\Bigr)
+        \leq \eu^{-s^2/(2n)} .
+        \]
+  \item Translate to fair coins ($X_i =
+        \frac{1+\varepsilon_i}2$): $\P\bigl(\widehat p_n -
+        \tfrac12 \geq \delta\bigr) \leq \eu^{-2n\delta^2}$,
+        and the two-sided version with a factor $2$.
+  \item (Hoeffding's lemma) Let $X \in \intcc01$ with $\E X =
+        p$, and $\psi(t) = \ln\E(\eu^{tX})$. Justify that
+        $\psi$ is twice differentiable with
+        \[
+        \psi''(t) = \E_t(X^2) - \E_t(X)^2, \qquad
+        \E_t(Y) := \frac{\E(Y\eu^{tX})}{\E(\eu^{tX})},
+        \]
+        a \emph{variance} of a reweighted variable still
+        taking values in $\intcc01$; bound it by $\frac14$
+        (\cref{exo:b2:randomvar:6}'s minimality argument) and
+        conclude by Taylor:
+        \[
+        \E\bigl(\eu^{t(X - p)}\bigr) \leq \eu^{t^2/8} .
+        \]
+  \item (Hoeffding's inequality) For independent $X_i \in
+        \intcc01$ with common mean $p$, deduce
+        \[
+        \P\bigl(\abs{\widehat p_n - p} \geq \delta\bigr)
+        \leq 2\,\eu^{-2n\delta^2}
+        \qquad (\delta > 0).
+        \]
+  \item Compare the Chebyshev rate
+        $\frac{p(1-p)}{n\delta^2}$ with Hoeffding's
+        $2\eu^{-2n\delta^2}$: which hypothesis does each
+        require, and from which $n$ (roughly) does the
+        exponential bound win at $\delta = 0.03$, $p =
+        \frac12$?
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part III --- How many people must a poll
+ask?} A poll asks $n$ independent, uniformly chosen voters;
+each answers honestly; $p$ is the true score, $\widehat p_n$
+the poll's figure.
+\begin{enumerate}[resume]
+  \item Show that the poll is accurate to $\pm\delta$ with
+        confidence $1 - \alpha$ (i.e.\
+        $\P(\abs{\widehat p_n - p} \geq \delta) \leq \alpha$)
+        as soon as
+        \[
+        n \;\geq\; \frac{\ln(2/\alpha)}{2\,\delta^2} .
+        \]
+  \item Compute the required $n$ for the standard ``three
+        points, ninety-five percent'' specification ($\delta
+        = 0.03$, $\alpha = 0.05$): $n \geq 2050$; and for one
+        point: $n \geq 18\,445$. Observe --- and explain ---
+        the striking fact that the answer does not involve
+        the population size.
+  \item Redo question 13 with Chebyshev ($V(X_1) = p(1-p)
+        \leq \frac14$): $n \geq \frac1{4\alpha\delta^2} =
+        5556$ at three points. Note that sampling
+        \emph{without} replacement only helps
+        (\cref{exo:b2:randomvar:5}: the variance shrinks by
+        $\frac{N-n}{N-1}$).
+  \item (Calling an election) A candidate's true score is $p
+        = 0.52$. How many voters must be polled so that
+        $\P(\widehat p_n \leq \tfrac12) \leq 0.01$? Show $n
+        \geq \frac{\ln 100}{2\cdot(0.02)^2} \approx 5757$ ---
+        calling a close race costs far more than estimating a
+        score.
+  \item What the mathematics does \emph{not} cover: list the
+        modelling assumptions used (independent uniform
+        sampling, honest answers, fixed $p$), and explain in
+        a short paragraph why real polling errors are
+        dominated by \emph{bias} (non-uniform sampling,
+        non-response), which no increase of $n$ reduces.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part IV --- Sharper and cheaper.}
+\begin{enumerate}[resume]
+  \item (Median of means: exponential decay from two moments)
+        Split a budget of $km$ samples into $k$ independent
+        groups of $m$; let $\widehat p^{(1)}, \dots, \widehat
+        p^{(k)}$ be the group means and $M$ their median.
+        Choose $m$ so that each group satisfies
+        $\P(\abs{\widehat p^{(i)} - p} \geq \delta) \leq
+        \frac18$ (Chebyshev: $m \geq \frac2{\delta^2}$
+        suffices). Show that if $\abs{M - p} \geq \delta$
+        then at least $k/2$ groups err, and deduce
+        \[
+        \P(\abs{M - p} \geq \delta)
+        \leq \binom{k}{\lceil k/2\rceil}\Bigl(\frac18
+        \Bigr)^{k/2}
+        \leq 2^k\cdot 8^{-k/2} = 2^{-k/2} :
+        \]
+        exponential concentration using nothing beyond
+        variances.
+  \item (Paley--Zygmund) For $X \geq 0$ with a second moment,
+        prove $\P(X > 0) \geq \dfrac{\E(X)^2}{\E(X^2)}$
+        \emph{(Cauchy--Schwarz on $X\mathbf 1_{X>0}$)}: the
+        reverse-direction tool --- moments can also force
+        events to happen.
+  \item (Pinsker-lite) Show $I(a) \geq 2\bigl(a -
+        \tfrac12\bigr)^2$ on $\intoo{\frac12}1$ \emph{(the
+        difference vanishes to second order at $\frac12$ and
+        its second derivative is $\frac1{a(1-a)} - 4 \geq
+        0$)}: Chernoff's exact exponent always beats
+        Hoeffding's quadratic one.
+  \item Expand $I\bigl(\tfrac12 + \delta\bigr) = 2\delta^2 +
+        O(\delta^4)$ and combine with question 4: for small
+        deviations the Hoeffding exponent $2n\delta^2$ is
+        asymptotically \emph{exact} --- no method can beat it
+        by more than polynomial factors.
+  \item Draw up the toolbox table: for Markov, Chebyshev, the
+        fourth-moment bound of \cref{exo:b2:randomvar:9},
+        Hoeffding, and Chernoff with exponent $I$, state in
+        one line each: hypothesis required, decay obtained,
+        and the question in this problem where it was
+        sharpest.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part V --- Dividends.}
+\begin{enumerate}[resume]
+  \item (Testing a coin) A coin is either fair or biased with
+        $p = 0.55$. You flip it $n$ times and declare
+        ``biased'' when $\widehat p_n > 0.525$. Show that
+        both error probabilities are at most
+        $\eu^{-2n(0.025)^2}$, and that $n \geq 3685$ flips
+        guarantee both below $1\%$.
+  \item (Rare events need a variance-aware bound) Let $p =
+        0.01$ and take the relative specification $\delta =
+        p/2 = 0.005$, $\alpha = 0.05$. Compare the sample
+        sizes demanded by Hoeffding ($n \approx 74\,000$) and
+        by Chebyshev with the true variance $p(1-p)$ ($n
+        \approx 7920$): the variance-blind exponential bound
+        loses to the humble second moment. State the moral,
+        and where the missing tool (a variance-aware
+        exponential bound; the Poisson approximation of
+        \cref{ch:b2:genfun}) will come from.
+  \item (Strong law for coins) From $\sum_n
+        2\eu^{-2n\delta^2} < \infty$ and Borel--Cantelli
+        (\cref{thm:b2:proba:borelcantelli}), prove that
+        $\widehat p_n \to p$ almost surely for independent
+        coin flips: formulate the almost-sure event as
+        $\bigcap_j\bigcup_N\bigcap_{n\geq N}
+        \{\abs{\widehat p_n - p} < \tfrac1j\}$ as in
+        \cref{exo:b2:randomvar:9}, and conclude. (Boundedness
+        replaces the fourth moment used there.)
+  \item Synthesis. In five sentences: what each rung of the
+        ladder (moments one, two, four; bounded exponential;
+        exact exponent) costs and buys; why polling $2050$
+        people suffices for a country of any size; and which
+        of these bounds the Year 3 volume will sharpen into
+        the central limit theorem's exact constants.
+\end{enumerate}
+\end{problem}

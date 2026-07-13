@@ -58,6 +58,58 @@ Hermitian setting). Pythagoras: $\norm f_2^2 = \norm{S_Nf}_2^2 +
 \abs{c_n}^2$; let $N \to \infty$.
 \end{proof}
 
+\begin{example}[Best approximation, measured]\label{ex:b2:fourier:bestapprox}
+How well do low-degree trigonometric polynomials approximate
+the sawtooth $f(t) = t$ (on $\intoo{-\pi}{\pi}$) in the
+quadratic mean? By \cref{prop:b2:fourier:bessel} the best
+degree-$N$ approximation \emph{is} $S_N(f)$, with squared error
+\[
+\norm{f - S_Nf}_2^2 = \norm f_2^2 -
+\sum_{\abs n\leq N}\abs{c_n}^2 .
+\]
+Here $\norm f_2^2 = \frac{1}{2\pi}\int_{-\pi}^\pi t^2\dd t =
+\frac{\pi^2}{3}$, and from $b_n = \frac{2(-1)^{n+1}}{n}$
+(\cref{ex:b2:fourier:basel}): $\abs{c_n}^2 + \abs{c_{-n}}^2 =
+\frac{b_n^2}{2} = \frac{2}{n^2}$. So
+\[
+\norm{f - S_Nf}_2^2
+= \frac{\pi^2}{3} - \sum_{n=1}^{N}\frac{2}{n^2}
+\qquad\text{: numerically } 1.29,\ 0.79,\ 0.57,\ 0.44
+\]
+for $N = 1, 2, 3, 4$ --- decreasing, but slowly: the tail
+$\sum_{n>N}\frac2{n^2} \sim \frac2N$ is governed by the slow
+$\frac1n$ decay of the coefficients, itself the signature of
+the jump (\cref{exo:b2:fourier:6} read backwards). Closing
+insight: Parseval turns approximation quality into a tail of a
+numerical series --- and predicts, before any picture, that
+jumps make Fourier series converge reluctantly.
+\end{example}
+
+\begin{method}[Computing Fourier coefficients efficiently]\label{met:b2:fourier:coefficients}
+Before integrating anything:
+\begin{enumerate}
+  \item \emph{Parity:} even $f$ has $b_n = 0$, odd $f$ has $a_n
+        = 0$, and the surviving integrals reduce to $\frac2\pi
+        \int_0^\pi$ --- half the work, twice the reliability.
+  \item \emph{Trigonometric polynomials are done already:}
+        linearize products ($\cos^3$, $\sin^2\cos$, \dots) and
+        read the coefficients off
+        (\cref{exo:b2:fourier:9}); orthonormality makes any
+        further integration redundant.
+  \item \emph{Complex exponentials for exponentials:} for
+        factors $\eu^{at}$ or damped oscillations, compute
+        $c_n$ directly --- one integral of $\eu^{(a - \iu
+        n)t}$ beats two integrations by parts
+        (\cref{exo:b2:fourier:10}).
+  \item \emph{Differentiate a known expansion:} if $f' $ has
+        known coefficients and $f$ is continuous, $c_n(f) =
+        \frac{c_n(f')}{\iu n}$ ($n \neq 0$) recovers all but
+        $c_0$, which is the mean --- often the fastest route,
+        and legitimate exactly under the hypotheses of
+        \cref{thm:b2:fourier:parseval}~(1).
+\end{enumerate}
+\end{method}
+
 \section{Dirichlet's theorem}
 
 \begin{lemma}[Dirichlet kernel]\label{lem:b2:fourier:kernel}
@@ -74,9 +126,18 @@ D_N(u) = \sum_{n=-N}^{N} \eu^{\iu nu}
 
 \begin{proof}
 Insert the definition of $c_n$ into $S_N$ and swap sum and integral
-(finite sum): $S_N(f)(x) = \frac{1}{2\pi}\int f(t) \sum_n \eu^{\iu
-n(x - t)}\dd t$; substitute $u = t - x$ and use periodicity. The
-closed form: geometric sum with ratio $\eu^{\iu u}$,
+(legitimate: the sum is finite):
+\[
+S_N(f)(x)
+= \sum_{n=-N}^{N}\Bigl(\frac{1}{2\pi}\int_{-\pi}^{\pi}
+f(t)\,\eu^{-\iu nt}\dd t\Bigr)\eu^{\iu nx}
+= \frac{1}{2\pi}\int_{-\pi}^{\pi} f(t)
+\sum_{n=-N}^{N}\eu^{\iu n(x-t)}\,\dd t ;
+\]
+substitute $u = t - x$ and slide the integration segment back
+to $\intcc{-\pi}{\pi}$ by $2\pi$-periodicity of the integrand;
+the symmetric index range makes $\sum_n\eu^{-\iu nu} = D_N(u)$.
+The closed form: geometric sum with ratio $\eu^{\iu u}$,
 \[
 D_N(u) = \eu^{-\iu Nu}\,\frac{\eu^{\iu(2N+1)u} - 1}{\eu^{\iu u} -
 1}
@@ -105,6 +166,30 @@ integration chapter; for $C^1$ pieces one can instead integrate by
 parts and bound by $\frac C\lambda$.
 \end{proof}
 
+\begin{example}[How fast do coefficients die?]\label{ex:b2:fourier:decaytable}
+Riemann--Lebesgue says the coefficients tend to $0$; their
+\emph{rate} is a smoothness meter. Three specimens from this
+chapter and its exercises:
+\[
+\text{square wave: } b_n = \frac{4}{\pi n}\ (n\ \text{odd}),
+\qquad
+\abs t : a_n = \frac{-4}{\pi n^2}\ (n\ \text{odd}),
+\qquad
+\abs{\sin t} : a_{2k} = \frac{-4}{\pi(4k^2-1)} .
+\]
+A jump in $f$ (square wave, sawtooth) leaves coefficients of
+order $\frac1n$: no normal convergence, Gibbs overshoot at the
+jumps. Continuity with a corner --- a jump in $f'$ only ---
+improves the order to $\frac{1}{n^2}$: normal convergence,
+uniform reconstruction. In general $k$ derivatives buy $c_n =
+O(n^{-k})$ (\cref{exo:b2:fourier:6}), and conversely a spectrum
+decaying faster than every power forces $f$ to be $C^\infty$
+(differentiate term by term, now legitimately). Closing
+insight: regularity of the signal and decay of the spectrum
+are the same information --- an engineer reads one off the
+slope of the other without ever plotting the function.
+\end{example}
+
 \begin{theorem}[Dirichlet]\label{thm:b2:fourier:dirichlet}
 Let $f$ be $2\pi$-periodic and piecewise $C^1$. Then for every $x$,
 \[
@@ -114,6 +199,7 @@ S_N(f)(x) \xrightarrow[N \to \infty]{}
 (the mean of one-sided limits) --- in particular $S_N(f)(x) \to
 f(x)$ at every point of continuity.\index{Dirichlet's theorem}
 \end{theorem}
+
 
 \begin{proof}
 By the kernel lemma and its unit mean, splitting the integral into
@@ -132,12 +218,37 @@ Treat the first (the second is symmetric). Write
 \sin\Bigl(\Bigl(N + \frac12\Bigr)u\Bigr) .
 \]
 The function $g$ is piecewise continuous on $\intoc{0}{\pi}$ and
-has a \emph{finite limit at $0^+$}: since $f$ is piecewise $C^1$,
-$\frac{f(x+u) - f(x^+)}{u} \to f'(x^+)$ and $\frac{u}{\sin(u/2)}
-\to 2$. So $g$ extends piecewise continuously to $\intcc{0}{\pi}$,
-and Riemann--Lebesgue (\cref{thm:b2:fourier:riemannlebesgue}) sends
-the integral to $0$.
+has a \emph{finite limit at $0^+$}: writing
+\[
+g(u) = \frac{f(x+u) - f(x^+)}{u}\cdot\frac{u}{\sin\frac u2} ,
+\]
+the first factor tends to $f'(x^+)$ (one-sided
+differentiability, from piecewise $C^1$) and the second to $2$
+(the standard limit $\frac{\sin v}{v} \to 1$ at $v = \frac
+u2$): $g(0^+) = 2f'(x^+)$ exists. So $g$ extends piecewise
+continuously to $\intcc{0}{\pi}$, and Riemann--Lebesgue
+(\cref{thm:b2:fourier:riemannlebesgue}) sends the integral to
+$0$. This is the whole point of the hypothesis: without
+one-sided derivatives, the factor $\frac{1}{\sin(u/2)}$ blows
+up at $0$ faster than Riemann--Lebesgue can compensate, and
+pointwise convergence can genuinely fail for merely continuous
+$f$ --- the gap that Fej\'er's theorem (weekend problem)
+closes by averaging.
 \end{proof}
+
+\begin{example}[Dirichlet at a jump]\label{ex:b2:fourier:jumpvalue}
+For the sawtooth $f(t) = t$ on $\intoo{-\pi}{\pi}$
+(\cref{ex:b2:fourier:basel} below), the periodic extension
+jumps at $t = \pi$ from $f(\pi^-) = \pi$ to $f(\pi^+) = -\pi$.
+Dirichlet promises the value $\frac{\pi + (-\pi)}{2} = 0$
+there, and indeed every term of $\sum
+\frac{2(-1)^{n+1}}{n}\sin nt$ vanishes at $t = \pi$: the
+series politely converges to the midpoint, ignoring both
+one-sided values. Moving the evaluation point to $t =
+\frac\pi2$ instead (a continuity point) turns the same series
+into Leibniz's $\frac\pi4$. One series, two behaviors ---
+exactly the two clauses of the theorem.
+\end{example}
 
 \begin{theorem}[Normal convergence for $C^1$; Parseval]\label{thm:b2:fourier:parseval}
 \begin{enumerate}
@@ -180,6 +291,34 @@ S_Nf}_2^2$) passes to the limit. The real form is bookkeeping with
 $a_n, b_n$.
 \end{proof}
 
+\begin{example}[The $C^1$ tail bound, made quantitative]\label{ex:b2:fourier:tailbound}
+The proof of \cref{thm:b2:fourier:parseval}~(1) hides a usable
+estimate. For continuous piecewise-$C^1$ $f$, the same
+Cauchy--Schwarz applied to the tail only gives
+\[
+\sum_{\abs n > N}\abs{c_n(f)}
+= \sum_{\abs n > N}\frac{\abs{c_n(f')}}{\abs n}
+\leq \Bigl(\sum_{\abs n > N}\abs{c_n(f')}^2\Bigr)^{\!1/2}
+\Bigl(\sum_{\abs n>N}\frac{1}{n^2}\Bigr)^{\!1/2}
+\leq \norm{f'}_2\,\sqrt{\frac{2}{N}} ,
+\]
+using Bessel for $f'$ and $\sum_{n>N}n^{-2} \leq \frac1N$. So
+the uniform error of the partial sums obeys
+\[
+\norm{f - S_Nf}_\infty
+\leq \sum_{\abs n>N}\abs{c_n(f)}
+\leq \norm{f'}_2\,\sqrt{\frac2N} .
+\]
+For $f(t) = \abs t$: $\norm{f'}_2 = 1$ (the derivative is
+$\pm1$), so ten terms already reconstruct $\abs t$ uniformly
+within $\sqrt{0.2} \approx 0.45$, and $N = 10^4$ within
+$0.015$. Closing insight: one derivative buys the
+$\frac{1}{\sqrt N}$ uniform rate; comparing with the
+$\frac1n$-coefficient world of the square wave (no uniform
+convergence at all), the dictionary of
+\cref{ex:b2:fourier:decaytable} acquires numbers.
+\end{example}
+
 \begin{example}[Basel and friends]\label{ex:b2:fourier:basel}
 Let $f(t) = t$ on $\intoo{-\pi}{\pi}$, extended $2\pi$-periodically
 (a sawtooth, piecewise $C^1$). Computing, $a_n = 0$ (oddness) and
@@ -198,6 +337,69 @@ Dirichlet at $t = \frac\pi2$ recovers Leibniz's $\frac\pi4 = 1 -
 --- Euler's Basel sum, in two lines. The function $f(t) = t^2$
 similarly yields $\sum \frac1{n^4} = \frac{\pi^4}{90}$
 (\cref{exo:b2:fourier:3}).
+\end{example}
+
+\begin{example}[A full expansion with built-in check: $\abs{\sin t}$]\label{ex:b2:fourier:abssin}
+The function $f(t) = \abs{\sin t}$ is continuous, even,
+$\pi$-periodic (hence $2\pi$-periodic), piecewise $C^1$.
+Evenness kills the $b_n$; $a_0 = \frac1\pi\int_{-\pi}^{\pi}
+\abs{\sin t}\dd t = \frac4\pi$; and for $n \geq 1$,
+product-to-sum gives
+\[
+a_n = \frac2\pi\int_0^\pi \sin t\cos nt\,\dd t
+= \frac{1}{\pi}\int_0^\pi\bigl(\sin(1+n)t +
+\sin(1-n)t\bigr)\dd t
+= \frac2\pi\cdot\frac{1 + \cos n\pi}{1 - n^2}
+\]
+for $n \neq 1$ (and $a_1 = 0$ directly): zero for odd $n$, and
+$a_{2k} = \frac{-4}{\pi(4k^2-1)}$. By
+\cref{thm:b2:fourier:parseval}~(1) the convergence is normal,
+and
+\[
+\abs{\sin t} = \frac{2}{\pi} - \frac{4}{\pi}
+\sum_{k\geq1}\frac{\cos(2kt)}{4k^2 - 1}
+\qquad (t \in \R) .
+\]
+Built-in check at $t = 0$: the identity demands
+$\sum_{k\geq1}\frac{1}{4k^2-1} = \frac12$, which telescoping
+confirms:
+\[
+\sum_{k\geq1}\frac{1}{4k^2-1}
+= \frac12\sum_{k\geq1}\Bigl(\frac{1}{2k-1} -
+\frac{1}{2k+1}\Bigr) = \frac12 . \checkmark
+\]
+Closing insight: the spectrum of $\abs{\sin}$ lives on the
+\emph{even} frequencies only --- rectifying a sine doubles its
+frequency content, which is why full-wave rectifiers hum at
+$100$ or $120$ hertz, twice the mains frequency.
+\end{example}
+
+\begin{example}[Parseval as a computing device]\label{ex:b2:fourier:zetafourodd}
+Parseval turns expansions into numerical series wholesale.
+Apply it to $f(t) = \abs t$ (\cref{exo:b2:fourier:2}: $a_0 =
+\pi$, $a_n = \frac{-4}{\pi n^2}$ for odd $n$, the rest zero):
+\[
+\frac{1}{2\pi}\int_{-\pi}^{\pi}t^2\,\dd t = \frac{\pi^2}{3}
+= \frac{a_0^2}{4} + \frac12\sum_{n \text{ odd}} a_n^2
+= \frac{\pi^2}{4} +
+\frac{8}{\pi^2}\sum_{n\text{ odd}}\frac{1}{n^4} ,
+\]
+whence
+\[
+\sum_{n\text{ odd}}\frac{1}{n^4}
+= \frac{\pi^2}{8}\Bigl(\frac{\pi^2}{3} -
+\frac{\pi^2}{4}\Bigr) = \frac{\pi^4}{96} .
+\]
+Cross-check against \cref{exo:b2:fourier:3}: splitting
+$\sum\frac1{n^4}$ into odd and even parts gives $\zeta$-style
+bookkeeping $S = S_{\mathrm{odd}} + \frac{S}{16}$, so $S =
+\frac{16}{15}\cdot\frac{\pi^4}{96} = \frac{\pi^4}{90}$ ---
+exactly the value found there by a different function. Two
+expansions, one number: the consistency is Parseval's isometry
+at work. Closing insight: each new Fourier expansion is a
+generating machine for series identities; the weekend
+problem's Part II explains why the machine can never
+contradict itself.
 \end{example}
 
 \begin{omfigure}
@@ -221,6 +423,117 @@ similarly yields $\sum \frac1{n^4} = \frac{\pi^4}{90}$
 a persistent $\sim 9\%$ overshoot near the jumps --- the
 \emph{Gibbs phenomenon}\index{Gibbs phenomenon}. Uniform
 convergence fails exactly because the limit is discontinuous.}
+\end{omfigure}
+
+\begin{example}[Translation and modulation]\label{ex:b2:fourier:shiftrules}
+Two one-line rules generate many expansions from one. For $a
+\in \R$, substituting $s = t - a$:
+\[
+c_n\bigl(f(\cdot - a)\bigr)
+= \frac{1}{2\pi}\int_{-\pi}^{\pi}f(t - a)\eu^{-\iu nt}\dd t
+= \eu^{-\iu na}\,c_n(f)
+\qquad\text{(translation modulates the spectrum)},
+\]
+and directly from the definition,
+\[
+c_n\bigl(\eu^{\iu kt}f\bigr) = c_{n-k}(f)
+\qquad\text{(modulation translates the spectrum)}.
+\]
+Worked instance: the sawtooth shifted by $\pi$, $g(t) = f(t -
+\pi)$ with $f(t) = t$, has $b_n$-coefficients
+$(-1)^n\cdot\frac{2(-1)^{n+1}}{n} = -\frac2n$: the expansion
+$g \sim -2\sum\frac{\sin nt}{n}$ of the sawtooth that jumps at
+$0$ instead of at $\pi$ --- no integral recomputed. Closing
+insight: time shifts only turn phases, never amplitudes
+($\abs{c_n}$ is shift-invariant), which is why energy
+(Parseval) and convergence class are properties of the signal
+\emph{shape}, not of where the clock starts.
+\end{example}
+
+\begin{remark}[Common pitfalls]
+\emph{(i) Three convergences, three currencies:} pointwise
+(Dirichlet: needs piecewise $C^1$, pays the \emph{midpoint} at
+each jump --- never the one-sided value), uniform (needs a
+continuous limit; impossible across a jump, Gibbs is the
+visible symptom), and quadratic mean (Parseval: the most
+robust, blind to individual points). Always name which one you
+are claiming. \emph{(ii) No termwise differentiation by
+default:} differentiating the sawtooth series of
+\cref{ex:b2:fourier:basel} term by term yields $\sum
+2(-1)^{n+1}\cos nt$, whose terms do not even tend to $0$ ---
+the transfer theorems of the function-sequences chapter need
+uniform convergence of the \emph{derived} series, which the
+jump destroys. Smoothness first, differentiation second
+(\cref{exo:b2:fourier:6} is the dictionary). \emph{(iii)
+Symmetric partial sums:} Dirichlet's theorem concerns $S_N =
+\sum_{-N}^{N}$; rearranging or summing one side first can
+change divergence into convergence and back. \emph{(iv)
+Normalization drift:} conventions differ across books
+($\frac{1}{2\pi}$ or $\frac1\pi$ in front, period $2\pi$ or
+$1$); the reliable invariants are the orthonormality relations
+--- recompute $\langle e_m, e_n\rangle$ in the convention at
+hand before trusting any formula.
+\end{remark}
+
+\begin{remark}[Where this is used]
+Parseval is the germ of the $L^2$ theory of Fourier series: the
+Year 3 volume completes the picture (the exponentials are a
+Hilbert basis of $L^2$, and the map $f \mapsto (c_n)$ is a
+bijective isometry). Within this volume, the weekend problem
+proves \emph{Fej\'er's theorem} --- the Ces\`aro means of the
+Fourier series converge uniformly for every continuous periodic
+$f$ --- which upgrades the admitted general Parseval to a
+theorem, yields the trigonometric Weierstrass theorem, and pays
+two spectacular dividends: Weyl's equidistribution theorem and
+the isoperimetric inequality. Applied mathematics reads this
+chapter daily: spectra of signals, harmonics of vibrating
+systems, and the fast Fourier transform (the finite avatar was
+\cref{exo:b2:hermitian:10}).
+\end{remark}
+
+\begin{remark}[Perspectives within this volume]
+Three chapters converse with this one. Backward: the Hermitian
+chapter supplied the geometry (orthonormal families,
+projections, Bessel), and the function-sequences chapter the
+analysis (uniform convergence, transfer theorems, approximate
+identities --- Fej\'er's kernel is to Fourier series what
+Bernstein's polynomials were to Weierstrass). Sideways: the
+power-series chapter's boundary theory returns through Abel
+summation, realized here by the Poisson kernel
+(\cref{exo:b2:fourier:12}) --- the disk's radius $r$ playing
+the role of the summation parameter. Forward: the
+differential-equations chapter decomposes periodic forcing
+into harmonics and feeds each to the oscillator's frequency
+response; resonance happens when a Fourier mode of the input
+matches a natural frequency, which is why its weekend problem
+and this chapter's are two halves of one story.
+\end{remark}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=9.2cm, height=5.6cm,
+    xmin=-3.6, xmax=3.6, ymin=-2.5, ymax=9.5,
+    xtick={-3.1416, 0, 3.1416},
+    xticklabels={$-\pi$, $0$, $\pi$}, ytick={8}]
+  \addplot[omDef, thick, domain=0.02:3.3, samples=300]
+    {sin(deg(8.5*x))/sin(deg(0.5*x))};
+  \addplot[omDef, thick, domain=-3.3:-0.02, samples=300]
+    {sin(deg(8.5*x))/sin(deg(0.5*x))};
+  \addplot[omThm, very thick, domain=0.02:3.3, samples=300]
+    {sin(deg(4*x))^2/(8*sin(deg(0.5*x))^2)};
+  \addplot[omThm, very thick, domain=-3.3:-0.02, samples=300]
+    {sin(deg(4*x))^2/(8*sin(deg(0.5*x))^2)};
+  \node[font=\small, omDef] at (axis cs:1.05,5.2) {$D_8$};
+  \node[font=\small, omThm] at (axis cs:-0.75,6.2) {$F_8$};
+\end{axis}
+\end{tikzpicture}
+
+{\small The Dirichlet kernel $D_8$ (blue) oscillates and takes
+negative values; the Fej\'er kernel $F_8$ (red) is nonnegative,
+concentrates at $0$, and has mean $1$: an \emph{approximate
+identity}. Positivity is exactly what the Dirichlet kernel
+lacks, and what makes Fej\'er's theorem in the weekend problem
+unconditional.}
 \end{omfigure}
 
 \section{Exercises}
@@ -299,3 +612,298 @@ a Riemann sum of $\frac{2}{\pi}\cdot\frac{\sin u}{u}$ on
 $\intcc{0}{\pi}$ at midpoints. Conclude that the overshoot beyond
 the jump value $1$ does not vanish as $N \to \infty$.
 \end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:fourier:9}
+Expand $\cos^3 t$ and $\sin^2 t\,\cos t$ in Fourier series
+\emph{(linearize; a trigonometric polynomial is its own Fourier
+series, by uniqueness of coefficients)}. What are $c_n$,
+$a_n$, $b_n$ for each?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:fourier:10}
+Let $a > 0$ and $f(t) = \eu^{at}$ on $\intoc{-\pi}{\pi}$,
+extended $2\pi$-periodically. Compute
+\[
+c_n(f) = \frac{(-1)^n\sinh(a\pi)}{\pi(a - \iu n)} ,
+\]
+apply Dirichlet's theorem at the jump $t = \pi$, and deduce the
+partial-fraction expansion of the hyperbolic cotangent:
+\[
+\coth(\pi a) = \frac{1}{\pi a} + \sum_{n\geq1}
+\frac{2a}{\pi(a^2 + n^2)} .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:fourier:11}
+(Convolution) For $f, g$ continuous and $2\pi$-periodic define
+\[
+(f * g)(x) = \frac{1}{2\pi}\int_{-\pi}^{\pi} f(x - t)\,g(t)\,
+\dd t .
+\]
+Show that $f * g = g * f$, that $c_n(f*g) = c_n(f)\,c_n(g)$
+\emph{(to swap the two integrals of a continuous integrand,
+compare the two functions of the upper limit: both vanish at the
+left endpoint and have the same derivative, by continuity and
+differentiation under the integral sign)}, and that $S_N(f) =
+f * D_N$ for the Dirichlet kernel. (The weekend problem's
+Fej\'er means are likewise convolutions, $\sigma_N(f) = f *
+F_N$.)
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:fourier:12}
+(Poisson kernel: Abel means of Fourier series) For $0 \leq r <
+1$ set $P_r(t) = \sum_{n\in\Z} r^{\abs n}\eu^{\iu nt}$.
+\begin{enumerate}
+  \item Sum the two geometric series and show
+        \[
+        P_r(t) = \frac{1 - r^2}{1 - 2r\cos t + r^2} > 0,
+        \qquad
+        \frac{1}{2\pi}\int_{-\pi}^{\pi}P_r = 1 .
+        \]
+  \item Show that for $\delta \leq \abs t \leq \pi$: $P_r(t)
+        \leq \frac{1 - r^2}{1 - 2r\cos\delta + r^2} \to 0$ as
+        $r \to 1^-$, uniformly.
+  \item Deduce that for every continuous $2\pi$-periodic $f$,
+        the \emph{Abel means} $(f * P_r)(x) = \sum_n
+        r^{\abs n}c_n(f)\,\eu^{\iu nx}$ converge to $f$
+        uniformly as $r \to 1^-$ --- the continuous-parameter
+        sibling of Fej\'er's theorem, and the Fourier
+        incarnation of Abel summation from the power-series
+        chapter.
+\end{enumerate}
+\end{exercise}
+
+\section{Problem: Fej\'er's theorem and its dividends}
+
+\begin{problem}\label{pb:b2:fourier:1}
+Dirichlet's theorem needs $f$ piecewise $C^1$; for merely
+continuous $f$ the partial sums $S_N(f)$ can misbehave. Fej\'er's
+discovery: their \emph{Ces\`aro means} never do. The engine is
+the positivity of the Fej\'er kernel, and the harvest is
+immense: uniform trigonometric approximation (Weierstrass),
+uniqueness of Fourier coefficients, Parseval for every function
+of this chapter (removing the ``admitted'' in
+\cref{thm:b2:fourier:parseval}), Weyl's equidistribution
+theorem, and --- crowning a century of geometry --- the
+isoperimetric inequality.\index{Fejer's theorem@Fej\'er's
+theorem}\index{equidistribution}\index{isoperimetric inequality}
+Throughout, $f$ is $2\pi$-periodic and piecewise continuous,
+and
+\[
+\sigma_N(f) = \frac{S_0(f) + S_1(f) + \dots +
+S_{N-1}(f)}{N} .
+\]
+
+\medskip
+\noindent\textbf{Part I --- The Fej\'er kernel.}
+\begin{enumerate}
+  \item Show that $\sigma_N(f)(x) =
+        \frac{1}{2\pi}\int_{-\pi}^{\pi}f(x+u)\,F_N(u)\,\dd u$
+        with $F_N = \frac{D_0 + \dots + D_{N-1}}{N}$, and
+        that $\frac{1}{2\pi}\int_{-\pi}^{\pi}F_N = 1$.
+  \item Prove the closed form, for $u \notin 2\pi\Z$:
+        \[
+        F_N(u) = \frac{1}{N}\,
+        \frac{\sin^2\bigl(\frac{Nu}{2}\bigr)}
+        {\sin^2\bigl(\frac u2\bigr)} \;\geq\; 0
+        \]
+        \emph{(sum $\sin\bigl((n+\frac12)u\bigr)$ as the
+        imaginary part of a geometric series)}.
+  \item Show the concentration estimate: for $0 < \delta \leq
+        \abs u \leq \pi$,
+        \[
+        F_N(u) \leq \frac{1}{N\sin^2\frac\delta2}
+        \xrightarrow[N\to\infty]{} 0
+        \quad\text{uniformly} :
+        \]
+        $(F_N)$ is a positive approximate identity.
+  \item (Fej\'er's theorem) Prove: if $f$ is continuous and
+        $2\pi$-periodic, then $\sigma_N(f) \to f$
+        \emph{uniformly} on $\R$ \emph{(split the integral of
+        $\bigl(f(x+u) - f(x)\bigr)F_N(u)$ at $\abs u =
+        \delta$; use Heine and questions 1--3)}.
+  \item For piecewise continuous $f$, show the pointwise
+        version $\sigma_N(f)(x) \to \frac{f(x^+) +
+        f(x^-)}{2}$ at every $x$, and the uniform bound
+        $\norm{\sigma_N(f)}_\infty \leq \norm f_\infty$
+        \emph{(positivity!)}.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part II --- Weierstrass, uniqueness,
+Parseval.}
+\begin{enumerate}[resume]
+  \item (Trigonometric Weierstrass) Deduce: every continuous
+        $2\pi$-periodic function is a uniform limit of
+        trigonometric polynomials.
+  \item (Uniqueness) Deduce: a continuous $f$ with $c_n(f) = 0$
+        for all $n$ is identically zero --- two continuous
+        periodic functions with the same Fourier coefficients
+        coincide (\cref{exo:b2:fourier:4}, now with no
+        admission).
+  \item (Parseval, continuous case) Using the projection
+        property of $S_N$ (\cref{prop:b2:fourier:bessel}) and
+        $\sigma_Nf \in \mathcal T_{N-1} \subseteq \mathcal
+        T_N$, prove
+        \[
+        \norm{f - S_Nf}_2 \leq \norm{f - \sigma_Nf}_2
+        \leq \norm{f - \sigma_Nf}_\infty
+        \xrightarrow[N\to\infty]{} 0 ,
+        \]
+        and conclude Parseval's identity for every
+        \emph{continuous} $2\pi$-periodic $f$.
+  \item (Parseval, piecewise continuous case) Given $f$
+        piecewise continuous and $\varepsilon > 0$, construct a
+        continuous periodic $g$ with $\norm{f - g}_2 \leq
+        \varepsilon$ \emph{(replace $f$ by an affine
+        interpolation on tiny intervals around the jumps)},
+        and deduce $\norm{f - S_Nf}_2 \to 0$
+        \emph{(use Bessel: $\norm{S_Nh}_2 \leq \norm h_2$)}:
+        Parseval holds in the full generality stated in
+        \cref{thm:b2:fourier:parseval} --- the ``admitted''
+        is gone.
+  \item (No Gibbs for Fej\'er) Contrast with
+        \cref{exo:b2:fourier:8}: show that for the square wave
+        $f$, $\abs{\sigma_N(f)} \leq 1$ everywhere, for every
+        $N$ --- Ces\`aro averaging erases the overshoot that
+        haunts $S_N$. Explain in one sentence which property
+        of $F_N$ is responsible.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part III --- Rates.}
+\begin{enumerate}[resume]
+  \item Prove the two kernel bounds, for $0 < \abs u \leq
+        \pi$:
+        \[
+        F_N(u) \leq N,
+        \qquad
+        F_N(u) \leq \frac{\pi^2}{N u^2}
+        \]
+        \emph{(for the first, $\abs{\sin N\theta} \leq
+        N\abs{\sin\theta}$ by induction; for the second,
+        $\sin\frac u2 \geq \frac{u}{\pi}$ on
+        $\intcc{0}{\pi}$)}.
+  \item Deduce the first-moment estimate
+        \[
+        \frac{1}{2\pi}\int_{-\pi}^{\pi}\abs u\,F_N(u)\,\dd u
+        \;\leq\; \frac{C\,\ln N}{N}
+        \qquad (N \geq 2)
+        \]
+        for an explicit constant \emph{(split at $\abs u =
+        \frac1N$)}.
+  \item Conclude: if $f$ is $L$-Lipschitz and $2\pi$-periodic,
+        then
+        \[
+        \norm{\sigma_N f - f}_\infty \leq \frac{C\,L\ln N}{N} .
+        \]
+  \item (Saturation) Compute $\sigma_N(e_1)$ for $e_1(t) =
+        \eu^{\iu t}$ and show $\norm{\sigma_Ne_1 - e_1}_\infty
+        = \frac1N$: even for the smoothest functions, Fej\'er
+        converges no faster than $\frac1N$ --- the exact
+        analogue of the Bernstein saturation in the
+        function-sequences chapter's weekend problem.
+  \item (Localization) Show: if $f$ (piecewise continuous)
+        vanishes on $\intoo{x - \delta}{x + \delta}$, then
+        $\sigma_N(f)(x) \to 0$, however wild $f$ is elsewhere
+        --- convergence of the means at $x$ only sees $f$ near
+        $x$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part IV --- Weyl's equidistribution theorem.}
+A sequence $(x_n)_{n\geq1}$ in $\intco{0}{1}$ is
+\emph{equidistributed} when, for every interval
+$\intcc{a}{b} \subseteq \intcc{0}{1}$,
+\[
+\frac{\#\{n \leq N : x_n \in \intcc ab\}}{N}
+\xrightarrow[N\to\infty]{} b - a .
+\]
+\begin{enumerate}[resume]
+  \item Show that $(x_n)$ is equidistributed as soon as
+        $\frac1N\sum_{n\leq N}f(x_n) \to \int_0^1 f$ for every
+        \emph{continuous} $1$-periodic $f$ \emph{(squeeze the
+        indicator of $\intcc ab$ between two continuous
+        piecewise-affine functions whose integrals differ by
+        $\varepsilon$)}.
+  \item (Weyl's criterion, sufficiency) Suppose
+        \[
+        \frac{1}{N}\sum_{n=1}^{N}\eu^{2\iu\pi kx_n}
+        \xrightarrow[N\to\infty]{} 0
+        \qquad\text{for every } k \in \Z\setminus\{0\} .
+        \]
+        Show $\frac1N\sum f(x_n) \to \int_0^1f$ first for
+        trigonometric polynomials, then for all continuous
+        $1$-periodic $f$ by question 6 (transported to period
+        $1$): with question 16, $(x_n)$ is equidistributed.
+  \item Let $\alpha$ be irrational and $x_n = \{n\alpha\}$
+        (fractional part). Bound the geometric sum
+        \[
+        \Bigl|\sum_{n=1}^{N}\eu^{2\iu\pi kn\alpha}\Bigr|
+        \leq \frac{2}{\abs{1 - \eu^{2\iu\pi k\alpha}}}
+        \qquad (k \neq 0),
+        \]
+        and conclude \emph{Weyl's theorem}: $(\{n\alpha\})$ is
+        equidistributed in $\intco{0}{1}$.
+  \item Deduce that $(\{n\alpha\})$ is dense in
+        $\intcc{0}{1}$ for irrational $\alpha$, and explain in
+        one sentence why equidistribution is strictly stronger
+        than density.
+  \item (Leading digits) Prove that the proportion of integers
+        $n \leq N$ such that $2^n$ has leading (decimal) digit
+        $1$ tends to $\log_{10}2 \approx 0.301$ \emph{(leading
+        digit $1$ means $\{n\log_{10}2\} \in
+        \intco{0}{\log_{10}2}$; show $\log_{10}2$ is
+        irrational)}.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part V --- The isoperimetric inequality.} Let
+$\Gamma$ be a closed simple $C^1$ curve of length $L$ enclosing
+a signed area $A$, parametrized by scaled arc length: $z(t) =
+x(t) + \iu y(t)$, $2\pi$-periodic, with $\abs{z'(t)} =
+\frac{L}{2\pi}$ constant; the enclosed area is
+\[
+A = \frac12\int_0^{2\pi}\bigl(x\,y' - y\,x'\bigr)\dd t
+= \frac{1}{2}\,\Im\int_0^{2\pi}\conj{z}\,z'\,\dd t
+\]
+(taken here as the definition of the signed area; the chapter
+on multiple integrals proves it agrees with the intuitive one,
+via Green's formula).
+\begin{enumerate}[resume]
+  \item Expand $z(t) = \sum_{n\in\Z}c_n\eu^{\iu nt}$ (the
+        series of a $C^1$ function, normally convergent) and
+        prove, by Parseval applied to $z'$:
+        \[
+        \frac{L^2}{2\pi} = \int_0^{2\pi}\abs{z'}^2\dd t
+        = 2\pi\sum_{n\in\Z}n^2\abs{c_n}^2 .
+        \]
+  \item Prove likewise $A = \pi\sum_{n\in\Z}
+        n\,\abs{c_n}^2$ \emph{(Parseval in its polarized form:
+        $\frac{1}{2\pi}\int\conj f g = \sum
+        \conj{c_n(f)}c_n(g)$, applied to $f = z$, $g = z'$)}.
+  \item (Hurwitz) Conclude:
+        \[
+        L^2 - 4\pi A = 4\pi^2\sum_{n\in\Z}
+        (n^2 - n)\abs{c_n}^2 \;\geq\; 0 ,
+        \]
+        with equality if and only if $z(t) = c_0 +
+        c_1\eu^{\iu t}$ --- a circle. The isoperimetric
+        inequality: among closed curves of length $L$, only
+        the circle encloses area $\frac{L^2}{4\pi}$.
+  \item Sanity checks: verify equality for the circle of
+        radius $R$ and the strict inequality for the square of
+        side $a$; explain why $n^2 - n \geq 0$ for every
+        integer $n$, including the negative ones, and where
+        the parametrization's constant speed was used.
+  \item Synthesis. In one sentence each: (i) the single
+        property of $F_N$ from which Parts I--III flow, and
+        which $D_N$ lacks; (ii) how Ces\`aro summation here
+        relates to the power-series chapter's weekend problem
+        (Frobenius); (iii) which dividend used only
+        Weierstrass (question 6) and which needed full
+        Parseval; (iv) one sentence on what the Year 3 volume
+        adds ($L^2$ completeness: Fourier series as a Hilbert
+        basis).
+\end{enumerate}
+\end{problem}

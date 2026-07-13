@@ -40,6 +40,26 @@ happen (\cref{exo:b2:powerseries:2}). In practice $R$ is computed
 by d'Alembert's ratio test on $\abs{a_n}\abs z^n$ or by comparison.
 \end{definition}
 
+\begin{example}[A radius with no ratio test]\label{ex:b2:powerseries:sinn}
+What is the radius of $\sum \sin(n)\,z^n$? The ratio
+$\abs{\sin(n+1)/\sin n}$ has no limit, but the definition works
+directly. \emph{$R \geq 1$:} $\abs{\sin n} \leq 1$, so $(\sin
+n\cdot r^n)$ is bounded for every $r < 1$ --- indeed for $r =
+1$. \emph{$R \leq 1$:} it suffices that $\sin n \not\to 0$.
+Suppose $\sin n \to 0$; the addition formula
+\[
+\sin(n+1) = \sin n\cos 1 + \cos n\sin 1
+\]
+would force $\cos n \to 0$ (solve for $\cos n$: $\sin 1 \neq
+0$), contradicting $\sin^2 n + \cos^2 n = 1$. So the terms
+$\sin(n)\,1^n$ do not tend to $0$: the series diverges at $z =
+1$, and $R \leq 1$. Conclusion: $R = 1$. Closing insight: the
+radius is a statement about $\abs{a_n}r^n$ being bounded ---
+no limit of ratios is ever required, and boundedness arguments
+settle cases the ratio test cannot touch (compare the
+oscillating coefficients of \cref{exo:b2:powerseries:1}).
+\end{example}
+
 \begin{proposition}[Operations]\label{prop:b2:powerseries:operations}
 Let $\sum a_nz^n$, $\sum b_nz^n$ have radii $R_a, R_b$. Then, for
 $\abs z < \min(R_a, R_b)$:
@@ -55,10 +75,61 @@ the Cauchy product, legitimate by absolute convergence and
 \end{proposition}
 
 \begin{proof}
-Sums of convergent series; for the product, both factors converge
-absolutely inside the smaller disk and
-\cref{thm:b2:series:fubini} applies.
+The sum formula is the linearity of convergent series, and
+$(a_n + b_n)r^n$ is bounded whenever both $a_nr^n$ and $b_nr^n$
+are: radius $\geq \min(R_a, R_b)$. For the product, fix $\abs z
+< \min(R_a, R_b)$: both series converge \emph{absolutely}
+there (\cref{lem:b2:powerseries:abel}), so the doubly indexed
+family $(a_kz^k\,b_lz^l)_{k,l}$ is summable, and
+\cref{thm:b2:series:fubini} allows any grouping. Grouping by $k
++ l = n$:
+\[
+\Bigl(\sum_k a_kz^k\Bigr)\Bigl(\sum_l b_lz^l\Bigr)
+= \sum_{n\geq0}\Bigl(\sum_{k+l=n}a_kb_l\Bigr)z^n
+= \sum_{n\geq0}c_nz^n ,
+\]
+absolutely convergent for every such $z$: the product series
+has radius $\geq \min(R_a, R_b)$ as well.
 \end{proof}
+
+\begin{example}[A Cauchy square, cross-checked]\label{ex:b2:powerseries:cauchysquare}
+Square the geometric series: for $\abs x < 1$, the coefficient
+of $x^n$ in $\bigl(\sum x^k\bigr)^2$ is $c_n = \sum_{k+l=n}
+1\cdot1 = n + 1$, so
+\[
+\frac{1}{(1-x)^2} = \sum_{n\geq0}(n+1)\,x^n .
+\]
+Cross-check by term-by-term differentiation
+(\cref{thm:b2:powerseries:calculus} below): differentiating
+$\frac{1}{1-x} = \sum x^n$ gives $\frac{1}{(1-x)^2} = \sum
+nx^{n-1} = \sum(n+1)x^n$ --- the same series by two unrelated
+mechanisms. Closing insight: when a coefficient identity looks
+mysterious, one of these two engines (convolution or
+differentiation) usually produces it in one line; the weekend
+problem's question on $\sum\binom{2k}k\binom{2n-2k}{n-k} = 4^n$
+runs the convolution engine at full power.
+\end{example}
+
+\begin{example}[Multiplying by $\frac{1}{1-x}$ sums the coefficients]\label{ex:b2:powerseries:partialsums}
+A Cauchy product against the geometric series has a memorable
+meaning: for any $\sum a_nx^n$ of radius $R > 0$ and $\abs x <
+\min(R, 1)$,
+\[
+\frac{1}{1-x}\sum_{n\geq0}a_nx^n
+= \sum_{n\geq0}\Bigl(\sum_{k=0}^{n}a_k\Bigr)x^n :
+\]
+multiplication by $\frac{1}{1-x}$ replaces coefficients by
+their partial sums (convolve with the all-ones sequence).
+Instance: $\dfrac{\eu^x}{1-x} = \sum_n s_n x^n$ with $s_n =
+\sum_{k\leq n}\frac{1}{k!}$, the partial sums of $\eu$ ---
+compare \cref{exo:b2:powerseries:11}, where the same product
+with $\eu^{-x}$ encodes the derangement counts. Closing
+insight: operations on power series are operations on
+coefficient sequences in disguise (multiply by $\frac1{1-x}$:
+sum; multiply by $x$: shift; differentiate: multiply by $n$
+and shift) --- a dictionary the generating-functions chapter
+will read fluently.
+\end{example}
 
 \section{Regularity of the sum}
 
@@ -92,10 +163,38 @@ radius computation); the original converges at $x = 0$: the
 differentiation theorem for series
 (\cref{thm:b2:funcseq:seriestransfer}) applies on every such
 segment, hence on $\intoo{-R}{R}$. Iterating $k$ times and
-evaluating at $0$: $f^{(k)}(0) = k!\,a_k$ (only the constant term
-of the $k$-th derived series survives). Primitives: same radius by
-the same computation, and differentiate term by term back.
+evaluating at $0$: explicitly, the $k$-th derived series is
+\[
+f^{(k)}(x) = \sum_{n\geq k} n(n-1)\cdots(n-k+1)\,a_n\,x^{n-k},
+\]
+and at $x = 0$ every term with $n > k$ vanishes, leaving only
+the constant term $k(k-1)\cdots1\cdot a_k$: $f^{(k)}(0) =
+k!\,a_k$. Uniqueness of coefficients follows: two power series
+with the same sum near $0$ have the same derivatives at $0$,
+hence the same $a_k$. Primitives: same radius by the same
+computation, and differentiate term by term back.
 \end{proof}
+
+\begin{example}[Evaluating a series at a point]\label{ex:b2:powerseries:evaluate}
+What is $\sum_{n\geq1}\dfrac{n^2}{2^n}$? It is the sum
+$\sum n^2x^n$ of \cref{exo:b2:powerseries:3} evaluated
+\emph{inside} the disk, at $x = \frac12 < 1 = R$, where every
+manipulation used to derive the closed form was legitimate:
+\[
+\sum_{n\geq1} n^2x^n = \frac{x(1+x)}{(1-x)^3}
+\quad\Longrightarrow\quad
+\sum_{n\geq1}\frac{n^2}{2^n}
+= \frac{\frac12\cdot\frac32}{(\frac12)^3}
+= \frac{3/4}{1/8} = 6 .
+\]
+Same engine, other dials: $x = \frac13$ gives
+$\sum\frac{n^2}{3^n} = \frac{\frac13\cdot\frac43}{(2/3)^3} =
+\frac32$. Closing insight: a power-series identity is a
+machine, not a single formula --- one derivation prices every
+numerical series $\sum n^2q^n$ at once, for all $\abs q < 1$;
+this is how the generating-functions chapter will compute
+expectations and variances wholesale.
+\end{example}
 
 \begin{example}[The classics, this time honestly]\label{ex:b2:powerseries:classics}
 $\displaystyle\frac{1}{1 - x} = \sum x^n$ ($R = 1$); integrating
@@ -106,11 +205,73 @@ term by term (\cref{thm:b2:powerseries:calculus}~(2)):
 \arctan x = \sum_{n \geq 0} \frac{(-1)^n x^{2n+1}}{2n+1}
 \quad (\abs x < 1),
 \]
-the second from $\frac{1}{1+x^2} = \sum (-1)^n x^{2n}$. And $\exp$:
+the second in two steps: substitute $-x^2$ in the geometric
+series to get $\frac{1}{1+x^2} = \sum(-1)^nx^{2n}$ (radius
+$1$, since $\abs{x^2} < 1 \iff \abs x < 1$), then take the
+term-by-term primitive vanishing at $0$; both sides are
+primitives of the same function with the same value at $0$,
+hence equal on $\intoo{-1}{1}$. And $\exp$:
 the series $E(x) = \sum \frac{x^n}{n!}$ ($R = \infty$) satisfies
 $E' = E$, $E(0) = 1$ by termwise differentiation, so $E = \exp$ by
 the Year 1 uniqueness. Every ``standard expansion'' of the Year 1
 volume is now a theorem about its full power series.
+\end{example}
+
+\begin{example}[A logarithm computed from inside the disk]\label{ex:b2:powerseries:lntwo}
+Evaluating $-\ln(1-x) = \sum\frac{x^n}{n}$ at the interior
+point $x = \frac12$:
+\[
+\sum_{n\geq1}\frac{1}{n\,2^n} = \ln 2 ,
+\]
+a fast-converging representation of $\ln 2$ (ten terms already
+give $0.69306\ldots$ against $\ln 2 = 0.69314\ldots$), far
+better than the alternating series $1 - \frac12 + \frac13 -
+\dots$ available only at the boundary. Closing insight:
+whenever a constant is reachable both at the rim and strictly
+inside the disk, the interior wins numerically --- geometric
+decay against harmonic decay.
+\end{example}
+
+\begin{example}[Differentiation preserves the radius, not the boundary]\label{ex:b2:powerseries:boundaryloss}
+The series $\sum_{n\geq1}\frac{x^n}{n^2}$ has radius $1$ and
+converges at \emph{both} endpoints ($\sum\frac1{n^2}$ and its
+alternating twin). Its derived series,
+\[
+\sum_{n\geq1}\frac{x^{n-1}}{n} ,
+\]
+has the same radius $1$ --- as
+\cref{thm:b2:powerseries:calculus} guarantees --- but now
+diverges at $x = 1$ (harmonic series) while still converging
+at $x = -1$ (alternating). One more differentiation yields
+$\sum_{n\geq2}\frac{n-1}{n}x^{n-2}$, divergent at both ends
+(terms do not tend to $0$). Closing insight: each
+differentiation multiplies the coefficients by $n$, which
+never moves the radius (geometric beats polynomial) but eats
+one order of boundary decay; term-by-term calculus is an
+interior sport, and whatever happens on the rim must be
+re-examined --- the weekend problem's Abel--Tauber theory is
+exactly that re-examination.
+\end{example}
+
+\begin{example}[Splitting a series by residues --- worked to the end]\label{ex:b2:powerseries:quarter}
+Compute $f(x) = \sum_{n\geq0} \dfrac{x^{4n}}{(4n)!}$ in closed
+form. Both $\cosh x = \sum \frac{x^{2m}}{(2m)!}$ and $\cos x =
+\sum \frac{(-1)^m x^{2m}}{(2m)!}$ have radius $\infty$, so their
+average may be computed term by term:
+\[
+\frac{\cosh x + \cos x}{2}
+= \sum_{m\geq0}\frac{1 + (-1)^m}{2}\,\frac{x^{2m}}{(2m)!}
+= \sum_{m \text{ even}}\frac{x^{2m}}{(2m)!}
+= \sum_{n\geq0}\frac{x^{4n}}{(4n)!} = f(x) .
+\]
+The filter $\frac{1+(-1)^m}{2}$ keeps exactly the even $m$: this
+is the real avatar of the roots-of-unity filter (the complex
+version, with $\iu^n$, extracts residues modulo $4$ in one
+stroke). Closing check: $f$ solves $f'''' = f$ with $f(0) = 1$,
+$f'(0) = f''(0) = f'''(0) = 0$ --- differentiate the series four
+times (\cref{thm:b2:powerseries:calculus}) and watch it
+reproduce itself; $\frac{\cosh + \cos}{2}$ satisfies the same
+data.
 \end{example}
 
 \begin{definition}[Analytic functions]\label{def:b2:powerseries:analytic}
@@ -124,6 +285,59 @@ the converse \emph{fails}: the flat function $\eu^{-1/x^2}$
 (\cref{exo:b2:powerseries:7}).
 \end{definition}
 
+\begin{example}[Re-centering, and the radius as a distance]\label{ex:b2:powerseries:recenter}
+Expand $f(x) = \frac{1}{1-x}$ around $x_0 = \frac12$: writing
+$x = \frac12 + h$,
+\[
+\frac{1}{1 - x} = \frac{1}{\frac12 - h}
+= \frac{2}{1 - 2h}
+= \sum_{n\geq0} 2^{n+1}\,h^n
+= \sum_{n\geq0} 2^{n+1}\Bigl(x - \frac12\Bigr)^{\!n},
+\]
+valid for $\abs{2h} < 1$, i.e.\ $\abs{x - \frac12} < \frac12$.
+The new radius is exactly the distance from the new center to
+the singularity $x = 1$: re-centering shrinks (or grows) the
+disk to fit the nearest obstruction. Closing insight: this is
+the picture behind the definition of analyticity --- one
+function, many local power series, each living on the largest
+disk avoiding the trouble; the Year 3 volume turns the
+heuristic ``radius $=$ distance to the nearest complex
+singularity'' into a theorem.
+\end{example}
+
+\begin{remark}[Common pitfalls]
+\emph{(i) The ratio test is sufficient, not necessary:} when
+$\abs{a_{n+1}/a_n}$ has no limit
+(\cref{ex:b2:powerseries:sinn}, \cref{exo:b2:powerseries:1}),
+go back to the definition: $R = \sup\{r : (a_nr^n)$
+bounded$\}$. \emph{(ii) Nothing crosses the boundary for free:}
+term-by-term differentiation and integration are theorems
+\emph{inside} the open disk; at $\abs x = R$ each series must
+be re-examined (that is the whole subject of the weekend
+problem). \emph{(iii) Radius of a sum:} $\min(R_a, R_b)$ is
+only a lower bound --- cancellations can enlarge it ($a_n = 1,
+b_n = -1$: sum identically $0$, radius $\infty$). \emph{(iv)
+$C^\infty$ is not analytic:} a convergent Taylor series may
+converge to the \emph{wrong} function
+(\cref{exo:b2:powerseries:7}); before writing $f(x) = \sum
+\frac{f^{(n)}(0)}{n!}x^n$, prove it --- via an ODE
+(\cref{met:b2:powerseries:ode}), a remainder estimate, or an
+integral formula.
+\end{remark}
+
+\begin{remark}[Where this is used]
+Power series are the workhorse of three later chapters: the
+differential-equations chapter solves linear ODEs by injecting
+$\sum a_nx^n$ (the method box below, industrialized); the
+generating-functions chapter converts identities about
+probabilities into identities about power series and back; and
+the Year 3 volume makes the complex variable official, where
+analyticity becomes equivalent to complex differentiability and
+the ``admitted re-centering'' above gets its honest proof. The
+weekend problem explores the one place this chapter's theorems
+stay silent: the boundary $\abs x = R$ itself.
+\end{remark}
+
 \begin{method}[Expanding via a differential equation]\label{met:b2:powerseries:ode}
 To expand a function $f$ in a power series: find a linear ODE with
 polynomial coefficients satisfied by $f$; inject $\sum a_nx^n$;
@@ -136,6 +350,28 @@ the same ODE with the same initial value, equals $(1 + x)^\alpha$
 by the uniqueness theorem for linear ODEs (Year 1 volume).
 \end{method}
 
+\begin{example}[The method on a forced equation]\label{ex:b2:powerseries:odeforced}
+Solve $y' = y + x$, $y(0) = 0$, by power series. Injecting $y =
+\sum a_nx^n$:
+\[
+\sum_{n\geq0}(n+1)a_{n+1}x^n
+= \sum_{n\geq0}a_nx^n + x ,
+\]
+and identifying coefficients: $a_1 = a_0 = 0$, $2a_2 = a_1 + 1
+= 1$, and $(n+1)a_{n+1} = a_n$ for $n \geq 2$. So $a_2 =
+\frac{1}{2!}$ and, by induction, $a_n = \frac{1}{n!}$ for every
+$n \geq 2$: radius $\infty$, and
+\[
+y(x) = \sum_{n\geq2}\frac{x^n}{n!} = \eu^x - 1 - x .
+\]
+Check: $y' = \eu^x - 1 = y + x$ and $y(0) = 0$. Closing
+insight: the recurrence \emph{is} the equation, coefficient by
+coefficient; the forcing term only perturbs finitely many
+initial coefficients, after which the homogeneous pattern takes
+over --- a discrete shadow of ``particular solution plus
+homogeneous solution''.
+\end{example}
+
 \section{Generating functions}
 
 \begin{example}[Fibonacci]\label{ex:b2:powerseries:fibonacci}
@@ -147,11 +383,48 @@ F(x) - x = x\,F(x) + x^2 F(x)
 \quad\Longrightarrow\quad
 F(x) = \frac{x}{1 - x - x^2} ,
 \]
-valid where the series converges ($R = \frac{1}{\varphi}$, from
-$F_n \sim \frac{\varphi^n}{\sqrt5}$). Partial fractions on
+valid where the series converges. The radius is
+$\frac{1}{\varphi}$: from $F_n \sim
+\frac{\varphi^n}{\sqrt5}$ (Binet, next example --- or the crude
+induction $F_n \leq 2^n$ plus the recurrence), the ratio test
+gives
+\[
+\frac{F_{n+1}\abs x^{n+1}}{F_n\abs x^n}
+\longrightarrow \varphi\abs x ,
+\qquad\text{convergence iff } \abs x < \frac1\varphi
+\approx 0.618 .
+\] Partial fractions on
 $\frac{x}{1 - x - x^2}$ and the geometric series re-derive Binet's
 formula --- generating functions industrialize linear
 recurrences.\index{generating function}
+\end{example}
+
+\begin{example}[Binet's formula, carried out]\label{ex:b2:powerseries:binet}
+Let $\varphi = \frac{1+\sqrt5}{2}$ and $\psi =
+\frac{1-\sqrt5}{2}$, the roots of $X^2 = X + 1$; since $\varphi
++ \psi = 1$ and $\varphi\psi = -1$,
+\[
+1 - x - x^2 = (1 - \varphi x)(1 - \psi x) .
+\]
+Partial fractions: seeking $\frac{x}{(1-\varphi x)(1-\psi x)} =
+\frac{A}{1 - \varphi x} + \frac{B}{1 - \psi x}$, the constant
+term gives $A + B = 0$ and the $x$-coefficient $-A\psi - B\varphi
+= 1$, so $A(\varphi - \psi) = 1$: $A = \frac{1}{\sqrt5} = -B$.
+Two geometric series later,
+\[
+F(x) = \frac{1}{\sqrt5}\sum_{n\geq0}
+\bigl(\varphi^n - \psi^n\bigr)x^n
+\quad\Longrightarrow\quad
+F_n = \frac{\varphi^n - \psi^n}{\sqrt5}
+\]
+by uniqueness of coefficients
+(\cref{thm:b2:powerseries:calculus}). Since $\abs\psi < 1$, the
+term $\frac{\psi^n}{\sqrt5}$ has absolute value $< \frac12$:
+$F_n$ is the \emph{nearest integer} to
+$\frac{\varphi^n}{\sqrt5}$. Closing insight: the radius
+$\frac1\varphi$ of $F$ is the reciprocal of the dominant root
+--- growth of coefficients and radius of convergence are the
+same information read in opposite directions.
 \end{example}
 
 \begin{example}[Catalan numbers]\label{ex:b2:powerseries:catalan}
@@ -164,13 +437,54 @@ C(x) = 1 + x\,C(x)^2
 \quad\Longrightarrow\quad
 C(x) = \frac{1 - \sqrt{1 - 4x}}{2x} ,
 \]
-choosing the root with $C(0) = 1$. Expanding $\sqrt{1 - 4x}$ by the
+choosing the root with $C(0) = 1$: solving the quadratic
+$xC^2 - C + 1 = 0$ gives the two candidates $\frac{1 \pm
+\sqrt{1-4x}}{2x}$, and as $x \to 0$ the ``$+$'' root blows up
+like $\frac1x$ while the ``$-$'' root tends to $1$ (expand
+$\sqrt{1-4x} = 1 - 2x + O(x^2)$) --- only the minus sign can
+carry a power series with $C_0 = 1$. Expanding $\sqrt{1 - 4x}$ by the
 binomial series gives the closed form
 \[
 C_n = \frac{1}{n+1}\binom{2n}{n} ,
 \]
 carried out in \cref{exo:b2:powerseries:8}.\index{Catalan numbers}
 \end{example}
+
+\begin{remark}[Formal series versus convergent series]
+Every generating-function computation above ends by invoking
+the uniqueness of coefficients, and that theorem lives
+\emph{inside} a disk of positive radius: before ``reading off''
+$F_n$ or $C_n$, one must know $R > 0$. A crude a priori bound
+suffices --- $F_n \leq 2^n$ (immediate induction) gives $R \geq
+\frac12$ for Fibonacci; $C_n \leq 4^n$ (each Catalan number
+counts subsets of paths) gives $R \geq \frac14$. Beware the
+degenerate end of the scale: $\sum n!\,x^n$ has radius $0$, and
+manipulating it as a function is meaningless --- identities
+involving such series belong to the \emph{formal} calculus of
+coefficients, a purely algebraic game with its own (different)
+rules. At this level: always secure a positive radius first,
+then compute freely inside it.
+\end{remark}
+
+\begin{remark}[Perspectives within this volume]
+Power series are one of the book's two great expansion
+machines; the other is the Fourier series of the harmonic
+chapters, and comparing them is instructive. A power series is
+rigid: its coefficients are forced ($a_n = f^{(n)}(0)/n!$),
+its convergence is ruthless (normal inside, hopeless outside),
+and its sum is analytic --- infinitely rigid
+(\cref{def:b2:powerseries:analytic}). A Fourier series is
+supple: it represents merely piecewise-smooth signals, at the
+price of delicate convergence questions at the boundary of
+smoothness. The two theories meet in this chapter's weekend
+problem: Ces\`aro and Abel summation, developed here for the
+boundary circle, return in the Fourier chapter as Fej\'er's
+and Poisson's kernels. Meanwhile the differential-equations
+chapter consumes power series directly ($\eu^{tA}$, series
+solutions), and the generating-functions chapter turns
+\cref{ex:b2:powerseries:fibonacci}'s trick into a systematic
+calculus for probabilities.
+\end{remark}
 
 \section{Exercises}
 
@@ -245,3 +559,257 @@ a_nx^n - A = (1-x)\sum (A_n - A)x^n$, split the sum at a large
 $N$.)} Application: $\sum \frac{(-1)^{n-1}}{n} = \ln 2$ and $\sum
 \frac{(-1)^n}{2n+1} = \frac\pi4$, re-proved from the power series.
 \end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:powerseries:10}
+Show that $\displaystyle\sum_{n\geq1}\frac{x^n}{n(n+1)} = 1 +
+\frac{1-x}{x}\,\ln(1-x)$ for $0 < \abs x < 1$, determine the
+radius, and check that the convergence is normal on
+$\intcc{-1}{1}$; verify that the value at $x = 1$ predicted by
+continuity agrees with the telescoping sum $\sum
+\frac{1}{n(n+1)} = 1$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:powerseries:11}
+(Derangements) Let $D_n$ be the number of permutations of $n$
+objects without fixed point ($D_0 = 1$). Sorting the
+permutations of $\{1, \dots, n\}$ by their fixed-point set gives
+$n! = \sum_{k=0}^{n}\binom nk D_{n-k}$. Multiply by
+$\frac{x^n}{n!}$, sum, and recognize a Cauchy product to obtain
+the exponential generating function
+\[
+\sum_{n\geq0} D_n\,\frac{x^n}{n!} = \frac{\eu^{-x}}{1-x}
+\qquad (\abs x < 1),
+\]
+then read off the closed form $\dfrac{D_n}{n!} =
+\sum_{k=0}^{n}\dfrac{(-1)^k}{k!}$ and the limit $\dfrac{D_n}{n!}
+\to \eu^{-1}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:powerseries:12}
+Prove, with the binomial series of
+\cref{met:b2:powerseries:ode}, that
+\[
+\frac{1}{\sqrt{1 - 4x}} = \sum_{n\geq0}\binom{2n}{n}x^n
+\qquad \Bigl(\abs x < \frac14\Bigr),
+\]
+and deduce, by squaring (Cauchy product against
+$\frac{1}{1-4x} = \sum 4^nx^n$), the convolution identity
+\[
+\sum_{k=0}^{n}\binom{2k}{k}\binom{2n-2k}{n-k} = 4^n .
+\]
+\end{exercise}
+
+\section{Problem: Abel, Tauber, and the boundary of convergence}
+
+\begin{problem}\label{pb:b2:powerseries:1}
+Inside the disk of convergence everything is easy; all the
+drama of power series happens \emph{on} the boundary. This
+problem builds the boundary theory in the real variable: Abel's
+theorem in its uniform form, its converse under Tauber's
+condition, the Ces\`aro--Abel hierarchy of summation methods
+(with Frobenius' theorem), term-by-term integration up to the
+boundary with classical constants as dividends, and finally the
+rigidity of analytic functions --- the identity
+theorem.\index{Abel's theorem}\index{Tauber's theorem}
+Throughout, $(a_n)$ is a real sequence, $f(x) = \sum_{n\geq0}
+a_nx^n$, and $A_n = a_0 + \dots + a_n$.
+
+\medskip
+\noindent\textbf{Part I --- Abel's theorem, uniformly.} Assume
+in this part that $\sum a_n$ converges, and set $r_n =
+\sum_{k\geq n} a_k$ (so $r_n \to 0$ and $a_n = r_n -
+r_{n+1}$).
+\begin{enumerate}
+  \item Prove, by summation by parts, that for all $0 \leq x
+        \leq 1$ and $N \leq M$:
+        \[
+        \Bigl|\sum_{n=N}^{M} a_n x^n\Bigr|
+        \leq 2\sup_{n \geq N}\,\abs{r_n} .
+        \]
+  \item Deduce that $\sum a_nx^n$ converges \emph{uniformly} on
+        $\intcc{0}{1}$, that its sum is continuous there, and
+        recover the radial limit of
+        \cref{exo:b2:powerseries:9}: $f(x) \to \sum a_n$ as $x
+        \to 1^-$.
+  \item (Abel's theorem for Cauchy products) Let $\sum a_n = A$,
+        $\sum b_n = B$ and suppose the Cauchy product $\sum
+        c_n$, $c_n = \sum_{k} a_kb_{n-k}$, \emph{converges},
+        with sum $C$. Prove $C = AB$ \emph{(inside the disk the
+        product identity holds by
+        \cref{prop:b2:powerseries:operations}; let $x \to
+        1^-$)}.
+  \item Show the hypothesis matters: for $a_n = b_n =
+        \frac{(-1)^n}{\sqrt{n+1}}$, both series converge, yet
+        $\abs{c_n} \geq \frac{2(n+1)}{n+2} \geq 1$ \emph{(bound
+        each factor $\sqrt{(k+1)(n-k+1)}$ by AM--GM)}: the
+        Cauchy product of two convergent series may diverge.
+  \item (A dividend of \cref{exo:b2:powerseries:5}) Show that
+        $\bigl(\ln(1-x)\bigr)^2 = 2\sum_{n\geq1}
+        \frac{H_n}{n+1}x^{n+1}$ on $\intoo{-1}{1}$, check that
+        $\bigl(\frac{H_n}{n+1}\bigr)_{n\geq1}$ decreases to
+        $0$, and conclude with Abel:
+        \[
+        \sum_{n\geq1} (-1)^{n+1}\,\frac{H_n}{n+1}
+        = \frac{(\ln 2)^2}{2} .
+        \]
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part II --- Tauber's converse.} Call $\sum
+a_n$ \emph{Abel-summable} to $L$ when $f(x) \to L$ as $x \to
+1^-$.
+\begin{enumerate}[resume]
+  \item Show that $\sum (-1)^n$ is Abel-summable to $\frac12$
+        yet divergent: Abel's theorem has no unconditional
+        converse.
+  \item (Ces\`aro lemma) If $u_n \to 0$ then $\frac{u_1 + \dots
+        + u_N}{N} \to 0$ \emph{(split the sum at a fixed $m$)}.
+  \item Assume now $n\,a_n \to 0$ and $f(x) \to L$. With $x_N =
+        1 - \frac1N$, prove the two estimates
+        \[
+        \Bigl|\sum_{n=0}^{N} a_n\bigl(1 - x_N^n\bigr)\Bigr|
+        \leq \frac{1}{N}\sum_{n=1}^{N} n\,\abs{a_n},
+        \qquad
+        \Bigl|\sum_{n>N} a_n x_N^n\Bigr|
+        \leq \sup_{n>N}\bigl(n\abs{a_n}\bigr)
+        \]
+        \emph{(for the first, $1 - x^n \leq n(1-x)$; for the
+        second, $\abs{a_n} \leq \frac{1}{N}\sup_{m>N}
+        m\abs{a_m}$ and $\sum x_N^n \leq N$)}.
+  \item Conclude \emph{Tauber's theorem}: if $n\,a_n \to 0$ and
+        $\sum a_n$ is Abel-summable to $L$, then $\sum a_n$
+        converges to $L$.
+  \item (The easy Tauberian for positive coefficients) If $a_n
+        \geq 0$ and $f$ is bounded on $\intco{0}{1}$, show that
+        $\sum a_n$ converges and $\sum a_n = \lim_{x\to1^-}
+        f(x)$ \emph{(bound $\sum_{n\leq N}a_nx^n \leq f(x)$ and
+        let $x \to 1^-$, then use Abel)}.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part III --- Ces\`aro means and Frobenius'
+theorem.} Call $\sum a_n$ \emph{Ces\`aro-summable} to $L$ when
+$\sigma_N = \frac{A_0 + \dots + A_{N-1}}{N} \to L$.
+\begin{enumerate}[resume]
+  \item Show that a convergent series is Ces\`aro-summable to
+        its sum \emph{(question 7 applied to $A_n - L$)}.
+  \item Compute the Ces\`aro value of $\sum(-1)^n$ and check it
+        agrees with the Abel value $\frac12$ of question 6.
+  \item With $S_n = A_0 + \dots + A_n = (n+1)\,\sigma_{n+1}$,
+        prove the two identities, for $0 \leq x < 1$:
+        \[
+        f(x) = (1-x)^2\sum_{n\geq0}(n+1)\,\sigma_{n+1}x^n,
+        \qquad
+        (1-x)^2\sum_{n\geq0}(n+1)x^n = 1 .
+        \]
+  \item (Frobenius) Deduce: if $\sigma_N \to L$ then $f(x) \to
+        L$ as $x \to 1^-$ --- Ces\`aro-summable implies
+        Abel-summable, to the same value \emph{(subtract the two
+        identities and split the sum at a large $N$, as in
+        \cref{exo:b2:powerseries:9})}.
+  \item Show that the hierarchy
+        \[
+        \text{convergent} \;\Longrightarrow\;
+        \text{Ces\`aro-summable} \;\Longrightarrow\;
+        \text{Abel-summable}
+        \]
+        is strict at both arrows: question 6 for the first;
+        for the second, show that $\sum(-1)^n(n+1)$ is
+        Abel-summable to $\frac14$ (compute $f$) but not
+        Ces\`aro-summable (compute $\sigma_N$ separately for
+        even and odd $N$).
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part IV --- Integrating to the boundary.}
+\begin{enumerate}[resume]
+  \item Suppose $\sum a_nx^n$ converges on $\intco{0}{1}$ and
+        $\sum \frac{a_n}{n+1}$ converges. Prove that the
+        improper integral $\int_0^1 f$ exists and
+        \[
+        \int_0^1 \Bigl(\sum_{n\geq0} a_nx^n\Bigr)\dd x
+        = \sum_{n\geq0}\frac{a_n}{n+1}
+        \]
+        \emph{(the primitive $F(x) = \sum\frac{a_n}{n+1}x^{n+1}$
+        is continuous at $1$ by Part I)}.
+  \item Let $\eta = \sum_{n\geq1}\frac{(-1)^{n-1}}{n^2}$. Show
+        $\int_0^1 \frac{\ln(1+x)}{x}\dd x = \eta$ and, by
+        splitting even and odd indices in the absolutely
+        convergent $\sum \frac1{n^2}$, that $\eta =
+        \frac12\sum_{n\geq1}\frac{1}{n^2}$. (The Fourier
+        chapter's weekend problem evaluates
+        $\sum\frac1{n^2} = \frac{\pi^2}{6}$.)
+  \item Prove
+        \[
+        \sum_{n\geq0}\frac{(-1)^n}{3n+1}
+        = \int_0^1\frac{\dd x}{1+x^3}
+        = \frac13\Bigl(\ln 2 + \frac{\pi}{\sqrt3}\Bigr)
+        \]
+        \emph{(the series converges by Leibniz; integrate the
+        geometric series $\sum(-1)^nx^{3n}$ with question 16;
+        then partial fractions: $\frac{1}{1+x^3} =
+        \frac{1/3}{1+x} + \frac{(2-x)/3}{x^2-x+1}$)}.
+  \item From the binomial series for $(1-t)^{-1/2}$
+        (\cref{exo:b2:powerseries:12}) derive
+        \[
+        \arcsin x = \sum_{n\geq0}
+        \frac{\binom{2n}{n}}{4^n(2n+1)}\,x^{2n+1}
+        \quad(\abs x < 1),
+        \qquad\text{then}\qquad
+        \sum_{n\geq0}\frac{\binom{2n}{n}}{4^n(2n+1)}
+        = \frac\pi2 ,
+        \]
+        justifying the boundary value by \emph{normal}
+        convergence on $\intcc{-1}{1}$ (use
+        $\binom{2n}n4^{-n} \sim \frac{1}{\sqrt{\pi n}}$,
+        \cref{ex:b2:comparison:centralbinomial}) --- here not
+        even Abel is needed.
+  \item (Catalan at the boundary) Show that $\sum C_n 4^{-n} =
+        2$: the Catalan series of
+        \cref{ex:b2:powerseries:catalan} converges \emph{at}
+        its radius $\frac14$ (asymptotics of
+        \cref{exo:b2:powerseries:8}), its sum is continuous on
+        $\intcc{0}{\frac14}$, and the closed form has limit $2$
+        there.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part V --- Rigidity: the identity theorem.}
+\begin{enumerate}[resume]
+  \item (Isolated zeros) Let $f = \sum a_nx^n$ have radius $R >
+        0$ and not all $a_n = 0$; let $m$ be the smallest index
+        with $a_m \neq 0$. Show $f(x) = x^m g(x)$ with $g$ a
+        power series of radius $R$, $g(0) = a_m \neq 0$, and
+        deduce that $f$ has no zero in some punctured
+        neighborhood of $0$.
+  \item (Identity theorem) Let $f, h$ be sums of power series
+        near $0$ and $(x_k)$ a sequence of \emph{nonzero}
+        points with $x_k \to 0$ and $f(x_k) = h(x_k)$. Prove
+        that $f$ and $h$ have the same coefficients, hence
+        coincide near $0$.
+  \item Find \emph{all} functions $f$ analytic near $0$ with
+        \[
+        f\Bigl(\frac1k\Bigr) = \frac{k^2}{k^2+1}
+        \qquad\text{for all large integers } k .
+        \]
+  \item Show that a function analytic on an open interval $I$
+        which vanishes on a subinterval vanishes identically on
+        $I$ \emph{(the set of points around which $f$ vanishes
+        identically is open and, by the identity theorem
+        applied at accumulation points, closed in $I$)}.
+        Conclude that no nonzero analytic function on $\R$ has
+        compact support --- whereas $C^\infty$ bump functions
+        exist (\cref{exo:b2:powerseries:7} supplies the
+        building block): analyticity is rigid, smoothness is
+        flabby.
+  \item Synthesis. In one sentence each: (i) what Abel's
+        theorem adds to the normal-convergence package of
+        \cref{lem:b2:powerseries:abel}; (ii) the exact
+        hypotheses under which the converse holds (Tauber) and
+        the intermediate rung (Frobenius); (iii) one boundary
+        constant from Part IV you could now derive for a
+        friend in two lines; (iv) where Ces\`aro means will
+        reappear in this book, for series of a very different
+        kind.
+\end{enumerate}
+\end{problem}

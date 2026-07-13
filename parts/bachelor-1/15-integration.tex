@@ -33,9 +33,19 @@ relation $\int_a^b = \int_a^c + \int_c^b$ for $a < c < b$.
 \end{proposition}
 
 \begin{proof}
-Refine the subdivisions of the two functions (or insert the point
-$c$) into a common one; each statement becomes a statement about
-finite sums, checked term by term.
+The engine is \emph{refinement invariance}, stated in the
+definition: inserting one extra node $t \in \intoo{x_{i-1}}{x_i}$
+into a subdivision replaces the term $c_i(x_i - x_{i-1})$ by
+$c_i(t - x_{i-1}) + c_i(x_i - t)$ --- the same number --- so the
+integral is unchanged by any finite refinement. Now take
+$\varphi$ with subdivision $\sigma$ and $\psi$ with subdivision
+$\sigma'$: on the common refinement $\sigma \cup \sigma'$ both
+are step functions with the \emph{same} nodes, and on each piece
+$\varphi + \lambda\psi$ is constant equal to $c_i + \lambda
+d_i$: linearity reduces to linearity of finite sums. Increase:
+$c_i \leq d_i$ on each piece gives $\sum c_i \Delta_i \leq \sum
+d_i \Delta_i$ (lengths $\Delta_i \geq 0$). Chasles: insert the
+node $c$ and split the sum at it.
 \end{proof}
 
 \section{Integral of a continuous function}
@@ -88,6 +98,42 @@ $\varepsilon$ there is a pair with $\int\psi - \int\varphi \leq
 I_+$.
 \end{proof}
 
+\begin{example}[Piecewise continuous, no drama]\label{ex:b1:integration:piecewise}
+The floor function on $\intcc{0}{3}$ is a step function in
+disguise: splitting at its jumps,
+\[
+\int_0^3 \lfloor t \rfloor\,\dd t
+= \int_0^1 0 + \int_1^2 1 + \int_2^3 2 = 0 + 1 + 2 = 3 ,
+\]
+and the values \emph{at} the jump points $1, 2$ are irrelevant:
+changing a function at finitely many points changes no integral
+(the framing step functions are unaffected). This is the whole
+content of the ``piecewise continuous'' extension: cut at the
+finitely many discontinuities, integrate each continuous piece,
+add --- Chasles as a definition.
+\end{example}
+
+\begin{example}[The definition computes, once]\label{ex:b1:integration:defcompute}
+Let $f(x) = x$ on $\intcc{0}{1}$ and cut into $n$ equal pieces.
+The best step functions constant on the pieces are $\varphi =
+\frac{k-1}{n}$ and $\psi = \frac kn$ on the $k$-th piece, with
+\[
+\int_0^1 \varphi = \sum_{k=1}^{n} \frac{k-1}{n}\cdot\frac1n
+= \frac{n-1}{2n},
+\qquad
+\int_0^1 \psi = \sum_{k=1}^{n} \frac{k}{n}\cdot\frac1n
+= \frac{n+1}{2n} .
+\]
+Every lower integral is $\leq I_-(f) \leq I_+(f) \leq$ every
+upper one, so $\frac{n-1}{2n} \leq I_-(f) \leq I_+(f) \leq
+\frac{n+1}{2n}$ for all $n$: both squeeze onto $\frac12$, and
+$\int_0^1 x\,\dd x = \frac12$ straight from the definition. The
+closing insight: this is the first and last time we integrate
+from the definition --- the fundamental theorem below replaces
+all such computations by one antiderivative lookup, which is
+the entire economic point of this chapter.
+\end{example}
+
 \begin{theorem}[Properties]\label{thm:b1:integration:props}
 For $f, g$ continuous (or piecewise continuous) on $\intcc{a}{b}$ and
 $\lambda \in \R$:
@@ -106,17 +152,51 @@ $\lambda \in \R$:
 \end{theorem}
 
 \begin{proof}
-(1)--(3) pass from step functions to the limit through the sup/inf
-definition (for linearity, approximate $f$ and $g$ separately and
-add the framings; for $\lambda < 0$ the roles of $\varphi, \psi$
-swap). The bound $\abs{\int f} \leq \int \abs f$ comes from $-\abs f
-\leq f \leq \abs f$ and monotonicity.
+(1)--(3) pass from step functions to the limit through the
+sup/inf definition. Linearity deserves the details once: given
+$\varepsilon > 0$, frame $\varphi_f \leq f \leq \psi_f$ and
+$\varphi_g \leq g \leq \psi_g$ with gaps $\leq \varepsilon$
+(\cref{thm:b1:integration:approx}). For $\lambda \geq 0$,
+$\varphi_f + \lambda\varphi_g \leq f + \lambda g \leq \psi_f +
+\lambda\psi_g$ is a framing by step functions with gap $\leq
+(1 + \lambda)\varepsilon$, and its step integrals equal $\int
+\varphi_f + \lambda\int\varphi_g$ etc.\
+(\cref{prop:b1:integration:stepprops}): letting $\varepsilon \to
+0$ squeezes $\int(f + \lambda g)$ onto $\int f + \lambda\int g$.
+For $\lambda < 0$, multiplying by $\lambda$ \emph{reverses} the
+framing of $g$ --- the lower step function of $\lambda g$ is
+$\lambda \psi_g$ --- and the same squeeze runs with the roles
+swapped. The bound $\abs{\int f} \leq \int \abs f$ comes from
+$-\abs f \leq f \leq \abs f$ and monotonicity.
 
 (4) Contrapositive: if $f(x_0) = m > 0$, continuity provides a
 subinterval of length $\eta > 0$ on which $f \geq \frac m2$; the
 step function worth $\frac m2$ there and $0$ elsewhere is $\leq f$,
 so $\int f \geq \frac{m\eta}{2} > 0$.
 \end{proof}
+
+\begin{example}[Chasles at work: integrals with absolute values]\label{ex:b1:integration:chasleswork}
+To integrate an absolute value, cut where the sign changes.
+\[
+\int_0^2 \abs{x - 1}\,\dd x
+= \int_0^1 (1 - x)\,\dd x + \int_1^2 (x - 1)\,\dd x
+= \frac12 + \frac12 = 1 ,
+\]
+and, cutting $\intcc{0}{2\pi}$ at $\pi$:
+\[
+\int_0^{2\pi} \abs{\sin t}\,\dd t
+= \int_0^{\pi} \sin t\,\dd t - \int_{\pi}^{2\pi} \sin t\,\dd t
+= 2 + 2 = 4 ,
+\]
+while $\int_0^{2\pi} \sin t\,\dd t = 0$: cancellation is real,
+and this is why the strict positivity statement
+(\cref{thm:b1:integration:props}~(4)) carries the hypothesis $f
+\geq 0$ --- without it, a vanishing integral proves nothing
+about $f$. The closing insight: $\int \abs f$ measures
+\emph{area}, $\int f$ measures \emph{signed balance}; the
+inequality $\abs{\int f} \leq \int\abs f$ is the exact record of
+what cancellation can destroy.
+\end{example}
 
 \section{The fundamental theorem of calculus}
 
@@ -149,6 +229,97 @@ $C^1$. If $G' = f$ too, then $(G - F)' = 0$ on the interval, so $G =
 F + c$ (\cref{cor:b1:derivative:monotone}), and $G(b) - G(a) = F(b)
 - F(a) = \int_a^b f$.
 \end{proof}
+
+\begin{example}[Symmetry before computation]\label{ex:b1:integration:parity}
+On a symmetric interval, parity does the work: if $f$ is odd,
+the substitution $t \mapsto -t$ sends $\int_{-a}^{0} f$ to
+$-\int_0^a f$, so
+\[
+\int_{-a}^{a} f(t)\,\dd t = 0 ;
+\qquad\text{if $f$ is even,}\quad
+\int_{-a}^{a} f = 2\int_0^a f .
+\]
+Thus $\int_{-1}^{1} \frac{t^3\cos t}{1 + t^4}\,\dd t = 0$ with
+no primitive in sight (the integrand is odd), and
+$\int_{-\pi}^{\pi} t^2\cos t\,\dd t = 2\int_0^\pi t^2\cos t\,
+\dd t$. Check symmetry before reaching for techniques: the
+fastest integral is the one never computed.
+\end{example}
+
+\begin{example}[Recognizing a derivative on sight]\label{ex:b1:integration:halfangle}
+Compute $\displaystyle\int_0^{\pi/2} \frac{\dd x}{1 + \cos x}$.
+The half-angle identity $1 + \cos x = 2\cos^2\frac x2$ turns the
+integrand into $\frac{1}{2}\bigl(1 + \tan^2\frac
+x2\bigr)$, which is exactly the derivative of $\tan\frac x2$:
+\[
+\int_0^{\pi/2} \frac{\dd x}{1 + \cos x}
+= \Bigl[\tan\frac x2\Bigr]_0^{\pi/2} = \tan\frac\pi4 = 1 .
+\]
+No substitution machinery was needed --- only the reflex of
+reading an integrand as somebody's derivative, the fundamental
+theorem doing the rest. (The systematic tool behind such
+trigonometric integrals, the substitution $t = \tan\frac x2$,
+belongs to the standard toolkit built from
+\cref{thm:b1:integration:parts}~(2).)
+\end{example}
+
+\begin{example}[Functions defined by integrals]\label{ex:b1:integration:definedby}
+The fundamental theorem manufactures functions. Let
+\[
+F(x) = \int_0^x \eu^{-t^2}\,\dd t .
+\]
+No combination of classical functions has derivative
+$\eu^{-t^2}$ (a theorem of Liouville, admitted); yet $F$ exists,
+is $C^1$ with $F'(x) = \eu^{-x^2} > 0$, strictly increasing, odd
+(substitute $t \mapsto -t$), and bounded: for $x \geq 1$,
+\[
+F(x) - F(1) = \int_1^x \eu^{-t^2}\dd t
+\leq \int_1^x \eu^{-t}\dd t \leq \eu^{-1} ,
+\]
+so $F \leq F(1) + \eu^{-1} \leq 1 + \eu^{-1}$. (The exact limit,
+$\frac{\sqrt\pi}{2}$, is computed with double integrals in the
+Year 3 volume.) Chain rule for moving bounds: $\frac{\dd}{\dd
+x}\int_x^{x^2} \eu^{-t^2}\dd t = 2x\,\eu^{-x^4} - \eu^{-x^2}$.
+The closing insight: integration \emph{creates} new functions
+from old ones, with all their properties readable from the
+integrand --- the primitive you cannot write down is still a
+function you fully control.
+\end{example}
+
+\begin{example}[Estimating without evaluating]\label{ex:b1:integration:estimate}
+The integrals $R_n = \int_0^1 \frac{t^n}{1 + t}\,\dd t$ have no
+pleasant closed form, yet monotonicity pins them precisely: on
+$\intcc{0}{1}$, $\frac12 \leq \frac{1}{1+t} \leq 1$, so
+\[
+\frac{1}{2(n+1)} = \frac12\int_0^1 t^n\,\dd t
+\;\leq\; R_n \;\leq\; \int_0^1 t^n \,\dd t = \frac{1}{n+1} :
+\]
+the exact order of decay ($R_n \sim$ a multiple of $\frac1n$,
+in fact $R_n \sim \frac{1}{2n}$) with two lines and no
+antiderivative. The weekend problems of this chapter and the
+next run on exactly such framings --- the analyst's first
+instinct before an integral should be \emph{bound it}, and only
+then, if needed, compute it.
+\end{example}
+
+\begin{example}[Average values]\label{ex:b1:integration:average}
+The \emph{mean} of a continuous $f$ over $\intcc{a}{b}$ is
+$\frac{1}{b-a}\int_a^b f$. For the arch of the sine:
+\[
+\frac{1}{\pi}\int_0^\pi \sin t\,\dd t
+= \frac{1}{\pi}\bigl[-\cos t\bigr]_0^\pi = \frac{2}{\pi}
+\approx 0.637 :
+\]
+a full positive arch averages not to $\frac12$ but to
+$\frac2\pi$ --- the curve spends more time high than a triangle
+would. By \cref{exo:b1:integration:11} (mean value theorem for
+integrals, $g = 1$), the mean is a \emph{value}: $\sin c =
+\frac2\pi$ for some $c \in \intoo{0}{\pi}$. And by the Riemann
+sums of this chapter, the mean is the limit of ordinary
+averages of $n$ samples --- the bridge between the discrete
+mean of data and the continuous mean of a signal, which is how
+the integral enters physics.
+\end{example}
 
 \begin{theorem}[Integration by parts; substitution]\label{thm:b1:integration:parts}
 \begin{enumerate}
@@ -188,6 +359,78 @@ $\int_0^1 t\,\eu^t \dd t = \bigl[t\,\eu^t\bigr]_0^1 - \int_0^1
 \]
 --- a quarter of the unit disk, as geometry demands. (Linearization
 from \cref{met:b1:complex:trig} at work.)
+\end{example}
+
+\begin{remark}[Common pitfalls in integral calculus]
+(i) \emph{Substitutions must be $C^1$ on the whole interval}:
+the change $x = \frac1t$ is illegal across $0$; applied blindly
+to $\int_{-1}^{1}\frac{\dd x}{1 + x^2}$ it ``proves'' that the
+integral equals its own negative. When a substitution has a
+singularity, cut the interval first (Chasles), substitute on
+each piece, and only then recombine. (ii) \emph{Logarithmic
+primitives need absolute values}: $\int \frac{\dd x}{x - 2} =
+\ln\abs{x - 2} + C$ on each side of $2$ separately --- writing
+$\ln(x - 2)$ on $\intoo{0}{1}$ is writing the logarithm of a
+negative number; and the constant $C$ may differ on the two
+sides of the singularity. (iii) \emph{A vanishing integral does
+not kill the function}: $\int_0^{2\pi}\sin = 0$; positivity of
+the integrand is required before concluding $f = 0$
+(\cref{ex:b1:integration:chasleswork}). (iv) \emph{Riemann sums
+must be calibrated}: in $\frac{b-a}{n}\sum f\bigl(a +
+k\frac{b-a}{n}\bigr)$, the step outside and the points inside
+must match the same subdivision --- the frequent error is a sum
+$\sum_{k=1}^{n} f\bigl(\frac kn\bigr)$ \emph{without} the factor
+$\frac1n$, which diverges instead of converging to $\int_0^1
+f$. Checklist before invoking \cref{thm:b1:integration:riemann}:
+factor out $\frac1n$, rewrite the summand as $f$ of $\frac kn$,
+name $f$ and check its continuity.
+\end{remark}
+
+\begin{example}[Guess, differentiate, adjust]\label{ex:b1:integration:guessdiff}
+What is $\int_1^x (\ln t)^2\,\dd t$? Guess a primitive of the
+form $t\,P(\ln t)$ with $P$ polynomial and differentiate:
+\[
+\bigl(t\,P(\ln t)\bigr)' = P(\ln t) + P'(\ln t) .
+\]
+We need $P(u) + P'(u) = u^2$: take $P(u) = u^2 - 2u + 2$
+(matching coefficients downward from $u^2$). Hence
+\[
+\int_1^x (\ln t)^2\,\dd t
+= \bigl[t\bigl((\ln t)^2 - 2\ln t + 2\bigr)\bigr]_1^x
+= x(\ln x)^2 - 2x\ln x + 2x - 2 ,
+\]
+a result otherwise reached by two integrations by parts. The
+closing insight: for integrands of the form
+(polynomial in $\ln t$) or (polynomial times $\eu^{\lambda t}$),
+the primitive has the same shape --- differentiating a shaped
+guess converts integration into linear algebra on coefficients,
+faster and less error-prone than iterated parts.
+\end{example}
+
+\begin{example}[The boomerang integral]\label{ex:b1:integration:boomerang}
+Compute $I = \int_0^{\pi/2} \eu^x \cos x\,\dd x$. Integrate by
+parts twice, differentiating the trigonometric factor each time:
+\[
+I = \bigl[\eu^x \sin x\bigr]_0^{\pi/2}
+- \int_0^{\pi/2} \eu^x \sin x\,\dd x
+= \eu^{\pi/2} - J,
+\qquad
+J = \bigl[-\eu^x\cos x\bigr]_0^{\pi/2}
++ \int_0^{\pi/2} \eu^x\cos x\,\dd x = 1 + I .
+\]
+The integral has returned to itself: $I = \eu^{\pi/2} - 1 - I$,
+whence
+\[
+I = \frac{\eu^{\pi/2} - 1}{2} .
+\]
+The closing insight: when the integrand is a product of two
+functions that reproduce themselves under differentiation
+($\eu^{ax}$, $\cos bx$, $\sin bx$), two integrations by parts
+produce a linear equation for the unknown integral --- solve it
+instead of integrating; equivalently, pass through
+$\eu^{(a + \iu b)x}$ (\cref{ch:b1:complex}) and take real
+parts. Both roads give the same answer, and checking that they
+do is a free sanity test.
 \end{example}
 
 \section{Riemann sums}
@@ -246,6 +489,41 @@ $\displaystyle\sum_{k=1}^{n} \frac{1}{n + k} = \frac 1n
 \int_0^1 \frac{\dd x}{1 + x} = \ln 2$: a limit invisible to
 elementary bounds, transparent as a Riemann sum.
 \end{example}
+
+\begin{example}[A second Riemann sum, with calibration]\label{ex:b1:integration:riemann2}
+Find $\lim_{n\to\infty} \sum_{k=1}^{n} \dfrac{n}{(n+k)^2}$.
+Calibrate:
+\[
+\sum_{k=1}^{n} \frac{n}{(n+k)^2}
+= \frac{1}{n}\sum_{k=1}^{n} \frac{n^2}{(n+k)^2}
+= \frac1n \sum_{k=1}^{n} \frac{1}{\bigl(1 + \frac kn\bigr)^2} ,
+\]
+a Riemann sum of the continuous $f(x) = \frac{1}{(1+x)^2}$ on
+$\intcc{0}{1}$: the limit is
+\[
+\int_0^1 \frac{\dd x}{(1 + x)^2}
+= \Bigl[-\frac{1}{1+x}\Bigr]_0^1 = \frac12 .
+\]
+The closing insight: the whole art is the middle line ---
+force the summand into the shape $f(\frac kn)$ at the cost of
+extracting exactly one factor $\frac1n$; once the shape is
+right, the theorem does the analysis and the fundamental theorem
+does the arithmetic.
+\end{example}
+
+\begin{remark}[Where the integral works next]
+The chapter's constructions each have a sequel. Riemann sums
+return in \cref{ch:b1:series} as the bridge between series and
+integrals (comparison of $\sum \frac{1}{n^\alpha}$ with $\int
+\frac{\dd t}{t^\alpha}$); the integral remainder is the sharpest
+form of Taylor's formula in \cref{ch:b1:taylor}; the
+$\sup$-based definition is the prototype for the Lebesgue
+integral of the Year 3 volume, where the same three properties
+(linearity, monotonicity, a convergence theorem) are rebuilt on a
+far larger class of functions. And the weekend problem below
+turns integration by parts into arithmetic: the irrationality of
+$\pi^2$.
+\end{remark}
 
 \section{Exercises}
 
@@ -348,3 +626,248 @@ by integrating by parts. Then prove it again for $f$ merely
 continuous, by uniform approximation with step functions
 (\cref{thm:b1:integration:approx}).
 \end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:integration:11}
+(Mean value theorem for integrals) Let $f, g$ be continuous on
+$\intcc{a}{b}$ with $g \geq 0$. Prove that there exists $c \in
+\intcc{a}{b}$ with
+\[
+\int_a^b f(t)\,g(t)\,\dd t = f(c)\int_a^b g(t)\,\dd t ,
+\]
+and show by an example that the hypothesis $g \geq 0$ cannot be
+dropped.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:integration:12}
+(Moments force zeros) Let $f$ be continuous on $\intcc{a}{b}$
+with
+\[
+\int_a^b f(t)\,t^k\,\dd t = 0 \qquad \text{for } k = 0, 1,
+\dots, n .
+\]
+Prove that $f$ vanishes at $n + 1$ distinct points of
+$\intoo{a}{b}$. \emph{(If $f$ changes sign only at $z_1 < \dots
+< z_m$ with $m \leq n$, integrate $f$ against $P(t) = (t - z_1)
+\cdots (t - z_m)$ and use strict positivity.)}
+\end{exercise}
+
+\begin{remark}[Perspectives inside this volume]
+Three chapters ahead lean directly on this one.
+\Cref{ch:b1:taylor} carries the integral remainder --- the
+sharpest of the three Taylor formulas is an integration by parts
+iterated $n$ times. \Cref{ch:b1:series} converts the framing of
+sums by integrals into the decisive test for $\sum n^{-\alpha}$,
+and its weekend problem refines that framing into Euler's
+constant. \Cref{ch:b1:curves} makes the integral geometric: the
+length of a parametrized arc is $\int \sqrt{x'(t)^2 +
+y'(t)^2}\,\dd t$, an integral of a continuous function on a
+segment --- precisely the object built here, no improper theory
+needed. The single most reused fact will be the humblest:
+$\bigl|\int f\bigr| \leq (b - a)\sup\abs{f}$, the inequality
+that turns every pointwise estimate into an integral estimate.
+\end{remark}
+
+\section{Problem: The integral irrationality machine}
+
+\begin{problem}[{Weekend problem --- $\eu$ and $\pi^2$ are
+irrational, $\eu$ to six decimals, and $\frac{22}{7} > \pi$ with
+proof}]
+\label{pb:b1:integration:1}
+One mechanism powers this whole problem: \emph{an expression that
+must be a positive integer, yet is provably smaller than $1$,
+cannot exist}. \Cref{exo:b1:integration:9} (Niven) ran it once to
+prove $\pi \notin \Q$; here we industrialize it. The machine
+needs three parts: an \emph{integrality} input (endpoint values
+of well-chosen polynomials), a \emph{smallness} input (a factor
+$\frac{1}{n!}$ crushing the integral), and a \emph{bridge}
+(integration by parts) connecting them. We prove that $\eu$ is
+irrational and compute it with certified error, prove Legendre's
+sharper theorem that $\pi^2$ is irrational, and end with the
+most charming integral in analysis: $\int_0^1 \frac{x^4(1 -
+x)^4}{1 + x^2}\dd x = \frac{22}{7} - \pi$, which brackets $\pi$
+by hand.\index{irrationality!of pi squared@of
+$\pi^2$}\index{irrationality!of e@of $\eu$}
+
+\medskip
+\noindent\textbf{Part I --- Fuel.}
+\begin{enumerate}
+  \item Prove that $\dfrac{c^{\,n}}{n!} \to 0$ for every fixed $c
+        > 0$ \emph{(beyond $n \geq 2c$, each step at least halves
+        the term)}.
+  \item (Beta integrals) Prove, by induction on $m$ with
+        integration by parts:
+        \[
+        \int_0^1 x^{\,k}\,(1 - x)^{\,m}\,\dd x =
+        \frac{k!\,m!}{(k + m + 1)!}
+        \qquad (k, m \in \N).
+        \]
+  \item Deduce $\displaystyle\int_0^1 \bigl(x(1-x)\bigr)^n \dd x
+        = \frac{1}{(2n+1)\binom{2n}{n}}$, and --- comparing with
+        the bound $x(1 - x) \leq \frac14$ --- the estimate
+        $\binom{2n}{n} \geq \dfrac{4^n}{2n+1}$, matching
+        $\binom{2n}{n}^{1/n} \to 4$ from \cref{pb:b1:seq:1}.
+  \item Prove the smallness lemma used twice below: for every
+        continuous $g > 0$ on $\intoo{0}{1}$,
+        \[
+        0 < \int_0^1 \bigl(x(1-x)\bigr)^n g(x)\,\dd x
+        \leq \frac{\sup_{\intcc{0}{1}}\abs g}{4^{\,n}} .
+        \]
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part II --- $\eu$: irrationality, then six
+decimals.} Set $A_n = \displaystyle\int_0^1 x^n \eu^x \dd x$.
+\begin{enumerate}[resume]
+  \item Compute $A_0$ and $A_1$, prove the recurrence $A_n = \eu
+        - n A_{n-1}$, and the bounds $0 < A_n \leq
+        \dfrac{\eu}{n+1}$.
+  \item Show by induction that $A_n = \alpha_n + \beta_n \eu$
+        with $\alpha_n, \beta_n \in \Z$.
+  \item Deduce that $\eu$ is irrational \emph{(if $\eu = \frac
+        pq$, then $q A_n$ is an integer trapped in
+        $\intoo{0}{1}$ for $n$ large)}. Compare with the proof
+        of \cref{exo:b1:seq:9}: same punchline, different fuel.
+  \item Prove, by induction and integration by parts, the exact
+        remainder formula
+        \[
+        \eu = \sum_{k=0}^{n} \frac{1}{k!} + R_n,
+        \qquad
+        R_n = \frac{1}{n!}\int_0^1 (1 - t)^n\,\eu^{\,t}\,\dd t,
+        \qquad
+        \frac{1}{(n+1)!} \leq R_n \leq \frac{\eu}{(n+1)!} .
+        \]
+  \item Take $n = 9$: bound $R_9$ using $\eu < 2.75$ (from
+        $b_2 = 2.75$ in \cref{ex:b1:seq:e}), evaluate the sum,
+        and conclude the certified bracketing $2.7182818 \leq
+        \eu \leq 2.7182823$ --- six decimals, $\eu \approx
+        2.718282$, with proof.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part III --- Legendre's theorem: $\pi^2$ is
+irrational.} Let $f(x) = \dfrac{x^n (1 - x)^n}{n!}$, and suppose
+$\pi^2 = \frac ab$ with $a, b \in \N^*$.
+\begin{enumerate}[resume]
+  \item Show $f(1 - x) = f(x)$ and $0 < f \leq
+        \dfrac{1}{4^n\,n!}$ on $\intoo{0}{1}$.
+  \item Show that $f^{(k)}(0)$ and $f^{(k)}(1)$ are integers for
+        every $k \geq 0$ \emph{(expand $x^n(1-x)^n$ with integer
+        coefficients; $\frac{k!}{n!} \in \Z$ for $k \geq n$;
+        then use the symmetry)}.
+  \item Define
+        \[
+        G = b^{\,n} \sum_{k=0}^{n} (-1)^k\,
+        \pi^{2n - 2k} f^{(2k)} .
+        \]
+        Show that $G(0)$ and $G(1)$ are integers \emph{(each
+        $b^n \pi^{2n-2k} = a^{\,n-k}\,b^{\,k}$)}.
+  \item Verify the telescoping $G'' + \pi^2 G = b^n \pi^{2n+2} f
+        = \pi^2 a^n f$, then
+        \[
+        \frac{\dd}{\dd x}\Bigl(G'(x)\sin \pi x - \pi\,G(x)\cos
+        \pi x\Bigr) = \pi^2 a^n f(x)\sin \pi x .
+        \]
+  \item Integrate over $\intcc{0}{1}$ and conclude
+        \[
+        \pi\,a^n \int_0^1 f(x)\sin(\pi x)\,\dd x = G(0) + G(1)
+        \in \Z ,
+        \]
+        a \emph{positive} integer bounded by $\dfrac{\pi
+        a^n}{4^n\,n!}$.
+  \item Conclude with question 1 that $\pi^2$ is irrational
+        (Legendre, 1794), and that this strengthens
+        \cref{exo:b1:integration:9}: why does the irrationality
+        of $\pi^2$ imply that of $\pi$, and not conversely?
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part IV --- Understanding the machine.}
+\begin{enumerate}[resume]
+  \item Locate the two opposing forces (integrality of endpoint
+        data; analytic smallness of the integral) and the
+        bridge, in Parts II and III. Then explain why the factor
+        $\frac{1}{n!}$ in $f$ is the crux: if it is removed,
+        integrality survives, but which inequality dies, and for
+        which claimed fractions $\frac ab$ does the proof then
+        fail?
+  \item Effectivity: suppose someone claims $\pi^2 = \frac ab$
+        with $a \leq 10$. Show that the contradiction already
+        lands at $n = 7$: compute $\pi\,(10/4)^7/7! \approx
+        0.38 < 1$. The machine does not merely refute; it
+        refutes by a fixed, computable stage.
+  \item Sanity check the bridge unconditionally: prove by two
+        integrations by parts that
+        \[
+        \int_0^1 x(1 - x)\sin(\pi x)\,\dd x = \frac{4}{\pi^3},
+        \]
+        and reconcile with question 14 at $n = 1$ (keep
+        $\pi^2$ symbolic: the telescoped identity reads $\pi^3
+        \int_0^1 f_1 \sin \pi x = -(f_1''(0) + f_1''(1)) = 4$).
+  \item What makes $\eu^x$ and $\sin \pi x$ eligible as the
+        machine's kernels? Identify the property (each satisfies
+        a linear differential equation with constant
+        coefficients, so repeated integration by parts cycles
+        back to the start), and name the frontier: the same
+        machine, refined by Hermite and Lindemann, proves $\eu$
+        and $\pi$ \emph{transcendental} --- beyond this volume.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part V --- $\frac{22}{7}$ versus $\pi$, and the
+moral.}
+\begin{enumerate}[resume]
+  \item Establish the polynomial division
+        \[
+        \frac{x^4(1-x)^4}{1 + x^2}
+        = x^6 - 4x^5 + 5x^4 - 4x^2 + 4 - \frac{4}{1 + x^2},
+        \]
+        and deduce the celebrated identity
+        \[
+        \int_0^1 \frac{x^4 (1-x)^4}{1 + x^2}\,\dd x
+        = \frac{22}{7} - \pi .
+        \]
+  \item The integrand is positive: conclude $\pi <
+        \frac{22}{7}$. Then, bounding $\frac{1}{1+x^2}$ between
+        $\frac12$ and $1$ and using $\int_0^1 (x(1-x))^4 =
+        \frac{1}{630}$ (question 3), prove
+        \[
+        \frac{22}{7} - \frac{1}{630} \;\leq\; \pi \;\leq\;
+        \frac{22}{7} - \frac{1}{1260} ,
+        \]
+        i.e.\ $3.14126 \leq \pi \leq 3.14207$: two correct
+        decimals, by hand.
+  \item Generalize: dividing $x^{4m}(1-x)^{4m}$ by $1 + x^2$,
+        show the remainder is the constant $(-4)^m$ \emph{(work
+        modulo $x^2 + 1$: $(1-x)^2 \equiv -2x$)}, deduce
+        rationals $r_m$ with
+        \[
+        \abs{\pi - r_m} \leq 4^{\,1 - 5m} ,
+        \]
+        and check that $m = 1$ reproduces question 20--21.
+  \item Confront these rationals with the approximation theory
+        of \cref{pb:b1:derivative:1}: compute $\abs{\pi -
+        \frac{22}{7}} \approx 1.26\cdot10^{-3}$ against the
+        Dirichlet guarantee $\frac{1}{49}$, and quote
+        $\abs{\pi - \frac{355}{113}} \approx 2.7\cdot10^{-7}$
+        against $\frac{1}{113^2} \approx 7.8\cdot10^{-5}$:
+        exceptionally good rational approximations exist for
+        $\pi$ --- consistent, since $\pi$ is not known to be
+        badly approximable.
+  \item (The integer trap, abstracted) Prove the lemma that
+        unifies everything: \emph{if $x \in \R$ and there exist
+        integers $a_n, b_n$ with $0 < \abs{a_n + b_n x} \to 0$,
+        then $x$ is irrational.} List its instances in this
+        problem, in \cref{exo:b1:integration:9}, in
+        \cref{exo:b1:seq:9}, and in \cref{pb:b1:derivative:1}.
+  \item Synthesis, one sentence each: (i) the machine's three
+        parts and where each lives in the toolbox of this
+        chapter; (ii) what the integral contributes that the
+        mean value theorem of \cref{pb:b1:derivative:1} could
+        not; (iii) the inventory of results extracted (two
+        irrationalities, one six-decimal constant, one
+        bracketing of $\pi$, one binomial bound); (iv) the
+        frontier (Hermite, Lindemann; and the same trap, run on
+        $\zeta(2)$ and $\zeta(3)$, in twentieth-century
+        arithmetic).
+\end{enumerate}
+\end{problem}

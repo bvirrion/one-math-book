@@ -83,6 +83,26 @@ X^4 + X^3 - 2X + 1 = (X^2 + 1)(X^2 + X - 1) + (-3X + 2).
 $-3X + 2$ has degree $1 < 2$.)
 \end{example}
 
+\begin{method}[Horner's scheme]\label{met:b1:poly:horner}
+To evaluate $P = a_nX^n + \dots + a_0$ at $x$, or to divide $P$ by
+$X - x$, avoid computing powers: read the coefficients left to
+right, and iterate \emph{multiply by $x$, add the next
+coefficient}:
+\[
+b_n = a_n, \qquad b_{k} = a_{k} + x\,b_{k+1}
+\quad (k = n-1, \dots, 0) .
+\]
+Then $b_0 = P(x)$, and the earlier $b_k$ are the quotient's
+coefficients: $P = (X - x)(b_nX^{n-1} + \dots + b_1) + b_0$
+(expand and compare). Example: $P = X^4 - 5X^3 + 6X^2 + 4X - 8$
+at $x = 2$: the $b$'s are $1, -3, 0, 4, 0$, so $P(2) = 0$ and $P
+= (X-2)(X^3 - 3X^2 + 4)$ --- one line instead of a long
+division, and $n$ multiplications instead of the $\approx n^2/2$
+of the naive evaluation. Iterating the scheme at the same point
+extracts multiplicities (compare
+\cref{ex:b1:poly:multexample}).
+\end{method}
+
 \begin{remark}[{Arithmetic of $K[X]$}]
 With Euclidean division in hand, the entire arithmetic of
 \cref{ch:b1:arith} transfers to $K[X]$, with the same proofs, degree
@@ -107,10 +127,19 @@ factorization $P = (X - a_1)\cdots(X - a_r)\, Q$.
 \begin{proof}
 Divide: $P = (X - a) Q + R$ with $\deg R < 1$, so $R$ is a constant
 $c$; substituting $X = a$ (substitution respects sums and products)
-gives $P(a) = c$. The equivalence follows. For several roots, induct:
-$P = (X - a_1) Q_1$, and for $i \geq 2$, $0 = P(a_i) = (a_i - a_1)
-Q_1(a_i)$ with $a_i - a_1 \neq 0$ forces $Q_1(a_i) = 0$; apply the
-induction hypothesis to $Q_1$.
+gives $P(a) = c$. The equivalence follows. For several roots,
+induct on $r$: the case $r = 1$ is the equivalence just proved.
+Assume the statement for $r - 1$ roots and let $a_1, \dots, a_r$
+be distinct roots of $P$. Write $P = (X - a_1)Q_1$; for each $i
+\geq 2$, substituting $a_i$:
+\[
+0 = P(a_i) = (a_i - a_1)\,Q_1(a_i),
+\qquad a_i - a_1 \neq 0 ,
+\]
+and since $K$ has no zero divisors, $Q_1(a_i) = 0$: the $r - 1$
+distinct points $a_2, \dots, a_r$ are roots of $Q_1$. The
+induction hypothesis factors $Q_1 = (X - a_2)\cdots(X - a_r)\,Q$,
+and substituting back gives the claim.
 \end{proof}
 
 \begin{corollary}[A polynomial of degree $n$ has at most $n$ roots]\label{cor:b1:poly:nroots}
@@ -125,6 +154,33 @@ If $a_1, \dots, a_r$ are distinct roots, \cref{thm:b1:poly:factor}
 gives $P = (X-a_1)\cdots(X-a_r) Q$, so $n = \deg P \geq r$. The two
 consequences follow by contradiction and by difference.
 \end{proof}
+
+\begin{example}[The auxiliary-polynomial trick]\label{ex:b1:poly:auxiliary}
+Let $P$ be the polynomial of degree $\leq n$ with
+\[
+P(k) = \frac{k}{k+1} \qquad (k = 0, 1, \dots, n) ;
+\]
+it exists and is unique by Lagrange interpolation below. What is
+$P(n+1)$? Clear denominators: the polynomial $Q = (X+1)P - X$ has
+degree $\leq n + 1$ and vanishes at the $n + 1$ points $0, 1,
+\dots, n$, so by \cref{thm:b1:poly:factor}
+\[
+Q = c\,X(X-1)(X-2)\cdots(X-n)
+\]
+for some constant $c$. Evaluate where $Q$ is known independently:
+at $X = -1$, $Q(-1) = 0 \cdot P(-1) + 1 = 1$, while the product
+equals $(-1)(-2)\cdots(-1-n) = (-1)^{n+1}(n+1)!$; hence $c =
+\frac{(-1)^{n+1}}{(n+1)!}$. Now evaluate at $X = n + 1$:
+\[
+(n+2)\,P(n+1) - (n+1) = Q(n+1) = c\,(n+1)! = (-1)^{n+1} ,
+\]
+so $P(n+1) = \dfrac{(n+1) + (-1)^{n+1}}{n+2}$: equal to $1$ for
+odd $n$, and to $\frac{n}{n+2}$ for even $n$ --- the
+interpolating polynomial does \emph{not} continue the pattern
+$\frac{n+1}{n+2}$. The trick to remember: encode the data as
+roots of an auxiliary polynomial, identify the unknown constant
+at a point outside the data, and harvest.
+\end{example}
 
 \begin{definition}[Derivative, multiplicity]\label{def:b1:poly:derivative}
 The \emph{formal derivative} of $P = \sum a_k X^k$ is $P' = \sum_{k
@@ -158,11 +214,61 @@ $R^{(k)}(a) = k!\, c_k$. Hence: all $P^{(k)}(a) = 0$ for $k < m$
 $\iff$ all $c_k = 0$ $\iff$ $R = 0$ $\iff$ $(X-a)^m \mid P$.
 \end{proof}
 
+\begin{example}[Computing a multiplicity]\label{ex:b1:poly:multexample}
+What is the multiplicity of the root $2$ in $P = X^4 - 5X^3 + 6X^2
++ 4X - 8$? Evaluate the successive derivatives at $2$:
+\[
+P(2) = 16 - 40 + 24 + 8 - 8 = 0, \qquad
+P'(2) = 32 - 60 + 24 + 4 = 0,
+\]
+\[
+P''(2) = 48 - 60 + 12 = 0, \qquad
+P'''(2) = 48 - 30 = 18 \neq 0
+\]
+(with $P' = 4X^3 - 15X^2 + 12X + 4$, $P'' = 12X^2 - 30X + 12$,
+$P''' = 24X - 30$). Three vanishing values then a nonzero one:
+multiplicity exactly $3$. Dividing, $P = (X - 2)^3(X + 1)$ ---
+which one checks by expanding $(X-2)^3 = X^3 - 6X^2 + 12X - 8$ and
+multiplying by $X + 1$. The insight: multiplicities are read off
+\emph{evaluations}, no factorization needed --- which is exactly
+how one detects them when the factorization is out of reach.
+\end{example}
+
+\begin{example}[Detecting multiple roots with a gcd]\label{ex:b1:poly:gcdmultiple}
+When no root is known, \cref{prop:b1:poly:multiplicity} still
+gives a \emph{global} multiple-root detector: $a$ is a multiple
+root of $P$ iff it is a common root of $P$ and $P'$, so $P$ has a
+multiple root (in $\C$) iff $\gcd(P, P') \neq 1$ --- computable by
+the Euclidean algorithm without solving anything. Sample: $P =
+X^3 - 3X + 2$, $P' = 3X^2 - 3 = 3(X - 1)(X + 1)$. Testing the
+roots $\pm1$ of $P'$ inside $P$: $P(1) = 0$ but $P(-1) = 4$, so
+\[
+\gcd(P, P') = X - 1 :
+\]
+the root $1$ is multiple; dividing twice, $P = (X - 1)^2(X + 2)$.
+The gcd even reports the full set of multiple roots, each with
+multiplicity lowered by one --- the fact every computer-algebra
+system exploits to ``square-free factorize'' before any
+root-hunting, and the polynomial twin of
+\cref{exo:b1:poly:9}'s no-multiple-root arguments.
+\end{example}
+
 \begin{theorem}[Fundamental theorem of algebra]\label{thm:b1:poly:fta}
 Every nonconstant polynomial of $\C[X]$ has a root in
 $\C$.\index{fundamental theorem of algebra}
 \end{theorem}
 \admitted
+
+\begin{remark}
+Despite its name, the theorem is a statement of \emph{analysis}:
+every known proof uses the completeness of $\R$ in some form, and
+none is purely algebraic --- the honest proof is given in the
+Year 3 volume, once either complex integration or compactness
+arguments are available. What this chapter genuinely proves is
+the \emph{reduction}: granted one root for every nonconstant
+polynomial, the full factorizations over $\C$ and $\R$ below
+follow by pure algebra.
+\end{remark}
 
 \begin{corollary}[Factorization over $\C$ and over $\R$]\label{cor:b1:poly:factorization}
 \begin{enumerate}
@@ -206,8 +312,70 @@ the four complex roots $\pm 1 \pm \iu$:
 $X^4 + 4 = (X^2 - 2X + 2)(X^2 + 2X + 2)$. Neither quadratic splits
 over $\R$ (discriminants $-4$). Note: an \emph{irreducible} real
 polynomial has degree $1$ or $2$ --- this is exactly what the
-factorization theorem says.
+factorization theorem says. The same conjugate-pairing run on
+$X^4 + 1$, whose roots are $\eu^{\pm\iu\pi/4}$ and
+$\eu^{\pm3\iu\pi/4}$: each pair contributes $X^2 -
+2\cos\theta\,X + 1$, so
+\[
+X^4 + 1 = \bigl(X^2 - \sqrt2\,X + 1\bigr)
+\bigl(X^2 + \sqrt2\,X + 1\bigr) ,
+\]
+an identity invisible to naive factoring attempts over $\Q$ ---
+the price of insisting on real (here even irrational)
+coefficients, and a standard input for integrating $\frac1{x^4 +
+1}$ in \cref{ch:b1:integration}.
 \end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}[xscale=2.6, yscale=1.35]
+  \draw[->, thin] (-1.15,0) -- (1.2,0) node[below] {$x$};
+  \draw[->, thin] (0,-1.35) -- (0,1.4) node[left] {$y$};
+  \draw[dashed, gray] (-1,1) -- (1,1);
+  \draw[dashed, gray] (-1,-1) -- (1,-1);
+  \draw[gray, thin] (-1,-1.1) -- (-1,1.1) (1,-1.1) -- (1,1.1);
+  \draw[omThm, very thick, domain=-1:1, samples=300, smooth]
+    plot (\x, {16*\x^5 - 20*\x^3 + 5*\x});
+  \node[right, font=\small] at (1.02,1) {$1$};
+  \node[right, font=\small] at (1.02,-1) {$-1$};
+  \fill[omThm] (-1,-1) circle (0.018) (-0.809,1) circle (0.018)
+    (-0.309,-1) circle (0.018) (0.309,1) circle (0.018)
+    (0.809,-1) circle (0.018) (1,1) circle (0.018);
+\end{tikzpicture}
+
+{\small The Chebyshev polynomial $T_5 = 16X^5 - 20X^3 + 5X$ on
+$\intcc{-1}1$: it oscillates exactly between $-1$ and $1$,
+touching the bounds at six points (marked). This
+\emph{equioscillation} is what makes $2^{-4}T_5$ the monic
+quintic of smallest sup-norm on the interval
+(\cref{exo:b1:poly:10} and the weekend problem).}
+\end{omfigure}
+
+\begin{remark}[Common pitfalls with polynomials]\label{rem:b1:poly:pitfalls}
+\begin{enumerate}
+  \item \emph{Polynomial versus function.} Over $K = \Q, \R, \C$
+        the two notions match (equal functions have equal
+        coefficients, by \cref{cor:b1:poly:nroots} and
+        infiniteness of $K$), but conceptually a polynomial is
+        its coefficient list: over the two-element field
+        $\Z/2\Z$ of \cref{ch:b1:structures}, $X^2 + X$ vanishes
+        at both points, yet is not the zero polynomial.
+  \item \emph{Degrees under addition.} $\deg(P + Q)$ can drop
+        below $\max(\deg P, \deg Q)$ when leading terms cancel;
+        writing ``$\deg(P + Q) = \max(\dots)$'' is only safe for
+        distinct degrees.
+  \item \emph{Roots counted correctly.} ``$n$ roots'' in
+        \cref{cor:b1:poly:factorization} means \emph{with
+        multiplicity, in $\C$}: $X^2 + 1$ has no real roots, and
+        $(X-1)^2$ has one distinct root but two with
+        multiplicity. Statements mixing the three counts are the
+        commonest source of false proofs.
+  \item \emph{Irreducibility depends on the field.} $X^2 - 2$ is
+        irreducible over $\Q$, splits over $\R$; $X^2 + 1$ is
+        irreducible over $\R$, splits over $\C$. The bare word
+        ``irreducible'' means nothing until the coefficient
+        field is named.
+\end{enumerate}
+\end{remark}
 
 \section{Coefficients and roots}
 
@@ -226,9 +394,23 @@ the $k$-th symmetric function of the roots being $(-1)^k c_{n-k}$.
 \end{theorem}
 
 \begin{proof}
-Expand $P = (X - a_1)\cdots(X - a_n)$: choosing $X$ in all factors
-but $k$ of them produces the term $(-1)^k \bigl(\sum_{i_1 < \dots <
-i_k} a_{i_1}\cdots a_{i_k}\bigr) X^{n-k}$; identify coefficients.
+By \cref{cor:b1:poly:factorization}, $P = (X - a_1)\cdots(X -
+a_n)$ (monic, all roots listed). Expanding the product
+distributively produces one term per way of choosing, in each
+factor, either $X$ or the root term $-a_i$: choosing the roots in
+the factors indexed by $i_1 < \dots < i_k$ and $X$ in the $n - k$
+others contributes $(-a_{i_1})\cdots(-a_{i_k})\,X^{n-k}$. Grouping
+by the power of $X$:
+\[
+P = \sum_{k=0}^{n} (-1)^k
+\Bigl(\sum_{i_1 < \dots < i_k} a_{i_1}\cdots a_{i_k}\Bigr)
+X^{n-k} ,
+\]
+and identifying with $P = \sum_k c_{n-k}X^{n-k}$ (coefficients
+are unique, \cref{def:b1:poly:def}) gives $c_{n-k} = (-1)^k
+\sigma_k$, i.e.\ $\sigma_k = (-1)^kc_{n-k}$, where $\sigma_k$
+denotes the $k$-th symmetric function displayed above. The three
+displayed cases are $k = 1$, $k = 2$ and $k = n$.
 \end{proof}
 
 \begin{example}\label{ex:b1:poly:vieta}
@@ -244,6 +426,49 @@ $X^3 + aX^2 + bX + c$ with roots $\alpha, \beta, \gamma$:
 \]
 which allows computing symmetric quantities like $\alpha^2 + \beta^2
 + \gamma^2 = a^2 - 2b$ without solving.
+\end{example}
+
+\begin{example}[Transforming the roots without finding them]\label{ex:b1:poly:transformroots}
+Let $\alpha, \beta$ be the roots of $X^2 - 3X + 1$. Which monic
+quadratic has roots $\alpha^2, \beta^2$? By Vieta, $\alpha +
+\beta = 3$ and $\alpha\beta = 1$, so
+\[
+\alpha^2 + \beta^2 = (\alpha+\beta)^2 - 2\alpha\beta = 7,
+\qquad
+\alpha^2\beta^2 = (\alpha\beta)^2 = 1 :
+\]
+the answer is $X^2 - 7X + 1$ --- obtained without computing
+$\alpha = \frac{3 + \sqrt5}2$. (Check: $\alpha^2 = \frac{7 +
+3\sqrt5}2$ and indeed $\alpha^2 + \beta^2 = 7$.) The same
+strategy handles reciprocals ($X^2 - \frac ba X + \frac
+ca$-type transformations), shifts, and any symmetric data: Vieta
+converts questions about \emph{unknown} roots into algebra on
+\emph{known} coefficients. It will serve constantly when the
+roots are eigenvalues (\cref{ch:b1:det}).
+\end{example}
+
+\begin{example}[Palindromic equations]\label{ex:b1:poly:palindrome}
+Solve $X^4 + X^3 - 4X^2 + X + 1 = 0$. The coefficients read the
+same in both directions, so $0$ is not a root and dividing by
+$X^2$ loses no solutions:
+\[
+X^2 + X - 4 + \frac1X + \frac1{X^2} = 0 .
+\]
+Set $y = X + \frac1X$: then $X^2 + \frac1{X^2} = y^2 - 2$, and
+the equation collapses to
+\[
+y^2 + y - 6 = 0 \iff (y + 3)(y - 2) = 0 .
+\]
+Unfold each value through $X^2 - yX + 1 = 0$: for $y = 2$, $X^2 -
+2X + 1 = (X - 1)^2$ gives the double root $1$; for $y = -3$,
+$X^2 + 3X + 1 = 0$ gives $X = \frac{-3 \pm \sqrt5}2$. Four roots
+with multiplicity for a quartic, as
+\cref{cor:b1:poly:factorization} requires --- obtained by solving
+two quadratics. The trick covers every \emph{palindromic}
+polynomial: their roots come in reciprocal pairs $\{x, 1/x\}$
+(replace $X$ by $1/X$ and clear denominators), and $y = X +
+\frac1X$ is precisely the quantity constant on such pairs,
+halving the degree.
 \end{example}
 
 \begin{theorem}[Lagrange interpolation]\label{thm:b1:poly:lagrange}
@@ -264,6 +489,47 @@ So the displayed $P$ has degree $\leq n$ and interpolates. Uniqueness:
 two interpolating polynomials of degree $\leq n$ agree at the $n+1$
 points $x_i$, hence are equal (\cref{cor:b1:poly:nroots}).
 \end{proof}
+
+\begin{remark}[Interlude: polynomials are also vectors]\label{rem:b1:poly:interlude}
+A change of viewpoint that \cref{ch:b1:vspaces} will make
+official: the polynomials of degree $\leq n$ form a space in
+which addition and scaling behave exactly like coordinates ---
+a polynomial \emph{is} its list of $n + 1$ coefficients. Three
+statements of this chapter are secretly linear algebra.
+Lagrange interpolation (\cref{thm:b1:poly:lagrange}) says that
+the evaluation data $(P(x_0), \dots, P(x_n))$ determines $P$
+uniquely: evaluation at $n + 1$ points is a linear bijection,
+and the $L_i$ are the basis adapted to it. The expansion $R =
+\sum c_k(X - a)^k$ in the proof of
+\cref{prop:b1:poly:multiplicity} says that the powers of
+$(X - a)$ form another coordinate system, with $c_k =
+R^{(k)}(a)/k!$ as coordinates. And
+\cref{cor:b1:poly:nroots} --- more roots than the degree forces
+the zero polynomial --- is the engine of all uniqueness: it will
+become ``a linear map injective on a space of dimension $n + 1$''
+in \cref{ch:b1:findim}. When those chapters arrive, the space
+$K_n[X]$ will be their favorite example; it is worth arriving
+there already fluent in it.
+\end{remark}
+
+\begin{remark}[Where this chapter is used]\label{rem:b1:poly:whereused}
+Factorization over $\R$ and $\C$
+(\cref{cor:b1:poly:factorization}) is the engine of partial
+fractions in \cref{ch:b1:fractions}, hence of a large class of
+integrals in \cref{ch:b1:integration}. The expansion of a
+polynomial in powers of $(X - a)$, met in the proof of
+\cref{prop:b1:poly:multiplicity}, is the algebraic shadow of the
+Taylor formulas of \cref{ch:b1:taylor}. Characteristic polynomials
+already appeared for differential equations (\cref{ch:b1:diffeq})
+and return for matrices in \cref{ch:b1:det}; Lagrange
+interpolation is the first existence-and-uniqueness theorem of
+numerical analysis, and the Chebyshev polynomials of
+\cref{exo:b1:poly:10} --- whose optimality the weekend problem
+below establishes --- tell that discipline \emph{where} to
+interpolate. Finally the whole arithmetic of $K[X]$, copied from
+\cref{ch:b1:arith}, feeds the study of $K[X]$-ideals and quotient
+rings in the Year 2 volume.
+\end{remark}
 
 \section{Exercises}
 
@@ -352,3 +618,203 @@ convex hull of the roots of $P$ \emph{(evaluate the identity at a
 root $w$ of $P'$ which is not a root of $P$, take conjugates, and
 read the result as $w$ being a weighted average of the $a_i$)}.
 \end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:poly:12}
+(Roots-of-unity filter) Let $n \in \N^*$ and $j = \eu^{2\iu\pi/3}$.
+Evaluating $(1 + X)^n$ at $1$, $j$ and $j^2$, prove that
+\[
+\sum_{k \geq 0} \binom{n}{3k}
+= \frac{2^n + 2\cos\frac{n\pi}{3}}{3} ,
+\]
+and check the formula for $n = 3$ and $n = 6$. \emph{Hint: $1 +
+j^m + j^{2m}$ equals $3$ if $3 \mid m$ and $0$ otherwise; and $1 +
+j = \eu^{\iu\pi/3}$.}
+\end{exercise}
+
+\section{Problem: Chebyshev polynomials and the flattest polynomial}
+
+\begin{problem}\label{pb:b1:poly:1}
+Among all \emph{monic} polynomials of degree $n$, which one stays
+closest to zero on $\intcc{-1}1$? The answer --- Chebyshev's
+theorem, the birth certificate of approximation theory --- is
+$2^{1-n}T_n$, where $T_n$ is the Chebyshev polynomial of
+\cref{exo:b1:poly:10}, and no monic competitor can beat its
+deviation $2^{1-n}$.\index{Chebyshev polynomials} This problem
+develops the algebra of the family $(T_n)$ (composition law,
+explicit coefficients, the second-kind family $U_n$, a
+differential equation), proves the extremality theorem with its
+equality case, and collects applications: optimal interpolation
+nodes, the exact value of $\cos 36^\circ$, and a congruence
+$T_p \equiv X^p \pmod p$. Throughout, $T_0 = 1$, $T_1 = X$,
+$T_{n+1} = 2X\,T_n - T_{n-1}$, and we freely use
+$T_n(\cos\theta) = \cos n\theta$ from \cref{exo:b1:poly:10}.
+
+\medskip
+\noindent\textbf{Part I --- The family $(T_n)$.}
+\begin{enumerate}
+  \item Compute $T_2, T_3, T_4, T_5$ from the recurrence. (Compare
+        $T_3$ with the identity $\cos3\theta = 4\cos^3\theta -
+        3\cos\theta$ of \cref{ex:b1:complex:cos3}.)
+  \item Prove by induction: $\deg T_n = n$ with leading
+        coefficient $2^{n-1}$ for $n \geq 1$, and $T_n$ has the
+        parity of $n$ (only even or only odd powers appear).
+  \item Prove the uniqueness principle: $T_n$ is the \emph{only}
+        polynomial satisfying $P(\cos\theta) = \cos n\theta$ for
+        all $\theta$. (Two polynomials agreeing on $\intcc{-1}1$
+        agree everywhere: \cref{cor:b1:poly:nroots}.)
+  \item Deduce the composition and product laws:
+        \[
+        T_m \circ T_n = T_{mn},
+        \qquad
+        2\,T_m T_n = T_{m+n} + T_{\abs{m-n}} .
+        \]
+  \item Recall from \cref{exo:b1:poly:10} the roots $x_k =
+        \cos\frac{(2k+1)\pi}{2n}$ and the equioscillation points
+        $y_k = \cos\frac{k\pi}n$ with $T_n(y_k) = (-1)^k$. Write
+        down the complete factorization of $T_n$ over $\R$, and
+        justify that the $y_k$ interlace: $y_n < x_{n-1} < y_{n-1}
+        < \dots < x_0 < y_0$.
+  \item Prove that $T_n(\cosh t) = \cosh(nt)$ for all $t \in \R$
+        (same induction, using
+        \cref{prop:b1:functions:hyprules}), and deduce for $x
+        \geq 1$ the closed form
+        \[
+        T_n(x) = \frac{\bigl(x + \sqrt{x^2 - 1}\bigr)^n +
+        \bigl(x - \sqrt{x^2 - 1}\bigr)^n}{2} ,
+        \]
+        so $T_n(x) > 1$ for $x > 1$: outside $\intcc{-1}1$ the
+        polynomial escapes at once.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part II --- Coefficients, the family $U_n$, a
+differential equation.}
+\begin{enumerate}[resume]
+  \item From de Moivre's formula
+        (\cref{cor:b1:complex:demoivre}), prove the explicit
+        expression
+        \[
+        T_n(x) = \sum_{0 \leq 2j \leq n} \binom{n}{2j}\,
+        x^{\,n-2j}\,(x^2 - 1)^j ,
+        \]
+        and verify it for $n = 3$.
+  \item Compute $T_n(1)$, $T_n(-1)$ and $T_n(0)$ for all $n$.
+  \item Define $U_n$ (\emph{second kind}) by $U_0 = 1$, $U_1 =
+        2X$, $U_{n+1} = 2X\,U_n - U_{n-1}$. Prove that
+        $U_n(\cos\theta) = \frac{\sin(n+1)\theta}{\sin\theta}$
+        for $\theta \notin \pi\Z$, and that $T_n' = n\,U_{n-1}$
+        for $n \geq 1$.
+  \item Prove that $\abs{\sin n\theta} \leq n\,\abs{\sin\theta}$
+        for all $\theta$ (induction), and deduce the Markov-type
+        bound
+        \[
+        \abs{T_n'(x)} \leq n^2
+        \quad\text{on } \intcc{-1}1,
+        \qquad\text{with } T_n'(\pm1) = (\pm1)^{n-1}\,n^2 .
+        \]
+  \item Show that $y = T_n$ satisfies the differential equation
+        \[
+        (1 - x^2)\,y'' - x\,y' + n^2\,y = 0 ,
+        \]
+        by differentiating the identity $\sin\theta\,
+        T_n'(\cos\theta) = n\sin n\theta$ with respect to
+        $\theta$; verify directly for $T_2$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part III --- Chebyshev's extremality theorem.}
+Let $\widetilde T_n = 2^{1-n}\,T_n$ (monic by question 2) and
+write $\norm{P}_\infty = \sup_{x \in \intcc{-1}1}\abs{P(x)}$.
+\begin{enumerate}[resume]
+  \item Justify $\norm{\widetilde T_n}_\infty = 2^{1-n}$, attained
+        with alternating signs at the $n + 1$ points $y_n < \dots
+        < y_0$.
+  \item Suppose some monic $P$ of degree $n$ had
+        $\norm P_\infty < 2^{1-n}$, and set $D = \widetilde T_n -
+        P$. Show $\deg D \leq n - 1$, and that $D(y_k)$ has the
+        strict sign of $(-1)^k$ for each $k = 0, \dots, n$.
+  \item Deduce that $D$ has at least $n$ distinct real roots (one
+        in each gap, by the intermediate value property, used
+        here at High School level and proved in
+        \cref{ch:b1:continuity}), and conclude \emph{Chebyshev's
+        theorem}: every monic $P$ of degree $n$ satisfies
+        \[
+        \norm{P}_\infty \geq 2^{1-n} .
+        \]
+  \item (Equality case, first step) Suppose now $\norm P_\infty =
+        2^{1-n}$ exactly, $P$ monic of degree $n$, and let $D =
+        \widetilde T_n - P$. Show that $(-1)^kD(y_k) \geq 0$ for
+        all $k$, and that if $D(y_k) = 0$ for an \emph{interior}
+        point $y_k$ ($0 < k < n$), then $D'(y_k) = 0$ as well.
+        \emph{(At an interior $y_k$, both $\widetilde T_n$ and
+        $P$ attain an extremum of absolute value $\norm{\cdot}
+        _\infty$; a differentiable function has zero derivative
+        at an interior extremum --- used at High School level,
+        proved in \cref{ch:b1:derivative}.)}
+  \item (Equality case, conclusion) Count roots of $D$ with
+        multiplicity to show $D = 0$: the minimizer is
+        \emph{unique}, $P = \widetilde T_n$.
+  \item Transport to an arbitrary segment $\intcc ab$: show that
+        the minimal sup-norm of a monic degree-$n$ polynomial on
+        $\intcc ab$ is $2\bigl(\frac{b-a}4\bigr)^n$, attained by a
+        rescaled Chebyshev polynomial. \emph{(Substitute $x =
+        \frac{a+b}2 + \frac{b-a}2\,t$ and track the leading
+        coefficient.)}
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part IV --- Applications.}
+\begin{enumerate}[resume]
+  \item Work out the case $n = 3$ by hand: locate the extrema of
+        $\widetilde T_3 = X^3 - \frac34X$ on $\intcc{-1}1$,
+        verify the four-fold equioscillation with value
+        $\frac14$, and conclude that no monic cubic does better.
+  \item (Optimal interpolation nodes) For $n + 1$ nodes $x_0,
+        \dots, x_n \in \intcc{-1}1$, the interpolation error is
+        governed by $\omega(X) = \prod_i (X - x_i)$ (as
+        \cref{ch:b1:taylor} will quantify). Prove that the choice
+        minimizing $\norm\omega_\infty$ is the set of $n + 1$
+        roots of $T_{n+1}$, with $\norm\omega_\infty = 2^{-n}$:
+        Chebyshev nodes are the right places to interpolate.
+  \item Using $T_5$, prove that $c = \cos 36^\circ$ satisfies
+        $16c^5 - 20c^3 + 5c + 1 = 0$, factor this polynomial as
+        $(x + 1)(4x^2 - 2x - 1)^2$, and conclude
+        \[
+        \cos 36^\circ = \frac{1 + \sqrt5}4 .
+        \]
+        Check the consistency with $\cos 72^\circ =
+        \frac{\sqrt5 - 1}4$ from \cref{exo:b1:complex:8}.
+  \item Estimate $T_{10}(1.1)$ with the closed form of question 6
+        (two significant digits suffice), and interpret: a
+        polynomial bounded by $1$ on $\intcc{-1}1$ can already
+        exceed $40$ at $x = 1.1$. (That $T_n$ grows
+        \emph{fastest} among such polynomials is another
+        extremal property of the family, beyond this problem.)
+  \item Prove the congruence: for every odd prime $p$, all
+        coefficients of $T_p - X^p$ are divisible by $p$.
+        \emph{(Use question 7 and $p \mid \binom p{2j}$ for $0 <
+        2j < p$, from the proof of
+        \cref{thm:b1:arith:fermat}.)} Verify on $T_3$ and $T_5$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part V --- Synthesis.}
+\begin{enumerate}[resume]
+  \item Compute explicitly the monic quadratic of minimal
+        sup-norm on $\intcc01$ and its deviation. (Question 17
+        with $n = 2$.)
+  \item Where exactly did the problem use: (i) the rigidity of
+        polynomials (\cref{cor:b1:poly:nroots}); (ii) the
+        trigonometry of \cref{ch:b1:complex} and
+        \cref{ch:b1:functions}; (iii) the arithmetic of binomial
+        coefficients from \cref{ch:b1:arith}? One sentence each.
+  \item Synthesis, in a short paragraph: the theorem says that
+        the flattest monic polynomial is the one that
+        \emph{equioscillates}, and the proof converts optimality
+        into root-counting. Comment on this mechanism, on the
+        role of the substitution $x = \cos\theta$ as a bridge
+        between algebra and trigonometry, and name the two
+        places where the problem needed analysis facts (IVT,
+        interior extremum) that later chapters prove.
+\end{enumerate}
+\end{problem}
