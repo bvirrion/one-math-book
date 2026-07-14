@@ -90,6 +90,7 @@
 \makeindex[intoc]
 \RequirePackage[colorlinks=true,linkcolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
 \RequirePackage[nameinlink,capitalize]{cleveref}
+\RequirePackage{etoolbox}
 
 \setlist[enumerate]{itemsep=1pt,topsep=3pt}
 \setlist[itemize]{itemsep=1pt,topsep=3pt}
@@ -390,11 +391,105 @@
 % Every solution is also a hyperlink target labelled sol:<key>, so that
 % exercises can link forward to their solutions (see \omsolutionlinks).
 % ----------------------------------------------------------------------------
+% Under \omlinkpadding (below) the sol: anchor is put after \noindent, i.e. into
+% the line of type rather than into the vertical list, which is the only place
+% hyperref can raise it from. A book with no padding keeps the anchor, and so
+% its appendix keeps the page breaks, exactly where they were.
+\newcommand{\om@solutionanchor}[1]{%
+  \ifdim\omlinkpad=\z@
+    \phantomsection\label{sol:#1}\noindent
+  \else
+    \noindent\phantomsection\label{sol:#1}%
+  \fi
+}
 \newenvironment{solution}[1]{%
-  \par\medskip\phantomsection\label{sol:#1}%
-  \noindent\textbf{\omsolutionof~\cref{#1}} (\ompage~\pageref{#1}).\par\nopagebreak\smallskip
+  \par\medskip\om@solutionanchor{#1}%
+  \textbf{\omsolutionof~\cref{#1}} (\ompage~\pageref{#1}).\par\nopagebreak\smallskip
   \noindent\ignorespaces
 }{\par\medskip}
+
+% ----------------------------------------------------------------------------
+% Defined terms: \omterm{def:...}{text} links a term used in the course, an
+% exercise, a problem or a solution back to the definition that introduces it.
+%
+% The wrapping is generated, not hand-written: a term earns a link only if it
+% is introduced as \emph{term}\index{...} inside a definition (the convention
+% in CONTRIBUTING.md), and it is linked at its first use in each chapter and
+% again inside each exercise, problem and solution -- enough for a reader who
+% lands mid-chapter, without turning every paragraph blue. Terms defined twice
+% (\emph{compact} as a space and as an operator) are deliberately not linked:
+% an automatic link would point at the wrong one half the time.
+% ----------------------------------------------------------------------------
+\newcommand{\omterm}[2]{\hyperref[#1]{#2}}
+
+% ----------------------------------------------------------------------------
+% Where a clicked link lands (opt-in per book)
+%
+% hyperref writes an XYZ destination at exactly the anchor's position and the
+% viewer puts that point at the top of the window, so following \omterm, \cref
+% or a "Solution p. N" pointer used to leave the definition box flush against
+% the top edge, with nothing above it. \omlinkpadding{<len>} raises the
+% destination of every statement (and of every solution) by <len>, so the
+% reader lands <len> above the target instead. A book that does not call it is
+% typeset, and its destinations placed, exactly as before.
+%
+% How the raise is applied: hyperref raises an anchor written in HORIZONTAL
+% mode (\Hy@raisedlink smashes it into a \raise'd box, which costs no space)
+% and lets a package add to that raise through \HyperRaiseLinkHook -- so an
+% anchor sitting in a line of type is free to move. In VERTICAL mode it raises
+% nothing, and there is no room to raise anything: a box put into the vertical
+% list to carry the anchor upwards is itself an item in that list, and it
+% breaks the \addvspace glue merging around it (measurably: the contents grew
+% by a page, and \@item's \addvspace stopped absorbing \parskip before every
+% statement).
+%
+% A theorem anchor is written in vertical mode -- \hyper@refstepcounter runs
+% inside amsthm's \trivlist. But amsthm boxes the theorem head immediately
+% afterwards (\sbox\@labels in \deferred@thm@head), in horizontal mode. So the
+% anchor is caught as it is written, held, and released inside that box: it
+% ends up in the head's line of type, where hyperref's own raise carries it up
+% by \HyperRaiseLinkDefault + \omlinkpad and the page does not move at all.
+% Chapter, section and contents anchors are left exactly where hyperref puts
+% them (a heading at the top of the window reads fine, and a raised anchor
+% before a heading's \addvspace risks landing on the previous page).
+% ----------------------------------------------------------------------------
+\newlength{\omlinkpad}
+\setlength{\omlinkpad}{0pt}
+\newcommand{\omlinkpadding}[1]{\setlength{\omlinkpad}{#1}}
+\renewcommand{\HyperRaiseLinkHook}{\addtolength{\HyperRaiseLinkLength}{\omlinkpad}}
+
+\newif\ifom@holdanchor
+\newcommand{\om@heldanchor}{}
+\newcommand{\om@holdanchor}{\ifdim\omlinkpad=\z@\else\om@holdanchortrue\fi}
+\newcommand{\om@flushanchor}{%
+  \ifdefempty{\om@heldanchor}{}{%
+    \Hy@raisedlink{\om@heldanchor}\gdef\om@heldanchor{}%
+  }%
+}
+\let\om@raisedlink\Hy@raisedlink
+\def\Hy@raisedlink#1{%
+  \ifom@holdanchor
+    \gdef\om@heldanchor{#1}%
+    \om@holdanchorfalse
+  \else
+    \om@raisedlink{#1}%
+  \fi
+}
+% Hold the anchor \refstepcounter writes from the moment a statement opens
+% (\@thm is cleveref's wrapper around amsthm's, so hook its front, not its
+% body) ...
+\pretocmd{\@thm}{\om@holdanchor}{}%
+  {\PackageWarning{onemath}{Cannot hold statement anchors: \string\@thm\space
+    not patchable, \string\omlinkpadding\space does nothing for statements}}
+% ... and release it into the head box a moment later. The \om@holdanchorfalse
+% is for the statement that writes no anchor at all (an unnumbered one): the
+% hold must not outlive it and swallow somebody else's anchor.
+\pretocmd{\deferred@thm@head}{\om@holdanchorfalse}{}%
+  {\PackageWarning{onemath}{Cannot disarm statement anchor hold}}
+\patchcmd{\deferred@thm@head}{\sbox\@labels{\normalfont#1}}%
+  {\sbox\@labels{\normalfont\om@flushanchor#1}}{}%
+  {\PackageWarning{onemath}{Cannot release statement anchors: \string
+    \deferred@thm@head\space not patchable}}
 
 % ----------------------------------------------------------------------------
 % Forward links exercise -> solution (opt-in per book)
@@ -404,7 +499,6 @@
 % sol:<key> target above, where <key> is the first \label written inside
 % the environment. Books that do not opt in are typeset unchanged.
 % ----------------------------------------------------------------------------
-\RequirePackage{etoolbox}
 \newif\ifomsollinks
 \newcommand{\omsolutionlinks}{\omsollinkstrue}
 \gdef\omsollink@key{}

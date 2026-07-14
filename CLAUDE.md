@@ -110,6 +110,30 @@ link target; a book that calls `\omsolutionlinks` in its entry file
 end of each exercise/problem. The pointer resolves to the first `\label`
 inside the environment, so keep the `exo:`/`pb:` label first.
 
+Branded running header: a book that calls `\ombrandheader` (all of them)
+gets the rosette + `ONE-COURSE.COM` (linking to the site) above the
+chapter mark and `\bookline` on even pages, the section mark on odd
+pages, and the page number at the foot. The chapter and section marks
+link to their own lines in the table of contents.
+
+Defined-term links (Book 5): `\omterm{def:...}{term}` links a term used
+in the course, an exercise, a problem or a solution back to its
+definition. **These are generated, not hand-written** — after adding
+chapters or definitions, regenerate:
+
+```sh
+git checkout parts/bachelor-3/   # drop the old wrapping
+python3 tools/link_defined_terms.py           # dry run
+python3 tools/link_defined_terms.py --apply
+```
+
+A term earns a link only if introduced as `\emph{term}\index{...}` in a
+`definition` (a bare `\emph` is ordinary emphasis — linking those made
+"countable" point at the σ-algebra definition). Terms defined twice
+(`compact` as a space and as an operator) and words whose sense changes
+by chapter (`basis`, `degree`, `Euclidean`, …) are deliberately skipped:
+an automatic link would point at the wrong definition.
+
 Content rules (from CONTRIBUTING.md, enforced in review):
 
 - 8–12 exercises per chapter, graded `[$\star$]` to `[$\star\star\star$]`,
