@@ -116,23 +116,56 @@ chapter mark and `\bookline` on even pages, the section mark on odd
 pages, and the page number at the foot. The chapter and section marks
 link to their own lines in the table of contents.
 
-Defined-term links (Book 5): `\omterm{def:...}{term}` links a term used
-in the course, an exercise, a problem or a solution back to its
-definition. **These are generated, not hand-written** — after adding
-chapters or definitions, regenerate:
+Link landing: every book raises each statement's and each solution's
+hyperlink destination by three lines (`\omlinkpad`, default
+`3\baselineskip`), so a clicked link lands just above its target instead
+of flush against the top of the window. `\omlinkpadding{<len>}` overrides
+the amount for one book; `\omlinkpadding{0pt}` restores hyperref's own
+placement. The raise only works on an anchor sitting in a line of type,
+so the statement anchor amsthm writes in vertical mode is caught and
+released inside the theorem head — see the comment in `styles/onemath.sty`
+before touching it.
+
+Defined-term links: `\omterm{def:...}{term}` links a term used in the
+course, an exercise, a problem or a solution back to its definition.
+**These are generated, not hand-written** — after adding chapters or
+definitions, regenerate the affected book:
 
 ```sh
-git checkout parts/bachelor-3/   # drop the old wrapping
-python3 tools/link_defined_terms.py           # dry run
-python3 tools/link_defined_terms.py --apply
+python3 tools/link_defined_terms.py --book 5                    # dry run
+python3 tools/link_defined_terms.py --book 5 --unwrap --apply   # drop old links
+python3 tools/link_defined_terms.py --book 5 --apply            # regenerate
+python3 tools/link_defined_terms.py --book 1 --lang fr --apply  # a translation
 ```
+
+Always `--unwrap` before regenerating: a plain re-run can only *add*
+links, so removing a term from a config looks like it worked (0 new
+links) while its stale links stay in the sources.
+
+- The **rules** live in `tools/termlink/` and are shared by every book.
+  Do not tune them for one book: `sh tools/check_book5_golden.sh`
+  regenerates Book 5 and fails unless the sources come back
+  byte-identical.
+- The **vocabulary** lives in `tools/term_config/book<N>_<lang>.py` —
+  `STOP` (words that are ordinary language here), `NO_CAPITAL` (linked
+  mid-sentence but not sentence-initially: "Circle the even numbers" is
+  an imperative), `EXTRA` (manual term → label, and it may point at any
+  label, not just a `def:` one), `EXTRA_PROTECT` (regexes for a fixed
+  phrase in which a defined word carries another sense — "for free",
+  "closed form", "il reste 7 cerises"), `AMBIG_POLICY` (`drop` for the
+  university books; `nearest-preceding` for the school books, whose
+  spiral curriculum re-defines a term each year).
+- `STOP` is **soft on purpose**: a stoplisted word is still linked inside
+  the chapter that defines it, which is what lets `compact` point at the
+  space in one chapter and at the operator in another. `DROP` is the hard
+  version — use it when a word must never be a link anywhere.
 
 A term earns a link only if introduced as `\emph{term}\index{...}` in a
 `definition` (a bare `\emph` is ordinary emphasis — linking those made
-"countable" point at the σ-algebra definition). Terms defined twice
-(`compact` as a space and as an operator) and words whose sense changes
-by chapter (`basis`, `degree`, `Euclidean`, …) are deliberately skipped:
-an automatic link would point at the wrong definition.
+"countable" point at the σ-algebra definition). Under `AMBIG_POLICY =
+drop`, terms defined twice (`compact` as a space and as an operator) and
+words whose sense changes by chapter (`basis`, `degree`, `Euclidean`, …)
+are skipped: an automatic link would point at the wrong definition.
 
 Content rules (from CONTRIBUTING.md, enforced in review):
 
