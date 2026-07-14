@@ -198,6 +198,129 @@
     at (#1,#2) {1};}
 
 % ----------------------------------------------------------------------------
+% Branded running header (opt-in: a book's entry file calls \ombrandheader
+% after loading this package; see one_math_book_5_university_year_3.tex).
+%
+% Even (left) pages carry the brand and the book title, on two lines:
+%
+%     .           (rosette) ONE-COURSE.COM            .
+%     116  Chapter 11. Sequences     Book 5: ... -- Year 3
+%     ----------------------------------------------------
+%
+% Odd (right) pages keep the plain navigation line (section mark + page
+% number): the brand travels with the chapter mark, and leaving the odd side
+% clear is what lets even the longest section titles print unclipped. Their
+% empty first header line keeps the rule level across a spread.
+%
+% The rosette is drawn once into a box, not on every page. The wordmark sits
+% two font steps below the running mark: all-caps bold sans reads optically
+% larger than the italic serif mark at equal size.
+% ----------------------------------------------------------------------------
+\newsavebox{\omHeadRosette}
+\AtBeginDocument{\savebox{\omHeadRosette}{%
+  \begin{tikzpicture}[baseline=-0.5ex]
+    \ocRosette{0}{0}{0.135}{3.1}%
+  \end{tikzpicture}}}
+% The brand mark links out to the site. \href would recolor it (hyperref's
+% urlcolor), so the ink is restated inside the link.
+\newcommand{\omSiteURL}{https://one-course.com}
+\newcommand{\omHeadBrand}{%
+  \href{\omSiteURL}{\textcolor{ocInk}{\usebox{\omHeadRosette}\hspace{0.3em}%
+    {\scriptsize\sffamily\bfseries\textls[40]{ONE-COURSE.COM}}}}}
+\newcommand{\omHeadBook}{{\small\bookline}}
+
+% The chapter mark links back to its own line in the table of contents; both
+% halves of the mechanism are armed by \ombrandheader, so books that do not
+% opt in keep the stock marks.
+%
+% Anchors: hyperref hands \contentsline the destination name of the entry it is
+% typesetting (#4, e.g. "chapter.11" or "appendix.A"). Wrapping it lets us drop
+% a target, "toc.<that name>", on the contents line itself. \Hy@raisedlink keeps
+% the anchor from displacing the line.
+%
+% Marks: \@currentHref holds the current chapter's destination name at
+% \chaptermark time, so the mark carries the anchor alongside the title
+% (\omTocMark{anchor}{title}), and the header builds the link at shipout -- on
+% whichever chapter owns the page.
+%
+% The header must NOT put the link inside \truncate: truncate typesets its
+% argument into a box to measure it, and a hyperlink opened inside a box that
+% is then discarded leaks pdfTeX's link stack ("TeX capacity exceeded [pdf link
+% stack size=10]"). So the mark is first split into anchor and title, the title
+% alone is truncated, and the finished box is wrapped in one link.
+\newcommand{\omTocMark}[2]{#2}          % plain text outside the header
+\newcommand{\om@anchor}{}
+\newcommand{\om@title}{}
+\newcommand{\om@splitmark}[1]{%
+  \begingroup
+    \def\omTocMark##1##2{\gdef\om@anchor{##1}\gdef\om@title{##2}}%
+    \gdef\om@anchor{}\gdef\om@title{}%
+    #1%
+  \endgroup}
+\newcommand{\om@tocbacklinks}{%
+  \AtBeginDocument{%
+    \let\om@orig@contentsline\contentsline
+    \renewcommand{\contentsline}[4]{%
+      \Hy@raisedlink{\hypertarget{toc.##4}{}}%
+      \om@orig@contentsline{##1}{##2}{##3}{##4}}%
+  }%
+  \renewcommand{\chaptermark}[1]{%
+    \markboth{\protect\omTocMark{\@currentHref}{%
+      \ifnum\c@secnumdepth>\m@ne\if@mainmatter
+        \@chapapp\ \thechapter. \ %
+      \fi\fi ##1}}{}}%
+  % Same for the section mark, which is what the odd pages show.
+  \renewcommand{\sectionmark}[1]{%
+    \markright{\protect\omTocMark{\@currentHref}{%
+      \ifnum\c@secnumdepth>\z@ \thesection. \ \fi ##1}}}%
+}
+\newcommand{\omHeadMark}[1]{{\small\itshape\nouppercase{#1}}}
+% On even pages the chapter mark shares its line with the book title, and some
+% chapter titles are long ("Product Measures, Fubini, Change of Variables"):
+% cap the mark at whatever width the book title leaves, ending it with an
+% ellipsis, so the two never touch.
+\RequirePackage{truncate}
+\newlength{\omHeadBookWd}
+\newcommand{\omHeadMarkCapped}[1]{%
+  \settowidth{\omHeadBookWd}{\omHeadBook}%
+  \truncate[\,\dots]{\dimexpr\headwidth-\omHeadBookWd-1.5em\relax}{%
+    \omHeadMark{#1}}}
+% Split the mark, truncate the title, wrap the result in the link to the
+% contents line (nothing linked inside the measured box -- see above).
+\newcommand{\omHeadChapMark}{%
+  \om@splitmark{\leftmark}%
+  \ifx\om@anchor\@empty
+    \omHeadMarkCapped{\om@title}%
+  \else
+    \hyperlink{toc.\om@anchor}{\textcolor{ocInk}{%
+      \omHeadMarkCapped{\om@title}}}%
+  \fi}
+% The section mark, shown on odd pages, links the same way. It has the line to
+% itself, so it needs no width cap.
+\newcommand{\omHeadSectMark}{%
+  \om@splitmark{\rightmark}%
+  \ifx\om@anchor\@empty
+    \omHeadMark{\om@title}%
+  \else
+    \hyperlink{toc.\om@anchor}{\textcolor{ocInk}{\omHeadMark{\om@title}}}%
+  \fi}
+\newcommand{\ombrandheader}{%
+  % The two-line head needs 40.3pt (fancyhdr's own figure); the body block is
+  % unchanged, so page counts do not move.
+  \geometry{headheight=41pt,headsep=12pt}%
+  \om@tocbacklinks
+  \fancyhead[LE]{\parbox[b]{\headwidth}{%
+    \hfill\omHeadBrand\hfill\null\\[2pt]
+    \omHeadChapMark\hfill\omHeadBook}}%
+  \fancyhead[RO]{\parbox[b]{\headwidth}{%
+    \strut\\[2pt]
+    \hfill\omHeadSectMark}}%
+  % Page number at the foot, centered -- which is also where the `plain' style
+  % puts it on chapter-opening pages, so every page of the book agrees.
+  \fancyfoot[C]{\thepage}%
+}
+
+% ----------------------------------------------------------------------------
 % Theorem environments
 %
 % amsthm owns numbering, labels and cleveref support; tcolorbox only

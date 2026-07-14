@@ -54,6 +54,29 @@ A slim horizontal bar split into four equal segments, one per quad color, in
 brand order. Used as a page-width rule under bands and as a short centered
 separator. LaTeX: `\ocQuadLine{x0}{x1}{y}{h}`.
 
+## The brand in running headers
+
+Opt-in per book: the entry file calls `\ombrandheader` (see
+`one_math_book_5_university_year_3.tex`; `styles/onemath.sty` holds the
+implementation). Even (left) pages then carry, above the usual navigation
+line, a centered rosette (R = 0.135 cm) followed by the `ONE-COURSE.COM`
+wordmark, with the book's `\bookline` opposite the chapter mark below it:
+
+```
+              (rosette) ONE-COURSE.COM
+116  Chapter 11. Product Measures, …   Book 5: University Mathematics -- Year 3
+------------------------------------------------------------------------------
+```
+
+Odd (right) pages stay plain (section mark + page number): the brand travels
+with the chapter mark, and keeping the odd side clear lets long section titles
+print unclipped. Two rules of thumb, both learned the hard way:
+
+- the wordmark is set two font steps below the running mark (`\scriptsize` vs
+  `\small`) — all-caps bold sans reads optically larger at equal point size;
+- anything sharing a header line with `\bookline` must be width-capped
+  (`\omHeadMarkCapped`), or a long chapter title will collide with it.
+
 ## Cover layout (chosen design, mockup 81)
 
 White A4 page, coordinates in cm from the bottom-left corner:
