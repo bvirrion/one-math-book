@@ -1,0 +1,925 @@
+\chapter{Équations différentielles ordinaires}\label{ch:b3:ode}
+
+L'année~2 a résolu les équations différentielles linéaires et
+énoncé le théorème de Cauchy--Lipschitz~; ce chapitre le
+démontre --- deux fois plutôt qu'une~: existence et unicité par
+le point fixe de Banach, structure globale par la théorie des
+\omterm{thm:b3:ode:maximal}{solutions maximales} et le théorème d'\omterm{thm:b3:ode:maximal}{échappement des
+compacts}. La théorie linéaire est ensuite reconstruite sur des
+fondations honnêtes (\omterm{thm:b3:ode:linearstructure}{résolvante}, \omterm{thm:b3:ode:linearstructure}{wronskien}, \omterm{thm:b3:ode:matrixexp}{exponentielle de
+matrice}, Duhamel), et la seconde moitié du chapitre ouvre la
+théorie \emph{qualitative} --- \omterm{ex:b3:ode:planeclassification}{flots}, équilibres, \omterm{thm:b3:ode:lyapunov}{fonctions de
+Lyapunov} et \omterm{thm:b3:ode:linearization}{stabilité par linéarisation}~: comment comprendre des
+solutions qu'on ne calculera jamais. Le pendule, dans le
+problème de week-end, en est l'étude de cas éternelle. Tout au
+long du chapitre, $U \subseteq \R\times\R^d$ est \omterm{def:b3:topology:topology}{ouvert} et
+$f \colon U \to \R^d$ est \omterm{def:b3:topology:continuity}{continue}~; une \emph{solution} de
+$x' = f(t, x)$ est une application $\mathcal C^1$
+$x \colon I \to \R^d$ ($I$ un intervalle) de graphe \omterm{def:b3:rings:content}{contenu}
+dans $U$ et vérifiant l'équation.
+
+\section{Cauchy--Lipschitz}
+
+\begin{definition}\label{def:b3:ode:lipschitz}
+$f$ est \emph{localement lipschitzienne en $x$}\index{localement lipschitzienne}
+si tout point de $U$ admet un \omterm{def:b3:topology:topology}{voisinage} $V$ et une constante
+$L$ tels que $\norm{f(t, x_1) - f(t, x_2)} \leq L\norm{x_1 -
+x_2}$ pour $(t, x_1), (t, x_2) \in V$. Si $f$ est $\mathcal
+C^1$ (ou simplement si $\partial_xf$ existe et est \omterm{def:b3:topology:continuity}{continue}),
+elle est localement lipschitzienne en $x$~: sur un \omterm{def:b3:topology:topology}{voisinage}
+convexe compact, l'inégalité des accroissements finis donne
+$L = \sup\vertiii{\partial_xf}$.
+\end{definition}
+
+\begin{theorem}[Cauchy--Lipschitz, version locale]
+\label{thm:b3:ode:cauchylipschitz}
+Soient $f$ \omterm{def:b3:topology:continuity}{continue} et \omterm{def:b3:ode:lipschitz}{localement lipschitzienne} en $x$, et
+$(t_0, x_0) \in U$. Il existe $T > 0$ tel que le problème de
+Cauchy
+\[
+x' = f(t, x), \qquad x(t_0) = x_0
+\]
+admet exactement une solution sur $[t_0 - T, t_0 +
+T]$.\index{théorème de Cauchy--Lipschitz}
+\end{theorem}
+
+\begin{proof}
+Choisissons $a, b > 0$ tels que $Q = [t_0 - a, t_0 + a]\times\bar
+B(x_0, b) \subseteq U$, sur lequel $\norm f \leq M$ et $f$ est
+$L$-lipschitzienne en $x$. Une fonction $\mathcal C^1$ est
+solution si et seulement si elle satisfait l'équation
+intégrale
+\[
+x(t) = x_0 + \int_{t_0}^{t}f\bigl(s, x(s)\bigr)\,\dd s
+\]
+(théorème fondamental de l'analyse, dans les deux sens). Soient
+$T = \min\bigl(a, \frac bM, \frac1{2L}\bigr)$,
+$I = [t_0 - T, t_0 + T]$, et
+\[
+\mathcal E = \{x \in \mathcal C(I, \R^d) : \norm{x(t) - x_0}
+\leq b\ \text{sur } I\},
+\]
+un fermé de l'espace de Banach $(\mathcal C(I, \R^d),
+\norm\cdot_\infty)$~: \omterm{def:b3:complete:complete}{complet}
+(\cref{def:b3:complete:complete}). Définissons
+$\Phi(x)(t) = x_0 + \int_{t_0}^tf(s, x(s))\dd s$~: pour
+$x \in \mathcal E$,
+$\norm{\Phi(x)(t) - x_0} \leq M\abs{t - t_0} \leq MT \leq b$
+--- $\Phi$ envoie $\mathcal E$ dans lui-même --- et pour
+$x, y \in \mathcal E$~:
+\[
+\norm{\Phi(x)(t) - \Phi(y)(t)} \leq \Bigl|\int_{t_0}^t
+L\,\norm{x(s) - y(s)}\,\dd s\Bigr| \leq LT\,\norm{x -
+y}_\infty \leq \tfrac12\norm{x - y}_\infty :
+\]
+une contraction. Le point fixe de Banach
+(\cref{thm:b3:complete:banach}) fournit un unique point fixe
+dans $\mathcal E$~: existence, et unicité parmi les solutions
+restant dans $\bar B(x_0, b)$ --- mais toute solution sur $I$
+y demeure ($\norm{x(t) - x_0} \leq M\abs{t - t_0} \leq b$ tant
+que le graphe reste dans $Q$, argument de continuité)~:
+unicité sur $I$.
+\end{proof}
+
+\begin{lemma}[Gronwall]\label{lem:b3:ode:gronwall}
+Soit $u \colon I \to \intco0\infty$ \omterm{def:b3:topology:continuity}{continue}, $t_0 \in I$, et
+supposons\index{lemme de Gronwall}
+\[
+u(t) \leq \alpha + \beta\,\Bigl|\int_{t_0}^{t}u(s)\,\dd
+s\Bigr| \qquad (t \in I)
+\]
+avec $\alpha \geq 0$, $\beta > 0$. Alors $u(t) \leq
+\alpha\,\eu^{\beta\abs{t - t_0}}$ sur $I$.
+\end{lemma}
+
+\begin{proof}
+Pour $t \geq t_0$~: posons $v(t) = \alpha +
+\beta\int_{t_0}^tu(s)\dd s$, de sorte que $u \leq v$,
+$v' = \beta u \leq \beta v$, et
+$(v\eu^{-\beta(t - t_0)})' \leq 0$~: $v(t) \leq
+v(t_0)\eu^{\beta(t-t_0)} = \alpha\eu^{\beta(t - t_0)}$. Pour
+$t \leq t_0$, on applique le même argument à
+$\tilde u(t) = u(2t_0 - t)$.
+\end{proof}
+
+\begin{corollary}[Unicité et dépendance continue]
+\label{cor:b3:ode:uniqueness}
+Sous les hypothèses du~\cref{thm:b3:ode:cauchylipschitz}, deux
+solutions de $x' = f(t,x)$ qui coïncident en un point
+coïncident sur leur intervalle commun de définition.
+Quantitativement, si $x, y$ sont deux solutions de graphes
+\omterm{def:b3:rings:content}{contenus} dans une région où $f$ est $L$-lipschitzienne en $x$,
+alors
+\[
+\norm{x(t) - y(t)} \leq \norm{x(t_0) -
+y(t_0)}\,\eu^{L\abs{t - t_0}} .
+\]
+\end{corollary}
+
+\begin{proof}
+L'estimée~: $u = \norm{x - y}$ vérifie $u(t) \leq u(t_0)
++ L\abs{\int_{t_0}^tu}$ (soustraction des équations
+intégrales)~; Gronwall. Unicité globale~: l'ensemble
+d'accord $\{t : x(t) = y(t)\}$ est fermé dans l'intervalle
+commun, non vide, et \omterm{def:b3:topology:topology}{ouvert} --- autour de tout point
+d'accord, on recouvre un morceau compact du graphe commun par
+un nombre fini de boîtes lipschitziennes et on applique
+l'estimée avec $u(t_1) = 0$ sur chacune~: localement
+$x \equiv y$. Une partie non vide, ouverte et fermée d'un
+intervalle est l'intervalle tout entier.
+\end{proof}
+
+\section{Solutions maximales}
+
+\begin{theorem}[Solutions maximales~; échappement des
+compacts]
+\label{thm:b3:ode:maximal}
+On suppose $f$ \omterm{def:b3:topology:continuity}{continue}, \omterm{def:b3:ode:lipschitz}{localement lipschitzienne} en $x$.
+\begin{enumerate}
+  \item Tout problème de Cauchy admet une unique solution
+        \emph{maximale} $x \colon \intoo{T_-}{T_+} \to \R^d$~:
+        toute autre solution passant par $(t_0, x_0)$ en est
+        la restriction. L'intervalle est \omterm{def:b3:topology:topology}{ouvert}.
+  \item (\emph{Échappement}) Pour tout compact
+        $K \subseteq U$ il existe $\varepsilon > 0$ tel que
+        $(t, x(t)) \notin K$ pour tout
+        $t \in \intoo{T_+ - \varepsilon}{T_+}$ (et
+        symétriquement en $T_-$)~: \emph{le graphe d'une
+        \omterm{thm:b3:ode:maximal}{solution maximale} finit par quitter tout sous-ensemble
+        compact de $U$}. En particulier, pour
+        $U = \R\times\R^d$ et $T_+ < +\infty$~:
+        $\norm{x(t)} \to +\infty$ quand $t \to T_+^-$
+        (\emph{explosion}).\index{solution maximale}\index{échappement
+        des compacts}\index{explosion}
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) Soit $\mathcal S$ l'ensemble de toutes les solutions
+passant par $(t_0, x_0)$~; d'après
+le~\cref{cor:b3:ode:uniqueness} deux d'entre elles coïncident
+sur l'intersection de leurs intervalles, donc se recollent~:
+sur $J = \bigcup_{y \in \mathcal S}I_y$, on définit
+$x(t) = y(t)$ pour tout $y$ défini en $t$~: solution bien
+définie, manifestement maximale et unique. $J$ est \omterm{def:b3:topology:topology}{ouvert}~: une
+solution définie en une extrémité pourrait être prolongée par
+le~\cref{thm:b3:ode:cauchylipschitz} en cette extrémité.
+
+(2) Supposons que l'affirmation échoue en $T_+$~: il existe
+$t_n \to T_+$ avec $(t_n, x(t_n)) \in K$~; cela force
+$T_+ < \infty$, sinon si $T_+ = \infty$ il n'y a rien à
+prouver ($K$ est borné en temps). On suppose donc
+$T_+ < \infty$. Compacité~: des constantes uniformes
+$M, L, a, b$ fonctionnent pour toutes les données de Cauchy
+dans un \omterm{def:b3:topology:topology}{voisinage} de $K$ --- concrètement, on recouvre $K$
+par un nombre fini de boîtes $Q_i$ comme dans la preuve du
+théorème local et on prend $T^* > 0$ minimum des temps
+d'existence correspondants~: toute donnée de Cauchy dans $K$
+lance une solution vivant au moins $T^*$ au-delà de son
+instant initial. Appliqué en $(t_n, x(t_n))$ avec
+$t_n > T_+ - T^*/2$, cela prolonge $x$ au-delà de $T_+$ (le
+prolongement coïncide avec $x$ par unicité, puis le
+prolonge)~: contradiction avec la maximalité. Donc le graphe
+quitte $K$ définitivement avant $T_+$. Pour
+$U = \R\times\R^d$~: si $\norm{x(t)}\not\to\infty$, une suite
+$t_n \to T_+$ maintient $(t_n, x(t_n))$ dans le compact
+$[t_0, T_+]\times\bar B(0, R)$~: exclu.
+\end{proof}
+
+\begin{corollary}[Existence globale sous croissance linéaire]
+\label{cor:b3:ode:globallinear}
+Si $U = I\times\R^d$ ($I$ intervalle \omterm{def:b3:topology:topology}{ouvert}) et
+$\norm{f(t, x)} \leq \alpha(t)\norm x + \beta(t)$ avec
+$\alpha, \beta$ \omterm{def:b3:topology:continuity}{continues}, alors toute \omterm{thm:b3:ode:maximal}{solution maximale} est
+définie sur tout $I$.
+\end{corollary}
+
+\begin{proof}
+Sur un compact $[t_0, T] \subseteq I$~:
+$\norm{x(t)} \leq \norm{x_0} + \int_{t_0}^t(\alpha\norm x +
+\beta)$, donc par Gronwall (avec $\alpha, \beta$ bornées par
+$A, B$ là) $\norm{x(t)} \leq (\norm{x_0} + B(T -
+t_0))\eu^{A(T - t_0)}$~: bornée. Si $T_+ < \sup I$, le graphe
+reste dans un compact de $I\times\R^d$ près de $T_+$~:
+contredit l'échappement (\cref{thm:b3:ode:maximal}).
+\end{proof}
+
+\section{Systèmes linéaires}
+
+Dans toute cette section $A \colon I \to M_d(\R)$ et
+$b \colon I \to \R^d$ sont \omterm{def:b3:topology:continuity}{continues}~; le système est
+$x' = A(t)x + b(t)$ --- croissance linéaire~: toutes les
+\omterm{thm:b3:ode:maximal}{solutions maximales} vivent sur tout $I$
+(\cref{cor:b3:ode:globallinear}).
+
+\begin{theorem}[Structure]\label{thm:b3:ode:linearstructure}
+Les solutions du système homogène $x' = A(t)x$ forment un
+espace vectoriel $S_H$ de dimension $d$~; pour chaque $t_0$,
+l'évaluation $x \mapsto x(t_0)$ est un isomorphisme
+$S_H \to \R^d$. La \emph{résolvante}\index{résolvante d'un
+système linéaire} $R(t, s) \in GL_d(\R)$, définie par~:
+$t \mapsto R(t, s)v$ est la solution de valeur $v$ en $s$,
+vérifie
+\[
+R(s,s) = I,\quad R(t, u)R(u, s) = R(t, s),\quad
+\partial_tR(t,s) = A(t)R(t,s),
+\]
+et le problème inhomogène est résolu par la \emph{formule de
+Duhamel}\index{formule de Duhamel}~:
+\[
+x(t) = R(t, t_0)\,x_0 + \int_{t_0}^{t}R(t, s)\,b(s)\,\dd s .
+\]
+Enfin le \emph{wronskien}\index{wronskien} $w(t) = \det
+R(t, s)$ obéit à la formule de Liouville $w' =
+\operatorname{tr}A(t)\,w$, donc $w(t) =
+\exp\bigl(\int_s^t\operatorname{tr}A\bigr) > 0$.
+\end{theorem}
+
+\begin{proof}
+La linéarité de l'équation fait des solutions un espace
+vectoriel~; l'évaluation est linéaire, injective (unicité~: une
+solution s'annulant en $t_0$ est $\equiv 0$) et surjective
+(existence)~: dimension $d$. Les propriétés de la \omterm{thm:b3:ode:linearstructure}{résolvante}
+rephrasent l'unicité (les deux côtés de chaque identité
+résolvent le même problème de Cauchy)~; l'inversibilité vient
+de $R(s,t)R(t,s) = I$. Duhamel~: on dérive la formule ---
+$x'(t) = A(t)R(t,t_0)x_0 + R(t,t)b(t) +
+\int_{t_0}^tA(t)R(t,s)b(s)\dd s = A(t)x(t) + b(t)$ (la
+dérivation sous le signe d'intégration est légitime~:
+l'intégrande est $\mathcal C^1$ en $t$ à dérivée \omterm{def:b3:topology:continuity}{continue} en
+$(t,s)$~; ou bien on vérifie via l'équation intégrale).
+Liouville~: $w(t + h) = \det\bigl(R(t+h, t)\bigr)w(t)$ et
+$R(t + h, t) = I + hA(t) + o(h)$ (par l'équation intégrale),
+donc $\det = 1 + h\operatorname{tr}A(t) + o(h)$
+(développement de $\det$ en $I$)~: $w'(t) =
+\operatorname{tr}A(t)\,w(t)$~; on intègre l'EDO scalaire
+linéaire.
+\end{proof}
+
+\begin{theorem}[Exponentielle de matrice]\label{thm:b3:ode:matrixexp}
+Pour $A \in M_d(\C)$, la série $\eu^{A} =
+\sum_{n\geq0}\frac{A^n}{n!}$ converge (absolument, dans toute
+norme sous-multiplicative), $\eu^{A+B} = \eu^A\eu^B$ dès que
+$AB = BA$, et $t \mapsto \eu^{tA}$ est la \omterm{thm:b3:ode:linearstructure}{résolvante} du
+système constant~: $R(t,s) = \eu^{(t-s)A}$~; elle est
+$\mathcal C^\infty$ avec $\frac{\dd}{\dd t}\eu^{tA} =
+A\eu^{tA}$. De plus~: si $\operatorname{Re}\lambda < -\alpha
+< 0$ pour toute valeur propre $\lambda$ de $A$, alors
+$\vertiii{\eu^{tA}} \leq C\eu^{-\alpha t}$ pour $t \geq
+0$.\index{exponentielle de matrice}
+\end{theorem}
+
+\begin{proof}
+Convergence~: $\vertiii{A^n/n!} \leq \vertiii A^n/n!$,
+sommable (\cref{exo:b3:complete:1}(b) dans l'algèbre de Banach
+$M_d$). Pour $A, B$ qui commutent~: le produit de Cauchy des
+deux séries absolument convergentes se réarrange, via le
+binôme de Newton (valable quand $AB = BA$), en
+$\sum_n\frac{(A+B)^n}{n!}$. Dérivabilité, directement~:
+$\frac{\eu^{(t+h)A} - \eu^{tA}}h = \eu^{tA}\frac{\eu^{hA} -
+I}{h} \to \eu^{tA}A$ car $\norm{\frac{\eu^{hA} - I}h - A}
+\leq \sum_{n\geq2}\frac{\abs h^{n-1}\vertiii A^n}{n!} =
+O(h)$. Donc $t \mapsto \eu^{(t - s)A}v$ résout le problème de
+Cauchy définissant $R(t,s)v$. Borne spectrale~: par la \omterm{thm:b3:modules:jordan}{forme
+de Jordan} (\cref{thm:b3:modules:jordan}), $A = P(D +
+N)P^{-1}$ avec $D$ diagonale portant les valeurs propres, $N$
+nilpotente, et $DN = ND$. Alors $\eu^{tA} =
+P\,\eu^{tD}\eu^{tN}P^{-1}$ avec $\vertiii{\eu^{tD}} \leq
+\eu^{-(\alpha + \delta)t}$ pour un certain $\delta > 0$
+($t \geq 0$) et $\eu^{tN}$ polynomiale en $t$
+(nilpotence)~: le produit est $\leq C\eu^{-\alpha t}$
+(polynôme battu par $\eu^{-\delta t}$).
+\end{proof}
+
+\begin{example}[Le plan, classifié]
+\label{ex:b3:ode:planeclassification}
+Pour $x' = Ax$ avec $A \in M_2(\R)$ inversible, le portrait
+de phase près de $0$ est décidé par $\tau =
+\operatorname{tr}A$ et $\delta = \det A$, via les valeurs
+propres $\lambda_\pm = \frac{\tau \pm \sqrt{\tau^2 -
+4\delta}}2$~:
+\begin{itemize}
+  \item $\delta < 0$~: valeurs propres réelles de signes
+        opposés --- un \emph{col}~; deux trajectoires
+        entrent, deux sortent, toutes les autres passent. Toujours
+        instable.
+  \item $\delta > 0$, $\tau^2 \geq 4\delta$~: valeurs propres
+        réelles de même signe ($= \operatorname{sign}\tau$)
+        --- un \emph{nœud}, \omterm{def:b3:ode:stability}{stable} ssi $\tau < 0$~; les
+        trajectoires sont tangentes à la direction propre
+        lente.
+  \item $\delta > 0$, $\tau^2 < 4\delta$, $\tau \neq 0$~:
+        valeurs propres complexes conjuguées $\frac\tau2 \pm
+        \iu\omega$ --- une \emph{spirale} (foyer), \omterm{def:b3:ode:stability}{stable} ssi
+        $\tau < 0$~; les solutions sont
+        $\eu^{\tau t/2}\times$ rotations de période
+        $\frac{2\pi}\omega$.
+  \item $\tau = 0$, $\delta > 0$~: valeurs propres purement
+        imaginaires --- un \emph{\omterm{ex:b3:groups:actions}{centre}}~: \omterm{def:b3:groups:action}{orbites} fermées
+        (ellipses), stabilité sans stabilité asymptotique,
+        exactement la frontière que
+        le~\cref{thm:b3:ode:linearization} ne peut trancher
+        pour les systèmes non linéaires (l'équilibre bas du
+        pendule, \cref{pb:b3:ode:1}, se situe ici).
+\end{itemize}
+La parabole frontière $\tau^2 = 4\delta$ porte les nœuds
+dégénérés (blocs de Jordan~: trajectoires à une seule
+direction tangente). Tout se lit sur deux nombres --- d'où le
+premier réflexe avant tout portrait de phase plan~: calculer
+$\operatorname{tr}$ et $\det$~; p.ex.\
+$A = \bigl(\begin{smallmatrix}0 & 1\\ -1 &
+-c\end{smallmatrix}\bigr)$ (oscillateur amorti)~: $\delta = 1 >
+0$, $\tau = -c$~: spirale \omterm{def:b3:ode:stability}{stable} pour $0 < c < 2$, nœud
+\omterm{def:b3:ode:stability}{stable} pour $c \geq 2$ --- sous-amortissement contre
+sur-amortissement, d'un coup d'œil.
+\end{example}
+
+\section{Flots, équilibres, stabilité}
+
+Considérons maintenant l'équation \emph{autonome}
+$x' = F(x)$, $F \colon \Omega \to \R^d$ \omterm{def:b3:ode:lipschitz}{localement
+lipschitzienne} sur l'\omterm{def:b3:topology:topology}{ouvert} $\Omega \subseteq \R^d$. On note
+$\varphi_t(x_0) = x(t)$ la \omterm{thm:b3:ode:maximal}{solution maximale} avec $x(0) =
+x_0$ (le \emph{flot}\index{flot d'un champ de vecteurs})~;
+l'autonomie donne la propriété de groupe $\varphi_{t+s} =
+\varphi_t\circ\varphi_s$ là où c'est défini (les deux côtés
+résolvent le même problème à l'instant $s$).
+
+\begin{definition}\label{def:b3:ode:stability}
+Un \emph{équilibre} est un point $\bar x$ tel que $F(\bar x)
+= 0$ (donc $\varphi_t(\bar x) = \bar x$). Il est
+\emph{stable}\index{stabilité (Lyapunov)} si pour tout
+$\varepsilon > 0$ il existe $\delta > 0$ tel que
+$\norm{x_0 - \bar x} < \delta$ implique que la solution
+existe pour tout $t \geq 0$ avec $\norm{\varphi_t(x_0) - \bar
+x} < \varepsilon$~; \emph{asymptotiquement stable} si de plus
+$\varphi_t(x_0) \to \bar x$ pour tout $x_0$ voisin de $\bar
+x$.
+\end{definition}
+
+\begin{theorem}[Fonctions de Lyapunov]\label{thm:b3:ode:lyapunov}
+Soit $\bar x$ un équilibre et $V \colon \mathcal V \to \R$
+une fonction $\mathcal C^1$ sur un \omterm{def:b3:topology:topology}{voisinage} de $\bar x$
+telle que~:\index{fonction de Lyapunov}
+\[
+V(\bar x) = 0,\qquad V(x) > 0 \text{ pour } x \neq \bar x,
+\qquad \dot V(x) = \nabla V(x)\cdot F(x) \leq 0 .
+\]
+Alors $\bar x$ est \omterm{def:b3:ode:stability}{stable}. Si de plus $\dot V < 0 $ hors de
+$\bar x$, alors $\bar x$ est asymptotiquement \omterm{def:b3:ode:stability}{stable}.
+\end{theorem}
+
+\begin{proof}
+Le long d'une solution, $\frac{\dd}{\dd t}V(x(t)) =
+\dot V(x(t)) \leq 0$~: $V$ décroît. Étant donné $\varepsilon$
+(assez petit pour que $\bar B(\bar x, \varepsilon) \subseteq
+\mathcal V$), soit $m = \min\{V(x) : \norm{x - \bar x} =
+\varepsilon\} > 0$ (compacité, positivité) et choisissons
+$\delta < \varepsilon$ avec $V < m$ sur $B(\bar x, \delta)$
+(continuité). Une solution partant de $B(\bar x, \delta)$ a
+$V(x(t)) < m$ pour tous les temps ultérieurs, donc ne peut
+jamais atteindre la sphère $\norm{x - \bar x} = \varepsilon$
+(où $V \geq m$)~: elle reste dans la boule --- et existe alors
+pour tout $t \geq 0$~: la solution demeure dans le compact
+$\bar B$, donc le~\cref{thm:b3:ode:maximal}(2)
+(\omterm{thm:b3:ode:maximal}{échappement des compacts}) force $T_+ = +\infty$. Stabilité.
+
+Cas asymptotique~: soit $x(t)$ partant de $B(\bar x,
+\delta)$~; $V(x(t))$ décroît vers un $c \geq 0$. Si $c > 0$~:
+la trajectoire reste dans $K = \{x \in \bar B(\bar x,
+\varepsilon): V(x) \geq c\}$, un compact qui exclut un
+\omterm{def:b3:topology:topology}{voisinage} de $\bar x$ ($V$ est \omterm{def:b3:topology:continuity}{continue} avec $V(\bar x) = 0 <
+c$). Sur $K$, la fonction $\dot V$ est \omterm{def:b3:topology:continuity}{continue}, strictement
+négative, d'où $\mu = \max_K\dot V < 0$ (compacité)~; alors
+$V(x(t)) \leq V(x(0)) + \mu t \to -\infty$~: absurde, $V \geq
+0$. Donc $c = 0$, et $x(t) \to \bar x$ (les points à distance
+$\geq \rho$ de $\bar x$ dans la boule ont $V \geq m_\rho >
+0$).
+\end{proof}
+
+\begin{theorem}[Stabilité par linéarisation]
+\label{thm:b3:ode:linearization}
+Soit $F$ de classe $\mathcal C^1$, $F(\bar x) = 0$, $A =
+DF(\bar x)$. Si toute valeur propre de $A$ vérifie
+$\operatorname{Re}\lambda < 0$, alors $\bar x$ est
+asymptotiquement \omterm{def:b3:ode:stability}{stable}.\index{stabilité par linéarisation}
+\end{theorem}
+
+\begin{proof}
+On translate $\bar x$ en $0$ et on écrit $F(x) = Ax + g(x)$
+avec $g(x) = o(\norm x)$ (différentiabilité $\mathcal C^1$).
+Choisissons $\alpha > 0$ avec $\vertiii{\eu^{tA}} \leq
+C\eu^{-\alpha t}$ ($t \geq 0$~;
+\cref{thm:b3:ode:matrixexp}) et $r > 0$ avec $\norm{g(x)}
+\leq \frac{\alpha}{2C}\norm x$ pour $\norm x \leq r$. Duhamel
+avec $b(s) = g(x(s))$~:
+\[
+x(t) = \eu^{tA}x_0 + \int_0^t\eu^{(t-s)A}g(x(s))\,\dd s,
+\]
+valable tant que $\norm{x(s)} \leq r$. Alors $u(t) =
+\eu^{\alpha t}\norm{x(t)}$ vérifie
+\[
+u(t) \leq C\norm{x_0} +
+\int_0^{t}C\,\frac{\alpha}{2C}\,u(s)\,\dd s ,
+\]
+donc Gronwall donne $u(t) \leq C\norm{x_0}\eu^{\alpha t/2}$,
+c'est-à-dire $\norm{x(t)} \leq C\norm{x_0}\eu^{-\alpha t/2}$.
+Si $\norm{x_0} < r/C$, la borne a priori maintient
+$\norm{x(t)} < r$ pour tout $t$ (argument de
+continuité/bootstrap~: l'ensemble des temps où $\norm x \leq
+r$ est \omterm{def:b3:topology:topology}{ouvert} et fermé dans $\intco0{T_+}$ compte tenu de
+l'estimée stricte), la solution est globale, et elle converge
+vers $0$ exponentiellement~: stabilité asymptotique.
+\end{proof}
+
+\begin{method}\label{met:b3:ode:strategy}
+Face à une EDO~: (1) existence/unicité --- vérifier le
+\omterm{def:b3:representations:character}{caractère} localement lipschitzien (souvent $\mathcal C^1$)~;
+(2) globalité --- croissance linéaire, bornitude, ou un
+compact invariant via une \omterm{thm:b3:ode:lyapunov}{fonction de Lyapunov} ou une
+intégrale première~; à défaut, soupçonner une explosion et
+tester sur la caricature scalaire $x' = x^2$~; (3) systèmes
+linéaires --- \omterm{thm:b3:ode:linearstructure}{résolvante}, Duhamel, et pour les coefficients
+constants la structure propre de $A$~; (4) questions
+qualitatives --- équilibres, linéariser, et chercher une
+\omterm{thm:b3:ode:lyapunov}{fonction de Lyapunov} (énergie, quand le système est
+mécanique) ou une intégrale première dont les niveaux
+piègent les trajectoires. Le problème de week-end déroule
+toute la méthode sur le pendule.
+\end{method}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=11cm, height=6cm,
+    xmin=-7.2, xmax=7.2, ymin=-2.9, ymax=2.9,
+    xtick={-6.2832, -3.1416, 0, 3.1416, 6.2832},
+    xticklabels={$-2\pi$, $-\pi$, $0$, $\pi$, $2\pi$},
+    ytick={-2,0,2}]
+  % oscillations: E<1 : y = +-sqrt(2(E+cos x)), E = -0.3, 0.5
+  \foreach \E in {-0.3, 0.5}{
+    \addplot[omDef, samples=200, domain=-7.2:7.2]
+      {sqrt(max(0, 2*(\E + cos(deg(x)))))};
+    \addplot[omDef, samples=200, domain=-7.2:7.2]
+      {-sqrt(max(0, 2*(\E + cos(deg(x)))))};
+  }
+  % separatrix E = 1
+  \addplot[omThm, thick, samples=300, domain=-7.2:7.2]
+    {sqrt(max(0, 2*(1 + cos(deg(x)))))};
+  \addplot[omThm, thick, samples=300, domain=-7.2:7.2]
+    {-sqrt(max(0, 2*(1 + cos(deg(x)))))};
+  % rotations E > 1
+  \foreach \E in {1.6, 2.4}{
+    \addplot[omProp, samples=200, domain=-7.2:7.2]
+      {sqrt(2*(\E + cos(deg(x))))};
+    \addplot[omProp, samples=200, domain=-7.2:7.2]
+      {-sqrt(2*(\E + cos(deg(x))))};
+  }
+\end{axis}
+\end{tikzpicture}
+
+{\small Portrait de phase du pendule $x'' = -\sin x$ dans le
+plan $(x, x')$~: courbes de niveau de l'énergie $E =
+\frac{x'^2}2 - \cos x$. Courbes fermées (bleu)~: oscillations,
+$E < 1$~; courbes courantes (orange)~: rotations complètes,
+$E > 1$~; entre elles la \emph{séparatrice} (rouge), $E = 1$,
+reliant les équilibres instables $(\pm\pi, 0)$. Le problème de
+week-end démontre tout ce que cette figure suggère.}
+\end{omfigure}
+
+\section{Exercices}
+
+\begin{exercise}[$\star$]\label{exo:b3:ode:1}
+Résoudre explicitement et déterminer l'intervalle \omterm{def:b3:rings:primemaximal}{maximal}~:
+(a) $x' = x^2$, $x(0) = 1$~; (b) $x' = 1 + x^2$, $x(0) = 0$~;
+(c) $x' = x(1-x)$, $x(0) = \frac12$. Réconcilier chaque
+réponse avec le~\cref{thm:b3:ode:maximal}(2) et
+le~\cref{cor:b3:ode:globallinear}.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b3:ode:2}
+Soient $x, y$ solutions de $x' = f(t,x)$ avec $f$
+globalement $L$-lipschitzienne en $x$ sur $\R\times\R^d$.
+(a) Montrer $\norm{x(t) - y(t)} \leq \norm{x(0) -
+y(0)}\eu^{L\abs t}$, et montrer par un exemple (linéaire~!)
+que le facteur $\eu^{L\abs t}$ est atteint.
+(b) En déduire que l'application de \omterm{ex:b3:ode:planeclassification}{flot} $x_0 \mapsto x(t;
+x_0)$ est \omterm{def:b3:topology:continuity}{continue}, en fait lipschitzienne sur les ensembles
+bornés.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:ode:3}
+Montrer que chacun des suivants a toutes ses \omterm{thm:b3:ode:maximal}{solutions
+maximales} globales sur $\R$, en citant le bon théorème~:
+(a) $x' = \sin(tx)$~;
+(b) $x' = \frac{t\,x}{1 + x^2}$~;
+(c) $x'' + q(t)x = 0$ avec $q$ \omterm{def:b3:topology:continuity}{continue} (convertir en un
+système du premier ordre)~;
+(d) $x' = A(t)x$ avec $A$ \omterm{def:b3:topology:continuity}{continue} et bornée --- et donner la
+borne de Gronwall sur $\norm{x(t)}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:ode:4}
+(a) Calculer $\eu^{tA}$ pour
+$A = \bigl(\begin{smallmatrix}0 & -1\\ 1 &
+0\end{smallmatrix}\bigr)$,
+$\bigl(\begin{smallmatrix}\lambda & 1\\ 0 &
+\lambda\end{smallmatrix}\bigr)$, et
+$\bigl(\begin{smallmatrix}0 & 1\\ 1 &
+0\end{smallmatrix}\bigr)$.
+(b) Résoudre l'oscillateur forcé $x'' + x = \cos(\omega t)$
+par Duhamel (forme système), pour $\omega \neq 1$ et $\omega
+= 1$~: la résonance apparaît comme le terme séculaire $t\sin
+t$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:ode:5}
+Pour l'équation scalaire $x'' + p(t)x' + q(t)x = 0$~:
+(a) Montrer que le \omterm{thm:b3:ode:linearstructure}{wronskien} $w = x_1x_2' - x_1'x_2$ de deux
+solutions vérifie $w' = -p\,w$ (Abel), et en déduire que deux
+solutions avec $w \neq 0$ quelque part forment une \omterm{def:b3:topology:basis}{base}.
+(b) Étant donnée une solution non nulle $x_1$, trouver la
+solution générale par \emph{réduction de l'ordre}~: poser
+$x_2 = x_1\int \frac{\eu^{-\int p}}{x_1^2}$ et vérifier.
+Appliquer à $t^2x'' - 2x = 0$ sur $\intoo0{+\infty}$ avec
+$x_1(t) = t^2$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:ode:6}
+(Logistique) Pour $x' = x(1 - x)$~: déterminer tous les
+équilibres et leur stabilité (par
+le~\cref{thm:b3:ode:linearization} et directement)~; montrer
+que toute solution avec $x(0) \in \intoo01$ est croissante,
+globale, de limites $0$ et $1$ en $\mp\infty$~; et résoudre
+explicitement pour confirmer. Montrer plus généralement que
+les solutions autonomes scalaires sont monotones, et
+conclure~: pas de solutions périodiques non constantes en
+dimension~$1$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:ode:7}
+(Intégrales premières) Soit $H \colon \Omega \to \R$ de
+classe $\mathcal C^1$ et considérons le système hamiltonien
+plan $x' = \partial_yH$, $y' = -\partial_xH$.
+(a) Montrer que $H$ est constante le long des solutions.
+(b) Pour $H = \frac{y^2}2 + \frac{x^4}4$~: montrer que toutes
+les solutions sont globales et bornées, et que l'origine est
+\omterm{def:b3:ode:stability}{stable} (Lyapunov~: $H$) bien que la linéarisation
+($\bigl(\begin{smallmatrix}0&1\\0&0\end{smallmatrix}\bigr)$)
+ne soit \emph{pas} asymptotiquement \omterm{def:b3:ode:stability}{stable}~: la linéarisation
+peut être non concluante.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:ode:8}
+(Pendule amorti) $x'' + cx' + \sin x = 0$, $c > 0$~; système~:
+$x' = y$, $y' = -\sin x - cy$.
+(a) Montrer que $V(x, y) = \frac{y^2}2 + 1 - \cos x$ vérifie
+$\dot V = -cy^2 \leq 0$~: l'origine est \omterm{def:b3:ode:stability}{stable}.
+(b) $\dot V$ s'annule sur tout l'axe $y = 0$~: le critère
+strict de Lyapunov échoue. Prouver quand même la stabilité
+asymptotique, par linéarisation
+(\cref{thm:b3:ode:linearization})~: calculer les valeurs
+propres de la matrice linéarisée en $(0,0)$ et vérifier
+$\operatorname{Re} < 0$ pour tout $c > 0$.
+(c) Que se passe-t-il à l'équilibre $(\pi, 0)$~? Calculer la
+linéarisation et conclure (une valeur propre positive~:
+instabilité --- on peut utiliser l'énoncé d'instabilité de
+façon informelle ou produire une solution s'échappant
+explicite du système linéaire).
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:ode:9}
+(Frontière d'unicité) Pour $\alpha \in \intoo01$, montrer que
+le problème $x' = \abs x^{\alpha}$, $x(0) = 0$ a une infinité
+de solutions (adapter \cref{pb:b3:complete:1}, Partie~III).
+Montrer au contraire que pour $\alpha = 1$ (c'est-à-dire
+$x' = \abs x$) la solution passant par $0$ est unique, et
+identifier précisément quelle hypothèse du
+\cref{thm:b3:ode:cauchylipschitz} distingue les deux cas.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:ode:10}
+(Les bornes a priori piègent les solutions) Soit $F \colon
+\R^d \to \R^d$ \omterm{def:b3:ode:lipschitz}{localement lipschitzienne} avec $\langle F(x),
+x\rangle \leq 0$ dès que $\norm x \geq R$.
+(a) Montrer que la boule fermée $\bar B(0, R)$ est
+positivement invariante~: les solutions partant de l'intérieur
+y restent pour $t \geq 0$. \emph{(Si $\norm{x(t_2)} > R$,
+considérer le dernier instant $t_1 < t_2$ avec
+$\norm{x(t_1)} = R$ et étudier $\frac{\dd}{\dd
+t}\norm{x(t)}^2$ sur $\intcc{t_1}{t_2}$.)}
+(b) En déduire l'existence globale vers l'avant pour les
+données dans la boule. Traiter ensuite le système de gradient
+$x' = -\nabla G(x)$, $G \in \mathcal C^2$ avec $G(x) \to
++\infty$ quand $\norm x \to \infty$~: montrer que $G$ décroît
+le long des solutions, que chaque solution reste dans le
+sous-niveau (borné) $\{G \leq G(x_0)\}$, et conclure
+l'existence globale vers l'avant.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:ode:11}
+(Explosion par comparaison) Considérer $x' = x^2 + t^2$,
+$x(0) = 1$.
+(a) Montrer que la \omterm{thm:b3:ode:maximal}{solution maximale} existe sur un certain
+$\intco0{T_+}$ avec $T_+ < \infty$~: comparer avec $y' =
+y^2$, $y(0) = 1$ \emph{(prouver le lemme de comparaison
+nécessaire~: si $x' \geq F(x)$ et $y' = F(y)$ avec $x(0)
+\geq y(0)$, alors $x \geq y$ là où les deux vivent)}, et en
+déduire $T_+ \leq 1$.
+(b) Borner $T_+$ par en bas~: sur $\intcc01$, $x' \leq x^2 +
+1$~; comparer avec la supersolution $z' = z^2 + 1$, $z(0) =
+1$, résolue par $z(t) = \tan\bigl(t + \frac\pi4\bigr)$, et
+conclure $T_+ \geq \frac\pi4$.
+(c) Assembler $\frac\pi4 \leq T_+ \leq 1$ et formuler la
+morale~: c'est la croissance superlinéaire du second membre
+qui tue l'existence globale (l'\cref{exo:b3:ode:3} en étant
+le contrepoint), la frontière étant la convergence de
+$\int^{\infty}\frac{\dd s}{F(s)}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:ode:12}
+(Théorème de comparaison de Sturm) Soient $q_1 \leq q_2$
+\omterm{def:b3:topology:continuity}{continues} sur un intervalle $I$, et $u \neq 0$ solution de
+$u'' + q_1u = 0$, $v \neq 0$ solution de $v'' + q_2v = 0$.
+(a) Établir l'identité du \omterm{thm:b3:ode:linearstructure}{wronskien}~: avec $W = uv' - u'v$,
+$W' = (q_1 - q_2)\,uv$.
+(b) (Sturm) Montrer qu'entre deux zéros consécutifs $a < b$
+de $u$, soit $v$ s'annule quelque part dans $\intoo ab$, soit
+$q_1 = q_2$ et $v \propto u$ là \emph{(supposer $u > 0$ sur
+$\intoo ab$ et $v > 0$ aussi~; intégrer (a) de $a$ à $b$ et
+inspecter les signes des termes de bord $W(a), W(b)$)}.
+(c) En déduire~: les solutions de $u'' + qu = 0$ avec $q \geq
+m > 0$ s'annulent au moins une fois dans tout intervalle de
+longueur $\pi/\sqrt m$ (comparer avec $v'' + mv = 0$)~; les
+solutions avec $q \leq 0$ s'annulent au plus une fois sur
+$\R$. Tester les deux sur $q \equiv \pm1$.
+\end{exercise}
+
+\section{Problème~: le pendule, complètement résolu}
+
+\begin{problem}[{Problème de week-end --- oscillations,
+rotations, séparatrice, et la période}]\label{pb:b3:ode:1}
+L'équation du pendule $x'' = -\sin x$ --- comme système~:
+$x' = y$, $y' = -\sin x$ sur $\R^2$ --- est la drosophile de
+la dynamique~: \omterm{def:b3:groups:simple}{simple} à écrire, impossible à résoudre par des
+formules élémentaires, et pourtant complètement compréhensible
+par la méthode qualitative. Soit $E(x, y) = \frac{y^2}2 -
+\cos x$ (l'\emph{énergie}).
+
+\medskip
+\noindent\textbf{Partie I --- Structure globale.}
+\begin{enumerate}
+  \item Montrer que toutes les \omterm{thm:b3:ode:maximal}{solutions maximales} sont
+        globales (définies sur $\R$)~: utiliser $\dot E = 0$
+        et le~\cref{thm:b3:ode:maximal}. Équilibres~:
+        $(k\pi, 0)$~; classifier leurs linéarisations (type
+        \omterm{ex:b3:groups:actions}{centre} pour $k$ pair, col pour $k$ impair).
+  \item Montrer que les trajectoires sont \omterm{def:b3:rings:content}{contenues} dans les
+        ensembles de niveau $\{E = E_0\}$, et les
+        esquisser/décrire selon la valeur de $E_0 \in
+        \intco{-1}{+\infty}$~: $E_0 = -1$ (équilibres), $-1 <
+        E_0 < 1$ (courbes fermées autour de $(2k\pi, 0)$),
+        $E_0 = 1$ (la séparatrice passant par $(\pm\pi,
+        0)$), $E_0 > 1$ (graphes au-dessus de $x$~:
+        rotations).
+  \item Prouver que l'équilibre bas $(0,0)$ est \omterm{def:b3:ode:stability}{stable} mais
+        \emph{pas} asymptotiquement \omterm{def:b3:ode:stability}{stable}. \emph{(Lyapunov
+        avec $V = E + 1$~; non asymptotique~: la conservation
+        de l'énergie piège les \omterm{def:b3:groups:action}{orbites} sur des courbes de
+        niveau éloignées de l'origine.)}
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie II --- Oscillations et leur
+période.}
+Fixons $-1 < E_0 < 1$ et écrivons $E_0 = -\cos a$ avec $a \in
+\intoo0\pi$ (l'amplitude).
+\begin{enumerate}[resume]
+  \item Montrer que la solution avec $x(0) = a$, $y(0) = 0$
+        oscille~: $x(t) \in \intcc{-a}a$, et l'\omterm{def:b3:groups:action}{orbite} est la
+        courbe fermée $y^2 = 2(\cos x - \cos a)$. Justifier
+        que la solution est périodique~: l'\omterm{def:b3:groups:action}{orbite} est une
+        courbe compacte sans équilibre, parcourue à vitesse
+        minorée --- en faire un argument (la solution revient
+        à son point initial en temps fini, puis l'unicité
+        force la périodicité).
+  \item Établir la formule de la période
+        \[
+        T(a) = 4\int_0^{a}\frac{\dd x}{\sqrt{2(\cos x -
+        \cos a)}}
+        \]
+        \emph{(sur un quart d'\omterm{def:b3:groups:action}{orbite}, $y = \frac{\dd x}{\dd t}
+        > 0$ et séparer les variables~; justifier la
+        convergence impropre en $x = a$)}.
+  \item (Petites oscillations) Substituer $\sin\frac x2 =
+        \sin\frac a2\,\sin\varphi$ et montrer
+        \[
+        T(a) = 4\int_0^{\pi/2}\frac{\dd\varphi}{\sqrt{1 -
+        k^2\sin^2\varphi}},
+        \qquad k = \sin\frac a2
+        \]
+        (une intégrale elliptique complète). En déduire par
+        convergence dominée que $T(a) \to 2\pi$ quand $a \to
+        0^+$~: la limite harmonique, indépendante de
+        l'amplitude --- l'isochronisme approximatif de
+        Galilée, avec sa correction exacte $T(a) =
+        2\pi\bigl(1 + \frac{k^2}4 + O(k^4)\bigr)$
+        (développer l'intégrande et intégrer terme à terme,
+        en justifiant par convergence normale).
+  \item Montrer que $T(a) \to +\infty$ quand $a \to \pi^-$
+        \emph{(minorer l'intégrande près de $\varphi =
+        \frac\pi2$ quand $k \to 1$, ou appliquer la
+        convergence monotone)}~: en approchant la
+        séparatrice, le pendule ralentit sans borne.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie III --- La séparatrice.}
+\begin{enumerate}[resume]
+  \item Pour $E_0 = 1$, $y = 2\cos\frac x2$ sur la branche
+        supérieure~: séparer les variables et intégrer pour
+        trouver la solution explicite
+        \[
+        x(t) = 4\arctan\bigl(\eu^{t}\bigr) - \pi
+        \]
+        (avec $x(0) = 0$, $y(0) = 2$). Vérifier directement
+        qu'elle résout l'équation du pendule, et calculer ses
+        limites et les limites de $y(t)$ quand $t \to
+        \pm\infty$.
+  \item Conclure~: l'\omterm{def:b3:groups:action}{orbite} séparatrice relie le col
+        $(-\pi, 0)$ (quand $t \to -\infty$) au col $(\pi,
+        0)$ (quand $t \to +\infty$) mais n'atteint ni l'un
+        ni l'autre en temps fini --- cohérent avec l'unicité
+        (pourquoi atteindre un col en temps fini
+        contredirait-il le~\cref{cor:b3:ode:uniqueness}~?).
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie IV --- Rotations, et le tableau
+\omterm{def:b3:complete:complete}{complet}.}
+\begin{enumerate}[resume]
+  \item Pour $E_0 > 1$~: montrer que $y$ ne s'annule jamais,
+        que $x$ est strictement monotone et globale avec
+        $x(t) \to \pm\infty$, et que $t \mapsto y(t)$ est
+        périodique de période
+        \[
+        \tau(E_0) = \int_{-\pi}^{\pi}
+        \frac{\dd x}{\sqrt{2(E_0 + \cos x)}} .
+        \]
+  \item Assembler le portrait de phase \omterm{def:b3:complete:complete}{complet} (la figure du
+        chapitre) avec justification pleine de chaque
+        trait, et écrire un résumé en dix lignes de la
+        méthode~: énergie, ensembles de niveau, compacité,
+        unicité --- comment chaque théorème du chapitre est
+        entré en jeu. Où a-t-on jamais eu besoin d'une
+        formule pour la solution générale~?
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie V --- La fonction période sous la
+loupe.}
+\begin{enumerate}[resume]
+  \item Prouver les moments de Wallis
+        \[
+        W_n = \int_0^{\pi/2}\sin^{2n}\varphi\,\dd\varphi
+        = \frac\pi2\cdot\frac{(2n)!}{4^n\,(n!)^2}
+        \]
+        par récurrence (intégration par parties), développer
+        l'intégrande de la question~6 par la série du binôme,
+        et justifier l'intégration terme à terme pour
+        obtenir la série complète
+        \[
+        T(a) = 2\pi\sum_{n\geq0}
+        \Bigl(\frac{(2n)!}{4^n(n!)^2}\Bigr)^{\!2}k^{2n}
+        = 2\pi\Bigl(1 + \frac{k^2}4 + \frac{9k^4}{64}
+        + O(k^6)\Bigr),
+        \qquad k = \sin\frac a2 .
+        \]
+  \item Passer à l'amplitude~:
+        \[
+        T(a) = 2\pi\Bigl(1 + \frac{a^2}{16} +
+        \frac{11\,a^4}{3072} + O(a^6)\Bigr)
+        \]
+        \emph{(substituer le développement de $\sin\frac a2$
+        et collecter)}. L'isochronisme échoue à l'ordre
+        $a^2$, et l'échec est maintenant quantifié jusqu'à
+        l'ordre $a^4$.
+  \item Montrer que $a \mapsto T(a)$ est \omterm{def:b3:topology:continuity}{continue} et
+        strictement croissante sur $\intoo0\pi$, et conclure
+        avec les questions~6--7 que $T$ est une bijection de
+        $\intoo0\pi$ sur $\intoo{2\pi}{+\infty}$~: toute
+        période supercritique est réalisée par exactement une
+        amplitude.
+  \item (Arithmétique d'horloger) Un pendule réglé à
+        amplitude nulle garde le temps \omterm{def:b3:rings:ideal}{idéal}~; montrer que
+        lancé à l'amplitude $a$ il retarde de la fraction
+        $\frac{a^2}{16} + O(a^4)$ du temps \omterm{def:b3:rings:ideal}{idéal}, et
+        calculer la dérive pour $a = 0.2$~rad~: environ $216$
+        secondes par jour. (Les joues cycloïdales de Huygens
+        et les petites amplitudes constantes des
+        échappements sont l'une et l'autre des réponses à ce
+        nombre.)
+  \item Revenir à la période de rotation $\tau$ de la
+        question~10~: montrer que $\tau$ est strictement
+        décroissante sur $\intoo1{+\infty}$, que
+        $\tau(E_0) \to +\infty$ quand $E_0 \to 1^+$
+        (convergence monotone), et que $\sqrt{2E_0}\,\tau(E_0)
+        \to 2\pi$ quand $E_0 \to +\infty$ (convergence
+        dominée)~: le tournoiement rapide est asymptotiquement
+        une rotation \omterm{def:b3:modules:free}{libre} à la vitesse angulaire
+        $\sqrt{2E_0}$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie VI --- La méthode exportée~:
+Lotka--Volterra.} La recette du pendule --- intégrale
+première, courbes de niveau compactes, unicité --- résout un
+écosystème. Fixons $\alpha, \beta, \gamma, \delta > 0$ et
+considérons, sur le quadrant \omterm{def:b3:topology:topology}{ouvert} $Q =
+\intoo0{+\infty}\times\intoo0{+\infty}$,
+\[
+x' = x\,(\alpha - \beta y), \qquad
+y' = y\,(\delta x - \gamma)
+\]
+($x$ proies, $y$ prédateurs).
+\begin{enumerate}[resume]
+  \item Montrer que $Q$ est invariant --- les axes sont des
+        unions d'\omterm{def:b3:groups:action}{orbites}, explicitement calculables, qu'aucune
+        solution ne peut croiser
+        (\cref{cor:b3:ode:uniqueness}) --- et que l'unique
+        équilibre dans $Q$ est $(x_*, y_*) =
+        \bigl(\frac\gamma\delta, \frac\alpha\beta\bigr)$.
+  \item Montrer que
+        \[
+        H(x, y) = \delta x - \gamma\ln x + \beta y -
+        \alpha\ln y
+        \]
+        est une intégrale première, que $H = f(x) + g(y)$
+        avec $f, g$ strictement convexes et propres sur
+        $\intoo0{+\infty}$ avec minima en $x_*$, $y_*$, et
+        en déduire que toutes les \omterm{thm:b3:ode:maximal}{solutions maximales} dans
+        $Q$ sont globales.
+  \item Montrer que pour $h > h_* = H(x_*, y_*)$ l'ensemble
+        de niveau $\{H = h\}\cap Q$ est une courbe fermée
+        autour de l'équilibre~: deux branches \omterm{def:b3:topology:continuity}{continues}
+        $y_\pm(x)$ sur un intervalle compact
+        $\intcc{x_-}{x_+} \ni x_*$, recollées aux
+        extrémités --- l'analogue des ovales du pendule.
+  \item Prouver que toute \omterm{def:b3:groups:action}{orbite} non d'équilibre dans $Q$
+        est périodique~: établir la circulation dans le sens
+        antihoraire à travers les quatre régions découpées
+        par les droites $x = x_*$ et $y = y_*$, borner le
+        temps de traversée de chaque arc par une intégrale à
+        singularité en racine carrée convergente (comme à la
+        question~5), et conclure par l'unicité (comme à la
+        question~4).
+  \item (Loi des moyennes de Volterra) Si $T$ est la période
+        d'une telle \omterm{def:b3:groups:action}{orbite}, montrer que
+        \[
+        \frac1T\int_0^Tx(t)\,\dd t = \frac\gamma\delta,
+        \qquad
+        \frac1T\int_0^Ty(t)\,\dd t = \frac\alpha\beta :
+        \]
+        les moyennes temporelles égalent les valeurs
+        d'équilibre, quelle que soit l'amplitude
+        \emph{(intégrer $(\ln x)' = \alpha - \beta y$ sur une
+        période)}.
+  \item (Le paradoxe de la pêche) Récolter les deux espèces
+        au taux $\varepsilon \in \intoo0\alpha$~: le système
+        garde sa forme avec $\alpha - \varepsilon$ et $\gamma
+        + \varepsilon$ à la place de $\alpha$ et $\gamma$.
+        Que deviennent les populations moyennes~? Expliquer
+        l'observation de d'Ancona (1914--1918)~: quand la
+        pêche adriatique diminua pendant la guerre, la
+        proportion de prédateurs (requins) dans les prises
+        \emph{augmenta} --- et pourquoi une pêche modérée
+        favorise les proies.
+  \item Écrire la morale en dix lignes~: quels théorèmes du
+        chapitre alimentent chaque étape, ce qui remplace
+        l'énergie du pendule, et pourquoi ni l'un ni l'autre
+        système n'a eu besoin --- ni n'admet --- d'une
+        solution élémentaire en forme fermée.
+
+  \item (Modulation de vitesse) Dans le régime de rotation
+        $E_0 > 1$, montrer que $y = x'$ oscille entre
+        $\sqrt{2(E_0 - 1)}$ (en $x \equiv \pi \bmod 2\pi$)
+        et $\sqrt{2(E_0 + 1)}$ (en $x \equiv 0$), que la
+        moyenne temporelle de $y$ sur une période vaut
+        exactement $\frac{2\pi}{\tau(E_0)}$, et que le
+        rapport de modulation
+        $\sqrt{\frac{E_0 + 1}{E_0 - 1}} \to 1$ quand $E_0
+        \to \infty$~: la rotation rapide est
+        asymptotiquement uniforme.
+  \item (Monotonie de la période de rotation) Montrer que
+        $\tau(E_0)$ est $\mathcal C^1$ et strictement
+        décroissante sur $\intoo1{+\infty}$
+        \emph{(dériver sous le signe d'intégration, avec
+        domination sur tout $\intco{1 + \delta}\infty$)},
+        avec $\tau \to \infty$ quand $E_0 \to 1^+$ et $\tau
+        \to 0$ quand $E_0 \to \infty$. Assembler le tableau
+        de bifurcation \omterm{def:b3:complete:complete}{complet} du pendule le long de l'axe
+        d'énergie~: équilibres en $E_0 = -1$, librations de
+        période croissante de $2\pi$ à $\infty$ sur $-1 <
+        E_0 < 1$, la séparatrice en $E_0 = 1$, et rotations
+        de période décroissante de $\infty$ à $0$ au-delà.
+\end{enumerate}
+\end{problem}

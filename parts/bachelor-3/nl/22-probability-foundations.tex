@@ -1,0 +1,957 @@
+\chapter{Kansrekening: grondslagen en de wet van de grote
+aantallen}\label{ch:b3:probability}
+
+Jaar~2 bouwde kansrekening op aftelbare ruimten; de
+maattheorie verwijdert nu elke restrictie. Een
+\omterm{def:b3:probability:space}{waarschijnlijkheidsruimte} is een maatruimte van totale
+massa~$1$, \omterm{def:b3:probability:space}{stochastische variabelen} zijn meetbare
+afbeeldingen, \omterm{def:b3:probability:space}{verwachting} is de Lebesgue-integraal --- en
+onmiddellijk past het hele analytische arsenaal
+(\cref{ch:b3:measure,ch:b3:lebesgue,ch:b3:product}) toe op
+toeval. Dit hoofdstuk installeert het woordenboek, construeert
+oneindige rijen van onafhankelijke \omterm{def:b3:probability:space}{stochastische variabelen}
+(op $\intcc01$, uit binaire cijfers: toeval verbergt zich in
+de \omterm{def:b3:measure:lebesgueouter}{Lebesgue-maat}), bewijst de lemma's van Borel--Cantelli en
+de \omterm{thm:b3:probability:zeroone}{nul--één-wet} van Kolmogorov, ordent de
+convergentiewijzen, en bewijst de \omterm{def:b3:probability:space}{wet} van de grote aantallen
+--- de stelling die frequenties naar kansen laat convergeren
+en statistiek mogelijk maakt. Het weekendprobleem geeft het
+bewijs van Etemadi van de sterke \omterm{def:b3:probability:space}{wet} in haar definitieve
+$L^1$-vorm.
+
+\section{Het woordenboek}
+
+\begin{definition}\label{def:b3:probability:space}
+Een \emph{waarschijnlijkheidsruimte}\index{waarschijnlijkheidsruimte}
+is een maatruimte $(\Omega, \mathcal A, \P)$ met
+$\P(\Omega) = 1$; elementen van $\mathcal A$ zijn
+\emph{gebeurtenissen}, en een eigenschap geldt \emph{bijna
+zeker} (b.z.) als haar gebeurtenis kans $1$ heeft. Een
+\emph{stochastische variabele}\index{stochastische variabele}
+is een meetbare afbeelding $X \colon \Omega \to \R$ (of
+$\R^d$: een stochastische vector); haar \emph{wet}\index{wet
+van een stochastische variabele} is de
+pushforward-waarschijnlijkheidsmaat $\P_X = X_*\P$ op $\R$
+(\cref{exo:b3:product:9}), bepaald door de
+\emph{verdelingsfunctie} $F_X(t) = \P(X \leq t)$
+(\cref{exo:b3:measure:3}). $X$ heeft \emph{\omterm{ex:b3:lebesgue:gamma}{dichtheid}} $f$
+als $\P_X = f\,\dd\lambda$; zij is \emph{discreet} als
+$\P_X$ een aftelbare combinatie van Dirac-massa's is. De
+\emph{verwachting}\index{verwachting} is
+\[
+\E[X] = \int_\Omega X\,\dd\P
+\qquad (X \geq 0 \text{ of } X \in L^1(\P)),
+\]
+en de \emph{overdrachtsstelling} (\cref{exo:b3:product:9})
+berekent haar in de wet: $\E[g(X)] = \int_\R g\,\dd\P_X$ ---
+$= \sum g(x_k)p_k$ in het discrete geval, $= \int
+g(x)f(x)\dd x$ in het dichtheidsgeval: de formules van
+Jaar~2, nu stellingen van één theorie. De \emph{variantie}
+is $\V(X) = \E[(X - \E X)^2] = \E[X^2] - (\E X)^2$ voor $X
+\in L^2$.
+\end{definition}
+
+\begin{example}\label{ex:b3:probability:laws}
+De standaardwetten en hun noemenswaardige transformaties:
+Bernoulli $\mathcal B(p)$, binomiaal $\mathcal B(n, p)$,
+geometrisch, Poisson $\mathcal P(\lambda)$ (discreet: de
+tabellen van Jaar~2 blijven geldig); uniform op $\intcc01$
+(de \omterm{def:b3:measure:lebesgueouter}{Lebesgue-maat} zelf); exponentieel $\mathcal E(\lambda)$
+(\omterm{ex:b3:lebesgue:gamma}{dichtheid} $\lambda\eu^{-\lambda x}\mathbf 1_{x>0}$); de
+\emph{Gaussische}\index{Gaussische wet} $\mathcal N(m,
+\sigma^2)$ met \omterm{ex:b3:lebesgue:gamma}{dichtheid}
+$\frac1{\sigma\sqrt{2\pi}}\exp\bigl(-\frac{(x -
+m)^2}{2\sigma^2}\bigr)$ --- een kansdichtheid door
+\cref{pb:b3:lebesgue:1}, met gemiddelde $m$ en variantie
+$\sigma^2$ (Gaussische momenten,
+\cref{exo:b3:product:10}).
+\end{example}
+
+\begin{proposition}[Markov en Chebyshev]
+\label{prop:b3:probability:markov}
+Voor $X \geq 0$ en $a > 0$: $\P(X \geq a) \leq \frac{\E
+X}{a}$; voor $X \in L^2$: $\P\bigl(\abs{X - \E X} \geq
+a\bigr) \leq \frac{\V(X)}{a^2}$.\index{ongelijkheid van
+Markov}\index{ongelijkheid van Chebyshev}
+\end{proposition}
+
+\begin{proof}
+\cref{exo:b3:lebesgue:5}(a); Chebyshev is Markov toegepast op
+$(X - \E X)^2$.
+\end{proof}
+
+\section{Onafhankelijkheid}
+
+\begin{definition}\label{def:b3:probability:independence}
+Sub-$\sigma$-algebra's $\mathcal A_1, \dots, \mathcal A_n
+\subseteq \mathcal A$ zijn \emph{onafhankelijk}\index{onafhankelijkheid}
+als $\P(A_1 \cap \dots \cap A_n) = \P(A_1)\cdots\P(A_n)$
+voor alle $A_i \in \mathcal A_i$; een familie is
+onafhankelijk als elke eindige deelverzameling dat is.
+\omterm{def:b3:probability:space}{Stochastische variabelen} $X_1, \dots, X_n$ zijn onafhankelijk
+als de $\sigma$-algebra's $\sigma(X_i)$ dat zijn; equivalent,
+$\P(X_1 \in B_1, \dots, X_n \in B_n) = \prod_i\P(X_i \in
+B_i)$ voor Borel $B_i$, of (wanneer wetten dichtheden of
+massa's hebben) de gezamenlijke \omterm{def:b3:probability:space}{wet} is het product van de
+randwetten.
+\end{definition}
+
+\begin{theorem}\label{thm:b3:probability:independence}
+$X_1, \dots, X_n$ zijn \omterm{def:b3:probability:independence}{onafhankelijk} dan en slechts dan als
+de \omterm{def:b3:probability:space}{wet} van de vector $(X_1, \dots, X_n)$ de \omterm{thm:b3:product:existence}{productmaat}
+$\P_{X_1}\otimes\cdots\otimes\P_{X_n}$ is. In dat geval,
+voor $g_i \geq 0$ (of zodat de producten \omterm{def:b3:lebesgue:l1}{integreerbaar}
+zijn):
+\[
+\E\Bigl[\prod_ig_i(X_i)\Bigr] = \prod_i\E[g_i(X_i)],
+\]
+in het bijzonder $\E[XY] = \E X\,\E Y$ en $\V(X_1 + \dots +
+X_n) = \sum\V(X_i)$ voor onafhankelijke $L^2$-variabelen.
+\end{theorem}
+
+\begin{proof}
+Als de $X_i$ \omterm{def:b3:probability:independence}{onafhankelijk} zijn, komen de twee
+waarschijnlijkheidsmaten $\P_{(X_1,\dots,X_n)}$ en
+$\bigotimes\P_{X_i}$ overeen op alle producten $B_1\times
+\dots\times B_n$ van Borelverzamelingen --- een $\pi$-systeem
+dat $\mathcal B(\R^n)$ voortbrengt
+(\cref{prop:b3:product:sections}(b)) --- dus overal
+(\cref{thm:b3:measure:uniqueness}). Omgekeerd factoriseert
+een productwet alle gebeurtenissen
+$\bigcap_iX_i^{-1}(B_i)$: \omterm{def:b3:probability:independence}{onafhankelijkheid}. De
+verwachtingsformule is dan Tonelli/Fubini
+(\cref{thm:b3:product:tonelli}) via de overdrachtsstelling;
+$\E[XY] = \E X\E Y$ is het geval $g_i = \mathrm{id}$, en
+het kwadraat ontwikkelen geeft de additiviteit van
+varianties (kruistermen $\E[(X_i - \E X_i)(X_j - \E X_j)]
+= 0$).
+\end{proof}
+
+\begin{theorem}[Bestaan van onafhankelijke rijen]
+\label{thm:b3:probability:existence}
+Op $\bigl(\intcc01, \mathcal L, \lambda\bigr)$ bestaat een
+rij $(U_n)_{n\geq1}$ van onafhankelijke \omterm{def:b3:probability:space}{stochastische
+variabelen}, elk uniform op $\intcc01$. Bijgevolg bestaan,
+voor willekeurige voorgeschreven wetten $(\mu_n)$ op $\R$,
+onafhankelijke $(X_n)$ met $\P_{X_n} = \mu_n$.\index{onafhankelijke
+rijen, bestaan}
+\end{theorem}
+
+\begin{proof}
+\emph{Cijfers.} Voor $\omega \in \intcc01$, zij
+$(b_k(\omega))$ haar binaire cijfers ($\omega = \sum
+b_k2^{-k}$; kies de ontwikkeling die niet in louter $1$'s
+eindigt --- ambigüiteit betreft alleen een aftelbare, dus
+nul, verzameling). Elk $b_k$ is een \omterm{def:b3:probability:space}{stochastische variabele}
+($\{b_k = 1\}$ is een eindige unie van dyadische intervallen)
+en de vector $(b_1, \dots, b_m)$ neemt elke waarde in
+$\{0,1\}^m$ op een dyadisch interval van lengte $2^{-m}$: de
+$b_k$ zijn onafhankelijke Bernoulli$(\frac12)$.
+
+\emph{Herordenen.} Splits $\N^*$ in oneindig veel disjuncte
+oneindige verzamelingen $(I_n)$ (b.v.\ via priemmachten, of
+diagonalen); laat $(k^n_j)_j$ $I_n$ opsommen en stel
+\[
+U_n = \sum_{j\geq1} b_{k^n_j}\,2^{-j} .
+\]
+Elke $U_n$ is uniform: haar binaire cijfers zijn
+onafhankelijke fair bits, dus $\P(U_n \in [l2^{-m},
+(l+1)2^{-m})) = 2^{-m}$ voor elk dyadisch interval, en
+dyadische intervallen bepalen de \omterm{def:b3:probability:space}{wet}
+(\cref{thm:b3:measure:uniqueness}). De $U_n$ zijn
+\omterm{def:b3:probability:independence}{onafhankelijk}: zij zijn functies van disjuncte blokken van
+de onafhankelijke familie $(b_k)$ --- formeel, gebeurtenissen
+$\{U_n \in D_n\}$ voor dyadische $D_n$ hangen af van eindig
+veel cijfers uit disjuncte verzamelingen, en factoriseren;
+het $\pi$-systeem-argument tilt op naar alle
+Borelverzamelingen.
+
+\emph{Willekeurige wetten.} Zij $G_n(u) = \inf\{t :
+F_{\mu_n}(t) \geq u\}$ (de \emph{kwantielfunctie} van de
+verdelingsfunctie $F_{\mu_n}$); de sleutel-equivalentie
+$G_n(u) \leq t \iff u \leq F_{\mu_n}(t)$
+(rechtscontinuïteit van $F$, monotonie) toont dat $X_n =
+G_n(U_n)$ \omterm{def:b3:lebesgue:measurable}{meetbaar} is met $\P(X_n \leq t) = \P(U_n \leq
+F_{\mu_n}(t)) = F_{\mu_n}(t)$: \omterm{def:b3:probability:space}{wet} $\mu_n$;
+\omterm{def:b3:probability:independence}{onafhankelijkheid} wordt geërfd (functies van
+onafhankelijke variabelen,
+\cref{exo:b3:probability:3}).
+\end{proof}
+
+\begin{example}[Het verjaardagsprobleem, eerlijk]
+\label{ex:b3:probability:birthday}
+Onder $n$ personen met onafhankelijke, uniforme
+verjaardagen over $N = 365$ dagen is de kans dat alle
+verjaardagen verschillen
+\[
+p_n = \prod_{k=1}^{n-1}\Bigl(1 - \frac kN\Bigr),
+\]
+door geïtereerde conditionering (of rechtstreeks: de
+gunstige $N(N-1)\cdots(N - n + 1)$ over het totaal $N^n$,
+een telargument dat de productformule van \omterm{def:b3:probability:independence}{onafhankelijkheid}
+rigoureus maakt). Logaritmen nemen en $-\ln(1 - x) = x +
+O(x^2)$ gebruiken:
+\[
+\ln p_n = -\frac{n(n-1)}{2N} +
+O\Bigl(\frac{n^3}{N^2}\Bigr),
+\qquad\text{dus}\qquad
+p_n \approx \eu^{-n^2/2N} .
+\]
+Het kantelpunt $p_n = \frac12$ zit bij $n \approx
+\sqrt{2N\ln2} \approx 1{,}18\sqrt N$: voor $N = 365$, $n =
+23$ ($p_{23} = 0{,}4927$). Twee moraal. Ten eerste
+verschijnen botsingen onder $n$ items in $N$ dozen op de
+schaal $n \sim \sqrt N$, niet $n \sim N$ --- de
+\emph{verjaardags-schaling} die hashbotsingen en de
+$\sqrt N$-kost van verjaardagsaanvallen in cryptografie
+regeert. Ten tweede is de berekening een sjabloon: de
+$\binom n2$ paar-botsingsgebeurtenissen zijn niet
+\omterm{def:b3:probability:independence}{onafhankelijk}, maar het antwoord gedraagt zich alsof zij
+dat wel waren ($\eu^{-\binom n2/N}$ is precies de
+onafhankelijke-paren-heuristiek) --- een eerste instantie
+van de Poisson-benadering, rigoureus gemaakt in het
+weekendprobleem van \cref{ch:b3:clt} (ongelijkheid van Le
+Cam).
+\end{example}
+
+\section{Borel--Cantelli en de nul--één-wet}
+
+\begin{theorem}[Borel--Cantelli]
+\label{thm:b3:probability:borelcantelli}
+Zij $(A_n)$ gebeurtenissen en $\limsup A_n = \bigcap_N
+\bigcup_{n\geq N}A_n$ (``$A_n$ treedt oneindig vaak
+op'').\index{lemma's van Borel--Cantelli}
+\begin{enumerate}
+  \item Als $\sum\P(A_n) < \infty$, dan $\P(\limsup A_n) =
+        0$.
+  \item Als $\sum\P(A_n) = \infty$ \emph{en de $A_n$
+        \omterm{def:b3:probability:independence}{onafhankelijk} zijn}, dan $\P(\limsup A_n) = 1$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) is \cref{exo:b3:measure:4}. (2): voor $N \leq M$ geeft
+\omterm{def:b3:probability:independence}{onafhankelijkheid} van complementen
+(\cref{exo:b3:probability:3})
+\[
+\P\Bigl(\bigcap_{n=N}^{M}A_n^c\Bigr) = \prod_{n=N}^M\bigl(1
+- \P(A_n)\bigr) \leq
+\exp\Bigl(-\sum_{n=N}^M\P(A_n)\Bigr) \xrightarrow[M \to
+\infty]{} 0
+\]
+($1 - x \leq \eu^{-x}$; de reeks divergeert). Dus
+$\P\bigl(\bigcup_{n\geq N}A_n\bigr) = 1$ voor elke $N$, en
+de dalende doorsnede over $N$ heeft nog kans $1$
+(continuïteit van boven,
+\cref{prop:b3:measure:basics}).
+\end{proof}
+
+\begin{theorem}[Nul--één-wet van Kolmogorov]
+\label{thm:b3:probability:zeroone}
+Zij $(X_n)$ \omterm{def:b3:probability:independence}{onafhankelijk} en $\mathcal T =
+\bigcap_N\sigma(X_N, X_{N+1}, \dots)$ de
+\emph{staart-$\sigma$-algebra}\index{staart-$\sigma$-algebra}
+(gebeurtenissen ongevoelig voor enig eindig aantal van de
+$X_n$: convergentie van $\sum X_n$, van $\frac{S_n}n$,
+waarden van $\limsup$'s, \dots). Dan heeft elke $T \in
+\mathcal T$ $\P(T) \in \{0, 1\}$.\index{nul--één-wet}
+\end{theorem}
+
+\begin{proof}
+Fixeer $N$. De $\sigma$-algebra's $\sigma(X_1, \dots, X_N)$
+en $\sigma(X_{N+1}, \dots)$ zijn \omterm{def:b3:probability:independence}{onafhankelijk}:
+gebeurtenissen die van disjuncte blokken afhangen
+factoriseren op de voortbrengende $\pi$-systemen (cilinders
+$\bigcap_{i\leq N}\{X_i \in B_i\}$, resp.\ eindige
+voorwaarden op latere variabelen), en Dynkin
+(\cref{thm:b3:measure:dynkin}, tweemaal toegepast, één kant
+per keer) breidt de factorisatie uit. Een
+staartgebeurtenis $T$ ligt in $\sigma(X_{N+1}, \dots)$ voor
+elke $N$: $T$ is \omterm{def:b3:probability:independence}{onafhankelijk} van elke $\sigma(X_1, \dots,
+X_N)$, dus van de $\sigma$-algebra die zij voortbrengen,
+$\sigma(X_1, X_2, \dots)$ (Dynkin nogmaals: de unie van de
+$\sigma(X_1,\dots,X_N)$ is een $\pi$-systeem dat haar
+voortbrengt). Maar $T \in \sigma(X_1, X_2, \dots)$ ook: $T$
+is \omterm{def:b3:probability:independence}{onafhankelijk} \emph{van zichzelf}, $\P(T) = \P(T\cap T)
+= \P(T)^2$: $\P(T) \in \{0, 1\}$.
+\end{proof}
+
+\section{Convergentiewijzen}
+
+\begin{definition}\label{def:b3:probability:modes}
+$X_n \to X$ \emph{bijna zeker} als $\P(X_n \to X) = 1$;
+\emph{in kans} als $\P(\abs{X_n - X} \geq \varepsilon)
+\to 0$ voor elke $\varepsilon > 0$; \emph{in $L^p$} als
+$\E\abs{X_n - X}^p \to 0$.\index{convergentie van
+stochastische variabelen}
+\end{definition}
+
+\begin{proposition}\label{prop:b3:probability:modes}
+(a) b.z.-convergentie impliceert convergentie in kans;
+(b) $L^p$-convergentie impliceert convergentie in kans;
+(c) convergentie in kans impliceert b.z.-convergentie
+\emph{langs een deelrij};
+(d) geen andere implicatie geldt in het algemeen.
+\end{proposition}
+
+\begin{proof}
+(a) $\P(\abs{X_n - X} \geq \varepsilon) \leq
+\P\bigl(\sup_{m\geq n}\abs{X_m - X} \geq \varepsilon\bigr)
+\downarrow \P\bigl(\limsup\{\abs{X_m - X} \geq
+\varepsilon\}\bigr) = 0$ onder b.z.-convergentie
+(continuïteit van boven; de limsup-gebeurtenis sluit
+convergentie uit). (b) Markov: $\P(\abs{X_n - X} \geq
+\varepsilon) \leq \varepsilon^{-p}\,\E\abs{X_n - X}^p$.
+(c) Kies $n_k$ met $\P(\abs{X_{n_k} - X} \geq 2^{-k}) \leq
+2^{-k}$; Borel--Cantelli (1) maakt $\abs{X_{n_k} - X} <
+2^{-k}$ uiteindelijk, b.z. (d) De typewriter
+(\cref{exo:b3:lp:3}) op $(\intcc01, \lambda)$ convergeert in
+$L^1$ en in kans maar nergens puntsgewijs; $n\mathbf
+1_{\intoo0{1/n}} \to 0$ b.z.\ maar niet in $L^1$; details
+en de resterende tegenvoorbeelden in
+\cref{exo:b3:probability:6}.
+\end{proof}
+
+\section{De wet van de grote aantallen}
+
+Overal zijn $(X_n)$ \omterm{def:b3:probability:independence}{onafhankelijk} met dezelfde \omterm{def:b3:probability:space}{wet}
+(\emph{i.i.d.}), $S_n = X_1 + \dots + X_n$.
+
+\begin{theorem}[Zwakke wet van de grote aantallen]
+\label{thm:b3:probability:wlln}
+Als $X_1 \in L^2$, met $m = \E X_1$:
+\[
+\P\Bigl(\Bigl|\frac{S_n}{n} - m\Bigr| \geq
+\varepsilon\Bigr) \leq
+\frac{\V(X_1)}{n\,\varepsilon^2}
+\xrightarrow[n\to\infty]{} 0 :
+\]
+$\frac{S_n}n \to m$ in kans (en in $L^2$).\index{wet van de
+grote aantallen (zwak)}
+\end{theorem}
+
+\begin{proof}
+$\E\frac{S_n}n = m$ en $\V\bigl(\frac{S_n}n\bigr) =
+\frac{n\V(X_1)}{n^2}$
+(\cref{thm:b3:probability:independence}); Chebyshev.
+\end{proof}
+
+\begin{theorem}[Sterke wet van de grote aantallen]
+\label{thm:b3:probability:slln}
+Als $X_1 \in L^1$, dan\index{wet van de grote aantallen
+(sterk)}
+\[
+\frac{S_n}{n} \xrightarrow[n\to\infty]{\text{b.z.}} \E[X_1].
+\]
+We bewijzen haar hier onder de sterkere hypothese $X_1 \in
+L^4$; het algemene geval ($L^1$: bewijs van Etemadi) is het
+weekendprobleem.
+\end{theorem}
+
+\begin{proof}[Bewijs onder $\E X_1^4 < \infty$]
+Centreren ($X_i \mapsto X_i - m$), neem $m = 0$ aan.
+Ontwikkel:
+\[
+\E[S_n^4] = \sum_{i,j,k,l}\E[X_iX_jX_kX_l]
+= n\,\E[X_1^4] + 3n(n-1)\,\bigl(\E[X_1^2]\bigr)^2 \leq
+C\,n^2 ,
+\]
+aangezien \omterm{def:b3:probability:independence}{onafhankelijkheid} en centreren elke term met een
+geïsoleerde factor doden ($\E[X_iX_jX_kX_l] =
+\E[X_i]\E[\cdots] = 0$ tenzij de indices paren: de enige
+overlevers zijn de $n$ termen $i=j=k=l$ en de $3n(n-1)$
+termen met twee distincte paren). Markov:
+\[
+\P\Bigl(\Bigl|\frac{S_n}n\Bigr| \geq \varepsilon\Bigr)
+= \P\bigl(S_n^4 \geq n^4\varepsilon^4\bigr)
+\leq \frac{Cn^2}{n^4\varepsilon^4} =
+\frac{C}{\varepsilon^4n^2},
+\]
+sommeerbaar: Borel--Cantelli (1) geeft, voor elke rationale
+$\varepsilon$, dat $\abs{S_n/n} < \varepsilon$
+uiteindelijk, b.z.; doorsnijden over $\varepsilon \in
+\Q_+^*$ (aftelbaar veel kans-$1$-gebeurtenissen): $S_n/n
+\to 0$ b.z.
+\end{proof}
+
+\begin{example}[Wat de sterke wet koopt]
+\label{ex:b3:probability:sllnapps}
+(a) \emph{Frequenties}: voor i.i.d.\ muntworpen convergeert
+de waargenomen frequentie van kop b.z.\ naar $p$ --- de
+empirische rechtvaardiging van kans zelf.
+(b) \emph{Monte Carlo}\index{Monte Carlo-methode}: voor $g
+\in L^1(\intcc01)$ en $(U_n)$ i.i.d.\ uniform
+(\cref{thm:b3:probability:existence}),
+$\frac1n\sum_{k\leq n}g(U_k) \to \int_0^1g$ b.z.:
+integralen door bemonstering, in elke dimensie, met de
+dimensie-onafhankelijke snelheid $\sim n^{-1/2}$ precies
+gemaakt in \cref{ch:b3:clt}.
+(c) \emph{Normale getallen}: bijna elk reëel getal heeft, in
+haar binaire ontwikkeling, asymptotische frequentie
+$\frac12$ van enen (pas de sterke \omterm{def:b3:probability:space}{wet} toe op de
+cijfervariabelen van \cref{thm:b3:probability:existence})
+--- de stelling van Borel, een uitspraak over
+\emph{alledaagse} getallen bewezen door \omterm{def:b3:measure:measure}{maat}:
+\cref{pb:b3:probability:1} voltooit haar in alle basissen.
+\end{example}
+
+\begin{method}\label{met:b3:probability:toolkit}
+De werkvolgorde voor asymptotische uitspraken over
+stochastische rijen: (1) \emph{Is de gebeurtenis een
+staartgebeurtenis?} Dan is haar kans $0$ of $1$
+(\cref{thm:b3:probability:zeroone}) en men hoeft alleen te
+beslissen welke. (2) \emph{Om b.z.-uitspraken te bewijzen}:
+Borel--Cantelli --- sommeerbare kansen voor de ``slechte''
+gebeurtenissen, via Markov/Chebyshev-type grenzen op
+welke momenten ook bestaan; \omterm{def:b3:probability:independence}{onafhankelijkheid} alleen nodig
+voor de omgekeerde richting. (3) \emph{Deelrij + sandwich}:
+bewijs convergentie langs een hanteerbare deelrij, controleer
+de oscillatie ertussen door monotonie of
+maximaliteitsongelijkheden --- het skelet van Etemadi's
+bewijs. (4) Voor de CLT en concentratie: karakteristieke
+functies en exponentiële momenten, in het volgende
+hoofdstuk.
+\end{method}
+
+\section{Oefeningen}
+
+\begin{exercise}[$\star$]\label{exo:b3:probability:1}
+(a) Zij $X$ met continue strikt stijgende verdelingsfunctie
+$F$. Toon aan dat $F(X)$ uniform is op $\intcc01$, en dat
+$G(U) \sim F$ voor $U$ uniform, $G = F^{-1}$: simulatie door
+inversie.
+(b) Bereken de verdelingsfunctie en \omterm{ex:b3:lebesgue:gamma}{dichtheid} van $X^2$
+voor $X$ uniform op $\intcc{-1}1$, en van $-\frac1\lambda\ln
+U$ voor $U$ uniform op $\intoo01$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b3:probability:2}
+(a) Bereken gemiddelde en variantie van de Poisson $\mathcal
+P(\lambda)$ en geometrische wetten via de
+overdrachtsstelling.
+(b) Toon aan dat een positieve \omterm{def:b3:probability:space}{stochastische variabele} $T$
+met $\P(T > t) > 0$ voor alle $t$ de
+\emph{geheugenloosheids}-eigenschap $\P(T > t + s \mid
+T > t) = \P(T > s)$ voor alle $s, t \geq 0$ vervult dan en
+slechts dan als $T$ exponentieel is. \emph{(De
+overlevingsfunctie voldoet aan de functionaalvergelijking van
+Cauchy; monotonie vervangt continuïteit.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:probability:3}
+(a) Toon aan dat als $X_1, \dots, X_n$ \omterm{def:b3:probability:independence}{onafhankelijk} zijn en
+$f_i$ Borel-functies, de $f_i(X_i)$ \omterm{def:b3:probability:independence}{onafhankelijk} zijn.
+(b) Toon aan dat gebeurtenissen $A_1, \dots, A_n$
+\omterm{def:b3:probability:independence}{onafhankelijk} zijn desda hun complementen dat zijn, desda de
+indicatoren $\mathbf 1_{A_i}$ onafhankelijke \omterm{def:b3:probability:space}{stochastische
+variabelen} zijn.
+(c) (Paarsgewijs is zwakker) Twee eerlijke munten: $A = $
+eerste is kop, $B = $ tweede is kop, $C = $ de twee komen
+overeen. Toon aan dat $A, B, C$ paarsgewijs \omterm{def:b3:probability:independence}{onafhankelijk}
+zijn maar niet \omterm{def:b3:probability:independence}{onafhankelijk}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:probability:4}
+(a) (Oneindige aap) Een i.i.d.\ rij van uniforme
+toetsaanslagen op een eindig alfabet bevat b.z.\ elke
+eindige tekst oneindig vaak: bewijs het met Borel--Cantelli
+(2) op disjuncte blokken.
+(b) (Runs) Voor i.i.d.\ fair bits, zij $R_n$ de lengte van
+de run van enen startend op positie $n$. Toon aan dat b.z.\
+$R_n \geq (1+\varepsilon)\log_2n$ eindig vaak, en $R_n
+\geq \log_2 n$ oneindig vaak \emph{(beide helften van
+Borel--Cantelli; voor de tweede, ga naar disjuncte blokken
+om \omterm{def:b3:probability:independence}{onafhankelijkheid} te winnen)}: de langste run in de
+eerste $n$ cijfers groeit als $\log_2n$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:probability:5}
+Zij $(X_n)$ \omterm{def:b3:probability:independence}{onafhankelijk}.
+(a) Toon aan dat de convergentiestraal van $\sum X_n z^n$
+een b.z.-constante is (mogelijk $0$ of $\infty$).
+(b) Toon aan dat $\P(\sum X_n \text{ convergeert}) \in
+\{0, 1\}$ en $\P(S_n/n \to m) \in \{0,1\}$.
+(c) Geef een gebeurtenis over $(X_n)$ die \emph{geen}
+staartgebeurtenis is, en controleer dat de \omterm{thm:b3:probability:zeroone}{nul--één-wet}
+ervoor kan falen.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:probability:6}
+Op $(\intcc01, \lambda)$, exhibeer --- met bewijzen ---
+\omterm{def:b3:probability:space}{stochastische variabelen} zodat:
+(a) $X_n \to 0$ in kans en in elke $L^p$, maar nergens
+b.z.;
+(b) $X_n \to 0$ b.z.\ maar in geen $L^p$;
+(c) $X_n \to 0$ in $L^1$ maar niet in $L^2$;
+(d) en toon aan: als $X_n \to X$ in kans en $\abs{X_n}
+\leq Y \in L^1$, dan $X_n \to X$ in $L^1$
+\emph{(deelrijen + gedomineerde convergentie + de
+sub-subrij-truc)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:probability:7}
+Een opiniepeiling schat een onbekende proportie $p$ door de
+empirische frequentie $\hat p_n$ over $n$ i.i.d.\ trekkingen.
+(a) Chebyshev: toon aan $\P(\abs{\hat p_n - p} \geq
+\varepsilon) \leq \frac1{4n\varepsilon^2}$.
+(b) Hoeveel trekkingen garanderen een fout $\leq 3\%$ met
+kans $\geq 95\%$ door deze grens? (Het ware antwoord, via
+\cref{ch:b3:clt}, is ongeveer $1070$: Chebyshev is eerlijk
+maar ruw.)
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:probability:8}
+(Bernstein) Voor $f \in \mathcal C(\intcc01)$ definieer de
+Bernstein-polynomen $B_n(f)(x) =
+\sum_{k=0}^n f(\frac k n)\binom nk x^k(1-x)^{n-k}$.
+(a) Interpreteer $B_n(f)(x) = \E[f(S_n/n)]$ voor $S_n \sim
+\mathcal B(n,x)$.
+(b) Toon aan $B_n(f) \to f$ uniform op $\intcc01$ door te
+splitsen op $\{\abs{\frac{S_n}n - x} \leq \delta\}$ en haar
+complement, met uniforme continuïteit en Chebyshev met de
+binomiale variantie.
+(c) Concludeer: een tweede, probabilistisch bewijs van de
+stelling van Weierstrass
+(\cref{cor:b3:complete:weierstrass}), met de expliciete
+snelheid $O(\omega_f(n^{-1/2}))$ voor de
+continuïteitsmodulus $\omega_f$ --- bewijs minstens de
+$O(\omega_f(n^{-1/2}))$-vorm.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:probability:9}
+(Coupon collector) Kaarten van $n$ types worden uniform
+getrokken met teruglegging; zij $T_n$ het aantal trekkingen
+tot alle types gezien zijn.
+(a) Schrijf $T_n = \sum_{k=1}^{n}\tau_k$ met $\tau_k$
+geometrisch van parameter $\frac{n - k + 1}n$, de $\tau_k$
+\omterm{def:b3:probability:independence}{onafhankelijk}, en leid af $\E T_n = n\,H_n \sim n\ln n$
+($H_n$ het harmonische getal) en $\V(T_n) \leq
+\frac{\pi^2}6 n^2$.
+(b) Chebyshev: $\P(T_n > (1+\varepsilon)n\ln n) \to 0$.
+(c) Verfijn met Borel--Cantelli: toon rechtstreeks
+$\P(T_n > \beta n\ln n) \leq n^{1-\beta}$ voor $\beta > 1$,
+en leid af dat langs $n = 2^m$, b.z.\ $T_n \leq \beta n\ln
+n$ uiteindelijk, voor elke $\beta > 2$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:probability:10}
+Met de cijferconstructie van
+\cref{thm:b3:probability:existence}:
+(a) verifieer door rechtstreekse berekening dat $U = \sum
+b_{2k}2^{-k}$ (even-geïndexeerde cijfers van een uniforme
+$\omega$) uniform is en onafhankelijk van $V = \sum
+b_{2k-1}2^{-k}$;
+(b) generaliseer: één uniform stochastisch getal bevat twee
+(en aftelbaar veel) onafhankelijke --- vergelijk met de
+Peano-kromme (\cref{pb:b3:topology:1}), die surjectiviteit
+bereikte maar geen maatbewaring of injectiviteit.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:probability:11}
+(Records) Zij $(X_n)_{n\geq1}$ i.i.d.\ met continue
+verdelingsfunctie, en zeg dat een \emph{record} optreedt op
+tijd $n$ als $X_n > \max(X_1, \dots, X_{n-1})$ (tijd $1$ is
+een record). Zij $R_n$ de recordindicator.
+(a) Toon aan $\P(R_n = 1) = \frac1n$ \emph{(door symmetrie
+is elk van de $n!$ ordeningen van $X_1, \dots, X_n$ even
+waarschijnlijk en banden hebben kans $0$)}.
+(b) Toon aan dat de $R_n$ \emph{\omterm{def:b3:probability:independence}{onafhankelijk}} zijn
+\emph{(tel ordeningen verenigbaar met voorgeschreven
+recordposities, of argumenteer dat de relatieve volgorde van
+$X_1, \dots, X_{n-1}$ \omterm{def:b3:probability:independence}{onafhankelijk} is van de rang van $X_n$
+onder hen)}.
+(c) Leid af uit Borel--Cantelli
+(\cref{thm:b3:probability:borelcantelli}, beide helften) dat
+oneindig veel records b.z.\ optreden, en dat twee
+opeenvolgende tijden $n, n+1$ oneindig vaak optreden met
+kans --- beslis welke! --- en bereken
+$\E[\sum_{n\leq N}R_n] \sim \ln N$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:probability:12}
+(Langste kop-run) Gooi oneindig vaak met een eerlijke munt,
+en zij $L_n$ de lengte van de langste run van opeenvolgende
+koppen binnen de eerste $n$ worpen.
+(a) Toon aan dat voor elke $\varepsilon > 0$, b.z.\ $L_n
+\leq (1 + \varepsilon)\log_2n$ uiteindelijk \emph{(de kans
+dat enige run van lengte $\ell$ start onder de eerste $n$
+worpen is hoogstens $n2^{-\ell}$; Borel--Cantelli langs $n =
+2^m$)}.
+(b) Toon aan dat b.z.\ $L_n \geq (1 - \varepsilon)\log_2n$
+uiteindelijk \emph{(knip de eerste $n$ worpen in
+disjuncte blokken van lengte $\ell$; de blokken zijn
+\omterm{def:b3:probability:independence}{onafhankelijk}, elk louter-kop met kans $2^{-\ell}$, en de
+kans dat geen louter-kop is is hoogstens
+$(1-2^{-\ell})^{n/\ell}$)}. Moraal: in $10^6$ eerlijke
+worpen verwacht men een run van ongeveer $20$ koppen ---
+en een dataset zonder is waarschijnlijk gefabriceerd.
+\end{exercise}
+
+\section{Probleem: Etemadi's bewijs van de sterke wet}
+
+\begin{problem}[{Weekendprobleem --- de sterke wet van de grote
+aantallen voor i.i.d.\ integreerbare variabelen}]
+\label{pb:b3:probability:1}
+De sterke \omterm{def:b3:probability:space}{wet} van Kolmogorov --- $\frac{S_n}n \to \E X_1$
+b.z.\ voor i.i.d.\ $X_n \in L^1$ --- had lange tijd alleen
+ingewikkelde bewijzen; in 1981 vond N.~Etemadi er één van
+treffende zuinigheid, die niets voorbij dit hoofdstuk
+gebruikt (en zelfs \omterm{def:b3:probability:independence}{onafhankelijkheid} verzwakt tot
+paarsgewijze \omterm{def:b3:probability:independence}{onafhankelijkheid}). We volgen haar. Zij $(X_n)$
+paarsgewijs \omterm{def:b3:probability:independence}{onafhankelijk}, identiek verdeeld, \omterm{def:b3:lebesgue:l1}{integreerbaar};
+$m = \E X_1$, $S_n = X_1 + \dots + X_n$.
+
+\medskip
+\noindent\textbf{Deel I --- Reducties.}
+\begin{enumerate}
+  \item Toon aan dat het volstaat $X_n \geq 0$ te behandelen
+        \emph{(splits $X_n = X_n^+ - X_n^-$: controleer dat
+        de twee helften opnieuw paarsgewijs \omterm{def:b3:probability:independence}{onafhankelijk}
+        i.i.d.\ \omterm{def:b3:lebesgue:l1}{integreerbaar} zijn)}. Neem voortaan $X_n
+        \geq 0$ aan.
+  \item (Knippen) Zij $Y_n = X_n\,\mathbf 1_{X_n \leq n}$
+        en $S_n^* = Y_1 + \dots + Y_n$. Toon aan
+        \[
+        \sum_{n\geq1}\P(X_n \neq Y_n) =
+        \sum_{n\geq1}\P(X_1 > n) \leq \E[X_1] < \infty
+        \]
+        (\cref{exo:b3:product:3}), en leid via
+        Borel--Cantelli af dat $\frac{S_n - S_n^*}{n} \to 0$
+        b.z.: het volstaat $\frac{S^*_n}n \to m$ b.z.\ te
+        bewijzen.
+  \item Toon aan $\E Y_n = \E\bigl[X_1\mathbf 1_{X_1\leq
+        n}\bigr] \to m$ (monotone convergentie), dus
+        $\frac1n\sum_{k\leq n}\E Y_k \to m$ (Cesàro): het
+        volstaat $\frac{S_n^* - \E S_n^*}{n} \to 0$ b.z.\ te
+        bewijzen.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel II --- De variantieschatting.}
+\begin{enumerate}[resume]
+  \item Toon aan
+        \[
+        \V(Y_n) \leq \E[Y_n^2] = \E\bigl[X_1^2\,\mathbf
+        1_{X_1 \leq n}\bigr]
+        \]
+        en, met de lagenkoek
+        (\cref{prop:b3:product:layercake}), de sleutelgrens
+        \[
+        \sum_{n\geq1}\frac{\V(Y_n)}{n^2}
+        \leq \sum_{n\geq1}\frac1{n^2}\,
+        \E\bigl[X_1^2\mathbf 1_{X_1\leq n}\bigr]
+        \leq C\,\E[X_1] < \infty
+        \]
+        \emph{(verwissel de som en de \omterm{def:b3:probability:space}{verwachting} ---
+        Tonelli voor reeksen --- en schat $\sum_{n \geq
+        x}\frac1{n^2} \leq \frac2{\max(x,1)}$ voor de
+        inwendige schatting $x^2\sum_{n\geq x}n^{-2} \leq
+        2x$)}.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel III --- Convergentie langs meetkundige
+subrijen.} Fixeer $\alpha > 1$ en laat $k_j =
+\lfloor\alpha^j\rfloor$.
+\begin{enumerate}[resume]
+  \item Met paarsgewijze \omterm{def:b3:probability:independence}{onafhankelijkheid} (varianties tellen
+        op, \cref{thm:b3:probability:independence} ---
+        controleer dat additiviteit van varianties alleen
+        paarsgewijze \omterm{def:b3:probability:independence}{onafhankelijkheid} nodig heeft) en
+        Chebyshev, toon aan voor elke $\varepsilon > 0$:
+        \[
+        \sum_{j\geq1}\P\Bigl(\Bigl|
+        \frac{S^*_{k_j} - \E S^*_{k_j}}{k_j}\Bigr| \geq
+        \varepsilon\Bigr)
+        \leq
+        \frac1{\varepsilon^2}\sum_{j\geq1}\frac1{k_j^2}
+        \sum_{n\leq k_j}\V(Y_n)
+        = \frac1{\varepsilon^2}\sum_{n\geq1}\V(Y_n)
+        \sum_{j\,:\,k_j\geq n}\frac1{k_j^2} .
+        \]
+  \item Toon aan $\sum_{j : k_j \geq n}k_j^{-2} \leq
+        \frac{C_\alpha}{n^2}$ \emph{(meetkundige reeks; let
+        op de floor: $k_j \geq \frac{\alpha^j}2$ voor
+        $\alpha^j \geq 2$-type zorg)}, en concludeer met
+        vraag~4 en Borel--Cantelli:
+        \[
+        \frac{S^*_{k_j} - \E S^*_{k_j}}{k_j}
+        \xrightarrow[j\to\infty]{\text{b.z.}} 0,
+        \qquad\text{dus}\qquad
+        \frac{S^*_{k_j}}{k_j} \to m \ \text{b.z.}
+        \]
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel IV --- Sandwich en conclusie.}
+\begin{enumerate}[resume]
+  \item Voor $k_j \leq n \leq k_{j+1}$, gebruik de
+        monotonie van $S^*_n$ (niet-negatieve summanden!)
+        om te tonen
+        \[
+        \frac{k_j}{k_{j+1}}\,\frac{S^*_{k_j}}{k_j}
+        \;\leq\; \frac{S^*_n}{n} \;\leq\;
+        \frac{k_{j+1}}{k_j}\,\frac{S^*_{k_{j+1}}}{k_{j+1}},
+        \]
+        en leid af, b.z.:
+        \[
+        \frac m\alpha \leq \liminf\frac{S^*_n}n \leq
+        \limsup\frac{S^*_n}n \leq \alpha\,m .
+        \]
+  \item Laat $\alpha \downarrow 1$ langs een rij en
+        concludeer $\frac{S_n^*}n \to m$ b.z., dus (Deel~I)
+        de \emph{sterke \omterm{def:b3:probability:space}{wet} van de grote aantallen}:
+        \[
+        \boxed{\ \frac{S_n}{n}
+        \xrightarrow[n\to\infty]{\text{b.z.}} \E[X_1].\ }
+        \]
+  \item Waar precies was paarsgewijze \omterm{def:b3:probability:independence}{onafhankelijkheid}
+        (eerder dan volledige \omterm{def:b3:probability:independence}{onafhankelijkheid}) voldoende?
+        Lijst de drie plaatsen waar
+        onafhankelijkheid-type hypothesen werden
+        aangeroepen.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel V --- Dividenden.}
+\begin{enumerate}[resume]
+  \item (Normale getallen van Borel) Toon aan dat
+        $\lambda$-bijna elke $x \in \intcc01$ \emph{normaal
+        in elke basis} $b \geq 2$ is: elk cijfer $0, \dots,
+        b-1$ verschijnt met asymptotische frequentie
+        $\frac1b$ \emph{(fixeer $b$ en een cijfer, pas de
+        sterke \omterm{def:b3:probability:space}{wet} toe op de indicatorvariabelen ---
+        rechtvaardig dat basis-$b$-cijfers van een uniforme
+        variabele i.i.d.\ uniform op $\{0,\dots,b-1\}$ zijn
+        zoals in \cref{thm:b3:probability:existence} ---
+        doorsnijd dan de aftelbaar veel kans-$1$-
+        gebeurtenissen)}. Exhibeer één expliciet niet-normaal
+        getal, en reflecteer: de stelling beweert normaliteit
+        van bijna alle getallen, maar normaliteit van
+        $\sqrt2$ of $\pi$ bewijzen blijft open.
+  \item (\omterm{ex:b3:probability:sllnapps}{Monte Carlo}, gegarandeerd) Rechtvaardig \omterm{def:b3:complete:complete}{volledig} de
+        methode van \cref{ex:b3:probability:sllnapps}(b) voor
+        $g \in L^1(\intcc01^d)$: construeer de i.i.d.\
+        uniforme steekproef op $\intcc01^d$ uit
+        \cref{thm:b3:probability:existence} en
+        \cref{exo:b3:probability:10}, en zeg wat de sterke
+        \omterm{def:b3:probability:space}{wet} levert.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel VI --- Wat volledige \omterm{def:b3:probability:independence}{onafhankelijkheid}
+koopt: maximaliteitsongelijkheden en stochastische reeksen.}
+Etemadi besteedt alleen paarsgewijze \omterm{def:b3:probability:independence}{onafhankelijkheid}; de
+resterende delen benutten de volle (wederzijdse) versie. Zij
+$(Z_n)$ onafhankelijke gecentreerde variabelen van $L^2$ en
+$S_k = Z_1 + \dots + Z_k$ (een verse notatie, ongerelateerd
+aan de $X_n$ hierboven).
+\begin{enumerate}[resume]
+  \item (Maximaliteitsongelijkheid van Kolmogorov) Voor
+        $\varepsilon > 0$ bewijs
+        \[
+        \P\Bigl(\max_{1\leq k\leq n}\abs{S_k} \geq
+        \varepsilon\Bigr) \;\leq\;
+        \frac1{\varepsilon^2}\sum_{k=1}^n\V(Z_k) :
+        \]
+        de prijs van Chebyshev koopt het maximum
+        \emph{(partitioneer de gebeurtenis naar de eerste
+        \omterm{def:b3:holomorphic:index}{index} $k$ met $\abs{S_k} \geq \varepsilon$; op dat
+        stuk schrijf $S_n^2 \geq S_k^2 + 2S_k(S_n - S_k)$
+        en gebruik de \omterm{def:b3:probability:independence}{onafhankelijkheid} van de coalities
+        $(Z_1, \dots, Z_k)$ en $(Z_{k+1}, \dots, Z_n)$,
+        \cref{thm:b3:probability:independence})}. Wijs de
+        stap aan waar paarsgewijze \omterm{def:b3:probability:independence}{onafhankelijkheid} niet
+        meer zou volstaan.
+  \item (Eén-reeks-stelling van Khinchin--Kolmogorov) Leid
+        af: als $\sum_n\V(Z_n) < \infty$, dan convergeert
+        $\sum_nZ_n$ bijna zeker \emph{(toon aan dat b.z.\
+        de partiële sommen een Cauchy-rij vormen: laat $m
+        \to \infty$ in de maximaliteitsongelijkheid
+        toegepast op $Z_{N+1}, \dots, Z_{N+m}$, laat dan
+        $N \to \infty$)}.
+  \item (Rademacher-reeksen) Zij $(\varepsilon_n)$ i.i.d.\
+        tekens, $\P(\varepsilon_n = \pm1) = \frac12$
+        (\cref{thm:b3:probability:existence}), en zij
+        $(x_n)$ reële getallen. Toon aan dat
+        $\sum_nx_n\varepsilon_n$ b.z.\ convergeert zodra
+        $\sum_nx_n^2 < \infty$; toon ook dat, wat $(x_n)$
+        ook is, de kans dat $\sum_nx_n\varepsilon_n$
+        convergeert $0$ of $1$ is
+        (\cref{thm:b3:probability:zeroone}).
+  \item Het omgekeerde, elementair. Stel $T_n = \sum_{k\leq
+        n}x_k\varepsilon_k$ en $s_n^2 = \sum_{k\leq
+        n}x_k^2$, en veronderstel $s_n \to \infty$.
+        (a) Bewijs de \emph{ongelijkheid van
+        Paley--Zygmund}: voor $Z \geq 0$ met $\E Z^2 <
+        \infty$ en $0 < \theta < 1$,
+        \[
+        \P\bigl(Z > \theta\,\E Z\bigr) \;\geq\; (1 -
+        \theta)^2\,\frac{(\E Z)^2}{\E Z^2}
+        \]
+        \emph{(splits $\E Z$ op het niveau $\theta\E Z$ en
+        pas Cauchy--Schwarz toe op het bovenste stuk)}.
+        (b) Toon aan $\E T_n^4 \leq 3s_n^4$.
+        (c) Leid af $\P\bigl(\abs{T_n} > \frac{s_n}2\bigr)
+        \geq \frac3{16}$ en concludeer dat
+        $\sum_nx_n\varepsilon_n$ b.z.\ divergeert; dus de
+        dichotomie
+        \[
+        \sum_nx_n\varepsilon_n\ \text{convergeert b.z.}
+        \iff \sum_nx_n^2 < \infty .
+        \]
+  \item (Stochastische harmonische reeks) Concludeer dat
+        $\sum_n\frac{\varepsilon_n}{n^s}$ b.z.\ convergeert
+        dan en slechts dan als $s > \frac12$. Voor
+        $\frac12 < s \leq 1$ convergeert de reeks b.z.\
+        terwijl $\sum_nn^{-s} = \infty$: stochastische
+        tekens produceren vierkantswortel-sterke
+        opheffing --- vergelijk met de alternerende reeks
+        $\sum_n\frac{(-1)^n}{n^s}$, die convergeert voor
+        \emph{elke} $s > 0$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel VII --- Concentratie: de ongelijkheid
+van Hoeffding.} De sterke \omterm{def:b3:probability:space}{wet} zegt $\frac{S_n}n \to m$;
+concentratie-ongelijkheden zeggen hoe onwaarschijnlijk een
+afwijking is \emph{bij elke vaste $n$}.
+\begin{enumerate}[resume]
+  \item (Lemma van Hoeffding)
+        (a) Toon aan $\cosh\lambda \leq \eu^{\lambda^2/2}$
+        voor alle $\lambda \in \R$, door de twee reeksen
+        term voor term te vergelijken.
+        (b) Zij $Z$ gecentreerd met $a \leq Z \leq b$, $a <
+        b$. Toon aan
+        \[
+        \E\,\eu^{\lambda Z} \leq
+        \exp\Bigl(\frac{\lambda^2(b - a)^2}8\Bigr)
+        \]
+        \emph{(schat $\eu^{\lambda z}$ op $\intcc ab$ door
+        haar koorde, neem \omterm{def:b3:probability:space}{verwachtingen}, en bestudeer
+        $\varphi(t) = -pt + \log(1 - p + p\eu^t)$ met $p =
+        \frac{-a}{b-a}$ en $t = \lambda(b - a)$: toon aan
+        $\varphi(0) = \varphi'(0) = 0$ en $\varphi'' \leq
+        \frac14$)}.
+  \item (Ongelijkheid van Hoeffding) Zij $X_1, \dots, X_n$
+        \omterm{def:b3:probability:independence}{onafhankelijk} met $a_i \leq X_i \leq b_i$ en $S_n =
+        X_1 + \dots + X_n$. Bewijs, voor $t > 0$,
+        \[
+        \P\bigl(S_n - \E S_n \geq t\bigr) \leq
+        \exp\Bigl(\frac{-2t^2}{\sum_{i=1}^n(b_i -
+        a_i)^2}\Bigr),
+        \]
+        en dezelfde grens voor de onderste staart
+        \emph{(exponentiële Chebyshev: schat
+        $\E\,\eu^{\lambda(S_n - \E S_n)}$ met
+        \omterm{def:b3:probability:independence}{onafhankelijkheid} en vraag~17, optimaliseer dan over
+        $\lambda > 0$)}.
+  \item (De sterke \omterm{def:b3:probability:space}{wet}, begrensd geval, met een snelheid)
+        Zij de $X_i$ i.i.d.\ met waarden in $\intcc ab$ en
+        $m = \E X_1$. Toon aan
+        \[
+        \P\Bigl(\Bigl|\frac{S_n}n - m\Bigr| \geq
+        \varepsilon\Bigr) \leq
+        2\exp\Bigl(\frac{-2n\varepsilon^2}{(b - a)^2}\Bigr)
+        \]
+        en herwin $\frac{S_n}n \to m$ b.z.\ door
+        Borel--Cantelli: een tweede bewijs van de sterke
+        \omterm{def:b3:probability:space}{wet} voor begrensde variabelen --- geen knippen, een
+        exponentiële snelheid bij elke eindige $n$, maar
+        begrensde summanden en volle \omterm{def:b3:probability:independence}{onafhankelijkheid}.
+        Vergelijk de hypothesen met die van Etemadi.
+  \item (\omterm{ex:b3:probability:sllnapps}{Monte Carlo}, gegarandeerd bij vaste $n$) Zij $g
+        \colon \intcc01^d \to \intcc01$ \omterm{def:b3:lebesgue:measurable}{meetbaar} en
+        $(U_k)$ de i.i.d.\ uniforme steekproef van vraag~11.
+        Gegeven $\varepsilon, \delta > 0$, toon aan
+        \[
+        n \geq \frac{\log(2/\delta)}{2\varepsilon^2}
+        \implies
+        \P\Bigl(\Bigl|\frac1n\sum_{k=1}^ng(U_k) -
+        \int g\,\dd\lambda_d\Bigr| \geq \varepsilon\Bigr)
+        \leq \delta,
+        \]
+        en evalueer de drempel voor $\varepsilon = \delta =
+        10^{-2}$. De grens betrekt $d$ niet: vergelijk met
+        vraag~11 en met deterministische roosters.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel VIII --- Hoe groot is een random
+walk? Naar de geïtereerde logaritme.} Zij $S_n =
+\varepsilon_1 + \dots + \varepsilon_n$ de eenvoudige random
+walk gebouwd uit i.i.d.\ fair tekens.
+\begin{enumerate}[resume]
+  \item (Sub-Gaussische staarten) Toon aan
+        $\E\,\eu^{\lambda S_n} = (\cosh\lambda)^n \leq
+        \eu^{n\lambda^2/2}$ en leid af, voor $x > 0$,
+        \[
+        \P(S_n \geq x) \leq \eu^{-x^2/(2n)},
+        \qquad
+        \P(\abs{S_n} \geq x) \leq 2\,\eu^{-x^2/(2n)} .
+        \]
+  \item Leid via Borel--Cantelli af
+        \[
+        \limsup_{n\to\infty}\frac{\abs{S_n}}
+        {\sqrt{2n\log n}} \leq 1 \quad\text{b.z.}
+        \]
+        \emph{(voor $\eta > 0$, sommeer de staartgrenzen in
+        $x = (1 + \eta)\sqrt{2n\log n}$, doorsnijd dan over
+        $\eta = \frac1p$)}. In het bijzonder leeft de walk
+        op de CLT-schaal $\sqrt n$ tot op een logaritmische
+        factor --- ver onder de ruwe grens $\abs{S_n} \leq
+        n$.
+  \item Langs de verdubbelings-subrij $n_j = 2^j$, toon aan
+        \[
+        \limsup_{j\to\infty}\frac{S_{n_j}}
+        {\sqrt{2n_j\log\log n_j}} \leq 1 \quad\text{b.z.},
+        \]
+        en reflecteer: de \emph{\omterm{def:b3:probability:space}{wet} van de geïtereerde
+        logaritme} (Khinchin; Hartman--Wintner voor algemene
+        gecentreerde $L^2$-summanden) stelt dat
+        \[
+        \limsup_{n\to\infty}\frac{S_n}
+        {\sqrt{2n\log\log n}} = 1 \quad\text{b.z.}
+        \]
+        Leg precies uit wat de subrij-schatting zojuist
+        bewezen scheidt van de bovenste helft van deze
+        uitspraak (men moet $\max_{n_j \leq n \leq
+        n_{j+1}}S_n$ binnen elk blok controleren, wat een
+        maximaliteitsongelijkheid op de
+        \emph{exponentiële} schaal vereist) en controleer
+        kwantitatief dat de ongelijkheid van vraag~12 te
+        zwak is voor dat doel. De onderste helft steunt op
+        het tweede Borel--Cantelli-lemma toegepast op
+        onafhankelijke blokken; beide helften zijn eerlijk
+        Jaar~3-materiaal voor een dedicated
+        kansrekening-cursus.
+
+  \item (Uniforme afwijking over een eindige klasse) Zij
+        $A_1, \dots, A_N$ gebeurtenissen in een
+        herhaalbaar experiment, en schat elke kans door
+        haar empirische frequentie $\hat p_i$ over $n$
+        i.i.d.\ herhalingen. Combinerend de ongelijkheid
+        van Hoeffding met een uniegrens, toon aan
+        \[
+        \P\Bigl(\max_{i\leq N}\,\abs{\hat p_i - \P(A_i)} >
+        \varepsilon\Bigr) \;\leq\; 2N\,\eu^{-2n\varepsilon^2},
+        \]
+        en leid de steekproefgrootte-regel af: $n \geq
+        \frac{\ln(2N/\delta)}{2\varepsilon^2}$ garandeert
+        alle $N$ schattingen tegelijk $\varepsilon$-accuraat
+        met kans $\geq 1 - \delta$. Bereken $n$ voor $N =
+        10^6$, $\varepsilon = 0.01$, $\delta = 0.05$: de
+        logaritmische prijs van uniformiteit.
+  \item (Het stochastische harmonische venster) Combinerend
+        de twee helften van de stochastische reeks-theorie,
+        toon aan dat voor i.i.d.\ tekens $(\varepsilon_n)$
+        de reeks $\sum_n\frac{\varepsilon_n}{n^\alpha}$
+        b.z.\ convergeert als $\alpha > \frac12$ en b.z.\
+        divergeert als $\alpha \leq \frac12$; contrasteer
+        met absolute convergentie (die $\alpha > 1$
+        vereist): op het venster $\alpha \in
+        \intoc{\frac12}1$ is convergentie een echt
+        probabilistisch fenomeen --- opheffing, niet
+        grootte.
+\end{enumerate}
+\end{problem}

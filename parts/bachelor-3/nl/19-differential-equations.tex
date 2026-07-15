@@ -1,0 +1,905 @@
+\chapter{Gewone differentiaalvergelijkingen}\label{ch:b3:ode}
+
+Jaar~2 loste lineaire differentiaalvergelijkingen op en
+formuleerde de stelling van Cauchy--Lipschitz; dit hoofdstuk
+bewijst haar --- in twee stappen: bestaan en eenduidigheid via
+het Banach-vastpunt, globale structuur via de theorie van
+\emph{\omterm{thm:b3:ode:maximal}{maximale oplossingen}} en de stelling van \omterm{thm:b3:ode:maximal}{ontsnappen uit
+compacta}. De lineaire theorie wordt vervolgens op eerlijke
+grondslagen heropgebouwd (\emph{\omterm{thm:b3:ode:linearstructure}{resolvente}}, \emph{\omterm{thm:b3:ode:linearstructure}{Wronskiaan}},
+\emph{\omterm{thm:b3:ode:matrixexp}{matrixexponentiaal}}, Duhamel), en de tweede helft van het
+hoofdstuk opent de \emph{kwalitatieve} theorie --- \emph{stromen},
+evenwichten, \omterm{thm:b3:ode:lyapunov}{Lyapunov-functies}, en \omterm{thm:b3:ode:linearization}{stabiliteit door linearisatie}:
+hoe oplossingen te begrijpen die men nooit zal uitrekenen. De
+slinger, in het weekendprobleem, is de eeuwige casestudy.
+Overal is $U \subseteq \R\times\R^d$ open en $f \colon U \to
+\R^d$ continu; een \emph{oplossing} van $x' = f(t, x)$ is een
+$\mathcal C^1$-afbeelding $x \colon I \to \R^d$ ($I$ een
+interval) met grafiek in $U$ die aan de vergelijking voldoet.
+
+\section{Cauchy--Lipschitz}
+
+\begin{definition}\label{def:b3:ode:lipschitz}
+$f$ is \emph{lokaal Lipschitz in $x$}\index{lokaal Lipschitz}
+als elk punt van $U$ een \omterm{def:b3:topology:topology}{omgeving} $V$ en een constante $L$
+heeft met $\norm{f(t, x_1) - f(t, x_2)} \leq L\norm{x_1 -
+x_2}$ voor $(t, x_1), (t, x_2) \in V$. Als $f$ van klasse
+$\mathcal C^1$ is (of slechts $\partial_xf$ bestaat en
+continu is), is zij lokaal Lipschitz in $x$: op een compacte
+convexe \omterm{def:b3:topology:topology}{omgeving} geldt de middelwaardeongelijkheid met $L =
+\sup\vertiii{\partial_xf}$.
+\end{definition}
+
+\begin{theorem}[Cauchy--Lipschitz, lokaal]
+\label{thm:b3:ode:cauchylipschitz}
+Zij $f$ continu en \omterm{def:b3:ode:lipschitz}{lokaal Lipschitz} in $x$, en $(t_0,
+x_0) \in U$. Er bestaat $T > 0$ zodat het Cauchy-probleem
+\[
+x' = f(t, x), \qquad x(t_0) = x_0
+\]
+precies één oplossing heeft op $[t_0 - T, t_0 +
+T]$.\index{stelling van Cauchy--Lipschitz}
+\end{theorem}
+
+\begin{proof}
+Kies $a, b > 0$ met $Q = [t_0 - a, t_0 + a]\times\bar
+B(x_0, b) \subseteq U$, waarop $\norm f \leq M$ en $f$
+$L$-Lipschitz is in $x$. Een $\mathcal C^1$-functie is een
+oplossing dan en slechts dan als zij voldoet aan de
+integraalvergelijking
+\[
+x(t) = x_0 + \int_{t_0}^{t}f\bigl(s, x(s)\bigr)\,\dd s
+\]
+(fundamentele stelling van de analyse, beide kanten). Stel $T =
+\min\bigl(a, \frac bM, \frac1{2L}\bigr)$, $I = [t_0 - T, t_0
++ T]$, en
+\[
+\mathcal E = \{x \in \mathcal C(I, \R^d) : \norm{x(t) - x_0}
+\leq b\ \text{op } I\},
+\]
+een gesloten deelverzameling van de Banachruimte $(\mathcal
+C(I, \R^d), \norm\cdot_\infty)$: \omterm{def:b3:complete:complete}{volledig}
+(\cref{def:b3:complete:complete}). Definieer $\Phi(x)(t) =
+x_0 + \int_{t_0}^tf(s, x(s))\dd s$: voor $x \in \mathcal E$
+is $\norm{\Phi(x)(t) - x_0} \leq M\abs{t - t_0} \leq MT \leq
+b$ --- $\Phi$ beeldt $\mathcal E$ in zichzelf af --- en voor
+$x, y \in \mathcal E$:
+\[
+\norm{\Phi(x)(t) - \Phi(y)(t)} \leq \Bigl|\int_{t_0}^t
+L\,\norm{x(s) - y(s)}\,\dd s\Bigr| \leq LT\,\norm{x -
+y}_\infty \leq \tfrac12\norm{x - y}_\infty :
+\]
+een contractie. Het Banach-vastpunt
+(\cref{thm:b3:complete:banach}) levert een uniek vast punt in
+$\mathcal E$: bestaan, en eenduidigheid onder de oplossingen
+die in $\bar B(x_0, b)$ blijven --- maar elke oplossing op $I$
+blijft daar ($\norm{x(t) - x_0} \leq M\abs{t - t_0} \leq b$
+zolang de grafiek in $Q$ blijft, een continuïteitsargument):
+eenduidigheid op $I$.
+\end{proof}
+
+\begin{lemma}[Grönwall]\label{lem:b3:ode:gronwall}
+Zij $u \colon I \to \intco0\infty$ continu, $t_0 \in I$, en
+veronderstel\index{lemma van Gronwall}
+\[
+u(t) \leq \alpha + \beta\,\Bigl|\int_{t_0}^{t}u(s)\,\dd
+s\Bigr| \qquad (t \in I)
+\]
+met $\alpha \geq 0$, $\beta > 0$. Dan is $u(t) \leq
+\alpha\,\eu^{\beta\abs{t - t_0}}$ op $I$.
+\end{lemma}
+
+\begin{proof}
+Voor $t \geq t_0$: stel $v(t) = \alpha +
+\beta\int_{t_0}^tu(s)\dd s$, dus $u \leq v$, $v' = \beta u
+\leq \beta v$, en $(v\eu^{-\beta(t - t_0)})' \leq 0$: $v(t)
+\leq v(t_0)\eu^{\beta(t-t_0)} = \alpha\eu^{\beta(t - t_0)}$.
+Voor $t \leq t_0$, pas hetzelfde toe op $\tilde u(t) =
+u(2t_0 - t)$.
+\end{proof}
+
+\begin{corollary}[Eenduidigheid en continue afhankelijkheid]
+\label{cor:b3:ode:uniqueness}
+Onder de hypothesen van \cref{thm:b3:ode:cauchylipschitz}
+vallen twee oplossingen van $x' = f(t,x)$ die in één punt
+overeenkomen samen op hun gemeenschappelijk definitie-interval.
+Kwantitatief: als $x, y$ twee oplossingen zijn met grafieken in
+een gebied waar $f$ $L$-Lipschitz is in $x$, dan
+\[
+\norm{x(t) - y(t)} \leq \norm{x(t_0) -
+y(t_0)}\,\eu^{L\abs{t - t_0}} .
+\]
+\end{corollary}
+
+\begin{proof}
+De schatting: $u = \norm{x - y}$ voldoet aan $u(t) \leq
+u(t_0) + L\abs{\int_{t_0}^tu}$ (trek de
+integraalvergelijkingen af); Grönwall. Globale eenduidigheid:
+de overeenstemmingsverzameling $\{t : x(t) = y(t)\}$ is
+gesloten in het gemeenschappelijke interval, niet-leeg, en
+open --- rond elk overeenstemmingspunt, overdek een compact
+stuk van de gemeenschappelijke grafiek met eindig veel
+Lipschitz-dozen en pas de schatting toe met $u(t_1) = 0$ op
+elk: lokaal $x \equiv y$. Een niet-lege open gesloten
+deelverzameling van een interval is alles.
+\end{proof}
+
+\section{Maximale oplossingen}
+
+\begin{theorem}[Maximale oplossingen; ontsnappen uit compacta]
+\label{thm:b3:ode:maximal}
+Veronderstel $f$ continu, \omterm{def:b3:ode:lipschitz}{lokaal Lipschitz} in $x$.
+\begin{enumerate}
+  \item Elk Cauchy-probleem heeft een unieke \emph{maximale}
+        oplossing $x \colon \intoo{T_-}{T_+} \to \R^d$: elke
+        andere oplossing door $(t_0, x_0)$ is haar
+        restrictie. Het interval is open.
+  \item (\emph{Ontsnappen}) Voor elke compacte $K \subseteq U$
+        bestaat $\varepsilon > 0$ zodat $(t, x(t)) \notin
+        K$ voor alle $t \in \intoo{T_+ - \varepsilon}{T_+}$
+        (en symmetrisch in $T_-$): \emph{de grafiek van een
+        \omterm{thm:b3:ode:maximal}{maximale oplossing} verlaat uiteindelijk elke compacte
+        deelverzameling van $U$}. In het bijzonder, voor $U =
+        \R\times\R^d$ en $T_+ < +\infty$: $\norm{x(t)} \to
+        +\infty$ als $t \to T_+^-$
+        (\emph{explosie}).\index{maximale oplossing}\index{ontsnappen
+        uit compacta}\index{explosie (DV)}
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) Zij $\mathcal S$ de verzameling van alle oplossingen door
+$(t_0, x_0)$; volgens \cref{cor:b3:ode:uniqueness} komen
+elke twee overeen op de doorsnede van hun intervallen, dus
+lijmen ze: op $J = \bigcup_{y \in \mathcal S}I_y$, definieer
+$x(t) = y(t)$ voor enige $y$ gedefinieerd in $t$: een
+welgedefinieerde oplossing, evident \omterm{def:b3:rings:primemaximal}{maximaal} en uniek. $J$ is
+open: een oplossing gedefinieerd in een eindpunt kon worden
+voortgezet door \cref{thm:b3:ode:cauchylipschitz} in dat
+eindpunt.
+
+(2) Stel de claim faalt in $T_+$: er zijn $t_n \to T_+$ met
+$(t_n, x(t_n)) \in K$; merk op dat dit $T_+ < \infty$
+dwingt of, als $T_+ = \infty$, is er niets te bewijzen ($K$ is
+begrensd in de tijd). Dus $T_+ < \infty$. Compactheid:
+uniforme constanten $M, L, a, b$ werken voor alle
+Cauchy-gegevens in een \omterm{def:b3:topology:topology}{omgeving} van $K$ --- concreet, overdek
+$K$ met eindig veel dozen $Q_i$ zoals in het bewijs van de
+lokale stelling en laat $T^* > 0$ het minimum zijn van de
+bijbehorende bestaansduren: elk Cauchy-gegeven in $K$
+lanceert een oplossing die minstens $T^*$ voorbij haar
+begintijd leeft. Dit toepassen in $(t_n, x(t_n))$ met $t_n >
+T_+ - T^*/2$ zet $x$ voort voorbij $T_+$ (de voortzetting
+komt overeen met $x$ door eenduidigheid, en verlengt haar
+dan): tegenspraak met maximaliteit. Dus verlaat de grafiek $K$
+definitief vóór $T_+$. Voor $U = \R\times\R^d$: als
+$\norm{x(t)}\not\to\infty$, houdt een rij $t_n \to T_+$ de
+punten $(t_n, x(t_n))$ in de compacte $[t_0, T_+]\times\bar
+B(0, R)$: uitgesloten.
+\end{proof}
+
+\begin{corollary}[Globaal bestaan onder lineaire groei]
+\label{cor:b3:ode:globallinear}
+Als $U = I\times\R^d$ ($I$ open interval) en $\norm{f(t, x)}
+\leq \alpha(t)\norm x + \beta(t)$ met $\alpha, \beta$
+continu, dan is elke \omterm{thm:b3:ode:maximal}{maximale oplossing} gedefinieerd op heel
+$I$.
+\end{corollary}
+
+\begin{proof}
+Op een compacte $[t_0, T] \subseteq I$: $\norm{x(t)} \leq
+\norm{x_0} + \int_{t_0}^t(\alpha\norm x + \beta)$, dus
+volgens Grönwall (met $\alpha, \beta$ daar begrensd door $A,
+B$) $\norm{x(t)} \leq (\norm{x_0} + B(T - t_0))\eu^{A(T -
+t_0)}$: begrensd. Als $T_+ < \sup I$, blijft de grafiek in
+een compactum van $I\times\R^d$ nabij $T_+$: tegenspraak met
+ontsnappen (\cref{thm:b3:ode:maximal}).
+\end{proof}
+
+\section{Lineaire stelsels}
+
+In deze hele paragraaf zijn $A \colon I \to M_d(\R)$ en $b
+\colon I \to \R^d$ continu; het stelsel is $x' = A(t)x +
+b(t)$ --- lineaire groei: alle \omterm{thm:b3:ode:maximal}{maximale oplossingen} leven op
+heel $I$ (\cref{cor:b3:ode:globallinear}).
+
+\begin{theorem}[Structuur]\label{thm:b3:ode:linearstructure}
+De oplossingen van het homogene stelsel $x' = A(t)x$ vormen
+een $d$-dimensionale vectorruimte $S_H$; voor elke $t_0$ is
+de evaluatie $x \mapsto x(t_0)$ een isomorfisme $S_H \to
+\R^d$. De \emph{resolvente}\index{resolvente van een lineair
+stelsel} $R(t, s) \in GL_d(\R)$, gedefinieerd door: $t
+\mapsto R(t, s)v$ is de oplossing met waarde $v$ in $s$,
+voldoet aan
+\[
+R(s,s) = I,\quad R(t, u)R(u, s) = R(t, s),\quad
+\partial_tR(t,s) = A(t)R(t,s),
+\]
+en het inhomogene probleem wordt opgelost door de
+\emph{formule van Duhamel}\index{formule van Duhamel}:
+\[
+x(t) = R(t, t_0)\,x_0 + \int_{t_0}^{t}R(t, s)\,b(s)\,\dd s .
+\]
+Ten slotte gehoorzaamt de \emph{Wronskiaan}\index{Wronskiaan}
+$w(t) = \det R(t, s)$ de formule van Liouville $w' =
+\operatorname{tr}A(t)\,w$, zodat $w(t) =
+\exp\bigl(\int_s^t\operatorname{tr}A\bigr) > 0$.
+\end{theorem}
+
+\begin{proof}
+Lineariteit van de vergelijking maakt de oplossingen tot een
+vectorruimte; evaluatie is lineair, injectief (eenduidigheid:
+een oplossing die in $t_0$ verdwijnt is $\equiv 0$) en
+surjectief (bestaan): dimensie $d$. De resolvente-eigenschappen
+herformuleren eenduidigheid (beide kanten van elke identiteit
+lossen hetzelfde Cauchy-probleem op); inverteerbaarheid uit
+$R(s,t)R(t,s) = I$. Duhamel: differentieer de formule ---
+$x'(t) = A(t)R(t,t_0)x_0 + R(t,t)b(t) +
+\int_{t_0}^tA(t)R(t,s)b(s)\dd s = A(t)x(t) + b(t)$
+(differentiatie onder de integraal is legitiem: de integrand
+is $\mathcal C^1$ in $t$ met continue afgeleide in $(t,s)$; of
+verifieer via de integraalvergelijking). Liouville: $w(t +
+h) = \det\bigl(R(t+h, t)\bigr)w(t)$ en $R(t + h, t) = I +
+hA(t) + o(h)$ (uit de integraalvergelijking), dus $\det = 1
++ h\operatorname{tr}A(t) + o(h)$ (ontwikkeling van $\det$ in
+$I$): $w'(t) = \operatorname{tr}A(t)\,w(t)$; integreer de
+scalaire lineaire DV.
+\end{proof}
+
+\begin{theorem}[Matrixexponentiaal]\label{thm:b3:ode:matrixexp}
+Voor $A \in M_d(\C)$ convergeert de reeks $\eu^{A} =
+\sum_{n\geq0}\frac{A^n}{n!}$ (absoluut, in elke
+submultiplicatieve norm), $\eu^{A+B} = \eu^A\eu^B$ wanneer
+$AB = BA$, en $t \mapsto \eu^{tA}$ is de \omterm{thm:b3:ode:linearstructure}{resolvente} van het
+constante stelsel: $R(t,s) = \eu^{(t-s)A}$; zij is $\mathcal
+C^\infty$ met $\frac{\dd}{\dd t}\eu^{tA} = A\eu^{tA}$.
+Bovendien: als $\operatorname{Re}\lambda < -\alpha < 0$ voor
+elke eigenwaarde $\lambda$ van $A$, dan $\vertiii{\eu^{tA}}
+\leq C\eu^{-\alpha t}$ voor $t \geq 0$.\index{matrixexponentiaal}
+\end{theorem}
+
+\begin{proof}
+Convergentie: $\vertiii{A^n/n!} \leq \vertiii A^n/n!$,
+sommeerbaar (\cref{exo:b3:complete:1}(b) in de
+Banachalgebra $M_d$). Voor commuteren $A, B$: het
+Cauchy-product van de twee absoluut convergente reeksen
+herschikt, via de binomiaalstelling (geldig wanneer $AB =
+BA$), tot $\sum_n\frac{(A+B)^n}{n!}$. Differentieerbaarheid,
+rechtstreeks: $\frac{\eu^{(t+h)A} - \eu^{tA}}h =
+\eu^{tA}\frac{\eu^{hA} - I}{h} \to \eu^{tA}A$ aangezien
+$\norm{\frac{\eu^{hA} - I}h - A} \leq
+\sum_{n\geq2}\frac{\abs h^{n-1}\vertiii A^n}{n!} = O(h)$.
+Dus lost $t \mapsto \eu^{(t - s)A}v$ het Cauchy-probleem op
+dat $R(t,s)v$ definieert. Spectrale grens: via de
+Jordannormaalvorm (\cref{thm:b3:modules:jordan}), $A = P(D +
+N)P^{-1}$ met $D$ diagonaal met de eigenwaarden, $N$
+nilpotent, en $DN = ND$. Dan $\eu^{tA} =
+P\,\eu^{tD}\eu^{tN}P^{-1}$ met $\vertiii{\eu^{tD}} \leq
+\eu^{-(\alpha + \delta)t}$ voor enige $\delta > 0$ ($t \geq
+0$) en $\eu^{tN}$ polynomiaal in $t$ (nilpotentie): het
+product is $\leq C\eu^{-\alpha t}$ (polynoom verslagen door
+$\eu^{-\delta t}$).
+\end{proof}
+
+\begin{example}[Het vlak, geclassificeerd]
+\label{ex:b3:ode:planeclassification}
+Voor $x' = Ax$ met $A \in M_2(\R)$ inverteerbaar wordt het
+faseportret nabij $0$ bepaald door $\tau = \operatorname{tr}A$
+en $\delta = \det A$, via de eigenwaarden $\lambda_\pm =
+\frac{\tau \pm \sqrt{\tau^2 - 4\delta}}2$:
+\begin{itemize}
+  \item $\delta < 0$: reële eigenwaarden van tegengesteld
+        teken --- een \emph{zadel}; twee banen komen binnen,
+        twee vertrekken, alle andere vliegen voorbij. Altijd
+        instabiel.
+  \item $\delta > 0$, $\tau^2 \geq 4\delta$: reële
+        eigenwaarden van hetzelfde teken ($=
+        \operatorname{sign}\tau$) --- een \emph{knoop},
+        \omterm{def:b3:ode:stability}{stabiel} dan en slechts dan als $\tau < 0$; banen zijn
+        raak aan de trage eigenrichting.
+  \item $\delta > 0$, $\tau^2 < 4\delta$, $\tau \neq 0$:
+        complex geconjugeerde eigenwaarden $\frac\tau2 \pm
+        \iu\omega$ --- een \emph{spiraal} (focus), \omterm{def:b3:ode:stability}{stabiel} dan
+        en slechts dan als $\tau < 0$; de oplossingen zijn
+        $\eu^{\tau t/2}\times$ rotaties van periode
+        $\frac{2\pi}\omega$.
+  \item $\tau = 0$, $\delta > 0$: zuiver imaginaire
+        eigenwaarden --- een \emph{\omterm{ex:b3:groups:actions}{centrum}}: gesloten banen
+        (ellipsen), stabiliteit zonder asymptotische
+        stabiliteit, precies de grens die
+        \cref{thm:b3:ode:linearization} niet kan beslissen
+        voor niet-lineaire stelsels (het onderste evenwicht
+        van de slinger, \cref{pb:b3:ode:1}, zit hier).
+\end{itemize}
+De grensparabool $\tau^2 = 4\delta$ draagt de ontaarde knopen
+(Jordanblokken: banen met één enkele raakrichting). Alles
+wordt afgelezen uit twee getallen --- daarom is de eerste
+reflex vóór elk vlak faseportret $\operatorname{tr}$ en
+$\det$ te berekenen; b.v.\ $A =
+\bigl(\begin{smallmatrix}0 & 1\\ -1 &
+-c\end{smallmatrix}\bigr)$ (gedempte oscillator): $\delta = 1
+> 0$, $\tau = -c$: stabiele spiraal voor $0 < c < 2$, stabiele
+knoop voor $c \geq 2$ --- onderdemping versus overdemping, in
+één oogopslag.
+\end{example}
+
+\section{Stromen, evenwichten, stabiliteit}
+
+Beschouw nu de \emph{autonome} vergelijking $x' = F(x)$, $F
+\colon \Omega \to \R^d$ \omterm{def:b3:ode:lipschitz}{lokaal Lipschitz} op de open $\Omega
+\subseteq \R^d$. Schrijf $\varphi_t(x_0) = x(t)$ voor de
+\omterm{thm:b3:ode:maximal}{maximale oplossing} met $x(0) = x_0$ (de
+\emph{stroom}\index{stroom van een vectorveld}); autonomie
+geeft de groepeigenschap $\varphi_{t+s} =
+\varphi_t\circ\varphi_s$ waar gedefinieerd (beide kanten
+lossen hetzelfde probleem op in tijd $s$).
+
+\begin{definition}\label{def:b3:ode:stability}
+Een \emph{evenwicht} is een punt $\bar x$ met $F(\bar x) =
+0$ (dus $\varphi_t(\bar x) = \bar x$). Het is
+\emph{stabiel}\index{stabiliteit (Lyapunov)} als voor elke
+$\varepsilon > 0$ er $\delta > 0$ bestaat zodat
+$\norm{x_0 - \bar x} < \delta$ impliceert dat de oplossing
+bestaat voor alle $t \geq 0$ met $\norm{\varphi_t(x_0) - \bar
+x} < \varepsilon$; \emph{asymptotisch stabiel} als bovendien
+$\varphi_t(x_0) \to \bar x$ voor alle $x_0$ nabij $\bar x$.
+\end{definition}
+
+\begin{theorem}[Lyapunov-functies]\label{thm:b3:ode:lyapunov}
+Zij $\bar x$ een evenwicht en $V \colon \mathcal V \to
+\R$ een $\mathcal C^1$-functie op een \omterm{def:b3:topology:topology}{omgeving} van $\bar x$
+met:\index{Lyapunov-functie}
+\[
+V(\bar x) = 0,\qquad V(x) > 0 \text{ voor } x \neq \bar x,
+\qquad \dot V(x) = \nabla V(x)\cdot F(x) \leq 0 .
+\]
+Dan is $\bar x$ \omterm{def:b3:ode:stability}{stabiel}. Als bovendien $\dot V < 0$ buiten
+$\bar x$, dan is $\bar x$ asymptotisch \omterm{def:b3:ode:stability}{stabiel}.
+\end{theorem}
+
+\begin{proof}
+Langs een oplossing is $\frac{\dd}{\dd t}V(x(t)) = \dot
+V(x(t)) \leq 0$: $V$ daalt. Gegeven $\varepsilon$ (klein
+genoeg dat $\bar B(\bar x, \varepsilon) \subseteq \mathcal
+V$), laat $m = \min\{V(x) : \norm{x - \bar x} =
+\varepsilon\} > 0$ (compactheid, positiviteit) en kies
+$\delta < \varepsilon$ met $V < m$ op $B(\bar x, \delta)$
+(continuïteit). Een oplossing die start in $B(\bar x,
+\delta)$ heeft $V(x(t)) < m$ voor alle latere tijden, dus
+kan zij de bol $\norm{x - \bar x} = \varepsilon$ nooit
+bereiken (waar $V \geq m$): zij blijft in de bal --- en
+bestaat dan voor alle $t \geq 0$: de oplossing blijft in de
+compacte $\bar B$, dus dwingt
+\cref{thm:b3:ode:maximal}(2) (\omterm{thm:b3:ode:maximal}{ontsnappen uit compacta})
+$T_+ = +\infty$. Stabiliteit.
+
+Asymptotisch geval: laat $x(t)$ starten in $B(\bar x,
+\delta)$; $V(x(t))$ daalt naar enige $c \geq 0$. Als $c >
+0$: de \omterm{def:b3:groups:action}{baan} blijft in $K = \{x \in \bar B(\bar x,
+\varepsilon): V(x) \geq c\}$, een compacte verzameling die
+een \omterm{def:b3:topology:topology}{omgeving} van $\bar x$ uitsluit ($V$ is continu met
+$V(\bar x) = 0 < c$). Op $K$ is de functie $\dot V$ continu,
+strikt negatief, dus $\mu = \max_K\dot V < 0$
+(compactheid); dan $V(x(t)) \leq V(x(0)) + \mu t \to
+-\infty$: absurd, $V \geq 0$. Dus $c = 0$, en $x(t) \to
+\bar x$ (punten op afstand $\geq \rho$ van $\bar x$ binnen
+de bal hebben $V \geq m_\rho > 0$).
+\end{proof}
+
+\begin{theorem}[Stabiliteit door linearisatie]
+\label{thm:b3:ode:linearization}
+Zij $F$ van klasse $\mathcal C^1$, $F(\bar x) = 0$, $A =
+DF(\bar x)$. Als elke eigenwaarde van $A$ voldoet aan
+$\operatorname{Re}\lambda < 0$, dan is $\bar x$ asymptotisch
+\omterm{def:b3:ode:stability}{stabiel}.\index{stabiliteit door linearisatie}
+\end{theorem}
+
+\begin{proof}
+Transleer $\bar x$ naar $0$ en schrijf $F(x) = Ax + g(x)$ met
+$g(x) = o(\norm x)$ ($\mathcal C^1$-differentieerbaarheid).
+Kies $\alpha > 0$ met $\vertiii{\eu^{tA}} \leq
+C\eu^{-\alpha t}$ ($t \geq 0$; \cref{thm:b3:ode:matrixexp})
+en $r > 0$ met $\norm{g(x)} \leq \frac{\alpha}{2C}\norm x$
+voor $\norm x \leq r$. Duhamel met $b(s) = g(x(s))$:
+\[
+x(t) = \eu^{tA}x_0 + \int_0^t\eu^{(t-s)A}g(x(s))\,\dd s,
+\]
+geldig zolang $\norm{x(s)} \leq r$. Dan voldoet $u(t) =
+\eu^{\alpha t}\norm{x(t)}$ aan
+\[
+u(t) \leq C\norm{x_0} +
+\int_0^{t}C\,\frac{\alpha}{2C}\,u(s)\,\dd s ,
+\]
+dus geeft Grönwall $u(t) \leq C\norm{x_0}\eu^{\alpha t/2}$,
+d.w.z.\ $\norm{x(t)} \leq C\norm{x_0}\eu^{-\alpha t/2}$.
+Als $\norm{x_0} < r/C$, houdt de a-priorischatting
+$\norm{x(t)} < r$ voor alle $t$ (een
+continuïteits-/bootstrap-argument: de verzameling tijden
+waar $\norm x \leq r$ is open en gesloten in
+$\intco0{T_+}$ gegeven de strikte schatting), de oplossing is
+globaal, en zij convergeert exponentieel naar $0$:
+asymptotische stabiliteit.
+\end{proof}
+
+\begin{method}\label{met:b3:ode:strategy}
+Geconfronteerd met een DV: (1) bestaan/eenduidigheid ---
+controleer \omterm{def:b3:ode:lipschitz}{lokaal Lipschitz} (meestal $\mathcal C^1$); (2)
+globaliteit --- lineaire groei, begrensdheid, of een
+invariant compactum via een \omterm{thm:b3:ode:lyapunov}{Lyapunov-functie} of eerste
+integraal; bij falen, vermoed explosie en test op de scalaire
+karikatuur $x' = x^2$; (3) lineaire stelsels --- \omterm{thm:b3:ode:linearstructure}{resolvente},
+Duhamel, en voor constante coëfficiënten de eigenstructuur
+van $A$; (4) kwalitatieve vragen --- evenwichten,
+lineariseer, en jaag op een \omterm{thm:b3:ode:lyapunov}{Lyapunov-functie} (energie, wanneer
+het stelsel mechanisch is) of een eerste integraal waarvan
+de niveaucurven banen opsluiten. Het weekendprobleem loopt de
+hele methode door met de slinger.
+\end{method}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=11cm, height=6cm,
+    xmin=-7.2, xmax=7.2, ymin=-2.9, ymax=2.9,
+    xtick={-6.2832, -3.1416, 0, 3.1416, 6.2832},
+    xticklabels={$-2\pi$, $-\pi$, $0$, $\pi$, $2\pi$},
+    ytick={-2,0,2}]
+  % oscillations: E<1 : y = +-sqrt(2(E+cos x)), E = -0.3, 0.5
+  \foreach \E in {-0.3, 0.5}{
+    \addplot[omDef, samples=200, domain=-7.2:7.2]
+      {sqrt(max(0, 2*(\E + cos(deg(x)))))};
+    \addplot[omDef, samples=200, domain=-7.2:7.2]
+      {-sqrt(max(0, 2*(\E + cos(deg(x)))))};
+  }
+  % separatrix E = 1
+  \addplot[omThm, thick, samples=300, domain=-7.2:7.2]
+    {sqrt(max(0, 2*(1 + cos(deg(x)))))};
+  \addplot[omThm, thick, samples=300, domain=-7.2:7.2]
+    {-sqrt(max(0, 2*(1 + cos(deg(x)))))};
+  % rotations E > 1
+  \foreach \E in {1.6, 2.4}{
+    \addplot[omProp, samples=200, domain=-7.2:7.2]
+      {sqrt(2*(\E + cos(deg(x))))};
+    \addplot[omProp, samples=200, domain=-7.2:7.2]
+      {-sqrt(2*(\E + cos(deg(x))))};
+  }
+\end{axis}
+\end{tikzpicture}
+
+{\small Faseportret van de slinger $x'' = -\sin x$ in het
+$(x, x')$-vlak: niveaucurven van de energie $E = \frac{x'^2}2
+- \cos x$. Gesloten curven (blauw): oscillaties, $E < 1$;
+lopende curven (oranje): volledige rotaties, $E > 1$; ertussen
+de \emph{separatrix} (rood), $E = 1$, die de instabiele
+evenwichten $(\pm\pi, 0)$ verbindt. Het weekendprobleem
+bewijst alles wat dit plaatje suggereert.}
+\end{omfigure}
+
+\section{Oefeningen}
+
+\begin{exercise}[$\star$]\label{exo:b3:ode:1}
+Los expliciet op en bepaal het maximale interval:
+(a) $x' = x^2$, $x(0) = 1$; (b) $x' = 1 + x^2$, $x(0) = 0$;
+(c) $x' = x(1-x)$, $x(0) = \frac12$. Verenig elk antwoord
+met \cref{thm:b3:ode:maximal}(2) en
+\cref{cor:b3:ode:globallinear}.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b3:ode:2}
+Zij $x, y$ oplossingen van $x' = f(t,x)$ met $f$ globaal
+$L$-Lipschitz in $x$ op $\R\times\R^d$.
+(a) Bewijs $\norm{x(t) - y(t)} \leq \norm{x(0) -
+y(0)}\eu^{L\abs t}$, en toon met een voorbeeld (lineair!)
+dat de factor $\eu^{L\abs t}$ wordt bereikt.
+(b) Leid af dat de stroomafbeelding $x_0 \mapsto x(t; x_0)$
+continu is, zelfs Lipschitz op begrensde verzamelingen.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:ode:3}
+Toon aan dat elk van de volgende alle \omterm{thm:b3:ode:maximal}{maximale oplossingen}
+globaal op $\R$ heeft, met de juiste stelling:
+(a) $x' = \sin(tx)$;
+(b) $x' = \frac{t\,x}{1 + x^2}$;
+(c) $x'' + q(t)x = 0$ met $q$ continu (zet om naar een
+eerste-orde stelsel);
+(d) $x' = A(t)x$ met $A$ continu en begrensd --- en geef de
+Grönwall-grens op $\norm{x(t)}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:ode:4}
+(a) Bereken $\eu^{tA}$ voor
+$A = \bigl(\begin{smallmatrix}0 & -1\\ 1 &
+0\end{smallmatrix}\bigr)$,
+$\bigl(\begin{smallmatrix}\lambda & 1\\ 0 &
+\lambda\end{smallmatrix}\bigr)$, en
+$\bigl(\begin{smallmatrix}0 & 1\\ 1 &
+0\end{smallmatrix}\bigr)$.
+(b) Los de geforceerde oscillator $x'' + x = \cos(\omega t)$
+op via Duhamel (stelselvorm), voor $\omega \neq 1$ en $\omega
+= 1$: resonantie verschijnt als de seculaire term $t\sin t$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:ode:5}
+Voor de scalaire vergelijking $x'' + p(t)x' + q(t)x = 0$:
+(a) Toon aan dat de \omterm{thm:b3:ode:linearstructure}{Wronskiaan} $w = x_1x_2' - x_1'x_2$ van
+twee oplossingen voldoet aan $w' = -p\,w$ (Abel), en leid af
+dat twee oplossingen met $w \neq 0$ ergens een basis vormen.
+(b) Gegeven één nergens-verdwijnende oplossing $x_1$, vind de
+algemene oplossing door \emph{ordeverlaging}: stel $x_2 =
+x_1\int \frac{\eu^{-\int p}}{x_1^2}$ en verifieer. Pas toe
+op $t^2x'' - 2x = 0$ op $\intoo0{+\infty}$ met $x_1(t) =
+t^2$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:ode:6}
+(Logistisch) Voor $x' = x(1 - x)$: bepaal alle evenwichten en
+hun stabiliteit (via \cref{thm:b3:ode:linearization} en
+rechtstreeks); toon aan dat elke oplossing met $x(0) \in
+\intoo01$ stijgend is, globaal, met limieten $0$ en $1$ in
+$\mp\infty$; en los expliciet op ter bevestiging. Toon
+algemener dat scalaire autonome oplossingen monotoon zijn, en
+concludeer: geen niet-constante periodieke oplossingen in
+dimensie~$1$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:ode:7}
+(Eerste integralen) Zij $H \colon \Omega \to \R$ van klasse
+$\mathcal C^1$ en beschouw het vlakke Hamiltoniaanse stelsel
+$x' = \partial_yH$, $y' = -\partial_xH$.
+(a) Toon aan dat $H$ constant is langs oplossingen.
+(b) Voor $H = \frac{y^2}2 + \frac{x^4}4$: toon aan dat alle
+oplossingen globaal en begrensd zijn, en dat de oorsprong
+\omterm{def:b3:ode:stability}{stabiel} is (Lyapunov: $H$) hoewel de linearisatie
+($\bigl(\begin{smallmatrix}0&1\\0&0\end{smallmatrix}\bigr)$)
+\emph{niet} asymptotisch \omterm{def:b3:ode:stability}{stabiel} is: linearisatie kan
+inconclusief zijn.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:ode:8}
+(Gedempte slinger) $x'' + cx' + \sin x = 0$, $c > 0$;
+stelsel: $x' = y$, $y' = -\sin x - cy$.
+(a) Toon aan dat $V(x, y) = \frac{y^2}2 + 1 - \cos x$
+voldoet aan $\dot V = -cy^2 \leq 0$: de oorsprong is
+\omterm{def:b3:ode:stability}{stabiel}.
+(b) $\dot V$ verdwijnt op de hele as $y = 0$: het strikte
+criterium van Lyapunov faalt. Bewijs toch asymptotische
+stabiliteit, via linearisatie
+(\cref{thm:b3:ode:linearization}): bereken de eigenwaarden
+van de gelineariseerde matrix in $(0,0)$ en controleer
+$\operatorname{Re} < 0$ voor elke $c > 0$.
+(c) Wat gebeurt er in het evenwicht $(\pi, 0)$? Bereken de
+linearisatie en concludeer (één eigenwaarde positief:
+instabiliteit --- u mag de instabiliteitsuitspraak informeel
+gebruiken of een expliciet ontsnappende oplossing van het
+lineaire stelsel produceren).
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:ode:9}
+(Eenduidigheidsgrens) Voor $\alpha \in \intoo01$, toon aan
+dat het probleem $x' = \abs x^{\alpha}$, $x(0) = 0$ oneindig
+veel oplossingen heeft (pas \cref{pb:b3:complete:1}, Deel~III
+aan). Toon integendeel dat voor $\alpha = 1$ (d.w.z.\ $x' =
+\abs x$) de oplossing door $0$ uniek is, en identificeer
+precies welke hypothese van
+\cref{thm:b3:ode:cauchylipschitz} de twee gevallen
+onderscheidt.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:ode:10}
+(A-priorischattingen sluiten oplossingen op) Zij $F \colon
+\R^d \to \R^d$ \omterm{def:b3:ode:lipschitz}{lokaal Lipschitz} met $\langle F(x), x\rangle
+\leq 0$ wanneer $\norm x \geq R$.
+(a) Toon aan dat de gesloten bal $\bar B(0, R)$ positief
+invariant is: oplossingen die binnen starten blijven binnen
+voor $t \geq 0$. \emph{(Als $\norm{x(t_2)} > R$,
+beschouw de laatste tijd $t_1 < t_2$ met $\norm{x(t_1)} = R$
+en bestudeer $\frac{\dd}{\dd t}\norm{x(t)}^2$ op
+$\intcc{t_1}{t_2}$.)}
+(b) Leid globaal voorwaarts bestaan af voor gegevens in de
+bal. Behandel dan het gradiëntstelsel $x' = -\nabla G(x)$,
+$G \in \mathcal C^2$ met $G(x) \to +\infty$ als $\norm x \to
+\infty$: toon aan dat $G$ daalt langs oplossingen, dat elke
+oplossing in de (begrensde) subniveaumverzameling $\{G \leq
+G(x_0)\}$ blijft, en concludeer globaal voorwaarts bestaan.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:ode:11}
+(Explosie door vergelijking) Beschouw $x' = x^2 + t^2$,
+$x(0) = 1$.
+(a) Toon aan dat de \omterm{thm:b3:ode:maximal}{maximale oplossing} bestaat op enige
+$\intco0{T_+}$ met $T_+ < \infty$: vergelijk met $y' =
+y^2$, $y(0) = 1$ \emph{(bewijs het vergelijkingslemma dat u
+nodig hebt: als $x' \geq F(x)$ en $y' = F(y)$ met $x(0)
+\geq y(0)$, dan $x \geq y$ waar beiden leven)}, en leid af
+$T_+ \leq 1$.
+(b) Schat $T_+$ van onderen: op $\intcc01$ is $x' \leq x^2 +
+1$; vergelijk met de superoplossing $z' = z^2 + 1$, $z(0) =
+1$, opgelost door $z(t) = \tan\bigl(t + \frac\pi4\bigr)$, en
+concludeer $T_+ \geq \frac\pi4$.
+(c) Stel samen $\frac\pi4 \leq T_+ \leq 1$ en formuleer de
+moraal: superlineaire groei van het rechterlid is wat globaal
+bestaan doodt (\cref{exo:b3:ode:3} is het contrapunt), de
+grens is de convergentie van $\int^{\infty}\frac{\dd
+s}{F(s)}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:ode:12}
+(Vergelijkingsstelling van Sturm) Zij $q_1 \leq q_2$
+continu op een interval $I$, en zij $u \neq 0$ een oplossing
+van $u'' + q_1u = 0$, $v \neq 0$ een oplossing van $v'' +
+q_2v = 0$.
+(a) Stel de Wronskiaan-identiteit vast: met $W = uv' -
+u'v$, $W' = (q_1 - q_2)\,uv$.
+(b) (Sturm) Toon aan dat tussen twee opeenvolgende nulpunten
+$a < b$ van $u$, ofwel $v$ ergens in $\intoo ab$ verdwijnt,
+ofwel $q_1 = q_2$ en $v \propto u$ daar \emph{(neem $u > 0$
+op $\intoo ab$ en ook $v > 0$; integreer (a) van $a$ tot $b$
+en inspecteer de tekens van de randtermen $W(a), W(b)$)}.
+(c) Leid af: oplossingen van $u'' + qu = 0$ met $q \geq m >
+0$ verdwijnen minstens éénmaal in elk interval van lengte
+$\pi/\sqrt m$ (vergelijk met $v'' + mv = 0$); oplossingen met
+$q \leq 0$ verdwijnen hoogstens éénmaal op $\R$. Test beide
+op $q \equiv \pm1$.
+\end{exercise}
+
+\section{Probleem: de slinger, volledig opgelost}
+
+\begin{problem}[{Weekendprobleem --- oscillaties, rotaties,
+separatrix, en de periode}]\label{pb:b3:ode:1}
+De slingervergelijking $x'' = -\sin x$ --- als stelsel: $x' =
+y$, $y' = -\sin x$ op $\R^2$ --- is de drosophila van de
+dynamica: \omterm{def:b3:groups:simple}{eenvoudig} te schrijven, onmogelijk op te lossen met
+elementaire formules, maar \omterm{def:b3:complete:complete}{volledig} begrijpelijk via de
+kwalitatieve methode. Zij $E(x, y) = \frac{y^2}2 - \cos x$
+(de \emph{energie}).
+
+\medskip
+\noindent\textbf{Deel I --- Globale structuur.}
+\begin{enumerate}
+  \item Toon aan dat alle \omterm{thm:b3:ode:maximal}{maximale oplossingen} globaal zijn
+        ($\R$-gedefinieerd): gebruik $\dot E = 0$ en
+        \cref{thm:b3:ode:maximal}. Evenwichten: $(k\pi, 0)$;
+        classificeer hun linearisaties (centrum-type voor even
+        $k$, zadel voor oneven $k$).
+  \item Toon aan dat de banen in de niveaucurven $\{E =
+        E_0\}$ liggen, en schets/beschrijf ze naar de waarde
+        van $E_0 \in \intco{-1}{+\infty}$: $E_0 = -1$
+        (evenwichten), $-1 < E_0 < 1$ (gesloten curven rond
+        $(2k\pi, 0)$), $E_0 = 1$ (de separatrix door
+        $(\pm\pi, 0)$), $E_0 > 1$ (grafieken over $x$:
+        rotaties).
+  \item Bewijs dat het onderste evenwicht $(0,0)$ \omterm{def:b3:ode:stability}{stabiel} is
+        maar \emph{niet} asymptotisch \omterm{def:b3:ode:stability}{stabiel}.
+        \emph{(Lyapunov met $V = E + 1$; niet-asymptotisch:
+        energiebehoud sluit banen op niveaucurven weg van de
+        oorsprong.)}
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel II --- Oscillaties en hun periode.}
+Fixeer $-1 < E_0 < 1$ en schrijf $E_0 = -\cos a$ met $a \in
+\intoo0\pi$ (de amplitude).
+\begin{enumerate}[resume]
+  \item Toon aan dat de oplossing met $x(0) = a$, $y(0) = 0$
+        oscilleert: $x(t) \in \intcc{-a}a$, en de \omterm{def:b3:groups:action}{baan} is de
+        gesloten curve $y^2 = 2(\cos x - \cos a)$.
+        Rechtvaardig dat de oplossing periodiek is: de \omterm{def:b3:groups:action}{baan} is
+        een compacte curve zonder evenwichten, doorlopen met
+        snelheid van onderen begrensd --- maak hiervan een
+        argument (de oplossing keert in eindige tijd terug
+        naar haar beginpunt, dan dwingt eenduidigheid
+        periodiciteit).
+  \item Stel de periodeformule vast
+        \[
+        T(a) = 4\int_0^{a}\frac{\dd x}{\sqrt{2(\cos x -
+        \cos a)}}
+        \]
+        \emph{(op een kwartbaan is $y = \frac{\dd x}{\dd t} >
+        0$ en scheid de variabelen; rechtvaardig de oneigenlijke
+        convergentie in $x = a$)}.
+  \item (Kleine oscillaties) Substitueer $\sin\frac x2 =
+        \sin\frac a2\,\sin\varphi$ en toon aan
+        \[
+        T(a) = 4\int_0^{\pi/2}\frac{\dd\varphi}{\sqrt{1 -
+        k^2\sin^2\varphi}},
+        \qquad k = \sin\frac a2
+        \]
+        (een volledige elliptische integraal). Leid via
+        gedomineerde convergentie af dat $T(a) \to 2\pi$ als
+        $a \to 0^+$: de harmonische limiet, onafhankelijk van
+        de amplitude --- de bij benadering isochronie van
+        Galileo, met exacte correctie $T(a) =
+        2\pi\bigl(1 + \frac{k^2}4 + O(k^4)\bigr)$
+        (ontwikkel de integrand en integreer term voor term,
+        gerechtvaardigd door normale convergentie).
+  \item Toon aan dat $T(a) \to +\infty$ als $a \to \pi^-$
+        \emph{(schat de integrand van onderen nabij $\varphi
+        = \frac\pi2$ wanneer $k \to 1$, of pas monotone
+        convergentie toe)}: de separatrix nadererend, vertraagt
+        de slinger zonder grens.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel III --- De separatrix.}
+\begin{enumerate}[resume]
+  \item Voor $E_0 = 1$, $y = 2\cos\frac x2$ op de bovenste
+        tak: scheid de variabelen en integreer om de
+        expliciete oplossing te vinden
+        \[
+        x(t) = 4\arctan\bigl(\eu^{t}\bigr) - \pi
+        \]
+        (met $x(0) = 0$, $y(0) = 2$). Verifieer rechtstreeks
+        dat zij de slingervergelijking oplost, en bereken haar
+        limieten en de limieten van $y(t)$ als $t \to
+        \pm\infty$.
+  \item Concludeer: de separatrixbaan verbindt het zadel
+        $(-\pi, 0)$ (als $t \to -\infty$) met het zadel
+        $(\pi, 0)$ (als $t \to +\infty$) maar bereikt geen
+        van beide in eindige tijd --- consistent met
+        eenduidigheid (waarom zou het bereiken van een zadel
+        in eindige tijd \cref{cor:b3:ode:uniqueness}
+        tegenspreken?).
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel IV --- Rotaties, en het volledige
+beeld.}
+\begin{enumerate}[resume]
+  \item Voor $E_0 > 1$: toon aan dat $y$ nooit verdwijnt, $x$
+        strikt monotoon en globaal is met $x(t) \to
+        \pm\infty$, en $t \mapsto y(t)$ periodiek is met
+        periode
+        \[
+        \tau(E_0) = \int_{-\pi}^{\pi}
+        \frac{\dd x}{\sqrt{2(E_0 + \cos x)}} .
+        \]
+  \item Stel het volledige faseportret samen (de figuur van
+        het hoofdstuk) met volledige rechtvaardiging van elk
+        kenmerk, en schrijf een samenvatting van tien regels
+        van de methode: energie, niveaucurven, compactheid,
+        eenduidigheid --- hoe elke stelling van het hoofdstuk
+        binnenkwam. Waar hadden we ooit een formule voor de
+        algemene oplossing nodig?
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel V --- De periodefunctie onder de
+microscoop.}
+\begin{enumerate}[resume]
+  \item Bewijs de Wallis-momenten
+        \[
+        W_n = \int_0^{\pi/2}\sin^{2n}\varphi\,\dd\varphi
+        = \frac\pi2\cdot\frac{(2n)!}{4^n\,(n!)^2}
+        \]
+        door inductie (partieel integreren), ontwikkel de
+        integrand van vraag~6 via de binomiaalreeks, en
+        rechtvaardig term-voor-term-integratie om de volledige
+        reeks te verkrijgen
+        \[
+        T(a) = 2\pi\sum_{n\geq0}
+        \Bigl(\frac{(2n)!}{4^n(n!)^2}\Bigr)^{\!2}k^{2n}
+        = 2\pi\Bigl(1 + \frac{k^2}4 + \frac{9k^4}{64}
+        + O(k^6)\Bigr),
+        \qquad k = \sin\frac a2 .
+        \]
+  \item Zet om naar de amplitude:
+        \[
+        T(a) = 2\pi\Bigl(1 + \frac{a^2}{16} +
+        \frac{11\,a^4}{3072} + O(a^6)\Bigr)
+        \]
+        \emph{(substitueer de ontwikkeling van $\sin\frac a2$
+        en verzamel)}. Isochronie faalt in orde $a^2$, en het
+        falen is nu gekwantificeerd tot orde $a^4$.
+  \item Toon aan dat $a \mapsto T(a)$ continu en strikt
+        stijgend is op $\intoo0\pi$, en concludeer met
+        vragen~6--7 dat $T$ een bijectie is van
+        $\intoo0\pi$ op $\intoo{2\pi}{+\infty}$: elke
+        superkritische periode wordt gerealiseerd door precies
+        één amplitude.
+  \item (Rekenkunde van de klokkenmaker) Een slinger
+        afgesteld op verdwijnende amplitude houdt ideale tijd;
+        toon aan dat zij bij amplitude $a$ achterloopt met de
+        fractie $\frac{a^2}{16} + O(a^4)$ van ideale tijd, en
+        bereken de drift voor $a = 0{,}2$~rad: ongeveer $216$
+        seconden per dag. (De cycloïdale wangen van Huygens en
+        de kleine constante amplitudes van ankergangen zijn
+        beide antwoorden op dit getal.)
+  \item Keer terug naar de rotatieperiode $\tau$ van vraag
+        10: toon aan dat $\tau$ strikt dalend is op
+        $\intoo1{+\infty}$, dat $\tau(E_0) \to +\infty$ als
+        $E_0 \to 1^+$ (monotone convergentie), en dat
+        $\sqrt{2E_0}\,\tau(E_0) \to 2\pi$ als $E_0 \to
+        +\infty$ (gedomineerde convergentie): snelle rotatie is
+        asymptotisch vrije rotatie met hoeksnelheid
+        $\sqrt{2E_0}$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel VI --- De methode geëxporteerd:
+Lotka--Volterra.} Het recept van de slinger --- eerste
+integraal, compacte niveaucurven, eenduidigheid --- lost een
+ecosysteem op. Fixeer $\alpha, \beta, \gamma, \delta > 0$ en
+beschouw, op het open kwadrant $Q =
+\intoo0{+\infty}\times\intoo0{+\infty}$,
+\[
+x' = x\,(\alpha - \beta y), \qquad
+y' = y\,(\delta x - \gamma)
+\]
+($x$ prooi, $y$ predatoren).
+\begin{enumerate}[resume]
+  \item Toon aan dat $Q$ invariant is --- de assen zijn
+        unies van banen, expliciet berekenbaar, die geen
+        oplossing mag kruisen (\cref{cor:b3:ode:uniqueness})
+        --- en dat het unieke evenwicht in $Q$ is $(x_*, y_*)
+        = \bigl(\frac\gamma\delta, \frac\alpha\beta\bigr)$.
+  \item Toon aan dat
+        \[
+        H(x, y) = \delta x - \gamma\ln x + \beta y -
+        \alpha\ln y
+        \]
+        een eerste integraal is, dat $H = f(x) + g(y)$ met
+        $f, g$ strikt convex en proper op
+        $\intoo0{+\infty}$ met minima in $x_*$, $y_*$, en
+        leid af dat alle \omterm{thm:b3:ode:maximal}{maximale oplossingen} in $Q$ globaal
+        zijn.
+  \item Toon aan dat voor $h > h_* = H(x_*, y_*)$ de
+        niveaucurve $\{H = h\}\cap Q$ een gesloten curve is
+        rond het evenwicht: twee continue takken $y_\pm(x)$
+        over een compact interval $\intcc{x_-}{x_+} \ni
+        x_*$, gelijmd in de eindpunten --- het analoog van de
+        ovalen van de slinger.
+  \item Bewijs dat elke niet-evenwichtsbaan in $Q$ periodiek
+        is: vestig de tegen-de-klok-circulatie door de vier
+        gebieden gesneden door de lijnen $x = x_*$ en $y =
+        y_*$, schat de oversteektijd van elke boog door een
+        integraal met convergente vierkantswortelsingulariteit
+        (zoals in vraag~5), en sluit met eenduidigheid (zoals
+        in vraag~4).
+  \item (Wet van de gemiddelden van Volterra) Als $T$ de
+        periode is van zo'n \omterm{def:b3:groups:action}{baan}, toon aan dat
+        \[
+        \frac1T\int_0^Tx(t)\,\dd t = \frac\gamma\delta,
+        \qquad
+        \frac1T\int_0^Ty(t)\,\dd t = \frac\alpha\beta :
+        \]
+        de tijds-gemiddelden zijn gelijk aan de
+        evenwichtswaarden, ongeacht de amplitude
+        \emph{(integreer $(\ln x)' = \alpha - \beta y$ over
+        één periode)}.
+  \item (De visparadox) Oogst beide soorten met snelheid
+        $\varepsilon \in \intoo0\alpha$: het stelsel behoudt
+        zijn vorm met $\alpha - \varepsilon$ en $\gamma +
+        \varepsilon$ in plaats van $\alpha$ en $\gamma$. Wat
+        gebeurt er met de gemiddelde populaties? Verklaar de
+        waarneming van d'Ancona (1914--1918): toen de
+        Adriatische visserij tijdens de oorlog afnam, nam de
+        proportie predatoren (haaien) in de vangst \emph{toe}
+        --- en waarom matige visserij de prooi bevoordeelt.
+  \item Schrijf de moraal van tien regels: welke stellingen
+        van het hoofdstuk drijven elke stap, wat vervangt de
+        energie van de slinger, en waarom had geen van beide
+        stelsels --- of laat toe --- een elementaire
+        gesloten-vorm-oplossing nodig.
+
+  \item (Snelheidsmodulatie) In het rotatieregime $E_0 > 1$,
+        toon aan dat $y = x'$ oscilleert tussen
+        $\sqrt{2(E_0 - 1)}$ (in $x \equiv \pi \bmod 2\pi$)
+        en $\sqrt{2(E_0 + 1)}$ (in $x \equiv 0$), dat het
+        tijds-gemiddelde van $y$ over één periode precies
+        $\frac{2\pi}{\tau(E_0)}$ is, en dat de
+        modulatieverhouding $\sqrt{\frac{E_0 + 1}{E_0 - 1}}
+        \to 1$ als $E_0 \to \infty$: snelle rotatie is
+        asymptotisch uniform.
+  \item (Monotonie van de rotatieperiode) Toon aan dat
+        $\tau(E_0)$ van klasse $\mathcal C^1$ en strikt
+        dalend is op $\intoo1{+\infty}$
+        \emph{(differentieer onder het integraalteken, met
+        dominantie op elke $\intco{1 + \delta}\infty$)}, met
+        $\tau \to \infty$ als $E_0 \to 1^+$ en $\tau \to 0$
+        als $E_0 \to \infty$. Stel het volledige
+        bifurcatiebeeld van de slinger samen langs de
+        energie-as: evenwichten in $E_0 = -1$, libraties met
+        periode stijgend van $2\pi$ tot $\infty$ op $-1 <
+        E_0 < 1$, de separatrix in $E_0 = 1$, en rotaties met
+        periode dalend van $\infty$ tot $0$ daarbuiten.
+\end{enumerate}
+\end{problem}

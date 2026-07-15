@@ -1,0 +1,998 @@
+\chapter{Fonctions caractéristiques et théorème central
+limite}\label{ch:b3:clt}
+
+La \omterm{def:b3:probability:space}{loi} des grands nombres dit que les moyennes convergent~; le
+théorème central limite dit \emph{comment elles fluctuent}~:
+l'erreur, amplifiée par $\sqrt n$, est asymptotiquement
+gaussienne --- quelle que soit la \omterm{def:b3:probability:space}{loi} de départ. Cette
+universalité est le fait le plus profond des probabilités
+élémentaires, et sa preuve naturelle est fourier-analytique~:
+la \emph{\omterm{def:b3:clt:cf}{fonction caractéristique}} (la transformée de Fourier
+d'une \omterm{def:b3:probability:space}{loi}) convertit les sommes \omterm{def:b3:probability:independence}{indépendantes} en produits, et
+la machinerie du~\cref{ch:b3:fouriertransform} ---
+injectivité, points fixes \omterm{def:b3:clt:gaussianvector}{gaussiens} --- convertit la
+convergence ponctuelle de ces produits en convergence des
+\omterm{def:b3:probability:space}{lois} (théorème de Lévy, prouvé en entier). Le chapitre
+s'achève sur les \omterm{def:b3:clt:gaussianvector}{vecteurs gaussiens} et la dérivation honnête
+des intervalles de confiance utilisés partout en
+statistique~; le problème de week-end donne la seconde preuve
+de Lindeberg du TCL, avec un taux d'erreur explicite.
+
+\section{Fonctions caractéristiques}
+
+\begin{definition}\label{def:b3:clt:cf}
+La \emph{fonction caractéristique}\index{fonction
+caractéristique} d'une \omterm{def:b3:probability:space}{variable aléatoire} réelle $X$ est
+\[
+\varphi_X(\xi) = \E\bigl[\eu^{\iu\xi X}\bigr]
+= \int_\R \eu^{\iu\xi x}\,\dd\P_X(x)
+\qquad (\xi \in \R)
+\]
+(le théorème de transfert la calcule depuis la \omterm{def:b3:probability:space}{loi}~; pour une
+\omterm{ex:b3:lebesgue:gamma}{densité} $f$, $\varphi_X(\xi) = \hat f(-\xi)$ dans la
+convention du~\cref{ch:b3:fouriertransform}).
+\end{definition}
+
+\begin{proposition}\label{prop:b3:clt:cfbasics}
+(a) $\varphi_X(0) = 1$, $\abs{\varphi_X} \leq 1$, et
+$\varphi_X$ est uniformément \omterm{def:b3:topology:continuity}{continue}~;
+$\varphi_{aX + b}(\xi) = \eu^{\iu b\xi}\varphi_X(a\xi)$.
+(b) Si $X, Y$ sont \emph{\omterm{def:b3:probability:independence}{indépendantes}}~:
+$\varphi_{X+Y} = \varphi_X\,\varphi_Y$.
+(c) Si $\E\abs X^k < \infty$, alors $\varphi_X \in \mathcal
+C^k$ avec $\varphi_X^{(j)}(0) = \iu^j\,\E[X^j]$ pour $j \leq
+k$~; en particulier, pour $X$ centrée dans $L^2$ de variance
+$\sigma^2$~:
+\[
+\varphi_X(\xi) = 1 - \frac{\sigma^2\xi^2}{2} +
+o(\xi^2) \qquad (\xi \to 0).
+\]
+(d) Gaussienne~: $X \sim \mathcal N(m, \sigma^2)$ a
+$\varphi_X(\xi) = \eu^{\iu m\xi - \sigma^2\xi^2/2}$.
+\end{proposition}
+
+\begin{proof}
+(a) Les bornes sont immédiates~; continuité~:
+$\abs{\varphi(\xi + h) - \varphi(\xi)} \leq
+\E\abs{\eu^{\iu hX} - 1} \to 0$ quand $h \to 0$ par
+convergence dominée, uniformément en $\xi$. La règle affine
+est une substitution. (b) $\eu^{\iu\xi(X+Y)} =
+\eu^{\iu\xi X}\eu^{\iu\xi Y}$, et les \omterm{def:b3:probability:space}{espérances} de produits
+de variables \omterm{def:b3:probability:independence}{indépendantes} se factorisent
+(\cref{thm:b3:probability:independence}, appliqué aux
+parties réelles et imaginaires). (c) Dérivation sous
+l'\omterm{def:b3:probability:space}{espérance}, dominée par $\E\abs X^j$
+(\cref{thm:b3:lebesgue:paramdiff})~; le développement de
+Taylor en $0$ est alors Taylor--Young pour la fonction
+$\mathcal C^2$ $\varphi$. (d) Pour $\mathcal N(0,1)$~: la
+transformée gaussienne
+(\cref{ex:b3:fouriertransform:gaussian} avec $a = \frac12$)
+donne $\int\eu^{\iu\xi x}\frac{\eu^{-x^2/2}}{\sqrt{2\pi}}\dd
+x = \eu^{-\xi^2/2}$~; le cas général par la règle affine.
+\end{proof}
+\begin{theorem}[Injectivité]\label{thm:b3:clt:injectivity}
+Si $\varphi_X = \varphi_Y$, alors $X$ et $Y$ ont la même
+\omterm{def:b3:probability:space}{loi}. Plus précisément, pour $N \sim \mathcal N(0,1)$
+indépendante de $X$ et $\varepsilon > 0$, la variable lissée
+$X + \varepsilon N$ a pour \omterm{ex:b3:lebesgue:gamma}{densité}
+\[
+p_\varepsilon(x) = \frac1{2\pi}\int_\R
+\varphi_X(-\xi)\,\eu^{-\varepsilon^2\xi^2/2}\,
+\eu^{\iu\xi x}\,\dd\xi ,
+\]
+déterminée par $\varphi_X$ seule~; faire $\varepsilon \to 0$
+récupère la \omterm{def:b3:probability:space}{loi} de $X$.\index{fonction caractéristique,
+injectivité}
+\end{theorem}
+
+\begin{proof}
+$X + \varepsilon N$ a pour \omterm{ex:b3:lebesgue:gamma}{densité} $p_\varepsilon(x) =
+\E\bigl[g_\varepsilon(x - X)\bigr]$, où $g_\varepsilon$ est
+la \omterm{ex:b3:lebesgue:gamma}{densité} $\mathcal N(0, \varepsilon^2)$~: en effet pour
+$B$ borélien, l'\omterm{def:b3:probability:independence}{indépendance} et Tonelli donnent $\P(X +
+\varepsilon N \in B) = \int\!\!\int\mathbf 1_B(x +
+\varepsilon n)g_1(n)\,\dd n\,\dd\P_X(x) =
+\int_B\E[g_\varepsilon(t - X)]\dd t$ (substituer, puis
+Tonelli encore). Écrire $g_\varepsilon$ par inversion de
+Fourier de sa transformée
+(\cref{exo:b3:fouriertransform:4}, rescalée)~:
+$g_\varepsilon(u) = \frac1{2\pi}\int
+\eu^{-\varepsilon^2\xi^2/2}\eu^{\iu\xi u}\dd\xi$, et Fubini
+(tout est dominé par le facteur \omterm{def:b3:clt:gaussianvector}{gaussien})~:
+\[
+p_\varepsilon(x) = \frac1{2\pi}\int_\R
+\varphi_X(-\xi)\,\eu^{-\varepsilon^2\xi^2/2}\,
+\eu^{\iu\xi x}\,\dd\xi ,
+\]
+une fonctionnelle de $\varphi_X$ seule. Si $\varphi_X =
+\varphi_Y$~: $X + \varepsilon N$ et $Y + \varepsilon N$ ont
+même \omterm{def:b3:probability:space}{loi} pour tout $\varepsilon$~; pour $f$ \omterm{def:b3:topology:continuity}{continue} bornée,
+$\E f(X + \varepsilon N) \to \E f(X)$ quand $\varepsilon \to
+0$ (convergence dominée, $X + \varepsilon N \to X$
+pointwise sur l'espace produit), donc $\E f(X) = \E f(Y)$
+pour toute telle $f$ --- et cela détermine la \omterm{def:b3:probability:space}{loi}~: pour
+chaque $t$, encadrer $\mathbf 1_{\intoc{-\infty}t}$ entre
+les rampes \omterm{def:b3:topology:continuity}{continues} bornées $f_k^\pm$ (égales à $1$ sur
+$\intoc{-\infty}{t \mp \frac1k}$, à $0$ au-delà de $t \pm
+\frac1k$, affines entre)~; en passant à la limite dans $\E
+f_k^-(X) \leq F_X(t) \leq \E f_k^+(X)$ on obtient $F_X(t)
+= F_Y(t)$ en tout $t$ où les deux sont \omterm{def:b3:topology:continuity}{continues}, donc
+partout par continuité à droite et \omterm{ex:b3:lebesgue:gamma}{densité} des points de
+continuité communs (les deux $F$ ont dénombrablement
+beaucoup de sauts)~; des fonctions de répartition égales
+forcent des \omterm{def:b3:probability:space}{lois} égales (\cref{exo:b3:measure:3}, reposant
+sur le~\cref{thm:b3:measure:uniqueness}).
+\end{proof}
+
+\section{Convergence en loi}
+
+\begin{definition}\label{def:b3:clt:cid}
+$X_n$ \emph{converge en \omterm{def:b3:probability:space}{loi}} (ou en distribution) vers $X$,
+noté $X_n \Rightarrow X$, si\index{convergence en loi}
+\[
+\E\bigl[f(X_n)\bigr] \longrightarrow \E\bigl[f(X)\bigr]
+\qquad\text{pour toute } f\colon\R\to\R \text{ continue
+bornée}.
+\]
+Équivalemment (\cref{exo:b3:clt:4})~: $F_{X_n}(t) \to
+F_X(t)$ en tout point de continuité $t$ de $F_X$. Les $X_n$
+n'ont pas besoin de vivre sur un \omterm{def:b3:probability:space}{espace probabilisé}
+commun~: seules les \omterm{def:b3:probability:space}{lois} comptent.
+\end{definition}
+
+\begin{theorem}[Théorème de sélection de Helly]
+\label{thm:b3:clt:helly}
+Toute suite $(F_n)$ de fonctions de répartition admet une
+sous-suite convergeant pointwise, en tout point de continuité
+de la limite, vers une $G \colon \R \to \intcc01$ croissante
+et \omterm{def:b3:topology:continuity}{continue} à droite --- éventuellement avec $G(+\infty) -
+G(-\infty) < 1$ (de la masse peut s'échapper à
+l'infini).\index{théorème de Helly}
+\end{theorem}
+
+\begin{proof}
+L'extraction diagonale donne $F_{n_k}(q) \to \ell(q)$ pour
+tout rationnel $q$ (valeurs dans le compact $\intcc01$).
+Définir $G(t) = \inf\{\ell(q) : q \in \Q, q > t\}$~:
+croissante~; \omterm{def:b3:topology:continuity}{continue} à droite (un infimum sur des \omterm{def:b3:topology:topology}{voisinages}
+rationnels rétrécissants depuis la droite). En un point de
+continuité $t$ de $G$~: pour des rationnels $q_1 < t < q_2$,
+\[
+\ell(q_1) \leq \liminf F_{n_k}(t) \leq \limsup F_{n_k}(t)
+\leq \ell(q_2),
+\]
+par monotonie de chaque $F_{n_k}$. Depuis la définition de
+$G$ comme infimum et la monotonie de $\ell$ sur les
+rationnels~: $G(s) \leq \ell(q) \leq G(q)$ dès que $s < q$.
+Prendre $s < q_1 < t$ donne $\ell(q_1) \geq G(s)$, et
+$\ell(q_2) \leq G(q_2)$~; en faisant $s \uparrow t$ et $q_2
+\downarrow t$, la continuité de $G$ en $t$ force le
+$\liminf$ et le $\limsup$ vers $G(t)$.
+\end{proof}
+
+\begin{lemma}[Tension depuis la fonction caractéristique]
+\label{lem:b3:clt:tightness}
+Pour toute \omterm{def:b3:probability:space}{variable aléatoire} $X$ et $u > 0$~:
+\[
+\P\Bigl(\abs X \geq \frac2u\Bigr) \;\leq\;
+\frac1u\int_{-u}^{u}\bigl(1 -
+\operatorname{Re}\varphi_X(\xi)\bigr)\,\dd\xi .
+\]
+\end{lemma}
+
+\begin{proof}
+Par Tonelli--Fubini (intégrande bornée, région finie en
+$\xi$)~:
+\[
+\frac1u\int_{-u}^u\bigl(1 -
+\operatorname{Re}\varphi_X(\xi)\bigr)\dd\xi
+= \E\Bigl[\frac1u\int_{-u}^u(1 - \cos(\xi X))\,\dd\xi\Bigr]
+= 2\,\E\Bigl[1 - \frac{\sin(uX)}{uX}\Bigr]
+\]
+(interpréter le crochet comme sa limite $0$ en $X = 0$).
+L'intégrande est positive ($\abs{\sin t} \leq \abs t$), et
+pour $\abs{uX} \geq 2$~: $1 - \frac{\sin(uX)}{uX} \geq 1 -
+\frac1{\abs{uX}} \geq \frac12$. En ne gardant que
+l'événement $\{\abs{uX} \geq 2\}$ dans l'\omterm{def:b3:probability:space}{espérance}, on laisse
+au moins $2 \cdot \frac12\,\P(\abs X \geq \frac2u)$, qui
+est l'affirmation.
+\end{proof}
+
+\begin{theorem}[Théorème de continuité de Lévy]
+\label{thm:b3:clt:levy}
+Soient $(X_n)$ des \omterm{def:b3:probability:space}{variables aléatoires} dont les \omterm{def:b3:clt:cf}{fonctions
+caractéristiques} convergent pointwise~: $\varphi_{X_n}(\xi)
+\to \varphi(\xi)$ pour tout $\xi$, où $\varphi = \varphi_X$
+est la \omterm{def:b3:clt:cf}{fonction caractéristique} d'une certaine \omterm{def:b3:probability:space}{variable
+aléatoire} $X$. Alors $X_n \Rightarrow X$.\index{théorème de
+continuité de Lévy}
+\end{theorem}
+
+\begin{proof}
+\emph{Tension.} Fixer $\varepsilon > 0$. Comme $\varphi$ est
+\omterm{def:b3:topology:continuity}{continue} en $0$ avec $\varphi(0) = 1$, choisir $u > 0$ avec
+$\frac1u\int_{-u}^u(1 - \operatorname{Re}\varphi) <
+\varepsilon$~; par convergence dominée (intégrande bornée
+par $2$ sur le $[-u,u]$ fixe), la même intégrale pour
+$\varphi_{X_n}$ est $< 2\varepsilon$ pour $n$ grand~: le
+\cref{lem:b3:clt:tightness} donne $\P(\abs{X_n} \geq
+\frac2u) \leq 2\varepsilon$ pour $n$ grand, et élargir la
+constante gère les finiment beaucoup d'autres~: les \omterm{def:b3:probability:space}{lois}
+sont \emph{tendues} --- aucune masse ne s'échappe.
+
+\emph{Sous-suites.} Soit $(F_{n_k})$ une sous-suite
+quelconque~; par Helly (\cref{thm:b3:clt:helly}) extraire
+$F_{n_{k_j}} \to G$ aux points de continuité. La tension
+force $G(-\infty) = 0$, $G(+\infty) = 1$ ($G(\frac2u) -
+G(-\frac2u) \geq 1 - 2\varepsilon$ aux points de
+continuité)~: $G$ est une vraie fonction de répartition,
+d'une certaine variable $Y$. Alors $X_{n_{k_j}} \Rightarrow
+Y$ (\cref{exo:b3:clt:4}, convergence en \omterm{def:b3:probability:space}{loi} depuis les $F$),
+donc $\varphi_{X_{n_{k_j}}} \to \varphi_Y$ \emph{pointwise}
+($x \mapsto \eu^{\iu\xi x}$ est \omterm{def:b3:topology:continuity}{continue} bornée, parties
+réelle et imaginaire séparément)~; en comparant avec
+l'hypothèse~: $\varphi_Y = \varphi = \varphi_X$, et
+l'injectivité (\cref{thm:b3:clt:injectivity}) donne $Y \sim
+X$, c'est-à-dire $G = F_X$.
+
+\emph{Conclusion.} Toute sous-suite de $(F_n)$ a une
+sous-sous-suite convergeant vers la \emph{même} $F_X$ (en
+ses points de continuité)~; donc $F_n(t) \to F_X(t)$ en tout
+point de continuité $t$ (une suite réelle dont toutes les
+sous-suites ont des sous-sous-suites de même limite
+converge)~: $X_n \Rightarrow X$.
+\end{proof}
+
+\section{Le théorème central limite}
+
+\begin{theorem}[Théorème central limite]\label{thm:b3:clt:clt}
+Soient $(X_n)$ i.i.d.\ avec $\E X_1 = m$ et $\V(X_1) =
+\sigma^2 \in \intoo0\infty$. Alors\index{théorème central
+limite}
+\[
+\frac{S_n - nm}{\sigma\sqrt n} \;\Longrightarrow\; \mathcal
+N(0, 1) :
+\qquad
+\P\Bigl(a \leq \frac{S_n - nm}{\sigma\sqrt n} \leq
+b\Bigr) \longrightarrow
+\frac{1}{\sqrt{2\pi}}\int_a^b\eu^{-x^2/2}\,\dd x
+\]
+pour tous $a < b$.
+\end{theorem}
+
+\begin{proof}
+Centrer et normaliser~: $Z_i = \frac{X_i - m}{\sigma}$
+(i.i.d., moyenne $0$, variance $1$) et $T_n =
+\frac1{\sqrt n}\sum_{i\leq n}Z_i$. Par \omterm{def:b3:probability:independence}{indépendance} et la
+règle affine (\cref{prop:b3:clt:cfbasics})~:
+\[
+\varphi_{T_n}(\xi) =
+\varphi_{Z}\Bigl(\frac{\xi}{\sqrt n}\Bigr)^{n},
+\qquad
+\varphi_Z(\eta) = 1 - \frac{\eta^2}2 + \eta^2\rho(\eta),\quad
+\rho(\eta)\to0 .
+\]
+Fixer $\xi$ et poser $a_n = \varphi_Z(\xi/\sqrt n)$, $b_n =
+1 - \frac{\xi^2}{2n}$~: tous deux ont un \omterm{def:b3:modules:module}{module} $\leq 1$
+pour $n$ grand ($\abs{b_n} \leq 1$ dès que $\xi^2 \leq 4n$~;
+$\abs{a_n} \leq 1$ toujours). L'inégalité élémentaire
+$\abs{a^n - b^n} \leq n\abs{a - b}$ pour $\abs a, \abs b
+\leq 1$ (télescopage $a^n - b^n = \sum a^k(a - b)b^{n-1-k}$)
+donne
+\[
+\Bigl|\varphi_{T_n}(\xi) - \Bigl(1 -
+\frac{\xi^2}{2n}\Bigr)^{n}\Bigr|
+\leq n\,\Bigl|\varphi_Z\Bigl(\frac\xi{\sqrt n}\Bigr) - 1 +
+\frac{\xi^2}{2n}\Bigr|
+= \xi^2\,\Bigl|\rho\Bigl(\frac{\xi}{\sqrt n}\Bigr)\Bigr|
+\longrightarrow 0,
+\]
+tandis que $\bigl(1 - \frac{\xi^2}{2n}\bigr)^n \to
+\eu^{-\xi^2/2}$ (logarithme réel). Donc $\varphi_{T_n}(\xi)
+\to \eu^{-\xi^2/2} = \varphi_{\mathcal N(0,1)}(\xi)$
+(\cref{prop:b3:clt:cfbasics}(d)) pour tout $\xi$~: Lévy
+(\cref{thm:b3:clt:levy}) conclut $T_n \Rightarrow \mathcal
+N(0,1)$. Les probabilités d'intervalles suivent car
+$F_{\mathcal N}$ est \omterm{def:b3:topology:continuity}{continue} partout.
+\end{proof}
+
+\begin{example}[Intervalles de confiance, honnêtement dérivés]
+\label{ex:b3:clt:confidence}
+Sonder $n$ électeurs indépendants~; $\hat p_n = S_n/n$
+estime le vrai $p$, avec $\sigma^2 = p(1-p) \leq \frac14$.
+Le TCL donne, pour $n$ grand,
+\[
+\P\Bigl(\abs{\hat p_n - p} \leq
+\frac{z}{2\sqrt n}\Bigr)
+\;\geq\; \P\Bigl(\Bigl|\frac{S_n - np}{\sigma\sqrt n}\Bigr|
+\leq z\Bigr)
+\longrightarrow \Phi(z) - \Phi(-z),
+\]
+où $\Phi$ est la fonction de répartition gaussienne
+standard. Avec $z = 1.96$~: confiance asymptotique $95\%$,
+et une marge $\frac{1.96}{2\sqrt n} \leq 3\%$ exige $n \geq
+\bigl(\frac{1.96}{0.06}\bigr)^2 \approx 1068$ --- le nombre
+derrière chaque <<~$\pm3$ points, $95\%$~>> qu'on lit~;
+comparer aux $5556$ de Bienaymé--Tchebychev
+(\cref{exo:b3:probability:7}). Le $\sqrt n$ est
+universel~: pour diviser l'erreur par deux, quadrupler
+l'échantillon --- la même \omterm{def:b3:probability:space}{loi} qui fixe le coût du
+\omterm{ex:b3:probability:sllnapps}{Monte-Carlo} (\cref{exo:b3:clt:7}).
+\end{example}
+
+\section{Vecteurs gaussiens}
+
+\begin{definition}\label{def:b3:clt:gaussianvector}
+Un vecteur aléatoire $X = (X_1, \dots, X_d)$ est
+\emph{gaussien}\index{vecteur gaussien} si toute combinaison
+linéaire $\langle t, X\rangle = \sum t_iX_i$ est une
+variable gaussienne réelle (éventuellement dégénérée). Sa
+\omterm{def:b3:probability:space}{loi} est déterminée par le vecteur moyen $m = (\E X_i)$ et la
+\emph{matrice de covariance} $\Sigma =
+\bigl(\operatorname{Cov}(X_i, X_j)\bigr)$~: en effet la
+\omterm{def:b3:clt:cf}{fonction caractéristique} du vecteur, $\varphi_X(t) =
+\E\eu^{\iu\langle t, X\rangle}$, est la valeur en $1$ de la
+fc de $\langle t, X\rangle$~:
+\[
+\varphi_X(t) = \exp\Bigl(\iu\langle t, m\rangle -
+\tfrac12\,t^{\mathsf T}\Sigma\,t\Bigr),
+\]
+et les \omterm{def:b3:clt:cf}{fonctions caractéristiques} $d$-dimensionnelles sont
+injectives (même preuve de lissage que
+le~\cref{thm:b3:clt:injectivity}, gaussiennes
+coordonnée par coordonnée).
+\end{definition}
+
+\begin{theorem}\label{thm:b3:clt:gaussianvector}
+Soit $X$ un \omterm{def:b3:clt:gaussianvector}{vecteur gaussien}.
+\begin{enumerate}
+  \item Toute image affine $AX + b$ est un \omterm{def:b3:clt:gaussianvector}{vecteur
+        gaussien}.
+  \item Les composantes $X_i$ sont \emph{\omterm{def:b3:probability:independence}{indépendantes}} si
+        et seulement si $\Sigma$ est diagonale~: pour des
+        variables conjointement gaussiennes, non corrélées
+        $=$ \omterm{def:b3:probability:independence}{indépendantes}.
+  \item Si $\Sigma$ est inversible, $X$ a pour \omterm{ex:b3:lebesgue:gamma}{densité}
+        $\frac{1}{(2\pi)^{d/2}\sqrt{\det\Sigma}}
+        \exp\bigl(-\frac12(x - m)^{\mathsf T}\Sigma^{-1}(x -
+        m)\bigr)$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) Les combinaisons linéaires des composantes de $AX + b$
+sont des fonctions affines de combinaisons linéaires de
+$X$~: gaussiennes (l'image affine d'une variable gaussienne
+est gaussienne).
+(2) Si $\Sigma$ est diagonale, la \omterm{def:b3:clt:cf}{fonction caractéristique}
+se factorise~: $\varphi_X(t) = \prod_i\exp(\iu t_im_i -
+\frac12\Sigma_{ii}t_i^2) = \prod\varphi_{X_i}(t_i)$, qui est
+la \omterm{def:b3:clt:cf}{fonction caractéristique} de la \omterm{def:b3:probability:space}{loi} produit
+(\cref{thm:b3:probability:independence} lue via
+l'injectivité $d$-dimensionnelle)~: les composantes sont
+\omterm{def:b3:probability:independence}{indépendantes}. La réciproque est l'annulation des
+covariances de variables $L^2$ \omterm{def:b3:probability:independence}{indépendantes}.
+(3) Diagonaliser $\Sigma = P D P^{\mathsf T}$ ($P$
+orthogonal, $D > 0$ diagonale ---
+\cref{exo:b3:submanifolds:8})~; le vecteur $Y = P^{\mathsf
+T}(X - m)$ est \omterm{def:b3:clt:gaussianvector}{gaussien} de covariance $D$~: par (2) ses
+composantes sont \omterm{def:b3:probability:independence}{indépendantes} $\mathcal N(0, d_i)$, donc
+$Y$ a la \omterm{ex:b3:lebesgue:gamma}{densité} produit~; pousser en avant par le
+$x = m + PY$ préservant le volume
+(\cref{thm:b3:product:linearchange}, $\abs{\det P} = 1$) et
+réécrire l'exposant de façon invariante.
+\end{proof}
+
+\begin{theorem}[TCL multidimensionnel]
+\label{thm:b3:clt:multiclt}
+Soient $(X_n)$ des \emph{vecteurs} aléatoires i.i.d.\ de
+$\R^d$ de carré \omterm{def:b3:lebesgue:l1}{intégrable}, d'\omterm{def:b3:probability:space}{espérance} $m$ et de matrice
+de covariance $\Sigma$. Alors $\frac{S_n - nm}{\sqrt n}$
+converge en \omterm{def:b3:probability:space}{loi} vers le \omterm{def:b3:clt:gaussianvector}{vecteur gaussien} $\mathcal N(0,
+\Sigma)$.\index{théorème central limite!multidimensionnel}
+\admitted
+\end{theorem}
+
+\begin{remark}\label{rem:b3:clt:multiclt}
+Presque tout est déjà entre nos mains. Pour chaque
+direction $t \in \R^d$, la variable réelle $\langle t,
+\frac{S_n - nm}{\sqrt n}\rangle$ est une somme normalisée
+de variables réelles i.i.d.\ de variance $t^{\mathsf
+T}\Sigma t$, donc le calcul du~\cref{thm:b3:clt:clt} donne
+la convergence ponctuelle des \omterm{def:b3:clt:cf}{fonctions caractéristiques}
+$d$-dimensionnelles vers $\eu^{-t^{\mathsf T}\Sigma t/2}$,
+la \omterm{def:b3:clt:cf}{fonction caractéristique} de $\mathcal N(0, \Sigma)$
+(\cref{def:b3:clt:gaussianvector}). Ce que nous n'avons pas
+reprouvé est le théorème de continuité de Lévy \emph{dans
+$\R^d$}~: la sélection de Helly et l'estimée de tension se
+généralisent routinièrement (coordonnée par coordonnée), et
+cette réduction de Cramér--Wold est menée honnêtement dans
+tout cours de probabilités de master~; rien au-delà des
+méthodes de ce chapitre n'est nécessaire.
+\end{remark}
+
+\begin{method}\label{met:b3:clt:method}
+Pour identifier une \omterm{def:b3:probability:space}{loi} limite~: calculer les \omterm{def:b3:clt:cf}{fonctions
+caractéristiques}, prendre la limite ponctuelle, la
+reconnaître (gaussienne $\eu^{-\sigma^2\xi^2/2}$, Poisson
+$\eu^{\lambda(\eu^{\iu\xi}-1)}$, exponentielle
+$\frac{\lambda}{\lambda - \iu\xi}$, $\dots$) et invoquer
+Lévy. Le rituel en trois étapes (\omterm{def:b3:probability:independence}{indépendance} $\to$
+produit~; Taylor en $0$ $\to$ limite exponentielle~; Lévy
+$\to$ convergence en \omterm{def:b3:probability:space}{loi}) prouve le TCL, la \omterm{def:b3:probability:space}{loi} de Poisson
+des événements rares (\cref{exo:b3:clt:5}), et tout
+théorème limite classique de ce cours. Pour les énoncés
+p.s., revenir à la boîte à outils du
+\cref{ch:b3:probability}~: les deux chapitres répondent à
+des questions différentes sur le même $S_n$.
+\end{method}
+
+
+\section{Exercices}
+
+\begin{exercise}[$\star$]\label{exo:b3:clt:1}
+Calculer les \omterm{def:b3:clt:cf}{fonctions caractéristiques}~: uniforme sur
+$\intcc{-1}1$~; exponentielle $\mathcal E(\lambda)$~;
+Poisson $\mathcal P(\lambda)$~; binomiale $\mathcal B(n,
+p)$. En déduire via le~\cref{thm:b3:clt:injectivity} que la
+somme de variables de Poisson \omterm{def:b3:probability:independence}{indépendantes} ($\lambda,
+\mu$) est Poisson $(\lambda + \mu)$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:2}
+(a) Montrer que $\varphi_X$ est à valeurs réelles si et
+seulement si $X$ et $-X$ ont la même \omterm{def:b3:probability:space}{loi} (une variable
+\emph{symétrique}).
+(b) Supposer $\abs{\varphi_X(\xi_0)} = 1$ pour un $\xi_0
+\neq 0$. Montrer que $X$ est presque sûrement supportée sur
+une progression arithmétique $a + \frac{2\pi}{\xi_0}\Z$
+\emph{(écrire $\varphi_X(\xi_0) = \eu^{\iu\theta}$ et
+calculer $\E[1 - \cos(\xi_0X - \theta)]$)}. En déduire que
+si $X$ a une \omterm{ex:b3:lebesgue:gamma}{densité}, alors $\abs{\varphi_X(\xi)} < 1$ pour
+tout $\xi \neq 0$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:3}
+Soient $X \sim \mathcal N(m_1, \sigma_1^2)$ et $Y \sim
+\mathcal N(m_2, \sigma_2^2)$ \omterm{def:b3:probability:independence}{indépendantes}. Montrer $X + Y
+\sim \mathcal N(m_1 + m_2, \sigma_1^2 + \sigma_2^2)$, et
+plus généralement que la famille gaussienne est \omterm{def:b3:ode:stability}{stable} sous
+sommes \omterm{def:b3:probability:independence}{indépendantes} et applications affines. Contraste~: la
+somme de deux gaussiennes \emph{dépendantes} est-elle
+toujours gaussienne~? (\cref{exo:b3:clt:9}.)
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:4}
+(a) Prouver l'équivalence dans
+la~\cref{def:b3:clt:cid}~: si $\E f(X_n) \to \E f(X)$ pour
+toute $f$ \omterm{def:b3:topology:continuity}{continue} bornée, alors $F_{X_n}(t) \to F_X(t)$
+aux points de continuité \emph{(encadrer $\mathbf
+1_{\intoc{-\infty}t}$ entre deux rampes en escalier
+\omterm{def:b3:topology:continuity}{continues})}~; et réciproquement \emph{(approximer une $f$
+\omterm{def:b3:topology:continuity}{continue} bornée par des sommes de fonctions en rampe, ou
+conditionner sur une grille fine de points de continuité)}
+--- la réciproque peut être traitée d'abord pour $f$
+uniformément \omterm{def:b3:topology:continuity}{continue}, puis en général.
+(b) Montrer que $X_n \Rightarrow c$ (une constante) implique
+$X_n \to c$ en probabilité.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:5}
+(\omterm{def:b3:probability:space}{Loi} des événements rares) Soit $X_n \sim \mathcal B(n,
+p_n)$ avec $np_n \to \lambda > 0$. Montrer, via les
+\omterm{def:b3:clt:cf}{fonctions caractéristiques} et le~\cref{thm:b3:clt:levy},
+que $X_n \Rightarrow \mathcal P(\lambda)$. Vérification
+numérique~: comparer $\P(X = 0)$ pour $\mathcal B(100,
+0.02)$ et $\mathcal P(2)$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:6}
+(a) Un dé équitable est lancé $n = 1000$ fois~; approximer
+la probabilité que le total dépasse $3600$ (moyenne $3500$,
+variance par lancer $\frac{35}{12}$).
+(b) Pour $S \sim \mathcal B(100, \frac12)$, approximer
+$\P(45 \leq S \leq 55)$ par le TCL avec la correction de
+continuité ($\pm\frac12$), et commenter l'effet de la
+correction.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:7}
+(Erreur de \omterm{ex:b3:probability:sllnapps}{Monte-Carlo}) Dans le cadre du
+\cref{pb:b3:probability:1}, question~11, avec $g \in
+L^2(\intcc01^d)$, soit $\sigma^2 = \V(g(U_1))$ et $I =
+\int g$. Montrer
+\[
+\sqrt n\,\Bigl(\frac1n\sum_{k\leq n}g(U_k) - I\Bigr)
+\Longrightarrow \mathcal N(0, \sigma^2),
+\]
+et en déduire la barre d'erreur asymptotique $95\%$ $\pm
+1.96\,\sigma/\sqrt n$ --- indépendante de la dimension $d$.
+Comparer avec la règle du point milieu déterministe en
+dimension $d$ (erreur $\sim n^{-2/d}$ pour des intégrandes
+$\mathcal C^2$)~: à partir de quelle dimension
+l'échantillonnage aléatoire l'emporte-t-il~?
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:clt:8}
+(Slutsky) Supposer $X_n \Rightarrow X$ et $Y_n \to c$ en
+probabilité ($c$ constante). Montrer $X_n + Y_n \Rightarrow
+X + c$ et $Y_nX_n \Rightarrow cX$. \emph{(Travailler avec
+les \omterm{def:b3:clt:cf}{fonctions caractéristiques} et la borne
+$\abs{\E\eu^{\iu\xi(X_n+Y_n)} - \eu^{\iu\xi
+c}\E\eu^{\iu\xi X_n}} \leq \E\abs{\eu^{\iu\xi(Y_n - c)} -
+1}$, scinder sur $\abs{Y_n - c} \leq \delta$.)}
+Application~: dans l'\cref{ex:b3:clt:confidence}, justifier
+le remplacement de l'inconnue $\sigma = \sqrt{p(1-p)}$ par
+$\sqrt{\hat p_n(1 - \hat p_n)}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:clt:9}
+Soit $X \sim \mathcal N(0,1)$ et $\varepsilon$ indépendante
+avec $\P(\varepsilon = \pm1) = \frac12$~; poser $Y =
+\varepsilon X$.
+(a) Montrer $Y \sim \mathcal N(0,1)$ et
+$\operatorname{Cov}(X, Y) = 0$.
+(b) Montrer que $X$ et $Y$ ne sont \emph{pas}
+\omterm{def:b3:probability:independence}{indépendantes}, et que $(X, Y)$ n'est pas un \omterm{def:b3:clt:gaussianvector}{vecteur
+gaussien} \emph{(calculer $\P(X + Y = 0)$)}.
+(c) Morale~: le~\cref{thm:b3:clt:gaussianvector}(2) exige
+la gaussianité conjointe --- <<~gaussiennes non corrélées~>>
+seules ne prouvent rien.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:10}
+La \omterm{def:b3:probability:space}{loi} de Cauchy a pour \omterm{ex:b3:lebesgue:gamma}{densité} $\frac1{\pi(1 + x^2)}$.
+(a) Montrer que sa \omterm{def:b3:clt:cf}{fonction caractéristique} est
+$\eu^{-\abs\xi}$ (\cref{exo:b3:fouriertransform:1} et
+inversion).
+(b) Montrer que si $X_1, \dots, X_n$ sont i.i.d.\ Cauchy,
+alors $\frac{S_n}n$ est encore Cauchy --- la \emph{même}
+\omterm{def:b3:probability:space}{loi}~: la moyenne ne se concentre jamais.
+(c) Réconcilier avec les \omterm{def:b3:probability:space}{lois} des grands nombres et le
+TCL~: quelles hypothèses échouent~? (Calculer $\E\abs{X_1}$.)
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:11}
+(\omterm{def:b3:probability:space}{Lois} \omterm{def:b3:ode:stability}{stables} en germe) Soient $(X_n)$ i.i.d.\ Cauchy
+standard (\cref{exo:b3:clt:10}).
+(a) Montrer que pour tous $a, b > 0$, $aX_1 + bX_2$ a la
+\omterm{def:b3:probability:space}{loi} de $(a + b)X_1$~: la famille de Cauchy est
+\emph{strictement \omterm{def:b3:ode:stability}{stable}} d'\omterm{def:b3:holomorphic:index}{indice} $1$.
+(b) Montrer que la famille gaussienne est strictement
+\omterm{def:b3:ode:stability}{stable} d'\omterm{def:b3:holomorphic:index}{indice} $2$~: $aX_1 + bX_2 \sim \sqrt{a^2 +
+b^2}\,X_1$ pour $X_i$ i.i.d.\ $\mathcal N(0,1)$.
+(c) Expliquer, via les \omterm{def:b3:clt:cf}{fonctions caractéristiques} de la
+forme $\eu^{-c\abs\xi^\alpha}$, pourquoi la stabilité
+d'\omterm{def:b3:holomorphic:index}{indice} $\alpha$ force la normalisation $n^{1/\alpha}$
+pour les sommes, et ce que cela dit sur les bassins
+d'attraction du TCL~: quelles sommes i.i.d.\ peuvent
+converger, après normalisation affine, vers une \omterm{def:b3:probability:space}{loi} de
+Cauchy plutôt qu'une gaussienne~?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:12}
+(La fonction de répartition empirique) Soient $(X_n)$
+i.i.d.\ de fonction de répartition $F$, et $F_n(t) =
+\frac1n\#\{k \leq n : X_k \leq t\}$.
+(a) Fixer $t$. Montrer que $n F_n(t) \sim \mathcal B(n,
+F(t))$, que $F_n(t) \to F(t)$ p.s.\
+(\cref{thm:b3:probability:slln}), et que
+\[
+\sqrt n\,\bigl(F_n(t) - F(t)\bigr) \Longrightarrow
+\mathcal N\bigl(0,\ F(t)(1 - F(t))\bigr) .
+\]
+(b) En quel $t$ la variance asymptotique est-elle
+maximale~? Interpréter~: la médiane est l'endroit où une
+répartition empirique est le plus difficile à épingler.
+(c) Pour $F$ \omterm{def:b3:topology:continuity}{continue}, montrer que la \omterm{def:b3:probability:space}{loi} de
+$\sup_t\abs{F_n(t) - F(t)}$ ne dépend pas de $F$
+\emph{(se ramener à des variables uniformes via
+l'\cref{exo:b3:probability:1})} --- le miracle sans
+distribution derrière le test de Kolmogorov--Smirnov~; aucun
+calcul de cette \omterm{def:b3:probability:space}{loi} n'est demandé.
+\end{exercise}
+
+\section{Problème~: la preuve de Lindeberg du TCL, avec un
+taux}
+
+\begin{problem}[{Problème de week-end --- la méthode de
+remplacement}]\label{pb:b3:clt:1}
+Lindeberg (1922) a prouvé le théorème central limite par une
+idée d'une simplicité désarmante~: \emph{échanger les
+summands un par un contre des gaussiennes} et contrôler
+chaque échange par un développement de Taylor. La méthode
+n'a besoin d'aucune analyse de Fourier, produit un taux
+d'erreur explicite, et alimente aujourd'hui les preuves
+d'universalité à travers la théorie des probabilités.
+Soient $(X_i)$ i.i.d., centrées, $\V(X_1) = 1$, avec $\beta
+= \E\abs{X_1}^3 < \infty$~; soient $(N_i)$ i.i.d.\
+$\mathcal N(0,1)$, \omterm{def:b3:probability:independence}{indépendantes} des $X_i$ (existence~:
+\cref{thm:b3:probability:existence}). Poser
+\[
+T_n = \frac{X_1 + \dots + X_n}{\sqrt n},
+\qquad
+G_n = \frac{N_1 + \dots + N_n}{\sqrt n} \sim \mathcal N(0,1).
+\]
+
+\medskip
+\noindent\textbf{Partie I --- L'identité d'échange.} Fixer
+$f \in \mathcal C^3_b(\R)$ (trois dérivées \omterm{def:b3:topology:continuity}{continues}
+bornées~; $M_3 = \sup\abs{f'''}$). Pour $0 \leq i \leq n$
+définir les sommes hybrides
+\[
+H_i = \frac{X_1 + \dots + X_i + N_{i+1} + \dots +
+N_n}{\sqrt n},
+\]
+donc $H_n = T_n$ et $H_0 = G_n$.
+\begin{enumerate}
+  \item Écrire $H_i = W_i + \frac{X_i}{\sqrt n}$ et
+        $H_{i-1} = W_i + \frac{N_i}{\sqrt n}$ avec $W_i =
+        \frac{1}{\sqrt n}\bigl(\sum_{j<i}X_j +
+        \sum_{j>i}N_j\bigr)$, et noter que $W_i$ est
+        indépendante de la paire $(X_i, N_i)$. Justifier.
+  \item Taylor avec reste intégral ou de Lagrange~: pour
+        tous réels $w, h$~:
+        \[
+        \Bigl|f(w + h) - f(w) - f'(w)h -
+        \tfrac12f''(w)h^2\Bigr| \leq
+        \frac{M_3\,\abs h^3}{6} .
+        \]
+  \item Appliquer la question~2 deux fois ($h =
+        \frac{X_i}{\sqrt n}$ et $h = \frac{N_i}{\sqrt n}$ en
+        $w = W_i$), prendre les \omterm{def:b3:probability:space}{espérances}, et utiliser
+        l'\omterm{def:b3:probability:independence}{indépendance} plus l'égalité des deux premiers
+        moments de $X_i$ et $N_i$ pour montrer
+        \[
+        \bigl|\E f(H_i) - \E f(H_{i-1})\bigr|
+        \leq \frac{M_3}{6}\cdot
+        \frac{\beta + \gamma}{n^{3/2}},
+        \qquad \gamma = \E\abs{N_1}^3 =
+        \frac{2\sqrt2}{\sqrt\pi} .
+        \]
+  \item Télescoper sur $i$ et conclure la \emph{borne de
+        Lindeberg}~:
+        \[
+        \bigl|\E f(T_n) - \E f(G_n)\bigr| \leq
+        \frac{M_3\,(\beta + \gamma)}{6\,\sqrt n} .
+        \]
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie II --- Des $f$ lisses au TCL.}
+\begin{enumerate}[resume]
+  \item Montrer que $\E f(T_n) \to \E f(N)$ pour toute $f
+        \in \mathcal C_b^3$, et monter à toutes les $f$
+        \omterm{def:b3:topology:continuity}{continues} bornées~: étant donnés une telle $f$ et
+        $\varepsilon$, construire $f_\varepsilon \in
+        \mathcal C^3_b$ avec $\norm{f - f_\varepsilon}_\infty
+        \leq \varepsilon$ sur un grand intervalle --- p.ex.\
+        convoler $f$ avec une bosse $\mathcal C^\infty$
+        (\cref{thm:b3:lp:regularization}) --- et traiter les
+        queues par la tension ($\V(T_n) = 1$ et
+        Bienaymé--Tchebychev). Conclure $T_n \Rightarrow
+        \mathcal N(0, 1)$~: le théorème central limite,
+        reprouvé.
+  \item Où la preuve a-t-elle utilisé que les $X_i$ sont
+        \emph{identiquement} distribuées~? Montrer que
+        c'est à peine le cas~: énoncer et prouver la
+        version pour des $X_i$ \omterm{def:b3:probability:independence}{indépendantes}, centrées, non
+        identiques avec $\sum_i\V(X_i) = s_n^2$ et moments
+        d'ordre trois, obtenant l'erreur
+        $\frac{M_3}{6s_n^3}\sum_i\bigl(\E\abs{X_i}^3 +
+        \V(X_i)^{3/2}\gamma\bigr)$ --- le vrai théorème de
+        Lindeberg sous sa forme de Lyapunov.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie III --- Dividendes quantitatifs.}
+\begin{enumerate}[resume]
+  \item (Fonctions de répartition) Soit $t \in \R$ et
+        approximer $\mathbf 1_{\intoc{-\infty}t}$ par
+        dessus et par dessous par des rampes $\mathcal
+        C^3_b$ de largeur $\delta$ (les construire, avec
+        $M_3 = O(\delta^{-3})$). En combinant avec la
+        Partie~I, dériver la borne à deux termes
+        \[
+        \sup_{t\in\R}\,\bigl|\P(T_n \leq t) -
+        \Phi(t)\bigr| \;\leq\;
+        \frac{C_1(\beta + \gamma)}{\delta^3\sqrt n} +
+        C_2\,\delta
+        \qquad (\text{tout } \delta > 0),
+        \]
+        avec des constantes explicites (le terme $C_2\delta$
+        utilise que $\Phi$ a une \omterm{ex:b3:lebesgue:gamma}{densité} bornée par
+        $\frac1{\sqrt{2\pi}}$), et optimiser $\delta \sim
+        n^{-1/8}$ pour obtenir un taux uniforme d'ordre
+        $n^{-1/8}$.
+        (L'optimal $n^{-1/2}$ --- Berry--Esseen --- demande
+        des outils plus fins~; le point est un taux
+        \emph{explicite} par échange élémentaire.)
+  \item (De Moivre--Laplace, quantifié) Spécialiser à $X_i
+        = 2B_i - 1$ (signes de pièces équitables)~: comparer
+        la conclusion avec l'estimée locale du
+        \cref{pb:b3:product:1}, question~7 --- que donne
+        chaque méthode que l'autre ne donne pas~?
+  \item (Universalité) Expliquer en un paragraphe pourquoi
+        la méthode de remplacement montre plus que le
+        TCL~: toute statistique de la forme $\E
+        f(\text{somme})$ avec $f$ lisse est insensible, à
+        l'ordre $n^{-1/2}$, à la \emph{\omterm{def:b3:probability:space}{loi} entière} des
+        summands au-delà de ses deux premiers moments ---
+        le «~principe d'invariance~» qui sous-tend les
+        résultats modernes d'universalité (matrices
+        aléatoires, polynômes aléatoires), dont le TCL est
+        la première instance.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie IV --- Lissage poussé~: meilleurs
+taux.} La perte de $n^{-1/2}$ ($f$ lisse) à $n^{-1/8}$
+(fonctions de répartition) venait de facturer $f'''$ en
+norme sup. Les hybrides peuvent en réparer une partie~: ils
+contiennent des summands \omterm{def:b3:clt:gaussianvector}{gaussiens}, et les gaussiennes
+\emph{lissent}.
+\begin{enumerate}[resume]
+  \item (Une gaussienne cachée) Pour $1 \leq i \leq n - 1$,
+        $h = \frac{X_i}{\sqrt n}$ ou $\frac{N_i}{\sqrt n}$,
+        et $\theta \in \intcc01$, écrire $W_i + \theta h =
+        A + Z$ avec $Z = \frac{N_{i+1} + \dots + N_n}{\sqrt
+        n}$. Montrer que $Z \sim \mathcal N\bigl(0,
+        \frac{n-i}n\bigr)$ est indépendante de la paire
+        $(A, h)$, et en déduire, pour toute $g$ \omterm{def:b3:topology:continuity}{continue}
+        dans $L^1(\R)$,
+        \[
+        \E\bigl[\abs h^3\,\abs{g(W_i + \theta h)}\bigr]
+        \;\leq\; \sqrt{\frac{n}{2\pi(n - i)}}\;
+        \norm{g}_{L^1}\;\E\abs h^3 .
+        \]
+  \item Combiner la question~10 avec la forme intégrale du
+        reste de Taylor,
+        \[
+        f(w + h) = f(w) + f'(w)h + \tfrac12f''(w)h^2 +
+        \int_0^1\frac{(1 - \theta)^2}2\,f'''(w + \theta
+        h)\,h^3\,\dd\theta,
+        \]
+        pour refaire les questions~3--4~: pour $f \in
+        \mathcal C^3_b$ avec de plus $f''' \in L^1(\R)$,
+        \[
+        \bigl|\E f(T_n) - \E f(G_n)\bigr| \leq
+        \frac{\beta + \gamma}{3\sqrt{2\pi}}\cdot
+        \frac{\norm{f'''}_{L^1}}{\sqrt n} +
+        \frac{M_3(\beta + \gamma)}{6\,n^{3/2}}
+        \]
+        \emph{(la question~10 traite les échanges $i \leq n
+        - 1$ --- utiliser $\sum_{m=1}^{n-1}m^{-1/2} \leq
+        2\sqrt n$ --- et la borne grossière de la question~3
+        traite le dernier)}. Vérifier que les rampes de la
+        question~7 satisfont $\norm{\psi_\delta'''}_{L^1} =
+        K_1\delta^{-2}$ tandis que $M_3 = K\delta^{-3}$,
+        les injecter, et optimiser $\delta$~: le taux
+        uniforme de fonction de répartition s'améliore en
+        $O(n^{-1/6})$.
+  \item (Apparier un moment de plus) Supposer de plus $\E
+        X_1^3 = 0$ et $\beta_4 = \E X_1^4 < \infty$.
+        Calculer $\E N_1^3$ et $\E N_1^4$, développer à
+        l'ordre quatre, et prouver le long des mêmes lignes
+        que le taux de fonction de répartition devient
+        $O(n^{-1/4})$ \emph{(maintenant
+        $\norm{\psi_\delta^{(4)}}_{L^1} = K_2\delta^{-3}$
+        et $M_4 = K'\delta^{-4}$~; choisir $\delta =
+        n^{-1/4}$)}.
+  \item (L'obstruction) Supposer que les $k$ premiers
+        moments de $X_1$ coïncident avec les \omterm{def:b3:clt:gaussianvector}{gaussiens} ($k
+        = 2$ toujours~; $k = 3$ exactement quand $\E X_1^3
+        = 0$~; $k \geq 4$ essentiellement jamais, car $\E
+        N_1^4 = 3$). Vérifier que le schéma des
+        questions~10--12 délivre le taux de fonction de
+        répartition $n^{-(k-1)/(2k+2)}$, en équilibrant
+        $\delta^{-k}n^{-(k-1)/2}$ contre $\delta$, et
+        observer que l'exposant n'approche la valeur de
+        Berry--Esseen $\frac12$ que quand $k \to \infty$.
+        Expliquer en quelques phrases pourquoi la méthode
+        d'échange sature~: chaque échange est facturé en
+        valeur absolue, tandis que la voie de Fourier
+        (inégalité de lissage d'Esseen) exploite
+        l'oscillation de la différence des \omterm{def:b3:clt:cf}{fonctions
+        caractéristiques} et atteint $C\beta n^{-1/2}$ avec
+        seulement trois moments.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie V --- Deux dimensions~: le TCL
+multidimensionnel, par échange.} Soient maintenant les
+$X_i$ des \emph{vecteurs} aléatoires i.i.d.\ centrés de
+$\R^2$ de matrice de covariance $\Sigma$ et $\beta' =
+\E\norm{X_1}^3 < \infty$ (norme euclidienne).
+\begin{enumerate}[resume]
+  \item (\omterm{def:b3:clt:gaussianvector}{Vecteurs gaussiens}, en ordre) Diagonaliser $\Sigma
+        = PDP^{\mathsf T}$ (\cref{exo:b3:submanifolds:8}) et
+        poser $C = P\sqrt DP^{\mathsf T}$. Pour $Z = (Z^1,
+        Z^2)$ une paire de gaussiennes standard
+        \omterm{def:b3:probability:independence}{indépendantes} (\cref{thm:b3:probability:existence}),
+        montrer que $N = CZ$ est un \omterm{def:b3:clt:gaussianvector}{vecteur gaussien}
+        (\cref{def:b3:clt:gaussianvector}) d'\omterm{def:b3:probability:space}{espérance} $0$,
+        de covariance $\Sigma$, avec $\gamma' = \E\norm N^3
+        < \infty$~; et que $G_n = \frac{N_1 + \dots +
+        N_n}{\sqrt n}$ a pour \omterm{def:b3:probability:space}{loi} $\mathcal N(0, \Sigma)$
+        \emph{exactement} pour des copies i.i.d.\ $N_i$.
+  \item (Taylor en deux variables) Pour $f \colon \R^2 \to
+        \R$ de classe $\mathcal C^3$ avec $M_3 =
+        \max_{\abs\alpha = 3}\sup\abs{\partial^\alpha f} <
+        \infty$, prouver
+        \[
+        \Bigl|f(w + h) - f(w) - \langle\nabla f(w),
+        h\rangle - \tfrac12\langle h, D^2f(w)\,h\rangle
+        \Bigr| \leq \frac{M_3}6\,\bigl(\abs{h_1} +
+        \abs{h_2}\bigr)^3 \leq \frac{\sqrt2\,M_3}3\,
+        \norm h^3
+        \]
+        \emph{(étudier $t \mapsto f(w + th)$ sur
+        $\intcc01$)}.
+  \item (Le TCL dans $\R^2$) Faire tourner le schéma de
+        remplacement sur les hybrides vectoriels $H_i$~:
+        montrer que les termes d'ordre un et deux
+        s'annulent (moyennes et covariances coïncident),
+        télescoper, et monter comme à la question~5 (tension
+        depuis $\E\norm{T_n}^2 = \operatorname{tr}\Sigma$~;
+        mollification maintenant dans $\R^2$,
+        \cref{thm:b3:lp:regularization}) pour conclure~:
+        pour toute $f \colon \R^2 \to \R$ \omterm{def:b3:topology:continuity}{continue} bornée,
+        \[
+        \E\,f\Bigl(\frac{X_1 + \dots + X_n}{\sqrt n}\Bigr)
+        \longrightarrow \E\,f(N), \qquad N \sim \mathcal
+        N(0, \Sigma) :
+        \]
+        le~\cref{thm:b3:clt:multiclt} en dimension~$2$, avec
+        un taux pour les $f$ lisses et sans analyse de
+        Fourier.
+  \item (Cramér--Wold, et une fluctuation jointe) En
+        déduire que $\langle t, \frac{S_n}{\sqrt n}\rangle
+        \Rightarrow \mathcal N(0, t^{\mathsf T}\Sigma t)$
+        pour tout $t \in \R^2$ fixé. Application~: pour des
+        $(\xi_i)$ réels i.i.d., centrés, $\E\xi_1^2 = 1$,
+        $\E\xi_1^6 < \infty$ (de sorte que la Partie~V
+        s'applique à $V_i = (\xi_i, \xi_i^2 - 1)$), montrer
+        \[
+        \frac1{\sqrt n}\Bigl(\sum_{i\leq n}\xi_i,\
+        \sum_{i\leq n}(\xi_i^2 - 1)\Bigr) \Longrightarrow
+        \mathcal N\Bigl(0, \begin{pmatrix} 1 & \E\xi_1^3\\
+        \E\xi_1^3 & \E\xi_1^4 - 1\end{pmatrix}\Bigr) :
+        \]
+        moyenne empirique et second moment empirique
+        fluctuent conjointement de façon gaussienne ---
+        indépendamment à la limite si et seulement si
+        $\E\xi_1^3 = 0$ (\cref{thm:b3:clt:gaussianvector}).
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie VI --- La méthode delta.}
+\begin{enumerate}[resume]
+  \item Soient $(\hat\theta_n)$ des \omterm{def:b3:probability:space}{variables aléatoires}
+        avec $\sqrt n(\hat\theta_n - \theta) \Rightarrow
+        \mathcal N(0, \sigma^2)$ pour un paramètre réel
+        $\theta$, et $g$ différentiable en $\theta$.
+        Prouver la \emph{méthode delta}~:
+        \[
+        \sqrt n\bigl(g(\hat\theta_n) - g(\theta)\bigr)
+        \Longrightarrow \mathcal N\bigl(0,
+        g'(\theta)^2\sigma^2\bigr)
+        \]
+        \emph{(écrire $g(x) - g(\theta) = (g'(\theta) +
+        \eta(x))(x - \theta)$ avec $\eta \to 0$ en
+        $\theta$~; montrer $\hat\theta_n \to \theta$, puis
+        $\eta(\hat\theta_n) \to 0$, en probabilité~;
+        conclure avec Slutsky, \cref{exo:b3:clt:8}, et
+        \cref{exo:b3:clt:4}(b))}.
+  \item Applications. (a) Pour des $(\xi_i)$ réels i.i.d.\
+        d'\omterm{def:b3:probability:space}{espérance} $\mu$ et de variance $\sigma^2$, et
+        $\bar X_n = \frac1n\sum_{i\leq n}\xi_i$~: montrer
+        $\sqrt n(\bar X_n^2 - \mu^2) \Rightarrow \mathcal
+        N(0, 4\mu^2\sigma^2)$ quand $\mu \neq 0$, et que
+        pour $\mu = 0$ l'énoncé correct vit à une autre
+        échelle~: $n\bar X_n^2 \Rightarrow \sigma^2N^2$
+        avec $N \sim \mathcal N(0,1)$ (identifier la
+        fonction de répartition de la limite). (b)
+        (Stabilisation de la variance) Pour $\hat p_n$ la
+        fréquence de succès d'un échantillon $\mathcal
+        B(1, p)$, $p \in \intoo01$~: montrer que $g(p) =
+        \arcsin\sqrt p$ satisfait
+        \[
+        \sqrt n\,\bigl(g(\hat p_n) - g(p)\bigr)
+        \Longrightarrow \mathcal N\Bigl(0, \frac14\Bigr)
+        \]
+        \emph{quel que soit} $p$ --- une barre d'erreur
+        asymptotique \omterm{def:b3:modules:free}{libre} du paramètre inconnu~; comparer
+        avec l'\cref{ex:b3:clt:confidence}.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie VII --- Poisson, par la même
+méthode~: le théorème de Le Cam.} Le remplacement connaît
+une seconde classe d'universalité~: les sommes de beaucoup
+d'événements indépendants \emph{rares}. Pour les \omterm{def:b3:probability:space}{lois} sur
+$\N$ la bonne distance est la \emph{variation totale},
+\[
+d_{\mathrm{TV}}(\mu, \nu) = \sup_{A\subseteq\N}\,
+\abs{\mu(A) - \nu(A)} .
+\]
+\begin{enumerate}[resume]
+  \item Montrer que $d_{\mathrm{TV}}(\mu, \nu) =
+        \frac12\sum_{k\geq0}\abs{\mu(\{k\}) -
+        \nu(\{k\})}$, et prouver la borne de couplage~: pour
+        \emph{toute} paire $(X, Y)$ de \omterm{def:b3:probability:space}{variables aléatoires}
+        de \omterm{def:b3:probability:space}{lois} $\mu$ et $\nu$ sur le même espace,
+        $d_{\mathrm{TV}}(\mu, \nu) \leq \P(X \neq Y)$.
+  \item Calculer exactement, pour $p \in \intoo01$~:
+        \[
+        d_{\mathrm{TV}}\bigl(\mathcal B(1, p), \mathcal
+        P(p)\bigr) = p\bigl(1 - \eu^{-p}\bigr) \leq p^2 .
+        \]
+  \item (Le Cam, par échange) Soient $X_i \sim \mathcal
+        B(1, p_i)$ et $Y_i \sim \mathcal P(p_i)$, les $2n$
+        variables \omterm{def:b3:probability:independence}{indépendantes}~; $S = X_1 + \dots + X_n$,
+        et rappeler $Y_1 + \dots + Y_n \sim \mathcal
+        P(\lambda)$ avec $\lambda = \sum_ip_i$
+        (\cref{exo:b3:clt:1}). Échanger une coordonnée à la
+        fois dans les hybrides entiers $H_i = Y_1 + \dots +
+        Y_i + X_{i+1} + \dots + X_n$~: montrer, pour tout
+        $A \subseteq \N$,
+        \[
+        \abs{\P(H_{i-1} \in A) - \P(H_i \in A)} \leq
+        d_{\mathrm{TV}}\bigl(\mathcal B(1, p_i), \mathcal
+        P(p_i)\bigr),
+        \]
+        et conclure l'\emph{inégalité de Le Cam}~:
+        \[
+        d_{\mathrm{TV}}\bigl(\text{loi de } S,\ \mathcal
+        P(\lambda)\bigr) \leq \sum_{i=1}^np_i^2 .
+        \]
+  \item Dividendes. (a) Pour $p_i = \frac\lambda n$~: la
+        borne est $\frac{\lambda^2}n$ --- la \omterm{def:b3:probability:space}{loi} des
+        événements rares (\cref{exo:b3:clt:5}) montée à un
+        taux explicite, uniforme sur tous les événements, et
+        valable pour des $p_i$ inégaux aussi. (b) $500$
+        lettres sont livrées, chacune s'égarant
+        indépendamment avec probabilité $\frac1{500}$~:
+        borner l'erreur du modèle de Poisson de paramètre
+        $1$, et estimer la probabilité qu'aucune lettre ne
+        s'égare. (c) Clore le problème~: comparer les deux
+        classes d'universalité rencontrées ici ---
+        gaussienne (beaucoup de petites contributions
+        étalées~; deux moments appariés~; Taylor) et
+        Poisson (beaucoup de contributions rares~; une
+        moyenne appariée~; un couplage exact en variation
+        totale) --- et la seule méthode de remplacement
+        derrière les deux.
+
+  \item (Erreur relative et transformée log) Soient
+        $(X_n)$ i.i.d., positives, d'\omterm{def:b3:probability:space}{espérance} $\mu > 0$,
+        de variance $\sigma^2$, et $\bar X_n$ la moyenne
+        empirique. Montrer par la méthode delta que
+        \[
+        \sqrt n\,\bigl(\ln\bar X_n - \ln\mu\bigr)
+        \Longrightarrow
+        \mathcal N\Bigl(0,\ \frac{\sigma^2}{\mu^2}\Bigr) :
+        \]
+        le paramètre asymptotique de $\ln\bar X_n$ est le
+        \emph{coefficient de variation} $\sigma/\mu$ ---
+        erreur relative, sans échelle. En déduire un
+        intervalle de confiance $95\%$ pour $\mu$ de la
+        forme multiplicative $\bar
+        X_n\cdot\eu^{\pm1.96\,\sigma/(\mu\sqrt n)}$, et
+        expliquer quand il est préférable à l'additif.
+  \item (Le troisième moment oriente l'erreur) Pour $X
+        \sim$ Bernoulli($p$) centrée, calculer
+        $\E\bigl[(X - p)^3\bigr] = p(1-p)(1-2p)$. En
+        utilisant l'analyse de la Partie~IV (l'erreur
+        d'échange est pilotée par les moments d'ordre
+        trois), expliquer pourquoi l'approximation normale
+        de $\mathcal B(n, p)$ est asymétrique pour $p \neq
+        \frac12$ --- dépassant d'un côté, sous-estimant de
+        l'autre --- et pourquoi $p = \frac12$ bénéficie du
+        taux plus rapide à moments appariés. Vérifier le
+        signe de l'asymétrie numériquement sur $\mathcal
+        B(20, 0.1)$ contre $\mathcal N(2, 1.8)$~: comparer
+        $\P(S = 0) = 0.9^{20}$ avec la masse gaussienne de
+        $\intoo{-\infty}{0.5}$.
+\end{enumerate}
+\end{problem}

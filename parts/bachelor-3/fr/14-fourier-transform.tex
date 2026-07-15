@@ -1,0 +1,800 @@
+\chapter{La transformée de Fourier}\label{ch:b3:fouriertransform}
+
+Les séries de Fourier décomposent les signaux périodiques en
+harmoniques discrètes~; la \emph{transformée} de Fourier fait
+de même pour les signaux sur toute la droite, avec un continuum
+de fréquences. Elle convertit la dérivation en multiplication,
+la convolution en produits, et les gaussiennes en gaussiennes
+--- les raisons pour lesquelles elle résout les équations
+différentielles, anime le traitement du signal, et prouvera le
+théorème central limite au~\cref{ch:b3:clt}. Ce chapitre
+développe la théorie $L^1$ (Riemann--Lebesgue, inversion,
+injectivité), la \omterm{def:b3:fouriertransform:schwartz}{classe de Schwartz} où la transformée est une
+bijection parfaite, et la théorie $L^2$ (Plancherel~: la
+transformée est, à une constante près, un opérateur unitaire),
+avec deux applications vitrines~: l'équation de la chaleur,
+résolue de bout en bout dans le problème du week-end, et la
+formule de sommation de Poisson. Convention~:
+\[
+\hat f(\xi) = \int_\R f(x)\,\eu^{-\iu\xi x}\,\dd x .
+\]
+
+\section{La transformée sur \texorpdfstring{$L^1$}{L1}}
+
+\begin{proposition}\label{prop:b3:fouriertransform:basic}
+Pour $f \in L^1(\R)$~: $\hat f$ est bien définie, bornée
+($\norm{\hat f}_\infty \leq \norm f_1$), \omterm{def:b3:topology:continuity}{continue}, et~:
+\begin{enumerate}
+  \item $\widehat{\tau_af}(\xi) = \eu^{-\iu a\xi}\hat f(\xi)$
+        et $\widehat{\eu^{\iu ax}f}(\xi) = \hat f(\xi - a)$~;
+  \item $\widehat{f(\cdot/\lambda)}(\xi) = \lambda\hat
+        f(\lambda\xi)$ pour $\lambda > 0$~;
+  \item si $xf \in L^1$, alors $\hat f$ est $\mathcal C^1$ avec
+        $(\hat f)'(\xi) = \widehat{(-\iu x)f}(\xi)$~;
+  \item si $f \in \mathcal C^1$ avec $f' \in L^1$ (et $f \to
+        0$ en $\pm\infty$, automatique ici), alors
+        $\widehat{f'}(\xi) = \iu\xi\hat f(\xi)$~;
+  \item $\widehat{f * g} = \hat f\,\hat g$ pour $f, g \in L^1$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+Bornitude~: $\abs{\hat f} \leq \int\abs f$. Continuité~: DCT
+avec dominante $\abs f$ (\cref{thm:b3:lebesgue:paramcont}).
+(1), (2)~: changements de variables
+(\cref{thm:b3:product:linearchange}). (3)~: dérivation sous
+l'intégrale, dominante $\abs{xf}$
+(\cref{thm:b3:lebesgue:paramdiff}). (4)~: d'abord, $f(x) =
+f(0) + \int_0^xf'$ a une limite en $\pm\infty$ ($f' \in L^1$),
+qui doit être $0$ ($f \in L^1$)~; puis intégration par parties
+sur $[-A, A]$ et $A \to \infty$. (5)~: Fubini, légitime car
+$(x,y)\mapsto f(x - y)g(y)\eu^{-\iu\xi x}$ est absolument
+\omterm{def:b3:lebesgue:l1}{intégrable} (\cref{thm:b3:product:convolution})~:
+\[
+\widehat{f*g}(\xi) = \iint f(x - y)g(y)\eu^{-\iu\xi(x - y)}
+\eu^{-\iu\xi y}\dd x\,\dd y = \hat f(\xi)\,\hat g(\xi).
+\]
+\end{proof}
+
+\begin{example}\label{ex:b3:fouriertransform:gaussian}
+La gaussienne~: pour $a > 0$,\index{gaussienne, transformée de Fourier}
+\[
+\widehat{\eu^{-ax^2}}(\xi) =
+\sqrt{\frac\pi a}\;\eu^{-\xi^2/4a} :
+\]
+par l'~\cref{exo:b3:lebesgue:7} (le tour de l'EDO $F' =
+-\frac\xi{2}F$, rescalé), ou par (3)~: $g =
+\widehat{\eu^{-ax^2}}$ satisfait $g'(\xi) =
+-\frac{\xi}{2a}g(\xi)$ (intégration par parties), $g(0) =
+\sqrt{\pi/a}$. Les gaussiennes sont des points fixes de la
+transformée à un scaling près --- la raison profonde pour
+laquelle elles règnent sur le théorème central limite.
+\end{example}
+
+\begin{theorem}[Riemann--Lebesgue]
+\label{thm:b3:fouriertransform:riemannlebesgue}
+Pour $f \in L^1(\R)$~: $\hat f(\xi) \to 0$ quand $\abs\xi \to
+\infty$. Ainsi $\widehat{\phantom f} \colon L^1 \to \mathcal
+C_0(\R)$ (fonctions \omterm{def:b3:topology:continuity}{continues} s'annulant à
+l'infini).\index{lemme de Riemann--Lebesgue}
+\end{theorem}
+
+\begin{proof}
+Pour un indicateur d'intervalle, $\widehat{\mathbf 1_{\intcc
+ab}}(\xi) = \frac{\eu^{-\iu a\xi} - \eu^{-\iu b\xi}}{\iu\xi}
+\to 0$~; d'où pour les fonctions en escalier. Les fonctions en
+escalier sont \omterm{def:b3:topology:interior}{denses} dans $L^1$
+(\cref{thm:b3:lp:density}(1) plus approximation des ensembles
+de \omterm{def:b3:measure:measure}{mesure} finie par unions finies d'intervalles,
+\cref{exo:b3:measure:7}), et la transformée est
+$\norm\cdot_\infty$-$\norm\cdot_1$ \omterm{def:b3:topology:continuity}{continue}~: pour $\norm{f -
+s}_1 < \varepsilon$, $\limsup_{\abs\xi\to\infty}\abs{\hat
+f(\xi)} \leq \varepsilon$.
+\end{proof}
+
+\section{Inversion et injectivité}
+
+\begin{lemma}[Formule de multiplication]
+\label{lem:b3:fouriertransform:multiplication}
+Pour $f, g \in L^1(\R)$~: $\displaystyle\int \hat f\,g =
+\int f\,\hat g$.
+\end{lemma}
+
+\begin{proof}
+Les deux côtés valent $\iint f(x)g(\xi)\eu^{-\iu x\xi}\dd
+x\,\dd\xi$ (Tonelli--Fubini~: l'intégrale double de la valeur
+absolue est $\norm f_1\norm g_1$).
+\end{proof}
+
+\begin{theorem}[Inversion]\label{thm:b3:fouriertransform:inversion}
+Soit $f \in L^1(\R)$.\index{théorème d'inversion de Fourier}
+\begin{enumerate}
+  \item (Sommabilité gaussienne) Pour tout $x$,
+        \[
+        (f * g_\varepsilon)(x) =
+        \frac1{2\pi}\int_\R \hat f(\xi)\,
+        \eu^{-\varepsilon\xi^2}\,\eu^{\iu x\xi}\,\dd\xi,
+        \qquad\text{où } g_\varepsilon(y) =
+        \frac{1}{2\sqrt{\pi\varepsilon}}\,
+        \eu^{-y^2/4\varepsilon},
+        \]
+        et $f * g_\varepsilon \to f$ dans $L^1$ quand
+        $\varepsilon \to 0$.
+  \item Si de plus $\hat f \in L^1$, alors pour presque tout
+        $x$
+        \[
+        f(x) = \frac{1}{2\pi}\int_\R \hat
+        f(\xi)\,\eu^{\iu x\xi}\,\dd\xi ,
+        \]
+        et $f$ admet un représentant continu.
+  \item (Injectivité) Si $\hat f = 0$ alors $f = 0$ p.p.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) Fixons $x$ et appliquons
+\cref{lem:b3:fouriertransform:multiplication} à $f$ et
+$g(\xi) = \frac1{2\pi}\eu^{-\varepsilon\xi^2}\eu^{\iu x\xi}$~:
+par l'~\cref{ex:b3:fouriertransform:gaussian} (avec la règle de
+modulation),
+\[
+\hat g(y) = \frac1{2\pi}\sqrt{\frac\pi\varepsilon}\,
+\eu^{-(y - x)^2/4\varepsilon} = g_\varepsilon(x - y),
+\]
+donc $\frac1{2\pi}\int\hat f(\xi)\eu^{-\varepsilon\xi^2}
+\eu^{\iu x\xi}\dd\xi = \int f(y)g_\varepsilon(x - y)\dd y =
+(f*g_\varepsilon)(x)$. Les $g_\varepsilon$ forment une
+approximation de l'identité~: $g_\varepsilon \geq 0$,
+$\int g_\varepsilon = 1$ (intégrale gaussienne), se
+concentrant en $0$~; la preuve du~\cref{thm:b3:lp:regularization}(2) s'applique mot pour mot
+(seuls $\int g_\varepsilon = 1$ et la concentration
+intervenaient~: pour la queue, $\int_{\abs y >
+\delta}g_\varepsilon \to 0$)~: $\norm{f * g_\varepsilon -
+f}_1 \to 0$.
+
+(2) Si $\hat f \in L^1$~: le membre de droite de (1) converge,
+par DCT (dominante $\abs{\hat f}$), vers
+$\frac1{2\pi}\int\hat f(\xi)\eu^{\iu x\xi}\dd\xi$ pour
+\emph{tout} $x$, et cette fonction limite est \omterm{def:b3:topology:continuity}{continue} (DCT
+encore). D'autre part $f * g_\varepsilon \to f$ dans $L^1$,
+donc le long d'une sous-suite p.p.\
+(\cref{thm:b3:lp:complete})~: les deux limites coïncident
+p.p.
+
+(3) $\hat f = 0$ annule le membre de droite de (1)~: $f *
+g_\varepsilon = 0$ pour tout $\varepsilon$, et $f *
+g_\varepsilon \to f$ dans $L^1$~: $f = 0$ p.p.
+\end{proof}
+
+\section{La classe de Schwartz}
+
+\begin{definition}\label{def:b3:fouriertransform:schwartz}
+La \emph{classe de Schwartz}\index{classe de Schwartz}
+$\mathcal S(\R)$ est constituée des fonctions $\mathcal
+C^\infty$ $f$ telles que $\sup_x\abs{x^m f^{(n)}(x)} < \infty$
+pour tous $m, n \geq 0$ (toutes les dérivées décroissent plus
+vite que toute puissance). Exemples~: $\eu^{-ax^2}$,
+$\mathcal C_c^\infty$. Clairement $\mathcal S \subseteq L^p$
+pour tout $p$ (majorer par $C(1 + x^2)^{-1}$), et $\mathcal S$
+est stable par dérivation, multiplication par des polynômes, et
+produits.
+\end{definition}
+
+\begin{theorem}\label{thm:b3:fouriertransform:schwartz}
+La transformée de Fourier envoie $\mathcal S(\R)$ bijectivement
+sur lui-même, avec inverse $\check g(x) =
+\frac1{2\pi}\int g(\xi)\eu^{\iu x\xi}\dd\xi$.
+\end{theorem}
+
+\begin{proof}
+Soit $f \in \mathcal S$. En itérant
+\cref{prop:b3:fouriertransform:basic}(3), $(\hat f)^{(n)} =
+\widehat{(-\iu x)^nf}$ (chaque $x^kf \in L^1$)~; en itérant
+(4) avec $h = (-\iu x)^nf \in \mathcal S$ (toutes les
+dérivées \omterm{def:b3:lebesgue:l1}{intégrables}), $(\iu\xi)^m\hat h =
+\widehat{h^{(m)}}$. En combinant,
+\[
+\abs{\xi^m\,(\hat f)^{(n)}(\xi)}
+= \bigl|\widehat{\,h^{(m)}}(\xi)\bigr|
+\leq \bigl\|\bigl((-\iu x)^nf\bigr)^{(m)}\bigr\|_1 < \infty
+\]
+uniformément en $\xi$~: $\hat f \in \mathcal S$. Puisque
+$\hat f \in L^1$, l'inversion
+(\cref{thm:b3:fouriertransform:inversion}(2)) vaut partout
+(les deux côtés continus)~: $\check{\hat f} = f$, et
+symétriquement $\widehat{\check g} = g$ (la transformée
+check est $g \mapsto \frac1{2\pi}\hat g(-\cdot)$, préservant
+encore $\mathcal S$)~: bijection.
+\end{proof}
+
+\section{Plancherel et \texorpdfstring{$L^2$}{L2}}
+
+\begin{theorem}[Plancherel]\label{thm:b3:fouriertransform:plancherel}
+Pour $f \in L^1 \cap L^2(\R)$~\index{théorème de Plancherel}~:
+\[
+\norm{\hat f}_2^2 = 2\pi\,\norm f_2^2 .
+\]
+Par suite $\widehat{\phantom f}$ se prolonge de façon unique
+en une application linéaire \omterm{def:b3:topology:continuity}{continue} $\mathcal F \colon
+L^2(\R) \to L^2(\R)$ avec $\norm{\mathcal Ff}_2 =
+\sqrt{2\pi}\norm f_2$~; $\mathcal F$ est bijective, avec
+$\mathcal F^{-1} = \frac1{2\pi}\,\mathcal F\circ\sigma$ où
+$\sigma f = f(-\cdot)$, et elle préserve les \omterm{def:b3:hilbert:inner}{produits
+scalaires} à un facteur $2\pi$ près.
+\end{theorem}
+
+\begin{proof}
+Soit $f \in L^1\cap L^2$ et $h = f * \tilde f$ avec
+$\tilde f(x) = \overline{f(-x)}$. Alors $h \in L^1$
+(\cref{thm:b3:product:convolution}), $h$ est \omterm{def:b3:topology:continuity}{continue} et
+bornée (\cref{exo:b3:lp:6}~: $f, \tilde f \in L^2$), $h(0) =
+\int f\bar f = \norm f_2^2$, et $\hat h = \hat
+f\,\widehat{\tilde f} = \hat f\,\overline{\hat f} =
+\abs{\hat f}^2 \geq 0$ (calculer $\widehat{\tilde f} =
+\overline{\hat f}$). Appliquons
+\cref{thm:b3:fouriertransform:inversion}(1) à $h$ en $x =
+0$~:
+\[
+(h * g_\varepsilon)(0) = \frac1{2\pi}\int \hat
+h(\xi)\,\eu^{-\varepsilon\xi^2}\dd\xi .
+\]
+Quand $\varepsilon \to 0$~: le membre de gauche tend vers
+$h(0)$ ($h$ \omterm{def:b3:topology:continuity}{continue} bornée~: $(h*g_\varepsilon)(0) - h(0) =
+\int(h(-y) - h(0))g_\varepsilon(y)\dd y \to 0$ en scindant
+petit/grand $y$)~; le membre de droite croît vers
+$\frac1{2\pi}\int\hat h$ par MCT ($\hat h \geq 0$). D'où
+$\frac1{2\pi}\int\abs{\hat f}^2 = \norm f_2^2$, fini ou non
+\emph{a priori} --- et fini, prouvant à la fois l'appartenance
+et l'identité.
+
+Prolongement~: $L^1\cap L^2 \supseteq \mathcal C_c$ est \omterm{def:b3:topology:interior}{dense}
+dans $L^2$ (\cref{thm:b3:lp:density})~; la transformée y est
+$\sqrt{2\pi}$-isométrique, donc se prolonge de façon unique en
+une isométrie-à-constante-près $\mathcal F$ sur $L^2$
+(\cref{thm:b3:complete:extension}). L'inversion pour
+$\mathcal S$ (\cref{thm:b3:fouriertransform:schwartz}) se
+transfère par la même \omterm{ex:b3:lebesgue:gamma}{densité} (les deux côtés $L^2$-continus)~:
+$\mathcal F\bigl(\frac1{2\pi}\mathcal F(\sigma f)\bigr) = f$
+sur $\mathcal S$, donc sur $L^2$~: bijectivité. \omterm{def:b3:hilbert:inner}{Produits
+scalaires}~: polarisation à partir de l'identité des normes.
+\end{proof}
+
+\begin{theorem}[Sommation de Poisson]
+\label{thm:b3:fouriertransform:poisson}
+Soit $f \in \mathcal S(\R)$ ($f$ \omterm{def:b3:topology:continuity}{continue} avec $\abs{f} +
+\abs{\hat f} \leq C(1 + \abs\cdot)^{-2}$ suffit).
+Alors\index{formule de sommation de Poisson}
+\[
+\sum_{n\in\Z} f(n) \;=\; \sum_{k\in\Z}\hat f(2\pi k) .
+\]
+\end{theorem}
+
+\begin{proof}
+Soit $F(x) = \sum_{n\in\Z}f(x + n)$~: la série converge
+normalement sur les compacts (décroissance de $f$), donc $F$
+est \omterm{def:b3:topology:continuity}{continue}, et $1$-périodique. Ses coefficients de Fourier
+(période $1$~: $c_k(F) = \int_0^1F(t)\eu^{-2\iu\pi kt}\dd
+t$)~:
+\[
+c_k(F) = \sum_n\int_0^1 f(t + n)\,\eu^{-2\iu\pi kt}\dd t
+= \int_\R f(t)\,\eu^{-2\iu\pi kt}\dd t = \hat f(2\pi k)
+\]
+(la convergence normale justifie l'interversion~; la phase est
+$1$-périodique). La série $\sum_k\abs{c_k(F)}$ converge
+(décroissance de $\hat f$), donc la série de Fourier de $F$
+converge normalement~; sa somme est une fonction \omterm{def:b3:topology:continuity}{continue} de
+mêmes coefficients de Fourier que $F$, donc égale à $F$
+(injectivité sur le cercle~: la différence a des coefficients
+nuls, et le~\cref{thm:b3:hilbert:fourier} donne zéro dans $L^2$,
+donc partout par continuité). On évalue en $x = 0$.
+\end{proof}
+
+\begin{example}[L'identité thêta]
+\label{ex:b3:fouriertransform:theta}
+En appliquant Poisson à $f(x) = \eu^{-\pi tx^2}$ ($t > 0$),
+dont la transformée est $\hat f(\xi) =
+t^{-1/2}\eu^{-\xi^2/4\pi t}$
+(\cref{ex:b3:fouriertransform:gaussian} avec $a = \pi t$)~:
+\[
+\sum_{n\in\Z}\eu^{-\pi n^2t}
+= \frac1{\sqrt t}\sum_{k\in\Z}\eu^{-\pi k^2/t} :
+\]
+l'équation fonctionnelle de la fonction thêta de Jacobi, clé
+de l'équation fonctionnelle du $\zeta$ de Riemann --- et un
+accélérateur numérique spectaculaire~: pour $t$ petit, le
+membre de gauche converge lentement, le membre de droite
+fulgurant.
+\end{example}
+
+\begin{method}\label{met:b3:fouriertransform:method}
+Domaines de travail~: $L^1$ --- transformée définie
+ponctuellement, l'inversion exige $\hat f \in L^1$~;
+$\mathcal S$ --- tout est légal, prouver d'abord ici~; $L^2$
+--- transformée définie par \omterm{ex:b3:lebesgue:gamma}{densité} (pas par l'intégrale~!),
+symétrie parfaite, comptabilité de \omterm{thm:b3:hilbert:parseval}{Parseval}. Pour calculer une
+transformée~: se ramener à la table (indicateur, exponentielle,
+gaussienne) par les règles du~\cref{prop:b3:fouriertransform:basic}~; pour prouver une
+identité~: l'établir sur $\mathcal S$ (ou $\mathcal
+C_c^\infty$) et prolonger par \omterm{ex:b3:lebesgue:gamma}{densité} et continuité
+(\cref{met:b3:lp:toolkit})~; pour résoudre une EDP ou EDO
+linéaire à coefficients constants~: transformer, diviser,
+inverser.
+\end{method}
+
+\begin{omfigure}
+\begin{tikzpicture}[xscale=1.05, yscale=2.2]
+  \draw[->] (-4.3,0) -- (4.3,0) node[right,font=\small] {$x$};
+  \draw[->] (0,0) -- (0,1.25);
+  \draw[omThm, thick, smooth]
+    plot[domain=-4:4, samples=81]
+    (\x, {exp(-\x*\x/0.4)/1.1209});
+  \draw[omProp, thick, smooth]
+    plot[domain=-4:4, samples=81]
+    (\x, {exp(-\x*\x/1.6)/2.2418});
+  \draw[omDef, thick, smooth]
+    plot[domain=-4:4, samples=81]
+    (\x, {exp(-\x*\x/6.4)/4.4836});
+  \node[omThm, font=\small] at (1.35,0.75) {$t = 0.1$};
+  \node[omProp, font=\small] at (2.4,0.36) {$t = 0.4$};
+  \node[omDef, font=\small] at (3.5,0.17) {$t = 1.6$};
+\end{tikzpicture}
+
+{\small Le \omterm{pb:b3:fouriertransform:1}{noyau de la chaleur} $g_t(x) =
+\frac1{2\sqrt{\pi t}}\,\eu^{-x^2/4t}$ à trois temps~: masse
+totale $1$ pour toujours, hauteur $\sim t^{-1/2}$, largeur
+$\sim \sqrt t$. Convoler les données initiales avec cette
+gaussienne qui s'étale, c'est tout le \omterm{def:b3:rings:content}{contenu} du problème du
+week-end~; en fréquence, le même tableau se lit
+$\hat g_t(\xi) = \eu^{-t\xi^2}$ --- les hautes fréquences
+meurent d'abord, et cette asymétrie est la flèche du temps.}
+\end{omfigure}
+
+\section{Exercices}
+
+\begin{exercise}[$\star$]\label{exo:b3:fouriertransform:1}
+Calculer les transformées de Fourier de~: $\mathbf
+1_{\intcc{-a}a}$~; $\eu^{-a\abs x}$ ($a > 0$)~; la fonction
+tente $\max(0, 1 - \abs x)$~; $\frac1{x^2 + a^2}$
+\emph{(utiliser l'inversion sur la seconde)}. Noter la table
+qui émerge.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b3:fouriertransform:2}
+Soit $f \in L^1$. Exprimer en termes de $\hat f$ les
+transformées de~: $f(x - a)$, $f(x)\cos(bx)$, $f(ax + b)$,
+$\overline{f(-x)}$, $(f * f)(x)$. Vérifier chaque règle sur
+la gaussienne.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:fouriertransform:3}
+(a) Montrer que $\mathbf 1_{\intcc{-1}1} * \mathbf
+1_{\intcc{-1}1}$ a pour transformée
+$\bigl(\frac{2\sin\xi}\xi\bigr)^2$, et en déduire
+$\int_\R\bigl(\frac{\sin\xi}\xi\bigr)^2\dd\xi = \pi$ par
+Plancherel --- ou par inversion en $0$. Comparer
+le~\cref{pb:b3:lebesgue:1}.
+(b) Calculer $\int_\R\frac{\dd x}{(x^2+1)^2}$ via Plancherel
+appliqué à $\eu^{-\abs x}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:fouriertransform:4}
+(Algèbre du \omterm{pb:b3:fouriertransform:1}{noyau de la chaleur}) Avec $g_t(x) =
+\frac1{2\sqrt{\pi t}}\eu^{-x^2/4t}$~:
+(a) vérifier $\hat g_t(\xi) = \eu^{-t\xi^2}$~;
+(b) en déduire la loi de semigroupe $g_t * g_s = g_{t+s}$ sans
+aucun calcul d'intégrale~;
+(c) montrer $\norm{g_t}_1 = 1$ et $\norm{g_t}_2^2 =
+(8\pi t)^{-1/2}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:fouriertransform:5}
+Montrer que si $f \in L^1$ est paire et réelle, $\hat f$ est
+paire et réelle~; si $f$ est impaire et réelle, $\hat f$ est
+impaire et purement imaginaire. Que calcule $\hat f(0)$~? En
+déduire que $f \geq 0$ force $\norm{\hat f}_\infty = \hat
+f(0) = \int f$, et interpréter pour les \omterm{ex:b3:lebesgue:gamma}{densités} de
+probabilité (\cref{ch:b3:clt}~: une fonction caractéristique
+a un \omterm{def:b3:modules:module}{module} $\leq 1$, atteint en $0$).
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:fouriertransform:6}
+(Non-surjectivité) Montrer que $\widehat{\phantom f}\colon
+L^1 \to \mathcal C_0$ est injective et \omterm{def:b3:topology:continuity}{continue}, mais
+\emph{pas} surjective, en trois étapes.
+(i) Injectivité (\cref{thm:b3:fouriertransform:inversion}) et
+continuité ($\norm{\hat f}_\infty \leq \norm f_1$), et
+$\mathcal C_0$ est un espace de Banach (fermé dans
+$\norm\cdot_\infty$).
+(ii) Si l'application était surjective, elle serait bijective,
+et le théorème de l'application ouverte
+(\cref{thm:b3:banach:openmapping}) donnerait une constante $C$
+avec $\norm f_1 \leq C\norm{\hat f}_\infty$ pour tout $f \in
+L^1$.
+(iii) Contredire ceci avec $f_n(x) = \frac{\sin
+x}{x}\cdot\frac{\sin(x/n)}{x/n}$~: sa transformée est (à des
+constantes près) la convolution $\mathbf 1_{\intcc{-1}1} *
+\mathbf 1_{\intcc{-1/n}{1/n}}$-type trapèze --- montrer
+$\norm{\hat f_n}_\infty \leq \pi$ uniformément, tandis que
+$\norm{f_n}_1 \geq c\ln n$ en comptant les arches de
+$\frac{\abs{\sin x}}x$ sur $[1, n]$ (où le second facteur est
+minoré), comme au~\cref{thm:b3:banach:fourierdiverge}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:fouriertransform:7}
+(Dictionnaire régularité $\leftrightarrow$ décroissance)
+Prouver~: $f \in L^1$ avec $\hat f(\xi) =
+O(\abs\xi^{-k-1-\delta})$ pour un $\delta > 0$ implique que
+$f$ admet un représentant $\mathcal C^k$. Réciproquement $f
+\in \mathcal C^k_c$ implique $\hat f(\xi) = O(\abs\xi^{-k})$.
+Illustrer les deux sens sur la fonction tente.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:fouriertransform:8}
+(Inégalité de Heisenberg) Pour $f \in \mathcal S(\R)$ réelle
+avec $\norm f_2 = 1$, prouver
+\[
+\Bigl(\int x^2f(x)^2\dd x\Bigr)\cdot
+\Bigl(\frac1{2\pi}\int \xi^2\abs{\hat f(\xi)}^2\dd\xi\Bigr)
+\;\geq\; \frac14 ,
+\]
+avec égalité pour les gaussiennes. \emph{(Écrire $1 = \int
+f^2 = -\int x\,(f^2)'$ par parties, majorer par
+Cauchy--Schwarz, et convertir $\norm{f'}_2$ par Plancherel.)}
+Interprétation~: un signal et son spectre ne peuvent pas être
+tous deux concentrés.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:fouriertransform:9}
+Justifier l'~\cref{ex:b3:fouriertransform:theta} en détail
+(hypothèses de Poisson pour la gaussienne), et utiliser
+l'identité pour évaluer $\sum_{n\in\Z}\eu^{-\pi n^2}$ à six
+décimales avec trois termes. Combien de termes de la série
+\emph{définissante} la même précision exigerait-elle en $t =
+10^{-2}$, contre la série transformée~?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:fouriertransform:10}
+(Fonctions à bande limitée) Soit $f \in L^2(\R)$ avec
+$\mathcal Ff$ supportée dans $\intcc{-\pi}\pi$. Montrer que
+$f$ admet un représentant dont chacune des valeurs est
+récupérable à partir d'échantillons~: prouver
+l'\emph{interpolation de Shannon} aux entiers,
+\[
+f(x) = \sum_{n\in\Z} f(n)\,
+\frac{\sin\bigl(\pi(x - n)\bigr)}{\pi(x - n)}
+\quad\text{dans } L^2,
+\]
+en développant $\mathcal Ff$ dans la \omterm{def:b3:topology:basis}{base} de Fourier de
+$L^2(\intcc{-\pi}\pi)$ (\cref{thm:b3:hilbert:fourier}) et en
+retransformant terme à terme.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:fouriertransform:11}
+(La transformée comme opérateur d'ordre quatre) Sur $\mathcal
+S(\R)$, soit $\mathcal F f = \hat f$.
+(a) En utilisant la formule d'inversion, montrer $(\mathcal
+F^2f)(x) = 2\pi\,f(-x)$, et en déduire $\mathcal F^4 =
+(2\pi)^2\,\mathrm{id}$.
+(b) En déduire que toute valeur propre de $\mathcal F$ sur
+$\mathcal S$ appartient à $\{\pm\sqrt{2\pi},
+\pm\iu\sqrt{2\pi}\}$, et exhiber une fonction propre pour
+$+\sqrt{2\pi}$ \emph{(quelle fonction de ce chapitre est
+proportionnelle à sa propre transformée~?)}.
+(c) Montrer que les fonctions paires satisfont $\mathcal F^2f
+= 2\pi f$ et les impaires $\mathcal F^2f = -2\pi f$~; produire
+une fonction propre pour la valeur propre $-\iu\sqrt{2\pi}$ à
+partir de $x\eu^{-x^2/2}$ en calculant sa transformée (dériver
+la transformée de la gaussienne).
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:fouriertransform:12}
+(Autocorrélation et lemme de Wiener) Pour $f \in L^2(\R)$
+définir $\tilde f(x) = \overline{f(-x)}$ et
+l'\emph{autocorrélation} $A_f = f * \tilde f$.
+(a) Montrer que $A_f$ est une fonction \omterm{def:b3:topology:continuity}{continue} bornée avec
+$A_f(0) = \norm f_2^2 \geq \abs{A_f(x)}$ pour tout $x$
+(\cref{exo:b3:lp:6} et Cauchy--Schwarz).
+(b) Montrer, d'abord pour $f \in L^1\cap L^2$, que
+$\widehat{A_f} = \abs{\hat f\,}^2 \geq 0$~: l'autocorrélation
+a une transformée positive --- les spectres d'autocorrélations
+sont des spectres de puissance.
+(c) En déduire l'identité $\int_\R\abs{\hat
+f(\xi)}^2\eu^{\iu x\xi}\,\dd\xi = 2\pi A_f(x)$ (inversion~;
+justifier son applicabilité quand $\hat f \in L^2$ a
+$\abs{\hat f}^2 \in L^1$), et l'évaluer pour $f = \mathbf
+1_{\intcc{-1/2}{1/2}}$ en $x = 0$~: retrouver
+$\int_\R\bigl(\frac{\sin u}u\bigr)^2\dd u = \pi$.
+\end{exercise}
+
+\section{Problème~: l'équation de la chaleur sur la droite}
+
+\begin{problem}[{Problème du week-end --- $\partial_tu =
+\partial^2_{xx}u$, résolue de bout en bout}]
+\label{pb:b3:fouriertransform:1}
+La chaleur se propage~; l'équation $\partial_tu =
+\partial_{xx}^2u$ dit que sa \omterm{ex:b3:lebesgue:gamma}{densité} diffuse à un taux donné
+par la courbure locale du profil de température. Nous
+résolvons le problème de Cauchy sur $\R$ --- étant donné $f$,
+trouver $u(t, x)$ pour $t > 0$ avec $u(0, \cdot) = f$ ---
+prouvons les propriétés remarquables de la solution, et voyons
+pourquoi le temps ne peut pas être inversé. Tout au long,
+$g_t(x) = \frac1{2\sqrt{\pi t}}\eu^{-x^2/4t}$ est le
+\emph{noyau de la chaleur}\index{noyau de la chaleur} et
+$u(t, \cdot) = g_t * f$.
+
+\medskip
+\noindent\textbf{Partie I --- Dériver le noyau.} Travailler
+d'abord formellement~: supposer $u(t, \cdot) \in \mathcal S$
+résout l'équation, et soit $\hat u(t, \xi)$ la transformée en
+$x$.
+\begin{enumerate}
+  \item Montrer (formellement) $\partial_t\hat u =
+        -\xi^2\hat u$, d'où $\hat u(t,\xi) =
+        \eu^{-t\xi^2}\hat f(\xi)$, et reconnaître $u(t) =
+        g_t * f$ (\cref{exo:b3:fouriertransform:4}). Ceci
+        motive la \emph{définition} de $u$~; tout est
+        désormais prouvé directement, pour $f \in \mathcal
+        C_b(\R)$ (\omterm{def:b3:topology:continuity}{continue} bornée) ou $f \in L^p$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie II --- Vérification.}
+\begin{enumerate}[resume]
+  \item Montrer que pour $t > 0$, $u(t, x) = \int
+        g_t(x-y)f(y)\dd y$ est bien définie pour $f \in
+        \mathcal C_b$, et que $u$ est $\mathcal C^\infty$ en
+        $(t, x)$ sur $\intoo0\infty\times\R$
+        \emph{(dériver sous l'intégrale~; dominer les
+        dérivées gaussiennes localement uniformément en
+        $(t,x)$)}.
+  \item Vérifier $\partial_tg_t = \partial^2_{xx}g_t$ par
+        calcul direct, et en déduire $\partial_tu =
+        \partial^2_{xx}u$ pour $t > 0$.
+  \item (Condition initiale) Montrer que pour $f \in \mathcal
+        C_b$, $u(t, x) \to f(x)$ quand $t \to 0^+$,
+        uniformément sur les compacts \emph{(approximation de
+        l'identité~: scinder $\abs y \leq \delta$, $\abs y >
+        \delta$)}~; pour $f \in L^p$ ($p < \infty$), montrer
+        $\norm{u(t) - f}_p \to 0$.
+  \item (Lissage instantané) Conclure~: même pour $f$
+        seulement \omterm{def:b3:topology:continuity}{continue} bornée, la solution est $\mathcal
+        C^\infty$ pour tout $t > 0$ --- la chaleur efface
+        instantanément les rugosités. Calculer $u(t, \cdot)$
+        explicitement pour $f = \mathbf 1_{\intoo0\infty}$
+        (une fonction d'erreur) et croquer son profil pour
+        trois valeurs de $t$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie III --- Propriétés structurelles.}
+\begin{enumerate}[resume]
+  \item (Positivité et comparaison) Si $f \geq 0$ alors $u >
+        0$ pour tout $t > 0$ (strictement, sauf si $f = 0$
+        p.p.)~; si $f_1 \leq f_2$ alors $u_1 \leq u_2$. Un
+        point froid se réchauffe instantanément~: commenter.
+  \item (Conservation) Pour $f \in L^1$~: $\int u(t, x)\dd x =
+        \int f$ pour tout $t$ \emph{(Tonelli)} --- la chaleur
+        totale est conservée.
+  \item (Dissipation) Pour $f \in L^1\cap L^2$, montrer via
+        Plancherel que $t \mapsto \norm{u(t)}_2$ est
+        décroissante, strictement sauf si $f = 0$, et
+        calculer sa limite quand $t \to \infty$. Montrer de
+        plus $\norm{u(t)}_\infty \leq \frac{\norm
+        f_1}{2\sqrt{\pi t}} \to 0$~: la chaleur s'étale et
+        meurt.
+  \item (Unicité, classe $L^2$) Soit $u$ une solution avec
+        $u(t) \in L^2$ pour tout $t$, $u \in \mathcal
+        C^1(\intoo0\infty, L^2)$ au sens naturel et $u(t)
+        \to f$ dans $L^2$ quand $t\to0$~; en admettant que la
+        transformée la convertit en $\partial_t\hat u =
+        -\xi^2\hat u$ ponctuellement p.p.\ en $\xi$ pour
+        p.p.\ $t$ \emph{(justifié en testant contre
+        $\mathcal C_c^\infty$ en $\xi$ --- esquisse)},
+        montrer $\hat u(t,\xi) = \eu^{-t\xi^2}\hat f(\xi)$,
+        d'où l'unicité dans cette classe.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie IV --- La flèche du temps.}
+\begin{enumerate}[resume]
+  \item Montrer que le problème \emph{rétrograde} est mal
+        posé~: pour que la solution existe au temps $-s$ ($s
+        > 0$) avec donnée $f$ au temps $0$ --- i.e.\ pour que
+        $f = g_s * h$ ait une solution $h \in L^2$ --- il est
+        nécessaire que $\eu^{s\xi^2}\hat f(\xi) \in L^2$~:
+        une condition extrême de décroissance sur $\hat f$.
+        Exhiber une $f \in L^2$ lisse explicite pour laquelle
+        aucune solution rétrograde n'existe sur aucun
+        intervalle de temps~: prendre la fonction avec $\hat
+        f(\xi) = \eu^{-\abs\xi}$ --- identifier $f$
+        (\cref{exo:b3:fouriertransform:1}) et montrer
+        $\eu^{s\xi^2}\eu^{-\abs\xi} \notin L^2$ pour tout $s
+        > 0$.
+  \item (Lissage vs.\ information) Expliquer en un court
+        paragraphe, en utilisant les questions 5, 9 et 10,
+        pourquoi le semigroupe de la chaleur $(f \mapsto g_t
+        * f)_{t\geq0}$ est injectif mais non surjectif sur
+        $L^2$, et pourquoi cela exprime l'irréversibilité de
+        la diffusion.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie V --- Le théorème d'échantillonnage de
+Shannon.} Une fonction $f \in L^2(\R)$ est \emph{à bande
+limitée} à $\Omega$ si $\hat f = 0$ p.p.\ hors de
+$\intcc{-\Omega}\Omega$~; on note $PW_\Omega$ (espace de
+Paley--Wiener) pour celles-ci.
+\begin{enumerate}[resume]
+  \item Montrer que toute $f \in PW_\Omega$ coïncide p.p.\
+        avec la fonction $\mathcal C^\infty$
+        $\frac1{2\pi}\int_{-\Omega}^{\Omega}\hat
+        f(\xi)\eu^{\iu x\xi}\,\dd\xi$ (justifier la
+        régularité et l'identification), avec toutes les
+        dérivées bornées~: la limitation de bande est une
+        forme extrême de régularité. Désormais $f$ désigne
+        ce représentant.
+  \item Développer $\hat f \in L^2(\intcc{-\Omega}\Omega)$
+        dans la \omterm{def:b3:topology:basis}{base} de Fourier de cet intervalle et
+        identifier les coefficients comme des
+        \emph{échantillons} de $f$~:
+        \[
+        \hat f(\xi) = \frac\pi\Omega\sum_{n\in\Z}
+        f\Bigl(\frac{n\pi}\Omega\Bigr)\,
+        \eu^{-\iu n\pi\xi/\Omega}
+        \quad\text{dans } L^2(\intcc{-\Omega}\Omega) .
+        \]
+  \item En déduire le \emph{théorème d'échantillonnage}~: pour
+        $f \in PW_\Omega$,
+        \[
+        f(x) = \sum_{n\in\Z}f\Bigl(\frac{n\pi}
+        \Omega\Bigr)\,\operatorname{sinc}(\Omega x - n\pi),
+        \qquad \operatorname{sinc}t = \frac{\sin t}t,
+        \]
+        avec convergence dans $L^2(\R)$ et uniformément sur
+        $\R$ \emph{(injecter la série de la question 13 dans
+        la formule d'inversion et calculer l'intégrale
+        élémentaire)}~: un signal à bande limitée est
+        entièrement déterminé par ses valeurs sur une grille
+        de pas $\pi/\Omega$ --- le taux de Nyquist.
+  \item Montrer que les fonctions $x \mapsto
+        \operatorname{sinc}(\Omega x - n\pi)$, $n \in \Z$,
+        forment une famille orthogonale dans $L^2(\R)$ de
+        norme constante $\sqrt{\pi/\Omega}$, et en déduire
+        l'identité d'énergie $\norm f_2^2 =
+        \frac\pi\Omega\sum_n\abs{f(n\pi/\Omega)}^2$.
+  \item (Repliement de spectre) Exhiber une $g \in
+        PW_{2\Omega}$ non nulle s'annulant en tout point
+        d'échantillon $\frac{n\pi}\Omega$ \emph{(considérer
+        $g(x) = \sin(\Omega x)\operatorname{sinc}(\Omega x)$
+        et vérifier sa bande)}~: échantillonner sous le taux
+        de Nyquist perd de l'information --- deux signaux
+        différents peuvent partager tous les échantillons~:
+        l'effet stroboscopique des roues de chariot,
+        mathématisé.
+  \item (\omterm{def:b3:galois:extension}{Degrés} de liberté) En utilisant les questions 14--15,
+        justifier la règle d'ingénierie~: un signal à bande
+        limitée à $\Omega$ dont l'énergie est essentiellement
+        portée par une fenêtre temporelle de longueur $T$ est
+        décrit par environ $\frac{\Omega T}\pi$ échantillons
+        réels --- rendre «~essentiellement~» précis via
+        l'identité d'énergie et la queue
+        $\sum_{\abs{n\pi/\Omega} > T/2}$.
+  \item (Vérifications de cohérence) Vérifier le théorème
+        d'échantillonnage à la main sur deux membres de
+        $PW_\Omega$~: (a) $f = \operatorname{sinc}(\Omega
+        \,\cdot)$, dont les échantillons sont $\delta_{n0}$~;
+        (b) des signaux à bande étroite du type $f(x) =
+        \cos(\omega x)\operatorname{sinc}(\varepsilon x)$ ---
+        plus précisément, montrer que pour $f \in
+        PW_{\Omega'}$ avec $\Omega' < \Omega$, la série au
+        taux $\Omega$ reconstruit aussi $f$ (le
+        sur-échantillonnage est inoffensif), en plongeant
+        $PW_{\Omega'} \subseteq PW_\Omega$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie VI --- Incertitude, deux fois encore.}
+L'inégalité de Heisenberg (\cref{exo:b3:fouriertransform:8})
+borne \emph{à quel point} $f$ et $\hat f$ peuvent être
+conjointement concentrées~; voici sa sœur du tout-ou-rien et
+sa saturation exacte.
+\begin{enumerate}[resume]
+  \item Soit $f \in L^1$ avec $\operatorname{supp}f \subseteq
+        \intcc{-A}A$. Montrer que $\hat f$ est la somme d'une
+        série entière partout convergente~:
+        \[
+        \hat f(\xi) = \sum_{k\geq0}\frac{(-\iu\xi)^k}{k!}
+        \,m_k, \qquad m_k = \int_{-A}^{A}x^kf(x)\,\dd x,
+        \quad \abs{m_k} \leq A^k\norm f_1
+        \]
+        \emph{(développer $\eu^{-\iu\xi x}$ et justifier
+        l'interversion par convergence normale)}~: la
+        transformée est \emph{réelle-analytique}, de rayon
+        de convergence infini en tout point.
+  \item En déduire la dichotomie de support~: une fonction
+        réelle-analytique s'annulant sur un intervalle \omterm{def:b3:topology:topology}{ouvert}
+        non vide s'annule identiquement \emph{(l'ensemble où
+        toutes les dérivées s'annulent est \omterm{def:b3:topology:topology}{ouvert} et fermé ---
+        dérouler l'argument de Taylor)}~; conclure qu'aucune
+        $f$ non nulle n'a à la fois $f$ et $\hat f$ à support
+        compact, et que $PW_\Omega$ ne contient aucune
+        fonction non nulle à support compact --- les signaux
+        à bande limitée durent pour toujours, et les signaux
+        à temps limité fuient vers toutes les fréquences.
+  \item (Saturation de Heisenberg) Sur la famille
+        gaussienne $f = \eu^{-ax^2}$, calculer les deux
+        facteurs de concentration et vérifier que le produit
+        normalisé
+        $\bigl(\int x^2\abs f^2\bigr)\bigl(\frac1{2\pi}\int
+        \xi^2\abs{\hat f}^2\bigr)\big/\norm f_2^4$ vaut
+        $\frac14$ pour \emph{tout} $a$ --- la famille
+        d'égalité du~\cref{exo:b3:fouriertransform:8} en
+        chair et en os~; expliquer par un argument de
+        scaling pourquoi le produit doit être constant le
+        long de la famille.
+  \item Expliquer la lecture physique (\omterm{ex:b3:lebesgue:gamma}{densités} de
+        position/impulsion d'un état quantique~; $\hbar$ dans
+        la normalisation donne $\sigma_x\sigma_p \geq
+        \frac\hbar2$), et relier à travers le chapitre~:
+        lissage instantané (Partie II), irréversibilité
+        (Partie IV), échantillonnage (Partie V), Heisenberg
+        et la dichotomie de support sont cinq expressions
+        d'une même loi --- le comportement de $\hat f$ à
+        l'infini légifère ce que $f$ peut faire n'importe où.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie VII --- L'algèbre du noyau, et un
+exemple solvable.}
+\begin{enumerate}[resume]
+  \item (Semigroupe) Prouver l'\emph{identité de
+        Chapman--Kolmogorov} $g_t * g_s = g_{t+s}$ pour $t, s
+        > 0$ (via le théorème de convolution et
+        l'injectivité de la transformée sur $L^1$), et en
+        déduire $u(t + s) = g_s * u(t)$~: évoluer pendant le
+        temps $t + s$ c'est évoluer pendant $t$, puis pendant
+        $s$. Affiner la dissipation de la question 8~: en
+        écrivant $\norm{u(t)}_2^2 = \frac1{2\pi}\int
+        \eu^{-2t\xi^2}\abs{\hat f(\xi)}^2\dd\xi$, montrer par
+        Cauchy--Schwarz que
+        \[
+        t \longmapsto \ln\,\norm{u(t)}_2
+        \quad\text{est convexe sur } \intoo0{+\infty} :
+        \]
+        l'énergie $L^2$ ne diminue pas seulement, elle
+        diminue de façon log-convexe.
+  \item (Où va la chaleur) Soit $f \geq 0$, $f \in L^1$, avec
+        $\int x^2f(x)\dd x < \infty$. Montrer que pour tout
+        $t > 0$
+        \[
+        \int_\R x\,u(t, x)\,\dd x = \int_\R x f(x)\,\dd x,
+        \qquad
+        \int_\R x^2u(t, x)\,\dd x
+        = \int_\R x^2f(x)\,\dd x + 2t\int_\R f :
+        \]
+        le \omterm{ex:b3:groups:actions}{centre} de chaleur ne bouge jamais, et la variance
+        croît \emph{linéairement} en temps --- le scaling
+        diffusif $x \sim \sqrt{2t}$, à relire quand le
+        mouvement brownien apparaîtra au
+        \cref{ch:b3:probability}. \emph{(Calculer les deux
+        premiers moments de $g_t$ et utiliser Tonelli sur la
+        convolution.)}
+  \item (La gaussienne, résolue de bout en bout) Pour $f(x) =
+        \eu^{-x^2}$, établir la forme fermée
+        \[
+        u(t, x) = \frac1{\sqrt{1 + 4t}}\,
+        \exp\Bigl(-\frac{x^2}{1 + 4t}\Bigr),
+        \]
+        et vérifier dessus, à la main~: l'équation
+        $\partial_tu = \partial^2_{xx}u$~; la conservation
+        $\int u(t) = \sqrt\pi$~; la loi de dissipation
+        $\norm{u(t)}_2 = (\pi/2)^{1/4}(1 + 4t)^{-1/4}$
+        (comparer sa décroissance en $t^{-1/4}$ avec la
+        décroissance en $t^{-1/2}$ de la norme uniforme de
+        la question 8)~; et la croissance exacte de variance
+        de la question 24. En $t = 6$~: le pic est tombé au
+        $\frac15$ de sa hauteur initiale tandis que le
+        profil est cinq fois plus large --- même chaleur,
+        étalée.
+\end{enumerate}
+\end{problem}

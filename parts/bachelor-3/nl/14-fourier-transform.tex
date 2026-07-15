@@ -1,0 +1,785 @@
+\chapter{De Fouriertransformatie}\label{ch:b3:fouriertransform}
+
+Fourierreeksen ontbinden periodieke signalen in discrete
+harmonischen; de Fourier\emph{transformatie} doet hetzelfde
+voor signalen op de hele lijn, met een continuum van
+frequenties. Ze zet differentiatie om in vermenigvuldiging,
+convolutie in producten, en Gaussen in Gaussen --- de redenen
+waarom ze differentiaalvergelijkingen oplost, signaalverwerking
+aandrijft, en de centrale limietstelling in \cref{ch:b3:clt}
+zal bewijzen. Dit hoofdstuk ontwikkelt de $L^1$-theorie
+(Riemann--Lebesgue, inversie, injectiviteit), de
+\omterm{def:b3:fouriertransform:schwartz}{Schwartz-klasse} waar de transformatie een perfecte bijectie
+is, en de $L^2$-theorie (Plancherel: de transformatie is, op
+een constante na, een unitaire operator), met twee
+pronkstuktoepassingen: de warmtevergelijking, van begin tot
+eind opgelost in de weekendopgave, en de somformule van
+Poisson. Conventie:
+\[
+\hat f(\xi) = \int_\R f(x)\,\eu^{-\iu\xi x}\,\dd x .
+\]
+
+\section{De transformatie op \texorpdfstring{$L^1$}{L1}}
+
+\begin{proposition}\label{prop:b3:fouriertransform:basic}
+Voor $f \in L^1(\R)$: $\hat f$ is welgedefinieerd, begrensd
+($\norm{\hat f}_\infty \leq \norm f_1$), continu, en:
+\begin{enumerate}
+  \item $\widehat{\tau_af}(\xi) = \eu^{-\iu a\xi}\hat f(\xi)$
+        en $\widehat{\eu^{\iu ax}f}(\xi) = \hat f(\xi - a)$;
+  \item $\widehat{f(\cdot/\lambda)}(\xi) = \lambda\hat
+        f(\lambda\xi)$ voor $\lambda > 0$;
+  \item als $xf \in L^1$, dan is $\hat f$ $\mathcal C^1$ met
+        $(\hat f)'(\xi) = \widehat{(-\iu x)f}(\xi)$;
+  \item als $f \in \mathcal C^1$ met $f' \in L^1$ (en $f \to
+        0$ in $\pm\infty$, hier automatisch), dan
+        $\widehat{f'}(\xi) = \iu\xi\hat f(\xi)$;
+  \item $\widehat{f * g} = \hat f\,\hat g$ voor $f, g \in L^1$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+Begrensdheid: $\abs{\hat f} \leq \int\abs f$. Continuïteit:
+DCT met dominator $\abs f$ (\cref{thm:b3:lebesgue:paramcont}).
+(1), (2): substituties
+(\cref{thm:b3:product:linearchange}). (3): differentiatie
+onder de integraal, dominator $\abs{xf}$
+(\cref{thm:b3:lebesgue:paramdiff}). (4): eerst, $f(x) = f(0)
++ \int_0^xf'$ heeft een limiet in $\pm\infty$ ($f' \in L^1$),
+die $0$ moet zijn ($f \in L^1$); integreer dan partieel op
+$[-A, A]$ en laat $A \to \infty$. (5): Fubini, legitiem
+omdat $(x,y)\mapsto f(x - y)g(y)\eu^{-\iu\xi x}$ absoluut
+\omterm{def:b3:lebesgue:l1}{integreerbaar} is (\cref{thm:b3:product:convolution}):
+\[
+\widehat{f*g}(\xi) = \iint f(x - y)g(y)\eu^{-\iu\xi(x - y)}
+\eu^{-\iu\xi y}\dd x\,\dd y = \hat f(\xi)\,\hat g(\xi).
+\]
+\end{proof}
+
+\begin{example}\label{ex:b3:fouriertransform:gaussian}
+De Gauss: voor $a > 0$,\index{Gauss, Fouriertransformatie}
+\[
+\widehat{\eu^{-ax^2}}(\xi) =
+\sqrt{\frac\pi a}\;\eu^{-\xi^2/4a} :
+\]
+via \cref{exo:b3:lebesgue:7} (de ODE $F' = -\frac\xi{2}F$
+truc, herschaald), of via (3): $g = \widehat{\eu^{-ax^2}}$
+voldoet aan $g'(\xi) = -\frac{\xi}{2a}g(\xi)$ (partieel
+integreren), $g(0) = \sqrt{\pi/a}$. Gaussen zijn vaste
+punten van de transformatie op schaling na --- de diepe
+reden waarom ze de centrale limietstelling regeren.
+\end{example}
+
+\begin{theorem}[Riemann--Lebesgue]
+\label{thm:b3:fouriertransform:riemannlebesgue}
+Voor $f \in L^1(\R)$: $\hat f(\xi) \to 0$ als $\abs\xi \to
+\infty$. Dus $\widehat{\phantom f} \colon L^1 \to \mathcal
+C_0(\R)$ (continue functies die in oneindig
+verdwijnen).\index{lemma van Riemann--Lebesgue}
+\end{theorem}
+
+\begin{proof}
+Voor een indicator van een interval, $\widehat{\mathbf 1_{\intcc
+ab}}(\xi) = \frac{\eu^{-\iu a\xi} - \eu^{-\iu b\xi}}{\iu\xi}
+\to 0$; dus voor stapfuncties. Stapfuncties zijn \omterm{def:b3:topology:interior}{dicht} in
+$L^1$ (\cref{thm:b3:lp:density}(1) plus benadering van
+eindig-maatverzamelingen door eindige unies van intervallen,
+\cref{exo:b3:measure:7}), en de transformatie is
+$\norm\cdot_\infty$-$\norm\cdot_1$ continu: voor $\norm{f -
+s}_1 < \varepsilon$, $\limsup_{\abs\xi\to\infty}\abs{\hat
+f(\xi)} \leq \varepsilon$.
+\end{proof}
+
+\section{Inversie en injectiviteit}
+
+\begin{lemma}[Vermenigvuldigingsformule]
+\label{lem:b3:fouriertransform:multiplication}
+Voor $f, g \in L^1(\R)$: $\displaystyle\int \hat f\,g =
+\int f\,\hat g$.
+\end{lemma}
+
+\begin{proof}
+Beide zijden zijn gelijk aan $\iint f(x)g(\xi)\eu^{-\iu x\xi}\dd
+x\,\dd\xi$ (Tonelli--Fubini: de dubbele integraal van de
+absolute waarde is $\norm f_1\norm g_1$).
+\end{proof}
+
+\begin{theorem}[Inversie]\label{thm:b3:fouriertransform:inversion}
+Zij $f \in L^1(\R)$.\index{inversiestelling van Fourier}
+\begin{enumerate}
+  \item (Gaussiaanse sommeerbaarheid) Voor elke $x$,
+        \[
+        (f * g_\varepsilon)(x) =
+        \frac1{2\pi}\int_\R \hat f(\xi)\,
+        \eu^{-\varepsilon\xi^2}\,\eu^{\iu x\xi}\,\dd\xi,
+        \qquad\text{waar } g_\varepsilon(y) =
+        \frac{1}{2\sqrt{\pi\varepsilon}}\,
+        \eu^{-y^2/4\varepsilon},
+        \]
+        en $f * g_\varepsilon \to f$ in $L^1$ als
+        $\varepsilon \to 0$.
+  \item Als bovendien $\hat f \in L^1$, dan voor bijna elke
+        $x$
+        \[
+        f(x) = \frac{1}{2\pi}\int_\R \hat
+        f(\xi)\,\eu^{\iu x\xi}\,\dd\xi ,
+        \]
+        en $f$ heeft een continue representant.
+  \item (Injectiviteit) Als $\hat f = 0$ dan $f = 0$ a.e.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) Fixeer $x$ en pas
+\cref{lem:b3:fouriertransform:multiplication} toe op $f$ en
+$g(\xi) = \frac1{2\pi}\eu^{-\varepsilon\xi^2}\eu^{\iu x\xi}$:
+via \cref{ex:b3:fouriertransform:gaussian} (met de
+modulatieregel),
+\[
+\hat g(y) = \frac1{2\pi}\sqrt{\frac\pi\varepsilon}\,
+\eu^{-(y - x)^2/4\varepsilon} = g_\varepsilon(x - y),
+\]
+dus $\frac1{2\pi}\int\hat f(\xi)\eu^{-\varepsilon\xi^2}
+\eu^{\iu x\xi}\dd\xi = \int f(y)g_\varepsilon(x - y)\dd y =
+(f*g_\varepsilon)(x)$. De $g_\varepsilon$ zijn een
+benaderende eenheid: $g_\varepsilon \geq 0$, $\int
+g_\varepsilon = 1$ (Gauss-integraal), concentrerend in $0$;
+het bewijs van \cref{thm:b3:lp:regularization}(2) geldt
+woordelijk (alleen $\int g_\varepsilon = 1$ en concentratie
+werden gebruikt: voor de staart, $\int_{\abs y >
+\delta}g_\varepsilon \to 0$): $\norm{f * g_\varepsilon -
+f}_1 \to 0$.
+
+(2) Als $\hat f \in L^1$: de rechterkant van (1) convergeert,
+via DCT (dominator $\abs{\hat f}$), naar
+$\frac1{2\pi}\int\hat f(\xi)\eu^{\iu x\xi}\dd\xi$ voor
+\emph{elke} $x$, en deze limietfunctie is continu (DCT
+opnieuw). Anderzijds $f * g_\varepsilon \to f$ in $L^1$,
+dus langs een deelrij a.e.\ (\cref{thm:b3:lp:complete}): de
+twee limieten stemmen a.e.\ overeen.
+
+(3) $\hat f = 0$ maakt de rechterkant van (1) verdwijnen: $f
+* g_\varepsilon = 0$ voor alle $\varepsilon$, en $f *
+g_\varepsilon \to f$ in $L^1$: $f = 0$ a.e.
+\end{proof}
+
+\section{De Schwartz-klasse}
+
+\begin{definition}\label{def:b3:fouriertransform:schwartz}
+De \emph{Schwartz-klasse}\index{Schwartz-klasse} $\mathcal
+S(\R)$ bestaat uit de $\mathcal C^\infty$-functies $f$ met
+$\sup_x\abs{x^m f^{(n)}(x)} < \infty$ voor alle $m, n \geq 0$
+(alle afgeleiden vervallen sneller dan elke macht).
+Voorbeelden: $\eu^{-ax^2}$, $\mathcal C_c^\infty$. Duidelijk
+$\mathcal S \subseteq L^p$ voor elke $p$ (grens door $C(1 +
+x^2)^{-1}$), en $\mathcal S$ is stabiel onder afgeleiden,
+vermenigvuldiging met polynomen, en producten.
+\end{definition}
+
+\begin{theorem}\label{thm:b3:fouriertransform:schwartz}
+De Fouriertransformatie beeldt $\mathcal S(\R)$ bijectief op
+zichzelf af, met inverse $\check g(x) = \frac1{2\pi}\int
+g(\xi)\eu^{\iu x\xi}\dd\xi$.
+\end{theorem}
+
+\begin{proof}
+Zij $f \in \mathcal S$. Itereren van
+\cref{prop:b3:fouriertransform:basic}(3), $(\hat f)^{(n)} =
+\widehat{(-\iu x)^nf}$ (elke $x^kf \in L^1$); itereren van (4)
+met $h = (-\iu x)^nf \in \mathcal S$ (al wier afgeleiden
+\omterm{def:b3:lebesgue:l1}{integreerbaar} zijn), $(\iu\xi)^m\hat h =
+\widehat{h^{(m)}}$. Combineren,
+\[
+\abs{\xi^m\,(\hat f)^{(n)}(\xi)}
+= \bigl|\widehat{\,h^{(m)}}(\xi)\bigr|
+\leq \bigl\|\bigl((-\iu x)^nf\bigr)^{(m)}\bigr\|_1 < \infty
+\]
+uniform in $\xi$: $\hat f \in \mathcal S$. Omdat $\hat f \in
+L^1$, geldt inversie
+(\cref{thm:b3:fouriertransform:inversion}(2)) overal (beide
+zijden continu): $\check{\hat f} = f$, en symmetrisch
+$\widehat{\check g} = g$ (de check-transformatie is $g
+\mapsto \frac1{2\pi}\hat g(-\cdot)$, opnieuw $\mathcal S$
+bewarend): bijectie.
+\end{proof}
+
+\section{Plancherel en \texorpdfstring{$L^2$}{L2}}
+
+\begin{theorem}[Plancherel]\label{thm:b3:fouriertransform:plancherel}
+Voor $f \in L^1 \cap L^2(\R)$:\index{stelling van Plancherel}
+\[
+\norm{\hat f}_2^2 = 2\pi\,\norm f_2^2 .
+\]
+Bijgevolg strekt $\widehat{\phantom f}$ zich uniek uit tot een
+continue lineaire afbeelding $\mathcal F \colon L^2(\R) \to
+L^2(\R)$ met $\norm{\mathcal Ff}_2 = \sqrt{2\pi}\norm f_2$;
+$\mathcal F$ is bijectief, met $\mathcal F^{-1} =
+\frac1{2\pi}\,\mathcal F\circ\sigma$ waar $\sigma f =
+f(-\cdot)$, en ze bewaart inwendige producten op de factor
+$2\pi$ na.
+\end{theorem}
+
+\begin{proof}
+Zij $f \in L^1\cap L^2$ en $h = f * \tilde f$ met
+$\tilde f(x) = \overline{f(-x)}$. Dan $h \in L^1$
+(\cref{thm:b3:product:convolution}), $h$ is continu en
+begrensd (\cref{exo:b3:lp:6}: $f, \tilde f \in L^2$), $h(0)
+= \int f\bar f = \norm f_2^2$, en $\hat h = \hat
+f\,\widehat{\tilde f} = \hat f\,\overline{\hat f} =
+\abs{\hat f}^2 \geq 0$ (bereken $\widehat{\tilde f} =
+\overline{\hat f}$). Pas
+\cref{thm:b3:fouriertransform:inversion}(1) toe op $h$ in $x
+= 0$:
+\[
+(h * g_\varepsilon)(0) = \frac1{2\pi}\int \hat
+h(\xi)\,\eu^{-\varepsilon\xi^2}\dd\xi .
+\]
+Als $\varepsilon \to 0$: de linkerkant gaat naar $h(0)$ ($h$
+continu begrensd: $(h*g_\varepsilon)(0) - h(0) = \int(h(-y)
+- h(0))g_\varepsilon(y)\dd y \to 0$ door splitsen
+klein/groot $y$); de rechterkant stijgt naar
+$\frac1{2\pi}\int\hat h$ via MCT ($\hat h \geq 0$). Dus
+$\frac1{2\pi}\int\abs{\hat f}^2 = \norm f_2^2$, eindig of
+niet \emph{a priori} --- en eindig, bewijzend zowel
+lidmaatschap als de identiteit.
+
+Uitbreiding: $L^1\cap L^2 \supseteq \mathcal C_c$ is \omterm{def:b3:topology:interior}{dicht}
+in $L^2$ (\cref{thm:b3:lp:density}); de transformatie is
+$\sqrt{2\pi}$-isometrisch daar, dus strekt uniek uit tot een
+isometrie-op-constante-na $\mathcal F$ op $L^2$
+(\cref{thm:b3:complete:extension}). Inversie voor $\mathcal
+S$ (\cref{thm:b3:fouriertransform:schwartz}) transporteert
+via dezelfde \omterm{ex:b3:lebesgue:gamma}{dichtheid} (beide zijden $L^2$-continu):
+$\mathcal F\bigl(\frac1{2\pi}\mathcal F(\sigma f)\bigr) = f$
+op $\mathcal S$, dus op $L^2$: bijectiviteit. Inwendige
+producten: polarisatie uit de normidentiteit.
+\end{proof}
+
+\begin{theorem}[Somformule van Poisson]
+\label{thm:b3:fouriertransform:poisson}
+Zij $f \in \mathcal S(\R)$ (continue $f$ met $\abs{f} +
+\abs{\hat f} \leq C(1 + \abs\cdot)^{-2}$ volstaat).
+Dan\index{somformule van Poisson}
+\[
+\sum_{n\in\Z} f(n) \;=\; \sum_{k\in\Z}\hat f(2\pi k) .
+\]
+\end{theorem}
+
+\begin{proof}
+Zij $F(x) = \sum_{n\in\Z}f(x + n)$: de reeks convergeert
+normaal op compacta (verval van $f$), dus $F$ is continu, en
+ze is $1$-periodiek. Haar Fouriercoëfficiënten (periode $1$:
+$c_k(F) = \int_0^1F(t)\eu^{-2\iu\pi kt}\dd t$):
+\[
+c_k(F) = \sum_n\int_0^1 f(t + n)\,\eu^{-2\iu\pi kt}\dd t
+= \int_\R f(t)\,\eu^{-2\iu\pi kt}\dd t = \hat f(2\pi k)
+\]
+(normale convergentie rechtvaardigt de verwisseling; de fase
+is $1$-periodiek). De reeks $\sum_k\abs{c_k(F)}$ convergeert
+(verval van $\hat f$), dus de Fourierreeks van $F$
+convergeert normaal; haar som is een continue functie met
+dezelfde Fouriercoëfficiënten als $F$, dus gelijk aan $F$
+(injectiviteit op de cirkel: het verschil heeft nule
+coëfficiënten, en \cref{thm:b3:hilbert:fourier} geeft nul in
+$L^2$, dus overal door continuïteit). Evalueer in $x = 0$.
+\end{proof}
+
+\begin{example}[De theta-identiteit]
+\label{ex:b3:fouriertransform:theta}
+Poisson toepassen op $f(x) = \eu^{-\pi tx^2}$ ($t > 0$),
+wier transform $\hat f(\xi) = t^{-1/2}\eu^{-\xi^2/4\pi t}$ is
+(\cref{ex:b3:fouriertransform:gaussian} met $a = \pi t$):
+\[
+\sum_{n\in\Z}\eu^{-\pi n^2t}
+= \frac1{\sqrt t}\sum_{k\in\Z}\eu^{-\pi k^2/t} :
+\]
+de functionaalvergelijking van Jacobi's theta-functie,
+sleutel tot de functionaalvergelijking van Riemanns $\zeta$
+--- en een spectaculaire numerieke accelerator: voor $t$
+klein convergeert de linkerkant langzaam, de rechterkant
+bliksemsnel.
+\end{example}
+
+\begin{method}\label{met:b3:fouriertransform:method}
+Werkbereiken: $L^1$ --- transform puntsgewijs gedefinieerd,
+inversie heeft $\hat f \in L^1$ nodig; $\mathcal S$ --- alles
+is legaal, bewijs hier eerst; $L^2$ --- transform gedefinieerd
+via \omterm{ex:b3:lebesgue:gamma}{dichtheid} (niet via de integraal!), perfecte symmetrie,
+Parseval-boekhouding. Om een transform te berekenen: reduceer
+tot de tabel (indicator, exponentiaal, Gauss) via de regels
+van \cref{prop:b3:fouriertransform:basic}; om een identiteit
+te bewijzen: vestig ze op $\mathcal S$ (of $\mathcal
+C_c^\infty$) en strek uit via \omterm{ex:b3:lebesgue:gamma}{dichtheid} en continuïteit
+(\cref{met:b3:lp:toolkit}); om een lineaire PDE of ODE met
+constante coëfficiënten op te lossen: transformeer, deel,
+inverteer.
+\end{method}
+
+\begin{omfigure}
+\begin{tikzpicture}[xscale=1.05, yscale=2.2]
+  \draw[->] (-4.3,0) -- (4.3,0) node[right,font=\small] {$x$};
+  \draw[->] (0,0) -- (0,1.25);
+  \draw[omThm, thick, smooth]
+    plot[domain=-4:4, samples=81]
+    (\x, {exp(-\x*\x/0.4)/1.1209});
+  \draw[omProp, thick, smooth]
+    plot[domain=-4:4, samples=81]
+    (\x, {exp(-\x*\x/1.6)/2.2418});
+  \draw[omDef, thick, smooth]
+    plot[domain=-4:4, samples=81]
+    (\x, {exp(-\x*\x/6.4)/4.4836});
+  \node[omThm, font=\small] at (1.35,0.75) {$t = 0.1$};
+  \node[omProp, font=\small] at (2.4,0.36) {$t = 0.4$};
+  \node[omDef, font=\small] at (3.5,0.17) {$t = 1.6$};
+\end{tikzpicture}
+
+{\small De \omterm{pb:b3:fouriertransform:1}{warmtekern} $g_t(x) =
+\frac1{2\sqrt{\pi t}}\,\eu^{-x^2/4t}$ op drie tijden: totale
+massa $1$ voor altijd, hoogte $\sim t^{-1/2}$, breedte $\sim
+\sqrt t$. Convolueren van beginwaarden met deze spreidende
+Gauss is de hele \omterm{def:b3:rings:content}{inhoud} van de weekendopgave; in frequentie
+leest hetzelfde plaatje $\hat g_t(\xi) = \eu^{-t\xi^2}$ ---
+hoge frequenties sterven eerst, en die asymmetrie is de
+pijl van de tijd.}
+\end{omfigure}
+
+\section{Oefeningen}
+
+\begin{exercise}[$\star$]\label{exo:b3:fouriertransform:1}
+Bereken de Fouriertransformaties van: $\mathbf 1_{\intcc{-a}a}$;
+$\eu^{-a\abs x}$ ($a > 0$); de tentfunctie $\max(0, 1 -
+\abs x)$; $\frac1{x^2 + a^2}$ \emph{(gebruik inversie op de
+tweede)}. Noteer de opkomende tabel.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b3:fouriertransform:2}
+Zij $f \in L^1$. Druk uit in termen van $\hat f$ de
+transformaties van: $f(x - a)$, $f(x)\cos(bx)$, $f(ax + b)$,
+$\overline{f(-x)}$, $(f * f)(x)$. Verifieer elke regel op de
+Gauss.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:fouriertransform:3}
+(a) Toon dat $\mathbf 1_{\intcc{-1}1} * \mathbf
+1_{\intcc{-1}1}$ transform $\bigl(\frac{2\sin\xi}\xi
+\bigr)^2$ heeft, en concludeer
+$\int_\R\bigl(\frac{\sin\xi}\xi\bigr)^2\dd\xi = \pi$ via
+Plancherel --- of via inversie in $0$. Vergelijk
+\cref{pb:b3:lebesgue:1}.
+(b) Bereken $\int_\R\frac{\dd x}{(x^2+1)^2}$ via Plancherel
+toegepast op $\eu^{-\abs x}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:fouriertransform:4}
+(Warmtekern-algebra) Met $g_t(x) =
+\frac1{2\sqrt{\pi t}}\eu^{-x^2/4t}$:
+(a) verifieer $\hat g_t(\xi) = \eu^{-t\xi^2}$;
+(b) concludeer de semigroepwet $g_t * g_s = g_{t+s}$ zonder
+enige integraalberekening;
+(c) toon $\norm{g_t}_1 = 1$ en $\norm{g_t}_2^2 =
+(8\pi t)^{-1/2}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:fouriertransform:5}
+Toon dat als $f \in L^1$ even en reëel is, $\hat f$ even en
+reëel is; als $f$ oneven en reëel is, is $\hat f$ oneven en
+zuiver imaginair. Wat berekent $\hat f(0)$? Concludeer dat $f
+\geq 0$ $\norm{\hat f}_\infty = \hat f(0) = \int f$ forceert,
+en interpreteer voor kansdichtheden (\cref{ch:b3:clt}: een
+karakteristieke functie heeft modulus $\leq 1$, bereikt in
+$0$).
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:fouriertransform:6}
+(Niet-surjectiviteit) Toon dat $\widehat{\phantom f}\colon
+L^1 \to \mathcal C_0$ injectief en continu is, maar
+\emph{niet} surjectief, in drie stappen.
+(i) Injectiviteit (\cref{thm:b3:fouriertransform:inversion})
+en continuïteit ($\norm{\hat f}_\infty \leq \norm f_1$), en
+$\mathcal C_0$ is een Banachruimte (gesloten in
+$\norm\cdot_\infty$).
+(ii) Als de afbeelding surjectief was, zou ze bijectief zijn,
+en de open-afbeeldingsstelling
+(\cref{thm:b3:banach:openmapping}) zou een constante $C$
+geven met $\norm f_1 \leq C\norm{\hat f}_\infty$ voor alle
+$f \in L^1$.
+(iii) Weerspreek dit met $f_n(x) = \frac{\sin
+x}{x}\cdot\frac{\sin(x/n)}{x/n}$: haar transform is (op
+constanten na) de convolutie $\mathbf 1_{\intcc{-1}1} *
+\mathbf 1_{\intcc{-1/n}{1/n}}$-type trapezium --- toon
+$\norm{\hat f_n}_\infty \leq \pi$ uniform, terwijl
+$\norm{f_n}_1 \geq c\ln n$ door de bogen van
+$\frac{\abs{\sin x}}x$ op $[1, n]$ te tellen (waar de tweede
+factor van onderen begrensd is), zoals in
+\cref{thm:b3:banach:fourierdiverge}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:fouriertransform:7}
+(Gladheid $\leftrightarrow$ verval-woordenboek) Bewijs: $f \in
+L^1$ met $\hat f(\xi) = O(\abs\xi^{-k-1-\delta})$ voor zekere
+$\delta > 0$ impliceert dat $f$ een $\mathcal C^k$-representant
+heeft. Omgekeerd $f \in \mathcal C^k_c$ impliceert $\hat
+f(\xi) = O(\abs\xi^{-k})$. Illustreer beide richtingen op de
+tentfunctie.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:fouriertransform:8}
+(Ongelijkheid van Heisenberg) Voor $f \in \mathcal S(\R)$
+reëel met $\norm f_2 = 1$, bewijs
+\[
+\Bigl(\int x^2f(x)^2\dd x\Bigr)\cdot
+\Bigl(\frac1{2\pi}\int \xi^2\abs{\hat f(\xi)}^2\dd\xi\Bigr)
+\;\geq\; \frac14 ,
+\]
+met gelijkheid voor Gaussen. \emph{(Schrijf $1 = \int f^2 =
+-\int x\,(f^2)'$ partieel, begrens door Cauchy--Schwarz, en
+converteer $\norm{f'}_2$ via Plancherel.)} Interpretatie: een
+signaal en zijn spectrum kunnen niet beide geconcentreerd
+zijn.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:fouriertransform:9}
+Rechtvaardig \cref{ex:b3:fouriertransform:theta} in detail
+(hypothesen van Poisson voor de Gauss), en gebruik de
+identiteit om $\sum_{n\in\Z}\eu^{-\pi n^2}$ tot zes
+decimalen met drie termen te evalueren. Hoeveel termen van
+de \emph{definiërende} reeks zou dezelfde nauwkeurigheid
+vereisen bij $t = 10^{-2}$, versus de getransformeerde
+reeks?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:fouriertransform:10}
+(Bandbegrensde functies) Zij $f \in L^2(\R)$ met $\mathcal
+Ff$ gedragen in $\intcc{-\pi}\pi$. Toon dat $f$ een
+representant heeft die zich uitstrekt waarvan elke waarde
+herwinbaar is uit samples: bewijs de \emph{Shannon-interpolatie}
+in de gehele getallen,
+\[
+f(x) = \sum_{n\in\Z} f(n)\,
+\frac{\sin\bigl(\pi(x - n)\bigr)}{\pi(x - n)}
+\quad\text{in } L^2,
+\]
+door $\mathcal Ff$ te ontwikkelen in de Fourier-basis van
+$L^2(\intcc{-\pi}\pi)$ (\cref{thm:b3:hilbert:fourier}) en
+term-voor-term terug te transformeren.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:fouriertransform:11}
+(De transform als operator van orde vier) Op $\mathcal
+S(\R)$, zij $\mathcal F f = \hat f$.
+(a) Met de inversieformule, toon $(\mathcal F^2f)(x) =
+2\pi\,f(-x)$, en concludeer $\mathcal F^4 = (2\pi)^2\,
+\mathrm{id}$.
+(b) Concludeer dat elke eigenwaarde van $\mathcal F$ op
+$\mathcal S$ tot $\{\pm\sqrt{2\pi},
+\pm\iu\sqrt{2\pi}\}$ behoort, en exposeer een
+eigenfunctie voor $+\sqrt{2\pi}$ \emph{(welke functie van
+dit hoofdstuk is evenredig met haar eigen transform?)}.
+(c) Toon dat even functies $\mathcal F^2f = 2\pi f$ en
+oneven $\mathcal F^2f = -2\pi f$ voldoen; produceer een
+eigenfunctie voor de eigenwaarde $-\iu\sqrt{2\pi}$ uit
+$x\eu^{-x^2/2}$ door haar transform te berekenen
+(differentiëer de transform van de Gauss).
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:fouriertransform:12}
+(Autocorrelatie en lemma van Wiener) Voor $f \in L^2(\R)$
+definieer $\tilde f(x) = \overline{f(-x)}$ en de
+\emph{autocorrelatie} $A_f = f * \tilde f$.
+(a) Toon dat $A_f$ een begrensde continue functie is met
+$A_f(0) = \norm f_2^2 \geq \abs{A_f(x)}$ voor alle $x$
+(\cref{exo:b3:lp:6} en Cauchy--Schwarz).
+(b) Toon, eerst voor $f \in L^1\cap L^2$, dat
+$\widehat{A_f} = \abs{\hat f\,}^2 \geq 0$: de
+autocorrelatie heeft niet-negatieve transform --- spectra
+van autocorrelaties zijn vermogensspectra.
+(c) Concludeer de identiteit $\int_\R\abs{\hat
+f(\xi)}^2\eu^{\iu x\xi}\,\dd\xi = 2\pi A_f(x)$ (inversie;
+rechtvaardig toepasbaarheid wanneer $\hat f \in L^2$
+$\abs{\hat f}^2 \in L^1$ heeft), en evalueer ze voor $f =
+\mathbf 1_{\intcc{-1/2}{1/2}}$ in $x = 0$: herwin
+$\int_\R\bigl(\frac{\sin u}u\bigr)^2\dd u = \pi$.
+\end{exercise}
+
+\section{Probleem: de warmtevergelijking op de lijn}
+
+\begin{problem}[{Weekendopgave --- $\partial_tu =
+\partial^2_{xx}u$, van begin tot eind opgelost}]
+\label{pb:b3:fouriertransform:1}
+Warmte spreidt; de vergelijking $\partial_tu =
+\partial_{xx}^2u$ zegt dat haar \omterm{ex:b3:lebesgue:gamma}{dichtheid} diffundeert met een
+snelheid gegeven door de lokale kromming van het
+temperatuurprofiel. We lossen het Cauchy-probleem op $\R$ op
+--- gegeven $f$, vind $u(t, x)$ voor $t > 0$ met $u(0,
+\cdot) = f$ --- bewijzen de opmerkelijke eigenschappen van
+de oplossing, en zien waarom tijd niet omkeerbaar is.
+Doorheen is $g_t(x) = \frac1{2\sqrt{\pi t}}\eu^{-x^2/4t}$ de
+\emph{warmtekern}\index{warmtekern} en $u(t, \cdot) = g_t *
+f$.
+
+\medskip
+\noindent\textbf{Deel I --- De kern afleiden.} Werk eerst
+formeel: veronderstel $u(t, \cdot) \in \mathcal S$ lost de
+vergelijking op, en laat $\hat u(t, \xi)$ de transform in
+$x$ zijn.
+\begin{enumerate}
+  \item Toon (formeel) $\partial_t\hat u = -\xi^2\hat u$,
+        dus $\hat u(t,\xi) = \eu^{-t\xi^2}\hat f(\xi)$, en
+        herken $u(t) = g_t * f$
+        (\cref{exo:b3:fouriertransform:4}). Dit motiveert de
+        \emph{definitie} van $u$; alles wordt nu direct
+        bewezen, voor $f \in \mathcal C_b(\R)$ (begrensd
+        continu) of $f \in L^p$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel II --- Verificatie.}
+\begin{enumerate}[resume]
+  \item Toon dat voor $t > 0$, $u(t, x) = \int
+        g_t(x-y)f(y)\dd y$ welgedefinieerd is voor $f \in
+        \mathcal C_b$, en dat $u$ $\mathcal C^\infty$ is in
+        $(t, x)$ op $\intoo0\infty\times\R$
+        \emph{(differentiëer onder de integraal; domineer
+        Gauss-afgeleiden lokaal uniform in $(t,x)$)}.
+  \item Verifieer $\partial_tg_t = \partial^2_{xx}g_t$ door
+        directe berekening, en concludeer $\partial_tu =
+        \partial^2_{xx}u$ voor $t > 0$.
+  \item (Beginvoorwaarde) Toon dat voor $f \in \mathcal
+        C_b$, $u(t, x) \to f(x)$ als $t \to 0^+$, uniform op
+        compacta \emph{(benaderende eenheid: splits $\abs y
+        \leq \delta$, $\abs y > \delta$)}; voor $f \in L^p$
+        ($p < \infty$), toon $\norm{u(t) - f}_p \to 0$.
+  \item (Instant gladmaking) Concludeer: zelfs voor louter
+        begrensd continue $f$ is de oplossing $\mathcal
+        C^\infty$ voor elke $t > 0$ --- warmte wist
+        onmiddellijk ruwheid. Bereken $u(t, \cdot)$
+        expliciet voor $f = \mathbf 1_{\intoo0\infty}$ (een
+        errorfunctie) en schets haar profiel voor drie
+        waarden van $t$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel III --- Structurele eigenschappen.}
+\begin{enumerate}[resume]
+  \item (Positiviteit en vergelijking) Als $f \geq 0$ dan $u
+        > 0$ voor alle $t > 0$ (strikt, tenzij $f = 0$ a.e.);
+        als $f_1 \leq f_2$ dan $u_1 \leq u_2$. Een koude plek
+        warmt onmiddellijk: commentarieer.
+  \item (Behoud) Voor $f \in L^1$: $\int u(t, x)\dd x =
+        \int f$ voor alle $t$ \emph{(Tonelli)} --- totale
+        warmte is behouden.
+  \item (Dissipatie) Voor $f \in L^1\cap L^2$, toon via
+        Plancherel dat $t \mapsto \norm{u(t)}_2$
+        niet-stijgend is, strikt tenzij $f = 0$, en bereken
+        haar limiet als $t \to \infty$. Toon bovendien
+        $\norm{u(t)}_\infty \leq \frac{\norm
+        f_1}{2\sqrt{\pi t}} \to 0$: warmte spreidt en
+        sterft.
+  \item (Uniciteit, $L^2$-klasse) Zij $u$ een oplossing met
+        $u(t) \in L^2$ voor alle $t$, $u \in \mathcal
+        C^1(\intoo0\infty, L^2)$ in de natuurlijke zin en
+        $u(t) \to f$ in $L^2$ als $t\to0$; toelatend dat de
+        transform haar omzet in $\partial_t\hat u =
+        -\xi^2\hat u$ puntsgewijs a.e.\ in $\xi$ voor a.e.\
+        $t$ \emph{(gerechtvaardigd door testen tegen
+        $\mathcal C_c^\infty$ in $\xi$ --- schets dit)},
+        toon $\hat u(t,\xi) = \eu^{-t\xi^2}\hat f(\xi)$,
+        dus uniciteit in deze klasse.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel IV --- De pijl van de tijd.}
+\begin{enumerate}[resume]
+  \item Toon dat het \emph{achterwaartse} probleem slecht
+        gesteld is: opdat de oplossing in tijd $-s$ ($s >
+        0$) bestaat met data $f$ in tijd $0$ --- d.w.z.\
+        opdat $f = g_s * h$ een oplossing $h \in L^2$ heeft
+        --- is nodig dat $\eu^{s\xi^2}\hat f(\xi) \in L^2$:
+        een extreme vervalvoorwaarde op $\hat f$. Exposeer
+        een expliciete gladde $f \in L^2$ waarvoor geen
+        achterwaartse oplossing op enig tijdsinterval
+        bestaat: neem de functie met $\hat f(\xi) =
+        \eu^{-\abs\xi}$ --- identificeer $f$
+        (\cref{exo:b3:fouriertransform:1}) en toon
+        $\eu^{s\xi^2}\eu^{-\abs\xi} \notin L^2$ voor elke $s
+        > 0$.
+  \item (Gladmaking vs.\ informatie) Leg in een korte
+        alinea, met vragen 5, 9 en 10, uit waarom de
+        warmtesemigroep $(f \mapsto g_t * f)_{t\geq0}$
+        injectief maar niet surjectief is op $L^2$, en
+        waarom dit de onomkeerbaarheid van diffusie
+        uitdrukt.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel V --- Shannons samplingstelling.} Een
+functie $f \in L^2(\R)$ is \emph{bandbegrensd} tot $\Omega$
+als $\hat f = 0$ a.e.\ buiten $\intcc{-\Omega}\Omega$;
+schrijf $PW_\Omega$ (Paley--Wiener-ruimte) voor deze.
+\begin{enumerate}[resume]
+  \item Toon dat elke $f \in PW_\Omega$ a.e.\ overeenstemt
+        met de $\mathcal C^\infty$-functie
+        $\frac1{2\pi}\int_{-\Omega}^{\Omega}\hat
+        f(\xi)\eu^{\iu x\xi}\,\dd\xi$ (rechtvaardig
+        gladheid en de identificatie), met alle afgeleiden
+        begrensd: bandbeperking is een extreme vorm van
+        regulariteit. Vanaf nu duidt $f$ deze representant
+        aan.
+  \item Ontwikkel $\hat f \in L^2(\intcc{-\Omega}\Omega)$ in
+        de Fourier-basis van dat interval en identificeer de
+        coëfficiënten als \emph{samples} van $f$:
+        \[
+        \hat f(\xi) = \frac\pi\Omega\sum_{n\in\Z}
+        f\Bigl(\frac{n\pi}\Omega\Bigr)\,
+        \eu^{-\iu n\pi\xi/\Omega}
+        \quad\text{in } L^2(\intcc{-\Omega}\Omega) .
+        \]
+  \item Concludeer de \emph{samplingstelling}: voor $f \in
+        PW_\Omega$,
+        \[
+        f(x) = \sum_{n\in\Z}f\Bigl(\frac{n\pi}
+        \Omega\Bigr)\,\operatorname{sinc}(\Omega x - n\pi),
+        \qquad \operatorname{sinc}t = \frac{\sin t}t,
+        \]
+        met convergentie in $L^2(\R)$ en uniform op $\R$
+        \emph{(injecteer de reeks van vraag 13 in de
+        inversieformule en bereken de elementaire
+        integraal)}: een bandbegrensd signaal is \omterm{def:b3:complete:complete}{volledig}
+        bepaald door haar waarden op een rooster van stap
+        $\pi/\Omega$ --- de Nyquist-snelheid.
+  \item Toon dat de functies $x \mapsto
+        \operatorname{sinc}(\Omega x - n\pi)$, $n \in \Z$,
+        een orthogonale familie in $L^2(\R)$ vormen met
+        constante norm $\sqrt{\pi/\Omega}$, en concludeer de
+        energie-identiteit $\norm f_2^2 =
+        \frac\pi\Omega\sum_n\abs{f(n\pi/\Omega)}^2$.
+  \item (Aliasing) Exposeer een niet-nul $g \in PW_{2\Omega}$
+        die verdwijnt in elk samplepunt $\frac{n\pi}\Omega$
+        \emph{(beschouw $g(x) =
+        \sin(\Omega x)\operatorname{sinc}(\Omega x)$ en
+        controleer haar band)}: samplen onder de
+        Nyquist-snelheid verliest informatie --- twee
+        verschillende signalen kunnen alle samples delen:
+        het stroboscopische wagenwiel-effect, gemathematiseerd.
+  \item (Vrijheidsgraden) Met vragen 14--15, rechtvaardig de
+        ingenieursregel: een signaal bandbegrensd tot
+        $\Omega$ waarvan de energie in wezen door een
+        tijdsvenster van lengte $T$ wordt gedragen, wordt
+        beschreven door ongeveer $\frac{\Omega T}\pi$ reële
+        samples --- maak ``in wezen'' precies via de
+        energie-identiteit en de staart
+        $\sum_{\abs{n\pi/\Omega} > T/2}$.
+  \item (Consistentiecontroles) Verifieer de samplingstelling
+        met de hand op twee leden van $PW_\Omega$: (a) $f =
+        \operatorname{sinc}(\Omega\,\cdot)$, wier samples
+        $\delta_{n0}$ zijn; (b) $f(x) = \cos(\omega x)
+        \operatorname{sinc}(\varepsilon x)$-type smalleband-
+        signalen --- preciezer, toon dat voor $f \in
+        PW_{\Omega'}$ met $\Omega' < \Omega$, de
+        $\Omega$-snelheidsreeks $f$ ook reconstrueert
+        (oversampling is onschuldig), door $PW_
+        {\Omega'} \subseteq PW_\Omega$ in te bedden.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel VI --- Onzekerheid, nog tweemaal.}
+Heisenbergs ongelijkheid (\cref{exo:b3:fouriertransform:8})
+begrens \emph{hoe} geconcentreerd $f$ en $\hat f$ gezamenlijk
+kunnen zijn; hier zijn haar alles-of-niets-zus en haar exacte
+verzadiging.
+\begin{enumerate}[resume]
+  \item Zij $f \in L^1$ met $\operatorname{supp}f \subseteq
+        \intcc{-A}A$. Toon dat $\hat f$ de som is van een
+        overal-convergente machtreeks:
+        \[
+        \hat f(\xi) = \sum_{k\geq0}\frac{(-\iu\xi)^k}{k!}
+        \,m_k, \qquad m_k = \int_{-A}^{A}x^kf(x)\,\dd x,
+        \quad \abs{m_k} \leq A^k\norm f_1
+        \]
+        \emph{(ontwikkel $\eu^{-\iu\xi x}$ en rechtvaardig de
+        verwisseling door normale convergentie)}: de transform
+        is \emph{reëel-analytisch}, met oneindige straal van
+        convergentie in elk punt.
+  \item Concludeer de drager-dichotomie: een reëel-analytische
+        functie die verdwijnt op een niet-leeg open interval
+        verdwijnt identiek \emph{(de verzameling waar alle
+        afgeleiden verdwijnen is open en gesloten --- werk
+        het Taylor-argument uit)}; concludeer dat geen
+        niet-nul $f$ zowel $f$ als $\hat f$ compact
+        gedragen heeft, en dat $PW_\Omega$ geen niet-nul
+        compact-gedragen functie bevat --- bandbegrensde
+        signalen duren eeuwig, en tijdsbegrensde signalen
+        lekken in alle frequenties.
+  \item (Verzadiging van Heisenberg) Op de Gauss-familie $f
+        = \eu^{-ax^2}$, bereken beide
+        concentratiefactoren en verifieer dat het
+        genormaliseerde product
+        $\bigl(\int x^2\abs f^2\bigr)\bigl(\frac1{2\pi}\int
+        \xi^2\abs{\hat f}^2\bigr)\big/\norm f_2^4$ gelijk is
+        aan $\frac14$ voor \emph{elke} $a$ --- de
+        gelijkheidsfamilie van
+        \cref{exo:b3:fouriertransform:8} in levenden lijve;
+        leg via een schalingsargument uit waarom het product
+        constant moet zijn langs de familie.
+  \item Leg de fysische lezing uit (positie/impulsdichtheden
+        van een kwantumtoestand; $\hbar$ in de normalisatie
+        geeft $\sigma_x\sigma_p \geq \frac\hbar2$), en
+        verbind over het hoofdstuk: instant gladmaking (Deel
+        II), onomkeerbaarheid (Deel IV), sampling (Deel V),
+        Heisenberg en de drager-dichotomie zijn vijf
+        uitdrukkingen van één wet --- het gedrag van $\hat
+        f$ in oneindig wetgeeft wat $f$ overal mag doen.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel VII --- De algebra van de kern, en één
+\omterm{def:b3:groups:derived}{oplosbaar} voorbeeld.}
+\begin{enumerate}[resume]
+  \item (Semigroep) Bewijs de \emph{Chapman--Kolmogorov-
+        identiteit} $g_t * g_s = g_{t+s}$ voor $t, s > 0$
+        (via de convolutiestelling en injectiviteit van de
+        transform op $L^1$), en concludeer $u(t + s) = g_s *
+        u(t)$: evolueren voor tijd $t + s$ is evolueren
+        voor $t$, dan voor $s$. Verscherp de dissipatie van
+        vraag 8: schrijvend $\norm{u(t)}_2^2 =
+        \frac1{2\pi}\int \eu^{-2t\xi^2}\abs{\hat
+        f(\xi)}^2\dd\xi$, toon via Cauchy--Schwarz dat
+        \[
+        t \longmapsto \ln\,\norm{u(t)}_2
+        \quad\text{convex is op } \intoo0{+\infty} :
+        \]
+        de $L^2$-energie daalt niet louter, ze daalt
+        log-convex.
+  \item (Waar de warmte naartoe gaat) Zij $f \geq 0$, $f \in
+        L^1$, met $\int x^2f(x)\dd x < \infty$. Toon dat
+        voor alle $t > 0$
+        \[
+        \int_\R x\,u(t, x)\,\dd x = \int_\R x f(x)\,\dd x,
+        \qquad
+        \int_\R x^2u(t, x)\,\dd x
+        = \int_\R x^2f(x)\,\dd x + 2t\int_\R f :
+        \]
+        het zwaartepunt van de warmte beweegt nooit, en de
+        variantie groeit \emph{lineair} in de tijd --- de
+        diffusieve schaling $x \sim \sqrt{2t}$, te
+        herlezen wanneer Brownse beweging verschijnt in
+        \cref{ch:b3:probability}. \emph{(Bereken de eerste
+        twee momenten van $g_t$ en gebruik Tonelli op de
+        convolutie.)}
+  \item (De Gauss, van begin tot eind opgelost) Voor $f(x)
+        = \eu^{-x^2}$, vestig de gesloten vorm
+        \[
+        u(t, x) = \frac1{\sqrt{1 + 4t}}\,
+        \exp\Bigl(-\frac{x^2}{1 + 4t}\Bigr),
+        \]
+        en verifieer erop, met de hand: de vergelijking
+        $\partial_tu = \partial^2_{xx}u$; behoud $\int u(t)
+        = \sqrt\pi$; de dissipatiewet $\norm{u(t)}_2 =
+        (\pi/2)^{1/4}(1 + 4t)^{-1/4}$ (vergelijk haar
+        $t^{-1/4}$-verval met het $t^{-1/2}$ sup-norm-verval
+        van vraag 8); en de exacte variantiegroei van vraag
+        24. Bij $t = 6$: de piek is gedaald tot $\frac15$
+        van haar beginhoogte terwijl het profiel vijf keer
+        breder is --- dezelfde warmte, uitgespreid.
+\end{enumerate}
+\end{problem}

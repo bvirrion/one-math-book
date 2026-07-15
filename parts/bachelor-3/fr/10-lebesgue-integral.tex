@@ -1,0 +1,811 @@
+\chapter{L'intégrale de Lebesgue}\label{ch:b3:lebesgue}
+
+L'intégrale de Riemann découpe le \emph{domaine} en petits
+intervalles~; celle de Lebesgue découpe le \emph{but}~: pour
+intégrer $f$, on \omterm{def:b3:measure:measure}{mesure} les ensembles $\{f > t\}$. Le
+changement paraît innocent et est révolutionnaire. Limites et
+intégrales, en perpétuelle querelle dans la théorie de Riemann
+(convergence uniforme exigée~!), se réconcilient par trois
+théorèmes de convergence --- convergence monotone, Fatou,
+convergence dominée --- dont les hypothèses sont presque
+embarrassamment faibles. Ce chapitre construit l'intégrale sur
+un espace mesuré arbitraire $(X, \mathcal A, \mu)$, prouve les
+trois théorèmes, fixe le rapport exact avec l'intégrale de
+Riemann (une fonction bornée est \omterm{def:b3:lebesgue:l1}{Riemann-intégrable} ssi elle
+est \omterm{def:b3:topology:continuity}{continue} \omterm{def:b3:lebesgue:l1}{presque partout}), et industrialise la
+dérivation des intégrales à paramètre --- la technique que le
+problème du week-end utilise pour calculer
+$\int_0^\infty\frac{\sin x}x\,\dd x$ et $\int_\R
+\eu^{-x^2}\dd x$.
+
+\section{Fonctions mesurables}
+
+\begin{definition}\label{def:b3:lebesgue:measurable}
+Soient $(X, \mathcal A)$, $(Y, \mathcal B)$ des espaces
+mesurables. $f \colon X \to Y$ est
+\emph{mesurable}\index{fonction mesurable} si $f^{-1}(B)
+\in \mathcal A$ pour tout $B \in \mathcal B$. Pour les
+fonctions réelles (ou à valeurs dans $[-\infty,+\infty]$), $Y
+= \R$ porte sa $\sigma$-algèbre de Borel, et il suffit de
+vérifier $f^{-1}(\intoo t{+\infty}) = \{f > t\} \in \mathcal
+A$ pour tout $t \in \R$~: les bons ensembles $\{B :
+f^{-1}(B) \in \mathcal A\}$ forment une $\sigma$-algèbre
+(les images réciproques commutent avec les opérations
+ensemblistes) contenant les demi-droites engendrant
+(\cref{def:b3:measure:borel},
+\cref{met:b3:measure:goodsets}).
+\end{definition}
+
+\begin{proposition}\label{prop:b3:lebesgue:stability}
+(a) Les composées d'applications \omterm{def:b3:lebesgue:measurable}{mesurables} sont \omterm{def:b3:lebesgue:measurable}{mesurables}~;
+les \omterm{def:b3:topology:continuity}{applications continues} sont \omterm{def:b3:lebesgue:measurable}{Borel-mesurables}.
+(b) Si $f, g \colon X \to \R$ sont \omterm{def:b3:lebesgue:measurable}{mesurables}, le sont aussi
+$f + g$, $fg$, $\max(f,g)$, $\abs f$, $\lambda f$.
+(c) Si $(f_n)$ sont \omterm{def:b3:lebesgue:measurable}{mesurables} à valeurs dans
+$[-\infty, +\infty]$, alors $\sup_nf_n$, $\inf_nf_n$,
+$\limsup f_n$, $\liminf f_n$ sont \omterm{def:b3:lebesgue:measurable}{mesurables}~; si $f_n \to f$
+ponctuellement, $f$ est \omterm{def:b3:lebesgue:measurable}{mesurable}.
+\end{proposition}
+
+\begin{proof}
+(a) $(g\circ f)^{-1}(B) = f^{-1}(g^{-1}(B))$~; la continuité
+donne la mesurabilité via les \omterm{def:b3:topology:topology}{ouverts} engendrant
+(\cref{pb:b3:measure:1}, question 10, sous forme générale).
+(b) $(f, g) \colon X \to \R^2$ est \omterm{def:b3:lebesgue:measurable}{mesurable} pour la
+$\sigma$-algèbre de Borel de $\R^2$ --- vérifier sur les
+boîtes \omterm{def:b3:topology:topology}{ouvertes}, qui engendrent (les \omterm{def:b3:topology:topology}{ouverts} de $\R^2$ sont
+des unions dénombrables de boîtes rationnelles)~:
+$(f,g)^{-1}(U\times V) = f^{-1}(U)\cap g^{-1}(V)$ --- et
+$+, \times, \max$ sont \omterm{def:b3:topology:continuity}{continues} $\R^2 \to \R$~: composer.
+(c) $\{\sup f_n > t\} = \bigcup_n\{f_n > t\}$~; $\inf =
+-\sup(-)$~; $\limsup = \inf_N\sup_{n \geq N}$~; une limite
+ponctuelle est son propre $\limsup$.
+\end{proof}
+
+\begin{definition}\label{def:b3:lebesgue:simple}
+Une \emph{fonction simple}\index{fonction simple} est une
+\omterm{def:b3:lebesgue:measurable}{fonction mesurable} à un nombre fini de valeurs~: $s =
+\sum_{i=1}^n c_i\,\mathbf 1_{A_i}$, $A_i \in \mathcal A$
+disjoints, $c_i \geq 0$ (pour la théorie positive). Son
+intégrale est
+\[
+\int s\,\dd\mu = \sum_i c_i\,\mu(A_i) \in [0, +\infty]
+\]
+(convention $0\cdot\infty = 0$)~; la valeur ne dépend pas de
+la \omterm{def:b3:representations:rep}{représentation} (raffiner deux partitions).
+\end{definition}
+
+\begin{theorem}[Approximation par des fonctions simples]
+\label{thm:b3:lebesgue:approximation}
+Toute $f \colon X \to [0, +\infty]$ \omterm{def:b3:lebesgue:measurable}{mesurable} est la limite
+ponctuelle d'une suite \emph{croissante} de \omterm{def:b3:lebesgue:simple}{fonctions
+simples}~:
+\[
+s_n = \sum_{k=1}^{n2^n} \frac{k-1}{2^n}\,
+\mathbf 1_{\{\frac{k-1}{2^n} \leq f < \frac k{2^n}\}}
++ n\,\mathbf 1_{\{f \geq n\}} \nearrow f .
+\]
+\end{theorem}
+
+\begin{proof}
+Chaque $s_n$ est \omterm{def:b3:groups:simple}{simple} (les ensembles sont des images
+réciproques de boréliens). Monotonie~: le passage de $n$ à
+$n+1$ scinde chaque niveau dyadique en deux et ne diminue
+jamais la valeur assignée (un point avec $\frac{k-1}{2^n}
+\leq f(x) < \frac k{2^n}$ reçoit soit $\frac{2k-2}{2^{n+1}}$
+soit $\frac{2k-1}{2^{n+1}}$, tous deux $\geq
+\frac{k-1}{2^n}$~; le plafond $n$ monte aussi). Convergence~:
+si $f(x) < \infty$, pour $n > f(x)$ on a $f(x) - s_n(x)
+\leq 2^{-n}$~; si $f(x) = \infty$, $s_n(x) = n \to \infty$.
+\end{proof}
+
+\section{L'intégrale et les théorèmes de convergence}
+
+\begin{definition}\label{def:b3:lebesgue:integral}
+Pour $f \geq 0$ \omterm{def:b3:lebesgue:measurable}{mesurable}~:
+\[
+\int f \,\dd\mu = \sup\Bigl\{\int s\,\dd\mu : s \text{
+simple},\ 0 \leq s \leq f\Bigr\} \in [0, +\infty].
+\]
+Elle est monotone en $f$ par construction, et prolonge le cas
+\omterm{def:b3:groups:simple}{simple} (pour $f$ \omterm{def:b3:groups:simple}{simple}, le sup est atteint en $f$~:
+comparaison des intégrales \omterm{def:b3:groups:simple}{simples} via raffinements
+communs).
+\end{definition}
+
+\begin{theorem}[Convergence monotone, Beppo Levi]
+\label{thm:b3:lebesgue:mct}
+Si $0 \leq f_n \nearrow f$ ponctuellement (\omterm{def:b3:lebesgue:measurable}{mesurables}),
+alors
+\[
+\int f_n\,\dd\mu \nearrow \int f\,\dd\mu .
+\]
+\index{théorème de convergence monotone}
+\end{theorem}
+
+\begin{proof}
+$f$ est \omterm{def:b3:lebesgue:measurable}{mesurable} (\cref{prop:b3:lebesgue:stability}(c)) et
+$\int f_n$ croît vers un certain $L \leq \int f$
+(monotonie). Réciproquement, fixons une \omterm{def:b3:groups:simple}{simple} $s = \sum
+c_i\mathbf 1_{A_i} \leq f$ et $\theta \in (0,1)$~; les
+ensembles $E_n = \{f_n \geq \theta s\}$ sont \omterm{def:b3:lebesgue:measurable}{mesurables} et
+croissent vers $X$ (là où $s(x) > 0$~: $f(x) \geq s(x) >
+\theta s(x)$, donc éventuellement $f_n(x) \geq \theta
+s(x)$~; là où $s(x) = 0$~: trivialement). Alors
+\[
+\int f_n \geq \int_{E_n}\theta s\,\dd\mu
+= \theta\sum_i c_i\,\mu(A_i \cap E_n)
+\xrightarrow[n\to\infty]{} \theta\sum_ic_i\,\mu(A_i)
+= \theta\int s
+\]
+par continuité par en bas (\cref{prop:b3:measure:basics}(c)).
+Donc $L \geq \theta\int s$ pour tout $\theta < 1$ et toute
+\omterm{def:b3:groups:simple}{simple} $s \leq f$~: $L \geq \int f$.
+\end{proof}
+
+\begin{corollary}\label{cor:b3:lebesgue:additivity}
+Pour $f, g \geq 0$ \omterm{def:b3:lebesgue:measurable}{mesurables} et $c \geq 0$~: $\int(f + g)
+= \int f + \int g$ et $\int cf = c\int f$~; pour une série
+de \omterm{def:b3:lebesgue:measurable}{fonctions mesurables} positives, $\int\sum_nf_n =
+\sum_n\int f_n$.
+\end{corollary}
+
+\begin{proof}
+Pour les \omterm{def:b3:lebesgue:simple}{fonctions simples}, l'additivité est un calcul sur
+un raffinement commun. En général prendre $s_n \nearrow f$,
+$t_n \nearrow g$ (\cref{thm:b3:lebesgue:approximation})~:
+$s_n + t_n \nearrow f + g$, et le TCM passe l'additivité à
+la limite. L'énoncé pour les séries est le TCM appliqué aux
+sommes partielles.
+\end{proof}
+
+\begin{theorem}[Lemme de Fatou]\label{thm:b3:lebesgue:fatou}
+Pour $f_n \geq 0$ \omterm{def:b3:lebesgue:measurable}{mesurables}~:
+\[
+\int \liminf_n f_n \,\dd\mu \;\leq\; \liminf_n \int
+f_n\,\dd\mu .
+\]
+\index{lemme de Fatou}
+\end{theorem}
+
+\begin{proof}
+Soit $g_N = \inf_{n\geq N}f_n$~: \omterm{def:b3:lebesgue:measurable}{mesurable}, $0 \leq g_N
+\nearrow \liminf f_n$, et $g_N \leq f_n$ pour tout $n \geq
+N$, donc $\int g_N \leq \inf_{n \geq N}\int f_n$. Appliquer
+le TCM au membre de gauche~: $\int\liminf f_n =
+\lim_N\int g_N \leq \lim_N\inf_{n\geq N}\int f_n =
+\liminf\int f_n$.
+\end{proof}
+
+\begin{definition}\label{def:b3:lebesgue:l1}
+Une $f \colon X \to \R$ (ou $\C$) \omterm{def:b3:lebesgue:measurable}{mesurable} est
+\emph{intégrable}\index{fonction intégrable} si $\int\abs
+f\,\dd\mu < \infty$~; alors $\int f = \int f^+ - \int f^-$
+(parties positive et négative~; parties réelle et imaginaire
+dans le cas complexe). L'intégrale est linéaire sur les
+fonctions intégrables (décomposer et recombiner les parties
+positives~; le cas complexe se ramène au réel) et satisfait
+$\abs{\int f} \leq \int\abs f$ (cas réel~: $\pm\int f =
+\int(\pm f) \leq \int\abs f$~; cas complexe~: multiplier par
+une constante unimodulaire pour rendre l'intégrale réelle).
+Une propriété vaut \emph{presque partout}
+(p.p.)\index{presque partout} si elle échoue seulement sur
+un ensemble $\mu$-nul~; modifier $f$ sur un ensemble nul ne
+change aucune intégrale (la différence est dominée par
+$\infty\cdot\mathbf 1_N$, d'intégrale $0$).
+\end{definition}
+
+\begin{theorem}[Convergence dominée]\label{thm:b3:lebesgue:dct}
+Soient $f_n \to f$ p.p., avec $\abs{f_n} \leq g$ p.p.\ pour
+un $g$ \emph{\omterm{def:b3:lebesgue:l1}{intégrable}} fixe. Alors $f$ est \omterm{def:b3:lebesgue:l1}{intégrable} et
+\[
+\int f_n\,\dd\mu \longrightarrow \int f\,\dd\mu,
+\qquad\text{et même}\quad \int\abs{f_n - f}\,\dd\mu \to 0 .
+\]
+\index{théorème de convergence dominée}
+\end{theorem}
+
+\begin{proof}
+Écarter un ensemble nul pour rendre les hypothèses
+ponctuelles. $\abs f \leq g$~: $f$ est \omterm{def:b3:lebesgue:l1}{intégrable}. Les
+fonctions $h_n = 2g - \abs{f_n - f} \geq 0$ satisfont
+$\liminf h_n = 2g$~; Fatou donne
+\[
+\int 2g \leq \liminf\int\bigl(2g - \abs{f_n - f}\bigr)
+= \int 2g - \limsup\int\abs{f_n - f},
+\]
+donc $\limsup\int\abs{f_n - f} \leq 0$ (la soustraction est
+légitime~: $\int 2g < \infty$). Enfin $\abs{\int f_n - \int
+f} \leq \int\abs{f_n - f} \to 0$.
+\end{proof}
+
+\begin{method}\label{met:b3:lebesgue:convergence}
+Face à $\lim_n\int f_n$~: essayer, dans l'ordre --- (1) la
+suite est-elle monotone (ou une série de termes positifs)~?
+TCM, aucune intégrabilité requise. (2) Existe-t-il un
+dominateur \omterm{def:b3:lebesgue:l1}{intégrable} unique $g \geq \abs{f_n}$, trouvé par
+des bornes grossières («~$\sup_n$~» les estimations)~? TCD.
+(3) Pas de domination, pas de monotonie~? Fatou borne encore
+un côté, et l'égalité peut sincèrement échouer~: la bosse
+qui s'échappe $f_n = n\mathbf 1_{\intoo0{1/n}}$ a $\int f_n
+= 1$ mais $f_n \to 0$ p.p. La domination est exactement ce
+qui interdit à la masse de s'échapper à l'infini,
+verticalement ou horizontalement.
+\end{method}
+
+\section{Riemann versus Lebesgue}
+
+\begin{theorem}[Critère de Lebesgue]
+\label{thm:b3:lebesgue:riemann}
+Soit $f \colon \intcc ab \to \R$ \emph{bornée}. Alors $f$
+est \omterm{def:b3:lebesgue:l1}{Riemann-intégrable} ssi $f$ est \omterm{def:b3:topology:continuity}{continue}
+$\lambda$-presque partout~; dans ce cas $f$ est
+\omterm{def:b3:lebesgue:l1}{Lebesgue-intégrable} et les deux intégrales
+coïncident.\index{intégrale de Riemann vs Lebesgue}
+\end{theorem}
+
+\begin{proof}
+Pour une subdivision $\sigma = (a = x_0 < \dots < x_N =
+b)$, soient $L_\sigma$ et $U_\sigma$ les fonctions en
+escalier égales, sur chaque $\intoo{x_{i-1}}{x_i}$, à $m_i
+= \inf_{[x_{i-1}, x_i]}f$ et $M_i = \sup$~; les sommes de
+Darboux sont leurs intégrales (Riemann et Lebesgue
+coïncident sur les fonctions en escalier, donnant toutes
+deux $\sum m_i\Delta x_i$). Prendre une suite de
+subdivisions $\sigma_n$, chacune raffinant la précédente, de
+pas $\to 0$, avec sommes de Darboux convergeant vers les
+intégrales de Darboux inférieure et supérieure de $f$. Les
+raffinements rendent $L_{\sigma_n}$ croissante et
+$U_{\sigma_n}$ décroissante ponctuellement hors de
+l'ensemble dénombrable $D$ de tous les points de division~;
+appeler les limites $\ell$ et $u$ (\omterm{def:b3:lebesgue:measurable}{mesurables},
+\cref{prop:b3:lebesgue:stability}). Pour $x \notin D$, en
+écrivant $I_n(x)$ pour l'intervalle \omterm{def:b3:topology:topology}{ouvert} $\sigma_n$
+contenant $x$~: $\ell(x) = \sup_n\inf_{I_n(x)}f$ et $u(x) =
+\inf_n\sup_{I_n(x)}f$~; comme les pas tendent vers $0$, ce
+sont les \emph{enveloppes} inférieure et supérieure de $f$
+en $x$ --- $u(x) - \ell(x)$ est l'oscillation de $f$ en $x$
+--- de sorte que \emph{$\ell(x) = u(x)$ ssi $f$ est \omterm{def:b3:topology:continuity}{continue}
+en $x$}. Par TCM/TCD (borné, intervalle fini)~:
+\[
+\int_{\intcc ab}\ell\,\dd\lambda = \lim_n\int L_{\sigma_n}
+= \underline{\int}f,
+\qquad
+\int_{\intcc ab}u\,\dd\lambda = \overline{\int}f .
+\]
+$f$ \omterm{def:b3:lebesgue:l1}{Riemann-intégrable} $\iff$ $\underline\int f =
+\overline\int f$ $\iff$ $\int(u - \ell) = 0$ $\iff$ $u =
+\ell$ p.p.\ ($u - \ell \geq 0$~; \cref{exo:b3:lebesgue:5})
+$\iff$ $f$ \omterm{def:b3:topology:continuity}{continue} p.p. Dans ce cas $\ell \leq f \leq u$
+avec $\ell = u$ p.p.~: $f$ égale le \omterm{def:b3:lebesgue:measurable}{mesurable} $\ell$ p.p.,
+donc est \omterm{def:b3:lebesgue:measurable}{Lebesgue-mesurable} (complétude de $\lambda$) avec
+$\int f\,\dd\lambda = \int\ell\,\dd\lambda =
+\underline\int f = \int_a^bf$.
+\end{proof}
+
+\begin{example}\label{ex:b3:lebesgue:riemannexamples}
+$\mathbf 1_\Q$ est nulle part \omterm{def:b3:topology:continuity}{continue}~: non
+\omterm{def:b3:lebesgue:l1}{Riemann-intégrable} --- mais Lebesgue-triviale~: $\int\mathbf
+1_\Q\,\dd\lambda = \lambda(\Q) = 0$. La fonction de Thomae
+(\,$\frac1q$ aux rationnels $\frac pq$, $0$ ailleurs) est
+\omterm{def:b3:topology:continuity}{continue} exactement aux irrationnels~:
+\omterm{def:b3:lebesgue:l1}{Riemann-intégrable} d'intégrale $0$. Et les intégrales de
+Riemann \emph{impropres} sont une notion différente~:
+$\int_0^\infty\frac{\sin x}x\,\dd x$ converge comme limite de
+$\int_0^A$ (le problème du week-end calcule qu'elle vaut
+$\frac\pi2$), mais $\frac{\sin x}x \notin
+L^1(\intoo0{+\infty})$~: l'intégrale absolue diverge comme
+la série harmonique (\cref{exo:b3:lebesgue:6}). La théorie
+de Lebesgue échange la convergence conditionnelle contre des
+théorèmes de limite robustes.
+\end{example}
+
+\section{Intégrales à paramètre}
+
+Tout au long, $(X, \mathcal A, \mu)$ est un espace mesuré,
+$T$ un espace métrique (le paramètre), et $f \colon T \times
+X \to \C$ avec $f(t, \cdot)$ \omterm{def:b3:lebesgue:l1}{intégrable} pour chaque $t$~;
+poser $F(t) = \int_X f(t, x)\,\dd\mu(x)$.
+
+\begin{theorem}[Continuité]\label{thm:b3:lebesgue:paramcont}
+Supposons~: $t \mapsto f(t,x)$ est \omterm{def:b3:topology:continuity}{continue} en $t_0$ pour
+p.t.\ $x$, et il existe un $g$ \omterm{def:b3:lebesgue:l1}{intégrable} avec $\abs{f(t,x)}
+\leq g(x)$ pour tout $t$ dans un \omterm{def:b3:topology:topology}{voisinage} de $t_0$ et p.t.\
+$x$. Alors $F$ est \omterm{def:b3:topology:continuity}{continue} en $t_0$.\index{intégrales à
+paramètre}
+\end{theorem}
+
+\begin{proof}
+Pour toute suite $t_n \to t_0$~: $f(t_n, \cdot) \to f(t_0,
+\cdot)$ p.p., dominée par $g$~: le TCD donne $F(t_n) \to
+F(t_0)$~; la continuité séquentielle suffit dans les
+espaces métriques (\cref{rem:b3:topology:sequences}).
+\end{proof}
+
+\begin{theorem}[Dérivation sous le signe intégral]
+\label{thm:b3:lebesgue:paramdiff}
+Soit $T$ un intervalle \omterm{def:b3:topology:topology}{ouvert} de $\R$. Supposons~: pour p.t.\
+$x$, $t \mapsto f(t,x)$ est dérivable sur $T$, avec
+\[
+\Bigl|\frac{\partial f}{\partial t}(t, x)\Bigr| \leq g(x)
+\quad \text{pour tout } t \in T,\ \text{p.t.\ } x,
+\]
+$g$ \omterm{def:b3:lebesgue:l1}{intégrable}. Alors $F$ est dérivable sur $T$ avec $F'(t)
+= \int_X \frac{\partial f}{\partial t}(t, x)\,\dd\mu(x)$.
+\end{theorem}
+
+\begin{proof}
+Fixer $t$ et $h_n \to 0$~: les quotients de différences
+\[
+\varphi_n(x) = \frac{f(t + h_n, x) - f(t, x)}{h_n}
+\longrightarrow \frac{\partial f}{\partial t}(t,x)
+\quad\text{p.p.},
+\]
+et l'inégalité des accroissements finis borne
+$\abs{\varphi_n(x)} \leq \sup_{s}\abs{\partial_tf(s,x)} \leq
+g(x)$~: le TCD s'applique, et $\frac{F(t + h_n) -
+F(t)}{h_n} = \int\varphi_n \to \int\partial_t f(t,
+\cdot)$.
+\end{proof}
+
+\begin{example}[La fonction gamma]\label{ex:b3:lebesgue:gamma}
+Pour $t > 0$ soit\index{fonction gamma}
+\[
+\Gamma(t) = \int_0^{+\infty} x^{t-1}\eu^{-x}\,\dd x .
+\]
+L'intégrale converge~: près de $0$, $x^{t-1}$ est
+\omterm{def:b3:lebesgue:l1}{intégrable} ($t > 0$)~; à l'infini, $x^{t-1}\eu^{-x} \leq
+C\eu^{-x/2}$. L'intégration par parties (sur
+$[\varepsilon, A]$, puis limites via TCM) donne l'équation
+fonctionnelle $\Gamma(t + 1) = t\,\Gamma(t)$, d'où
+$\Gamma(n+1) = n!$~: la factorielle interpolée. Sur tout
+$\intcc ab \subseteq \intoo0{+\infty}$,
+$\partial_t\bigl(x^{t-1}\eu^{-x}\bigr) = \ln
+x\cdot x^{t-1}\eu^{-x}$ est dominé par $\abs{\ln
+x}(x^{a-1} + x^{b-1})\eu^{-x}$, \omterm{def:b3:lebesgue:l1}{intégrable}~: $\Gamma$ est
+$\mathcal C^1$, et par induction $\mathcal C^\infty$, avec
+$\Gamma^{(k)}(t) =
+\int_0^\infty(\ln x)^kx^{t-1}\eu^{-x}\dd x$. La valeur
+$\Gamma(\frac12) = \sqrt\pi$ est l'intégrale gaussienne
+déguisée (\cref{pb:b3:lebesgue:1}).
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=10.6cm, height=5.4cm,
+    xmin=0, xmax=25, ymin=-0.25, ymax=1.05,
+    xtick={0, 3.1416, 6.2832, 9.4248, 12.566, 15.708, 18.850,
+      21.991, 25.133},
+    xticklabels={$0$, $\pi$, $2\pi$, $3\pi$, $4\pi$, $5\pi$,
+      $6\pi$, $7\pi$, $8\pi$},
+    ytick={0, 1}]
+  \addplot[omDef!40] coordinates {(0,0) (25,0)};
+  \addplot[omThm, thick, domain=0.02:25, samples=600]
+    {sin(deg(x))/x};
+  \addplot[omDef, dashed, domain=0.02:25, samples=200]
+    {1/x};
+  \addplot[omDef, dashed, domain=0.02:25, samples=200]
+    {-1/x};
+\end{axis}
+\end{tikzpicture}
+
+{\small L'intégrande $\frac{\sin x}x$~: l'intégrale impropre
+$\int_0^\infty$ converge par annulation alternée entre les
+arches, mais les aires $\abs{\cdot}$ des arches se
+comportent comme $\frac2{\pi k}$ --- une série harmonique~:
+$\frac{\sin x}x \notin L^1$. L'intégrabilité au sens de
+Lebesgue est l'intégrabilité absolue.}
+\end{omfigure}
+
+\section{Exercices}
+
+\begin{exercise}[$\star$]\label{exo:b3:lebesgue:1}
+(a) Montrer qu'une fonction monotone $\R \to \R$ est
+\omterm{def:b3:lebesgue:measurable}{Borel-mesurable}, et qu'une dérivée (d'une fonction partout
+dérivable) est \omterm{def:b3:lebesgue:measurable}{Borel-mesurable}.
+(b) Montrer que $f \colon X \to \R$ est \omterm{def:b3:lebesgue:measurable}{mesurable} ssi $\{f
+> q\} \in \mathcal A$ pour tout $q$ \emph{rationnel}.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b3:lebesgue:2}
+Calculer, avec justification complète~:
+\[
+\lim_{n\to\infty}\int_0^{+\infty}
+\frac{\cos x}{(1 + x/n)^{n}}\,\dd x,
+\qquad
+\lim_{n\to\infty}\int_0^1 \frac{n\,x^{n-1}}{1 + x}\,\dd x .
+\]
+\emph{(Pour la seconde~: substituer $u = x^n$ avant de
+dominer.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:lebesgue:3}
+(a) Exhiber une inégalité stricte dans le lemme de Fatou.
+(b) Exhiber $f_n \to 0$ ponctuellement avec $\int f_n = 1$
+de trois façons~: échappée en hauteur, en largeur, à
+l'infini. Quelle hypothèse unique du TCD chacune viole-t-elle~?
+(c) Montrer que dans le lemme de Fatou on ne peut remplacer
+$\liminf$ par $\limsup$ d'aucun côté.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:lebesgue:4}
+(a) Montrer $\displaystyle\int_0^{+\infty}\frac{x}{\eu^x -
+1}\,\dd x = \sum_{n\geq1}\frac1{n^2} = \frac{\pi^2}6$
+\emph{(développer $\frac1{\eu^x - 1}$ en série géométrique
+et intégrer terme à terme --- quel théorème le permet~?)}.
+(b) (Rêve du sophomore) Montrer
+$\displaystyle\int_0^1 x^{-x}\,\dd x = \sum_{n\geq1}n^{-n}$.
+\emph{(Écrire $x^{-x} = \eu^{-x\ln x} = \sum_k\frac{(-x\ln
+x)^k}{k!}$ et calculer $\int_0^1(-x\ln x)^k\dd x$ en
+substituant $x = \eu^{-u/(k+1)}$, en reconnaissant
+$\Gamma$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:lebesgue:5}
+(a) Montrer que $f \geq 0$ \omterm{def:b3:lebesgue:measurable}{mesurable} avec $\int f\,\dd\mu =
+0$ satisfait $f = 0$ p.p. \emph{(Considérer $\{f \geq 1/n\}$
+et l'inégalité de Markov~: $\mu(\{f \geq a\}) \leq
+\frac1a\int f$ --- la prouver.)}
+(b) Montrer qu'une $f$ \omterm{def:b3:lebesgue:l1}{intégrable} est finie p.p.
+(c) Montrer que si $\int_A f\,\dd\mu = 0$ pour \emph{tout}
+$A$ \omterm{def:b3:lebesgue:measurable}{mesurable}, alors $f = 0$ p.p.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:lebesgue:6}
+(a) Appliquer le~\cref{thm:b3:lebesgue:riemann} pour
+décider de l'intégrabilité au sens de Riemann de~: $\mathbf
+1_\Q$~; la fonction de Thomae~; $\mathbf 1_K$ pour $K$ un
+ensemble de Cantor gras (\cref{exo:b3:measure:5}).
+(b) Montrer que $\int_1^{+\infty}\abs{\frac{\sin
+x}x}\,\dd x = +\infty$, tandis que
+$\lim_{A\to\infty}\int_1^A\frac{\sin x}x\,\dd x$ existe
+\emph{(intégrer par parties)}~: convergence impropre sans
+intégrabilité.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:lebesgue:7}
+Justifier que $F(t) =
+\int_0^{+\infty}\eu^{-x^2}\cos(tx)\,\dd x$ est $\mathcal
+C^1$ sur $\R$ et satisfait $F'(t) = -\frac t2F(t)$
+\emph{(intégrer par parties)}~; en déduire $F(t) =
+F(0)\,\eu^{-t^2/4}$. (Avec $F(0) = \frac{\sqrt\pi}2$ du
+problème du week-end~: la gaussienne est essentiellement sa
+propre transformée de Fourier ---
+le~\cref{ch:b3:fouriertransform} systématisera ceci.)
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:lebesgue:8}
+(Frullani) Soient $0 < a < b$. Montrer
+\[
+\int_0^{+\infty}\frac{\eu^{-ax} - \eu^{-bx}}{x}\,\dd x =
+\ln\frac ba,
+\]
+en écrivant l'intégrande comme $\int_a^b \eu^{-xt}\,\dd t$
+et en justifiant l'interversion via la théorie positive
+(\cref{cor:b3:lebesgue:additivity} sous forme \omterm{def:b3:topology:continuity}{continue} ---
+anticiper Tonelli, ou découper $[a,b]$ en $n$ parts égales
+et passer à la limite).
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:lebesgue:9}
+Soit $f \geq 0$ \omterm{def:b3:lebesgue:measurable}{mesurable} sur $(X, \mathcal A, \mu)$.
+Montrer que $\nu(A) = \int_A f\,\dd\mu$ définit une \omterm{def:b3:measure:measure}{mesure}
+(\emph{densité}\index{densité d'une mesure} $f$ par
+rapport à $\mu$), et que $\int g\,\dd\nu = \int
+gf\,\dd\mu$ pour toute $g \geq 0$ \omterm{def:b3:lebesgue:measurable}{mesurable} \emph{(le
+prouver pour les indicateurs, puis les \omterm{def:b3:groups:simple}{simples}, puis le TCM
+--- la machine standard)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:lebesgue:10}
+(Un échec à la Weierstrass) Définir $f(t) =
+\int_0^{+\infty}\frac{\sin(tx)}{x(1 + x^2)}\,\dd x$.
+(a) Montrer que $f$ est bien définie et \omterm{def:b3:topology:continuity}{continue} sur $\R$,
+et $\mathcal C^1$ avec $f'(t) =
+\int_0^\infty\frac{\cos(tx)}{1 + x^2}\dd x$ pour tout $t$
+--- mais que dériver \emph{encore} sous le signe intégral
+est illégitime.
+(b) En admettant $f'(t) = \frac\pi2\eu^{-t}$ pour $t > 0$
+(prouvé dans le~\cref{ch:b3:residues}), que vaut
+$\int_0^\infty\frac{x\sin(tx)}{1+x^2}\dd x$ pour $t > 0$,
+et pourquoi sa formule confirme l'échec en (a)~?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:lebesgue:11}
+(Lemme de Scheffé) Soient $f_n, f \geq 0$ \omterm{def:b3:lebesgue:l1}{intégrables} avec
+$f_n \to f$ p.p.\ et $\int f_n \to \int f$.
+(a) Montrer que $\int\abs{f_n - f} \to 0$. \emph{(Appliquer
+la convergence dominée à $g_n = (f - f_n)^+ \leq f$, et
+écrire $\int\abs{f_n - f} = 2\int g_n - \int(f - f_n)$.)}
+(b) Montrer par un exemple que l'hypothèse $\int f_n \to
+\int f$ ne peut être omise (bosse glissante ou
+concentrant), et que la conclusion échoue pour des $f_n$
+signées sans contrôle en valeur absolue~: $f_n = n\mathbf
+1_{\intoc0{1/n}} - n\mathbf 1_{\intoc{-1/n}0}$ a $f_n \to
+0$ p.p., $\int f_n = 0 \to 0$, pourtant $\int\abs{f_n} =
+2$.
+(c) Application (\omterm{ex:b3:lebesgue:gamma}{densités})~: si des \omterm{ex:b3:lebesgue:gamma}{densités} de probabilité
+$p_n \to p$ p.p., alors automatiquement $\int\abs{p_n - p}
+\to 0$~: la convergence ponctuelle des \omterm{ex:b3:lebesgue:gamma}{densités} est la
+convergence $L^1$ --- une montée en grade gratuite.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:lebesgue:12}
+Limites classiques, avec justification complète via
+TCM/TCD~:
+\[
+\text{(a)}\ \lim_{n\to\infty}\int_0^n\Bigl(1 -
+\frac xn\Bigr)^n\eu^{x/2}\,\dd x, \qquad
+\text{(b)}\ \lim_{n\to\infty}\int_0^1\frac{n\,x^{n-1}}{1 +
+x}\,\dd x,
+\]
+\[
+\text{(c)}\ \lim_{n\to\infty}\int_0^\infty
+\frac{\dd x}{(1 + x/n)^n\,x^{1/n}} .
+\]
+\emph{(Pour (a)~: $(1 - x/n)^n \nearrow \eu^{-x}$ pour $x$
+fixé --- prouver la monotonie via $\log$~; pour (b),
+intégrer par parties ou substituer $x = u^{1/n}$ et
+identifier une concentration au bord~; pour (c), trouver un
+dominateur \omterm{def:b3:lebesgue:l1}{intégrable} valable pour tout $n \geq 2$ en
+scindant en $x = 1$.)}
+\end{exercise}
+
+\section{Problème~: deux intégrales célèbres}
+
+\begin{problem}[{Problème du week-end --- l'intégrale
+gaussienne et l'intégrale de Dirichlet, par les seuls
+paramètres}]
+\label{pb:b3:lebesgue:1}
+Deux intégrales règnent sur l'analyse appliquée~:
+\[
+G = \int_{-\infty}^{+\infty}\eu^{-x^2}\dd x = \sqrt\pi,
+\qquad
+D = \int_0^{+\infty}\frac{\sin x}{x}\,\dd x = \frac\pi2
+\]
+(la seconde comme intégrale impropre,
+\cref{ex:b3:lebesgue:riemannexamples}). On les prouve toutes
+deux avec les seuls outils de ce chapitre.
+
+\medskip
+\noindent\textbf{Partie I --- La gaussienne.} Pour $t \geq
+0$ poser
+\[
+A(t) = \Bigl(\int_0^t\eu^{-x^2}\dd x\Bigr)^{2},
+\qquad
+B(t) = \int_0^1\frac{\eu^{-t^2(1 + x^2)}}{1 + x^2}\,\dd x .
+\]
+\begin{enumerate}
+  \item Justifier que $A$ et $B$ sont $\mathcal C^1$ sur
+        $\intoo0{+\infty}$ et calculer $A'$ et $B'$~;
+        montrer $A'(t) + B'(t) = 0$. \emph{(Dans $B'$,
+        substituer $u = tx$.)}
+  \item Calculer $A(0) + B(0)$ et $\lim_{t\to+\infty}(A +
+        B)(t)$ --- justifier la limite sous le signe
+        intégral dans $B$.
+  \item Conclure $\int_0^\infty \eu^{-x^2}\dd x =
+        \frac{\sqrt\pi}2$, d'où $G = \sqrt\pi$, et en
+        déduire $\Gamma(\tfrac12) = \sqrt\pi$
+        \emph{(substituer $x = u^2$ dans
+        $\Gamma(\frac12)$)}.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie II --- L'intégrale de Dirichlet.}
+Pour $t \geq 0$ poser
+\[
+F(t) = \int_0^{+\infty}\eu^{-tx}\,\frac{\sin x}{x}\,\dd x .
+\]
+\begin{enumerate}[resume]
+  \item Montrer que l'intégrale définissant $F(t)$ converge
+        pour tout $t > 0$ comme intégrale de Lebesgue, et
+        pour $t = 0$ comme intégrale impropre~; montrer que
+        $D = \lim_{A\to\infty}\int_0^A\frac{\sin x}x\dd x$
+        existe \emph{(intégrer par parties sur $[\pi,
+        A]$)}.
+  \item Montrer que $F$ est $\mathcal C^1$ sur
+        $\intoo0{+\infty}$ avec
+        \[
+        F'(t) = -\int_0^{+\infty}\eu^{-tx}\sin x\,\dd x
+        = -\frac{1}{1 + t^2}
+        \]
+        \emph{(domination sur $[t_0, \infty)$ pour chaque
+        $t_0 > 0$~; la dernière intégrale par deux
+        intégrations par parties ou exponentielles
+        complexes)}.
+  \item Montrer $F(t) \to 0$ lorsque $t \to +\infty$, et en
+        déduire $F(t) = \frac\pi2 - \arctan t$ sur
+        $\intoo0{+\infty}$.
+  \item Le point délicat~: $D = \lim_{t\to0^+}F(t)$. Le
+        prouver par contrôle uniforme de la queue~: pour
+        $0 \leq t \leq 1$ et $A \geq \pi$, intégrer par
+        parties pour montrer
+        \[
+        \Bigl|\int_A^{+\infty}\eu^{-tx}\frac{\sin
+        x}x\,\dd x\Bigr| \leq \frac{C}{A}
+        \]
+        avec $C$ indépendante de $t$ \emph{(dériver
+        $\frac{\eu^{-tx}}x$ et borner $\abs{\cos}$ par
+        $1$~; noter $t\eu^{-tx} \leq 1/x\cdot(tx\eu^{-tx})$
+        avec $\sup_{u\geq0}u\eu^{-u} < 1$)}~; puis scinder
+        $F(t) - D$ en $[0, A]$ (où le TCD s'applique
+        lorsque $t \to 0$) et $[A, \infty)$.
+  \item Conclure~: $D = \frac\pi2$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie III --- Dividendes.}
+\begin{enumerate}[resume]
+  \item Calculer $\int_0^{+\infty}\frac{\sin^2x}{x^2}\,\dd
+        x$ \emph{(intégrer par parties et se ramener à $D$
+        via $\sin 2x = 2\sin x\cos x$)}.
+  \item Calculer $\int_0^{+\infty}\frac{1 -
+        \cos x}{x^2}\,\dd x$, et vérifier la cohérence des
+        deux résultats.
+  \item Pour $a > 0$, calculer
+        $\int_0^{+\infty}\frac{\sin(ax)}x\dd x$ et
+        $\int_{-\infty}^{+\infty}\eu^{-ax^2}\dd x$, et
+        enregistrer les règles d'échelle (elles seront les
+        chevaux de trait du~\cref{ch:b3:fouriertransform}).
+  \item Expliquer précisément pourquoi $D$ n'aurait pas pu
+        être traitée par le TCD directement en $t = 0$
+        (pas de dominateur \omterm{def:b3:lebesgue:l1}{intégrable} sur
+        $[0,1]\times[0,\infty)$), et pourquoi le scindage
+        de queue de la question 7 est le substitut honnête
+        --- ce schéma («~intégrabilité uniforme des
+        queues~») revient tout au long de l'analyse.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie IV --- La \omterm{ex:b3:lebesgue:gamma}{fonction gamma} selon Bohr
+et Mollerup.} La fonction $\Gamma$
+(\cref{ex:b3:lebesgue:gamma}) satisfait $\Gamma(1) = 1$ et
+$\Gamma(x+1) = x\Gamma(x)$ --- mais autant d'une infinité
+d'autres fonctions (multiplier par n'importe quel
+tremblement $1$-périodique). Une condition de convexité
+épingle $\Gamma$ de façon unique, et ses identités plus
+profondes s'en déduisent mécaniquement. Une fonction
+positive $f$ sur un intervalle est
+\emph{log-convexe}\index{log-convexité} si $\log f$ est
+convexe.
+\begin{enumerate}[resume]
+  \item Montrer que log-convexe implique convexe, que les
+        produits de fonctions log-convexes et leurs
+        composées avec des applications affines sont
+        log-convexes, et --- via l'inégalité de Hölder à
+        deux fonctions $\int\abs{uv} \leq
+        \bigl(\int\abs u^p\bigr)^{1/p}\bigl(\int\abs
+        v^q\bigr)^{1/q}$, prouvée directement à partir de
+        l'inégalité de Young --- que $\Gamma$ est
+        log-convexe sur $\intoo0\infty$.
+  \item (Lemme des pentes) Soit $g$ convexe sur
+        $\intoo0\infty$ avec $g(n+1) - g(n) = \log n$ pour
+        tout entier $n \geq 1$. Pour $x \in \intoc01$ et
+        $n \geq 2$, comparer les pentes de $g$ sur $[n-1,
+        n]$, $[n, n+x]$ et $[n, n+1]$, et en déduire
+        \[
+        x\log(n-1) \;\leq\; g(n + x) - g(n) \;\leq\; x\log
+        n .
+        \]
+  \item (Bohr--Mollerup) Soit $f > 0$ satisfaisant $f(1) =
+        1$, $f(x+1) = xf(x)$, et $\log f$ convexe. En
+        déroulant la récurrence en $f(n + x) =
+        x(x+1)\cdots(x + n - 1)\,f(x)$ et $f(n) =
+        (n-1)!$, déduire de la question 14 que pour $x \in
+        \intoc01$
+        \[
+        f(x) = \lim_{n\to\infty}
+        \frac{n!\,n^x}{x(x+1)\cdots(x+n)} :
+        \]
+        $f$ est unique, d'où $f = \Gamma$, et la
+        \emph{formule limite de Gauss} tient (étendre à
+        tout $x > 0$ par la récurrence).
+  \item Définir la \emph{fonction bêta} $B(x, y) =
+        \int_0^1t^{x-1}(1-t)^{y-1}\,\dd t$ ($x, y > 0$).
+        Prouver la convergence, la récurrence $B(x+1, y) =
+        \frac{x}{x+y}\,B(x, y)$ (intégrer par parties), et
+        $B(1, y) = \frac1y$.
+  \item Montrer que $x \mapsto B(x, y)$ est log-convexe
+        (Hölder encore), et appliquer Bohr--Mollerup à
+        \[
+        f(x) = \frac{B(x, y)\,\Gamma(x + y)}{\Gamma(y)}
+        \]
+        pour conclure la \emph{formule d'Euler}~: $B(x, y)
+        = \dfrac{\Gamma(x)\Gamma(y)}{\Gamma(x+y)}$ ---
+        aucune intégrale double nulle part.
+  \item Calculer $B(\frac12, \frac12)$ directement
+        (substituer $t = \sin^2\theta$) et en déduire
+        $\Gamma(\frac12) = \sqrt\pi$~: l'intégrale
+        gaussienne de la partie I, retrouvée par pure
+        convexité. Comparer les deux preuves en une phrase
+        chacune.
+  \item (Duplication de Legendre) Montrer que
+        \[
+        g(x) = \frac{2^{x-1}}{\sqrt\pi}\,
+        \Gamma\Bigl(\frac x2\Bigr)
+        \Gamma\Bigl(\frac{x+1}2\Bigr)
+        \]
+        satisfait les trois hypothèses de Bohr--Mollerup, et
+        conclure $g = \Gamma$, c.-à-d.\ $\Gamma(2z) =
+        \frac{2^{2z-1}}{\sqrt\pi}\,\Gamma(z)\,\Gamma(z +
+        \tfrac12)$ pour tout $z > 0$.
+  \item En déduire la forme fermée $\Gamma\bigl(n +
+        \tfrac12\bigr) =
+        \dfrac{(2n)!}{4^n\,n!}\sqrt\pi$, et prouver, par le
+        lemme des pentes appliqué à $\log\Gamma$ autour de
+        grands entiers, l'asymptotique
+        \[
+        \frac{\Gamma(n + \frac12)}{\Gamma(n)\,\sqrt n}
+        \longrightarrow 1 .
+        \]
+  \item Combiner les deux dernières questions en
+        l'asymptotique binomiale centrale
+        \[
+        \binom{2n}{n} \sim \frac{4^n}{\sqrt{\pi n}},
+        \]
+        et vérifier numériquement pour $n = 10$
+        ($\binom{20}{10} = 184756$, contre
+        $4^{10}/\sqrt{10\pi} \approx 187079$~: rapport
+        $\approx 0{,}988$).
+  \item (Synthèse) La constante $\sqrt\pi$ est maintenant
+        apparue comme l'intégrale gaussienne (partie I),
+        comme $B(\frac12, \frac12)$ (question 18), et dans
+        la duplication (question 19)~; l'estimation
+        binomiale centrale anticipe à la fois Stirling
+        (problème du week-end du~\cref{ch:b3:product}) et de
+        Moivre--Laplace. Cartographier les connexions~:
+        quels énoncés sont équivalents à quels, et que
+        contribue chaque technique --- dérivation sous le
+        signe intégral versus convexité --- que l'autre ne
+        peut pas~?
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie V --- Trois dividendes de plus.}
+\begin{enumerate}[resume]
+  \item (Wallis, par Bêta) Pour $p > -1$, substituer $t =
+        \sin^2\theta$ pour montrer
+        \[
+        W_p = \int_0^{\pi/2}\sin^p\theta\,\dd\theta
+        = \frac12\,B\Bigl(\frac{p+1}2, \frac12\Bigr),
+        \]
+        et déduire de la récurrence Bêta (question 16) que
+        $W_{n+2} = \frac{n+1}{n+2}\,W_n$ pour les entiers
+        $n \geq 0$. Calculer $W_{2n}$ et $W_{2n+1}$ sous
+        forme fermée, montrer $W_{2n+1}/W_{2n} \to 1$ par
+        encadrement, et conclure avec le \emph{produit de
+        Wallis}
+        \[
+        \frac\pi2 = \lim_{n\to\infty}
+        \prod_{k=1}^{n}\frac{4k^2}{4k^2 - 1} .
+        \]
+  \item (La gaussienne rencontre une fréquence) Pour $b \in
+        \R$ poser
+        \[
+        \Phi(b) = \int_{-\infty}^{+\infty}
+        \eu^{-x^2}\cos(2bx)\,\dd x .
+        \]
+        Montrer que $\Phi$ est $\mathcal C^1$ sur $\R$,
+        qu'une intégration par parties produit l'équation
+        différentielle $\Phi'(b) = -2b\,\Phi(b)$, et
+        conclure
+        \[
+        \Phi(b) = \sqrt\pi\,\eu^{-b^2} :
+        \]
+        la gaussienne se reproduit sous cette
+        transformée --- l'unique identité sur laquelle
+        le~\cref{ch:b3:fouriertransform} tournera.
+  \item (Intégrale de Frullani) Pour $0 < a < b$, montrer
+        que
+        \[
+        \int_0^{+\infty}
+        \frac{\eu^{-ax} - \eu^{-bx}}{x}\,\dd x
+        = \log\frac ba ,
+        \]
+        en dérivant en le paramètre $a$ (justifier la
+        domination sur tout $\intco{a_0}{+\infty}$, $a_0 >
+        0$, et identifier la constante en faisant $a \to
+        b$). Où exactement l'intégrande a-t-elle besoin de
+        sa singularité amovible en $x = 0$~?
+\end{enumerate}
+\end{problem}

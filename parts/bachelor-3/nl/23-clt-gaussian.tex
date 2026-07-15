@@ -1,0 +1,994 @@
+\chapter{Karakteristieke functies en de centrale
+limietstelling}\label{ch:b3:clt}
+
+De wet van de grote aantallen zegt dat gemiddelden
+convergeren; de centrale limietstelling zegt \emph{hoe zij
+fluctueren}: de fout, vergroot met $\sqrt n$, is
+asymptotisch \omterm{def:b3:clt:gaussianvector}{Gaussisch} --- wat de wet waarmee men begon ook
+was. Deze universaliteit is het diepste feit van de
+elementaire kansrekening, en haar natuurlijke bewijs is
+Fourier-analytisch: de \emph{\omterm{def:b3:clt:cf}{karakteristieke functie}}
+(de Fourier-transformatie van een wet) zet onafhankelijke
+sommen om in producten, en de machinerie van
+\cref{ch:b3:fouriertransform} --- injectiviteit, Gaussische
+vaste punten --- zet puntsgewijze convergentie van deze
+producten om in convergentie van wetten (stelling van Lévy,
+\omterm{def:b3:complete:complete}{volledig} bewezen). Het hoofdstuk eindigt met \omterm{def:b3:clt:gaussianvector}{Gaussische
+vectoren} en de eerlijke afleiding van de
+betrouwbaarheidsintervallen die overal in de statistiek
+gebruikt worden; het weekendprobleem geeft het tweede
+bewijs van Lindeberg van de CLT, met een expliciete
+foutratio.
+
+\section{Karakteristieke functies}
+
+\begin{definition}\label{def:b3:clt:cf}
+De \emph{karakteristieke functie}\index{karakteristieke
+functie} van een reële \omterm{def:b3:probability:space}{stochastische variabele} $X$ is
+\[
+\varphi_X(\xi) = \E\bigl[\eu^{\iu\xi X}\bigr]
+= \int_\R \eu^{\iu\xi x}\,\dd\P_X(x)
+\qquad (\xi \in \R)
+\]
+(de overdrachtsstelling berekent haar uit de wet; voor een
+\omterm{ex:b3:lebesgue:gamma}{dichtheid} $f$, $\varphi_X(\xi) = \hat f(-\xi)$ in de
+conventie van \cref{ch:b3:fouriertransform}).
+\end{definition}
+
+\begin{proposition}\label{prop:b3:clt:cfbasics}
+(a) $\varphi_X(0) = 1$, $\abs{\varphi_X} \leq 1$, en
+$\varphi_X$ is uniform continu;
+$\varphi_{aX + b}(\xi) = \eu^{\iu b\xi}\varphi_X(a\xi)$.
+(b) Als $X, Y$ \emph{\omterm{def:b3:probability:independence}{onafhankelijk}} zijn:
+$\varphi_{X+Y} = \varphi_X\,\varphi_Y$.
+(c) Als $\E\abs X^k < \infty$, dan $\varphi_X \in \mathcal
+C^k$ met $\varphi_X^{(j)}(0) = \iu^j\,\E[X^j]$ voor $j \leq
+k$; in het bijzonder, voor gecentreerde $X \in L^2$ met
+variantie $\sigma^2$:
+\[
+\varphi_X(\xi) = 1 - \frac{\sigma^2\xi^2}{2} +
+o(\xi^2) \qquad (\xi \to 0).
+\]
+(d) \omterm{def:b3:clt:gaussianvector}{Gaussisch}: $X \sim \mathcal N(m, \sigma^2)$ heeft
+$\varphi_X(\xi) = \eu^{\iu m\xi - \sigma^2\xi^2/2}$.
+\end{proposition}
+
+\begin{proof}
+(a) De grenzen zijn onmiddellijk; continuïteit:
+$\abs{\varphi(\xi + h) - \varphi(\xi)} \leq
+\E\abs{\eu^{\iu hX} - 1} \to 0$ als $h \to 0$ door
+gedomineerde convergentie, uniform in $\xi$. De affiene
+regel is een substitutie. (b) $\eu^{\iu\xi(X+Y)} =
+\eu^{\iu\xi X}\eu^{\iu\xi Y}$, en \omterm{def:b3:probability:space}{verwachtingen} van
+producten van onafhankelijke variabelen factoriseren
+(\cref{thm:b3:probability:independence}, toegepast op reële
+en imaginaire delen). (c) Differentiatie onder de
+\omterm{def:b3:probability:space}{verwachting}, gedomineerd door $\E\abs X^j$
+(\cref{thm:b3:lebesgue:paramdiff}); de Taylor-ontwikkeling
+in $0$ is dan Taylor--Young voor de $\mathcal C^2$-functie
+$\varphi$. (d) Voor $\mathcal N(0,1)$: de Gaussische
+transformatie (\cref{ex:b3:fouriertransform:gaussian} met
+$a = \frac12$) geeft $\int\eu^{\iu\xi
+x}\frac{\eu^{-x^2/2}}{\sqrt{2\pi}}\dd x = \eu^{-\xi^2/2}$;
+het algemene geval via de affiene regel.
+\end{proof}
+
+\begin{theorem}[Injectiviteit]\label{thm:b3:clt:injectivity}
+Als $\varphi_X = \varphi_Y$, dan hebben $X$ en $Y$ dezelfde
+wet. Nauwkeuriger: voor $N \sim \mathcal N(0,1)$
+onafhankelijk van $X$ en $\varepsilon > 0$ heeft de
+gegladde variabele $X + \varepsilon N$ de \omterm{ex:b3:lebesgue:gamma}{dichtheid}
+\[
+p_\varepsilon(x) = \frac1{2\pi}\int_\R
+\varphi_X(-\xi)\,\eu^{-\varepsilon^2\xi^2/2}\,
+\eu^{\iu\xi x}\,\dd\xi ,
+\]
+bepaald door $\varphi_X$ alleen; $\varepsilon \to 0$
+herwint de wet van $X$.\index{karakteristieke functie,
+injectiviteit}
+\end{theorem}
+
+\begin{proof}
+$X + \varepsilon N$ heeft de \omterm{ex:b3:lebesgue:gamma}{dichtheid} $p_\varepsilon(x) =
+\E\bigl[g_\varepsilon(x - X)\bigr]$, waarbij
+$g_\varepsilon$ de $\mathcal N(0, \varepsilon^2)$-dichtheid
+is: voor Borels $B$ geven \omterm{def:b3:probability:independence}{onafhankelijkheid} en Tonelli
+$\P(X + \varepsilon N \in B) = \int\!\!\int\mathbf 1_B(x +
+\varepsilon n)g_1(n)\,\dd n\,\dd\P_X(x) =
+\int_B\E[g_\varepsilon(t - X)]\dd t$ (substitueren, dan
+opnieuw Tonelli). Schrijf $g_\varepsilon$ via
+Fourier-inversie van haar transform
+(\cref{exo:b3:fouriertransform:4}, herschaald):
+$g_\varepsilon(u) = \frac1{2\pi}\int
+\eu^{-\varepsilon^2\xi^2/2}\eu^{\iu\xi u}\dd\xi$, en Fubini
+(alles gedomineerd door de Gaussische factor):
+\[
+p_\varepsilon(x) = \frac1{2\pi}\int_\R
+\varphi_X(-\xi)\,\eu^{-\varepsilon^2\xi^2/2}\,
+\eu^{\iu\xi x}\,\dd\xi ,
+\]
+een functionaal van $\varphi_X$ alleen. Als $\varphi_X =
+\varphi_Y$: $X + \varepsilon N$ en $Y + \varepsilon N$
+hebben gelijke wetten voor elke $\varepsilon$; voor
+begrensde continue $f$, $\E f(X + \varepsilon N) \to \E
+f(X)$ als $\varepsilon \to 0$ (gedomineerde convergentie, $X
++ \varepsilon N \to X$ puntsgewijs op de productruimte),
+dus $\E f(X) = \E f(Y)$ voor alle zulke $f$ --- en dit
+bepaalt de wet: voor elke $t$, klem $\mathbf
+1_{\intoc{-\infty}t}$ tussen de begrensde continue hellingen
+$f_k^\pm$ (gelijk aan $1$ op $\intoc{-\infty}{t \mp
+\frac1k}$, aan $0$ voorbij $t \pm \frac1k$, affien
+ertussen); limietneming in $\E f_k^-(X) \leq F_X(t) \leq \E
+f_k^+(X)$ geeft $F_X(t) = F_Y(t)$ in elk $t$ waar beide
+continu zijn, dus overal door rechtscontinuïteit en
+\omterm{ex:b3:lebesgue:gamma}{dichtheid} van gemeenschappelijke continuïteitspunten (beide
+$F$ hebben aftelbaar veel sprongen); gelijke
+verdelingsfuncties dwingen gelijke wetten
+(\cref{exo:b3:measure:3}, steunend op
+\cref{thm:b3:measure:uniqueness}).
+\end{proof}
+
+\section{Convergentie in verdeling}
+
+\begin{definition}\label{def:b3:clt:cid}
+$X_n$ \emph{convergeert in verdeling} (of in wet) naar $X$,
+genoteerd $X_n \Rightarrow X$, als\index{convergentie in
+verdeling}
+\[
+\E\bigl[f(X_n)\bigr] \longrightarrow \E\bigl[f(X)\bigr]
+\qquad\text{voor elke begrensde continue } f\colon\R\to\R .
+\]
+Equivalent (\cref{exo:b3:clt:4}): $F_{X_n}(t) \to F_X(t)$ in
+elk continuïteitspunt $t$ van $F_X$. De $X_n$ hoeven niet op
+een gemeenschappelijke \omterm{def:b3:probability:space}{waarschijnlijkheidsruimte} te leven:
+alleen de wetten tellen.
+\end{definition}
+
+\begin{theorem}[Selectiestelling van Helly]
+\label{thm:b3:clt:helly}
+Elke rij $(F_n)$ van verdelingsfuncties heeft een
+deelrij die puntsgewijs convergeert, in elk
+continuïteitspunt van de limiet, naar een niet-dalende
+rechtscontinue $G \colon \R \to \intcc01$ --- mogelijk met
+$G(+\infty) - G(-\infty) < 1$ (massa kan naar oneindig
+ontsnappen).\index{stelling van Helly}
+\end{theorem}
+
+\begin{proof}
+Diagonale extractie geeft $F_{n_k}(q) \to \ell(q)$ voor
+elke rationale $q$ (waarden in de compacte $\intcc01$).
+Definieer $G(t) = \inf\{\ell(q) : q \in \Q, q > t\}$:
+niet-dalend; rechtscontinu (een infimum over krimpende
+rationale buurten van rechts). In een continuïteitspunt $t$
+van $G$: voor rationalen $q_1 < t < q_2$,
+\[
+\ell(q_1) \leq \liminf F_{n_k}(t) \leq \limsup F_{n_k}(t)
+\leq \ell(q_2),
+\]
+door monotonie van elke $F_{n_k}$. Uit de definitie van $G$
+als infimum en de monotonie van $\ell$ op de rationalen:
+$G(s) \leq \ell(q) \leq G(q)$ zodra $s < q$. Nemen van $s <
+q_1 < t$ geeft $\ell(q_1) \geq G(s)$, en $\ell(q_2) \leq
+G(q_2)$; laten $s \uparrow t$ en $q_2 \downarrow t$, dwingt
+continuïteit van $G$ in $t$ zowel de $\liminf$ als de
+$\limsup$ naar $G(t)$.
+\end{proof}
+
+\begin{lemma}[Spanning vanuit de karakteristieke functie]
+\label{lem:b3:clt:tightness}
+Voor elke \omterm{def:b3:probability:space}{stochastische variabele} $X$ en $u > 0$:
+\[
+\P\Bigl(\abs X \geq \frac2u\Bigr) \;\leq\;
+\frac1u\int_{-u}^{u}\bigl(1 -
+\operatorname{Re}\varphi_X(\xi)\bigr)\,\dd\xi .
+\]
+\end{lemma}
+
+\begin{proof}
+Door Tonelli--Fubini (integrand begrensd, gebied eindig in
+$\xi$):
+\[
+\frac1u\int_{-u}^u\bigl(1 -
+\operatorname{Re}\varphi_X(\xi)\bigr)\dd\xi
+= \E\Bigl[\frac1u\int_{-u}^u(1 - \cos(\xi X))\,\dd\xi\Bigr]
+= 2\,\E\Bigl[1 - \frac{\sin(uX)}{uX}\Bigr]
+\]
+(interpreteer de haak als limiet $0$ in $X = 0$). De
+integrand is niet-negatief ($\abs{\sin t} \leq \abs t$), en
+voor $\abs{uX} \geq 2$: $1 - \frac{\sin(uX)}{uX} \geq 1 -
+\frac1{\abs{uX}} \geq \frac12$. Alleen de gebeurtenis
+$\{\abs{uX} \geq 2\}$ in de \omterm{def:b3:probability:space}{verwachting} houden laat
+minstens $2 \cdot \frac12\,\P(\abs X \geq \frac2u)$ over,
+wat de bewering is.
+\end{proof}
+
+\begin{theorem}[Continuïteitsstelling van Lévy]
+\label{thm:b3:clt:levy}
+Zij $(X_n)$ \omterm{def:b3:probability:space}{stochastische variabelen} waarvan de
+\omterm{def:b3:clt:cf}{karakteristieke functies} puntsgewijs convergeren:
+$\varphi_{X_n}(\xi) \to \varphi(\xi)$ voor elke $\xi$,
+waarbij $\varphi = \varphi_X$ de \omterm{def:b3:clt:cf}{karakteristieke functie} is
+van een zekere \omterm{def:b3:probability:space}{stochastische variabele} $X$. Dan $X_n
+\Rightarrow X$.\index{continuïteitsstelling van Lévy}
+\end{theorem}
+
+\begin{proof}
+\emph{Spanning.} Fixeer $\varepsilon > 0$. Omdat $\varphi$
+continu is in $0$ met $\varphi(0) = 1$, kies $u > 0$ met
+$\frac1u\int_{-u}^u(1 - \operatorname{Re}\varphi) <
+\varepsilon$; door gedomineerde convergentie (integrand
+begrensd door $2$ op het vaste $[-u,u]$) is dezelfde
+integraal voor $\varphi_{X_n}$ $< 2\varepsilon$ voor $n$
+groot: \cref{lem:b3:clt:tightness} geeft $\P(\abs{X_n} \geq
+\frac2u) \leq 2\varepsilon$ voor grote $n$, en de constante
+vergroten behandelt de eindig veel overige: de wetten zijn
+\emph{gespannen} --- geen massa ontsnapt.
+
+\emph{Deelrijen.} Zij $(F_{n_k})$ een willekeurige deelrij;
+via Helly (\cref{thm:b3:clt:helly}) extraheer $F_{n_{k_j}}
+\to G$ in continuïteitspunten. Spanning dwingt $G(-\infty)
+= 0$, $G(+\infty) = 1$ ($G(\frac2u) - G(-\frac2u) \geq 1 -
+2\varepsilon$ in continuïteitspunten): $G$ is een echte
+verdelingsfunctie, van een zekere \omterm{def:b3:probability:space}{stochastische variabele}
+$Y$. Dan $X_{n_{k_j}} \Rightarrow Y$ (\cref{exo:b3:clt:4},
+verdelingsconvergentie uit $F$'s), dus
+$\varphi_{X_{n_{k_j}}} \to \varphi_Y$ \emph{puntsgewijs}
+($x \mapsto \eu^{\iu\xi x}$ is begrensd continu, reële en
+imaginaire delen afzonderlijk); vergelijken met de
+hypothese: $\varphi_Y = \varphi = \varphi_X$, en
+injectiviteit (\cref{thm:b3:clt:injectivity}) geeft $Y \sim
+X$, d.w.z.\ $G = F_X$.
+
+\emph{Conclusie.} Elke deelrij van $(F_n)$ heeft een
+subdeelrij die convergeert naar dezelfde $F_X$ (in haar
+continuïteitspunten); dus $F_n(t) \to F_X(t)$ in elk
+continuïteitspunt $t$ (een reële rij waarvan alle deelrijen
+subdeelrijen met dezelfde limiet hebben, convergeert): $X_n
+\Rightarrow X$.
+\end{proof}
+
+\section{De centrale limietstelling}
+
+\begin{theorem}[Centrale limietstelling]\label{thm:b3:clt:clt}
+Zij $(X_n)$ i.i.d.\ met $\E X_1 = m$ en $\V(X_1) =
+\sigma^2 \in \intoo0\infty$. Dan\index{centrale
+limietstelling}
+\[
+\frac{S_n - nm}{\sigma\sqrt n} \;\Longrightarrow\; \mathcal
+N(0, 1) :
+\qquad
+\P\Bigl(a \leq \frac{S_n - nm}{\sigma\sqrt n} \leq
+b\Bigr) \longrightarrow
+\frac{1}{\sqrt{2\pi}}\int_a^b\eu^{-x^2/2}\,\dd x
+\]
+voor alle $a < b$.
+\end{theorem}
+
+\begin{proof}
+Centreer en normaliseer: $Z_i = \frac{X_i - m}{\sigma}$
+(i.i.d., gemiddelde $0$, variantie $1$) en $T_n =
+\frac1{\sqrt n}\sum_{i\leq n}Z_i$. Door \omterm{def:b3:probability:independence}{onafhankelijkheid}
+en de affiene regel (\cref{prop:b3:clt:cfbasics}):
+\[
+\varphi_{T_n}(\xi) =
+\varphi_{Z}\Bigl(\frac{\xi}{\sqrt n}\Bigr)^{n},
+\qquad
+\varphi_Z(\eta) = 1 - \frac{\eta^2}2 + \eta^2\rho(\eta),\quad
+\rho(\eta)\to0 .
+\]
+Fixeer $\xi$ en zet $a_n = \varphi_Z(\xi/\sqrt n)$, $b_n =
+1 - \frac{\xi^2}{2n}$: beide hebben modulus $\leq 1$ voor
+$n$ groot ($\abs{b_n} \leq 1$ zodra $\xi^2 \leq 4n$;
+$\abs{a_n} \leq 1$ altijd). De elementaire ongelijkheid
+$\abs{a^n - b^n} \leq n\abs{a - b}$ voor $\abs a, \abs b
+\leq 1$ (telescoperen $a^n - b^n = \sum a^k(a -
+b)b^{n-1-k}$) geeft
+\[
+\Bigl|\varphi_{T_n}(\xi) - \Bigl(1 -
+\frac{\xi^2}{2n}\Bigr)^{n}\Bigr|
+\leq n\,\Bigl|\varphi_Z\Bigl(\frac\xi{\sqrt n}\Bigr) - 1 +
+\frac{\xi^2}{2n}\Bigr|
+= \xi^2\,\Bigl|\rho\Bigl(\frac{\xi}{\sqrt n}\Bigr)\Bigr|
+\longrightarrow 0,
+\]
+terwijl $\bigl(1 - \frac{\xi^2}{2n}\bigr)^n \to
+\eu^{-\xi^2/2}$ (reële logaritme). Dus $\varphi_{T_n}(\xi)
+\to \eu^{-\xi^2/2} = \varphi_{\mathcal N(0,1)}(\xi)$
+(\cref{prop:b3:clt:cfbasics}(d)) voor elke $\xi$: Lévy
+(\cref{thm:b3:clt:levy}) concludeert $T_n \Rightarrow
+\mathcal N(0,1)$. De intervalkansen volgen omdat
+$F_{\mathcal N}$ overal continu is.
+\end{proof}
+
+\begin{example}[Betrouwbaarheidsintervallen, eerlijk afgeleid]
+\label{ex:b3:clt:confidence}
+Peil $n$ onafhankelijke kiezers; $\hat p_n = S_n/n$
+schat de ware $p$, met $\sigma^2 = p(1-p) \leq \frac14$. De
+CLT geeft, voor grote $n$,
+\[
+\P\Bigl(\abs{\hat p_n - p} \leq
+\frac{z}{2\sqrt n}\Bigr)
+\;\geq\; \P\Bigl(\Bigl|\frac{S_n - np}{\sigma\sqrt n}\Bigr|
+\leq z\Bigr)
+\longrightarrow \Phi(z) - \Phi(-z),
+\]
+waarbij $\Phi$ de standaard-Gaussische verdelingsfunctie is.
+Met $z = 1{,}96$: asymptotisch betrouwbaarheidsniveau $95\%$,
+en marge $\frac{1{,}96}{2\sqrt n} \leq 3\%$ eist $n \geq
+\bigl(\frac{1{,}96}{0{,}06}\bigr)^2 \approx 1068$ --- het
+getal achter elke ``$\pm3$ punten, $95\%$'' die men leest;
+vergelijk met de $5556$ van Chebyshev
+(\cref{exo:b3:probability:7}). De $\sqrt n$ is
+universeel: om de fout te halveren, verviervoudig de
+steekproef --- dezelfde wet die de kost van \omterm{ex:b3:probability:sllnapps}{Monte Carlo}
+vastlegt (\cref{exo:b3:clt:7}).
+\end{example}
+
+\section{Gaussische vectoren}
+
+\begin{definition}\label{def:b3:clt:gaussianvector}
+Een stochastische vector $X = (X_1, \dots, X_d)$ is
+\emph{Gaussisch}\index{Gaussische vector} als elke
+lineaire combinatie $\langle t, X\rangle = \sum t_iX_i$ een
+(mogelijk ontaarde) reële Gaussische variabele is. Haar wet
+wordt bepaald door de gemiddelde vector $m = (\E X_i)$ en de
+\emph{covariantiematrix} $\Sigma = \bigl(\operatorname{Cov}
+(X_i, X_j)\bigr)$: de \omterm{def:b3:clt:cf}{karakteristieke functie} van de
+vector, $\varphi_X(t) = \E\eu^{\iu\langle t, X\rangle}$, is
+immers de waarde in $1$ van de kf van $\langle t, X\rangle$:
+\[
+\varphi_X(t) = \exp\Bigl(\iu\langle t, m\rangle -
+\tfrac12\,t^{\mathsf T}\Sigma\,t\Bigr),
+\]
+en $d$-dimensionale \omterm{def:b3:clt:cf}{karakteristieke functies} zijn injectief
+(zelfde gladmakingsbewijs als \cref{thm:b3:clt:injectivity},
+Gaussisch per coördinaat).
+\end{definition}
+
+\begin{theorem}\label{thm:b3:clt:gaussianvector}
+Zij $X$ een \omterm{def:b3:clt:gaussianvector}{Gaussische vector}.
+\begin{enumerate}
+  \item Elke affiene afbeelding $AX + b$ is een \omterm{def:b3:clt:gaussianvector}{Gaussische
+        vector}.
+  \item De componenten $X_i$ zijn \emph{\omterm{def:b3:probability:independence}{onafhankelijk}} dan
+        en slechts dan als $\Sigma$ diagonaal is: voor
+        gezamenlijk Gaussische variabelen is
+        ongecorreleerd $=$ \omterm{def:b3:probability:independence}{onafhankelijk}.
+  \item Als $\Sigma$ inverteerbaar is, heeft $X$ de
+        \omterm{ex:b3:lebesgue:gamma}{dichtheid}
+        $\frac{1}{(2\pi)^{d/2}\sqrt{\det\Sigma}}
+        \exp\bigl(-\frac12(x - m)^{\mathsf T}\Sigma^{-1}(x -
+        m)\bigr)$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) Lineaire combinaties van componenten van $AX + b$ zijn
+affiene functies van lineaire combinaties van $X$: \omterm{def:b3:clt:gaussianvector}{Gaussisch}
+(een affien beeld van een Gaussische variabele is
+\omterm{def:b3:clt:gaussianvector}{Gaussisch}).
+(2) Als $\Sigma$ diagonaal is, factoriseert de
+\omterm{def:b3:clt:cf}{karakteristieke functie}: $\varphi_X(t) =
+\prod_i\exp(\iu t_im_i - \frac12\Sigma_{ii}t_i^2) =
+\prod\varphi_{X_i}(t_i)$, wat de \omterm{def:b3:clt:cf}{karakteristieke functie} is
+van de productwet (\cref{thm:b3:probability:independence}
+gelezen via $d$-dimensionale injectiviteit): de componenten
+zijn \omterm{def:b3:probability:independence}{onafhankelijk}. De omgekeerde is het verdwijnen van
+covarianties van onafhankelijke $L^2$-variabelen.
+(3) Diagonaliseer $\Sigma = P D P^{\mathsf T}$ ($P$
+orthogonaal, $D > 0$ diagonaal ---
+\cref{exo:b3:submanifolds:8}); de vector $Y = P^{\mathsf
+T}(X - m)$ is \omterm{def:b3:clt:gaussianvector}{Gaussisch} met covarianties $D$: door (2) zijn
+haar componenten \omterm{def:b3:probability:independence}{onafhankelijk} $\mathcal N(0, d_i)$, dus $Y$
+heeft de productdichtheid; push-forward door de
+volumebewarende $x = m + PY$
+(\cref{thm:b3:product:linearchange}, $\abs{\det P} = 1$) en
+herschrijf de exponent invariant.
+\end{proof}
+
+\begin{theorem}[Multidimensionale CLT]
+\label{thm:b3:clt:multiclt}
+Zij $(X_n)$ i.i.d.\ kwadratisch integreerbare stochastische
+\emph{vectoren} van $\R^d$ met gemiddelde $m$ en
+covariantiematrix $\Sigma$. Dan convergeert $\frac{S_n -
+nm}{\sqrt n}$ in verdeling naar de \omterm{def:b3:clt:gaussianvector}{Gaussische vector}
+$\mathcal N(0, \Sigma)$.\index{centrale
+limietstelling!multidimensionaal}
+\admitted
+\end{theorem}
+
+\begin{remark}\label{rem:b3:clt:multiclt}
+Bijna alles is al in onze handen. Voor elke richting $t \in
+\R^d$ is de reële variabele $\langle t, \frac{S_n -
+nm}{\sqrt n}\rangle$ een genormaliseerde som van i.i.d.\
+reële variabelen van variantie $t^{\mathsf T}\Sigma t$,
+dus de berekening van \cref{thm:b3:clt:clt} geeft
+puntsgewijze convergentie van de $d$-dimensionale
+\omterm{def:b3:clt:cf}{karakteristieke functies} naar $\eu^{-t^{\mathsf T}\Sigma
+t/2}$, de \omterm{def:b3:clt:cf}{karakteristieke functie} van $\mathcal N(0,
+\Sigma)$ (\cref{def:b3:clt:gaussianvector}). Wat we niet
+opnieuw bewezen hebben is de continuïteitsstelling van Lévy
+\emph{in $\R^d$}: de selectie van Helly en de
+spanningsafschatting generaliseren routineus (per
+coördinaat), en deze Cramér--Wold-reductie wordt eerlijk
+uitgevoerd in elke mastercursus kansrekening; niets buiten
+de methoden van dit hoofdstuk is nodig.
+\end{remark}
+
+\begin{method}\label{met:b3:clt:method}
+Om een limietwet te identificeren: bereken \omterm{def:b3:clt:cf}{karakteristieke
+functies}, neem de puntsgewijze limiet, herken haar
+(\omterm{def:b3:clt:gaussianvector}{Gaussisch} $\eu^{-\sigma^2\xi^2/2}$, Poisson
+$\eu^{\lambda(\eu^{\iu\xi}-1)}$, exponentieel
+$\frac{\lambda}{\lambda - \iu\xi}$, $\dots$) en roep Lévy
+aan. Het driestappenritueel (\omterm{def:b3:probability:independence}{onafhankelijkheid} $\to$
+product; Taylor in $0$ $\to$ exponentiële limiet; Lévy
+$\to$ convergentie in wet) bewijst de CLT, de Poissonwet
+van zeldzame gebeurtenissen (\cref{exo:b3:clt:5}), en elke
+klassieke limietstelling van deze cursus. Voor b.z.-uitspraken,
+ga terug naar de gereedschapskist van
+\cref{ch:b3:probability}: de twee hoofdstukken beantwoorden
+verschillende vragen over dezelfde $S_n$.
+\end{method}
+
+\section{Oefeningen}
+
+\begin{exercise}[$\star$]\label{exo:b3:clt:1}
+Bereken de \omterm{def:b3:clt:cf}{karakteristieke functies}: uniform op
+$\intcc{-1}1$; exponentieel $\mathcal E(\lambda)$; Poisson
+$\mathcal P(\lambda)$; binomiaal $\mathcal B(n, p)$. Leid
+via \cref{thm:b3:clt:injectivity} af dat de som van
+onafhankelijke Poissonvariabelen ($\lambda, \mu$) Poisson
+$(\lambda + \mu)$ is.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:2}
+(a) Toon aan dat $\varphi_X$ reëelwaardig is dan en
+slechts dan als $X$ en $-X$ dezelfde wet hebben (een
+\emph{symmetrische} variabele).
+(b) Stel $\abs{\varphi_X(\xi_0)} = 1$ voor zekere $\xi_0
+\neq 0$. Toon aan dat $X$ bijna zeker gedragen wordt door
+een rekenkundige rij $a + \frac{2\pi}{\xi_0}\Z$
+\emph{(schrijf $\varphi_X(\xi_0) = \eu^{\iu\theta}$ en
+bereken $\E[1 - \cos(\xi_0X - \theta)]$)}. Leid af dat als
+$X$ een \omterm{ex:b3:lebesgue:gamma}{dichtheid} heeft, dan $\abs{\varphi_X(\xi)} < 1$
+voor alle $\xi \neq 0$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:3}
+Zij $X \sim \mathcal N(m_1, \sigma_1^2)$ en $Y \sim
+\mathcal N(m_2, \sigma_2^2)$ \omterm{def:b3:probability:independence}{onafhankelijk}. Toon $X + Y
+\sim \mathcal N(m_1 + m_2, \sigma_1^2 + \sigma_2^2)$, en
+algemener dat de Gaussische familie \omterm{def:b3:ode:stability}{stabiel} is onder
+onafhankelijke sommen en affiene afbeeldingen. Contrast: is
+de som van twee \emph{afhankelijke} \omterm{def:b3:clt:gaussianvector}{Gaussischen} altijd
+\omterm{def:b3:clt:gaussianvector}{Gaussisch}? (\cref{exo:b3:clt:9}.)
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:4}
+(a) Bewijs de equivalentie in \cref{def:b3:clt:cid}: als
+$\E f(X_n) \to \E f(X)$ voor alle begrensde continue $f$,
+dan $F_{X_n}(t) \to F_X(t)$ in continuïteitspunten
+\emph{(klem $\mathbf 1_{\intoc{-\infty}t}$ tussen twee
+continue traphellingen)}; en omgekeerd \emph{(benader een
+begrensde continue $f$ door sommen van hellingsfuncties,
+of conditioneer op een fijne rooster van
+continuïteitspunten)} --- de omgekeerde mag eerst voor
+uniform continue $f$ behandeld worden, dan in het algemeen.
+(b) Toon dat $X_n \Rightarrow c$ (een constante) impliceert
+$X_n \to c$ in kans.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:5}
+(Wet van zeldzame gebeurtenissen) Zij $X_n \sim \mathcal
+B(n, p_n)$ met $np_n \to \lambda > 0$. Toon, via
+\omterm{def:b3:clt:cf}{karakteristieke functies} en \cref{thm:b3:clt:levy}, dat
+$X_n \Rightarrow \mathcal P(\lambda)$. Numerieke
+sanity-check: vergelijk $\P(X = 0)$ voor $\mathcal B(100,
+0{,}02)$ en $\mathcal P(2)$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:6}
+(a) Een eerlijke dobbelsteen wordt $n = 1000$ keer
+geworpen; benader de kans dat het totaal $3600$
+overschrijdt (gemiddelde $3500$, variantie per worp
+$\frac{35}{12}$).
+(b) Voor $S \sim \mathcal B(100, \frac12)$, benader
+$\P(45 \leq S \leq 55)$ met de CLT en de
+continuïteitscorrectie ($\pm\frac12$), en becommentarieer
+het effect van de correctie.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:7}
+(Monte-Carlo-fout) In de setting van
+\cref{pb:b3:probability:1}, vraag 11, met $g \in
+L^2(\intcc01^d)$, zij $\sigma^2 = \V(g(U_1))$ en $I = \int
+g$. Toon
+\[
+\sqrt n\,\Bigl(\frac1n\sum_{k\leq n}g(U_k) - I\Bigr)
+\Longrightarrow \mathcal N(0, \sigma^2),
+\]
+en leid de asymptotische $95\%$-foutbalk $\pm
+1{,}96\,\sigma/\sqrt n$ af --- \omterm{def:b3:probability:independence}{onafhankelijk} van de
+dimensie $d$. Vergelijk met de deterministische
+middelpuntsregel in dimensie $d$ (fout $\sim n^{-2/d}$ voor
+$\mathcal C^2$-integranden): vanaf welke dimensie wint
+stochastische steekproeftrekking?
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:clt:8}
+(Slutsky) Stel $X_n \Rightarrow X$ en $Y_n \to c$ in kans
+($c$ constant). Toon $X_n + Y_n \Rightarrow X + c$ en
+$Y_nX_n \Rightarrow cX$. \emph{(Werk met \omterm{def:b3:clt:cf}{karakteristieke
+functies} en de grens $\abs{\E\eu^{\iu\xi
+(X_n+Y_n)} - \eu^{\iu\xi c}\E\eu^{\iu\xi X_n}} \leq
+\E\abs{\eu^{\iu\xi(Y_n - c)} - 1}$, splits op $\abs{Y_n - c}
+\leq \delta$.)} Toepassing: in
+\cref{ex:b3:clt:confidence}, rechtvaardig het vervangen van
+de onbekende $\sigma = \sqrt{p(1-p)}$ door $\sqrt{\hat
+p_n(1 - \hat p_n)}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:clt:9}
+Zij $X \sim \mathcal N(0,1)$ en $\varepsilon$ \omterm{def:b3:probability:independence}{onafhankelijk}
+met $\P(\varepsilon = \pm1) = \frac12$; zet $Y =
+\varepsilon X$.
+(a) Toon $Y \sim \mathcal N(0,1)$ en
+$\operatorname{Cov}(X, Y) = 0$.
+(b) Toon dat $X$ en $Y$ \emph{niet} \omterm{def:b3:probability:independence}{onafhankelijk} zijn, en
+dat $(X, Y)$ geen \omterm{def:b3:clt:gaussianvector}{Gaussische vector} is \emph{(bereken $\P(X
++ Y = 0)$)}.
+(c) Moraal: \cref{thm:b3:clt:gaussianvector}(2) eist
+gezamenlijke Gaussiciteit --- ``ongecorreleerde
+\omterm{def:b3:clt:gaussianvector}{Gaussischen}'' alleen bewijst niets.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:10}
+De Cauchywet heeft \omterm{ex:b3:lebesgue:gamma}{dichtheid} $\frac1{\pi(1 + x^2)}$.
+(a) Toon dat haar \omterm{def:b3:clt:cf}{karakteristieke functie} $\eu^{-\abs\xi}$
+is (\cref{exo:b3:fouriertransform:1} en inversie).
+(b) Toon dat als $X_1, \dots, X_n$ i.i.d.\ Cauchy zijn,
+dan is $\frac{S_n}n$ opnieuw Cauchy --- dezelfde wet: het
+gemiddelde concentreert nooit.
+(c) Verzoen met de wetten van de grote aantallen en de CLT:
+welke hypothesen falen? (Bereken $\E\abs{X_1}$.)
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:11}
+(Stabiele wetten in kiem) Zij $(X_n)$ i.i.d.\ standaard
+Cauchy (\cref{exo:b3:clt:10}).
+(a) Toon dat voor alle $a, b > 0$, $aX_1 + bX_2$ de wet
+heeft van $(a + b)X_1$: de Cauchyfamilie is \emph{strikt
+\omterm{def:b3:ode:stability}{stabiel}} van \omterm{def:b3:holomorphic:index}{index} $1$.
+(b) Toon dat de Gaussische familie strikt \omterm{def:b3:ode:stability}{stabiel} is van
+\omterm{def:b3:holomorphic:index}{index} $2$: $aX_1 + bX_2 \sim \sqrt{a^2 + b^2}\,X_1$ voor
+$X_i$ i.i.d.\ $\mathcal N(0,1)$.
+(c) Leg uit, via \omterm{def:b3:clt:cf}{karakteristieke functies} van de vorm
+$\eu^{-c\abs\xi^\alpha}$, waarom index-$\alpha$-stabiliteit
+de normalisatie $n^{1/\alpha}$ voor sommen dwingt, en wat
+dit zegt over de attractiebekkens van de CLT: welke i.i.d.\
+sommen kunnen, na affiene normalisatie, naar een Cauchywet
+convergeren in plaats van een Gaussische?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:12}
+(De empirische verdelingsfunctie) Zij $(X_n)$ i.i.d.\ met
+verdelingsfunctie $F$, en $F_n(t) = \frac1n\#\{k \leq n :
+X_k \leq t\}$.
+(a) Fixeer $t$. Toon dat $n F_n(t) \sim \mathcal B(n,
+F(t))$, dat $F_n(t) \to F(t)$ b.z.\
+(\cref{thm:b3:probability:slln}), en dat
+\[
+\sqrt n\,\bigl(F_n(t) - F(t)\bigr) \Longrightarrow
+\mathcal N\bigl(0,\ F(t)(1 - F(t))\bigr) .
+\]
+(b) In welk $t$ is de asymptotische variantie \omterm{def:b3:rings:primemaximal}{maximaal}?
+Interpreteer: de mediaan is waar een empirische verdeling
+het moeilijkst vast te pinnen is.
+(c) Voor continue $F$, toon dat de wet van
+$\sup_t\abs{F_n(t) - F(t)}$ niet van $F$ afhangt
+\emph{(reduceer tot uniforme variabelen via
+\cref{exo:b3:probability:1})} --- het distributievrije
+wonder achter de Kolmogorov--Smirnov-toets; geen berekening
+van die wet wordt gevraagd.
+\end{exercise}
+
+\section{Probleem: het bewijs van Lindeberg van de CLT, met
+een ratio}
+
+\begin{problem}[{Weekendprobleem --- de
+vervangingsmethode}]\label{pb:b3:clt:1}
+Lindeberg (1922) bewees de centrale limietstelling met een
+idee van ontwapenende eenvoud: \emph{vervang de termen één
+voor één door \omterm{def:b3:clt:gaussianvector}{Gaussischen}} en beheers elke wissel met een
+Taylorontwikkeling. De methode heeft geen Fourieranalyse
+nodig, produceert een expliciete foutratio, en drijft
+vandaag de dag universaliteitsbewijzen doorheen de
+kansrekening. Zij $(X_i)$ i.i.d., gecentreerd, $\V(X_1) =
+1$, met $\beta = \E\abs{X_1}^3 < \infty$; zij $(N_i)$
+i.i.d.\ $\mathcal N(0,1)$, \omterm{def:b3:probability:independence}{onafhankelijk} van de $X_i$
+(bestaan: \cref{thm:b3:probability:existence}). Zet
+\[
+T_n = \frac{X_1 + \dots + X_n}{\sqrt n},
+\qquad
+G_n = \frac{N_1 + \dots + N_n}{\sqrt n} \sim \mathcal N(0,1).
+\]
+
+\medskip
+\noindent\textbf{Deel I --- De wisselidentiteit.} Fixeer $f
+\in \mathcal C^3_b(\R)$ (drie begrensde continue
+afgeleiden; $M_3 = \sup\abs{f'''}$). Voor $0 \leq i \leq n$
+definieer de hybride sommen
+\[
+H_i = \frac{X_1 + \dots + X_i + N_{i+1} + \dots +
+N_n}{\sqrt n},
+\]
+dus $H_n = T_n$ en $H_0 = G_n$.
+\begin{enumerate}
+  \item Schrijf $H_i = W_i + \frac{X_i}{\sqrt n}$ en
+        $H_{i-1} = W_i + \frac{N_i}{\sqrt n}$ met $W_i =
+        \frac{1}{\sqrt n}\bigl(\sum_{j<i}X_j +
+        \sum_{j>i}N_j\bigr)$, en merk op dat $W_i$
+        \omterm{def:b3:probability:independence}{onafhankelijk} is van het paar $(X_i, N_i)$.
+        Rechtvaardig.
+  \item Taylor met integraal- of Lagrangerest: voor alle
+        reële $w, h$:
+        \[
+        \Bigl|f(w + h) - f(w) - f'(w)h -
+        \tfrac12f''(w)h^2\Bigr| \leq
+        \frac{M_3\,\abs h^3}{6} .
+        \]
+  \item Pas vraag 2 tweemaal toe ($h = \frac{X_i}{\sqrt n}$
+        en $h = \frac{N_i}{\sqrt n}$ in $w = W_i$), neem
+        \omterm{def:b3:probability:space}{verwachtingen}, en gebruik \omterm{def:b3:probability:independence}{onafhankelijkheid} plus
+        de matching van de eerste twee momenten van $X_i$
+        en $N_i$ om te tonen
+        \[
+        \bigl|\E f(H_i) - \E f(H_{i-1})\bigr|
+        \leq \frac{M_3}{6}\cdot
+        \frac{\beta + \gamma}{n^{3/2}},
+        \qquad \gamma = \E\abs{N_1}^3 =
+        \frac{2\sqrt2}{\sqrt\pi} .
+        \]
+  \item Telescopeer over $i$ en concludeer de
+        \emph{Lindeberg-grens}:
+        \[
+        \bigl|\E f(T_n) - \E f(G_n)\bigr| \leq
+        \frac{M_3\,(\beta + \gamma)}{6\,\sqrt n} .
+        \]
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel II --- Van gladde $f$ naar de CLT.}
+\begin{enumerate}[resume]
+  \item Toon dat $\E f(T_n) \to \E f(N)$ voor elke $f \in
+        \mathcal C_b^3$, en upgrade naar alle begrensde
+        continue $f$: gegeven zo'n $f$ en $\varepsilon$,
+        construeer $f_\varepsilon \in \mathcal C^3_b$ met
+        $\norm{f - f_\varepsilon}_\infty \leq \varepsilon$
+        op een groot interval --- bv.\ convolueer $f$ met
+        een $\mathcal C^\infty$-bult
+        (\cref{thm:b3:lp:regularization}) --- en behandel de
+        staarten met spanning ($\V(T_n) = 1$ en Chebyshev).
+        Concludeer $T_n \Rightarrow \mathcal N(0, 1)$: de
+        centrale limietstelling, opnieuw bewezen.
+  \item Waar gebruikte het bewijs dat de $X_i$
+        \emph{identiek} verdeeld zijn? Toon dat dit amper
+        het geval was: formuleer en bewijs de versie voor
+        onafhankelijke, gecentreerde, niet-identieke $X_i$
+        met $\sum_i\V(X_i) = s_n^2$ en derde momenten,
+        met fout
+        $\frac{M_3}{6s_n^3}\sum_i\bigl(\E\abs{X_i}^3
+        + \V(X_i)^{3/2}\gamma\bigr)$ --- de ware stelling
+        van Lindeberg in haar Lyapunovvorm.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel III --- Kwantitatieve dividenden.}
+\begin{enumerate}[resume]
+  \item (Verdelingsfuncties) Zij $t \in \R$ en benader
+        $\mathbf 1_{\intoc{-\infty}t}$ van boven en onder
+        door $\mathcal C^3_b$-hellingen van breedte $\delta$
+        (construeer ze, met $M_3 = O(\delta^{-3})$).
+        Combinerend met Deel I, leid de tweetermengrens af
+        \[
+        \sup_{t\in\R}\,\bigl|\P(T_n \leq t) -
+        \Phi(t)\bigr| \;\leq\;
+        \frac{C_1(\beta + \gamma)}{\delta^3\sqrt n} +
+        C_2\,\delta
+        \qquad (\text{elke } \delta > 0),
+        \]
+        met expliciete constanten (de $C_2\delta$-term
+        gebruikt dat $\Phi$ een \omterm{ex:b3:lebesgue:gamma}{dichtheid} begrensd door
+        $\frac1{\sqrt{2\pi}}$ heeft), en optimaliseer
+        $\delta \sim n^{-1/8}$ om een uniforme ratio van
+        orde $n^{-1/8}$ te krijgen.
+        (De optimale $n^{-1/2}$ --- Berry--Esseen ---
+        eist fijnere tools; het punt is een \emph{expliciete}
+        ratio uit elementaire wisseling.)
+  \item (De Moivre--Laplace, gekwantificeerd) Specialiseer
+        tot $X_i = 2B_i - 1$ (tekens van eerlijke munten):
+        vergelijk de conclusie met de lokale schatting van
+        \cref{pb:b3:product:1}, vraag 7 --- wat geeft elke
+        methode wat de andere niet geeft?
+  \item (Universaliteit) Leg in een alinea uit waarom de
+        vervangingsmethode meer toont dan de CLT: elke
+        statistiek van de vorm $\E f(\text{som})$ met $f$
+        glad is, op orde $n^{-1/2}$, ongevoelig voor de
+        \emph{gehele wet} van de termen voorbij haar eerste
+        twee momenten --- het ``invariantiebeginsel'' dat
+        moderne universaliteitsresultaten (toevalsmatrices,
+        toevalspolynomen) onderbouwt, waarvan de CLT de
+        eerste instantie is.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel IV --- Gladmaking, verder: betere
+ratio's.} Het verlies van $n^{-1/2}$ (gladde $f$) naar
+$n^{-1/8}$ (verdelingsfuncties) kwam van het in sup-norm
+belasten van $f'''$. De hybriden kunnen een deel herstellen:
+zij bevatten Gaussische termen, en \omterm{def:b3:clt:gaussianvector}{Gaussischen}
+\emph{gladden}.
+\begin{enumerate}[resume]
+  \item (Een verborgen Gaussische) Voor $1 \leq i \leq n -
+        1$, $h = \frac{X_i}{\sqrt n}$ of $\frac{N_i}{\sqrt
+        n}$, en $\theta \in \intcc01$, schrijf $W_i +
+        \theta h = A + Z$ met $Z = \frac{N_{i+1} + \dots +
+        N_n}{\sqrt n}$. Toon dat $Z \sim \mathcal
+        N\bigl(0, \frac{n-i}n\bigr)$ \omterm{def:b3:probability:independence}{onafhankelijk} is van
+        het paar $(A, h)$, en leid af, voor elke continue
+        $g \in L^1(\R)$,
+        \[
+        \E\bigl[\abs h^3\,\abs{g(W_i + \theta h)}\bigr]
+        \;\leq\; \sqrt{\frac{n}{2\pi(n - i)}}\;
+        \norm{g}_{L^1}\;\E\abs h^3 .
+        \]
+  \item Combineer vraag 10 met de integraalvorm van de
+        Taylorrest,
+        \[
+        f(w + h) = f(w) + f'(w)h + \tfrac12f''(w)h^2 +
+        \int_0^1\frac{(1 - \theta)^2}2\,f'''(w + \theta
+        h)\,h^3\,\dd\theta,
+        \]
+        om vragen 3--4 opnieuw te doen: voor $f \in
+        \mathcal C^3_b$ met bovendien $f''' \in L^1(\R)$,
+        \[
+        \bigl|\E f(T_n) - \E f(G_n)\bigr| \leq
+        \frac{\beta + \gamma}{3\sqrt{2\pi}}\cdot
+        \frac{\norm{f'''}_{L^1}}{\sqrt n} +
+        \frac{M_3(\beta + \gamma)}{6\,n^{3/2}}
+        \]
+        \emph{(vraag 10 behandelt de wissels $i \leq n -
+        1$ --- gebruik $\sum_{m=1}^{n-1}m^{-1/2} \leq
+        2\sqrt n$ --- en de ruwe grens van vraag 3 behandelt
+        de laatste)}. Controleer dat de hellingen van
+        vraag 7 voldoen aan $\norm{\psi_\delta'''}_{L^1} =
+        K_1\delta^{-2}$ terwijl $M_3 = K\delta^{-3}$,
+        voer ze in, en optimaliseer $\delta$: de uniforme
+        verdelingsfunctieratio verbetert tot $O(n^{-1/6})$.
+  \item (Nog een moment matchen) Neem bovendien aan $\E
+        X_1^3 = 0$ en $\beta_4 = \E X_1^4 < \infty$.
+        Bereken $\E N_1^3$ en $\E N_1^4$, ontwikkel tot
+        orde vier, en bewijs langs dezelfde lijnen dat de
+        verdelingsfunctieratio $O(n^{-1/4})$ wordt
+        \emph{(nu $\norm{\psi_\delta^{(4)}}_{L^1} =
+        K_2\delta^{-3}$ en $M_4 = K'\delta^{-4}$; kies
+        $\delta = n^{-1/4}$)}.
+  \item (De obstructie) Stel dat de eerste $k$ momenten van
+        $X_1$ met de Gaussische overeenkomen ($k = 2$
+        altijd; $k = 3$ precies als $\E X_1^3 = 0$; $k \geq
+        4$ in wezen nooit, want $\E N_1^4 = 3$). Verifieer
+        dat het schema van vragen 10--12 de
+        verdelingsfunctieratio $n^{-(k-1)/(2k+2)}$
+        levert, door $\delta^{-k}n^{-(k-1)/2}$ tegen
+        $\delta$ te balanceren, en observeer dat de
+        exponent de Berry--Esseen-waarde $\frac12$ alleen
+        nadert als $k \to \infty$. Leg in enkele zinnen
+        uit waarom de wisselmethode verzadigt: elke wissel
+        wordt in absolute waarde belast, terwijl de
+        Fourierroute (Esseen-gladmakingsongelijkheid) de
+        oscillatie van het verschil van \omterm{def:b3:clt:cf}{karakteristieke
+        functies} uitbuit en $C\beta n^{-1/2}$ met slechts
+        drie momenten bereikt.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel V --- Twee dimensies: de
+multidimensionale CLT, door wisselen.} Laat nu de $X_i$
+i.i.d.\ gecentreerde stochastische \emph{vectoren} van
+$\R^2$ zijn met covariantiematrix $\Sigma$ en $\beta' =
+\E\norm{X_1}^3 < \infty$ (Euclidische norm).
+\begin{enumerate}[resume]
+  \item (\omterm{def:b3:clt:gaussianvector}{Gaussische vectoren}, op orde) Diagonaliseer
+        $\Sigma = PDP^{\mathsf T}$
+        (\cref{exo:b3:submanifolds:8}) en zet $C =
+        P\sqrt DP^{\mathsf T}$. Voor $Z = (Z^1, Z^2)$ een
+        paar onafhankelijke \omterm{def:b3:clt:gaussianvector}{standaard-Gaussischen}
+        (\cref{thm:b3:probability:existence}), toon dat $N
+        = CZ$ een \omterm{def:b3:clt:gaussianvector}{Gaussische vector} is
+        (\cref{def:b3:clt:gaussianvector}) van gemiddelde
+        $0$, covarianties $\Sigma$, met $\gamma' =
+        \E\norm N^3 < \infty$; en dat $G_n = \frac{N_1 +
+        \dots + N_n}{\sqrt n}$ wet $\mathcal N(0, \Sigma)$
+        heeft \emph{exact} voor i.i.d.\ kopieën $N_i$.
+  \item (Taylor in twee variabelen) Voor $f \colon \R^2
+        \to \R$ van klasse $\mathcal C^3$ met $M_3 =
+        \max_{\abs\alpha = 3}\sup\abs{\partial^\alpha f} <
+        \infty$, bewijs
+        \[
+        \Bigl|f(w + h) - f(w) - \langle\nabla f(w),
+        h\rangle - \tfrac12\langle h, D^2f(w)\,h\rangle
+        \Bigr| \leq \frac{M_3}6\,\bigl(\abs{h_1} +
+        \abs{h_2}\bigr)^3 \leq \frac{\sqrt2\,M_3}3\,
+        \norm h^3
+        \]
+        \emph{(bestudeer $t \mapsto f(w + th)$ op
+        $\intcc01$)}.
+  \item (De CLT in $\R^2$) Voer het vervangingsschema uit
+        op de vectorhybriden $H_i$: toon dat de
+        eerste- en tweede-ordetermen uitvallen
+        (gemiddelden en covarianties matchen), telescopeer,
+        en upgrade zoals in vraag 5 (spanning uit
+        $\E\norm{T_n}^2 = \operatorname{tr}\Sigma$;
+        mollificatie nu in $\R^2$,
+        \cref{thm:b3:lp:regularization}) om te concluderen:
+        voor elke begrensde continue $f \colon \R^2 \to
+        \R$,
+        \[
+        \E\,f\Bigl(\frac{X_1 + \dots + X_n}{\sqrt n}\Bigr)
+        \longrightarrow \E\,f(N), \qquad N \sim \mathcal
+        N(0, \Sigma) :
+        \]
+        \cref{thm:b3:clt:multiclt} in dimensie $2$, met een
+        ratio voor gladde $f$ en zonder Fourieranalyse.
+  \item (Cramér--Wold, en een gezamenlijke fluctuatie) Leid
+        af dat $\langle t, \frac{S_n}{\sqrt n}\rangle
+        \Rightarrow \mathcal N(0, t^{\mathsf T}\Sigma t)$
+        voor elke vaste $t \in \R^2$. Toepassing: voor
+        i.i.d.\ reële $(\xi_i)$, gecentreerd, $\E\xi_1^2 =
+        1$, $\E\xi_1^6 < \infty$ (zodat Deel V op $V_i =
+        (\xi_i, \xi_i^2 - 1)$ toepast), toon
+        \[
+        \frac1{\sqrt n}\Bigl(\sum_{i\leq n}\xi_i,\
+        \sum_{i\leq n}(\xi_i^2 - 1)\Bigr) \Longrightarrow
+        \mathcal N\Bigl(0, \begin{pmatrix} 1 & \E\xi_1^3\\
+        \E\xi_1^3 & \E\xi_1^4 - 1\end{pmatrix}\Bigr) :
+        \]
+        empirisch gemiddelde en empirisch tweede moment
+        fluctuëren gezamenlijk \omterm{def:b3:clt:gaussianvector}{Gaussisch} ---
+        \omterm{def:b3:probability:independence}{onafhankelijk} in de limiet dan en slechts dan als
+        $\E\xi_1^3 = 0$ (\cref{thm:b3:clt:gaussianvector}).
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel VI --- De deltamethode.}
+\begin{enumerate}[resume]
+  \item Zij $(\hat\theta_n)$ \omterm{def:b3:probability:space}{stochastische variabelen} met
+        $\sqrt n(\hat\theta_n - \theta) \Rightarrow
+        \mathcal N(0, \sigma^2)$ voor een reële parameter
+        $\theta$, en zij $g$ differentieerbaar in
+        $\theta$. Bewijs de \emph{deltamethode}:
+        \[
+        \sqrt n\bigl(g(\hat\theta_n) - g(\theta)\bigr)
+        \Longrightarrow \mathcal N\bigl(0,
+        g'(\theta)^2\sigma^2\bigr)
+        \]
+        \emph{(schrijf $g(x) - g(\theta) = (g'(\theta) +
+        \eta(x))(x - \theta)$ met $\eta \to 0$ in
+        $\theta$; toon $\hat\theta_n \to \theta$, dan
+        $\eta(\hat\theta_n) \to 0$, in kans; sluit af met
+        Slutsky, \cref{exo:b3:clt:8}, en
+        \cref{exo:b3:clt:4}(b))}.
+  \item Toepassingen. (a) Voor i.i.d.\ reële $(\xi_i)$ met
+        gemiddelde $\mu$ en variantie $\sigma^2$, en $\bar
+        X_n = \frac1n\sum_{i\leq n}\xi_i$: toon $\sqrt
+        n(\bar X_n^2 - \mu^2) \Rightarrow \mathcal N(0,
+        4\mu^2\sigma^2)$ als $\mu \neq 0$, en dat voor $\mu
+        = 0$ de juiste uitspraak op een andere schaal
+        leeft: $n\bar X_n^2 \Rightarrow \sigma^2N^2$ met
+        $N \sim \mathcal N(0,1)$ (identificeer de
+        verdelingsfunctie van de limiet). (b)
+        (Variantstabilisatie) Voor $\hat p_n$ de
+        succesfrequentie van een $\mathcal B(1, p)$-sample,
+        $p \in \intoo01$: toon dat $g(p) =
+        \arcsin\sqrt p$ voldoet aan
+        \[
+        \sqrt n\,\bigl(g(\hat p_n) - g(p)\bigr)
+        \Longrightarrow \mathcal N\Bigl(0, \frac14\Bigr)
+        \]
+        \emph{ongeacht} $p$ --- een asymptotische
+        foutbalk vrij van de onbekende parameter;
+        vergelijk met \cref{ex:b3:clt:confidence}.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel VII --- Poisson, met dezelfde methode:
+de stelling van Le Cam.} Vervanging kent een tweede
+universaliteitsklasse: sommen van veel onafhankelijke
+\emph{zeldzame} gebeurtenissen. Voor wetten op $\N$ is de
+juiste afstand de \emph{totale variatie},
+\[
+d_{\mathrm{TV}}(\mu, \nu) = \sup_{A\subseteq\N}\,
+\abs{\mu(A) - \nu(A)} .
+\]
+\begin{enumerate}[resume]
+  \item Toon dat $d_{\mathrm{TV}}(\mu, \nu) =
+        \frac12\sum_{k\geq0}\abs{\mu(\{k\}) -
+        \nu(\{k\})}$, en bewijs de koppelingsgrens: voor
+        \emph{elk} paar $(X, Y)$ van \omterm{def:b3:probability:space}{stochastische
+        variabelen} met wetten $\mu$ en $\nu$ op dezelfde
+        ruimte, $d_{\mathrm{TV}}(\mu, \nu) \leq \P(X \neq
+        Y)$.
+  \item Bereken exact, voor $p \in \intoo01$:
+        \[
+        d_{\mathrm{TV}}\bigl(\mathcal B(1, p), \mathcal
+        P(p)\bigr) = p\bigl(1 - \eu^{-p}\bigr) \leq p^2 .
+        \]
+  \item (Le Cam, door wisselen) Zij $X_i \sim \mathcal
+        B(1, p_i)$ en $Y_i \sim \mathcal P(p_i)$, de $2n$
+        variabelen \omterm{def:b3:probability:independence}{onafhankelijk}; $S = X_1 + \dots + X_n$,
+        en herinner $Y_1 + \dots + Y_n \sim \mathcal
+        P(\lambda)$ met $\lambda = \sum_ip_i$
+        (\cref{exo:b3:clt:1}). Wissel één coördinaat tegelijk
+        in de gehele hybriden $H_i = Y_1 + \dots + Y_i +
+        X_{i+1} + \dots + X_n$: toon, voor elke $A
+        \subseteq \N$,
+        \[
+        \abs{\P(H_{i-1} \in A) - \P(H_i \in A)} \leq
+        d_{\mathrm{TV}}\bigl(\mathcal B(1, p_i), \mathcal
+        P(p_i)\bigr),
+        \]
+        en concludeer de \emph{ongelijkheid van Le Cam}:
+        \[
+        d_{\mathrm{TV}}\bigl(\text{wet van } S,\ \mathcal
+        P(\lambda)\bigr) \leq \sum_{i=1}^np_i^2 .
+        \]
+  \item Dividenden. (a) Voor $p_i = \frac\lambda n$: de
+        grens is $\frac{\lambda^2}n$ --- de wet van
+        zeldzame gebeurtenissen (\cref{exo:b3:clt:5})
+        opgewaardeerd tot een expliciete ratio, uniform
+        over alle gebeurtenissen, en ook geldig voor
+        ongelijke $p_i$. (b) $500$ brieven worden
+        bezorgd, elk verdwaalt \omterm{def:b3:probability:independence}{onafhankelijk} met kans
+        $\frac1{500}$: begrens de fout van het Poissonmodel
+        van parameter $1$, en schat de kans dat geen brief
+        verdwaalt. (c) Sluit het probleem: vergelijk de
+        twee universaliteitsklassen hier ontmoet ---
+        \omterm{def:b3:clt:gaussianvector}{Gaussisch} (veel kleine uitgespreide bijdragen;
+        twee momenten gematcht; Taylor) en Poisson (veel
+        zeldzame bijdragen; één gemiddelde gematcht; een
+        exacte totale-variatiekoppeling) --- en de ene
+        vervangingsmethode achter beide.
+
+  \item (Relatieve fout en de logtransformatie) Zij $(X_n)$
+        i.i.d., positief, gemiddelde $\mu > 0$, variantie
+        $\sigma^2$, en $\bar X_n$ het empirisch
+        gemiddelde. Toon met de deltamethode dat
+        \[
+        \sqrt n\,\bigl(\ln\bar X_n - \ln\mu\bigr)
+        \Longrightarrow
+        \mathcal N\Bigl(0,\ \frac{\sigma^2}{\mu^2}\Bigr) :
+        \]
+        de asymptotische parameter van $\ln\bar X_n$ is de
+        \emph{variatiecoëfficiënt} $\sigma/\mu$ ---
+        relatieve, schaalvrije fout. Leid een
+        $95\%$-betrouwbaarheidsinterval voor $\mu$ af van
+        de multiplicatieve vorm $\bar
+        X_n\cdot\eu^{\pm1{,}96\,\sigma/(\mu\sqrt n)}$, en
+        leg uit wanneer het de voorkeur heeft boven het
+        additieve.
+  \item (Het derde moment stuurt de fout) Voor $X \sim$
+        Bernoulli($p$) gecentreerd, bereken $\E\bigl[(X -
+        p)^3\bigr] = p(1-p)(1-2p)$. Met de analyse van
+        Deel IV (de wisselfout wordt gestuurd door derde
+        momenten), leg uit waarom de normale benadering van
+        $\mathcal B(n, p)$ asymmetrisch is voor $p \neq
+        \frac12$ --- overshoot aan de ene kant, undershoot
+        aan de andere --- en waarom $p = \frac12$ geniet
+        van de snellere gematchte-momentenratio. Verifieer
+        het teken van de scheefheid numeriek op $\mathcal
+        B(20, 0{,}1)$ tegen $\mathcal N(2, 1{,}8)$:
+        vergelijk $\P(S = 0) = 0{,}9^{20}$ met de
+        Gaussische massa van $\intoo{-\infty}{0{,}5}$.
+\end{enumerate}
+\end{problem}

@@ -12,7 +12,8 @@ volumes also exist in full French and Dutch translations (`*_fr.tex` /
 middle, and high school books (Grades 1–12, `parts/grade-N/{fr,nl}/`) and,
 of the university books, **Book 3 (University Year 1)** in both FR and NL
 (`parts/bachelor-1/{fr,nl}/`) and **Book 4 (University Year 2)** in both FR
-and NL (`parts/bachelor-2/{fr,nl}/`). Book 5 FR/NL are in progress. Everything
+and NL (`parts/bachelor-2/{fr,nl}/`), and **Book 5 (University Year 3)** in
+both FR and NL (`parts/bachelor-3/{fr,nl}/`). Everything
 is written in English for an international audience; the FR/NL editions
 translate that content, keeping identical labels, order, and structure.
 `CONTRIBUTING.md` holds the authoritative style/structure conventions;
@@ -93,6 +94,7 @@ Reference implementations:
 - `one_math_book_2_high_school_fr.tex` / `_nl.tex`
 - `one_math_book_3_university_year_1_fr.tex` / `_nl.tex` (+ `book3_{fr,nl}.py`)
 - `one_math_book_4_university_year_2_fr.tex` / `_nl.tex` (+ `book4_{fr,nl}.py`)
+- `one_math_book_5_university_year_3_fr.tex` / `_nl.tex` (+ `book5_{fr,nl}.py`)
 
 PDFs: `build/one_math_book_<N>_<slug>[_<lang>].pdf`.
 
