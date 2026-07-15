@@ -1,0 +1,793 @@
+\chapter{Determinanten en lineaire stelsels}\label{ch:b1:det}
+
+De determinant vat in één scalair het antwoord samen op de vraag
+``vormen deze $n$ vectoren een \omterm{def:b1:vspaces:free}{basis}?'' --- en meet, meetkundig, het
+volume dat ze opspannen. We karakteriseren hem door zijn eigenschappen
+(multilineair, alternerend, genormaliseerd), berekenen hem in dimensie
+$2$ en $3$ en door \omterm{thm:b1:det:cofactor}{cofactorontwikkeling} in het algemene geval, en zetten
+hem aan het werk op lineaire stelsels, naast het alomvattende algoritme:
+\omterm{met:b1:det:gauss}{Gauss-eliminatie}.
+
+\section{De determinant}
+
+\begin{theorem}[Karakterisering]\label{thm:b1:det:def}
+Er is precies één \omterm{def:b1:logic:map}{afbeelding} $\det \colon \mathcal{M}_n(K) \to K$,
+beschouwd als functie van de $n$ kolommen, die
+\begin{enumerate}
+  \item \emph{\omterm{def:b1:linmaps:def}{lineair} in elke kolom} is (de andere vast);
+  \item \emph{alternerend} is: het verwisselen van twee kolommen
+        verandert het teken (dus twee gelijke kolommen geven $0$);
+  \item \emph{genormaliseerd} is: $\det I_n = 1$.
+\end{enumerate}
+Voor $n = 2$ en $3$:\index{determinant}
+\[
+\begin{vmatrix} a & b\\ c & d\end{vmatrix} = ad - bc,
+\qquad
+\begin{vmatrix} a & b & c\\ d & e & f\\ g & h & i\end{vmatrix}
+= aei + bfg + cdh - ceg - bdi - afh
+\]
+(de $3 \times 3$-regel van Sarrus: producten van dalende diagonalen
+min die van stijgende).
+\end{theorem}
+\admitted
+
+\begin{remark}
+Voor $n = 2$: ontwikkelen via bilineariteit op de canonieke kolommen
+geeft de formule, die omgekeerd aan de axioma's voldoet --- een volledig
+bewijs; $n = 3$ is identiek met meer termen. Het algemene geval
+(bestaan via de som over \omterm{def:b1:counting:objects}{permutaties}, uniciteit door dezelfde
+ontwikkeling) vereist de signatuur van een \omterm{def:b1:counting:objects}{permutatie} en wordt
+uitgesteld naar het tweede jaar; we gebruiken de axioma's en de
+gevolgen hieronder vrijelijk.
+
+De volledige ontwikkeling voor $n = 2$, want zij is het sjabloon: met
+kolommen $C_1 = a\,e_1 + c\,e_2$ en $C_2 = b\,e_1 + d\,e_2$ geeft
+bilineariteit
+\[
+\det(C_1, C_2) = ab\det(e_1, e_1) + ad\det(e_1, e_2)
++ cb\det(e_2, e_1) + cd\det(e_2, e_2),
+\]
+en alternatie doodt de herhaalde paren terwijl ze
+$\det(e_2, e_1) = -\det(e_1, e_2)$ omklapt: de hele \omterm{def:b1:logic:map}{afbeelding} valt
+samen tot $(ad - bc)\det(e_1, e_2) = ad - bc$ door normalisatie.
+Uniciteit is zichtbaar in de berekening zelf --- de axioma's lieten bij
+geen enkele stap een keuze --- en dit is precies het geschaalde
+uniciteitsfeit dat gebruikt wordt in het bewijs van de productregel
+hieronder.
+\end{remark}
+
+\begin{theorem}[Eigenschappen]\label{thm:b1:det:props}
+Voor $A, B \in \mathcal{M}_n(K)$:
+\begin{enumerate}
+  \item een veelvoud van een andere kolom bij een kolom optellen
+        verandert de determinant niet; een kolom met $\lambda$
+        vermenigvuldigen vermenigvuldigt hem met $\lambda$ (dus
+        $\det(\lambda A) = \lambda^n \det A$);
+  \item $\det(AB) = \det A\, \det B$;
+  \item $A$ is inverteerbaar $\iff$ $\det A \neq 0$ $\iff$ de kolommen
+        vormen een \omterm{def:b1:vspaces:free}{basis} van $K^n$; en dan is $\det(A^{-1}) = (\det
+        A)^{-1}$;
+  \item $\det(A^{\mathsf T}) = \det A$ --- dus elke kolomregel is ook
+        een rijregel;
+  \item de determinant van een driehoeksmatrix is het product van zijn
+        diagonaalelementen.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) Door lineariteit is $\det(\dots, C_i + \lambda C_j, \dots) = \det A +
+\lambda\det(\dots, C_j, \dots)$ waarbij de tweede determinant twee
+gelijke kolommen heeft: nul.
+
+(2) Fixeer $A$ en beschouw $\varphi(B) = \det(AB)$ als functie van de
+kolommen van $B$: aangezien $AB$ de kolommen $AB_j$ heeft, is $\varphi$
+multilineair en alternerend in de $B_j$. We aanvaarden, met
+\cref{thm:b1:det:def}, de uniciteitsuitspraak ervan in geschaalde vorm:
+\emph{elke} multilineaire alternerende \omterm{def:b1:logic:map}{afbeelding} $\varphi$ van de
+kolommen is gelijk aan $\varphi(I_n) \cdot \det$. Hier is
+$\varphi(I_n) = \det A$, dus $\det(AB) = \det A \cdot \det B$.
+
+(3) Als $A$ inverteerbaar is: $\det A\,\det A^{-1} = \det I = 1$, dus
+$\det A \neq 0$ en de inverseformule geldt. Als $A$ niet inverteerbaar
+is, zijn zijn kolommen afhankelijk (\cref{cor:b1:linmaps:samedim} en
+\cref{prop:b1:linmaps:basis}); één kolom uitdrukken via de andere en
+ontwikkelen via lineariteit laat determinanten met twee gelijke kolommen
+over: $\det A = 0$. De basisuitspraak is
+\cref{prop:b1:findim:twoofthree}.
+
+(4) Aanvaard met de algemene constructie (ze is onmiddellijk op de
+permutatieformule); we noteren ze om \omterm{met:b1:matrices:gauss}{rij-operaties} te gebruiken.
+
+(5) Als een diagonaalelement verdwijnt, zijn de eerste $k$ kolommen
+afhankelijk voor zekere $k$ (rangbeschouwingen) en $\det = 0 = $
+product. Anders: maak elke kolom links-en-onder leeg door operaties van
+type (1) --- mogelijk in de driehoeksvorm --- tot de diagonaalmatrix,
+waarvan de determinant het product van de elementen is door
+multilineariteit vanuit $I_n$.
+\end{proof}
+
+\begin{example}[De regels, gecontroleerd op getallen]
+\label{ex:b1:det:rulescheck}
+Neem $A = \begin{pmatrix} 1 & 2\\ 3 & 4\end{pmatrix}$ ($\det A =
+-2$) en $B = \begin{pmatrix} 0 & 1\\ 1 & 1\end{pmatrix}$ ($\det
+B = -1$). Dan
+\[
+AB = \begin{pmatrix} 2 & 3\\ 4 & 7\end{pmatrix},
+\quad \det(AB) = 14 - 12 = 2 = (-2)(-1) ;
+\qquad
+\det(A^{\mathsf T}) = \begin{vmatrix} 1 & 3\\ 2 & 4
+\end{vmatrix} = -2 = \det A .
+\]
+Multiplicativiteit en transponeerinvariantie bevestigd --- terwijl de
+\emph{valse} additiviteit faalt op hetzelfde paar:
+\[
+\det(A + B) = \begin{vmatrix} 1 & 3\\ 4 & 5\end{vmatrix} = -7
+\neq \det A + \det B = -3 .
+\]
+Dertig seconden rekenwerk van dit soort, na elke aangeroepen
+determinantidentiteit, is de goedkoopste foutverzekering die er is.
+\end{example}
+
+\begin{example}[Determinanten als oppervlakten]
+\label{ex:b1:det:area}
+Het parallellogram opgespannen door $u = (2, 0)$ en $v = (1, 3)$ heeft
+\omterm{def:b1:vspaces:free}{basis} $2$ en hoogte $3$: oppervlakte $6$. En
+\[
+\begin{vmatrix} 2 & 1\\ 0 & 3\end{vmatrix} = 6 :
+\]
+de $2\times2$-determinant \emph{is} de getekende oppervlakte van het
+parallellogram van zijn kolommen. De axioma's vertellen de meetkunde
+opnieuw: een veelvoud van de ene kolom bij de andere optellen is een
+\emph{scheefstelling}, die het parallellogram evenwijdig aan een zijde
+verschuift zonder \omterm{def:b1:vspaces:free}{basis} of hoogte te veranderen (operatie~(1) van
+\cref{thm:b1:det:props}); een kolom schalen schaalt de oppervlakte; de
+kolommen verwisselen keert de oriëntatie om, vandaar het teken,
+$\det(v, u) = -6$. In $\R^3$ geeft dezelfde lezing getekende volumes, en
+$\abs{\det}$ wordt de universele volumeschalingsfactor van \omterm{def:b1:linmaps:def}{lineaire
+afbeeldingen} --- het feit achter de formule voor verandering van
+veranderlijken bij meervoudige integralen in het volume van Jaar~2.
+\end{example}
+
+\begin{theorem}[Cofactorontwikkeling]\label{thm:b1:det:cofactor}
+Zij $A \in \mathcal{M}_n(K)$ en $\Delta_{ij}$ de determinant van $A$ met
+rij $i$ en kolom $j$ geschrapt. Dan geldt, voor elke vaste kolom $j$ (of
+rij, door transpositie):\index{cofactorontwikkeling}
+\[
+\det A = \sum_{i=1}^{n} (-1)^{i+j}\, a_{ij}\, \Delta_{ij} .
+\]
+\end{theorem}
+\admitted
+
+\begin{example}\label{ex:b1:det:cofactor}
+Ontwikkelen langs de eerste kolom:
+\[
+\begin{vmatrix}
+2 & 1 & 0\\
+1 & 2 & 1\\
+0 & 1 & 2
+\end{vmatrix}
+= 2\begin{vmatrix} 2 & 1\\ 1 & 2\end{vmatrix}
+- 1\begin{vmatrix} 1 & 0\\ 1 & 2\end{vmatrix}
+= 2 \times 3 - 2 = 4 .
+\]
+Strategie: maak eerst nullen (rij-/kolomoperaties), ontwikkel dan langs
+de leegste lijn.
+\end{example}
+
+\begin{example}[De cofactorinverse, eens met de hand]
+\label{ex:b1:det:cofactorinverse}
+Voor $A = \begin{pmatrix} 1 & 1 & 0\\ 0 & 1 & 1\\ 1 & 0 &
+1\end{pmatrix}$: $\det A = 1(1) - 1(-1) + 0 = 2$. De negen cofactoren
+$(-1)^{i+j}\Delta_{ij}$ assembleren tot
+\[
+\operatorname{Com}(A) = \begin{pmatrix}
+1 & 1 & -1\\
+-1 & 1 & 1\\
+1 & -1 & 1
+\end{pmatrix},
+\qquad
+A^{-1} = \frac{1}{\det A}\operatorname{Com}(A)^{\mathsf T}
+= \frac12\begin{pmatrix}
+1 & -1 & 1\\
+1 & 1 & -1\\
+-1 & 1 & 1
+\end{pmatrix},
+\]
+de formule die geciteerd wordt in \cref{exo:b1:det:8}. Controleer één
+rij-kolompaar: (rij $1$ van $A$)(kolom $1$ van $A^{-1}$) $= \frac12(1 + 1
++ 0) = 1$, en tegen kolom $2$: $\frac12(-1 + 1 + 0) = 0$. Negen
+$2\times2$-determinanten voor één $3\times3$-inverse: al bij deze grootte
+is rijreductie (\cref{exo:b1:det:3}) goedkoper --- de waarde van de
+cofactorformule is theoretisch (geheeltalligheid in \cref{exo:b1:det:8},
+\omterm{def:b1:derivative:def}{afleidbaarheid} van de inverse in latere volumes), niet rekenkundig.
+\end{example}
+
+\begin{example}[De blokdriehoeksregel, in grootte $4$]
+\label{ex:b1:det:blocktriangular}
+Bewering: $\det\begin{pmatrix} M & N\\ 0 & P\end{pmatrix} = \det
+M\,\det P$ voor $2\times2$-blokken. Maak het $N$-blok leeg door
+kolomoperaties: geschikte combinaties van kolommen $1, 2$ bij kolommen
+$3, 4$ optellen verwijdert $N$ \emph{wanneer $M$ inverteerbaar is} (los
+$M\Lambda = -N$ op voor de combinatiecoëfficiënten $\Lambda$), wat
+$\det\begin{pmatrix} M & 0\\ 0 & P\end{pmatrix}$ overlaat; dan geeft
+\omterm{thm:b1:det:cofactor}{cofactorontwikkeling} langs de eerste kolom, tweemaal, $\det M\det P$ voor
+deze blokdiagonaalvorm. Als $M$ niet inverteerbaar is, zijn zijn kolommen
+afhankelijk, dus de eerste twee kolommen van de grote matrix zijn
+afhankelijk (hun onderste helften zijn nul): beide leden verdwijnen. De
+regel breidt uit naar willekeurige blokgroottes met hetzelfde
+tweegevallenargument --- en ze is de motor van \cref{exo:b1:det:10}.
+\end{example}
+
+\begin{example}[Een $4 \times 4$-determinant, strategisch]
+\label{ex:b1:det:fourbyfour}
+\[
+\Delta = \begin{vmatrix}
+1 & 2 & 3 & 4\\
+2 & 3 & 4 & 1\\
+3 & 4 & 1 & 2\\
+4 & 1 & 2 & 3
+\end{vmatrix}.
+\]
+Elke rij sommeert tot $10$: de operatie $C_1 \leftarrow C_1 + C_2 +
+C_3 + C_4$ maakt de eerste kolom constant, en $10$ afsplitsen laat enen
+over. Dan maakt $L_i \leftarrow L_i - L_1$ ($i \geq 2$) de eerste kolom
+leeg:
+\[
+\Delta = 10\begin{vmatrix}
+1 & 2 & 3 & 4\\
+0 & 1 & 1 & -3\\
+0 & 2 & -2 & -2\\
+0 & -1 & -1 & -1
+\end{vmatrix}
+= 10\begin{vmatrix}
+1 & 1 & -3\\
+2 & -2 & -2\\
+-1 & -1 & -1
+\end{vmatrix}
+= 10 \times 16 = 160,
+\]
+waarbij de laatste $3\times3$-determinant langs zijn eerste rij
+ontwikkelt: $1(2 - 2) - 1(-2 - 2) + (-3)(-2 - 2) = 0 + 4 + 12 = 16$.
+Moraal: één goedgekozen operatie (de constante rijsom opmerken) verslaat
+zestien cofactoren.
+\end{example}
+
+\begin{method}[Een determinantstrategie kiezen]
+\label{met:b1:det:strategy}
+Bekijk de matrix vóór je iets berekent.
+\begin{enumerate}
+  \item \emph{Constante rij- of kolomsommen}: tel alles op in één lijn,
+        splits de gemeenschappelijke waarde af
+        (\cref{ex:b1:det:fourbyfour}, \cref{exo:b1:det:7}).
+  \item \emph{Repetitieve structuur}: trek naburige rijen of kolommen
+        af om nullen te maken; trappatronen storten in naar
+        driehoeksvorm, waarvan de determinant op de diagonaal wordt
+        afgelezen.
+  \item \emph{Geïsoleerde nullen}: ontwikkel langs de leegste lijn
+        (\cref{ex:b1:det:cofactor}); recursieve families (tridiagonaal,
+        \cref{exo:b1:det:6}) leveren zo recurrenties op.
+  \item \emph{Een parameter}: de determinant is een \omterm{def:b1:poly:def}{veelterm} erin; vind
+        zijn wortels door de gedegenereerde waarden op te sporen
+        (gelijke rijen, evenredige kolommen), en leg de \omterm{def:b1:poly:def}{veelterm} dan
+        vast door graad en leidende coëfficiënt. Voor de matrix van
+        \cref{exo:b1:det:7}: $m = 1$ geeft drie gelijke rijen (rang $1$,
+        een dubbele wortel), $m = -2$ maakt dat de rijen tot nul
+        sommeren (nog een wortel); de determinant heeft graad $3$ in $m$
+        met leidende term $-m^3$ (het antidiagonaalproduct
+        $m\cdot m\cdot m$, waarvan het Sarrus-teken $-1$ is), dus moet
+        hij $-(m+2)(m-1)^2$ zijn --- geen ontwikkeling nodig, en de twee
+        methoden controleren elkaar.
+\end{enumerate}
+\end{method}
+
+\begin{example}[Vandermonde-determinant]\label{ex:b1:det:vandermonde}
+Voor scalairen $x_1, \dots, x_n$:\index{Vandermonde-determinant}
+\[
+V(x_1, \dots, x_n) =
+\begin{vmatrix}
+1 & x_1 & x_1^2 & \cdots & x_1^{n-1}\\
+1 & x_2 & x_2^2 & \cdots & x_2^{n-1}\\
+\vdots & & & & \vdots\\
+1 & x_n & x_n^2 & \cdots & x_n^{n-1}
+\end{vmatrix}
+= \prod_{1 \leq i < j \leq n} (x_j - x_i) .
+\]
+Bewijsschets (uitgewerkt in \cref{exo:b1:det:5}): kolomoperaties
+$C_k \leftarrow C_k - x_1 C_{k-1}$ van rechts maken de eerste rij leeg,
+en elke resterende rij afsplitsen reduceert tot $V(x_2, \dots, x_n)$.
+Niet-nul dan en slechts dan als de $x_i$ paarsgewijs verschillend zijn
+--- de determinant achter \omterm{thm:b1:poly:lagrange}{Lagrange-interpolatie}
+(\cref{ex:b1:linmaps:interpolation}).
+\end{example}
+
+\section{Lineaire stelsels}
+
+\begin{definition}\label{def:b1:det:system}
+Een \omterm{def:b1:linmaps:def}{lineair} stelsel\index{lineair stelsel} van $n$ vergelijkingen in $p$
+onbekenden is $AX = B$ met $A \in \mathcal{M}_{n,p}(K)$, $B \in K^n$; het
+is \emph{homogeen} wanneer $B = 0$. Zijn oplossingsverzameling is, indien
+niet leeg, $X_0 + \ker A$: een particuliere oplossing plus de algemene
+homogene oplossing --- een affiene \omterm{def:b1:vspaces:subspace}{deelruimte} van dimensie $p -
+\operatorname{rk} A$ (rang-nulliteit).
+\end{definition}
+
+\begin{example}[De affiene structuur, zichtbaar gemaakt]
+\label{ex:b1:det:affinestructure}
+Los op
+\[
+\begin{cases}
+x + y + z = 3\\
+x - y + 2z = 2 .
+\end{cases}
+\]
+De vergelijkingen aftrekken: $2y - z = 1$, dus $z = 2y - 1$ en $x =
+3 - y - z = 4 - 3y$. De oplossingen vormen de rechte
+\[
+(x, y, z) = (4,\ 0,\ -1) + y\,(-3,\ 1,\ 2)
+\qquad (y \in \R):
+\]
+de particuliere oplossing $X_0 = (4, 0, -1)$ (de keuze $y = 0$) plus de
+kernrechte $\ker A = \operatorname{Vect}(-3, 1, 2)$ van het bijbehorende
+homogene stelsel --- controleer: $(-3) + 1 + 2 = 0$ en
+$(-3) - 1 + 4 = 0$. Meetkundig snijden twee niet-evenwijdige vlakken van
+$\R^3$ elkaar langs een rechte, en de dimensietelling $p -
+\operatorname{rk} A = 3 - 2 = 1$ wist het al voor we iets oplosten. De
+particuliere oplossing veranderen (zeg $y = 1$: $X_0' = (1, 1, 1)$)
+verandert de beschrijving, niet de rechte: een affiene \omterm{def:b1:vspaces:subspace}{deelruimte} heeft
+vele oorsprongen en één richting.
+\end{example}
+
+\begin{theorem}[Vierkante stelsels van Cramer]\label{thm:b1:det:cramer}
+Als $A \in GL_n(K)$, heeft het stelsel $AX = B$ de unieke oplossing $X =
+A^{-1}B$, waarvan de \omterm{prop:b1:vspaces:coordinates}{coördinaten} zijn\index{regel van Cramer}
+\[
+x_j = \frac{\det A_j}{\det A},
+\qquad A_j = A \text{ met kolom } j \text{ vervangen door } B .
+\]
+\end{theorem}
+
+\begin{proof}
+Uniciteit en bestaan zijn de inverteerbaarheid. Voor de formule: schrijf
+$B = \sum_k x_k C_k$ (kolommen van $A$); dan geldt, door
+multilineariteit en alternatie,
+\[
+\det A_j = \det\Bigl(C_1, \dots, \sum_k x_k C_k, \dots, C_n\Bigr)
+= \sum_k x_k \det(C_1, \dots, C_k, \dots, C_n)
+= x_j \det A ,
+\]
+waarbij elke term behalve $k = j$ een herhaalde kolom heeft.
+\end{proof}
+
+\begin{example}[Cramer met een parameter, volledig]
+\label{ex:b1:det:cramerparameter}
+Los voor $m \in \R$ op
+\[
+\begin{cases}
+x + m y = 1\\
+m x + y = 2 .
+\end{cases}
+\]
+De determinant is $1 - m^2$. \emph{Generiek geval} $m \neq \pm1$: Cramer
+geeft
+\[
+x = \frac{\begin{vmatrix} 1 & m\\ 2 & 1\end{vmatrix}}{1 - m^2}
+= \frac{1 - 2m}{1 - m^2},
+\qquad
+y = \frac{\begin{vmatrix} 1 & 1\\ m & 2\end{vmatrix}}{1 - m^2}
+= \frac{2 - m}{1 - m^2},
+\]
+één zuivere oplossing voor elke toelaatbare $m$ (controleer bij $m = 0$:
+$(1, 2)$, duidelijk correct). \emph{Gedegenereerde gevallen}: bij $m = 1$
+luiden de vergelijkingen $x + y = 1$ en $x + y = 2$: onverenigbaar; bij
+$m = -1$ luiden ze $x - y = 1$ en $-x + y = 2$, d.w.z.\ $x - y = 1$ en
+$x - y = -2$: opnieuw onverenigbaar. Het verdwijnen van de determinant
+kondigt aan dat \emph{iets} degenereert, maar zegt nooit wat --- leeg of
+oneindig moet beslist worden door naar het rechterlid te kijken. Merk ook
+op hoe de formules hun eigen grenzen aangeven: als $m \to 1^{-}$, gaat
+$x = \frac{1 - 2m}{1 - m^2} \to -\infty$; het oplossingspunt loopt weg
+naarmate de twee rechten evenwijdig worden.
+\end{example}
+
+\begin{method}[Gauss-eliminatie op stelsels]\label{met:b1:det:gauss}
+Rijreduceer de uitgebreide matrix $(A \mid B)$ tot echelonvorm.\index{Gauss-eliminatie}
+\begin{enumerate}
+  \item Als een spil in de laatste kolom verschijnt (regel $0 = 1$):
+        geen oplossing.
+  \item Anders splitsen de onbekenden zich in \emph{spilonbekenden} en
+        \emph{vrije onbekenden} (parameters); achterwaartse substitutie
+        drukt de eerste uit in de tweede: de oplossingsverzameling is
+        een affiene \omterm{def:b1:vspaces:subspace}{deelruimte} van dimensie $=$ aantal vrije onbekenden.
+\end{enumerate}
+De formules van Cramer zijn voor theorie en kleine stelsels; eliminatie
+is het praktische algoritme.
+\end{method}
+
+\begin{example}[Een bespreking met parameter]\label{ex:b1:det:parameter}
+Beschouw voor $m \in \R$
+\[
+\begin{cases}
+x + y + mz = 1\\
+x + my + z = 1\\
+mx + y + z = 1 .
+\end{cases}
+\]
+De matrix heeft determinant $-(m+2)(m-1)^2$ (berekend in
+\cref{exo:b1:det:7} door alle kolommen bij de eerste op te tellen). Voor
+$m \neq 1, -2$: unieke oplossing $x = y = z = \frac{1}{m+2}$ (door
+symmetrie). Voor $m = 1$: één vergelijking driemaal herhaald, een vlak
+van oplossingen. Voor $m = -2$: de drie vergelijkingen optellen geeft
+$0 = 3$, geen oplossing.
+\end{example}
+
+\begin{remark}[Veelvoorkomende valkuilen]
+\label{rem:b1:det:pitfalls}
+\emph{De determinant is niet \omterm{def:b1:linmaps:def}{lineair} in de matrix}: $\det(A + B)
+\neq \det A + \det B$ (reeds $\det(I_2 + I_2) = 4 \neq 2$); hij is
+\omterm{def:b1:linmaps:def}{lineair} in elke \emph{kolom} afzonderlijk, wat iets heel anders is.
+\emph{Schalen}: $\det(\lambda A) = \lambda^n\det A$, niet
+$\lambda\det A$ --- elk van de $n$ kolommen wordt geschaald.
+\emph{\omterm{met:b1:matrices:gauss}{Rij-operaties} zijn niet allemaal gratis}: $L_i \leftarrow L_i +
+\lambda L_j$ behoudt de determinant, maar een verwisseling verandert het
+teken en $L_i \leftarrow \lambda L_i$ vermenigvuldigt hem met $\lambda$
+--- boekhoudfouten hier zijn de klassieke bron van verkeerde tekens in
+eliminatiegebaseerde berekeningen.
+\emph{Een nuldeterminant is het begin, niet het einde}: hij zegt
+``rang $< n$'' maar niet welke rang; alleen verder werk (echelonvorm, of
+de minoren van \cref{exo:b1:det:12}) lokaliseert die --- vgl.\ het geval
+$m = 1$ versus $m = -2$ in \cref{ex:b1:det:parameter}.
+\emph{Cramer heeft inverteerbaarheid nodig}: wanneer $\det A = 0$ zijn de
+formules $x_j = \det A_j/\det A$ betekenisloos, en het stelsel kan best
+(oneindig veel) oplossingen hebben.
+\emph{Alleen vierkante matrices hebben determinanten}: voor een
+rechthoekig stelsel is eliminatie het enige gereedschap.
+\end{remark}
+
+\begin{remark}[Waar determinanten heen gaan]
+\label{rem:b1:det:whereused}
+Drie levens wachten deze scalair. \emph{Meetkundig}: $\abs{\det}$ is de
+oppervlakte- of volumeschalingsfactor van de bijbehorende \omterm{def:b1:logic:map}{afbeelding} ---
+precies gemaakt voor het vlak in \cref{ch:b1:euclid} en, als de
+Jacobiaan van een verandering van veranderlijken, in de meervoudige
+integralen van het volume van Jaar~2. \emph{Algebraïsch}:
+$\det(A - \lambda I)$, de \omterm{def:b1:diffeq:linear2}{karakteristieke veelterm}, opent de
+eigenwaardetheorie in Jaar~2 --- de identiteit
+$A^2 - (\operatorname{tr} A)A + (\det A)I = 0$ van het weekendprobleem
+van \cref{ch:b1:matrices} is er de eerste schaduw van.
+\emph{Analytisch}: determinanten van bijzondere matrices (Vandermonde,
+Cauchy, Gram) beslissen wanneer interpolatie-, ontbindings- en
+projectieproblemen welgesteld zijn; het weekendprobleem hieronder
+evalueert de eerste twee families volledig.
+\end{remark}
+
+\begin{remark}[Perspectieven binnen Boek 3]
+\label{rem:b1:det:perspectives}
+Dit hoofdstuk sluit de lineaire-algebraruggengraat van het volume af, en
+zijn twee resterende hoofdstukken innen de dividenden. In
+\cref{ch:b1:euclid}: de Gram-matrix
+$\bigl(\langle v_i, v_j\rangle\bigr)$ toetst vrijheid met een determinant
+(\cref{exo:b1:euclid:11}), en de vlakke isometrieën splitsen zich in
+rotaties en spiegelingen langs het teken van hun determinant --- de
+classificatie van het weekendprobleem daar draait erop. In
+\cref{ch:b1:multivar}: de Monge-grootheid $rt - s^2$ is de determinant
+van de symmetrische matrix van tweede \omterm{def:b1:derivative:def}{afgeleiden}, en de
+normaalvergelijkingen van kleinste kwadraten vormen een Cramer-stelsel
+waarvan de matrix een Gram-matrix (dus momentenmatrix) is ---
+inverteerbaar precies volgens de Vandermonde-achtige criteria die hier
+worden vastgelegd. Wanneer die hoofdstukken ``inverteerbaar'' of
+``positief'' beweren, liggen de bewijsstukken in dit hoofdstuk.
+\end{remark}
+
+\section{Oefeningen}
+
+\begin{exercise}[$\star$]\label{exo:b1:det:1}
+Bereken:
+\[
+\begin{vmatrix} 3 & 1\\ 5 & 2 \end{vmatrix},
+\qquad
+\begin{vmatrix} 1 & 2 & 3\\ 4 & 5 & 6\\ 7 & 8 & 9\end{vmatrix},
+\qquad
+\begin{vmatrix} 1 & 1 & 1\\ 1 & 2 & 4\\ 1 & 3 & 9\end{vmatrix}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:det:2}
+Voor welke $\lambda \in \R$ is de familie $\bigl((1, 1, \lambda),
+(1, \lambda, 1), (\lambda, 1, 1)\bigr)$ een \omterm{def:b1:vspaces:free}{basis} van $\R^3$?
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:det:3}
+Los op met de regel van Cramer:
+\[
+\begin{cases}
+2x + y = 5\\
+3x - 2y = 4 ,
+\end{cases}
+\qquad\text{daarna}\qquad
+\begin{cases}
+x + y + z = 6\\
+x - y + z = 2\\
+2x + y - z = 1 .
+\end{cases}
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:det:4}
+Los op met \omterm{met:b1:det:gauss}{Gauss-eliminatie} en beschrijf de oplossingsverzameling:
+\[
+\begin{cases}
+x + 2y - z + t = 1\\
+2x + 4y + z - t = 5\\
+x + 2y + 2z - 2t = 4 .
+\end{cases}
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:det:5}
+Bewijs de Vandermonde-formule van \cref{ex:b1:det:vandermonde} door
+inductie op $n$, met de kolomoperaties $C_k \leftarrow C_k -
+x_1 C_{k-1}$ uitgevoerd van $k = n$ omlaag tot $k = 2$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:det:6}
+(Tridiagonaal) Zij $D_n$ de $n \times n$-determinant met $2$ op de
+diagonaal, $1$ op de twee naburige diagonalen, $0$ elders. Bewijs, door
+langs de eerste rij te ontwikkelen, $D_n = 2D_{n-1} - D_{n-2}$ en bereken
+$D_n$ ($D_1 = 2$, $D_2 = 3$).
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:det:7}
+Vervolledig \cref{ex:b1:det:parameter}: bereken de determinant
+$\begin{vmatrix} 1 & 1 & m\\ 1 & m & 1\\ m & 1 & 1\end{vmatrix}$ door de
+operatie $C_1 \leftarrow C_1 + C_2 + C_3$, en voer de volledige
+bespreking van het stelsel uit.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:det:8}
+Zij $A \in \mathcal{M}_n(\R)$ met \emph{gehele} elementen. Bewijs dat $A$
+een inverse met gehele elementen heeft dan en slechts dan als $\det A =
+\pm 1$. \emph{(Voor de directe zin, neem determinanten; voor de
+omkering, aanvaard --- of bewijs voor $n \leq 3$ via cofactoren --- dat
+$A^{-1} = \frac{1}{\det A}\,\operatorname{Com}(A)^{\mathsf T}$ met gehele
+cofactormatrix.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:det:9}
+Bereken de $n \times n$-determinant van de matrix $aI + bJ$
+(\cref{exo:b1:matrices:9}), d.w.z.\ met $a + b$ op de diagonaal en $b$
+elders. \emph{(Tel alle kolommen bij de eerste op, splits af, maak dan
+leeg.)} Herwin de inverteerbaarheidsvoorwaarde $a \neq 0$, $a + nb
+\neq 0$.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:det:10}
+Zij $A, B \in \mathcal{M}_n(\R)$. Bewijs dat
+\[
+\det\begin{pmatrix} A & B\\ B & A \end{pmatrix}
+= \det(A + B)\,\det(A - B),
+\]
+door blokkolom- en blokrij-operaties ($C_1 \leftarrow C_1 + C_2$, dan
+$L_2 \leftarrow L_2 - L_1$, in blokvorm), aannemend de natuurlijke
+blokdriehoeksregel $\det\begin{pmatrix} M & N\\ 0 &
+P\end{pmatrix} = \det M \det P$ --- bewezen voor $2 \times 2$-blokken in
+\cref{ex:b1:det:blocktriangular}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:det:11}
+(Circulant van orde $3$) Zij $a, b, c \in \C$ en
+\[
+\Delta = \begin{vmatrix}
+a & b & c\\
+c & a & b\\
+b & c & a
+\end{vmatrix}.
+\]
+Bewijs dat $\Delta = (a + b + c)(a^2 + b^2 + c^2 - ab - bc - ca)$, en
+ontbind volledig over $\C$ met $j = \eu^{2\iu\pi/3}$:
+\[
+\Delta = (a + b + c)(a + jb + j^2c)(a + j^2b + jc) .
+\]
+\emph{(Begin met $C_1 \leftarrow C_1 + C_2 + C_3$; merk voor de complexe
+vorm op dat de kolom $(1, j, j^2)^{\mathsf T}$ zich bijna als een
+eigenvector gedraagt.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:det:12}
+(Rang en minoren) Zij $A \in \mathcal{M}_{n,p}(K)$. Bewijs dat
+$\operatorname{rk} A$ gelijk is aan de grootste grootte $r$ van een
+inverteerbare $r \times r$-deelmatrix van $A$ (een deelmatrix behoudt de
+elementen op de kruisingen van $r$ gekozen rijen en $r$ gekozen
+kolommen). \emph{(Als $\operatorname{rk} A = r$, kies $r$ vrije kolommen,
+dan $r$ vrije rijen van het resulterende $n \times r$-blok; omgekeerd
+dwingt een inverteerbare deelmatrix de bijbehorende kolommen van $A$ \omterm{def:b1:vspaces:free}{vrij}
+te zijn.)}
+\end{exercise}
+
+\section{Probleem: het dubbele alternant van Cauchy}
+
+\begin{problem}\label{pb:b1:det:1}
+Twee determinanten beheersen de toepassingen van dit hoofdstuk: de
+\omterm{ex:b1:det:vandermonde}{Vandermonde-determinant}, geëvalueerd in \cref{exo:b1:det:5}, en de
+\emph{\omterm{pb:b1:det:1}{Cauchy-determinant}} $\det\bigl(\frac{1}{a_i + b_j}\bigr)$, hier
+geëvalueerd. Rond hen verzamelt dit probleem de alternant-gereedschapskist:
+kolomtrucs met \omterm{def:b1:poly:def}{veeltermen}, interpolatie via Cramer, de \omterm{pb:b1:det:1}{Hilbert-matrix}, de
+discriminant van een derdegraadsveelterm en de methode van alternerende
+\omterm{def:b1:poly:def}{veeltermen}. Overal noteert $V(x_1, \dots, x_n) = \prod_{i < j}(x_j - x_i)$
+de Vandermonde-waarde.\index{Cauchy-determinant}\index{Hilbert-matrix}
+\index{discriminant}
+
+\medskip
+\noindent\textbf{Deel I --- De Vandermonde-gereedschapskist.}
+\begin{enumerate}
+  \item Bereken $V(1, 2, 3, 4)$, en herinner waarom interpolatie op $n$
+        paarsgewijs verschillende knopen een Cramer-stelsel is.
+  \item (Veelterm-alternant) Zij $P_0, \dots, P_{n-1}$ \emph{\omterm{def:b1:poly:def}{monisch}}
+        met $\deg P_k = k$. Bewijs
+        \[
+        \det\bigl(P_{j-1}(x_i)\bigr)_{1 \leq i, j \leq n}
+        = V(x_1, \dots, x_n) :
+        \]
+        kolomoperaties vervangen elke machtskolom door een willekeurige
+        monische trap, gratis.
+  \item Pas vraag 2 toe op de binomiale \omterm{def:b1:poly:def}{veeltermen} $B_k =
+        \frac{X(X-1)\cdots(X-k+1)}{k!}$: bewijs dat voor \emph{gehele}
+        getallen $m_1 < m_2 < \dots < m_n$,
+        \[
+        \frac{V(m_1, \dots, m_n)}{0!\,1!\,2!\cdots(n-1)!}
+        \in \N :
+        \]
+        het product van alle paarsgewijze verschillen van $n$ gehele
+        getallen is \omterm{def:b1:arith:divides}{deelbaar} door de superfaculteit
+        $0!\,1!\cdots(n-1)!$.
+  \item Bewijs $\det\bigl(x_i^{\,j}\bigr)_{1 \leq i, j \leq n} =
+        x_1 x_2 \cdots x_n\, V(x_1, \dots, x_n)$ (machten nu beginnend
+        bij $1$).
+  \item (Momentenmatrix) Zij $S = \bigl(p_{i+j-2}\bigr)_{1 \leq
+        i, j \leq n}$ waar $p_k = x_1^k + \dots + x_n^k$. Bewijs dat
+        $S = W^{\mathsf T} W$ voor de matrix $W = (x_i^{\,j-1})_{ij}$,
+        leid af
+        \[
+        \det S = V(x_1, \dots, x_n)^2 ,
+        \]
+        en besluit: $n$ \emph{reële} getallen zijn paarsgewijs
+        verschillend dan en slechts dan als hun momentenmatrix
+        inverteerbaar is, en $\det S \geq 0$ altijd.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel II --- Interpolatie herbekeken.} Knopen
+$x_1 < \dots < x_n$, waarden $y_1, \dots, y_n$.
+\begin{enumerate}[resume]
+  \item Schrijf de voorwaarden ``$P = c_0 + c_1X + \dots +
+        c_{n-1}X^{n-1}$ interpoleert'' als een \omterm{def:b1:det:system}{lineair stelsel} in de
+        $c_k$ met matrix $W$, en herwin uit $\det W = V \neq 0$ het
+        bestaan en de uniciteit van de interpolant (vergelijk de twee
+        eerdere bewijzen, \cref{thm:b1:poly:lagrange} en
+        \cref{ex:b1:linmaps:interpolation}).
+  \item Bewijs met de regel van Cramer en \omterm{thm:b1:det:cofactor}{cofactorontwikkeling} van de
+        relevante determinant langs zijn laatste kolom dat de leidende
+        coëfficiënt van de interpolant is
+        \[
+        c_{n-1} = \sum_{i=1}^{n}
+        \frac{y_i}{\prod_{j \neq i}(x_i - x_j)} .
+        \]
+  \item (Confluente Vandermonde) Bereken
+        \[
+        \begin{vmatrix}
+        1 & x_1 & x_1^2\\
+        0 & 1 & 2x_1\\
+        1 & x_2 & x_2^2
+        \end{vmatrix}
+        = (x_2 - x_1)^2 ,
+        \]
+        en interpreteer: de gegevens $\bigl(P(x_1), P'(x_1),
+        P(x_2)\bigr)$ bepalen een unieke $P \in \R_2[X]$ wanneer
+        $x_1 \neq x_2$ (Hermite-interpolatie).
+  \item Vind de unieke $P \in \R_2[X]$ met $P(0) = 1$, $P'(0) = 0$,
+        $P(1) = 2$, en controleer je antwoord tegen vraag 8.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel III --- De \omterm{pb:b1:det:1}{Cauchy-determinant}.} Zij $a_1,
+\dots, a_n$ en $b_1, \dots, b_n$ scalairen met $a_i + b_j
+\neq 0$ voor alle $i, j$, en
+\[
+C_n = \det\Bigl(\frac{1}{a_i + b_j}\Bigr)_{1 \leq i, j \leq n} .
+\]
+\begin{enumerate}[resume]
+  \item Bereken $C_2$ met de hand en breng het in de vorm ``producten
+        van verschillen over producten van sommen''.
+  \item Voer voor $n \geq 2$ $L_i \leftarrow L_i - L_n$ ($i < n$) uit en
+        splits rijen en kolommen af om te bewijzen
+        \[
+        C_n = \frac{\prod_{i<n}(a_n - a_i)}{\prod_{j}(a_n +
+        b_j)}\;\det M,
+        \]
+        waar $M$ overeenstemt met de Cauchy-matrix op rijen $i < n$ en
+        als laatste rij $(1, 1, \dots, 1)$ heeft.
+  \item Voer $C_j \leftarrow C_j - C_n$ ($j < n$) uit op $M$, splits
+        opnieuw af, en besluit door inductie het \emph{dubbele alternant
+        van Cauchy}:
+        \[
+        C_n = \frac{\prod_{1 \leq i < j \leq n}(a_j - a_i)(b_j -
+        b_i)}{\prod_{i, j}(a_i + b_j)} .
+        \]
+  \item Leid het inverteerbaarheidscriterium af (de $a_i$ paarsgewijs
+        verschillend en de $b_j$ paarsgewijs verschillend). Voor de
+        \emph{\omterm{pb:b1:det:1}{Hilbert-matrix}} $H_n = \bigl(\frac{1}{i + j - 1}\bigr)$:
+        bereken $\det H_2$ en $\det H_3$ uit de formule, en verifieer dat
+        $H_2^{-1}$ gehele elementen heeft.
+  \item Toon aan dat voor paarsgewijs verschillende $b_j$ en een
+        willekeurig rechterlid het stelsel $\sum_j \frac{c_j}{a_i + b_j}
+        = y_i$ ($i = 1, \dots, n$) een unieke oplossing heeft, en
+        verbind dit met het bestaan en de uniciteit van
+        partieelbreukontbindingen met enkelvoudige \omterm{def:b1:fractions:field}{polen}
+        (\cref{thm:b1:fractions:complex}).
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel IV --- De discriminant van een
+derdegraadsveelterm.} Zij $\lambda_1, \lambda_2, \lambda_3$ de wortels
+(in $\C$) van $X^3 + pX + q$, en $p_k = \lambda_1^k + \lambda_2^k +
+\lambda_3^k$.
+\begin{enumerate}[resume]
+  \item Bereken met $\lambda^3 = -p\lambda - q$ in elke wortel en Vieta
+        ($p_1 = 0$) $p_2 = -2p$, $p_3 = -3q$, en $p_4 = 2p^2$.
+  \item Bereken met vraag 5 (over $\C$, met behoud van $\det S = V^2$)
+        \[
+        \operatorname{disc} = V(\lambda_1, \lambda_2,
+        \lambda_3)^2 = \begin{vmatrix}
+        3 & 0 & -2p\\
+        0 & -2p & -3q\\
+        -2p & -3q & 2p^2
+        \end{vmatrix}
+        = -4p^3 - 27q^2 .
+        \]
+  \item Leid af: $X^3 + pX + q$ heeft een meervoudige wortel dan en
+        slechts dan als $4p^3 + 27q^2 = 0$; controleer op $X^3 - 3X + 2 =
+        (X - 1)^2(X + 2)$.
+  \item Onderstel $p, q$ reëel. Bewijs dat de derdegraadsveelterm drie
+        verschillende reële wortels heeft dan en slechts dan als
+        $\operatorname{disc} > 0$, en één reële plus twee niet-reële
+        toegevoegde wortels dan en slechts dan als $\operatorname{disc}
+        < 0$. \emph{(Als $\lambda_3 = \conj{\lambda_2} \neq \lambda_2$ en
+        $\lambda_1 \in \R$, toon dat $V$ zuiver imaginair is.)}
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel V --- Dividenden, en de alternerende methode.}
+\begin{enumerate}[resume]
+  \item Toon voor $0 < a_1 < a_2 < \dots < a_n$ aan dat
+        $\det\bigl(\frac{1}{a_i + a_j}\bigr) > 0$.
+  \item Bereken $\det\bigl(\binom{m_i}{j-1}\bigr)_{1 \leq i, j
+        \leq 3}$ voor $(m_1, m_2, m_3) = (2, 4, 7)$, eerst via de vragen
+        2--3, dan door directe ontwikkeling.
+  \item Zij $\lambda_1, \dots, \lambda_n$ paarsgewijs verschillend en
+        niet-nul. Bewijs met een inverteerbare Vandermonde-matrix
+        opnieuw dat de meetkundige rijen
+        $\bigl((\lambda_i^{\,k})_{k \geq 0}\bigr)_{1 \leq i \leq n}$ een
+        \omterm{def:b1:vspaces:free}{vrije familie} van de ruimte van rijen vormen.
+  \item Bereken $\det\bigl(\frac{1}{i + j}\bigr)_{1 \leq i, j
+        \leq 3}$ uit het dubbele alternant.
+  \item (Alternerende \omterm{def:b1:poly:def}{veeltermen}) Noem een \omterm{def:b1:poly:def}{veelterm} $F$ in $x_1,
+        \dots, x_n$ \emph{alternerend} wanneer het verwisselen van twee
+        willekeurige veranderlijken zijn teken verandert. Toon aan dat
+        een alternerende $F$ verdwijnt zodra $x_i = x_j$ ($i \neq j$), en
+        leid af --- één veranderlijke per keer, door de factorstelling
+        --- dat $F$ \omterm{def:b1:arith:divides}{deelbaar} is door $\prod_{i<j}(x_j - x_i)$.
+  \item Gebruik vraag 23 om de Vandermonde-formule opnieuw te bewijzen
+        zonder inductie: de determinant $\det(x_i^{\,j-1})$ is een
+        alternerende \omterm{def:b1:poly:def}{veelterm} van totale graad $\binom n2$, dus een
+        \emph{constant} veelvoud van $\prod_{i<j}(x_j - x_i)$;
+        identificeer de constante door één monomiaal te vergelijken.
+  \item Synthese, in vier zinnen: welke enkele eigenschap van de
+        determinant (welk axioma) genereert alle ontbindingen van dit
+        probleem; waarom de momentenmatrix-identiteit van vraag 5 een
+        \omterm{def:b1:logic:statement}{uitspraak} over \emph{complexe} onderscheidbaarheid omzet in een
+        berekenbaar \emph{reëel} tekentestje; welke twee klassieke
+        matrices hier volledig geëvalueerd werden en welke lineaire
+        problemen ze beheersen; en hoe de alternerende methode van de
+        vragen 23--24 in één beweging verklaart waarom
+        $\prod_{i<j}(x_j - x_i)$ blijft opduiken. Noem de stelling van
+        Deel III.
+\end{enumerate}
+\end{problem}

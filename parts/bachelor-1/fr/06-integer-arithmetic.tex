@@ -1,0 +1,805 @@
+\chapter{Arithmétique des entiers}\label{ch:b1:arith}
+
+L'arithmétique --- l'étude de la \omterm{def:b1:arith:divides}{divisibilité} dans $\Z$ --- a été
+commencée dans le volume de Terminale (lycée). Ce chapitre la reconstruit
+entièrement à partir de la division euclidienne, avec des démonstrations
+complètes~: \omterm{thm:b1:arith:gcd}{plus grand commun diviseur} et \omterm{met:b1:arith:euclid}{algorithme d'Euclide}, théorème
+de Bézout et \omterm{thm:b1:arith:gauss}{lemme de Gauss}, \omterm{thm:b1:arith:fta}{décomposition en facteurs premiers}, et le
+calcul des \omterm{def:b1:arith:congruence}{congruences} jusqu'au \omterm{thm:b1:arith:fermat}{petit théorème de Fermat}. Au-delà de son
+charme propre, ce matériau est le modèle que le \cref{ch:b1:poly} imite
+pour les polynômes.
+
+\section{Divisibilité et division euclidienne}
+
+\begin{definition}[Divisibilité]\label{def:b1:arith:divides}
+Pour $a, b \in \Z$, $b$ \emph{divise} $a$ (on note $b \mid
+a$)\index{divisibilité} lorsque $a = bq$ pour un certain $q \in \Z$.
+Conséquences immédiates~: si $b \mid a$ et $b \mid a'$, alors $b \mid (ua + va')$
+pour tous $u, v \in \Z$~; si $b \mid a$ et $a \neq 0$, alors $\abs b \leq
+\abs a$~; et $a \mid b$ joint à $b \mid a$ impose $b = \pm a$.
+\end{definition}
+
+\begin{theorem}[Division euclidienne]\label{thm:b1:arith:division}
+Pour tous $a \in \Z$ et $b \in \N^*$, il existe un unique couple $(q, r)
+\in \Z \times \N$ tel que
+\[
+a = bq + r, \qquad 0 \leq r < b .
+\]
+\end{theorem}
+
+\begin{proof}
+\emph{Existence.} L'\omterm{def:b1:logic:sets}{ensemble} $A = \{a - bk : k \in \Z\} \cap \N$ est une
+partie non vide de $\N$ (prendre $k = -\abs a$~: $a + b\abs a \geq a +
+\abs a \geq 0$). Soit $r = a - bq$ son plus petit élément. Si $r \geq b$,
+alors $r - b = a - b(q+1)$ serait un élément de $A$ plus petit~:
+contradiction. Donc $0 \leq r < b$.
+
+\emph{Unicité.} Si $bq + r = bq' + r'$ avec $0 \leq r, r' < b$,
+alors $b(q - q') = r' - r$ et $\abs{r' - r} < b$~: le multiple de $b$
+du membre de gauche est nécessairement $0$, donc $q = q'$ et $r = r'$.
+\end{proof}
+
+\begin{example}[Numération de position par divisions successives]\label{ex:b1:arith:base7}
+Écrivons $2026$ en base $7$. Divisons de façon répétée par $7$, en
+conservant les restes~:
+\[
+2026 = 7 \times 289 + 3, \quad
+289 = 7 \times 41 + 2, \quad
+41 = 7 \times 5 + 6, \quad
+5 = 7 \times 0 + 5 .
+\]
+En lisant les restes du dernier au premier~: $2026 =
+(5\,6\,2\,3)_7$. Vérification~: $5 \times 343 + 6 \times 49 + 2 \times 7
++ 3 = 1715 + 294 + 14 + 3 = 2026$. L'unicité dans la division
+euclidienne est exactement ce qui rend chaque chiffre \emph{forcé}~: à
+chaque étape, le reste est le seul entier de $\intint06$ \omterm{def:b1:arith:congruence}{congru}
+à la valeur courante modulo $7$, de sorte que l'écriture en base $7$ est
+unique --- fait utilisé silencieusement chaque fois que le devoir maison
+manipule «~les chiffres de $n$ en base $p$~».
+\end{example}
+
+\section{Plus grand commun diviseur}
+
+\begin{theorem}[Sous-groupes de $\Z$~; existence du PGCD]\label{thm:b1:arith:gcd}
+\begin{enumerate}
+  \item Tout sous-groupe de $(\Z, +)$ est de la forme $n\Z = \{nk : k
+        \in \Z\}$ pour un unique $n \in \N$.
+  \item Pour $a, b \in \Z$ non tous deux nuls, l'\omterm{def:b1:logic:sets}{ensemble} $a\Z + b\Z = \{au +
+        bv : u, v \in \Z\}$ est un sous-groupe de $\Z$, donc égal à
+        $d\,\Z$ pour un unique $d \in \N^*$. Cet entier $d$ est le
+        \emph{plus grand commun diviseur}\index{plus grand commun diviseur}
+        $\gcd(a, b)$~: il \omterm{def:b1:arith:divides}{divise} $a$ et $b$, et tout diviseur
+        commun de $a$ et $b$ \omterm{def:b1:arith:divides}{divise} $d$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) Soit $H \subseteq \Z$ un sous-groupe (non vide, stable par
+soustraction~; la définition formelle est au \cref{ch:b1:structures},
+et seules ces deux propriétés servent). Si $H = \{0\}$, prendre $n = 0$.
+Sinon, $H$ contient un élément non nul et son opposé, donc un
+plus petit élément strictement positif $n$. Alors $n\Z \subseteq H$. Pour $x
+\in H$, écrivons $x = nq + r$ avec $0 \leq r < n$
+(\cref{thm:b1:arith:division})~; $r = x - nq \in H$, et la minimalité de
+$n$ impose $r = 0$~: $x \in n\Z$. Unicité~: $n$ est le plus petit élément
+strictement positif de $n\Z$.
+
+(2) $a\Z + b\Z$ contient $0$ et est stable par soustraction, donc c'est
+$d\Z$ avec $d \geq 1$ (il contient $a$ ou $b$, non nul). Comme $a, b
+\in d\Z$, $d$ \omterm{def:b1:arith:divides}{divise} les deux. Et si $c$ \omterm{def:b1:arith:divides}{divise} $a$ et $b$, alors $c$
+\omterm{def:b1:arith:divides}{divise} tout $au + bv$ --- en particulier $c \mid d$, puisque $d \in a\Z
++ b\Z$. C'est la propriété annoncée (et elle entraîne $\abs c \leq
+d$, de sorte que $d$ mérite le nom de \emph{plus grand} diviseur commun).
+\end{proof}
+
+\begin{corollary}[Théorème de Bézout]\label{cor:b1:arith:bezout}
+Pour $a, b$ non tous deux nuls, il existe $u, v \in \Z$ tels que
+\[
+au + bv = \gcd(a, b) .
+\]
+En particulier (cas $\gcd(a,b) = 1$, celui des entiers
+\emph{premiers entre eux}\index{premiers entre eux})~: $a$ et $b$ sont
+\omterm{cor:b1:arith:bezout}{premiers entre eux} si et seulement si $au + bv = 1$ admet une
+solution.
+\end{corollary}
+
+\begin{proof}
+$\gcd(a,b) = d \in d\Z = a\Z + b\Z$. Pour l'équivalence~: si
+$\gcd(a,b) = 1$, Bézout fournit la solution~; réciproquement, $au + bv =
+1$ oblige tout diviseur commun de $a$ et $b$ à diviser $1$.
+\end{proof}
+
+\begin{method}[Algorithme d'Euclide, version étendue]\label{met:b1:arith:euclid}
+Pour calculer $\gcd(a, b)$ ($a > b > 0$)~: on divise, $a = bq + r$~; alors
+$\gcd(a, b) = \gcd(b, r)$ (les diviseurs communs de $(a,b)$ et de $(b,r)$
+coïncident, puisque $r = a - bq$)~; on itère jusqu'à un reste nul~; le
+dernier reste non nul est le PGCD\index{algorithme d'Euclide}. En
+remontant les divisions (ou en maintenant les coefficients au fil de la
+descente), on obtient un couple de Bézout $(u, v)$.
+\end{method}
+
+\begin{example}\label{ex:b1:arith:euclid}
+$\gcd(120, 23)$~: $120 = 5 \times 23 + 5$~; $23 = 4 \times 5 + 3$~; $5 =
+1\times 3 + 2$~; $3 = 1 \times 2 + 1$~; $2 = 2 \times 1 + 0$. Donc
+$\gcd = 1$. En remontant~:
+\begin{align*}
+1 &= 3 - 2 = 3 - (5 - 3) = 2\times 3 - 5 = 2(23 - 4\times 5) - 5 \\
+&= 2 \times 23 - 9 \times 5 = 2\times 23 - 9(120 - 5\times 23)
+= 47 \times 23 - 9 \times 120 .
+\end{align*}
+Vérification~: $47 \times 23 = 1081$, $9 \times 120 = 1080$.
+\end{example}
+
+\begin{theorem}[Lemme de Gauss et conséquences]\label{thm:b1:arith:gauss}
+Soient $a, b, c \in \Z$.
+\begin{enumerate}
+  \item (\omterm{thm:b1:arith:gauss}{Lemme de Gauss}\index{lemme de Gauss}) Si $a \mid bc$ et
+        $\gcd(a, b) = 1$, alors $a \mid c$.
+  \item Si $a \mid c$, $b \mid c$ et $\gcd(a,b) = 1$, alors $ab \mid
+        c$.
+  \item Si $\gcd(a, b) = \gcd(a, c) = 1$, alors $\gcd(a, bc) = 1$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) Bézout~: $au + bv = 1$. Multiplions par $c$~: $acu + bcv = c$. Les deux
+termes sont divisibles par $a$ (le second parce que $a \mid bc$), donc $a
+\mid c$.
+
+(2) Écrivons $c = aq$~; de $b \mid aq$ et $\gcd(a, b) = 1$, le point (1)
+donne $b \mid q$, donc $ab \mid aq = c$.
+
+(3) $au + bv = 1$ et $au' + cv' = 1$. Multiplions les deux
+relations~:
+\[
+1 = (au + bv)(au' + cv')
+= a\,\bigl(auu' + ucv' + u'bv\bigr) + bc\,(vv') ,
+\]
+une relation de Bézout entre $a$ et $bc$~: d'après le
+\cref{cor:b1:arith:bezout}, $\gcd(a, bc) = 1$.
+\end{proof}
+
+\begin{example}[Résolution d'une équation diophantienne linéaire]\label{ex:b1:arith:diophantine}
+Cherchons tous les $(x, y) \in \Z^2$ tels que $6x + 10y = 4$. D'abord le
+\emph{test d'existence}~: $\gcd(6, 10) = 2$ \omterm{def:b1:arith:divides}{divise} $4$, donc il y a des
+solutions (si le PGCD ne divisait pas le second membre, le premier
+membre en serait toujours un multiple et il n'y en aurait aucune).
+Divisons tout par $2$~: $3x + 5y = 2$. Une solution particulière saute aux
+yeux~: $(x_0, y_0) = (-1, 1)$. Pour la solution générale, soustrayons~:
+$3(x + 1) = -5(y - 1)$, donc $3 \mid 5(y-1)$, et le \omterm{thm:b1:arith:gauss}{lemme de Gauss}
+($\gcd(3,5) = 1$) donne $3 \mid y - 1$~: $y = 1 - 3k$, puis $x = -1 + 5k$.
+Réciproquement, tout couple de cette forme convient~:
+\[
+(x, y) = (-1 + 5k,\ 1 - 3k), \qquad k \in \Z .
+\]
+Le schéma est général~: une solution particulière plus les multiples
+entiers de $\bigl(\frac b{\gcd}, -\frac a{\gcd}\bigr)$ --- la
+même structure «~particulière plus homogène~» qu'au
+\cref{ch:b1:diffeq}, le \omterm{thm:b1:arith:gauss}{lemme de Gauss} y jouant le rôle de
+l'unicité.
+\end{example}
+
+\begin{definition}[Plus petit commun multiple]\label{def:b1:arith:lcm}
+$\operatorname{lcm}(a, b)$\index{plus petit commun multiple} est le
+générateur dans $\N$ du sous-groupe $a\Z \cap b\Z$~: c'est un multiple
+commun de $a$ et $b$ qui \omterm{def:b1:arith:divides}{divise} tout multiple commun, et pour
+$a, b \in \N^*$,
+\[
+\gcd(a,b) \times \operatorname{lcm}(a,b) = ab
+\qquad (\text{démonstration à l'} \cref{exo:b1:arith:5}).
+\]
+\end{definition}
+
+\begin{example}[Les problèmes de coïncidence sont des problèmes de PPCM]\label{ex:b1:arith:gears}
+Deux engrenages en prise ont $84$ et $36$ dents. Au bout de combien de
+dents de mouvement commun reviennent-ils \omterm{def:b1:logic:sets}{ensemble} à leur position initiale~?
+La configuration se répète lorsque le nombre de dents écoulées est un
+multiple commun de $84$ et de $36$~; la première fois, c'est au bout de
+\[
+\operatorname{lcm}(84, 36) = \frac{84 \times 36}{\gcd(84, 36)}
+= \frac{3024}{12} = 252
+\]
+dents --- c'est-à-dire $3$ tours du grand engrenage et $7$ du
+petit ($252/84$ et $252/36$). Notons la voie pratique~:
+\emph{calculer d'abord le PGCD} (Euclide~: $84 = 2\times36 + 12$, $36
+= 3\times12$), puis diviser --- jamais construire le PPCM en listant les
+multiples. Toute question de coïncidence périodique (engrenages,
+alignements planétaires, développements décimaux périodiques qui se
+rejoignent) se ramène à ce seul calcul.
+\end{example}
+
+\section{Nombres premiers}
+
+\begin{definition}\label{def:b1:arith:prime}
+Un entier $p \geq 2$ est \emph{premier}\index{nombre premier} lorsque ses
+seuls diviseurs positifs sont $1$ et $p$. Pour $p$ premier et $a \in \Z$~:
+ou bien $p \mid a$, ou bien $\gcd(p, a) = 1$. Par conséquent
+(\cref{thm:b1:arith:gauss}), le \emph{lemme d'Euclide} est vrai~: si $p \mid
+ab$, alors $p \mid a$ ou $p \mid b$.
+\end{definition}
+
+\begin{remark}[Test de primalité par divisions successives]\label{rem:b1:arith:trialdivision}
+Si $n = ab$ avec $2 \leq a \leq b$, alors $a^2 \leq ab = n$, donc $a
+\leq \sqrt n$~: un entier composé $n$ a toujours un diviseur \omterm{def:b1:arith:prime}{premier} $\leq
+\sqrt n$. Ainsi, pour tester si $n$ est \omterm{def:b1:arith:prime}{premier}, il suffit d'essayer
+les \omterm{def:b1:arith:prime}{nombres premiers} jusqu'à $\sqrt n$. Pour $n = 271$~: $\sqrt{271} < 17$, et
+$271$ n'est divisible par aucun de $2, 3, 5, 7, 11, 13$ (impair, somme
+des chiffres $10$, ne se termine ni par $0$ ni par $5$, $271 = 7\cdot38 + 5 =
+11\cdot24 + 7 = 13\cdot20 + 11$)~: \omterm{def:b1:arith:prime}{premier}, après six divisions
+au lieu de deux cents. La barrière $\sqrt n$ est un seuil véritable~:
+la franchir efficacement pour des nombres de cent chiffres exige les
+tests de primalité modernes issus du
+\cref{thm:b1:arith:fermat}.
+\end{remark}
+
+\begin{theorem}[Euclide]\label{thm:b1:arith:euclidprimes}
+Il existe une infinité de \omterm{def:b1:arith:prime}{nombres premiers}.
+\end{theorem}
+
+\begin{proof}
+Tout entier $n \geq 2$ possède un diviseur \omterm{def:b1:arith:prime}{premier}~: son plus petit
+diviseur $\geq 2$ est \omterm{def:b1:arith:prime}{premier} (une factorisation propre de celui-ci
+produirait un diviseur de $n$ plus petit). Supposons maintenant que $p_1, \dots, p_k$ soient tous les
+\omterm{def:b1:arith:prime}{nombres premiers}, et posons $N = p_1 p_2 \cdots p_k + 1 \geq 2$. Un certain \omterm{def:b1:arith:prime}{premier} $p_i$
+\omterm{def:b1:arith:divides}{divise} $N$~; mais $p_i$ \omterm{def:b1:arith:divides}{divise} aussi $N - 1 = p_1\cdots p_k$, donc $p_i
+\mid 1$ --- absurde.
+\end{proof}
+
+\begin{theorem}[Théorème fondamental de l'arithmétique]\label{thm:b1:arith:fta}
+Tout entier $n \geq 2$ est un produit de \omterm{def:b1:arith:prime}{nombres premiers}, et la
+factorisation
+\[
+n = p_1^{\alpha_1} p_2^{\alpha_2} \cdots p_k^{\alpha_k}
+\qquad (p_1 < p_2 < \dots < p_k \text{ premiers},\ \alpha_i \in \N^*)
+\]
+est unique.\index{décomposition en facteurs premiers}
+\end{theorem}
+
+\begin{proof}
+\emph{Existence} par récurrence forte (\cref{thm:b1:logic:induction})~:
+$n = 2$ est \omterm{def:b1:arith:prime}{premier}~; pour $n > 2$, ou bien $n$ est \omterm{def:b1:arith:prime}{premier}, ou bien $n = ab$ avec
+$2 \leq a, b < n$, et l'hypothèse de récurrence factorise $a$ et $b$.
+
+\emph{Unicité.} Supposons $p_1 \cdots p_r = q_1 \cdots q_s$
+(\omterm{def:b1:arith:prime}{nombres premiers} listés avec répétition, disons $r \leq s$), et raisonnons par
+récurrence sur $r$. Si $r = 0$, le membre de gauche vaut $1$, ce qui force $s = 0$ (un produit
+non vide de \omterm{def:b1:arith:prime}{nombres premiers} dépasse $1$). Pour $r \geq 1$~: le \omterm{def:b1:arith:prime}{premier} $p_1$
+\omterm{def:b1:arith:divides}{divise} $q_1(q_2\cdots q_s)$, donc, par le lemme d'Euclide, ou bien $p_1
+\mid q_1$, ou bien $p_1 \mid q_2\cdots q_s$~; en itérant, $p_1$ \omterm{def:b1:arith:divides}{divise}
+un certain $q_j$. Mais $q_j$ est \omterm{def:b1:arith:prime}{premier} et $p_1 \geq 2$~: nécessairement $p_1
+= q_j$. Simplifions par ce facteur commun (c'est légitime~: $\Z$ est un
+anneau intègre) pour obtenir
+\[
+p_2 \cdots p_r = q_1 \cdots \widehat{q_j} \cdots q_s
+\]
+(le chapeau marquant l'omission), une égalité de produits plus courts~;
+l'hypothèse de récurrence dit que les deux listes $p_2, \dots, p_r$ et
+$q_1, \dots, \widehat{q_j}, \dots, q_s$ coïncident à l'ordre près,
+donc les listes initiales aussi. L'écriture avec exposants regroupe les
+\omterm{def:b1:arith:prime}{premiers} égaux.
+\end{proof}
+
+\begin{proposition}[Valuations]\label{prop:b1:arith:valuation}
+Pour $p$ \omterm{def:b1:arith:prime}{premier} et $n \in \N^*$, notons $v_p(n)$\index{valuation
+p-adique@valuation $p$-adique} l'exposant de $p$ dans la
+factorisation de $n$ (avec $v_p(n) = 0$ si $p \nmid n$). Alors
+\[
+v_p(mn) = v_p(m) + v_p(n),
+\qquad
+m \mid n \iff \forall p,\ v_p(m) \leq v_p(n),
+\]
+\[
+v_p\bigl(\gcd(m,n)\bigr) = \min\bigl(v_p(m), v_p(n)\bigr),
+\qquad
+v_p\bigl(\operatorname{lcm}(m,n)\bigr) = \max\bigl(v_p(m),
+v_p(n)\bigr).
+\]
+\end{proposition}
+
+\begin{proof}
+La première identité vaut parce que les factorisations se multiplient et que
+la factorisation de $mn$ est unique. Si $m \mid n$, écrivons $n = mq$ et
+appliquons-la. Réciproquement, si tous les $v_p(m) \leq v_p(n)$, l'entier $q =
+\prod_p p^{\,v_p(n) - v_p(m)}$ vérifie $mq = n$. Formule du PGCD~:
+l'entier $d = \prod p^{\min}$ \omterm{def:b1:arith:divides}{divise} les deux d'après le critère, et
+tout diviseur commun $c$ vérifie $v_p(c) \leq \min$ pour tout $p$, donc $c
+\mid d$~; même raisonnement pour le PPCM avec le $\max$.
+\end{proof}
+
+\begin{example}[Carrés et cubes vus par les valuations]\label{ex:b1:arith:squarecube}
+Un entier $n \geq 1$ est un carré parfait si et seulement si tous les
+$v_p(n)$ sont pairs (si $n = m^2$, alors $v_p(n) = 2v_p(m)$~;
+réciproquement, on divise par deux chaque exposant). De même pour les cubes avec des
+multiples de $3$. Ainsi $21168 = 2^4 \times 3^3 \times 7^2$ n'est pas
+un carré ($v_3 = 3$ est impair) ni un cube ($v_2 = 4$)~; le
+plus petit entier $m > 0$ tel que $21168\,m$ \emph{soit} un
+cube s'obtient en complétant chaque exposant jusqu'au multiple de $3$
+suivant~:
+\[
+m = 2^{6-4} \times 3^{3-3} \times 7^{3-2} = 2^2 \times 7 = 28,
+\qquad
+21168 \times 28 = 2^6\,3^3\,7^3 = (2^2 \times 3 \times 7)^3
+= 84^3 .
+\]
+L'idée à retenir~: les questions multiplicatives (carrés, cubes,
+diviseurs, PGCD, PPCM) deviennent des questions \emph{coordonnée par
+coordonnée} sur les vecteurs d'exposants $(v_2, v_3, v_5, \dots)$ ---
+l'unicité de la factorisation, c'est exactement l'\omterm{def:b1:logic:statement}{assertion} que ces
+coordonnées existent et sont bien définies.
+\end{example}
+
+\section{Congruences}
+
+\begin{definition}\label{def:b1:arith:congruence}
+Pour $n \in \N^*$~: $a \equiv b \pmod n$\index{congruence} lorsque $n \mid
+a - b$. C'est une \omterm{def:b1:logic:equiv}{relation d'équivalence} compatible avec l'addition et
+la multiplication~: si $a \equiv b$ et $a' \equiv b'$ (mod $n$), alors
+$a + a' \equiv b + b'$, $aa' \equiv bb'$, et $a^k \equiv b^k$ pour
+$k \in \N$.
+\end{definition}
+
+\begin{example}[La preuve par neuf]\label{ex:b1:arith:castingnines}
+La compatibilité avec $+$ et $\times$ est un procédé de vérification
+aussi vieux que le commerce. Comme $10 \equiv 1 \pmod 9$, tout entier est
+\omterm{def:b1:arith:congruence}{congru} modulo $9$ à la somme de ses chiffres (démontré à
+l'\cref{exo:b1:arith:2}). Pour vérifier l'affirmation $1234 \times 567 =
+699\,678$~: les sommes des chiffres donnent $1234 \equiv 1$ et $567 \equiv 18
+\equiv 0 \pmod 9$, donc le produit doit être $\equiv 1 \times 0 =
+0$~; et en effet $6 + 9 + 9 + 6 + 7 + 8 = 45 \equiv 0$. La vérification
+passe (et le produit est en fait correct). Si quelqu'un avait annoncé
+$699\,478$, la somme des chiffres $43 \equiv 7 \not\equiv 0$ le
+confondrait aussitôt. Le test est unilatéral --- il attrape une
+erreur sauf si l'erreur est elle-même un multiple de $9$ --- ce qui est
+exactement, en miniature, la leçon des \omterm{def:b1:arith:prime}{pseudo-premiers} de
+l'\cref{ex:b1:arith:pseudoprime}~: les vérifications par \omterm{def:b1:arith:congruence}{congruence}
+réfutent, elles ne certifient pas.
+\end{example}
+
+\begin{proposition}[Inversibilité modulo $n$]\label{prop:b1:arith:invmod}
+$a$ est \emph{inversible modulo $n$} (c'est-à-dire $ab \equiv 1 \pmod n$ pour un
+certain $b$) si et seulement si $\gcd(a, n) = 1$. L'inverse est alors unique modulo
+$n$ et se calcule par l'\omterm{met:b1:arith:euclid}{algorithme d'Euclide} étendu.
+\end{proposition}
+
+\begin{proof}
+$ab \equiv 1 \pmod n$ signifie $ab + nk = 1$ pour un certain $k$~: une relation
+de Bézout, qui existe si et seulement si $\gcd(a,n) = 1$
+(\cref{cor:b1:arith:bezout}). Unicité~: si $ab \equiv ab' \equiv 1$,
+alors $b \equiv b(ab') = (ab)b' \equiv b' \pmod n$.
+\end{proof}
+
+\begin{example}[Inverser $7$ modulo $26$]\label{ex:b1:arith:inv7mod26}
+Comme $\gcd(7, 26) = 1$, la classe de $7$ est inversible modulo $26$.
+Euclide étendu~:
+\[
+26 = 3 \times 7 + 5, \qquad
+7 = 1 \times 5 + 2, \qquad
+5 = 2 \times 2 + 1 ,
+\]
+puis en remontant~:
+\[
+1 = 5 - 2 \times 2 = 5 - 2(7 - 5) = 3 \times 5 - 2 \times 7
+= 3(26 - 3 \times 7) - 2 \times 7 = 3 \times 26 - 11 \times 7 .
+\]
+Donc $7 \times (-11) \equiv 1 \pmod{26}$, c'est-à-dire $7^{-1} \equiv
+-11 \equiv 15 \pmod{26}$~; vérification~: $7 \times 15 = 105 = 4 \times 26
++ 1$. Une fois l'inverse en main, toute \omterm{def:b1:arith:congruence}{congruence} $7x \equiv c
+\pmod{26}$ se résout en une multiplication~: $x \equiv 15c$. Cette
+inversion mécanique est le cheval de trait de l'arithmétique modulaire ---
+et des protocoles à clé publique évoqués à la
+\cref{rem:b1:arith:whereused}, où les \omterm{def:b1:complex:field}{modules} ont des centaines de
+chiffres mais où l'algorithme est exactement celui-ci.
+\end{example}
+
+\begin{example}[Quand le coefficient n'est pas inversible]\label{ex:b1:arith:noninvertible}
+Résolvons $12x \equiv 8 \pmod{20}$. Ici $\gcd(12, 20) = 4$, donc $12$
+n'est pas inversible modulo $20$ --- mais l'équation reste
+traitable. La \omterm{def:b1:arith:congruence}{congruence} dit que $20 \mid 12x - 8$~; en divisant
+toute la relation par $4$ (diviseur des trois ingrédients), elle est
+équivalente à $5 \mid 3x - 2$, c'est-à-dire
+\[
+3x \equiv 2 \pmod 5 .
+\]
+Or $\gcd(3, 5) = 1$ et $3^{-1} \equiv 2 \pmod 5$ ($3 \times 2 =
+6 \equiv 1$), donc $x \equiv 4 \pmod 5$~: les solutions sont $x
+\equiv 4, 9, 14, 19 \pmod{20}$ --- \emph{quatre} classes modulo $20$,
+en accord avec le PGCD. (Si le second membre n'avait pas été divisible par $4$,
+par exemple $12x \equiv 6 \pmod{20}$, il n'y aurait aucune solution~:
+le premier membre est toujours $\equiv 0 \pmod 4$.) Forme générale~: $ax
+\equiv b \pmod n$ est résoluble si et seulement si $\gcd(a, n) \mid b$, et a
+alors exactement $\gcd(a, n)$ classes de solutions --- on divise tout
+par le PGCD et on inverse.
+\end{example}
+
+\begin{theorem}[Petit théorème de Fermat]\label{thm:b1:arith:fermat}
+Soit $p$ un \omterm{def:b1:arith:prime}{nombre premier}. Pour tout $a \in \Z$~:
+\[
+a^p \equiv a \pmod p,
+\]
+et si $p \nmid a$, alors $a^{p-1} \equiv 1 \pmod
+p$.\index{petit théorème de Fermat}
+\end{theorem}
+
+\begin{proof}
+D'abord, pour $1 \leq k \leq p - 1$, le \omterm{def:b1:counting:objects}{coefficient binomial} $\binom pk
+= \frac{p!}{k!(p-k)!}$ est divisible par $p$~: en effet $k!\,(p-k)!\,
+\binom pk = p!$ et $p$ \omterm{def:b1:arith:divides}{divise} $p!$ tout en étant premier avec $k!(p-k)!$
+(tous les facteurs sont $< p$), donc le \omterm{thm:b1:arith:gauss}{lemme de Gauss} donne $p \mid \binom pk$.
+
+Démontrons maintenant $a^p \equiv a$ pour $a \in \N$ par récurrence. C'est vrai pour $a =
+0$. Si $a^p \equiv a$, alors la formule du binôme donne
+\[
+(a+1)^p = \sum_{k=0}^{p} \binom pk a^k
+\equiv a^p + 1 \equiv a + 1 \pmod p,
+\]
+tous les termes intermédiaires s'annulant modulo $p$. Pour $a < 0$, on applique le résultat à
+$-a$ et on sépare $p = 2$ (où $x \equiv -x$) du cas $p$ impair (où
+$(-a)^p = -a^p$). Enfin, si $p \nmid a$, on multiplie $a^p \equiv a$ par
+un inverse de $a$ modulo $p$ (\cref{prop:b1:arith:invmod}).
+\end{proof}
+
+\begin{example}[La réciproque de Fermat est fausse~: $341$]\label{ex:b1:arith:pseudoprime}
+Le \omterm{thm:b1:arith:fermat}{petit théorème de Fermat} fournit un test de \emph{non-primalité} bon
+marché~: si $a^{n-1} \not\equiv 1 \pmod n$ pour un certain $a$ premier avec $n$,
+alors $n$ n'est pas \omterm{def:b1:arith:prime}{premier}. Le test pourrait-il aussi certifier la primalité~? Non~:
+prenons $n = 341 = 11 \times 31$, composé, et $a = 2$. Comme
+$2^{10} = 1024 = 3 \times 341 + 1$,
+\[
+2^{10} \equiv 1 \pmod{341}
+\qquad\Longrightarrow\qquad
+2^{340} = \bigl(2^{10}\bigr)^{34} \equiv 1 \pmod{341} :
+\]
+le nombre composé $341$ passe le test de Fermat en base $2$ (c'est le
+plus petit \emph{\omterm{def:b1:arith:prime}{pseudo-premier}} de ce genre). La base $3$ le démasque
+($3^{340} \not\equiv 1$), et les tests de primalité pratiques
+exécutent donc le test sur plusieurs bases, avec des raffinements ---
+les versions industrielles de cette idée sont celles qui certifient les
+grands \omterm{def:b1:arith:prime}{nombres premiers} de la \cref{rem:b1:arith:whereused}. Morale~: une implication
+et sa réciproque mènent des vies séparées
+(\cref{rem:b1:logic:pitfalls}), même pour les théorèmes.
+\end{example}
+
+\begin{example}[Calculs pratiques de congruences]\label{ex:b1:arith:congruences}
+Quel est le reste de $7^{2026}$ modulo $11$~? D'après Fermat, $7^{10}
+\equiv 1 \pmod{11}$. Comme $2026 = 10 \times 202 + 6$~:
+\[
+7^{2026} \equiv 7^6 = (7^2)^3 = 49^3 \equiv 5^3 = 125 \equiv 4
+\pmod{11}.
+\]
+Le reste vaut $4$. La stratégie~: réduire l'exposant modulo l'ordre
+fourni par Fermat, puis réduire les puissances intermédiaires à chaque
+étape.
+\end{example}
+
+\begin{remark}[Pièges classiques en arithmétique]\label{rem:b1:arith:pitfalls}
+\begin{enumerate}
+  \item \emph{Diviser une \omterm{def:b1:arith:congruence}{congruence}.} De $ac \equiv bc \pmod n$
+        on ne peut \emph{pas} conclure $a \equiv b$ sauf si $\gcd(c,
+        n) = 1$~: $6 \equiv 2 \pmod 4$ mais $3 \not\equiv 1 \pmod
+        4$. La règle générale correcte \omterm{def:b1:arith:divides}{divise} aussi le \omterm{def:b1:complex:field}{module}~: $ac
+        \equiv bc \pmod n \iff a \equiv b \pmod{n/\gcd(c,n)}$.
+  \item \emph{Mésusage du lemme d'Euclide.} $a \mid bc$ entraîne $a
+        \mid b$ ou $a \mid c$ seulement si $a$ est \emph{\omterm{def:b1:arith:prime}{premier}} (ou
+        premier avec l'un des facteurs)~: $6 \mid 4 \times 9$ alors que $6$
+        ne \omterm{def:b1:arith:divides}{divise} aucun des deux facteurs.
+  \item \emph{«~\omterm{cor:b1:arith:bezout}{Premiers entre eux}~» est une relation, pas une
+        propriété.} «~$8$ et $9$ sont \omterm{cor:b1:arith:bezout}{premiers entre eux}~» est vrai
+        bien qu'aucun des deux ne soit \omterm{def:b1:arith:prime}{premier}~;
+        «~\omterm{cor:b1:arith:bezout}{premiers entre eux} deux à deux~» est plus fort que
+        «~\omterm{cor:b1:arith:bezout}{premiers entre eux} dans leur ensemble~» ($\gcd(6, 10, 15) = 1$
+        mais aucune paire n'est formée d'entiers \omterm{cor:b1:arith:bezout}{premiers entre eux}).
+  \item \emph{Les exposants ne vivent pas modulo $n$.} Dans $a^k \bmod n$,
+        l'exposant ne peut être réduit que modulo l'\emph{ordre}
+        de $a$ (par exemple $p - 1$ quand Fermat s'applique), jamais
+        modulo $n$~: $2^{10} \bmod 11$ vaut $1$, et non $2^{10 \bmod
+        11} = 2^{10}$ --- la réduction qui marche est celle qu'effectue
+        l'\cref{ex:b1:arith:congruences}.
+\end{enumerate}
+\end{remark}
+
+\begin{remark}[Où ce chapitre est utilisé]\label{rem:b1:arith:whereused}
+Ce chapitre est un modèle autant qu'une boîte à outils. Toute la chaîne
+--- division euclidienne, PGCD, Bézout, Gauss, unicité de la
+factorisation --- est rejouée mot pour mot pour les polynômes au
+\cref{ch:b1:poly}, où le «~degré~» joue le rôle de la valeur absolue~;
+comparer les deux chapitres côte à côte est la meilleure façon de
+comprendre les deux. Le calcul des \omterm{def:b1:arith:congruence}{congruences} devient l'anneau $\Z/n\Z$ au
+\cref{ch:b1:structures}, dont les éléments inversibles
+(\cref{prop:b1:arith:invmod}) forment le premier exemple non trivial de
+groupe des unités. Les valuations reviennent dans le devoir maison ci-dessous
+(\omterm{pb:b1:arith:1}{formule de Legendre}) et alimentent les démonstrations d'irrationalité du
+\cref{ch:b1:reals}. Au-delà de ce volume, l'inversion de Bézout modulo $n$
+est le moteur de la cryptographie à clé publique, et le \omterm{thm:b1:arith:fermat}{petit théorème de
+Fermat} est l'ancêtre des tests de primalité qui certifient les
+grands \omterm{def:b1:arith:prime}{nombres premiers} qu'on y utilise.
+\end{remark}
+
+\begin{remark}[Interlude~: $\Z$ comme modèle]\label{rem:b1:arith:interlude}
+Prenons du recul par rapport aux théorèmes individuels et observons
+l'architecture du chapitre~: un outil (la division euclidienne)
+a produit une classification (les sous-groupes $n\Z$), qui a produit un
+théorème d'existence (PGCD, Bézout), qui a produit un calcul de
+\omterm{def:b1:arith:divides}{divisibilité} (Gauss), qui a produit l'unicité de la factorisation --- chaque
+étage ne reposant que sur celui du dessous. Le même bâtiment sera
+élevé deux fois encore dans ce volume, sur des rez-de-chaussée différents~:
+au \cref{ch:b1:poly}, où la division selon le degré remplace la division
+selon la taille et où tout l'étage supérieur se répète \emph{mot pour mot}~; et, en
+miniature, à l'intérieur de chaque $\Z/n\Z$ du \cref{ch:b1:structures},
+où les questions d'inversibilité (la \cref{prop:b1:arith:invmod} de ce
+chapitre) deviennent des énoncés structurels sur les
+anneaux et les corps. Reconnaître dans un argument «~l'argument dans $\Z$,
+transplanté~» est la façon la plus rapide d'apprendre ces chapitres --- et
+le premier avant-goût de l'habitude centrale de l'algèbre~: démontrer des théorèmes sur des
+\emph{axiomes} plutôt que sur des objets.
+\end{remark}
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=0.42]
+  \foreach \n/\k in {0/0, 1/0, 1/1, 2/0, 2/2, 3/0, 3/1, 3/2, 3/3,
+      4/0, 4/4, 5/0, 5/1, 5/4, 5/5, 6/0, 6/2, 6/4, 6/6,
+      7/0, 7/1, 7/2, 7/3, 7/4, 7/5, 7/6, 7/7}
+    \fill[omDef] ({2*\k - \n}, {-\n}) circle (0.32);
+  \foreach \n/\k in {2/1, 4/1, 4/2, 4/3, 5/2, 5/3, 6/1, 6/3, 6/5}
+    \draw[gray] ({2*\k - \n}, {-\n}) circle (0.32);
+\end{tikzpicture}
+
+{\small Les lignes $0$ à $7$ du triangle de Pascal, les coefficients
+\emph{impairs} étant coloriés~: la ligne $n$ en contient $2^{s_2(n)}$, où
+$s_2(n)$ est le nombre de uns dans l'écriture binaire de $n$
+(lignes $1, 2, 4$~: deux coefficients impairs~; ligne $7 = (111)_2$~: tous les huit).
+Le motif autosimilaire --- chaque «~triangle d'impairs~» engendre deux
+copies de lui-même --- est le \omterm{pb:b1:arith:1}{théorème de Kummer} sous forme d'image, démontré
+dans le devoir maison ci-dessous.}
+\end{omfigure}
+
+\section{Exercices}
+
+\begin{exercise}[$\star$]\label{exo:b1:arith:1}
+Calculez $\gcd(1\,001, 777)$ par l'\omterm{met:b1:arith:euclid}{algorithme d'Euclide}, ainsi qu'un couple
+de Bézout associé.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:arith:2}
+Démontrez les critères de \omterm{def:b1:arith:divides}{divisibilité} en base $10$~: un entier est \omterm{def:b1:arith:congruence}{congru} modulo
+$9$ à la somme de ses chiffres, et modulo $11$ à la somme alternée de
+ses chiffres. Que valent $123\,456\,789$ modulo $9$ et modulo $11$~?
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:arith:3}
+Résolvez dans $\Z$~: $91x \equiv 1 \pmod{237}$ \emph{(Euclide étendu)}.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:arith:4}
+Trouvez tous les couples $(x, y) \in \Z^2$ tels que $17x + 39y = 1$~; puis tous les couples
+tels que $17 x + 39 y = 5$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:arith:5}
+Démontrez que, pour $a, b \in \N^*$~: $\gcd(a,b) \times
+\operatorname{lcm}(a,b) = ab$. \emph{(Utilisez les formules de valuation de la
+\cref{prop:b1:arith:valuation} et $\min(\alpha,\beta) +
+\max(\alpha,\beta) = \alpha + \beta$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:arith:6}
+Soient $a = 2^{10} \times 3^4 \times 5^2$ et $b = 2^6 \times 3^7 \times
+7$. Calculez $\gcd(a, b)$, $\operatorname{lcm}(a,b)$, et le nombre de
+diviseurs positifs de $a$. \emph{(Démontrez la formule du nombre de diviseurs
+$\prod_i (\alpha_i + 1)$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:arith:7}
+Démontrez que $\sqrt p$ est irrationnel pour tout \omterm{def:b1:arith:prime}{nombre premier} $p$, en utilisant
+les valuations~: comparez $v_p$ des deux membres de $p q^2 = r^2$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:arith:8}
+(Problème des restes chinois) Trouvez tous les entiers $x$ tels que
+\[
+x \equiv 2 \pmod 7, \qquad x \equiv 5 \pmod{11}.
+\]
+Démontrez au passage que, pour $m, n$ \omterm{cor:b1:arith:bezout}{premiers entre eux}, le couple de \omterm{def:b1:arith:congruence}{congruences}
+$x \equiv a \ (m)$, $x \equiv b\ (n)$ a toujours une solution, unique
+modulo $mn$.\index{théorème des restes chinois}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:arith:9}
+Calculez $3^{1000}$ modulo $7$, ainsi que les deux derniers chiffres décimaux de
+$7^{100}$ \emph{(modulo $100 = 4 \times 25$~: utilisez
+l'\cref{exo:b1:arith:8})}.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:arith:10}
+Pour $m, n \in \N^*$, démontrez que $\gcd(2^m - 1,\, 2^n - 1) =
+2^{\gcd(m,n)} - 1$. \emph{Indication~: montrez d'abord que le reste de $2^m
+- 1$ modulo $2^n - 1$ est $2^r - 1$, où $r$ est le reste de $m$ modulo
+$n$~; puis suivez l'\omterm{met:b1:arith:euclid}{algorithme d'Euclide}.}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:arith:11}
+(Théorème de Wilson) Soit $p$ un \omterm{def:b1:arith:prime}{nombre premier}. Démontrez que
+\[
+(p-1)! \equiv -1 \pmod p ,
+\]
+en appariant chaque facteur de $(p-1)!$ avec son inverse modulo $p$ et
+en identifiant les facteurs appariés à eux-mêmes (résolvez d'abord $x^2 \equiv 1 \pmod p$).
+Vérifiez la réciproque~: si $n \geq 2$ n'est pas \omterm{def:b1:arith:prime}{premier}, alors $(n-1)!
+\not\equiv -1 \pmod n$.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:arith:12}
+(Nombres de Fermat) Pour $n \in \N$, posons $F_n = 2^{2^n} + 1$.
+\begin{enumerate}
+  \item Démontrez que $F_0 F_1 \cdots F_{n-1} = F_n - 2$ pour $n \geq
+        1$ (récurrence).
+  \item Déduisez-en que les nombres de Fermat sont deux à deux \omterm{cor:b1:arith:bezout}{premiers entre eux}.
+  \item Déduisez-en une seconde démonstration, indépendante du
+        \cref{thm:b1:arith:euclidprimes}, du fait qu'il existe une
+        infinité de \omterm{def:b1:arith:prime}{nombres premiers}.
+\end{enumerate}
+\end{exercise}
+
+\section{Problème~: la formule de Legendre et les retenues de Kummer}
+
+\begin{problem}\label{pb:b1:arith:1}
+Par combien de zéros se termine l'écriture décimale de $1000!$ --- et, plus
+profondément, quelle est la puissance exacte d'un \omterm{def:b1:arith:prime}{nombre premier} $p$ qui \omterm{def:b1:arith:divides}{divise} $n!$,
+ou qui \omterm{def:b1:arith:divides}{divise} un \omterm{def:b1:counting:objects}{coefficient binomial}~? Les réponses complètes sont deux joyaux de
+l'arithmétique élémentaire~: la \emph{formule de Legendre}
+\index{formule de Legendre} $v_p(n!) = \sum_{k\geq1}
+\lfloor n/p^k \rfloor$, avec son avatar en chiffres $v_p(n!) = \frac{n
+- s_p(n)}{p-1}$, et le \emph{théorème de Kummer}\index{théorème de
+Kummer}~: $v_p\binom{m+n}m$ compte les \emph{retenues} de l'addition de
+$m$ et $n$ en base $p$. Ce problème démontre les deux, les confronte
+numériquement l'un à l'autre, et en récolte les conséquences classiques
+--- zéros terminaux, parité du triangle de Pascal,
+et une première minoration en direction du théorème des \omterm{def:b1:arith:prime}{nombres premiers}.
+Dans tout ce qui suit, $p$ est un \omterm{def:b1:arith:prime}{nombre premier}, $\floor{x}$ est la partie entière, et
+$s_p(n)$ désigne la somme des chiffres de $n$ écrit en base $p$.
+
+\medskip
+\noindent\textbf{Partie I --- Parties entières, valuations et \omterm{pb:b1:arith:1}{formule
+de Legendre}.}
+\begin{enumerate}
+  \item Échauffement~: calculez $10!$ et lisez-y son nombre de zéros
+        terminaux~; calculez $v_2(10!)$ et $v_5(10!)$ directement à partir de la
+        factorisation de chacun des facteurs $1, 2, \dots, 10$.
+  \item Démontrez que, pour $x \in \R$ et $n \in \N^*$,
+        $\bigl\lfloor \lfloor x \rfloor / n \bigr\rfloor =
+        \lfloor x/n \rfloor$.
+  \item Démontrez que $v_p(a + b) \geq \min\bigl(v_p(a),
+        v_p(b)\bigr)$ pour tous $a, b \in \N^*$, avec égalité
+        dès que $v_p(a) \neq v_p(b)$.
+  \item Montrez que le nombre de multiples de $m$ dans $\intint1n$ est
+        $\lfloor n/m \rfloor$.
+  \item Démontrez la \emph{\omterm{pb:b1:arith:1}{formule de Legendre}}~: pour tout $n \in \N^*$,
+        \[
+        v_p(n!) = \sum_{k=1}^{\infty}
+        \Bigl\lfloor \frac{n}{p^k} \Bigr\rfloor
+        \]
+        (somme finie~: les termes s'annulent dès que $p^k > n$).
+        \emph{Comptez, pour chaque $k$, les facteurs de $\intint1n$
+        divisibles par $p^k$~: chacun contribue exactement pour une unité par
+        niveau qu'il atteint.}
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie II --- La forme en chiffres et les zéros
+terminaux.}
+\begin{enumerate}[resume]
+  \item Calculez $v_5(1000!)$ et $v_2(1000!)$, et concluez~: par combien
+        de zéros se termine $1000!$~?
+  \item Démontrez la forme en chiffres de la \omterm{pb:b1:arith:1}{formule de Legendre}~: en écrivant $n =
+        \sum_i a_i p^i$ en base $p$,
+        \[
+        v_p(n!) = \frac{n - s_p(n)}{p - 1} .
+        \]
+  \item Deux conséquences pour $p = 2$~: montrez que $2^n$ ne \omterm{def:b1:arith:divides}{divise}
+        jamais $n!$, et que $2^{n-1}$ \omterm{def:b1:arith:divides}{divise} $n!$ exactement lorsque
+        $n$ est une puissance de $2$.
+  \item Encadrez le défaut~: montrez que $\frac n{p-1} - \log_p(n) - 1 \leq
+        v_p(n!) < \frac n{p-1}$, de sorte que $\frac{v_p(n!)}{n} \to
+        \frac1{p-1}$~: à la longue, il s'accumule une proportion
+        $\frac1{p-1}$ de facteur $p$ par unité.
+  \item Soit $Z(n) = v_5(n!)$ le nombre de zéros terminaux de
+        $n!$. Montrez que $Z(n) - Z(n-1) = v_5(n)$, déduisez-en que $Z$ saute
+        entièrement la valeur $5$ (calculez $Z(24)$ et $Z(25)$), et
+        démontrez qu'aucune factorielle ne se termine par exactement cinq zéros.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie III --- Le \omterm{pb:b1:arith:1}{théorème de Kummer}.}
+\begin{enumerate}[resume]
+  \item Démontrez que $\lfloor x + y \rfloor - \lfloor x \rfloor -
+        \lfloor y \rfloor \in \{0, 1\}$ pour tous $x, y \in \R$, et
+        déduisez de la \omterm{pb:b1:arith:1}{formule de Legendre} que
+        \[
+        v_p\binom{m+n}m
+        = \sum_{k\geq1}\Bigl(
+        \Bigl\lfloor\frac{m+n}{p^k}\Bigr\rfloor
+        - \Bigl\lfloor\frac{m}{p^k}\Bigr\rfloor
+        - \Bigl\lfloor\frac{n}{p^k}\Bigr\rfloor\Bigr),
+        \]
+        somme de termes valant chacun $0$ ou $1$.
+  \item Démontrez le \emph{\omterm{pb:b1:arith:1}{théorème de Kummer}}~: le $k$-ième terme de cette somme
+        vaut $1$ exactement lorsque l'addition de $m$ et $n$ en
+        base $p$ produit une retenue en position $k$~; donc
+        $v_p\binom{m+n}m$ est le nombre total de retenues.
+        \emph{(Écrivez $m = p^km_1 + m_0$ et $n = p^kn_1 + n_0$
+        avec $0 \leq m_0, n_0 < p^k$ et examinez $\lfloor (m_0 +
+        n_0)/p^k \rfloor$.)}
+  \item Déduisez-en que, pour $0 < j < p^k$~:
+        \[
+        v_p\binom{p^k}{j} = k - v_p(j) ,
+        \]
+        en comptant les retenues dans l'addition $j + (p^k - j)$.
+        (En particulier $p \mid \binom p j$ pour $0 < j < p$~: l'étape
+        clé du \cref{thm:b1:arith:fermat}, retrouvée.)
+  \item Démontrez que $v_2\binom{2n}n = s_2(n)$. Déduisez-en que le
+        \omterm{def:b1:counting:objects}{coefficient binomial} central est toujours pair, et que
+        $\binom{2n}n \equiv 2 \pmod 4$ exactement lorsque $n$ est une puissance
+        de $2$.
+  \item Montrez, à l'aide de l'identité de Vandermonde
+        (\cref{exo:b1:counting:7}) et de la question 13, que
+        $\binom{2p}p \equiv 2 \pmod p$ pour tout \omterm{def:b1:arith:prime}{nombre premier} $p$.
+  \item Calculez $v_3\binom{1000}{500}$ de deux façons~: une fois par Kummer
+        (écrivez $500$ en base $3$ et comptez les retenues dans $500 +
+        500$), une fois par la forme en chiffres de Legendre (calculez $s_3(500)$
+        et $s_3(1000)$)~; vérifiez que les deux donnent la même valeur.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie IV --- La parité du triangle de Pascal, et
+une minoration de la densité des \omterm{def:b1:arith:prime}{nombres premiers}.}
+\begin{enumerate}[resume]
+  \item Démontrez le critère sur les chiffres~: $\binom nk$ est \emph{impair} si
+        et seulement si chaque chiffre binaire de $k$ est au plus égal au
+        chiffre correspondant de $n$. Énoncez et démontrez le critère
+        analogue pour $p \nmid \binom nk$ en base $p$.
+  \item Déduisez-en que la ligne $n$ du triangle de Pascal contient exactement
+        $2^{s_2(n)}$ coefficients impairs~; vérifiez-le sur les lignes $4$ et $5$.
+  \item Déduisez-en que tous les coefficients intérieurs $\binom nk$ ($0 < k < n$)
+        sont pairs si et seulement si $n$ est une puissance de $2$.
+  \item Démontrez que toute puissance de \omterm{def:b1:arith:prime}{nombre premier} divisant $\binom{m+n}m$ est au
+        plus $m + n$~: si $p^a \mid \binom{m+n}m$, alors $p^a \leq
+        m + n$. \emph{(Combien de termes non nuls la somme de
+        la question 11 peut-elle avoir~?)}
+  \item Déduisez-en que $\binom{2n}n$ \omterm{def:b1:arith:divides}{divise}
+        $\operatorname{lcm}(1, 2, \dots, 2n)$, et combinez avec
+        la minoration $\binom{2n}n \geq \frac{4^n}{2n+1}$
+        (que vous démontrerez~: le coefficient central est le plus grand
+        des $2n + 1$ coefficients de la ligne $2n$) pour obtenir
+        \[
+        \operatorname{lcm}(1, \dots, 2n) \geq \frac{4^n}{2n+1} :
+        \]
+        les multiples communs des premiers entiers croissent
+        \emph{exponentiellement} --- un premier aperçu quantitatif de
+        l'abondance des \omterm{def:b1:arith:prime}{nombres premiers}.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie V --- Synthèse.}
+\begin{enumerate}[resume]
+  \item Trouvez le plus petit $n$ tel que $n!$ se termine par au moins
+        $2026$ zéros. \emph{(Estimez $Z(n) \approx n/4$, puis
+        ajustez à l'aide de la formule exacte.)}
+  \item Une dernière vérification croisée~: montrez que $7$ ne \omterm{def:b1:arith:divides}{divise} \emph{pas}
+        $\binom{100}{50}$, d'abord en écrivant $50$ en base $7$ et
+        en vérifiant que l'addition $50 + 50$ est sans retenue, puis
+        en calculant $v_7(100!)$ et $v_7(50!)$ avec la \omterm{pb:b1:arith:1}{formule de
+        Legendre}.
+  \item Où exactement le problème a-t-il utilisé~: (i) l'unicité de la
+        factorisation~; (ii) la décomposition par division euclidienne
+        $n = p^k n_1 + n_0$~; (iii) un argument de dénombrement du
+        \cref{ch:b1:counting}~? Une phrase pour chacun.
+  \item Synthèse, en un court paragraphe~: la \omterm{pb:b1:arith:1}{formule de Legendre} transforme
+        une question de \omterm{def:b1:arith:divides}{divisibilité} en arithmétique des chiffres, et
+        le \omterm{pb:b1:arith:1}{théorème de Kummer} lit la réponse sur les retenues d'une seule
+        addition --- commentez cette traduction, les vérifications de
+        la question 16, et ce que la minoration de la question 21 suggère
+        au sujet des \omterm{def:b1:arith:prime}{nombres premiers} (l'énoncé complet, le théorème des
+        \omterm{def:b1:arith:prime}{nombres premiers}, dépasse de loin ce volume~; l'analogue polynomial
+        de la boîte à outils de ce chapitre est le
+        \cref{ch:b1:poly}).
+\end{enumerate}
+\end{problem}

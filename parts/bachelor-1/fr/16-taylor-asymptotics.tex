@@ -1,0 +1,922 @@
+\chapter{Formules de Taylor et développements limités}\label{ch:b1:taylor}
+
+Au \omterm{def:b1:topology:open}{voisinage} d'un point, une fonction régulière vaut un \omterm{def:b1:poly:def}{polynôme} --- à
+une erreur contrôlable près. Les \omterm{thm:b1:taylor:integral}{formules de Taylor} rendent cela exact
+sous trois formes (reste intégral, reste de Lagrange, reste de Young),
+et les \emph{développements limités} qui en résultent, manipulés
+algébriquement, deviennent l'outil le plus fin de l'analyse
+élémentaire~: limites, équivalents, comportement local, asymptotes.
+
+\section{Relations de comparaison}
+
+\begin{definition}[Notations de Landau]\label{def:b1:taylor:landau}
+Soient $f$ et $g$ définies au \omterm{def:b1:topology:open}{voisinage} de $x_0$ ($x_0 \in \R$ ou
+$\pm\infty$). On écrit, quand $x \to x_0$~:\index{notations de Landau}
+\begin{itemize}
+  \item $f = o(g)$ («~petit o~») lorsque $f = \varepsilon g$ avec
+        $\varepsilon(x) \to 0$~;
+  \item $f = O(g)$ («~grand O~») lorsque $f = u g$ avec $u$ bornée au
+        \omterm{def:b1:topology:open}{voisinage} de $x_0$~;
+  \item $f \sim g$ («~équivalentes~»\index{fonctions équivalentes})
+        lorsque $f = (1 + \varepsilon) g$ avec $\varepsilon \to 0$ ---
+        de façon équivalente, $f - g = o(g)$.
+\end{itemize}
+Les mêmes notations s'appliquent aux suites ($n \to \infty$).
+\end{definition}
+
+\begin{proposition}[Règles]\label{prop:b1:taylor:landaurules}
+Quand $x \to x_0$~:
+\begin{enumerate}
+  \item $\sim$ est une \omterm{def:b1:logic:equiv}{relation d'équivalence}~; $f \sim g$ entraîne que
+        $f$ et $g$ ont mêmes limites, même signe (au \omterm{def:b1:topology:open}{voisinage} de
+        $x_0$) et la même absence de zéros~;
+  \item les équivalents \emph{se multiplient et se divisent}~: $f_1
+        \sim g_1$ et $f_2 \sim g_2$ entraînent $f_1 f_2 \sim g_1 g_2$
+        et $\frac{f_1}{f_2} \sim \frac{g_1}{g_2}$~;
+  \item les équivalents ne s'\emph{additionnent pas}~: $x + 1 \sim x$
+        et $-x \sim -x + 2$ en $+\infty$, et pourtant les sommes $1$ et
+        $2$ ne sont pas équivalentes. Pour additionner, il faut revenir
+        aux développements avec des termes $o(\cdot)$ explicites~;
+  \item $o(g) + o(g) = o(g)$, $\;u \cdot o(g) = o(ug)$, $\;o(o(g)) =
+        o(g)$, et $f \sim g \iff f = g + o(g)$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+Chaque point est une courte manipulation des définitions~; par exemple
+$f_1 f_2 = (1+\varepsilon_1)(1+\varepsilon_2) g_1 g_2$ et $(1 +
+\varepsilon_1)(1+\varepsilon_2) \to 1$. Deux points de (4) méritent
+leur ligne. $u\cdot o(g) = o(ug)$~: si $f = \varepsilon g$ avec
+$\varepsilon \to 0$, alors $uf = \varepsilon\,(ug)$ avec le même
+$\varepsilon$. $o(o(g)) = o(g)$~: si $f = \varepsilon_1 h$ et
+$h = \varepsilon_2 g$ avec les deux $\varepsilon_i \to 0$, alors $f =
+(\varepsilon_1\varepsilon_2) g$ et le produit des deux infiniment
+petits en est un. L'équivalence $f \sim g \iff f = g +
+o(g)$ est la définition lue deux fois~: $f - g = \varepsilon g$.
+Le contre-exemple de (3) est la démonstration de (3).
+\end{proof}
+
+\begin{example}[L'échelle de comparaison]\label{ex:b1:taylor:scale}
+Quand $x \to +\infty$, l'échelle usuelle s'écrit, par ordre de
+force croissante~:
+\[
+1 \;=\; o(\ln x), \quad
+\ln x = o(x^{0.01}), \quad
+x^{0.01} = o(\sqrt x), \quad
+\sqrt x = o(x^{10}), \quad
+x^{10} = o(\eu^{x}), \quad
+\eu^x = o(\eu^{2x}) ,
+\]
+chaque étape étant un cas des \omterm{prop:b1:functions:powerrules}{croissances comparées} de la
+\cref{prop:b1:functions:powerrules} (les puissances l'emportent sur
+les logarithmes, les exponentielles sur les puissances, et à
+l'\omterm{def:b1:topology:closure}{intérieur} d'une même famille c'est l'exposant qui décide). Deux
+réflexes à prendre~: d'abord, un $O(\cdot)$ qui atterrit dans une
+classe plus petite se promeut silencieusement ($O(\ln x)$ est aussi
+un $o(x^{0.01})$)~; ensuite, en $x \to 0^+$ toute l'échelle se
+retourne par la substitution $x \mapsto \frac1x$ ---
+$\ln x = o(x^{-0.01})$ y devient vrai, de sorte que
+«~$x^\alpha \ln x \to 0$~» vaut pour tout $\alpha > 0$. Tenir
+l'échelle droite, c'est la moitié de tout raisonnement asymptotique
+du \cref{ch:b1:series}.
+\end{example}
+
+\begin{example}[Unicité des développements, et un dividende de parité]\label{ex:b1:taylor:uniqueness}
+Si une fonction admet deux développements en $0$ au même ordre,
+\[
+a_0 + a_1 x + \dots + a_n x^n + o(x^n)
+= b_0 + b_1 x + \dots + b_n x^n + o(x^n),
+\]
+alors $a_k = b_k$ pour tout $k$~: en soustrayant et en posant $c_k =
+a_k - b_k$, on évalue l'identité $c_0 + c_1 x + \dots + c_n x^n
+= o(x^n)$ quand $x \to 0$ pour obtenir $c_0 = 0$~; on divise par $x$
+et on recommence --- chaque division est légitime parce que
+l'expression restante est de nouveau un $o(x^{n-k})$. Les
+coefficients sont donc intrinsèques, et on peut les calculer par
+\emph{n'importe quelle} voie (\omterm{def:b1:derivative:def}{dérivées} de Taylor, algèbre sur des
+développements connus, intégration)~: toutes les voies doivent
+concorder. Dividende~: une fonction \emph{paire} n'a que des
+puissances paires dans son développement --- remplacer $x$ par $-x$
+et invoquer l'unicité~; de même les fonctions impaires n'ont que des
+puissances impaires. C'est pourquoi $\cos$ porte $o(x^{2p+1})$ et
+non $o(x^{2p})$ dans le tableau ci-dessous~: le terme impair absent
+est une information gratuite, un ordre de précision pour rien.
+\end{example}
+
+\section{Les trois formules de Taylor}
+
+\begin{theorem}[Formule de Taylor avec reste intégral]\label{thm:b1:taylor:integral}
+Soit $f$ de classe $C^{n+1}$ sur un \omterm{prop:b1:reals:intervals}{intervalle} contenant $a$ et $x$.
+Alors\index{formule de Taylor}
+\[
+f(x) = \sum_{k=0}^{n} \frac{f^{(k)}(a)}{k!}\,(x - a)^k
++ \int_a^x \frac{(x - t)^n}{n!}\, f^{(n+1)}(t)\, \dd t .
+\]
+\end{theorem}
+
+\begin{proof}
+Récurrence sur $n$. Pour $n = 0$~: $f(x) = f(a) + \int_a^x f'(t)\dd t$
+est le \omterm{thm:b1:integration:ftc}{théorème fondamental de l'analyse}
+(\cref{thm:b1:integration:ftc}). Hérédité~: on intègre le reste par
+parties,
+\[
+\int_a^x \frac{(x-t)^n}{n!} f^{(n+1)}(t)\,\dd t
+= \Bigl[-\frac{(x-t)^{n+1}}{(n+1)!} f^{(n+1)}(t)\Bigr]_a^x
++ \int_a^x \frac{(x-t)^{n+1}}{(n+1)!} f^{(n+2)}(t)\,\dd t ,
+\]
+le crochet fournissant le terme $\frac{f^{(n+1)}(a)}{(n+1)!}(x -
+a)^{n+1}$.
+\end{proof}
+
+\begin{example}[Un développement exact avec son reste]\label{ex:b1:taylor:lnexact}
+Pour $\ln(1 + x)$, le reste intégral peut être rendu complètement
+explicite sans dériver quoi que ce soit $n$ fois~: on intègre de
+$0$ à $x$ l'identité géométrique finie $\frac{1}{1+t} =
+\sum_{k=0}^{n-1}(-t)^k + \frac{(-t)^n}{1+t}$~:
+\[
+\ln(1 + x) = \sum_{k=1}^{n} \frac{(-1)^{k-1}x^k}{k}
++ (-1)^n \int_0^x \frac{t^n}{1 + t}\,\dd t ,
+\]
+et, pour $0 \leq x \leq 1$, le reste est majoré par $\int_0^x
+t^n\,\dd t = \frac{x^{n+1}}{n+1}$. C'est plus fort que
+Taylor--Young à deux titres~: c'est une \emph{identité} valable pour
+un $x$ fixé (et pas seulement quand $x \to 0$), et la majoration de
+l'erreur est numérique. Le devoir maison (\cref{pb:b1:taylor:1}) vit
+sur de telles formes exactes~; Taylor--Young ci-dessous est l'outil
+plus léger pour les limites, où seule la forme de l'erreur importe.
+\end{example}
+
+\begin{theorem}[Inégalité de Taylor--Lagrange]\label{thm:b1:taylor:lagrange}
+Soit $f$ de classe $C^{n+1}$, avec $\abs{f^{(n+1)}} \leq M$ entre $a$
+et $x$. Alors
+\[
+\Bigl| f(x) - \sum_{k=0}^{n} \frac{f^{(k)}(a)}{k!}(x-a)^k \Bigr|
+\leq M\, \frac{\abs{x - a}^{n+1}}{(n+1)!} .
+\]
+\end{theorem}
+
+\begin{proof}
+On majore le reste intégral~: $\bigl|\int_a^x \frac{(x-t)^n}{n!}
+f^{(n+1)}(t)\,\dd t\bigr| \leq M \bigl|\int_a^x
+\frac{\abs{x-t}^n}{n!}\dd t\bigr| = M\frac{\abs{x-a}^{n+1}}{(n+1)!}$.
+\end{proof}
+
+\begin{example}[Du numérique certifié]\label{ex:b1:taylor:certified}
+Combien vaut $\sqrt{1.02}$~? On applique l'inégalité de
+Taylor--Lagrange à $f(t) = \sqrt{1 + t}$ en $a = 0$, à l'ordre $2$,
+avec $x = 0.02$~:
+\[
+\sqrt{1.02} \approx 1 + \frac{0.02}{2} - \frac{0.02^2}{8}
+= 1.00995 ,
+\qquad
+\abs{f'''(t)} = \frac{3}{8}(1+t)^{-5/2} \leq \frac 38 ,
+\]
+donc l'erreur vaut au plus $\frac38 \cdot \frac{0.02^3}{6} =
+5\cdot10^{-7}$~: $\sqrt{1.02} = 1.00995$ avec six décimales
+certifiées (valeur exacte $1.0099504938\dots$ --- la majoration est
+presque optimale). L'idée à retenir~: Taylor--Young dit seulement
+\emph{à quelle vitesse} l'erreur s'annule~; Taylor--Lagrange
+convertit le même \omterm{def:b1:poly:def}{polynôme} en un \emph{certificat}, un nombre
+assorti d'une barre d'erreur démontrée. Chaque fois qu'une valeur
+décimale est affirmée dans ce livre, une majoration de type Lagrange
+se tient derrière~; le devoir maison (\cref{pb:b1:taylor:1})
+industrialise l'idée.
+\end{example}
+
+\begin{theorem}[Taylor--Young]\label{thm:b1:taylor:young}
+Soit $f$ une fonction $n$ fois \omterm{def:b1:derivative:def}{dérivable} en $a$. Alors, quand $x \to a$~:
+\[
+f(x) = \sum_{k=0}^{n} \frac{f^{(k)}(a)}{k!}\,(x-a)^k
++ o\bigl((x-a)^n\bigr) .
+\]
+\end{theorem}
+
+\begin{proof}
+Récurrence sur $n$. Pour $n = 1$, c'est la définition de la \omterm{def:b1:derivative:def}{dérivée}
+(\cref{def:b1:derivative:def}). Supposons l'énoncé acquis à l'ordre
+$n - 1$, et soit $f$ une fonction $n$ fois \omterm{def:b1:derivative:def}{dérivable} en $a$. On applique
+l'hypothèse de récurrence à $f'$ (qui est $n-1$ fois \omterm{def:b1:derivative:def}{dérivable}
+en $a$)~:
+\[
+f'(t) = \sum_{k=0}^{n-1} \frac{f^{(k+1)}(a)}{k!}(t-a)^k + r(t),
+\qquad r(t) = o\bigl((t-a)^{n-1}\bigr).
+\]
+Posons $g(x) = f(x) - \sum_{k=0}^{n} \frac{f^{(k)}(a)}{k!}(x-a)^k$~;
+alors $g' = r$ et $g(a) = 0$. Soit $\varepsilon > 0$~; choisissons
+$\delta$ tel que $\abs{r(t)} \leq \varepsilon\abs{t - a}^{n-1}$ pour
+$\abs{t-a} \leq \delta$~; l'inégalité des accroissements finis
+(\cref{thm:b1:derivative:mvt}) appliquée sur le segment joignant $a$ à
+$x$ (où $\abs{g'} \leq \varepsilon\abs{x-a}^{n-1}$) donne
+$\abs{g(x)} \leq \varepsilon\abs{x - a}^n$~: c'est exactement $g(x) =
+o((x-a)^n)$.
+\end{proof}
+
+\begin{remark}[Trois formules, trois prix, trois produits]
+Les hypothèses se gradent exactement comme les conclusions.
+Taylor--Young demande le moins ($n$ \omterm{def:b1:derivative:def}{dérivées} \emph{au point}
+seulement) et rend le moins~: un $o((x-a)^n)$ qualitatif,
+parfait pour les limites, inutile pour des décimales certifiées.
+L'inégalité de Lagrange exige $C^{n+1}$ \emph{sur l'\omterm{prop:b1:reals:intervals}{intervalle}} et
+une majoration $M$ qui y soit valable, et rend une barre d'erreur
+numérique. La forme intégrale demande la même régularité et rend le
+plus~: l'erreur comme objet explicite que l'on peut transformer
+(intégrer par parties, majorer par morceaux, changer de variable)
+--- c'est la forme qui faisait tourner la machine à irrationalité du
+\cref{pb:b1:integration:1}. Choisir la formule la plus faible qui
+suffit au but n'est pas de la pédanterie~: la fonction plate du
+\cref{pb:b1:taylor:1} vérifie Taylor--Young à tout ordre, alors que
+toute conclusion plus forte à son sujet est fausse dès qu'on
+s'éloigne de $0$.
+\end{remark}
+
+\begin{proposition}[Développements limités usuels en $0$]
+Quand $x \to 0$, pour tout ordre $n$ fixé~:
+\index{développement limité!usuel}
+\begin{align*}
+\eu^x &= 1 + x + \frac{x^2}{2!} + \dots + \frac{x^n}{n!} + o(x^n),\\
+\cos x &= 1 - \frac{x^2}{2!} + \frac{x^4}{4!} - \dots
++ \frac{(-1)^p x^{2p}}{(2p)!} + o(x^{2p+1}),\\
+\sin x &= x - \frac{x^3}{3!} + \dots + \frac{(-1)^p
+x^{2p+1}}{(2p+1)!} + o(x^{2p+2}),\\
+\frac{1}{1 - x} &= 1 + x + x^2 + \dots + x^n + o(x^n),\\
+\ln(1 + x) &= x - \frac{x^2}{2} + \frac{x^3}{3} - \dots +
+\frac{(-1)^{n-1} x^n}{n} + o(x^n),\\
+(1 + x)^\alpha &= 1 + \alpha x + \frac{\alpha(\alpha-1)}{2!}x^2 +
+\dots + \binom{\alpha}{n} x^n + o(x^n),
+\end{align*}
+où $\binom{\alpha}{n} = \frac{\alpha(\alpha - 1)\cdots(\alpha - n
++ 1)}{n!}$ pour $\alpha$ réel. ($\cosh$ et $\sinh$~: comme $\cos$ et
+$\sin$, mais sans l'alternance des signes.)
+\label{prop:b1:taylor:standard}
+\end{proposition}
+
+\begin{proof}
+Chaque fonction est de classe $C^\infty$ au \omterm{def:b1:topology:open}{voisinage} de $0$, avec des
+\omterm{def:b1:derivative:def}{dérivées} faciles à évaluer~: $(\eu^x)^{(k)} = \eu^x$~; les \omterm{def:b1:derivative:def}{dérivées} de
+$\sin$ et $\cos$ tournent avec une période $4$~;
+$\bigl((1+x)^\alpha\bigr)^{(k)} = \alpha(\alpha -
+1)\cdots(\alpha - k + 1)(1+x)^{\alpha - k}$~;
+$\bigl(\ln(1+x)\bigr)^{(k)} = \frac{(-1)^{k-1}(k-1)!}{(1+x)^k}$.
+On applique Taylor--Young en $a = 0$. (Le développement géométrique
+est exact~: $\frac{1}{1-x} - \sum_0^n x^k = \frac{x^{n+1}}{1 - x} =
+o(x^n)$.)
+\end{proof}
+
+\begin{method}[Calculer avec les développements limités]\label{met:b1:taylor:compute}
+\begin{enumerate}
+  \item \emph{Fixer d'abord l'ordre visé} $n$, et y tronquer tout
+        résultat intermédiaire --- traîner des termes plus élevés est
+        du travail perdu, en laisser tomber de plus bas est une faute.
+  \item \emph{Sommes, produits}~: développer chaque facteur à l'ordre
+        $n$ et multiplier, en jetant tout ce qui dépasse $x^n$.
+  \item \emph{Composition} $f(u(x))$ avec $u(x) \to 0$~: substituer
+        le développement de $u$ dans celui de $f$, ordre par ordre.
+  \item \emph{Quotients}~: écrire $\frac{1}{1 + v}$ avec $v \to 0$ et
+        utiliser le développement géométrique.
+  \item \emph{Intégrer} un développement terme à terme (dériver exige
+        plus de précautions --- justification~: l'\omterm{thm:b1:integration:def}{intégrale} de
+        $o(t^n)$ de $0$ à $x$ est un $o(x^{n+1})$, par majoration
+        directe).
+\end{enumerate}
+\end{method}
+
+\begin{example}[Composition, comptabilité à l'appui]\label{ex:b1:taylor:esin}
+Développons $\eu^{\sin x}$ à l'ordre $3$. Développement intérieur~:
+$u = \sin x = x - \frac{x^3}{6} + o(x^3)$, qui tend bien vers $0$.
+Développement extérieur~: $\eu^u = 1 + u + \frac{u^2}{2} +
+\frac{u^3}{6} + o(u^3)$, et $o(u^3) = o(x^3)$ puisque $u \sim x$.
+Les puissances de $u$, tronquées à $x^3$~:
+\[
+u^2 = x^2 + o(x^3), \qquad u^3 = x^3 + o(x^3)
+\]
+(le double produit $2x\cdot(-\frac{x^3}{6})$ est déjà en $x^4$). On
+assemble~:
+\[
+\eu^{\sin x} = 1 + \Bigl(x - \frac{x^3}{6}\Bigr) + \frac{x^2}{2}
++ \frac{x^3}{6} + o(x^3)
+= 1 + x + \frac{x^2}{2} + o(x^3) :
+\]
+les deux contributions en $x^3$ se compensent exactement. L'idée à
+retenir~: $\eu^{\sin x}$ et $\eu^x$ coïncident jusqu'à l'ordre $3$
+--- non pas parce que $\sin x \approx x$ grossièrement, mais parce
+que le premier désaccord des exposants ($-\frac{x^3}{6}$) entre
+multiplié par $\eu^0 = 1$ et se trouve alors rattrapé par le terme
+cubique de l'exponentielle extérieure~; la comptabilité ordre par
+ordre décèle de telles conspirations, le coup d'œil jamais. (Le
+terme suivant est $-\frac{x^4}{8}$~: la trêve prend fin à l'ordre
+$4$.)
+\end{example}
+
+\begin{example}\label{ex:b1:taylor:tan}
+Développement de $\tan$ à l'ordre $5$. Écrivons $\tan x =
+\sin x \cdot \frac{1}{\cos x}$~:
+\[
+\frac{1}{\cos x} = \frac{1}{1 - \bigl(\frac{x^2}{2} - \frac{x^4}{24}
++ o(x^5)\bigr)}
+= 1 + \Bigl(\frac{x^2}{2} - \frac{x^4}{24}\Bigr)
++ \Bigl(\frac{x^2}{2}\Bigr)^{\!2} + o(x^5)
+= 1 + \frac{x^2}{2} + \frac{5x^4}{24} + o(x^5),
+\]
+puis
+\[
+\tan x = \Bigl(x - \frac{x^3}{6} + \frac{x^5}{120}\Bigr)
+\Bigl(1 + \frac{x^2}{2} + \frac{5x^4}{24}\Bigr) + o(x^5)
+= x + \frac{x^3}{3} + \frac{2x^5}{15} + o(x^5) .
+\]
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}[x=1.15cm, y=1.05cm]
+  \draw[-Stealth] (-3.5,0) -- (3.6,0) node[below, font=\small]
+    {$x$};
+  \draw[-Stealth] (0,-2.15) -- (0,2.2);
+  \draw (3.1416,-0.05) -- (3.1416,0.05)
+    node[below=3pt, font=\small] {$\pi$};
+  \draw (-3.1416,-0.05) -- (-3.1416,0.05)
+    node[below=3pt, font=\small] {$-\pi$};
+  \draw (-0.05,1) -- (0.05,1) node[above left, font=\small,
+    inner sep=1pt] {$1$};
+  \draw (-0.05,-1) -- (0.05,-1) node[below right, font=\small,
+    inner sep=1pt] {$-1$};
+  \draw[omThm, very thick, smooth]
+    plot[domain=-3.3:3.3, samples=120] (\x, {sin(\x r)});
+  \draw[omDef, thick]
+    plot[domain=-2.0:2.0] (\x, \x)
+    node[right, font=\small] {$T_1$};
+  \draw[omDef, thick, dashed, smooth]
+    plot[domain=-2.7:2.7, samples=80] (\x, {\x - \x^3/6})
+    node[below right, font=\small, inner sep=1pt] {$T_3$};
+  \draw[omDef, thick, dotted, smooth]
+    plot[domain=-3.25:3.25, samples=90]
+    (\x, {\x - \x^3/6 + \x^5/120})
+    node[above right, font=\small, inner sep=1pt] {$T_5$};
+\end{tikzpicture}
+
+{\small Le sinus (en foncé) face à ses \omterm{def:b1:poly:def}{polynômes} de Taylor en $0$~:
+$T_1 = x$, $T_3 = x - \frac{x^3}{6}$ (tirets), $T_5 = x -
+\frac{x^3}{6} + \frac{x^5}{120}$ (pointillés). Chaque nouvelle paire
+de termes épouse la courbe sur une fenêtre visiblement plus large, mais
+tout \omterm{def:b1:poly:def}{polynôme} finit par s'en détacher~: un développement de Taylor est
+un contrat \emph{local}, affûté en $0$ et muet au loin. La majoration
+de Taylor--Lagrange $\frac{\abs{x}^{n+1}}{(n+1)!}$ quantifie la
+fenêtre~; la fonction plate du \cref{pb:b1:taylor:1} montre que le
+contrat peut même être vide au-delà du point lui-même.}
+\end{omfigure}
+
+\section{Applications}
+
+\begin{example}[Limites]\label{ex:b1:taylor:limits}
+\[
+\lim_{x \to 0} \frac{x - \sin x}{x^3}:
+\qquad
+x - \sin x = \frac{x^3}{6} + o(x^3) \sim \frac{x^3}{6},
+\qquad\text{donc la limite vaut } \frac16
+\]
+--- ce qui règle la question soulevée dans l'\cref{exo:b1:functions:9}.
+De même $\displaystyle\lim_{x\to0}\Bigl(\frac{\sin
+x}{x}\Bigr)^{1/x^2}$~: le logarithme vaut
+\[
+\frac{1}{x^2}\ln\Bigl(1 - \frac{x^2}{6} + o(x^2)\Bigr)
+= \frac{1}{x^2}\Bigl(-\frac{x^2}{6} + o(x^2)\Bigr)
+\longrightarrow -\frac16,
+\qquad\text{limite } \eu^{-1/6}.
+\]
+\end{example}
+
+\begin{remark}[Pièges classiques des développements limités]
+(i) \emph{Ne jamais additionner ni soustraire des équivalents}~: de
+$\tan x \sim x$ et $\sin x \sim x$ on ne peut \emph{pas} conclure
+$\tan x - \sin x \sim 0$ (ce qui n'a aucun sens) --- la voie honnête,
+ce sont les développements limités~:
+\[
+\tan x - \sin x
+= \Bigl(x + \frac{x^3}{3}\Bigr) - \Bigl(x - \frac{x^3}{6}\Bigr)
++ o(x^3) = \frac{x^3}{2} + o(x^3) \sim \frac{x^3}{2} .
+\]
+(ii) \emph{Développer au-delà du massacre}~: dans le même calcul,
+l'ordre $1$ ne voit que $x - x = 0$~; chaque fois que les termes
+dominants se compensent, on augmente l'ordre jusqu'à ce qu'un
+coefficient non nul survive, et seulement alors on revient à un
+équivalent. (iii) \emph{Les équivalents ne passent pas à
+l'exponentielle}~: $n^2 + n \sim n^2$, et pourtant
+$\eu^{n^2+n} = \eu^{n}\,\eu^{n^2}$ n'est \emph{pas} équivalent à
+$\eu^{n^2}$ --- on n'exponentie que des \emph{développements de
+l'exposant} dont l'erreur tend vers $0$, jamais des équivalents de
+l'exposant. (Les logarithmes sont plus sûrs~: si $u_n \sim v_n \to
+\ell \neq 1$, avec $\ell > 0$, alors $\ln u_n \sim \ln v_n$.) (iv)
+\emph{Le calcul des $o(\cdot)$ est à sens unique}~: $o(x^2) + o(x^2) =
+o(x^2)$, $5\,o(x^2) = o(x^2)$, $x\cdot o(x^2) = o(x^3)$ --- mais
+un $o(x^2)$ n'est pas une fonction déterminée, aussi ne faut-il jamais
+en simplifier deux l'un par l'autre~: $o(x^2) - o(x^2)$ vaut $o(x^2)$,
+et non $0$.
+\end{remark}
+
+\begin{proposition}[Comportement local]\label{prop:b1:taylor:local}
+Supposons $f(x) = f(a) + c\,(x - a)^p + o\bigl((x-a)^p\bigr)$ avec $c
+\neq 0$ (premier terme non nul après la constante~; $p \geq 2$ en un
+point critique).
+\begin{itemize}
+  \item Si $p$ est pair~: $f$ présente un minimum local en $a$ si $c >
+        0$, un maximum local si $c < 0$.
+  \item Si $p$ est impair~: pas d'extremum ($f - f(a)$ change de
+        signe)~; si de plus le développement commence après un terme
+        linéaire $f'(a)(x - a)$, le graphe traverse sa tangente~: c'est
+        un point d'\emph{inflexion}.
+\end{itemize}
+\end{proposition}
+
+\begin{proof}
+Au \omterm{def:b1:topology:open}{voisinage} de $a$, $f(x) - f(a) = (x-a)^p\bigl(c + o(1)\bigr)$ est du
+signe de $c\,(x-a)^p$~: signe constant si $p$ est pair, signe changeant
+si $p$ est impair.
+\end{proof}
+
+\begin{example}[Les exposants doivent être développés jusqu'au $o(1)$]\label{ex:b1:taylor:expdiscipline}
+Cherchons un équivalent de $u_n = \bigl(1 + \frac1n\bigr)^{n^2}$.
+Développons l'\emph{exposant} jusqu'à ce que son erreur tende vers
+$0$~:
+\[
+n^2 \ln\Bigl(1 + \frac1n\Bigr)
+= n^2\Bigl(\frac1n - \frac{1}{2n^2} +
+O\Bigl(\frac{1}{n^3}\Bigr)\Bigr)
+= n - \frac12 + O\Bigl(\frac1n\Bigr),
+\]
+donc $u_n = \eu^{\,n - 1/2}\,\eu^{O(1/n)}$ avec $\eu^{O(1/n)} \to
+1$~:
+\[
+u_n \;\sim\; \eu^{\,n - \frac12} .
+\]
+Remarquons ce qui aurait échoué avec moins de soin~: arrêter
+l'exposant à $n^2\cdot\frac1n = n + O(1)$ laisse un facteur
+$\eu^{O(1)}$ --- borné, mais ne tendant pas vers $1$ --- et
+aucun équivalent ne peut être affirmé. La règle des pièges
+ci-dessus, sous forme positive~: un équivalent de
+$\eu^{a_n}$ exige le développement de $a_n$ \emph{jusqu'à un terme
+tendant vers zéro}, tous les coefficients qui précèdent étant
+conservés exactement.
+\end{example}
+
+\begin{example}[Classer un point critique plat]\label{ex:b1:taylor:flatmin}
+Étudions $f(x) = \cos x + \frac{x^2}{2}$ au \omterm{def:b1:topology:open}{voisinage} de $0$. On a à
+la fois $f'(0) = 0$ et $f''(0) = -\cos 0 + 1 = 0$~: le critère de la
+\omterm{def:b1:derivative:def}{dérivée} seconde est muet. Développons plutôt~:
+\[
+f(x) = \Bigl(1 - \frac{x^2}{2} + \frac{x^4}{24} +
+o(x^4)\Bigr) + \frac{x^2}{2}
+= 1 + \frac{x^4}{24} + o(x^4) :
+\]
+premier terme non nul $c\,x^p$ avec $p = 4$ pair et $c =
+\frac{1}{24} > 0$~: un minimum local, d'une platitude inhabituelle
+(le graphe quitte sa valeur minimale comme $x^4$, et non comme
+$x^2$). L'idée à retenir~: le développement voit en une ligne ce que
+la dérivation itérée obscurcit --- et la \cref{prop:b1:taylor:local}
+est le dictionnaire systématique qui traduit «~premier terme
+survivant~» en «~forme locale~».
+\end{example}
+
+\begin{example}[Développements en l'infini]\label{ex:b1:taylor:atinfinity}
+Deux calculs où la variable tend vers $+\infty$ et où la
+substitution $h = \frac1x \to 0^+$ importe toute la boîte à outils.
+D'abord,
+\[
+x - x^2\ln\Bigl(1 + \frac1x\Bigr)
+= x - x^2\Bigl(\frac1x - \frac{1}{2x^2} +
+O\Bigl(\frac{1}{x^3}\Bigr)\Bigr)
+= \frac12 + O\Bigl(\frac1x\Bigr) \longrightarrow \frac12 .
+\]
+Ensuite, l'\omterm{def:b1:functions:arc}{arctangente} en l'infini~: de $\arctan x +
+\arctan\frac1x = \frac\pi2$ pour $x > 0$
+(\cref{prop:b1:functions:arcidentities}) et du développement de
+$\arctan$ en $0$ (\cref{exo:b1:taylor:3}),
+\[
+\arctan x = \frac\pi2 - \arctan\frac1x
+= \frac\pi2 - \frac1x + \frac{1}{3x^3} +
+o\Bigl(\frac{1}{x^3}\Bigr) :
+\]
+le graphe s'approche de son asymptote $y = \frac\pi2$ par en dessous
+à la vitesse $\frac1x$. L'idée à retenir~: il n'y a pas de théorie
+séparée des développements en l'infini --- une seule substitution par
+l'inverse les ramène à des développements en $0$, pourvu que chaque
+$O$ et chaque $o$ intermédiaire soit traîné honnêtement.
+\end{example}
+
+\begin{example}[Asymptote par développement limité]\label{ex:b1:taylor:asymptote}
+Quand $x \to +\infty$,
+\[
+\sqrt{x^2 + x} = x\sqrt{1 + \tfrac1x}
+= x\Bigl(1 + \frac{1}{2x} - \frac{1}{8x^2} + o\bigl(\tfrac{1}{x^2}\bigr)\Bigr)
+= x + \frac12 - \frac{1}{8x} + o\bigl(\tfrac 1x\bigr):
+\]
+la droite $y = x + \frac12$ est une asymptote, approchée \emph{par en
+dessous} (le terme suivant $-\frac{1}{8x}$ est négatif).
+\end{example}
+
+\begin{remark}[Où les développements travaillent ensuite]
+Les développements asymptotiques sont la langue permanente du reste
+du livre~: au \cref{ch:b1:series} ils décident de la convergence
+(les équivalents alimentent les critères de comparaison, et l'étude
+de $\sum \frac{1}{n^\alpha}$ est un développement déguisé)~; dans le
+volume de Licence 2 ils deviennent des \emph{séries entières}, où le
+\omterm{def:b1:poly:def}{polynôme} de Taylor acquiert une infinité de termes et un rayon de
+convergence~; et toute linéarisation en physique --- le pendule, la
+perturbation au premier ordre --- est un énoncé de Taylor--Young dont
+on a discrètement laissé tomber le $o(\cdot)$. Le seul avertissement
+qui mérite d'être gravé~: un développement ne décrit une fonction
+qu'\emph{au \omterm{def:b1:topology:open}{voisinage} d'un point} --- voir la fonction plate du devoir
+maison, dont le développement en $0$ est identiquement nul sans que la
+fonction le soit.
+\end{remark}
+
+\begin{remark}[Perspectives dans ce volume]
+Les développements limités sont la langue de travail de l'analyse qui
+reste et de la géométrie à venir. Le \cref{ch:b1:series} les convertit
+en verdicts de convergence~: un équivalent du terme général est un
+développement tronqué à son premier terme, et les critères plus fins
+(séries alternées avec contrôle de l'erreur) consomment aussi le
+deuxième terme. Le \cref{ch:b1:curves} lit la géométrie locale sur les
+développements des deux fonctions coordonnées~: qu'une courbe
+paramétrée traverse, effleure ou rebrousse en un point se décide selon
+les puissances de $t$ qui survivent dans $x(t)$ et $y(t)$ --- la
+version plane de la \cref{prop:b1:taylor:local}. Et le
+\cref{ch:b1:multivar} s'arrête volontairement à l'ordre un~: le plan
+tangent est un énoncé de Taylor--Young à deux variables, la théorie
+complète du second ordre (hessiennes, points cols) étant reportée au
+volume de Licence 2. Le fil conducteur~: toute question «~locale~» de
+ce livre se résout en écrivant le premier terme survivant d'un
+développement.
+\end{remark}
+
+\section{Exercices}
+
+\begin{exercise}[$\star$]\label{exo:b1:taylor:1}
+Donner les développements limités en $0$~: $\eu^{2x}$ à l'ordre $3$~;
+$\;\ln(1 - x)$ à l'ordre $4$~; $\;\sqrt{1 + x}$ à l'ordre $3$~;
+$\;\dfrac{1}{1 + x^2}$ à l'ordre $6$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:taylor:2}
+Calculer les limites~:
+\[
+\lim_{x\to 0} \frac{\eu^x - 1 - x}{x^2},
+\qquad
+\lim_{x\to 0} \frac{\cos x - \sqrt{1 - x^2}}{x^4},
+\qquad
+\lim_{x\to 0} \frac{\ln(1+x) - \sin x}{x^2}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:taylor:3}
+Développer $\arctan x$ en $0$ à l'ordre $5$ en intégrant le
+développement de $\frac{1}{1 + x^2}$, et $\arcsin x$ à l'ordre $5$ en
+intégrant celui de $(1 - x^2)^{-1/2}$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:taylor:4}
+À l'aide de l'inégalité de Taylor--Lagrange pour $\exp$ sur
+$\intcc{0}{1}$, démontrer que
+\[
+\Bigl| \eu - \sum_{k=0}^{n} \frac{1}{k!} \Bigr| \leq
+\frac{3}{(n+1)!},
+\]
+et déterminer un $n$ garantissant $6$ décimales exactes de $\eu$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:taylor:5}
+Développer à l'ordre $2$ en $\frac1n$ et en déduire la limite ainsi
+que la vitesse de convergence~:
+\[
+\Bigl(1 + \frac 1n\Bigr)^{\!n}
+= \eu\Bigl(1 - \frac{1}{2n} + \frac{11}{24n^2} +
+o\Bigl(\frac{1}{n^2}\Bigr)\Bigr).
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:taylor:6}
+Étudier le comportement local en $0$ de $f(x) = x^2 - x^4$ et de $g(x)
+= x^3 + x^5$~; puis déterminer la position du graphe de $h(x) = \eu^x$
+par rapport à sa tangente en $a = 1$, localement puis globalement.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:taylor:7}
+Déterminer les asymptotes en $\pm\infty$ de $f(x) =
+\sqrt[3]{x^3 + x^2}$ et la position de la courbe par rapport à
+elles.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:taylor:8}
+Trouver l'équivalent, quand $n \to \infty$, de
+\[
+u_n = \sqrt{n+1} - \sqrt n, \qquad
+v_n = \ln(n+1) - \ln n, \qquad
+w_n = \sin\frac{1}{n} - \tan\frac{1}{n},
+\]
+chacun sous la forme d'une puissance de $n$ multipliée par une
+constante.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:taylor:9}
+Soit $f$ de classe $C^2$ sur $\R$. Démontrer que, pour tout $x$ et tout
+$h > 0$~:
+\[
+\abs{f'(x)} \leq \frac{\abs{f(x+h) - f(x-h)}}{2h} +
+\frac{h}{2}\sup_{\intcc{x-h}{x+h}}\abs{f''} ,
+\]
+et en déduire l'inégalité de type Landau--Kolmogorov~: si $\abs f \leq
+M_0$ et $\abs{f''} \leq M_2$ sur $\R$, alors $\abs{f'} \leq
+\sqrt{2 M_0 M_2}$ partout. \emph{(Optimiser en $h$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:taylor:10}
+La suite définie par $u_0 \in \intoo{0}{\pi}$ et $u_{n+1} = \sin u_n$
+décroît vers $0$ (le justifier brièvement). Pour en trouver la
+vitesse, on considère $v_n = \frac{1}{u_n^2}$~:
+\begin{enumerate}
+  \item à l'aide du développement de $\sin$, démontrer que $v_{n+1} -
+        v_n \to \frac13$~;
+  \item avec Cesàro (\cref{exo:b1:seq:10}), en déduire $\frac{v_n}{n}
+        \to \frac13$, puis l'équivalent $u_n \sim
+        \sqrt{\dfrac{3}{n}}$.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:taylor:11}
+(Différences d'infinis) Calculer
+\[
+\lim_{x \to 0} \Bigl(\frac{1}{x^2} - \frac{1}{\sin^2 x}\Bigr)
+\qquad\text{et}\qquad
+\lim_{x \to 0^+} \Bigl(\frac 1x - \frac{1}{\ln(1 + x)}\Bigr)
+\]
+en réduisant au même dénominateur et en développant séparément
+numérateur et dénominateur.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:taylor:12}
+(Asymptotique des racines implicites) Montrer que, pour tout $k \in
+\N^*$, l'équation $\tan x = x$ admet exactement une solution $x_k$
+dans $\intoo{k\pi - \frac\pi2}{k\pi + \frac\pi2}$, que $x_k = k\pi
++ \frac\pi2 - \varepsilon_k$ avec $\varepsilon_k =
+\arctan\frac{1}{x_k}$, et en déduire le développement
+\[
+x_k = k\pi + \frac\pi2 - \frac{1}{k\pi} + o\Bigl(\frac
+1k\Bigr) \qquad (k \to \infty).
+\]
+\end{exercise}
+
+\section{Problème~: sommes alternées, décimales certifiées et
+irrationalité de $\cos 1$}
+
+\begin{problem}[{Devoir maison --- la \omterm{pb:b1:taylor:1}{majoration alternée}
+$\abs{S - S_n} \leq a_{n+1}$~: $\ln 2$ et $\pi$ avec décimales
+démontrées, la \omterm{rem:b1:functions:interlude}{formule de Machin}, et $\cos 1 \notin \Q$}]
+\label{pb:b1:taylor:1}
+Une somme alternée à termes décroissants est l'objet le plus
+accommodant de l'analyse numérique~: son erreur est majorée par le
+premier terme omis, \emph{et le signe en est connu}. Ce problème
+démontre ce principe à l'aide du théorème des \omterm{thm:b1:seq:adjacent}{suites adjacentes}, puis
+le dépense de trois façons~: décimales certifiées pour $\ln 2$ (trois
+voies concurrentes) et pour $\pi$ (Leibniz, puis la \omterm{rem:b1:functions:interlude}{formule de Machin}
+de 1706, restée pendant des siècles l'idée derrière les calculs
+record), l'irrationalité de $\cos 1$, $\sin 1$ et $\cosh 1$, et, en
+contrepoids, l'\emph{égalité} de Taylor--Lagrange et la fonction plate
+dont le développement de Taylor ment.\index{majoration
+alternée}\index{formule de Machin}\index{irrationalité!de cos 1@de
+$\cos 1$} Tout au long, le vocabulaire des «~séries~» reste
+informel~: toute somme est ici une \emph{suite de sommes partielles},
+comme dans l'\cref{ex:b1:seq:e}~; la théorie proprement dite s'ouvre
+au \cref{ch:b1:series}.
+
+\medskip
+\noindent\textbf{Partie I --- La \omterm{pb:b1:taylor:1}{majoration alternée}.} Soit
+$(a_k)_{k \geq 0}$ décroissant vers $0$, et $S_n = \sum_{k=0}^{n}
+(-1)^k a_k$.
+\begin{enumerate}
+  \item Montrer que $(S_{2n+1})$ est croissante, $(S_{2n})$
+        décroissante, et qu'elles sont adjacentes
+        (\cref{thm:b1:seq:adjacent})~: toutes deux convergent vers un
+        même $S$ avec, pour tout $n$,
+        \[
+        S_{2n+1} \leq S \leq S_{2n},
+        \qquad
+        \abs{S - S_n} \leq a_{n+1} ,
+        \]
+        l'erreur ayant le signe du premier terme omis.
+        Montrer de plus que si la décroissance est \emph{stricte},
+        toutes ces inégalités sont strictes.
+  \item Premier dividende~: pour $x = 1$ dans la série exponentielle,
+        comparer avec le \cref{thm:b1:taylor:lagrange} en $a = 0$~:
+        montrer que $T_n = \sum_{k=0}^{n} \frac{(-1)^k}{k!}$
+        converge vers $\eu^{-1}$ avec $\abs{\eu^{-1} - T_n} <
+        \frac{1}{(n+1)!}$.
+  \item (Leibniz, 1674) À partir de l'identité finie \emph{exacte}
+        \[
+        \frac{1}{1 + t^2} = \sum_{k=0}^{n} (-1)^k t^{2k}
+        + \frac{(-1)^{n+1} t^{2n+2}}{1 + t^2} ,
+        \]
+        intégrée sur $\intcc{0}{1}$, démontrer
+        \[
+        \frac\pi4 = \sum_{k=0}^{n} \frac{(-1)^k}{2k+1} + \rho_n,
+        \qquad \abs{\rho_n} \leq \frac{1}{2n+3} .
+        \]
+  \item Lenteur~: combien de termes de Leibniz garantissent six
+        décimales exactes de $\pi$~? (Environ deux millions.)
+        Évaluer $4 S_4 = 4\bigl(1 - \frac13 + \frac15 - \frac17 +
+        \frac19\bigr)$ et sa distance à $\pi$, pour éprouver la
+        douleur.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie II --- $\ln 2$ de trois façons.}
+\begin{enumerate}[resume]
+  \item (Voie 1~: la série harmonique alternée) De $\frac{1}{1+t} =
+        \sum_{k=0}^{n-1}(-1)^k t^k + \frac{(-1)^n t^n}{1+t}$
+        intégrée sur $\intcc{0}{1}$~:
+        \[
+        \ln 2 = \sum_{k=1}^{n} \frac{(-1)^{k-1}}{k} + (-1)^n
+        R_n, \qquad \frac{1}{2(n+1)} \leq R_n \leq
+        \frac{1}{n+1} :
+        \]
+        l'erreur est d'ordre exactement $\frac 1n$ --- un million
+        de termes pour six décimales.
+  \item (Voie 2~: la série rapide) Intégrer $\frac{1}{1 - t^2} =
+        \sum_{k=0}^{n} t^{2k} + \frac{t^{2n+2}}{1-t^2}$ de $0$
+        à $x \in \intoo{0}{1}$ et évaluer en $x = \frac13$
+        (noter que $\frac{1 + 1/3}{1 - 1/3} = 2$)~:
+        \[
+        \ln 2 = 2\sum_{k=0}^{n} \frac{(1/3)^{2k+1}}{2k+1} +
+        \tilde\rho_n,
+        \qquad
+        0 < \tilde\rho_n \leq \frac{9}{4}\cdot
+        \frac{(1/3)^{2n+3}}{2n+3} :
+        \]
+        convergence géométrique, à peu près un chiffre par terme.
+  \item (Voie 3~: \omterm{thm:b1:integration:riemann}{sommes de Riemann} et une identité cachée)
+        Démontrer par récurrence l'identité
+        \[
+        \sum_{k=1}^{2n} \frac{(-1)^{k-1}}{k} = H_{2n} - H_n =
+        \sum_{k=1}^{n} \frac{1}{n + k} ,
+        \]
+        et retrouver $\ln 2$ comme limite des \omterm{thm:b1:integration:riemann}{sommes de Riemann} de
+        l'\cref{ex:b1:integration:riemannexample}~: les voies 1 et 3
+        sont secrètement le même nombre vu deux fois.
+  \item Duel à six termes~: comparer $\sum_{k=1}^{6}
+        \frac{(-1)^{k-1}}{k} = 0.6167$ à la voie 2 pour $n = 5$,
+        qui donne déjà $\ln 2 = 0.693147$ avec une erreur $\leq
+        1.1\cdot10^{-7}$. Expliquer la raison structurelle (point
+        d'évaluation profondément à l'\omterm{def:b1:topology:closure}{intérieur} de l'\omterm{prop:b1:reals:intervals}{intervalle} de
+        convergence, contre point situé sur sa \omterm{def:b1:topology:closure}{frontière}).
+  \item Combien de termes de la voie 2 certifient \emph{dix}
+        décimales de $\ln 2$~? Montrer que $n = 10$ suffit.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie III --- La \omterm{rem:b1:functions:interlude}{formule de Machin}.}
+\begin{enumerate}[resume]
+  \item Calculer $(5 + \iu)^4$ et vérifier l'identité complexe
+        \[
+        (5 + \iu)^4 = 2\,(1 + \iu)\,(239 + \iu) .
+        \]
+        En prenant les arguments (conventions du
+        \cref{ch:b1:complex}), en déduire la \omterm{rem:b1:functions:interlude}{formule de Machin}
+        \[
+        \frac\pi4 = 4\arctan\frac15 - \arctan\frac{1}{239} .
+        \]
+        (Vérifier qu'aucun argument ne sort de
+        $\intoo{-\frac\pi2}{\frac\pi2}$.)
+  \item Comme à la question 3, établir, pour $0 < x < 1$~:
+        \[
+        \arctan x = \sum_{k=0}^{n} \frac{(-1)^k
+        x^{2k+1}}{2k+1} + r_n(x), \qquad \abs{r_n(x)} \leq
+        \frac{x^{2n+3}}{2n+3} .
+        \]
+  \item Certifier $\pi$ à sept décimales avec six termes~: majorer
+        l'erreur totale de
+        \[
+        \pi \approx 16\sum_{k=0}^{4}
+        \frac{(-1)^k (1/5)^{2k+1}}{2k+1}
+        - 4\Bigl(\frac{1}{239} - \frac{1}{3\cdot239^3}\Bigr)
+        \]
+        par $16\,\frac{(1/5)^{11}}{11} +
+        4\,\frac{(1/239)^5}{5} < 5\cdot10^{-8}$, et donner la
+        valeur obtenue $3.1415926\dots$
+  \item Comparer les trois voies vers $\pi$ désormais disponibles
+        --- Leibniz (question 4), les \omterm{thm:b1:integration:def}{intégrales} de Dalzell du
+        \cref{pb:b1:integration:1} (erreur $4^{1-5m}$), Machin
+        (erreur $\approx 16\cdot 5^{-(2n+3)}$) --- en chiffres par
+        terme, et expliquer pourquoi rapetisser le point
+        d'évaluation l'emporte sur tout le reste.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie IV --- Le piège de l'entier, version
+alternée.}
+\begin{enumerate}[resume]
+  \item Supposons $\cos 1 = \frac pq$. Multiplier l'encadrement
+        alterné strict de $\sum_{k}
+        \frac{(-1)^k}{(2k)!}$ (question 1) par $(2n)!$ avec $2n
+        \geq q$, et en tirer une contradiction~: $\cos 1$ est
+        irrationnel.
+  \item Adapter à $\sin 1 = \sum_k \frac{(-1)^k}{(2k+1)!}$
+        (multiplier par $(2n+1)!$)~: $\sin 1 \notin \Q$. Tous deux
+        irrationnels, et pourtant $\cos^2 1 + \sin^2 1 = 1$~:
+        l'irrationalité n'est pas stable par les opérations
+        algébriques.
+  \item Le cousin non alterné~: $\cosh 1 = \sum_k
+        \frac{1}{(2k)!}$ (au sens des sommes partielles, avec
+        l'encadrement du reste $0 < \cosh 1 - \sum_{k \leq n}
+        \frac{1}{(2k)!} < \frac{2}{(2n+2)!}$, à démontrer).
+        Conclure $\cosh 1 \notin \Q$ par le même piège.
+  \item Pousser jusqu'à $\cos\frac 1m$ pour tout entier $m \geq 1$~:
+        multiplier par $m^{2n}(2n)!$ et conclure $\cos\frac1m
+        \notin \Q$. Où la même tentative échoue-t-elle pour
+        $\cos\frac ab$ avec $b > 1$ quelconque~? (Identifier le
+        dénominateur qui ne se chasse plus.)
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie V --- Plus fin et plus sombre~: la forme
+d'égalité, et une fonction qui trompe Taylor.}
+\begin{enumerate}[resume]
+  \item (Taylor--Lagrange, forme d'égalité) Soit $f$ une fonction
+        $n + 1$ fois \omterm{def:b1:derivative:def}{dérivable} entre $a$ et $x$. On pose $g(t) =
+        f(x) - \sum_{k=0}^{n} \frac{f^{(k)}(t)}{k!}(x - t)^k -
+        A\,\frac{(x-t)^{n+1}}{(n+1)!}$, la constante $A$ étant
+        choisie de sorte que $g(a) = 0$. Calculer $g'$ (la somme
+        se télescope), appliquer le \omterm{thm:b1:derivative:rolle}{théorème de Rolle} sur
+        $\intcc{a}{x}$, et conclure qu'il existe $c$ strictement
+        compris entre $a$ et $x$ tel que
+        \[
+        f(x) = \sum_{k=0}^{n} \frac{f^{(k)}(a)}{k!}(x-a)^k
+        + \frac{f^{(n+1)}(c)}{(n+1)!}\,(x-a)^{n+1} .
+        \]
+  \item Dividende de l'égalité~: pour $x > 0$, montrer que
+        \[
+        \eu^x > 1 + x + \frac{x^2}{2!} + \dots +
+        \frac{x^n}{n!}
+        \]
+        (strictement, pour tout $n$), et repérer où l'inégalité se
+        renverse pour $x < 0$ selon la parité
+        de $n$.
+  \item Comparer les restes sur $\sin(0.5)$ à l'ordre $3$~:
+        Young ne donne que $o(x^3)$ (aucun nombre)~; Lagrange donne
+        $\abs{\sin 0.5 - (0.5 - \frac{0.5^3}{6})} \leq
+        \frac{0.5^5}{120} = 2.61\cdot10^{-4}$~; la \omterm{pb:b1:taylor:1}{majoration
+        alternée} donne la même borne \emph{plus} l'information de
+        signe $\sin 0.5 > 0.5 - \frac{0.5^3}{6}$. Comparer
+        à l'erreur réelle $2.59\cdot10^{-4}$~: la borne est presque
+        atteinte. Quel outil choisiriez-vous, et
+        quand~?
+  \item (La fonction plate) Soit $f(x) = \eu^{-1/x^2}$ pour $x
+        \neq 0$, et $f(0) = 0$. Montrer que $f$ est \omterm{def:b1:continuity:continuous}{continue} en $0$,
+        que $f'(0) = 0$, et plus généralement --- en démontrant que
+        toute \omterm{def:b1:derivative:def}{dérivée} s'écrit $f^{(k)}(x) =
+        P_k\bigl(\frac1x\bigr)\eu^{-1/x^2}$ pour un \omterm{def:b1:poly:def}{polynôme}
+        $P_k$ (récurrence) --- que $f^{(k)}(0) = 0$ pour tout $k$
+        \emph{(\omterm{prop:b1:functions:powerrules}{croissances comparées},
+        \cref{prop:b1:functions:powerrules})}. Conclure~: tous les
+        \omterm{def:b1:poly:def}{polynômes} de Taylor de $f$ en $0$ sont nuls, et pourtant
+        $f(x) > 0$ pour $x \neq 0$~: Taylor--Young vaut à tout ordre,
+        et ne dit rien de $f$ loin de $0$. Les développements
+        décrivent des \emph{germes}, pas des fonctions.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie VI --- Synthèse.}
+\begin{enumerate}[resume]
+  \item Faire jouer le piège une fois encore, sur $\eu^{-1} = \sum_k
+        \frac{(-1)^k}{k!}$~: multiplier l'encadrement alterné
+        strict par $n!$ et conclure $\eu^{-1} \notin \Q$,
+        donc $\eu \notin \Q$ --- la troisième démonstration de ce
+        fait dans le volume. Énumérer les trois (\omterm{thm:b1:seq:adjacent}{suites adjacentes},
+        \cref{exo:b1:seq:9}~; \omterm{thm:b1:integration:def}{intégrales},
+        \cref{pb:b1:integration:1}~; sommes alternées, ici) et
+        ce dont chacune a eu besoin.
+  \item Les petits caractères~: la monotonie n'est pas décorative.
+        Posons $b_k = \frac1k$ pour $k$ impair et $b_k = \frac{1}{k^2}$
+        pour $k$ pair~: les $b_k$ sont positifs et tendent vers $0$,
+        et pourtant les sommes partielles de $\sum (-1)^k b_k$
+        divergent vers $-\infty$. Le démontrer \emph{(scinder la
+        somme partielle en la partie paire, bornée grâce à
+        l'\cref{ex:b1:seq:basel}, et la partie impaire, qui
+        domine la moitié de la série harmonique,
+        \cref{exo:b1:seq:5})}, et dire exactement quelle étape de
+        la question 1 a utilisé la monotonie.
+  \item Vérifier l'identité plus simple d'Euler $\arctan\frac12 +
+        \arctan\frac13 = \frac\pi4$ à l'aide de $(2 + \iu)(3 + \iu) =
+        5(1 + \iu)$, estimer le nombre de termes nécessaires pour six
+        décimales de $\pi$ par cette voie ($n = 10$ suffit), et la
+        placer entre Leibniz et Machin dans le classement de la
+        question 13.
+  \item Synthèse, une phrase pour chacun~: (i) énoncer la \omterm{pb:b1:taylor:1}{majoration
+        alternée} et ses deux produits (borne et signe)~; (ii)
+        pourquoi les identités finies exactes à reste explicite
+        l'emportent sur les énoncés de limite pour le numérique
+        certifié~; (iii) inventaire du problème ($\pi$ à $10^{-7}$
+        à la main, $\ln 2$ à dix décimales, quatre démonstrations
+        d'irrationalité, un théorème d'égalité, un exemple
+        d'avertissement)~; (iv) lesquels de ces fils le
+        \cref{ch:b1:series} reprendra (le critère spécial des séries
+        alternées, la convergence absolue face à la convergence
+        conditionnelle, et le drame du réarrangement de son devoir
+        maison).
+\end{enumerate}
+\end{problem}

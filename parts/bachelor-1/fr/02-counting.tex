@@ -1,0 +1,834 @@
+\chapter{Dénombrement}\label{ch:b1:counting}
+
+Dénombrer les \omterm{def:b1:counting:card}{ensembles finis} a l'air élémentaire --- et devient vite
+subtil. Ce chapitre définit proprement le \omterm{def:b1:counting:card}{cardinal} (par les \omterm{def:b1:logic:inj}{bijections},
+dans l'esprit du \cref{ch:b1:logic}), établit la poignée de principes de
+dénombrement dont tout découle, puis en déduit les dénombrements
+classiques~: listes, \omterm{def:b1:counting:objects}{permutations}, parties, coefficients binomiaux.
+
+\section{Cardinal des ensembles finis}
+
+\begin{definition}[Ensemble fini, cardinal]\label{def:b1:counting:card}
+Pour $n \in \N^*$, on note $\intint{1}{n} = \{1, 2, \dots,
+n\}$. Un \omterm{def:b1:logic:sets}{ensemble} $E$ est \emph{fini}\index{ensemble fini} lorsque $E = \emptyset$
+ou qu'il existe une \omterm{def:b1:logic:inj}{bijection} de $\intint{1}{n}$ sur $E$ pour
+un certain $n \in \N^*$~; ce $n$ est alors unique (\cref{thm:b1:counting:welldef})
+et c'est le \emph{cardinal}\index{cardinal} de $E$, noté
+$\abs{E}$ (avec $\abs{\emptyset} = 0$).
+\end{definition}
+
+\begin{theorem}[Le cardinal est bien défini]\label{thm:b1:counting:welldef}
+Si $m \neq n$, il n'existe pas de \omterm{def:b1:logic:inj}{bijection} de $\intint{1}{m}$
+sur $\intint{1}{n}$. Plus précisément, si $m > n$, il n'existe
+pas d'\omterm{def:b1:logic:inj}{injection} de $\intint{1}{m}$ dans $\intint{1}{n}$.
+\end{theorem}
+
+\begin{proof}
+Démontrons par récurrence sur $n$ l'\omterm{def:b1:logic:statement}{assertion}~: \emph{pour tout $m > n$,
+il n'existe pas d'\omterm{def:b1:logic:inj}{injection} $\intint{1}{m} \to \intint{1}{n}$}. Pour $n = 0$, l'\omterm{def:b1:logic:sets}{ensemble} d'arrivée est vide et $m \geq 1$~: aucune
+\omterm{def:b1:logic:map}{application} n'existe. Supposons l'\omterm{def:b1:logic:statement}{assertion} vraie au rang $n$, et soit $f \colon
+\intint{1}{m} \to \intint{1}{n+1}$ une
+\omterm{def:b1:logic:inj}{injection} avec $m > n + 1$. Si la valeur $n + 1$ n'est pas atteinte, $f$
+est une \omterm{def:b1:logic:inj}{injection} dans $\intint{1}{n}$, ce qui contredit l'hypothèse
+de récurrence. Sinon, $f(a) = n + 1$ pour exactement un $a$~;
+échangeons $f(a)$ et $f(m)$ (formellement~: composons avec la transposition
+des deux valeurs), de sorte que la nouvelle \omterm{def:b1:logic:inj}{injection} $g$ vérifie $g(m) = n + 1$.
+Alors la restriction de $g$ à $\intint{1}{m-1}$ est une
+\omterm{def:b1:logic:inj}{injection} dans $\intint{1}{n}$ avec $m - 1 > n$ ---
+nouvelle contradiction.
+\end{proof}
+
+\begin{corollary}[Principe des tiroirs]\label{cor:b1:counting:pigeonhole}
+Si $\abs{E} > \abs{F}$, aucune \omterm{def:b1:logic:map}{application} $f \colon E \to F$ n'est
+\omterm{def:b1:logic:inj}{injective}~: deux éléments au moins de $E$ ont la même image\index{principe des tiroirs}.
+\end{corollary}
+
+\begin{proof}
+Écrivons $\abs E = m$, $\abs F = n$ avec $m > n$, et choisissons des
+\omterm{def:b1:logic:inj}{bijections} $u \colon \intint1m \to E$ et $v \colon F \to \intint1n$. Si $f$
+était \omterm{def:b1:logic:inj}{injective}, $v \circ f \circ u$ serait une \omterm{def:b1:logic:inj}{injection} de
+$\intint1m$ dans $\intint1n$ (composée d'\omterm{def:b1:logic:inj}{injections},
+\cref{prop:b1:logic:comp}), ce qui contredirait
+le \cref{thm:b1:counting:welldef}.
+\end{proof}
+
+\begin{remark}[Interlude~: pourquoi l'échange dans la démonstration du théorème~?]\label{rem:b1:counting:swapinterlude}
+La démonstration du \cref{thm:b1:counting:welldef} contient la
+première idée vraiment astucieuse du chapitre, qui mérite d'être
+rejouée lentement. L'obstacle~: pour appliquer l'hypothèse de
+récurrence, on voudrait supprimer le dernier point $m$ de
+l'\omterm{def:b1:logic:sets}{ensemble} de départ \emph{et} le dernier point $n+1$ de
+l'\omterm{def:b1:logic:sets}{ensemble} d'arrivée, mais $f$ peut envoyer un autre point $a$ sur
+$n + 1$, et supprimer alors ce point d'arrivée abîme l'\omterm{def:b1:logic:map}{application}
+ailleurs. Le remède~: composer $f$ avec la transposition des deux
+\emph{valeurs} $f(a)$ et $f(m)$ --- une \omterm{def:b1:logic:inj}{bijection} de l'\omterm{def:b1:logic:sets}{ensemble}
+d'arrivée, donc l'\omterm{def:b1:logic:inj}{injectivité} est préservée --- après quoi la
+valeur gênante $n + 1$ occupe la position inoffensive $m$, et
+les deux suppressions sont propres. Ce schéma «~normaliser
+d'abord, couper ensuite~» reviendra~: c'est ainsi que la
+récurrence des dérangements redirige $\sigma^{-1}(n+1)$ dans le
+devoir maison de ce chapitre, et ainsi que l'on rafistole les
+\omterm{def:b1:counting:objects}{permutations} tout au long du problème du \cref{ch:b1:structures}
+sur le groupe symétrique.
+\end{remark}
+
+\begin{proposition}[Injections, surjections et cardinal]\label{prop:b1:counting:injsur}
+Soient $E, F$ des \omterm{def:b1:counting:card}{ensembles finis} avec $\abs{E} = \abs{F}$, et $f \colon E
+\to F$. Alors
+\[
+f \text{ injective} \iff f \text{ surjective} \iff f \text{ bijective}.
+\]
+\end{proposition}
+
+\begin{proof}
+Supposons $f$ \omterm{def:b1:logic:inj}{injective}. Alors $f$ est une \omterm{def:b1:logic:inj}{bijection} de $E$ sur $f(E)$,
+donc $\abs{f(E)} = \abs{E} = \abs{F}$. Si $f(E)$ ratait un point $y_0$ de
+$F$, $f$ serait une \omterm{def:b1:logic:inj}{injection} de $E$ dans $F \setminus \{y_0\}$,
+\omterm{def:b1:logic:sets}{ensemble} de \omterm{def:b1:counting:card}{cardinal} $\abs{F} - 1 < \abs{E}$ --- impossible d'après le
+\omterm{cor:b1:counting:pigeonhole}{principe des tiroirs}. Donc $f(E) = F$~: $f$ est \omterm{def:b1:logic:inj}{surjective}, donc
+\omterm{def:b1:logic:inj}{bijective}.
+
+Supposons $f$ \omterm{def:b1:logic:inj}{surjective}. Choisissons pour chaque $y \in F$ un antécédent
+$s(y) \in E$~; alors $f \circ s = \mathrm{id}_F$, donc $s$ est \omterm{def:b1:logic:inj}{injective}
+(\cref{prop:b1:logic:comp}). D'après le paragraphe précédent appliqué à $s$
+(les cardinaux sont égaux), $s$ est \omterm{def:b1:logic:inj}{bijective}. De $f \circ s =
+\mathrm{id}_F$ on tire $f = \mathrm{id}_F \circ s^{-1} = s^{-1}$, donc
+$f$ est \omterm{def:b1:logic:inj}{bijective}. Enfin, une \omterm{def:b1:logic:map}{application} \omterm{def:b1:logic:inj}{bijective} est par définition à la fois
+\omterm{def:b1:logic:inj}{injective} et \omterm{def:b1:logic:inj}{surjective}, ce qui referme le cycle d'implications.
+\end{proof}
+
+\begin{example}[La finitude est essentielle]\label{ex:b1:counting:finiteonly}
+Sur un \omterm{def:b1:logic:sets}{ensemble} \emph{\omterm{def:b1:counting:card}{fini}}, la \cref{prop:b1:counting:injsur} est un
+raccourci puissant~: toute \omterm{def:b1:logic:map}{application} \omterm{def:b1:logic:inj}{injective} de $E$ dans lui-même est
+automatiquement une \omterm{def:b1:counting:objects}{permutation} de $E$ --- la moitié de la \omterm{def:b1:logic:inj}{bijectivité}
+est offerte. Les deux implications s'effondrent sur les \omterm{def:b1:logic:sets}{ensembles}
+infinis~: $n \mapsto n + 1$ est \omterm{def:b1:logic:inj}{injective} de $\N$ dans $\N$ mais rate
+$0$, et l'\omterm{def:b1:logic:map}{application} $\N \to \N$ qui envoie $0 \mapsto 0$ et
+$n \mapsto n - 1$ pour $n \geq 1$ est \omterm{def:b1:logic:inj}{surjective} sans être \omterm{def:b1:logic:inj}{injective}.
+Chaque fois que cette proposition est invoquée, l'hypothèse de finitude
+travaille réellement --- un thème que le devoir maison du
+\cref{ch:b1:logic} explore par l'autre bout, là où les \omterm{def:b1:logic:sets}{ensembles}
+infinis sont précisément ceux qui admettent de telles \omterm{def:b1:logic:map}{applications}
+d'eux-mêmes dans eux-mêmes.
+\end{example}
+
+\begin{example}[La moitié du travail, gratuitement]\label{ex:b1:counting:mod7}
+Considérons l'\omterm{def:b1:logic:map}{application} $f$ sur $\{0, 1, \dots, 6\}$ qui envoie $k$ sur
+le reste de $3k$ dans la division par $7$~; sa table de valeurs est
+\[
+0,\ 3,\ 6,\ 2,\ 5,\ 1,\ 4 .
+\]
+$f$ est-elle \omterm{def:b1:logic:inj}{bijective}~? L'\omterm{def:b1:logic:inj}{injectivité} suffit à elle seule
+(\cref{prop:b1:counting:injsur})~: si $3k$ et $3k'$ ont le même
+reste, $7$ divise $3(k - k')$, et comme $7$ est premier et ne
+divise pas $3$, il divise $k - k'$ (lemme d'Euclide, utilisé ici au
+niveau du lycée et démontré au \cref{ch:b1:arith})~; avec
+$\abs{k - k'} \leq 6$ cela force $k = k'$. La \omterm{def:b1:logic:inj}{surjectivité} vient
+gratuitement --- inutile de résoudre $3k \equiv c$ pour chaque $c$,
+même si la table confirme que chaque valeur apparaît exactement une
+fois. Le raccourci est une bête de somme~: il donne l'inversibilité
+de la multiplication modulaire (\cref{ch:b1:arith}), il fait
+fonctionner l'appariement du théorème de Wilson, et il revient en
+algèbre linéaire sous la forme «~un endomorphisme d'un espace de
+dimension finie est \omterm{def:b1:logic:inj}{injectif} si et seulement s'il est \omterm{def:b1:logic:inj}{surjectif}~»
+(\cref{ch:b1:findim}).
+\end{example}
+
+\section{Les principes de dénombrement}
+
+\begin{proposition}[Règles de somme et de produit]\label{prop:b1:counting:rules}
+Soient $E, F$ des \omterm{def:b1:counting:card}{ensembles finis}.
+\begin{enumerate}
+  \item Si $E \cap F = \emptyset$, alors $\abs{E \cup F} = \abs{E} +
+        \abs{F}$~; plus généralement, pour une \omterm{thm:b1:logic:partition}{partition} de $E$ en parties
+        $E_1, \dots, E_k$, $\abs{E} = \sum_i \abs{E_i}$.
+  \item En général, $\abs{E \cup F} = \abs{E} + \abs{F} - \abs{E \cap
+        F}$.
+  \item $\abs{E \times F} = \abs{E} \times \abs{F}$.
+  \item L'\omterm{def:b1:logic:sets}{ensemble} $F^E$ des \omterm{def:b1:logic:map}{applications} de $E$ dans $F$ vérifie
+        $\abs{F^E} = \abs{F}^{\abs{E}}$.
+  \item $\abs{\mathcal{P}(E)} = 2^{\abs{E}}$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(1) Concaténons les énumérations~: si $E = \{x_1, \dots, x_m\}$ et $F =
+\{y_1, \dots, y_n\}$ sans répétition, alors $x_1, \dots, x_m, y_1,
+\dots, y_n$ énumère $E \cup F$ sans répétition (les deux \omterm{def:b1:logic:sets}{ensembles}
+étant disjoints).
+Une récurrence étend cela à $k$ parties.
+
+(2) $E \cup F$ est la réunion disjointe de $E$ et de $F \setminus E$, et
+$F$ est la réunion disjointe de $F \cap E$ et de $F \setminus E$~; donc
+$\abs{E \cup F} = \abs{E} + \abs{F \setminus E} = \abs{E} + \abs{F} -
+\abs{E \cap F}$.
+
+(3) $E \times F$ est la réunion disjointe, pour $x \in E$, des \omterm{def:b1:logic:sets}{ensembles}
+$\{x\} \times F$, chacun de \omterm{def:b1:counting:card}{cardinal} $\abs{F}$~; on applique (1).
+
+(4) Une \omterm{def:b1:logic:map}{application} de $E = \{x_1, \dots, x_m\}$ dans $F$ n'est rien
+d'autre que le choix du $m$-uplet $(f(x_1), \dots, f(x_m)) \in F^m$~; cette
+correspondance est une \omterm{def:b1:logic:inj}{bijection}, et $\abs{F^m} = \abs{F}^m$ par (3) et
+récurrence.
+
+(5) Les parties de $E$ correspondent bijectivement aux \omterm{def:b1:logic:map}{applications} $E \to \{0, 1\}$
+(à $A$ on associe sa fonction indicatrice)~; on applique (4).
+\end{proof}
+
+\begin{example}[Dénombrement par le complémentaire]\label{ex:b1:counting:complement}
+Combien de codes PIN à $4$ chiffres (chiffres de $0$ à $9$, l'ordre
+compte, répétitions autorisées) contiennent \emph{au moins un} chiffre
+répété~? Les compter directement oblige à jongler avec les cas
+«~exactement une paire, deux paires, un brelan, un carré~» --- cinq
+configurations qui se chevauchent. Comptons plutôt le complémentaire~:
+les codes sont au nombre de $10^4 = 10\,000$ (règle du produit), les
+codes à quatre chiffres distincts au nombre de
+$10 \times 9 \times 8 \times 7 = 5\,040$
+($4$-arrangements), de sorte que la réponse est
+\[
+10^4 - 10 \cdot 9 \cdot 8 \cdot 7 = 10\,000 - 5\,040 = 4\,960 .
+\]
+Près de la moitié des codes PIN répètent un chiffre. L'idée à
+retenir~: dès qu'un dénombrement s'énonce avec «~au moins~» ou
+«~pas tous~», il faut essayer le complémentaire d'abord --- la règle
+de somme garantit que $\abs{A} = \abs{E} - \abs{\overline A}$, et le
+complémentaire est souvent une unique configuration bien propre.
+\end{example}
+
+\begin{example}[Chemins sur un réseau]\label{ex:b1:counting:paths}
+Dénombrons les chemins les plus courts allant du coin $(0,0)$ au coin
+$(4, 3)$ d'un quadrillage, chaque pas allant d'une unité vers la
+droite (D) ou d'une unité vers le haut (H). Un tel chemin comporte
+exactement $7$ pas, dont $4$ sont D et $3$ sont H~; réciproquement,
+tout mot de longueur $7$ en les lettres D, H comportant quatre D
+décrit exactement un chemin. Les chemins correspondent donc
+bijectivement aux choix des positions des D~:
+\[
+\binom{7}{4} = 35 .
+\]
+L'idée est le \emph{codage}~: le dénombrement est devenu trivial dès
+l'instant où chaque chemin a été traduit en un mot, c'est-à-dire en
+une partie de positions --- une illustration de plus du slogan selon
+lequel un dénombrement correct est une \omterm{def:b1:logic:inj}{bijection} déguisée
+(\cref{met:b1:counting:which}).
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=0.85]
+  \draw[gray!60] (0,0) grid (4,3);
+  \draw[->, thin] (-0.4,0) -- (4.6,0);
+  \draw[->, thin] (0,-0.4) -- (0,3.6);
+  \draw[omDef, very thick]
+    (0,0) -- (1,0) -- (1,1) -- (3,1) -- (3,2) -- (4,2) -- (4,3);
+  \fill (0,0) circle (0.07) node[below left] {$(0,0)$};
+  \fill (4,3) circle (0.07) node[above right] {$(4,3)$};
+  \node[omDef, below] at (0.5,0) {\small D};
+  \node[omDef, left] at (1,0.5) {\small H};
+  \node[omDef, below] at (1.5,1) {\small D};
+  \node[omDef, below] at (2.5,1) {\small D};
+  \node[omDef, left] at (3,1.5) {\small H};
+  \node[omDef, below] at (3.5,2) {\small D};
+  \node[omDef, left] at (4,2.5) {\small H};
+\end{tikzpicture}
+
+{\small L'un des $\binom74 = 35$ chemins les plus courts de $(0,0)$ à
+$(4,3)$~: le chemin représenté code le mot DHDDHDH, c'est-à-dire le
+choix des positions $\{1,3,4,6\}$ pour la lettre D parmi les sept
+pas.}
+\end{omfigure}
+
+\section{Listes, permutations, parties}
+
+\begin{definition}[Arrangements, permutations, combinaisons]\label{def:b1:counting:objects}
+Soit $E$ un \omterm{def:b1:logic:sets}{ensemble} avec $\abs{E} = n$, et soit $0 \leq k \leq n$.
+\begin{itemize}
+  \item Un \emph{$k$-arrangement} de $E$ est un $k$-uplet \omterm{def:b1:logic:inj}{injectif}
+        d'éléments de $E$ (une sélection ordonnée sans répétition)~;
+  \item une \emph{permutation}\index{permutation} de $E$ est une \omterm{def:b1:logic:inj}{bijection}
+        de $E$ sur lui-même --- de façon équivalente, un $n$-arrangement~;
+  \item une \emph{$k$-combinaison} est une partie de $E$ à $k$ éléments
+        (une sélection non ordonnée sans répétition). Leur nombre se
+        note $\binom{n}{k}$, lu «~$k$ parmi $n$~»
+        \index{coefficient binomial}.
+\end{itemize}
+\end{definition}
+
+\begin{theorem}[Les trois dénombrements]\label{thm:b1:counting:counts}
+Avec $n = \abs{E}$ et $0 \leq k \leq n$~:
+\begin{enumerate}
+  \item le nombre de $k$-arrangements de $E$ vaut $n (n-1) \cdots
+        (n-k+1) = \dfrac{n!}{(n-k)!}$~;
+  \item le nombre de \omterm{def:b1:counting:objects}{permutations} de $E$ vaut $n!$~;
+  \item $\dbinom{n}{k} = \dfrac{n!}{k!\,(n-k)!}$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) On choisit la première coordonnée ($n$ possibilités), puis la deuxième
+($n - 1$ choix restants), \dots, puis la $k$-ième ($n - k + 1$ choix).
+Formellement, récurrence sur $k$. Pour $k = 1$ il y a $n$ uplets
+\omterm{def:b1:logic:inj}{injectifs} à un terme. Supposons le dénombrement acquis au rang $k - 1$.
+Chaque $k$-arrangement $(x_1, \dots, x_k)$ s'obtient à partir d'un unique
+$(k-1)$-arrangement --- son tronqué $(x_1, \dots, x_{k-1})$
+--- en lui ajoutant une dernière coordonnée hors de $\{x_1, \dots,
+x_{k-1}\}$, pour laquelle exactement $n - (k - 1)$ valeurs sont
+disponibles. La troncature partitionne donc les $k$-arrangements en
+classes de taille commune $n - k + 1$ indexées par les
+$(k-1)$-arrangements, et la règle de somme donne
+\[
+\frac{n!}{(n-k+1)!}\;(n - k + 1) = \frac{n!}{(n-k)!} .
+\]
+
+(2) est (1) avec $k = n$.
+
+(3) Chaque partie à $k$ éléments s'ordonne en $k!$ $k$-arrangements
+distincts, et tout $k$-arrangement provient d'une unique partie~: donc
+$\frac{n!}{(n-k)!} = \binom nk \cdot k!$.
+\end{proof}
+
+\begin{example}[Tables rondes~: quotienter par une symétrie]\label{ex:b1:counting:roundtable}
+De combien de façons $n$ convives peuvent-ils s'asseoir autour d'une
+table ronde, deux placements étant identiques lorsque chaque convive a
+les mêmes voisins de gauche et de droite --- c'est-à-dire à rotation
+près~? Chaque placement circulaire correspond à exactement $n$
+placements linéaires (on coupe le cercle à l'une des $n$ places), de
+sorte que les $n!$ ordres linéaires s'effondrent par paquets de $n$~:
+\[
+\frac{n!}{n} = (n-1)! \quad\text{placements circulaires.}
+\]
+Autrement dit~: on assied un convive distingué n'importe où (ce qui tue
+la liberté de rotation), puis on ordonne les $n - 1$ convives restants
+dans le sens des aiguilles d'une montre. Pour $n = 6$~: $120$ tables.
+Les deux solutions illustrent les deux remèdes standard au surcomptage~:
+diviser par le nombre exact de répétitions, ou \emph{briser la symétrie}
+en fixant un objet. Tous deux exigent que le paquet de répétitions ait
+la même taille pour chaque configuration --- ce dont la démonstration de
+la formule $\binom nk = \frac{n!}{k!\,(n-k)!}$ ci-dessus s'est également
+servie, avec $k!$ à la place de $n$.
+\end{example}
+
+\begin{example}[Ajouter une contrainte]\label{ex:b1:counting:constraint}
+Poursuivons avec la table ronde~: parmi les $(n-1)!$ tables de $n \geq
+3$ convives, combien \emph{séparent} deux convives donnés $A$ et $B$
+(non voisins)~? Comptons le complémentaire. Les tables où $A$ et $B$
+sont assis côte à côte~: collons-les en un seul bloc --- $n - 1$ objets
+autour de la table, soit $(n-2)!$ dispositions circulaires --- puis
+ordonnons la paire à l'intérieur de son bloc ($2$ façons)~: $2\,(n-2)!$
+tables où ils sont voisins. Donc
+\[
+(n-1)! - 2\,(n-2)! = (n-2)!\,\bigl((n - 1) - 2\bigr)
+= (n-3)\,(n-2)!
+\]
+tables les séparent. Vérifications~: $n = 3$ donne $0$ (autour d'un
+triangle, tout le monde touche tout le monde) et $n = 4$ donne $2$,
+faciles à lister à la main. L'astuce du collage --- traiter un bloc
+imposé comme un seul objet, puis compter ses dispositions internes ---
+est le remède standard aux contraintes de voisinage, linéaires ou
+circulaires.
+\end{example}
+
+\begin{proposition}[Identités de base]\label{prop:b1:counting:identities}
+Pour $0 \leq k \leq n$~:
+\[
+\binom{n}{k} = \binom{n}{n-k},
+\qquad
+\binom{n}{k} = \binom{n-1}{k-1} + \binom{n-1}{k}
+\quad (1 \leq k \leq n-1),
+\qquad
+\sum_{k=0}^{n} \binom{n}{k} = 2^n .
+\]
+\end{proposition}
+
+\begin{proof}
+Première identité~: $A \mapsto E \setminus A$ est une \omterm{def:b1:logic:inj}{bijection} entre les
+parties à $k$ éléments et celles à $n-k$ éléments. \omterm{prop:b1:counting:identities}{Formule de
+Pascal}\index{formule de Pascal}~: fixons un élément $a \in E$~; les
+parties à $k$ éléments se scindent en celles qui contiennent
+$a$ (on choisit les $k - 1$ autres~: $\binom{n-1}{k-1}$) et celles qui
+évitent $a$ ($\binom{n-1}{k}$). Troisième identité~: les deux membres
+comptent toutes les parties de $E$, réparties selon leur taille dans le
+membre de gauche (\cref{prop:b1:counting:rules}~(1) et (5)).
+\end{proof}
+
+\begin{theorem}[Formule du binôme de Newton]\label{thm:b1:counting:binomial}
+Pour tous $a, b$ dans un anneau commutatif (disons $\R$ ou $\C$) et tout $n \in \N$~:
+\[
+(a + b)^n = \sum_{k=0}^{n} \binom{n}{k} a^k b^{\,n-k} .
+\]
+\end{theorem}
+
+\begin{proof}
+Développer $(a+b)(a+b)\cdots(a+b)$ par distributivité produit un terme
+par choix, dans chaque facteur, de $a$ ou de $b$~: le terme $a^k b^{n-k}$
+apparaît une fois pour chaque façon de choisir lesquels des $n$ facteurs,
+au nombre de $k$, fournissent $a$ --- c'est-à-dire $\binom nk$ fois.
+(Variante~: récurrence sur $n$ à l'aide de la \omterm{prop:b1:counting:identities}{formule de Pascal}.)
+\end{proof}
+
+\begin{example}\label{ex:b1:counting:binomial}
+Deux spécialisations classiques~: $a = b = 1$ redonne $\sum_k \binom nk
+= 2^n$~; $a = -1$, $b = 1$ donne $\sum_{k} (-1)^k \binom nk = 0$ pour
+$n \geq 1$~: parmi les parties d'un \omterm{def:b1:logic:sets}{ensemble} non vide, exactement la
+moitié sont de \omterm{def:b1:counting:card}{cardinal} pair.
+\end{example}
+
+\begin{example}[Une identité, deux démonstrations]\label{ex:b1:counting:threen}
+La spécialisation $a = 2$, $b = 1$ de la formule du binôme s'écrit
+\[
+\sum_{k=0}^{n} \binom nk\,2^k = 3^n .
+\]
+Voici la même identité sans le moindre calcul algébrique. Le membre de
+droite compte les mots de longueur $n$ sur l'alphabet $\{0, 1, 2\}$
+(règle du produit). Classons chaque mot selon l'\omterm{def:b1:logic:sets}{ensemble} $K$ des
+positions portant une lettre non nulle~: choisir $K$ avec $\abs K = k$
+coûte $\binom nk$, puis chaque position de $K$ porte indépendamment $1$
+ou $2$~: $2^k$ façons. La règle de somme sur $k$ donne le membre de
+gauche. Au-delà du plaisir de l'accord, les deux démonstrations ont des
+vertus différentes~: l'algébrique se généralise à toute valeur de $a$,
+la combinatoire \emph{explique} la formule et s'adapte à des contraintes
+(interdire la lettre $2$ en dernière position, par exemple) qu'aucune
+substitution ne capture. Garder les deux techniques actives est la
+compétence pratique que ce chapitre entraîne.
+\end{example}
+
+\begin{method}[Quel dénombrement appliquer~?]\label{met:b1:counting:which}
+Avant de calculer, répondez à deux questions sur la sélection~:
+l'\emph{ordre} compte-t-il, et les \emph{répétitions} sont-elles
+autorisées~?
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{l|c|c}
+ & l'ordre compte & l'ordre ne compte pas \\
+\hline
+sans répétition & $\dfrac{n!}{(n-k)!}$ & $\dbinom{n}{k}$ \\[6pt]
+avec répétition & $n^k$ & (\cref{exo:b1:counting:10}) \\
+\end{tabular}
+\end{center}
+Cherchez ensuite une \omterm{def:b1:logic:inj}{bijection} ou une \omterm{thm:b1:logic:partition}{partition} ramenant le problème à
+ces dénombrements modèles~; un dénombrement correct est une \omterm{def:b1:logic:inj}{bijection}
+déguisée.
+\end{method}
+
+\begin{remark}[Pièges classiques du dénombrement]\label{rem:b1:counting:pitfalls}
+\begin{enumerate}
+  \item \emph{Sommer des cas non disjoints.} La règle de somme exige une
+        \omterm{thm:b1:logic:partition}{partition}~; si des configurations peuvent relever de deux cas à
+        la fois, elles sont comptées deux fois --- le remède est la
+        formule du crible (\cref{thm:b1:counting:inclexcl}) ou une
+        disjonction de cas plus fine.
+  \item \emph{Ordonné contre non ordonné.} Choisir «~un comité de
+        deux~», c'est $\binom n2$, et non $n(n-1)$~: décidez \emph{avant
+        de calculer} si la sélection porte un ordre, et si un
+        dénombrement ordonné est plus facile, divisez par le nombre
+        d'ordonnancements à la fin --- mais seulement lorsque chaque
+        objet non ordonné provient du \emph{même} nombre d'objets
+        ordonnés.
+  \item \emph{Des choix successifs qui ne sont pas indépendants.}
+        La règle du produit demande que le nombre d'options à chaque
+        étape soit indépendant des choix précédents. «~Choisir un
+        capitaine, puis un vice-capitaine différent~» convient ($n(n-1)$)~;
+        «~choisir deux joueurs qui s'entendent bien~» n'est pas du tout
+        un produit à deux étapes.
+  \item \emph{Le double comptage par construction.} Construire chaque
+        objet deux fois --- par exemple compter les mains contenant
+        \emph{au moins} un as comme (choisir un as) $\times$ (choisir
+        $4$ autres cartes) --- surcompte les mains à deux as. «~Au
+        moins~» appelle presque toujours le complémentaire
+        (\cref{ex:b1:counting:complement}).
+\end{enumerate}
+\end{remark}
+
+\begin{example}[Un dénombrement à la poker]\label{ex:b1:counting:poker}
+Dans un jeu de $52$ cartes, le nombre de mains de $5$ cartes vaut
+$\binom{52}{5} = 2\,598\,960$. Les mains contenant exactement un as~:
+on choisit l'as ($4$ façons) puis $4$ cartes parmi les $48$ qui ne sont
+pas des as~: $4 \binom{48}{4} = 778\,320$. La règle du produit
+s'applique parce que le choix se scinde en étapes indépendantes.
+\end{example}
+
+\begin{method}[Double dénombrement]\label{met:b1:counting:doublecount}
+Pour démontrer une identité entre deux expressions de dénombrement,
+cherchez un unique \omterm{def:b1:counting:card}{ensemble fini} que les deux membres comptent ---
+typiquement un \omterm{def:b1:logic:sets}{ensemble} de \emph{couples} --- et évaluez son \omterm{def:b1:counting:card}{cardinal}
+dans deux ordres différents. Le prototype est le \emph{lemme des
+poignées de main}~: dans une soirée, comptons les couples (personne,
+main serrée). En sommant sur les personnes on obtient $\sum_p d_p$ (le
+nombre $d_p$ de poignées de main de chaque personne $p$)~; en sommant
+sur les poignées de main on obtient deux fois le nombre de poignées de
+main (chacune en implique deux). Donc $\sum_p d_p$ est pair --- de sorte
+que le nombre de personnes ayant serré un nombre impair de mains est
+toujours pair, conclusion non triviale obtenue sans la moindre formule.
+Le même moteur fait tourner l'\cref{exo:b1:counting:12} et plusieurs
+questions du devoir maison ci-dessous.
+\end{method}
+
+\begin{example}[La partie moyenne]\label{ex:b1:counting:averagesubset}
+Quel est le \omterm{def:b1:counting:card}{cardinal} moyen d'une partie d'un \omterm{def:b1:logic:sets}{ensemble} $E$ à $n$
+éléments, les $2^n$ parties étant équiprobables~? Comptons doublement
+les couples $(A, a)$ avec $a \in A$~: en sommant sur les parties on
+obtient $\sum_A \abs A$, le total cherché~; en sommant sur les éléments
+on obtient $n \cdot 2^{n-1}$ (chacun des $n$ éléments appartient à
+exactement la moitié des parties --- on apparie chaque $A$ contenant $a$
+avec $A \setminus \{a\}$). Donc
+\[
+\frac{1}{2^n}\sum_{A \subseteq E} \abs A
+= \frac{n\,2^{n-1}}{2^n} = \frac n2 :
+\]
+les parties sont, en moyenne, à moitié pleines --- ce que prédit
+également la symétrie $A \leftrightarrow \overline A$ (qui apparie les
+tailles $k$ et $n - k$). Deux démonstrations, une seule réponse, et
+toutes deux évitent le calcul direct $\sum_k k\binom nk$ de
+l'\cref{exo:b1:counting:5}~: un appariement bien choisi remplace souvent
+une identité.
+\end{example}
+
+\section{Formule du crible (inclusion-exclusion)}
+
+\begin{theorem}[Formule du crible]\label{thm:b1:counting:inclexcl}
+Pour des \omterm{def:b1:counting:card}{ensembles finis} $A_1, \dots, A_p$~:
+\[
+\Bigl|\, \bigcup_{i=1}^{p} A_i \,\Bigr|
+= \sum_{\emptyset \neq I \subseteq \intint{1}{p}}
+(-1)^{\abs{I}+1} \Bigl|\, \bigcap_{i \in I} A_i \,\Bigr| .
+\]
+Pour $p = 3$~:
+$\abs{A \cup B \cup C} = \abs A + \abs B + \abs C - \abs{A \cap B} -
+\abs{A \cap C} - \abs{B \cap C} + \abs{A \cap B \cap C}$.
+\end{theorem}
+
+\begin{proof}
+Fixons un élément $x$ de la réunion et comptons sa contribution au
+membre de droite. Posons $J = \{i : x \in A_i\}$, de \omterm{def:b1:counting:card}{cardinal} $m \geq
+1$. L'élément $x$ est compté une fois dans $\abs{\bigcap_{i \in I} A_i}$
+exactement lorsque $\emptyset \neq I \subseteq J$, avec le signe
+$(-1)^{\abs I + 1}$~; sa contribution totale vaut
+\[
+\sum_{k=1}^{m} \binom{m}{k} (-1)^{k+1}
+= 1 - \sum_{k=0}^{m} \binom mk (-1)^k = 1 - 0 = 1
+\]
+d'après l'\cref{ex:b1:counting:binomial}. Chaque élément de la réunion est
+donc compté exactement une fois.
+\end{proof}
+
+\begin{example}[Dénombrer les entiers premiers avec $120$]\label{ex:b1:counting:coprime}
+Combien d'entiers de $\intint1{120}$ sont premiers avec $120 = 2^3
+\times 3 \times 5$~? Un entier a un facteur commun avec $120$ exactement
+lorsqu'il est divisible par $2$, $3$ ou $5$~; comptons donc le
+complémentaire de $A_2 \cup A_3 \cup A_5$, où $A_d$ rassemble les
+multiples de $d$. Dans $\intint1{120}$, les multiples de $d$ sont au
+nombre de $120/d$ dès que $d$ divise $120$ --- aucune partie entière
+n'est nécessaire --- et $A_2 \cap A_3 = A_6$, etc. La formule du crible
+donne
+\[
+\abs{A_2 \cup A_3 \cup A_5}
+= 60 + 40 + 24 - 20 - 12 - 8 + 4 = 88 ,
+\]
+donc $120 - 88 = 32$ entiers sont premiers avec $120$. Il est
+instructif de regrouper le calcul sous forme de produit~:
+\[
+120 - 88 = 120\Bigl(1 - \frac12\Bigr)\Bigl(1 -
+\frac13\Bigr)\Bigl(1 - \frac15\Bigr) = 120 \cdot \frac12 \cdot
+\frac23 \cdot \frac45 = 32 :
+\]
+développer les trois parenthèses reproduit exactement les huit termes
+signés du crible, un par partie de $\{2, 3, 5\}$. Cette forme
+multiplicative définit l'indicatrice d'Euler, dont le rôle arithmétique
+apparaît avec les congruences du \cref{ch:b1:arith} et se développe
+dans le volume de Licence 2.
+\end{example}
+
+\begin{example}[Dérangements]\label{ex:b1:counting:derangement}
+Un \emph{dérangement} est une \omterm{def:b1:counting:objects}{permutation} sans point fixe. Soit $A_i$
+l'\omterm{def:b1:logic:sets}{ensemble} des \omterm{def:b1:counting:objects}{permutations} de $\intint{1}{n}$ qui fixent $i$~;
+alors $\abs{\bigcap_{i \in I} A_i} = (n - \abs I)!$, et la formule du
+crible compte les \omterm{def:b1:counting:objects}{permutations} ayant au moins un point fixe~; les
+dérangements sont donc au nombre de
+\[
+D_n = n! \sum_{k=0}^{n} \frac{(-1)^k}{k!} .
+\]
+Comme $\sum (-1)^k / k! \to \eu^{-1}$ (voir \cref{ch:b1:series}), environ
+$37\,\%$ des \omterm{def:b1:counting:objects}{permutations} sont des dérangements, quel que soit $n$.
+\end{example}
+
+\begin{remark}[Où ce chapitre est utilisé]\label{rem:b1:counting:whereused}
+Les coefficients binomiaux sont les objets de ce chapitre les plus
+réutilisés~: ils font marcher la formule du binôme au \cref{ch:b1:poly}
+(développement de $(X + a)^n$), la formule de Leibniz pour la dérivée
+$n$-ième d'un produit au \cref{ch:b1:derivative}, et les coefficients
+des développements de Taylor au \cref{ch:b1:taylor}.
+Les \omterm{def:b1:counting:objects}{permutations} reviennent en tant que groupe --- avec la signature
+construite en comptant les inversions --- au \cref{ch:b1:structures}, et
+la signature définit à son tour les déterminants au \cref{ch:b1:det}.
+La formule du crible et les principes de dénombrement forment l'ossature
+finie des probabilités discrètes, développées dans le volume de Licence 2~;
+les nombres de dérangements de l'\cref{ex:b1:counting:derangement} sont
+étudiés en profondeur dans le devoir maison ci-dessous.
+\end{remark}
+
+\section{Exercices}
+
+\begin{exercise}[$\star$]\label{exo:b1:counting:1}
+Une plaque d'immatriculation est formée de deux lettres (A--Z), puis de
+trois chiffres, puis de deux lettres. Combien de plaques sont possibles~?
+Combien sans lettre répétée parmi les quatre~?
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:counting:2}
+Combien d'anagrammes (réarrangements des lettres, ayant un sens ou non)
+possède le mot \textsc{orange}~? Et \textsc{banana}~?
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:counting:3}
+Un comité de $4$ personnes est choisi parmi $7$ femmes et $5$ hommes.
+Combien de comités~: au total~? avec exactement $2$ femmes~? avec au
+moins un homme~?
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:counting:4}
+Démontrer que dans tout groupe de $13$ personnes, deux ont le même mois
+de naissance~; et que parmi $n + 1$ entiers choisis dans $\intint{1}{2n}$, deux sont consécutifs. \emph{(Les tiroirs les deux fois~:
+nommez les boîtes.)}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:counting:5}
+Calculer $\sum_{k=0}^{n} k \binom{n}{k}$. \emph{Indication~: dériver
+$(1 + x)^n$, ou utiliser $k \binom nk = n \binom{n-1}{k-1}$ (le démontrer).}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:counting:6}
+Combien y a-t-il d'\omterm{def:b1:logic:map}{applications} strictement croissantes de $\intint{1}{k}$ dans $\intint{1}{n}$~? En déduire le nombre
+d'\omterm{def:b1:logic:map}{applications} croissantes (au sens large). \emph{Indication pour le second
+dénombrement~: $f$ croissante $\mapsto$ $g(i) = f(i) + i - 1$.}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:counting:7}
+(Vandermonde) Démontrer, en comptant les parties à $k$ éléments d'un
+\omterm{def:b1:logic:sets}{ensemble} scindé en deux blocs de tailles $m$ et $n$~:
+\[
+\binom{m+n}{k} = \sum_{j=0}^{k} \binom{m}{j} \binom{n}{k-j} .
+\]
+En déduire $\sum_{j=0}^{n} \binom nj^2 = \binom{2n}{n}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:counting:8}
+Combien d'entiers de $\intint{1}{1000}$ sont divisibles par
+$2$, $3$ ou $5$~? (Formule du crible~; $\lfloor 1000/6 \rfloor$
+compte les multiples de $6$, etc.)
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:counting:9}
+Dénombrer les \omterm{def:b1:logic:inj}{surjections} d'un \omterm{def:b1:logic:sets}{ensemble} à $4$ éléments sur un \omterm{def:b1:logic:sets}{ensemble} à
+$2$ éléments~; puis sur un \omterm{def:b1:logic:sets}{ensemble} à $3$ éléments. \emph{Indication~:
+compter les \omterm{def:b1:logic:map}{applications} non \omterm{def:b1:logic:inj}{surjectives} par le crible sur les valeurs
+manquées.}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:counting:10}
+(Étoiles et barres) Démontrer que le nombre de sélections de $k$ objets
+parmi $n$ \emph{avec} répétition, l'ordre étant ignoré --- de façon
+équivalente, le nombre de $(x_1, \dots, x_n) \in \N^n$ tels que
+$x_1 + \dots + x_n = k$ --- vaut $\binom{n + k - 1}{k}$.
+\emph{Indication~: coder une solution par une rangée de $k$ étoiles et
+$n - 1$ barres.}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:counting:11}
+Démontrer en détail la formule de l'\cref{ex:b1:counting:derangement} pour
+$D_n$, et en déduire $n! = \sum_{k=0}^{n} \binom{n}{k} D_{n-k}$
+(démontrer également cette identité directement, en classant les
+\omterm{def:b1:counting:objects}{permutations} selon leur \omterm{def:b1:logic:sets}{ensemble} de points fixes).
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:counting:12}
+Pour $n \in \N^*$, démontrer par un double comptage des couples (partie,
+élément marqué)~:
+\[
+\sum_{k=1}^{n} k \binom{n}{k} = n\, 2^{n-1},
+\qquad\text{puis}\qquad
+\sum_{k=1}^{n} k^2 \binom{n}{k} = n(n+1)\, 2^{n-2} .
+\]
+\emph{Pour la seconde~: compter les couples d'éléments marqués, égaux ou non.}
+\end{exercise}
+
+\section{Problème~: les dérangements, ou les lettres mal adressées}
+
+\begin{problem}\label{pb:b1:counting:1}
+Une secrétaire glisse au hasard $n$ lettres dans $n$ enveloppes déjà
+adressées~: quelle est la probabilité que \emph{personne} ne reçoive la
+bonne lettre~? Cette question classique (Montmort, 1708) conduit aux
+nombres de dérangements $D_n$ de l'\cref{ex:b1:counting:derangement}. La
+formule du crible n'est que le coup d'ouverture~: ce problème développe
+les récurrences qui calculent $D_n$, deux démonstrations indépendantes
+supplémentaires de la formule, le théorème frappant selon lequel $D_n$
+est l'entier le plus proche de $n!/\eu$, la loi complète des points fixes
+d'une \omterm{def:b1:counting:objects}{permutation} aléatoire, et la curieuse arithmétique de la suite
+$(D_n)$.\index{dérangement}
+Dans tout le problème, $D_n$ désigne le nombre de dérangements
+(\omterm{def:b1:counting:objects}{permutations} sans point fixe) de $\intint1n$, avec la convention $D_0 = 1$
+(la \omterm{def:b1:counting:objects}{permutation} vide n'a pas de point fixe).
+
+\medskip
+\noindent\textbf{Partie I --- Petits cas et recensement des points
+fixes.}
+\begin{enumerate}
+  \item Calculer directement $D_1, D_2, D_3$, et $D_4$ en listant les
+        dérangements de $\{1, 2, 3, 4\}$ groupés selon la valeur de
+        $\sigma(1)$. (Vous devez trouver $D_4 = 9$.)
+  \item Pour $0 \leq k \leq n$, montrer que le nombre $P_k(n)$ de
+        \omterm{def:b1:counting:objects}{permutations} de $\intint1n$ ayant \emph{exactement} $k$ points
+        fixes vaut $\binom nk D_{n-k}$.
+  \item Vérifier le recensement pour $n = 4$~: calculer $P_0(4), \dots,
+        P_4(4)$ et contrôler que leur somme vaut $4! = 24$. Qu'est-ce qui
+        est le plus probable pour quatre lettres~: aucune coïncidence, ou
+        exactement une~?
+  \item Par un double comptage (\cref{met:b1:counting:doublecount})
+        des couples $(\sigma, i)$ tels que $\sigma(i) = i$, montrer que
+        \[
+        \sum_{\sigma} \abs{\mathrm{Fix}(\sigma)} = n! :
+        \]
+        en moyenne, une \omterm{def:b1:counting:objects}{permutation} aléatoire a \emph{exactement un}
+        point fixe, quel que soit $n \geq 1$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie II --- Deux récurrences et deux nouvelles
+démonstrations de la formule.}
+\begin{enumerate}[resume]
+  \item Démontrer combinatoirement, pour $n \geq 1$~:
+        \[
+        D_{n+1} = n\,(D_n + D_{n-1}) .
+        \]
+        (Classer les dérangements $\sigma$ de $\intint1{n+1}$ selon
+        $j = \sigma(n+1)$, puis selon que $\sigma(j) = n + 1$ ou non~;
+        dans le cas $\sigma(j) \neq n+1$, construire une \omterm{def:b1:logic:inj}{bijection} avec
+        les dérangements de $\intint1n$ en redirigeant vers $j$
+        l'antécédent de $n + 1$.) Vérifier numériquement la récurrence
+        jusqu'à $D_6$.
+  \item En posant $u_n = D_n - n D_{n-1}$, déduire de la question 5
+        que $u_{n+1} = -u_n$, et conclure à la seconde récurrence~:
+        \[
+        D_n = n D_{n-1} + (-1)^n \qquad (n \geq 1).
+        \]
+  \item À partir de la question 6, démontrer par récurrence la formule
+        de l'\cref{ex:b1:counting:derangement},
+        \[
+        D_n = n! \sum_{k=0}^{n} \frac{(-1)^k}{k!},
+        \]
+        --- une démonstration entièrement indépendante du crible.
+  \item (Inversion binomiale) Soient $(a_n)$ et $(b_n)$ deux suites
+        telles que $a_n = \sum_{k=0}^n \binom nk b_k$ pour tout $n$.
+        Démontrer que
+        \[
+        b_n = \sum_{k=0}^{n} (-1)^{n-k} \binom nk a_k
+        \qquad (n \in \N).
+        \]
+        (Établir d'abord l'\emph{identité du \omterm{def:b1:logic:sets}{sous-ensemble} d'un
+        \omterm{def:b1:logic:sets}{sous-ensemble}}
+        $\binom nk \binom kj = \binom nj \binom{n-j}{k-j}$, puis
+        utiliser la somme alternée d'une ligne du triangle de Pascal
+        de l'\cref{ex:b1:counting:binomial}.)
+  \item Appliquer la question 8 à l'identité $n! = \sum_k \binom nk
+        D_{n-k}$ de l'\cref{exo:b1:counting:11} pour obtenir une
+        \emph{troisième} démonstration de la formule donnant $D_n$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie III --- L'entier le plus proche de
+$n!/\eu$.} Dans cette partie, on admettra --- la théorie est construite
+au \cref{ch:b1:series} --- que
+$\eu^{-1} = \lim_{n \to \infty} s_n$ où $s_n = \sum_{k=0}^{n}
+\frac{(-1)^k}{k!}$, avec la majoration stricte des séries alternées
+$\abs{\eu^{-1} - s_n} < \frac1{(n+1)!}$ pour tout $n$.
+\begin{enumerate}[resume]
+  \item Montrer que $\bigl| D_n - n!/\eu \bigr| < \frac1{n+1}$ pour
+        tout $n \in \N$.
+  \item En déduire le théorème vedette~: \emph{pour tout $n \geq 1$,
+        $D_n$ est l'entier le plus proche de $n!/\eu$}. Pourquoi
+        l'argument exige-t-il $n \geq 1$~?
+  \item Déterminer le signe de l'erreur~: montrer que $D_n > n!/\eu$
+        exactement lorsque $n$ est pair. (Localiser le premier terme
+        négligé de la série alternée.)
+  \item Calculer $D_7$ à $D_{10}$ avec la récurrence de la
+        question 5, puis comparer $D_{10}$ à $10!/\eu$
+        ($10! = 3\,628\,800$, $\eu \approx 2{,}718281828$).
+  \item (La probabilité du vestiaire) Soit $p_n = D_n/n!$ la
+        probabilité qu'une \omterm{def:b1:counting:objects}{permutation} tirée uniformément au hasard soit
+        un dérangement. Montrer que $\abs{p_n - \eu^{-1}} < \frac1{(n+1)!}$
+        et calculer $p_6$ à cinq décimales. Commentaire~: pourquoi la
+        réponse à la question de Montmort est-elle essentiellement
+        indépendante de $n$ --- et cela dès une douzaine de lettres~?
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie IV --- La loi des points fixes.}
+\begin{enumerate}[resume]
+  \item Fixons $k \in \N$. Montrer que la proportion des \omterm{def:b1:counting:objects}{permutations}
+        de $\intint1n$ ayant exactement $k$ points fixes vérifie
+        \[
+        \frac{P_k(n)}{n!} = \frac{s_{n-k}}{k!}
+        \;\xrightarrow[n \to \infty]{}\; \frac{\eu^{-1}}{k!} .
+        \]
+        (Ces valeurs limites, de somme $1$, forment la \emph{loi de
+        Poisson} de paramètre $1$, objet central du cours de
+        probabilités du volume de Licence 2.)
+  \item Par un double comptage des triplets $(\sigma, i, j)$ où $i
+        \neq j$ sont tous deux fixés par $\sigma$, montrer que
+        $\sum_\sigma \abs{\mathrm{Fix}(\sigma)}\,
+        (\abs{\mathrm{Fix}(\sigma)} - 1) = n!$ pour $n \geq 2$.
+        Combiné à la question 4~: la moyenne de
+        $\abs{\mathrm{Fix}}^2$ vaut $2$, donc la «~dispersion~»
+        (variance) du nombre de points fixes vaut $1$ --- là encore
+        indépendante de $n$, là encore conforme à la loi de Poisson.
+  \item Calculer la proportion des \omterm{def:b1:counting:objects}{permutations} ayant au moins un
+        point fixe pour $n = 4, 5, 6$ (en fractions et à quatre
+        décimales), et comparer avec $1 - \eu^{-1} \approx
+        0{,}6321$.
+  \item Montrer directement --- sans aucun passage à la limite --- que
+        $s_{n+2} - s_n = (-1)^{n+1}\bigl(\frac1{(n+1)!} - \frac1{(n+2)!}\bigr)$,
+        et en déduire que les probabilités $p_n = s_n$ de la
+        question 14 oscillent~: $p_0 > p_2 > p_4 > \dots$ et
+        $p_1 < p_3 < p_5 < \dots$, les valeurs paires (resp.\ impaires)
+        décroissant (resp.\ croissant) vers la limite commune
+        $\eu^{-1}$.
+  \item (Père Noël secret) $n$ personnes tirent chacune un nom dans un
+        chapeau~; si l'une d'elles tire son propre nom, \emph{tout} le
+        tirage est recommencé de zéro. En utilisant le fait standard
+        qu'un événement de probabilité $p$ demande en moyenne $1/p$
+        tentatives, estimer le nombre moyen de tirages complets
+        nécessaires, et conclure que la procédure coûte en moyenne
+        environ $\eu \approx 2{,}72$ tirages, essentiellement
+        indépendamment de $n$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie V --- L'arithmétique de $D_n$, et une
+synthèse.}
+\begin{enumerate}[resume]
+  \item Affiner la question 5~: montrer que, pour $j \in
+        \intint2n$ fixé, les dérangements de $\intint1n$ tels que
+        $\sigma(1) = j$ sont exactement au nombre de $D_{n-1} + D_{n-2}$,
+        indépendamment de $j$. En déduire que $n - 1$ divise $D_n$
+        pour tout $n \geq 2$.
+  \item Démontrer que $D_n$ est impair si et seulement si $n$ est pair.
+        (Travailler modulo $2$ dans la récurrence de la question 6.)
+  \item Démontrer que $D_n \equiv (-1)^n \pmod n$ pour $n \geq 1$, et
+        vérifier la congruence sur le dernier chiffre de $D_{10}$.
+  \item Déduire de la question 6 que $\dfrac{D_n}{D_{n-1}} = n +
+        \dfrac{(-1)^n}{D_{n-1}}$ pour $n \geq 3$, de sorte que le
+        rapport de deux nombres de dérangements consécutifs vaut
+        \emph{presque exactement} $n$~; expliquer en une phrase pourquoi
+        cela est cohérent avec $D_n \approx n!/\eu$.
+  \item Où exactement ce problème a-t-il utilisé~: (i) les règles de
+        produit et de somme~; (ii) le double comptage~; (iii) la formule
+        du binôme~; (iv) la majoration admise des séries alternées~? Une
+        phrase chacun.
+  \item Synthèse. La formule donnant $D_n$ a maintenant trois
+        démonstrations (le crible~; la relation de récurrence suivie
+        d'une démonstration par récurrence~; l'inversion binomiale).
+        En un court paragraphe, comparer
+        ce que chaque démonstration \emph{explique}~: laquelle calcule le
+        plus vite, laquelle se généralise à d'autres dénombrements de
+        points fixes, et laquelle révèle pourquoi $\eu$ apparaît dans un
+        problème d'enveloppes.
+\end{enumerate}
+\end{problem}

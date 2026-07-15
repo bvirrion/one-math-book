@@ -1,0 +1,821 @@
+\chapter{Numerieke reeksen}\label{ch:b1:series}
+
+Oneindig veel getallen optellen betekent de limiet van de partiële
+sommen nemen --- niets meer, niets minder. Dit hoofdstuk legt de
+definities vast en de convergentiecriteria die in het eerste jaar
+bruikbaar zijn: vergelijking en equivalenten voor positieve termen,
+het \omterm{thm:b1:series:ratio}{quotiëntcriterium}, de integraalvergelijking die de \omterm{thm:b1:series:riemann}{Riemann-reeks}
+oplevert, \omterm{thm:b1:series:absolute}{absolute convergentie}, en de stelling over alternerende
+reeksen. De fijnere theorie (producten van reeksen, sommatie per
+pakketten, reeksen van functies) hoort thuis in het tweede jaar.
+
+\section{Algemeenheden}
+
+\begin{definition}\label{def:b1:series:def}
+Gegeven een rij $(u_n)$ is de \emph{reeks}\index{reeks} $\sum u_n$
+de rij van \emph{partiële sommen} $S_N = \sum_{n=0}^{N} u_n$.
+De reeks \emph{convergeert} wanneer $(S_N)$ convergeert; de limiet is
+de \emph{som} $\sum_{n=0}^{\infty} u_n$, en $R_N = \sum_{n > N} u_n =
+S - S_N$ is de \emph{rest}, die naar $0$ streeft.
+\end{definition}
+
+\begin{example}[Meetkundige reeks]\label{ex:b1:series:geometric}
+Voor $q \in \C$: $\;S_N = \sum_{n=0}^{N} q^n = \frac{1 -
+q^{N+1}}{1-q}$ ($q \neq 1$). De \omterm{def:b1:series:def}{reeks} convergeert dan en slechts dan
+als $\abs q < 1$ (\cref{exo:b1:seq:3}), met\index{meetkundige reeks}
+\[
+\sum_{n=0}^{\infty} q^n = \frac{1}{1 - q} .
+\]
+\end{example}
+
+\begin{example}[Periodieke decimalen zijn meetkundige reeksen]\label{ex:b1:series:periodicdecimal}
+Welk getal is $0.363636\dots$? De schrijfwijze zelf is een \omterm{def:b1:series:def}{reeks}:
+\[
+0.\overline{36} = \sum_{k=1}^{\infty} \frac{36}{100^k}
+= 36\cdot\frac{1/100}{1 - 1/100} = \frac{36}{99} =
+\frac{4}{11} ,
+\]
+via de meetkundige som met $q = \frac{1}{100}$. In het algemeen is
+een blok $B$ van $p$ cijfers dat zich eeuwig herhaalt gelijk aan
+$\frac{B}{10^p - 1}$ --- het mechanisme achter het
+periodiciteitscriterium van \cref{pb:b1:reals:1}, dat de taal van
+dit hoofdstuk eindelijk in één regel formuleert: een \omterm{pb:b1:reals:1}{decimale
+ontwikkeling} is een convergente \omterm{def:b1:series:def}{reeks}, uiteindelijk periodiek precies
+wanneer haar som rationaal is. De cijfermachinerie van hoofdstuk 10,
+daar opgebouwd met kale suprema, was reekstheorie die incognito
+reisde.
+\end{example}
+
+\begin{proposition}[Eerste feiten]\label{prop:b1:series:first}
+\begin{enumerate}
+  \item Als $\sum u_n$ convergeert, dan $u_n \to 0$. (De omgekeerde
+        bewering is \emph{onwaar}: de harmonische \omterm{def:b1:series:def}{reeks}.)
+  \item Lineariteit: convergente reeksen mag men optellen en schalen,
+        met de verwachte sommen.
+  \item (Telescoperend\index{telescoperende reeks}) $\sum (v_{n+1} -
+        v_n)$ convergeert dan en slechts dan als $(v_n)$ convergeert,
+        met som $\lim v_n - v_0$.
+  \item Eindig veel termen wijzigen heeft geen invloed op de
+        convergentie (enkel op de som).
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(1) $u_N = S_N - S_{N-1} \to S - S = 0$. De harmonische \omterm{def:b1:series:def}{reeks} heeft
+$u_n = \frac1n \to 0$ en divergeert toch (\cref{exo:b1:seq:5}). (2)
+Bewerkingen op limieten. (3) $S_N = v_{N+1} - v_0$. (4) De partiële
+sommen veranderen met een uiteindelijk constante hoeveelheid.
+\end{proof}
+
+\begin{example}[Cijfers plannen met de meetkundige rest]\label{ex:b1:series:georemainder}
+Voor $\abs q < 1$ is de rest van de \omterm{ex:b1:series:geometric}{meetkundige reeks} expliciet:
+\[
+R_N = \sum_{n = N+1}^{\infty} q^n = \frac{q^{N+1}}{1 - q} .
+\]
+Dit zet nauwkeurigheidsdoelen om in aantallen termen nog vóór enige
+berekening. Om $\sum_{n\geq0} \bigl(\frac13\bigr)^n =
+\frac32$ te evalueren op $10^{-10}$ nauwkeurig: nodig is
+$\frac{(1/3)^{N+1}}{2/3} \leq 10^{-10}$, d.w.z.\ $3^{N} \geq
+\frac{3}{2}\cdot 10^{10}$, d.w.z.\ $N \geq 22$ (want $3^{22} \approx
+3.1\cdot10^{10}$): drieëntwintig termen, op voorhand bekend. Elke
+schatting op meetkundige snelheid uit de weekendopgaven (de
+$\frac13$-reeks voor $\ln 2$, de arctangensen van Machin in
+\cref{pb:b1:taylor:1}) is dit budget van twee regels in professioneel
+gewaad.
+\end{example}
+
+\begin{example}[Een langere telescoop]\label{ex:b1:series:telescope3}
+Bereken $\sum_{n\geq1} \frac{1}{n(n+1)(n+2)}$. Splitsing in
+partieelbreuken (\cref{ch:b1:fractions}):
+\[
+\frac{1}{n(n+1)(n+2)}
+= \frac{1/2}{n} - \frac{1}{n+1} + \frac{1/2}{n+2}
+= \frac12\Bigl(\frac{1}{n(n+1)} - \frac{1}{(n+1)(n+2)}\Bigr),
+\]
+waarbij de tweede vorm --- een verschil van opeenvolgende waarden van
+$w_n = \frac{1}{n(n+1)}$ --- de telescoperende is. Dus
+\[
+\sum_{n=1}^{N} \frac{1}{n(n+1)(n+2)}
+= \frac12\Bigl(w_1 - w_{N+1}\Bigr)
+= \frac12\Bigl(\frac12 - \frac{1}{(N+1)(N+2)}\Bigr)
+\longrightarrow \frac14 .
+\]
+Het afsluitende inzicht: partieelbreuken met drie termen telescoperen
+zelden zoals ze geschreven staan; hergroepeer ze eerst tot een
+verschil $w_n - w_{n+1}$ --- de beloning is niet enkel convergentie
+maar de exacte som, die geen enkel vergelijkingscriterium ooit levert.
+\end{example}
+
+\section{Reeksen met niet-negatieve termen}
+
+\begin{theorem}[Begrensde partiële sommen]\label{thm:b1:series:positive}
+Als $u_n \geq 0$ voor alle $n$, dan stijgen de partiële sommen, dus:
+$\sum u_n$ convergeert $\iff$ zijn partiële sommen zijn naar boven
+begrensd. Vandaar het \emph{vergelijkingscriterium}: als $0 \leq u_n
+\leq v_n$ voor alle (grote) $n$,
+\[
+\sum v_n \text{ convergeert} \implies \sum u_n \text{ convergeert},
+\qquad
+\sum u_n \text{ divergeert} \implies \sum v_n \text{ divergeert}.
+\]
+En het \emph{equivalentiecriterium}: als $u_n \sim v_n$ met $v_n \geq
+0$, dan hebben de twee reeksen dezelfde aard.
+\end{theorem}
+
+\begin{proof}
+Stelling van de monotone limiet (\cref{thm:b1:seq:monotone}) voor het
+eerste punt; vergelijking van partiële sommen voor het tweede.
+Equivalenten: voor grote $n$ geldt $\frac12 v_n \leq u_n \leq 2 v_n$
+(definitie van $\sim$ met $\varepsilon = \frac12$), en de vergelijking
+werkt in beide richtingen.
+\end{proof}
+
+\begin{example}[Een equivalent dat divergentie bewijst]\label{ex:b1:series:equivdiverge}
+Aard van $\sum_{n\geq1} n\sin\dfrac{1}{n^2}$? Omdat
+$\frac{1}{n^2} \to 0$ en $\sin h \sim h$ in $0$:
+\[
+n\sin\frac{1}{n^2} \;\sim\; n\cdot\frac{1}{n^2} = \frac1n ,
+\]
+en het equivalentiecriterium draagt de divergentie van de
+harmonische \omterm{def:b1:series:def}{reeks} over: divergent --- ook al streven de termen naar
+$0$. Eén ontwikkeling, één schaal, één oordeel; hetzelfde patroon in
+twee stappen (equivalent, dan Riemann of meetkundige opzoeking)
+beslist alle vier de reeksen van \cref{exo:b1:series:3}.
+\end{example}
+
+\begin{example}[Het equivalentiecriterium in één regel]\label{ex:b1:series:equivtest}
+Aard van $\sum_{n \geq 1} \frac{\sqrt{n+1} - \sqrt n}{n}$?
+Vermenigvuldig met de toegevoegde van de teller:
+\[
+\frac{\sqrt{n+1} - \sqrt n}{n}
+= \frac{1}{n\,(\sqrt{n+1} + \sqrt n)}
+\sim \frac{1}{2\,n^{3/2}} ,
+\]
+een convergente Riemann-schaal ($\alpha = \frac32 > 1$): de \omterm{def:b1:series:def}{reeks}
+convergeert. De hele beslissing vergde één equivalent en één
+opzoeking --- op voorwaarde dat de termen niet-negatief zijn, wat ze
+zijn. Het afsluitende inzicht: voor positieve reeksen is de hele
+convergentietheorie een \emph{woordenboek van schalen} ($n^{-\alpha}$,
+$q^n$, $\frac{1}{n(\ln n)^\alpha}$) plus de vrijheid om een term door
+een equivalent te vervangen; het analytische werk zit in de
+asymptotiek (\cref{ch:b1:taylor}), nooit in de sommatie.
+\end{example}
+
+\begin{theorem}[Integraalvergelijking; Riemann-reeks]\label{thm:b1:series:riemann}
+Zij $f$ \omterm{def:b1:continuity:continuous}{continu}, niet-negatief en \emph{dalend} op
+$\intco{1}{+\infty}$. Dan
+\[
+\int_1^{N+1} f(t)\,\dd t \;\leq\; \sum_{n=1}^{N} f(n) \;\leq\; f(1)
++ \int_1^{N} f(t)\,\dd t ,
+\]
+dus $\sum f(n)$ convergeert dan en slechts dan als $\bigl(\int_1^x
+f\bigr)$ begrensd is. In het bijzonder, voor $\alpha \in
+\R$:\index{Riemann-reeks}
+\[
+\sum_{n \geq 1} \frac{1}{n^\alpha} \text{ convergeert}
+\iff \alpha > 1,
+\]
+en $\sum_{n=1}^{N} \frac1n = \ln N + O(1)$.
+\end{theorem}
+
+\begin{proof}
+Voor $n \leq t \leq n+1$ geeft de monotonie $f(n+1) \leq f(t)
+\leq f(n)$; integreren over $\intcc{n}{n+1}$ (een segment van
+lengte $1$):
+\[
+f(n+1) \;\leq\; \int_n^{n+1} f(t)\,\dd t \;\leq\; f(n) .
+\]
+De rechterongelijkheden sommeren voor $n = 1, \dots, N-1$ geeft
+$\int_1^{N} f \leq \sum_{n=1}^{N-1} f(n)$, vandaar de bovenste
+inkadering na optelling van $f(N) \leq f(1)$; de linkerongelijkheden
+sommeren voor $n = 1, \dots, N$ geeft $\sum_{n=2}^{N+1} f(n) \leq
+\int_1^{N+1} f$, wat na herindexering de onderste inkadering is.
+Convergentie: de partiële sommen en de integralen $\int_1^x f$
+begrenzen elkaar op de constante $f(1)$ na, en beide zijn niet-dalend,
+dus de ene is begrensd dan en slechts dan als de andere dat is
+(\cref{thm:b1:series:positive}). Voor $f(t)
+= t^{-\alpha}$ ($\alpha \neq 1$): $\int_1^x t^{-\alpha}\dd t =
+\frac{x^{1-\alpha} - 1}{1 - \alpha}$, begrensd dan en slechts dan als
+$\alpha > 1$; voor $\alpha = 1$ is de \omterm{thm:b1:integration:def}{integraal} $\ln x \to \infty$, en
+de inkadering geeft $\ln(N+1) \leq H_N \leq 1 + \ln N$. Voor $\alpha
+\leq 0$ streven de termen niet naar $0$.
+\end{proof}
+
+\begin{example}[De harmonische stapel]\label{ex:b1:series:harmonicstack}
+Hoeveel termen moet de harmonische \omterm{def:b1:series:def}{reeks} opstapelen om $20$ te
+overschrijden? De inkadering $\ln(N+1) \leq H_N \leq 1 + \ln N$
+antwoordt zonder ook maar te sommeren: $H_N \geq 20$ vereist $1 + \ln
+N \geq 20$, d.w.z.\ $N \geq \eu^{19} \approx 1.8\cdot10^{8}$, en is
+gegarandeerd zodra $\ln(N + 1) \geq 20$, d.w.z.\ $N \approx \eu^{20}
+\approx 4.9\cdot10^{8}$. (De weekendopgave verscherpt dit tot $N
+\approx \eu^{20 - \gamma} \approx 2.7\cdot10^{8}$ via de \omterm{pb:b1:series:1}{constante van
+Euler}.) Het afsluitende inzicht: de integraalvergelijking beslist niet
+enkel over convergentie --- ze \emph{lokaliseert} partiële sommen met
+logaritmische precisie, en verandert een hopeloze berekening
+(honderden miljoenen termen) in een schatting van twee regels.
+\end{example}
+
+\begin{theorem}[Quotiëntcriterium (d'Alembert)]\label{thm:b1:series:ratio}
+Zij $u_n > 0$ met $\frac{u_{n+1}}{u_n} \to \ell$.\index{quotiëntcriterium}
+\begin{itemize}
+  \item Als $\ell < 1$: $\sum u_n$ convergeert;
+  \item als $\ell > 1$: $u_n \to +\infty$, divergentie;
+  \item als $\ell = 1$: geen besluit ($\sum \frac1n$ divergeert, $\sum
+        \frac{1}{n^2}$ convergeert).
+\end{itemize}
+\end{theorem}
+
+\begin{proof}
+Als $\ell < 1$, kies $q \in \intoo{\ell}{1}$ vast: voorbij een zekere
+$N$ geldt $u_{n+1} \leq q\,u_n$, dus $u_n \leq u_N q^{\,n-N}$ per
+inductie: vergelijking met een \omterm{ex:b1:series:geometric}{meetkundige reeks}. Als $\ell > 1$:
+voorbij een zekere $N$ is de rij $(u_n)$ stijgend, dus ze kan niet
+naar $0$ streven (haar limiet, als die bestaat, is $\geq u_N > 0$);
+volgens \cref{prop:b1:series:first}~(1), divergentie --- en in feite
+geeft $u_n \geq u_N q^{n-N}$ met $q > 1$ dat $u_n \to \infty$.
+\end{proof}
+
+\begin{example}\label{ex:b1:series:ratio}
+$\sum \frac{x^n}{n!}$ convergeert voor elke $x > 0$: quotiënt
+$\frac{x}{n+1} \to 0$. Haar som is $\eu^x$: volgens Taylor--Lagrange
+(\cref{thm:b1:taylor:lagrange}) op $\intcc{0}{x}$,
+\[
+\Bigl| \eu^x - \sum_{k=0}^{n} \frac{x^k}{k!} \Bigr|
+\leq \eu^{x}\, \frac{x^{n+1}}{(n+1)!} \xrightarrow[n\to\infty]{} 0 ,
+\]
+waarbij de grens naar $0$ streeft omdat de faculteit domineert
+(\cref{exo:b1:integration:9}~(1) gebruikte hetzelfde feit). Hetzelfde
+argument sommeert de reeksen voor $\sin$, $\cos$, $\sinh$, $\cosh$ op
+heel $\R$.
+\end{example}
+
+\begin{example}[Het quotiëntcriterium is voldoende, niet nodig]\label{ex:b1:series:rationotnecessary}
+Zij $u_n = 2^{-n}$ voor even $n$ en $u_n = 2^{-n-2}$ voor oneven
+$n$. De opeenvolgende quotiënten oscilleren tussen $\frac{1}{8}$ en
+$\frac12\cdot4 = 2$, dus $\frac{u_{n+1}}{u_n}$ heeft geen limiet en
+d'Alembert zwijgt --- toch is $u_n \leq 2^{-n}$ en beslecht het
+vergelijkingscriterium de convergentie onmiddellijk. De hypothese van
+het criterium (het quotiënt \emph{convergeert}) is een echte
+beperking: ze past bij termen met één dominante multiplicatieve
+structuur (faculteiten, machten), en faalt bij alles wat ademt.
+Wanneer quotiënten zich misdragen, val terug op vergelijking met een
+meetkundige omhullende --- wat het \omterm{thm:b1:series:ratio}{quotiëntcriterium} altijd al was,
+zoals zijn bewijs toont.
+\end{example}
+
+\begin{example}[Quotiëntcriterium bij faculteitengevechten]\label{ex:b1:series:ratiobinom}
+Aard van $\sum_{n\geq0} \dfrac{(n!)^2}{(2n)!}$ (omgekeerden van
+de centrale \omterm{def:b1:counting:objects}{binomiaalcoëfficiënten}, op de factor $n + 1$ na)?
+Het quotiënt laat de faculteiten instorten:
+\[
+\frac{u_{n+1}}{u_n}
+= \frac{((n+1)!)^2}{(n!)^2}\cdot\frac{(2n)!}{(2n+2)!}
+= \frac{(n+1)^2}{(2n+1)(2n+2)}
+\longrightarrow \frac14 < 1 :
+\]
+convergent, met ruimte over --- de termen dalen in wezen als
+$4^{-n}$, in overeenstemming met $\binom{2n}{n} \geq
+\frac{4^n}{2n+1}$ uit \cref{pb:b1:integration:1}. Het afsluitende
+inzicht: quotiënten van faculteiten zijn precies wat het
+\omterm{thm:b1:series:ratio}{quotiëntcriterium} verteert --- elke faculteit valt weg tot een
+rationale functie van $n$, waarvan de limiet uit de leidende termen
+afgelezen wordt.
+\end{example}
+
+\section{Absolute convergentie; alternerende reeksen}
+
+\begin{theorem}[Absolute convergentie]\label{thm:b1:series:absolute}
+Als $\sum \abs{u_n}$ convergeert (\emph{absolute
+convergentie}\index{absolute convergentie}), dan convergeert $\sum
+u_n$, en $\bigl|\sum u_n\bigr| \leq \sum \abs{u_n}$. Dit geldt voor
+reële of complexe termen.
+\end{theorem}
+
+\begin{proof}
+De partiële sommen voldoen, voor $M > N$ (Cauchy-criterium,
+\cref{thm:b1:seq:complete}):
+\[
+\abs{S_M - S_N} = \Bigl| \sum_{n=N+1}^{M} u_n \Bigr|
+\leq \sum_{n=N+1}^{M} \abs{u_n},
+\]
+wat klein is voor grote $N$ aangezien de partiële sommen van
+$\sum\abs{u_n}$ een \omterm{def:b1:seq:cauchy}{Cauchyrij} vormen. Dus $(S_N)$ is Cauchy, en dus
+convergent. De ongelijkheid gaat over op de limiet vanuit de eindige
+driehoeksongelijkheid.
+\end{proof}
+
+\begin{example}[Absolute convergentie, reëel en complex]\label{ex:b1:series:absexamples}
+$\sum_{n\geq1} \frac{\sin n}{n^2}$: de termen wisselen grillig van
+teken (inderdaad, $(\sin n)$ ligt \omterm{def:b1:topology:dense}{dicht} in $\intcc{-1}{1}$,
+\cref{exo:b1:seq:12}), en geen enkele alternerende structuur is in
+zicht. De \omterm{thm:b1:series:absolute}{absolute convergentie} redt alles in één keer:
+$\bigl|\frac{\sin n}{n^2}\bigr| \leq \frac{1}{n^2}$, een
+convergente schaal, dus de \omterm{def:b1:series:def}{reeks} convergeert. Hetzelfde schild werkt
+over $\C$: $\sum_{n\geq1}\frac{\eu^{\iu n}}{n^2}$ convergeert
+omdat $\bigl|\frac{\eu^{\iu n}}{n^2}\bigr| = \frac{1}{n^2}$
+--- tekenpatronen, zelfs tweedimensionale, zijn irrelevant
+zodra de moduli sommeerbaar zijn. Het afsluitende inzicht: \omterm{thm:b1:series:absolute}{absolute
+convergentie} is het enige gereedschap van dit hoofdstuk dat nooit
+vraagt hoe de tekens georganiseerd zijn; probeer het eerst
+(\cref{met:b1:series:decide}), en houd de delicate criteria achter de
+hand voor de reeksen die eraan ontsnappen.
+\end{example}
+
+\begin{theorem}[Criterium voor alternerende reeksen]\label{thm:b1:series:alternating}
+Zij $(a_n)$ dalend met $a_n \to 0$. Dan convergeert de \omterm{thm:b1:series:alternating}{alternerende
+reeks} $\sum (-1)^n a_n$; haar som ligt tussen elke twee opeenvolgende
+partiële sommen, en\index{alternerende reeks}
+\[
+\abs{R_N} = \Bigl| \sum_{n > N} (-1)^n a_n \Bigr| \leq a_{N+1} .
+\]
+\end{theorem}
+
+\begin{proof}
+De even en oneven partiële sommen zijn ingesloten: $S_{2p+2} - S_{2p}
+= a_{2p+2} - a_{2p+1} \leq 0$ (dalend), $S_{2p+1} - S_{2p-1} =
+a_{2p} - a_{2p+1} \geq 0$ (stijgend), en $S_{2p} - S_{2p+1} =
+a_{2p+1} \to 0$. Volgens \cref{thm:b1:seq:adjacent} delen ze een
+limiet $S$, die het criterium van de twee \omterm{def:b1:seq:subsequence}{deelrijen}
+(\cref{prop:b1:seq:subsequences}) tot de limiet van $(S_N)$ maakt;
+bovendien is $S$ gevangen tussen opeenvolgende partiële sommen, en
+$\abs{S - S_N}$ is hoogstens de afstand tot de volgende, $a_{N+1}$.
+\end{proof}
+
+\begin{example}[Alternerende harmonische reeks]\label{ex:b1:series:ln2}
+$\sum_{n \geq 1} \frac{(-1)^{n-1}}{n}$ convergeert (criterium voor
+alternerende reeksen) maar niet absoluut (harmonische \omterm{def:b1:series:def}{reeks}). Haar som
+is $\ln 2$: vertrek van de eindige meetkundige identiteit
+$\frac{1}{1+t} = \sum_{k=0}^{n-1} (-t)^k +
+\frac{(-t)^n}{1+t}$ en integreer over $\intcc{0}{1}$:
+\[
+\ln 2 = \sum_{k=1}^{n} \frac{(-1)^{k-1}}{k}
++ (-1)^n \int_0^1 \frac{t^n}{1+t}\,\dd t ,
+\qquad
+0 \leq \int_0^1 \frac{t^n}{1+t}\,\dd t \leq \frac{1}{n+1} \to 0 .
+\]
+De convergentie is pijnlijk traag ($R_N \approx \frac{1}{N}$) ---
+alternerende reeksen convergeren door wegvallen, niet door kleinheid.
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}[x=0.78cm, y=7.2cm]
+  \draw[-Stealth] (0.3,0.42) -- (11,0.42)
+    node[below, font=\small] {$N$};
+  \draw (1,0.415) -- (1,0.425) node[below=1pt, font=\small]
+    {$1$};
+  \draw (5,0.415) -- (5,0.425) node[below=1pt, font=\small]
+    {$5$};
+  \draw (10,0.415) -- (10,0.425) node[below=1pt, font=\small]
+    {$10$};
+  \draw[gray, dashed] (0.3,0.6931) -- (10.7,0.6931)
+    node[right, font=\small, text=black] {$\ln 2$};
+  \node[left, font=\small] at (0.3,1) {$1$};
+  \node[left, font=\small] at (0.3,0.5) {$0.5$};
+  \draw[omDef, thick]
+    plot coordinates {(1,1) (2,0.5) (3,0.8333) (4,0.5833)
+    (5,0.7833) (6,0.6167) (7,0.7595) (8,0.6345)
+    (9,0.7456) (10,0.6456)};
+  \fill[omDef] (1,1) circle (1.5pt);
+  \fill[omDef] (2,0.5) circle (1.5pt);
+  \fill[omDef] (3,0.8333) circle (1.5pt);
+  \fill[omDef] (4,0.5833) circle (1.5pt);
+  \fill[omDef] (5,0.7833) circle (1.5pt);
+  \fill[omDef] (6,0.6167) circle (1.5pt);
+  \fill[omDef] (7,0.7595) circle (1.5pt);
+  \fill[omDef] (8,0.6345) circle (1.5pt);
+  \fill[omDef] (9,0.7456) circle (1.5pt);
+  \fill[omDef] (10,0.6456) circle (1.5pt);
+\end{tikzpicture}
+
+{\small De partiële sommen $S_N$ van de alternerende harmonische
+\omterm{def:b1:series:def}{reeks} $1 - \frac12 + \frac13 - \cdots$ springen bij elke stap over
+hun limiet $\ln 2$ heen: oneven sommen van boven, even sommen van
+onder, elke sprong van grootte $\frac{1}{N+1}$. De insluiting is het
+bewijs van \cref{thm:b1:series:alternating} zichtbaar gemaakt --- en
+het trage dichtknijpen van de tang ($\abs{S_N - \ln 2} \approx
+\frac{1}{2N}$, weekendopgave \cref{pb:b1:series:1}) is waarom
+niemand $\ln 2$ op deze manier berekent.}
+\end{omfigure}
+
+\begin{remark}[Veelvoorkomende valkuilen bij reeksen]
+(i) \emph{Het equivalentiecriterium vereist een teken}: zij $v_n =
+\frac{(-1)^n}{\sqrt n}$ en $u_n = v_n + \frac1n$. Dan
+$\frac{u_n}{v_n} = 1 + \frac{(-1)^n}{\sqrt n} \to 1$, dus $u_n
+\sim v_n$; toch convergeert $\sum v_n$ (criterium voor alternerende
+reeksen) terwijl $\sum u_n = \sum v_n + \sum \frac1n$ divergeert.
+Equivalentie beheerst de \emph{grootte} van de termen, en voor
+reeksen met tekens is grootte geen lot --- het criterium is enkel
+geformuleerd, en waar, voor (uiteindelijk) niet-negatieve termen. (ii)
+\emph{$u_n \to 0$ bewijst niets}: de harmonische \omterm{def:b1:series:def}{reeks} is het
+eeuwige tegenvoorbeeld; de omgekeerde richting
+(\cref{prop:b1:series:first}~(1)) is enkel een snelle divergentietest.
+(iii) \emph{Quotiëntlimiet $1$ is stilte, geen convergentie}: zowel
+$\sum\frac1n$ als $\sum\frac{1}{n^2}$ hebben quotiënt $\to 1$;
+schakel over op Riemann-schalen of integraalvergelijking. (iv)
+\emph{Alternerend vereist dalend}: $\sum
+\frac{(-1)^n}{n + (-1)^n}$ lijkt alternerend en wordt enkel via
+ontwikkeling behandeld (\cref{exo:b1:series:5}); de weekendopgave van
+\cref{ch:b1:taylor} (vraag 23 daar) toont dat het criterium volledig
+kan falen zonder monotonie. (v) \emph{Groeperen en herordenen zijn
+niet gratis}: haakjes invoegen is onschadelijk voor convergente
+reeksen maar kan convergentie uit divergentie scheppen ($1 - 1 + 1 -
+\cdots$ per paar gegroepeerd), en herordenen kan de som zelf
+veranderen --- het drama dat in de weekendopgave van dit hoofdstuk
+wordt opgevoerd (\cref{pb:b1:series:1}).
+\end{remark}
+
+\begin{method}[De aard van een reeks bepalen]\label{met:b1:series:decide}
+\begin{enumerate}
+  \item Geldt $u_n \to 0$? Zo niet, divergentie, stop.
+  \item Niet-negatieve termen: zoek een equivalent van $u_n$
+        (ontwikkelingen, \cref{ch:b1:taylor}!), vergelijk met Riemann-
+        of meetkundige schalen; faculteiten en machten vragen om het
+        \omterm{thm:b1:series:ratio}{quotiëntcriterium}; dalende $f(n)$ vraagt om
+        integraalvergelijking.
+  \item Tekens variëren: probeer eerst \omterm{thm:b1:series:absolute}{absolute convergentie}; als dat
+        faalt, het criterium voor alternerende reeksen (controleer
+        zorgvuldig op \emph{dalend}); daarbuiten, gereedschap van het
+        tweede jaar.
+\end{enumerate}
+\end{method}
+
+\begin{example}[Oneven noemers, de halve telescoop]\label{ex:b1:series:oddtelescope}
+Bereken $\sum_{n \geq 1} \dfrac{1}{4n^2 - 1}$. Splitsing in
+partieelbreuken: $\frac{1}{(2n-1)(2n+1)} =
+\frac12\bigl(\frac{1}{2n-1} - \frac{1}{2n+1}\bigr)$, dus
+\[
+\sum_{n=1}^{N} \frac{1}{4n^2 - 1}
+= \frac12\Bigl(1 - \frac{1}{2N+1}\Bigr)
+\longrightarrow \frac12 .
+\]
+Vergelijk met $\sum \frac{1}{n(n+1)} = 1$
+(\cref{exo:b1:series:1}): hetzelfde telescoperende skelet, maar de
+opeenvolgende termen liggen hier twee uit elkaar in de oneven
+getallen, en de factor $\frac12$ registreert de stap. Het afsluitende
+inzicht: telescoperen is een verandering van standpunt, geen truc ---
+telkens de algemene term een verschil $w_n - w_{n+1}$ is van een rij
+met een limiet, is de som $w_1 - \lim w$, precies
+\cref{prop:b1:series:first}~(3).
+\end{example}
+
+\begin{remark}[De analyse-pijplijn, achteraf bekeken]
+Dit hoofdstuk is waar de analyse van het boekdeel samenkomt, en elk
+criterium noemt zijn voorouder. Begrensde partiële sommen is de
+stelling van de monotone limiet (\cref{ch:b1:seq}), zelf het
+volledigheidsaxioma van \cref{ch:b1:reals}; \omterm{thm:b1:series:absolute}{absolute convergentie} is
+het Cauchy-criterium; de integraaltest is de inkadering van
+oppervlakten uit \cref{ch:b1:integration}; equivalenten van algemene
+termen zijn de ontwikkelingen uit \cref{ch:b1:taylor}; en de stelling
+over alternerende reeksen is het lemma van de \omterm{thm:b1:seq:adjacent}{ingesloten rijen} in zijn
+zondagse kleren. Achterstevoren gelezen legt de pijplijn uit waar elk
+hoofdstuk \emph{voor diende} --- en de weekendopgaven die erdoorheen
+geweven zijn ($b$-adische cijfers, Cesàro--Stolz, de
+irrationaliteitsmachines, de \omterm{pb:b1:series:1}{constante van Euler}) zijn dezelfde paar
+ideeën die elkaar op steeds grotere hoogte ontmoeten. De lineaire
+algebra die volgt verandert van onderwerp, niet van standaard: de
+gewoonte van exacte uitspraken met gecertificeerde fout overleeft de
+overgang van limieten naar dimensies.
+\end{remark}
+
+\begin{remark}[Waar reeksen vervolgens heengaan]
+Dit hoofdstuk sluit de analyse van het boekdeel af en opent drie
+deuren. In het boekdeel van het tweede jaar krijgen reeksen een
+variabele ($\sum a_n x^n$: machtreeksen, met hun convergentiestraal)
+en vervolgens een functiewaardige theorie (Fourier-reeksen); de
+tweedeling absolute-versus-voorwaardelijke convergentie,
+gedramatiseerd in de weekendopgave hieronder, wordt de hoeksteen van
+beide. In de kansrekening (boekdeel van het derde jaar) \emph{zijn}
+verwachtingen van discrete stochastische variabelen reeksen, en
+\omterm{thm:b1:series:absolute}{absolute convergentie} is wat hen welgedefinieerd maakt. En de
+\omterm{thm:b1:series:riemann}{Riemann-reeks} $\sum n^{-s}$, doorgetrokken naar complexe $s$, wordt de
+zetafunctie --- de meest bestudeerde \omterm{def:b1:series:def}{reeks} in de wiskunde.
+\end{remark}
+
+\section{Oefeningen}
+
+\begin{exercise}[$\star$]\label{exo:b1:series:1}
+Aard (en som, indien telescoperend) van:
+\[
+\sum_{n\geq1} \frac{1}{n(n+1)},
+\qquad
+\sum_{n\geq2} \ln\Bigl(1 - \frac{1}{n^2}\Bigr),
+\qquad
+\sum_{n\geq0} \frac{3^n + 4^n}{5^n} .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:series:2}
+Aard van: $\;\sum \dfrac{n^2}{2^n}$; $\;\sum \dfrac{n!}{n^n}$;
+$\;\sum \dfrac{2^n\,n!}{n^n}$; $\;\sum \dfrac{3^n\,n!}{n^n}$.
+\emph{(\omterm{thm:b1:series:ratio}{Quotiëntcriterium}; herinner dat $\bigl(1 + \frac1n\bigr)^n \to
+\eu$.)}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:series:3}
+Aard van: $\;\sum \sin\dfrac{1}{n^2}$; $\;\sum
+\Bigl(1 - \cos\dfrac1n\Bigr)$; $\;\sum \dfrac{1}{\sqrt{n(n+1)}}$;
+$\;\sum \dfrac{\ln n}{n^2}$ \emph{(vergelijk met $n^{-3/2}$)}.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:series:4}
+Bewijs dat $\sum_{n\geq1} \frac{1}{n^2}$ convergeert met som $\leq 2$,
+gebruikmakend van $\frac{1}{n^2} \leq \frac{1}{n(n-1)}$ voor $n \geq
+2$ en een telescoperende grens.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:series:5}
+Aard van $\;\sum \dfrac{(-1)^n}{\sqrt n}$, van $\;\sum
+\dfrac{(-1)^n}{n + (-1)^n}$ \emph{(ontwikkel: het criterium voor
+alternerende reeksen is niet rechtstreeks toepasbaar --- waarom?)}, en
+van $\;\sum
+\sin\bigl(\pi\sqrt{n^2+1}\,\bigr)$ \emph{(reduceer modulo $\pi$:
+$\sqrt{n^2+1} = n + \frac{1}{2n} + O(n^{-3})$)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:series:6}
+Voor welke $\alpha > 0$ convergeert $\sum_{n \geq 2}
+\dfrac{1}{n (\ln n)^{\alpha}}$? \emph{(Integraalvergelijking;
+substitueer $u = \ln t$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:series:7}
+Zij $u_n = \dfrac{1}{n} - \ln\Bigl(1 + \dfrac1n\Bigr)$. Bewijs dat
+$0 \leq u_n \leq \dfrac{1}{2n^2}$, dat $\sum u_n$ convergeert, en
+leid het bestaan af van de \omterm{pb:b1:series:1}{constante van Euler}\index{constante van Euler}:
+\[
+\gamma = \lim_{N \to \infty} \Bigl( \sum_{n=1}^{N} \frac 1n - \ln N
+\Bigr) .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:series:8}
+Bereken de sommen
+\[
+\sum_{n=1}^{\infty} \frac{1}{n(n+2)}
+\qquad\text{en}\qquad
+\sum_{n=0}^{\infty} \frac{n}{2^n} .
+\]
+\emph{(Voor de eerste: splitsing in partieelbreuken. Voor de tweede:
+bereken $\sum_{n=1}^{N} n x^{n-1}$ in gesloten vorm en laat $N \to
+\infty$ bij $x = \frac12$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:series:9}
+(Cauchy-condensatie) Zij $(u_n)$ niet-negatief en dalend.
+Bewijs dat
+\[
+\sum_{n \geq 1} u_n \text{ convergeert}
+\iff
+\sum_{k \geq 0} 2^k\, u_{2^k} \text{ convergeert},
+\]
+door pakketten termen tussen opeenvolgende machten van $2$ te
+vergelijken. Herwin daaruit het Riemann-criterium en
+\cref{exo:b1:series:6}.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:series:10}
+Gebruikmakend van de integraalidentiteit van \cref{ex:b1:series:ln2}
+aangepast aan $\frac{1}{1+t^2}$, bewijs de formule van Leibniz
+\[
+\frac{\pi}{4} = \sum_{n=0}^{\infty} \frac{(-1)^n}{2n+1}
+= 1 - \frac13 + \frac15 - \frac17 + \cdots
+\]
+met de foutgrens $\abs{R_N} \leq \frac{1}{2N+3}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:series:11}
+Aard van $\displaystyle\sum_{n \geq 1} \frac{1}{n^{1 + 1/n}}$.
+\emph{(Bereken de limiet van $n^{1/n}$ en vind een equivalent van
+de algemene term: het Riemann-criterium vereist een \emph{vaste}
+exponent.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:series:12}
+Zij $(u_n)$ niet-negatief en \emph{dalend} met $\sum u_n$
+convergent. Bewijs dat $n\,u_n \to 0$ \emph{(begrens $n\,u_{2n}$
+door een plak $\sum_{k=n+1}^{2n} u_k$ en gebruik het Cauchy-criterium)}.
+Toon aan dat de omkering faalt, en dat de monotonie-hypothese niet
+weggelaten kan worden.
+\end{exercise}
+
+\section{Opgave: de constante van Euler en de reeks die haar som
+verandert}
+
+\begin{problem}[{Weekendopgave --- $H_n = \ln n + \gamma +
+\frac{1}{2n} + O(n^{-2})$, en het herschikken van $1 - \frac12 +
+\frac13 - \dots$ tot $\frac{\ln 2}{2}$}]
+\label{pb:b1:series:1}
+Twee verhalen delen de harmonische \omterm{def:b1:series:def}{reeks}. Ten eerste, de exacte
+boekhouding van haar divergentie: $H_n - \ln n$ convergeert naar de
+\omterm{pb:b1:series:1}{constante van Euler} $\gamma$ (\cref{exo:b1:series:7}), en deze opgave
+verscherpt de \omterm{def:b1:logic:statement}{uitspraak} tot een tweezijdige wet $\frac{1}{2(n+1)}
+\leq H_n - \ln n - \gamma \leq \frac{1}{2n}$, die $\gamma
+= 0.5772\dots$ met de hand certificeert. Ten tweede, het schandaal
+van de voorwaardelijke convergentie: de alternerende harmonische
+\omterm{def:b1:series:def}{reeks} sommeert tot $\ln 2$
+(\cref{ex:b1:series:ln2}), en toch sommeren \emph{dezelfde termen, in
+een andere volgorde}, tot $\frac{\ln 2}{2}$ --- of tot $\ln 2 +
+\frac12\ln\frac pq$ voor willekeurige $p, q$, of tot om het even welk
+reëel getal (Riemann). De twee verhalen zijn één: de herschikte
+sommen worden berekend \emph{met} de $\gamma$-wet.\index{constante van
+Euler}\index{herschikking van reeksen}
+
+\medskip
+\noindent\textbf{Deel I --- $\gamma$, ingekaderd.} Stel $a_n = H_n
+- \ln n$ en $b_n = H_n - \ln(n+1)$.
+\begin{enumerate}
+  \item Gebruikmakend van $\frac{t}{1+t} \leq \ln(1 + t) \leq t$,
+        toon aan dat $(a_n)$ daalt, $(b_n)$ stijgt, en dat ze
+        ingesloten zijn; hun gemeenschappelijke limiet is $\gamma$,
+        met $b_n \leq \gamma \leq a_n$ voor elke $n$.
+  \item Numeriek eerste schot: uit $H_{10} = 2.928968\dots$,
+        kader $\gamma$ in tussen $b_{10} = 0.5311$ en $a_{10} =
+        0.6264$. Hoe groot een $n$ zou deze ruwe inkadering nodig
+        hebben voor vier decimalen?
+  \item Toon de exacte staartrepresentatie $a_n - \gamma =
+        \sum_{k \geq n} w_k$ (limiet van partiële sommen), waarbij
+        \[
+        w_k = a_k - a_{k+1}
+        = \ln\Bigl(1 + \frac1k\Bigr) - \frac{1}{k+1}
+        = \int_k^{k+1} \frac{(k + 1 - t)}{t\,(k+1)}\,\dd t ,
+        \]
+        en leid uit de integraalvorm de tweezijdige grens
+        $\dfrac{1}{2(k+1)^2} \leq w_k \leq \dfrac{1}{2k(k+1)}$ af.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel II --- De $\frac{1}{2n}$-wet.}
+\begin{enumerate}[resume]
+  \item Sommeer de grenzen van vraag 3 (beide zijden telescoperen of
+        vergelijken met telescopen) en besluit de wet:
+        \[
+        \frac{1}{2(n+1)} \;\leq\; H_n - \ln n - \gamma \;\leq\;
+        \frac{1}{2n} \qquad (n \geq 1).
+        \]
+  \item Leid $H_n = \ln n + \gamma + \frac{1}{2n} +
+        O\bigl(\frac{1}{n^2}\bigr)$ af; preciezer, toon dat
+        $\gamma_n = H_n - \ln n - \frac{1}{2n}$ voldoet aan
+        $-\frac{1}{2n(n+1)} \leq \gamma_n - \gamma \leq 0$.
+  \item Certificeer vier decimalen met $n = 100$: gegeven $H_{100} =
+        5.1873775\dots$, bereken $\gamma_{100} = 0.577207\dots$
+        en besluit $\gamma = 0.5772 \pm 5\cdot10^{-5}$ (ware
+        waarde $0.5772156\dots$).
+  \item Twee dividenden van de wet, beide later nodig: als $m \to
+        \infty$,
+        \[
+        H_{2m} - H_m = \ln 2 - \frac{1}{4m} +
+        O\Bigl(\frac{1}{m^2}\Bigr),
+        \qquad
+        \sum_{j=1}^{m} \frac{1}{2j-1} = \frac{\ln m}{2} + \ln 2
+        + \frac\gamma2 + o(1) ,
+        \]
+        de tweede via $\sum_{j \leq m} \frac{1}{2j-1} = H_{2m}
+        - \frac12 H_m$, en evenzo $\sum_{j=1}^{m}
+        \frac{1}{2j} = \frac{\ln m}{2} + \frac\gamma2 + o(1)$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel III --- De alternerende harmonische \omterm{def:b1:series:def}{reeks},
+tot tweede orde.}
+\begin{enumerate}[resume]
+  \item Toon (inductie, of groepering) de identiteit
+        $\sum_{k=1}^{2m} \frac{(-1)^{k-1}}{k} = H_{2m} - H_m$,
+        en leid zowel de som $\ln 2$ (opnieuw) als de exacte
+        snelheid af:
+        \[
+        \sum_{k=1}^{2m} \frac{(-1)^{k-1}}{k}
+        = \ln 2 - \frac{1}{4m} + O\Bigl(\frac{1}{m^2}\Bigr) .
+        \]
+  \item Leid de asymptotische fout van de alternerende harmonische
+        \omterm{def:b1:series:def}{reeks} af bij \emph{om het even welke} index: $S - S_N \sim
+        \frac{(-1)^N}{2N}$ --- twee keer kleiner dan de
+        slechtst-mogelijke grens $a_{N+1} \approx \frac1N$ van
+        \cref{thm:b1:series:alternating}.
+  \item (Versnelling gratis) Toon dat de gemiddelde sommen
+        $\tilde S_N = \frac{S_N + S_{N+1}}{2}$ voldoen aan $\tilde
+        S_N = \ln 2 + O\bigl(\frac{1}{N^2}\bigr)$. Controle: $S_{10}
+        = 0.64563$, $S_{11} = 0.73654$, $\tilde S_{10} =
+        0.69109$, tegenover $\ln 2 = 0.69315$: één middeling koopt
+        twee decimalen.
+  \item Leg in twee zinnen uit waarom zo'n truc niet kan helpen bij
+        een \emph{positief} fenomeen met divergerende staart zoals de
+        inkadering van vraag 2: de alternerende fout oscilleert (teken
+        $(-1)^N$), dus middeling doet haar leidende term wegvallen,
+        terwijl de inkaderingsfout $\frac{1}{2n}$ van $\gamma$ een
+        constant teken heeft. (Het middelen van $a_n$ en $b_n$
+        \emph{helpt} wél: leg $\frac{a_n + b_n}{2}$ in verband met de
+        middelpuntschatting $H_n - \ln\bigl(n + \frac12\bigr)$ en toon
+        dat haar fout $O\bigl(\frac{1}{n^2}\bigr)$ is.)
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel IV --- Starheid en haar falen.}
+\begin{enumerate}[resume]
+  \item Toon dat het positieve deel $\sum \frac{1}{2j-1}$ en
+        het negatieve deel $\sum \frac{1}{2j}$ van de alternerende
+        harmonische \omterm{def:b1:series:def}{reeks} beide divergeren --- de signatuur van
+        \emph{voorwaardelijke} convergentie.
+  \item Bewijs de algemene \omterm{def:b1:logic:statement}{uitspraak} achter vraag 12: als
+        $\sum u_n$ convergeert maar $\sum \abs{u_n}$ divergeert, dan
+        divergeren de \omterm{def:b1:series:def}{reeks} van positieve delen $\sum u_n^+$ en die
+        van negatieve delen $\sum u_n^-$ beide \emph{(uit
+        $u_n^\pm = \frac{\abs{u_n} \pm u_n}{2}$: als de ene
+        convergeerde, dan ook de andere, en dus $\sum\abs{u_n}$)}.
+        Dit onuitputtelijke reservoir van positieve en negatieve
+        massa is wat het recept van Riemann zal uitgeven.
+  \item (Starheid) Bewijs: als $\sum u_n$ \emph{absoluut}
+        convergeert en $\sigma \colon \N \to \N$ een bijectie is, dan
+        convergeert $\sum u_{\sigma(n)}$ naar dezelfde som \emph{(voor
+        grote $N$ bevatten de eerste $M$ herschikte termen $u_0,
+        \dots, u_N$; vergelijk de partiële sommen via de staart
+        $\sum_{n > N}\abs{u_n}$)}.
+  \item (Het recept van Riemann) Zij $t \in \R$. Beschrijf de
+        gulzige herschikking van de alternerende harmonische \omterm{def:b1:series:def}{reeks}:
+        neem positieve termen $1, \frac13, \frac15, \dots$ tot de
+        partiële som $t$ voor het eerst overschrijdt, dan negatieve
+        termen $-\frac12, -\frac14, \dots$ tot ze voor het eerst onder
+        $t$ zakt, en herhaal. Toon dat elke term precies één keer
+        gebruikt wordt, dat na de eerste overschrijding de partiële
+        sommen binnen de laatst gebruikte term van $t$ blijven, en
+        besluit dat de herschikte \omterm{def:b1:series:def}{reeks} naar $t$ convergeert:
+        \emph{elke} voorgeschreven som is bereikbaar.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel V --- De $(p, q)$-formule.} Kies gehele
+getallen $p, q \geq 1$ vast. Herschik de alternerende harmonische
+\omterm{def:b1:series:def}{reeks} in blokken: $p$ positieve termen (de volgende oneven
+omgekeerden), dan $q$ negatieve termen (de volgende even omgekeerden),
+en herhaal.
+\begin{enumerate}[resume]
+  \item Ga na dat dit een echte herschikking is (elke term
+        precies één keer), en dat het voor $(p, q) = (1, 2)$ luidt
+        \[
+        1 - \frac12 - \frac14 + \frac13 - \frac16 - \frac18 +
+        \frac15 - \frac1{10} - \frac1{12} + \dots
+        \]
+  \item (De exacte halvering) Voor $(p, q) = (1, 2)$, bewijs de
+        blokidentiteit
+        \[
+        \frac{1}{2k-1} - \frac{1}{4k-2} - \frac{1}{4k}
+        = \frac12\Bigl(\frac{1}{2k-1} - \frac{1}{2k}\Bigr),
+        \]
+        en leid de \emph{exacte} betrekking $T_{3K} = \frac12
+        S_{2K}$ af tussen de herschikte partiële sommen en de
+        oorspronkelijke: de halvering van de som is zichtbaar bij
+        elke eindige fase, niet enkel in de limiet.
+  \item Toon dat de partiële som na $K$ volledige blokken
+        gelijk is aan $\sum_{j=1}^{pK} \frac{1}{2j-1} -
+        \sum_{j=1}^{qK} \frac{1}{2j}$, en bereken haar limiet
+        met vraag 7:
+        \[
+        \ln 2 + \frac12 \ln\frac pq .
+        \]
+  \item Beheers de partiële sommen \emph{binnen} een blok (de
+        termen streven naar $0$) en besluit dat de $(p,
+        q)$-herschikte \omterm{def:b1:series:def}{reeks} naar $\ln 2 + \frac12\ln
+        \frac pq$ convergeert. In het bijzonder geeft $(1, 2)$
+        $\frac{\ln 2}{2}$: verifieer tegen de eerste negen termen,
+        $T_9 = 0.3083$, die naar $0.3466$ kruipen.
+  \item Controles en bereik: $(1,1)$ herwint $\ln 2$;
+        $(2,1)$ geeft $\frac32\ln 2$; welke sommen zijn bereikbaar
+        met $(p, q)$-blokken, en hoe verhoudt dit aftelbare menu zich
+        tot de volledige kaart van Riemann (vraag 14)?
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel VI --- Epiloog: $\gamma$ aan het werk, en
+synthese.}
+\begin{enumerate}[resume]
+  \item Identificeer de som van de convergente \omterm{def:b1:series:def}{reeks}
+        $\sum_{k\geq1} \bigl(\frac1k - \ln\frac{k+1}{k}\bigr)$
+        (\cref{exo:b1:series:7}): toon dat ze gelijk is aan $\gamma$.
+  \item Voer het recept van Riemann (vraag 14) uit voor het doel $t =
+        1$ en geef de eerste twaalf geproduceerde termen ($1, \frac13,
+        -\frac12, \frac15, -\frac14, \frac17, \frac19, -\frac16,
+        \frac1{11}, \frac1{13}, -\frac18, \frac1{15}$),
+        en bereken de partiële som ($\approx 0.980$) --- kijk
+        hoe het algoritme rond zijn doel ademt.
+  \item Toon dat een of andere herschikking van de alternerende
+        harmonische \omterm{def:b1:series:def}{reeks} naar $+\infty$ divergeert \emph{(blokken
+        positieve termen lang genoeg om telkens $1$ te winnen, met
+        vraag 12, gescheiden door afzonderlijke negatieve termen)}.
+  \item Verscherp \cref{ex:b1:series:harmonicstack} met de
+        $\gamma$-wet: toon dat de eerste index met $H_N \geq
+        20$ voldoet aan $N = \eu^{\,20 - \gamma}\,(1 + o(1))
+        \approx 2.7\cdot10^{8}$ --- de \omterm{pb:b1:series:1}{constante van Euler} is precies
+        de correctie die de ruwe inkadering miste.
+  \item Synthese, telkens één zin: (i) de $\gamma$-wet en
+        wat elk van haar drie stukken ($\ln n$, $\gamma$,
+        $\frac{1}{2n}$) bijdraagt; (ii) waarom voorwaardelijke
+        convergentie de som volgorde-afhankelijk maakt terwijl
+        \omterm{thm:b1:series:absolute}{absolute convergentie} dat verbiedt; (iii) hoe de $(p,q)$-formule
+        een \emph{berekening} met de $\gamma$-wet was en geen
+        abstracte bestaanuitspraak; (iv) waar deze
+        draden verdergaan --- machtreeksen en producten van reeksen
+        in het boekdeel van het tweede jaar, en de weekendopgave van
+        het boekdeel van het derde jaar over de formule van Stirling,
+        waar dezelfde boekhouding som-tegen-integraal op volle kracht
+        draait.
+\end{enumerate}
+\end{problem}

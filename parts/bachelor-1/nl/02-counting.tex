@@ -1,0 +1,810 @@
+\chapter{Tellen}\label{ch:b1:counting}
+
+Het tellen van \omterm{def:b1:counting:card}{eindige verzamelingen} klinkt elementair --- en wordt al
+snel subtiel. Dit hoofdstuk definieert de \omterm{def:b1:counting:card}{kardinaliteit} netjes (via
+bijecties, in de geest van \cref{ch:b1:logic}), stelt de handvol
+telprincipes vast waaruit alles volgt, en leidt de klassieke tellingen
+af: lijsten, \omterm{def:b1:counting:objects}{permutaties}, deelverzamelingen, \omterm{def:b1:counting:objects}{binomiaalcoëfficiënten}.
+
+\section{Kardinaliteit van eindige verzamelingen}
+
+\begin{definition}[Eindige verzameling, kardinaliteit]\label{def:b1:counting:card}
+Voor $n \in \N^*$ schrijven we $\intint{1}{n} = \{1, 2, \dots,
+n\}$. Een \omterm{def:b1:logic:sets}{verzameling} $E$ is \emph{eindig}\index{eindige verzameling} wanneer $E = \emptyset$
+of wanneer er een bijectie is van $\intint{1}{n}$ op $E$ voor
+een zekere $n \in \N^*$; deze $n$ is uniek (\cref{thm:b1:counting:welldef})
+en is de \emph{kardinaliteit}\index{kardinaliteit} van $E$, genoteerd
+$\abs{E}$ (met $\abs{\emptyset} = 0$).
+\end{definition}
+
+\begin{theorem}[Kardinaliteit is welgedefinieerd]\label{thm:b1:counting:welldef}
+Als $m \neq n$, dan is er geen bijectie van $\intint{1}{m}$
+op $\intint{1}{n}$. Preciezer: als $m > n$ is er
+geen injectie van $\intint{1}{m}$ in $\intint{1}{n}$.
+\end{theorem}
+
+\begin{proof}
+We bewijzen door inductie op $n$ de \omterm{def:b1:logic:statement}{uitspraak}: \emph{voor alle $m > n$
+is er geen injectie $\intint{1}{m} \to \intint{1}{n}$}. Voor $n = 0$ is het doel leeg en $m \geq 1$: er bestaat
+helemaal geen \omterm{def:b1:logic:map}{afbeelding}. Neem de \omterm{def:b1:logic:statement}{uitspraak} aan voor $n$, en veronderstel dat $f \colon
+\intint{1}{m} \to \intint{1}{n+1}$ een
+injectie is met $m > n + 1$. Als de waarde $n + 1$ niet bereikt wordt, is $f$
+een injectie in $\intint{1}{n}$, wat de
+inductiehypothese tegenspreekt. Anders geldt $f(a) = n + 1$ voor precies één $a$;
+verwissel $f(a)$ en $f(m)$ (formeel: samenstellen met de transpositie van
+de twee waarden), zodat de nieuwe injectie $g$ voldoet aan $g(m) = n + 1$.
+Dan is de beperking van $g$ tot $\intint{1}{m-1}$ een
+injectie in $\intint{1}{n}$ met $m - 1 > n$ ---
+opnieuw een tegenspraak.
+\end{proof}
+
+\begin{corollary}[Duiventilprincipe]\label{cor:b1:counting:pigeonhole}
+Als $\abs{E} > \abs{F}$, dan is geen enkele \omterm{def:b1:logic:map}{afbeelding} $f \colon E \to F$ \omterm{def:b1:logic:inj}{injectief}: twee
+elementen van $E$ delen hun beeld\index{duiventilprincipe}.
+\end{corollary}
+
+\begin{proof}
+Schrijf $\abs E = m$, $\abs F = n$ met $m > n$, en kies bijecties
+$u \colon \intint1m \to E$ en $v \colon F \to \intint1n$. Als $f$
+\omterm{def:b1:logic:inj}{injectief} zou zijn, dan zou $v \circ f \circ u$ een injectie van
+$\intint1m$ in $\intint1n$ zijn (een samenstelling van injecties,
+\cref{prop:b1:logic:comp}), wat
+\cref{thm:b1:counting:welldef} tegenspreekt.
+\end{proof}
+
+\begin{remark}[Intermezzo: waarom de verwisseling in het bewijs van de stelling?]\label{rem:b1:counting:swapinterlude}
+Het bewijs van \cref{thm:b1:counting:welldef} bevat de
+eerste werkelijk vernuftige zet van het hoofdstuk, die het waard is
+langzaam over te doen. Het obstakel: om de inductiehypothese toe te passen wil men
+het laatste punt $m$ van het domein \emph{en} het laatste punt
+$n+1$ van het doel schrappen, maar $f$ kan een ander punt $a$ naar $n
++ 1$ sturen, en dan beschadigt het schrappen van het doelpunt de \omterm{def:b1:logic:map}{afbeelding}
+elders. De remedie: stel $f$ samen met de transpositie van de
+twee \emph{waarden} $f(a)$ en $f(m)$ --- een bijectie van het
+doel, zodat injectiviteit behouden blijft --- waarna de
+lastige waarde $n + 1$ op de onschadelijke positie $m$ staat, en
+beide schrappingen schoon zijn. Dit patroon van ``eerst normaliseren, dan
+snijden'' komt vaker terug: het is hoe de recurrentie voor derangementen
+$\sigma^{-1}(n+1)$ omleidt in het weekendprobleem van dit hoofdstuk, en
+hoe \omterm{def:b1:counting:objects}{permutaties} worden bijgesteld doorheen het probleem over de symmetrische groep in
+\cref{ch:b1:structures}.
+\end{remark}
+
+\begin{proposition}[Injecties, surjecties en kardinaliteit]\label{prop:b1:counting:injsur}
+Zij $E, F$ \omterm{def:b1:counting:card}{eindige verzamelingen} met $\abs{E} = \abs{F}$, en $f \colon E
+\to F$. Dan geldt
+\[
+f \text{ injectief} \iff f \text{ surjectief} \iff f \text{ bijectief}.
+\]
+\end{proposition}
+
+\begin{proof}
+Veronderstel $f$ \omterm{def:b1:logic:inj}{injectief}. Dan is $f$ een bijectie van $E$ op $f(E)$,
+dus $\abs{f(E)} = \abs{E} = \abs{F}$. Als $f(E)$ een punt $y_0$ van
+$F$ zou missen, dan zou $f$ een injectie van $E$ in $F \setminus \{y_0\}$ zijn,
+een \omterm{def:b1:logic:sets}{verzameling} van \omterm{def:b1:counting:card}{kardinaliteit} $\abs{F} - 1 < \abs{E}$ --- onmogelijk volgens het
+duiventilprincipe. Dus $f(E) = F$: $f$ is \omterm{def:b1:logic:inj}{surjectief}, en dus
+\omterm{def:b1:logic:inj}{bijectief}.
+
+Veronderstel $f$ \omterm{def:b1:logic:inj}{surjectief}. Kies voor elke $y \in F$ één \omterm{def:b1:logic:map}{origineel} $s(y)
+\in E$; dan geldt $f \circ s = \mathrm{id}_F$, dus $s$ is \omterm{def:b1:logic:inj}{injectief}
+(\cref{prop:b1:logic:comp}). Volgens de vorige paragraaf toegepast op $s$
+(de \omterm{def:b1:counting:card}{kardinaliteiten} zijn gelijk) is $s$ \omterm{def:b1:logic:inj}{bijectief}. Uit $f \circ s =
+\mathrm{id}_F$ krijgen we $f = \mathrm{id}_F \circ s^{-1} = s^{-1}$, dus
+$f$ is \omterm{def:b1:logic:inj}{bijectief}. Ten slotte is een bijectieve \omterm{def:b1:logic:map}{afbeelding} per definitie zowel
+\omterm{def:b1:logic:inj}{injectief} als \omterm{def:b1:logic:inj}{surjectief}, wat de cyclus van implicaties sluit.
+\end{proof}
+
+\begin{example}[Eindigheid is essentieel]\label{ex:b1:counting:finiteonly}
+Op een \emph{eindige} \omterm{def:b1:logic:sets}{verzameling} is \cref{prop:b1:counting:injsur} een krachtige
+kortere weg: elke injectieve \omterm{def:b1:logic:map}{afbeelding} van $E$ naar zichzelf is automatisch een
+\omterm{def:b1:counting:objects}{permutatie} van $E$ --- de helft van de bijectiviteit krijg je gratis. Beide
+implicaties vallen weg op oneindige \omterm{def:b1:logic:sets}{verzamelingen}: $n \mapsto n + 1$ is
+\omterm{def:b1:logic:inj}{injectief} van $\N$ naar $\N$ maar mist $0$, en de \omterm{def:b1:logic:map}{afbeelding} $\N \to \N$
+die $0 \mapsto 0$ en $n \mapsto n - 1$ voor $n \geq 1$ stuurt, is
+\omterm{def:b1:logic:inj}{surjectief} maar niet \omterm{def:b1:logic:inj}{injectief}. Telkens wanneer deze propositie wordt ingeroepen,
+doet de eindigheidshypothese echt werk --- een thema dat het
+weekendprobleem van \cref{ch:b1:logic} vanaf de andere kant verkent,
+waar oneindige \omterm{def:b1:logic:sets}{verzamelingen} juist die zijn die zulke zelfafbeeldingen toelaten.
+\end{example}
+
+\begin{example}[De helft van het werk, gratis]\label{ex:b1:counting:mod7}
+Beschouw de \omterm{def:b1:logic:map}{afbeelding} $f$ op $\{0, 1, \dots, 6\}$ die $k$ stuurt naar de
+rest van $3k$ bij deling door $7$; haar waardetabel is
+\[
+0,\ 3,\ 6,\ 2,\ 5,\ 1,\ 4 .
+\]
+Is $f$ een bijectie? Injectiviteit alleen volstaat
+(\cref{prop:b1:counting:injsur}): als $3k$ en $3k'$ dezelfde
+rest hebben, dan deelt $7$ het getal $3(k - k')$, en aangezien $7$ priem is en
+$3$ niet deelt, deelt het $k - k'$ (lemma van Euclides, hier gebruikt op het
+niveau van de middelbare school en bewezen in \cref{ch:b1:arith}); met
+$\abs{k - k'} \leq 6$ dwingt dit $k = k'$ af. Surjectiviteit komt er
+gratis bij --- geen noodzaak om $3k \equiv c$ voor elke $c$ op te lossen, hoewel de
+tabel bevestigt dat elke waarde precies eenmaal voorkomt. De kortere weg is
+een werkpaard: hij bewijst de inverteerbaarheid van modulaire
+vermenigvuldiging (\cref{ch:b1:arith}), drijft de koppeling in
+de stelling van Wilson aan, en keert terug in de lineaire algebra als ``een
+endomorfisme van een eindigdimensionale ruimte is \omterm{def:b1:logic:inj}{injectief} dan en slechts dan als het
+\omterm{def:b1:logic:inj}{surjectief} is'' (\cref{ch:b1:findim}).
+\end{example}
+
+\section{De telprincipes}
+
+\begin{proposition}[Som- en productregel]\label{prop:b1:counting:rules}
+Zij $E, F$ \omterm{def:b1:counting:card}{eindige verzamelingen}.
+\begin{enumerate}
+  \item Als $E \cap F = \emptyset$, dan geldt $\abs{E \cup F} = \abs{E} +
+        \abs{F}$; algemener, voor een \omterm{thm:b1:logic:partition}{partitie} van $E$ in stukken
+        $E_1, \dots, E_k$, geldt $\abs{E} = \sum_i \abs{E_i}$.
+  \item In het algemeen, $\abs{E \cup F} = \abs{E} + \abs{F} - \abs{E \cap
+        F}$.
+  \item $\abs{E \times F} = \abs{E} \times \abs{F}$.
+  \item De \omterm{def:b1:logic:sets}{verzameling} $F^E$ van alle \omterm{def:b1:logic:map}{afbeeldingen} van $E$ naar $F$ voldoet aan
+        $\abs{F^E} = \abs{F}^{\abs{E}}$.
+  \item $\abs{\mathcal{P}(E)} = 2^{\abs{E}}$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(1) Rijg de opsommingen aaneen: als $E = \{x_1, \dots, x_m\}$ en $F =
+\{y_1, \dots, y_n\}$ zonder herhaling, dan somt $x_1, \dots, x_m, y_1,
+\dots, y_n$ de \omterm{def:b1:logic:sets}{verzameling} $E \cup F$ op zonder herhaling (disjunctheid).
+Inductie breidt dit uit tot $k$ stukken.
+
+(2) $E \cup F$ is de disjuncte vereniging van $E$ en $F \setminus E$, en
+$F$ is de disjuncte vereniging van $F \cap E$ en $F \setminus E$; dus
+$\abs{E \cup F} = \abs{E} + \abs{F \setminus E} = \abs{E} + \abs{F} -
+\abs{E \cap F}$.
+
+(3) $E \times F$ is de disjuncte vereniging, over $x \in E$, van de \omterm{def:b1:logic:sets}{verzamelingen}
+$\{x\} \times F$, elk van \omterm{def:b1:counting:card}{kardinaliteit} $\abs{F}$; pas (1) toe.
+
+(4) Een \omterm{def:b1:logic:map}{afbeelding} van $E = \{x_1, \dots, x_m\}$ naar $F$ is precies de keuze
+van het $m$-tal $(f(x_1), \dots, f(x_m)) \in F^m$; deze
+correspondentie is een bijectie, en $\abs{F^m} = \abs{F}^m$ volgens (3) en
+inductie.
+
+(5) Deelverzamelingen van $E$ corresponderen \omterm{def:b1:logic:inj}{bijectief} met \omterm{def:b1:logic:map}{afbeeldingen} $E \to \{0, 1\}$
+(stuur $A$ naar zijn indicatorfunctie); pas (4) toe.
+\end{proof}
+
+\begin{example}[Tellen via het complement]\label{ex:b1:counting:complement}
+Hoeveel $4$-cijferige pincodes (cijfers $0$--$9$, volgorde telt,
+herhaling toegestaan) bevatten \emph{ten minste één} herhaald cijfer?
+Ze rechtstreeks tellen betekent jongleren met de gevallen ``precies één paar,
+twee paren, een drietal, een viertal'' --- vijf overlappende
+configuraties. Tel in plaats daarvan het complement: alle codes zijn er
+$10^4 = 10\,000$ (productregel), de codes met vier verschillende
+cijfers zijn er $10 \times 9 \times 8 \times 7 = 5\,040$
+($4$-schikkingen), dus het antwoord is
+\[
+10^4 - 10 \cdot 9 \cdot 8 \cdot 7 = 10\,000 - 5\,040 = 4\,960 .
+\]
+Bijna de helft van alle pincodes herhaalt een cijfer. Het inzicht: telkens wanneer een
+telling geformuleerd is met ``ten minste'' of ``niet alle'', probeer het
+complement eerst --- de somregel garandeert dat
+$\abs{A} = \abs{E} - \abs{\overline A}$, en het complement is
+vaak één enkele nette configuratie.
+\end{example}
+
+\begin{example}[Roosterpaden]\label{ex:b1:counting:paths}
+Tel de kortste paden van de hoek $(0,0)$ naar de hoek
+$(4, 3)$ van een rooster, waarbij je telkens slechts één stap naar rechts (R) of één stap omhoog
+(U) beweegt. Elk zo'n pad neemt precies $7$ stappen, waarvan
+$4$ R zijn en $3$ U; omgekeerd beschrijft elk woord van lengte $7$ in de
+letters R, U met vier R's precies één pad. De paden
+corresponderen dus \omterm{def:b1:logic:inj}{bijectief} met de keuzes van de posities
+van de R's:
+\[
+\binom{7}{4} = 35 .
+\]
+Het inzicht is de \emph{codering}: de telling werd triviaal op het
+moment dat elk pad vertaald werd in een woord, d.w.z.\ een deelverzameling van
+posities --- nog een instantie van de slagzin dat een correcte telling
+een vermomde bijectie is (\cref{met:b1:counting:which}).
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=0.85]
+  \draw[gray!60] (0,0) grid (4,3);
+  \draw[->, thin] (-0.4,0) -- (4.6,0);
+  \draw[->, thin] (0,-0.4) -- (0,3.6);
+  \draw[omDef, very thick]
+    (0,0) -- (1,0) -- (1,1) -- (3,1) -- (3,2) -- (4,2) -- (4,3);
+  \fill (0,0) circle (0.07) node[below left] {$(0,0)$};
+  \fill (4,3) circle (0.07) node[above right] {$(4,3)$};
+  \node[omDef, below] at (0.5,0) {\small R};
+  \node[omDef, left] at (1,0.5) {\small U};
+  \node[omDef, below] at (1.5,1) {\small R};
+  \node[omDef, below] at (2.5,1) {\small R};
+  \node[omDef, left] at (3,1.5) {\small U};
+  \node[omDef, below] at (3.5,2) {\small R};
+  \node[omDef, left] at (4,2.5) {\small U};
+\end{tikzpicture}
+
+{\small Een van de $\binom74 = 35$ kortste paden van $(0,0)$ naar
+$(4,3)$: het getoonde pad codeert het woord RURRURU, d.w.z.\ de keuze
+van de posities $\{1,3,4,6\}$ voor de letter R onder de zeven
+stappen.}
+\end{omfigure}
+
+\section{Lijsten, permutaties, deelverzamelingen}
+
+\begin{definition}[Schikkingen, permutaties, combinaties]\label{def:b1:counting:objects}
+Zij $E$ een \omterm{def:b1:logic:sets}{verzameling} met $\abs{E} = n$ en zij $0 \leq k \leq n$.
+\begin{itemize}
+  \item Een \emph{$k$-schikking} van $E$ is een \omterm{def:b1:logic:inj}{injectief} $k$-tal van
+        elementen van $E$ (een geordende selectie zonder herhaling);
+  \item een \emph{permutatie}\index{permutatie} van $E$ is een bijectie
+        van $E$ naar zichzelf --- equivalent, een $n$-schikking;
+  \item een \emph{$k$-combinatie} is een deelverzameling van $E$ met $k$ elementen
+        (een ongeordende selectie zonder herhaling). Hun aantal wordt
+        genoteerd $\binom{n}{k}$, gelezen als ``$n$ boven $k$''
+        \index{binomiaalcoëfficiënt}.
+\end{itemize}
+\end{definition}
+
+\begin{theorem}[De drie tellingen]\label{thm:b1:counting:counts}
+Met $n = \abs{E}$ en $0 \leq k \leq n$:
+\begin{enumerate}
+  \item het aantal $k$-schikkingen van $E$ is $n (n-1) \cdots
+        (n-k+1) = \dfrac{n!}{(n-k)!}$;
+  \item het aantal \omterm{def:b1:counting:objects}{permutaties} van $E$ is $n!$;
+  \item $\dbinom{n}{k} = \dfrac{n!}{k!\,(n-k)!}$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) Kies de eerste coördinaat ($n$ manieren), dan de tweede ($n - 1$
+resterende keuzes), \dots, dan de $k$-de ($n - k + 1$ keuzes).
+Formeel, doe inductie op $k$. Voor $k = 1$ zijn er $n$ injectieve tallen
+met één term. Neem de telling aan voor $k - 1$. Elke
+$k$-schikking $(x_1, \dots, x_k)$ wordt uit precies één
+$(k-1)$-schikking verkregen --- haar afknotting $(x_1, \dots, x_{k-1})$
+--- door een laatste coördinaat toe te voegen buiten $\{x_1, \dots,
+x_{k-1}\}$, waarvoor precies $n - (k - 1)$ waarden beschikbaar zijn.
+De $k$-schikkingen worden zo, door afknotting, verdeeld in
+klassen van gemeenschappelijke grootte $n - k + 1$ geïndexeerd door de
+$(k-1)$-schikkingen, en de somregel geeft
+\[
+\frac{n!}{(n-k+1)!}\;(n - k + 1) = \frac{n!}{(n-k)!} .
+\]
+
+(2) is (1) met $k = n$.
+
+(3) Elke $k$-deelverzameling ordent zich tot $k!$ verschillende $k$-schikkingen, en
+elke $k$-schikking ontstaat uit precies één deelverzameling: dus
+$\frac{n!}{(n-k)!} = \binom nk \cdot k!$.
+\end{proof}
+
+\begin{example}[Ronde tafels: uitdelen door symmetrie]\label{ex:b1:counting:roundtable}
+Op hoeveel manieren kunnen $n$ gasten rond een ronde tafel zitten, waarbij twee
+plaatsingen identiek zijn wanneer elke gast dezelfde linker- en
+rechterbuur heeft --- d.w.z.\ op rotatie na? Elke cirkelvormige plaatsing
+correspondeert met precies $n$ lineaire plaatsingen (knip de cirkel op elk
+van de $n$ plaatsen), dus de $n!$ lineaire ordeningen vallen samen in groepen
+van $n$:
+\[
+\frac{n!}{n} = (n-1)! \quad\text{cirkelvormige plaatsingen.}
+\]
+Equivalent: zet één uitverkoren gast ergens neer (waarmee de
+rotatievrijheid geëlimineerd wordt), ordn dan de overige $n - 1$ gasten
+met de klok mee. Voor $n = 6$: $120$ tafels. De twee oplossingen illustreren
+de twee standaardremedies voor overtelling: deel door het exacte
+aantal herhalingen, of \emph{breek de symmetrie} door één
+object vast te pinnen. Beide vereisen dat de grootte van de groep herhalingen
+voor elke configuratie dezelfde is --- wat het bewijs van de formule
+$\binom nk = \frac{n!}{k!\,(n-k)!}$ hierboven eveneens gebruikte, met
+$k!$ in plaats van $n$.
+\end{example}
+
+\begin{example}[Een beperking toevoegen]\label{ex:b1:counting:constraint}
+De ronde tafel voortzettend: onder de $(n-1)!$ tafels van $n \geq
+3$ gasten, hoeveel plaatsen twee gegeven gasten $A$ en $B$ \emph{uit elkaar}
+(niet naast elkaar)? Tel het complement. Tafels waar $A$ en $B$
+samen zitten: lijm ze aaneen tot één blok --- $n - 1$ objecten
+rond de tafel, d.w.z.\ $(n-2)!$ cirkelvormige schikkingen --- ordn dan
+het paar binnen zijn blok ($2$ manieren): $2\,(n-2)!$ tafels waar ze naast elkaar zitten. Dus
+\[
+(n-1)! - 2\,(n-2)! = (n-2)!\,\bigl((n - 1) - 2\bigr)
+= (n-3)\,(n-2)!
+\]
+tafels houden ze uit elkaar. Controles: $n = 3$ geeft $0$ (rond
+een driehoek raakt iedereen iedereen) en $n = 4$ geeft $2$,
+gemakkelijk met de hand opgesomd. De lijmtruc --- behandel een gedwongen blok
+als één object, tel dan zijn interne schikkingen --- is de
+standaardremedie voor beperkingen op aangrenzendheid, lineair of cirkelvormig.
+\end{example}
+
+\begin{proposition}[Basisidentiteiten]\label{prop:b1:counting:identities}
+Voor $0 \leq k \leq n$:
+\[
+\binom{n}{k} = \binom{n}{n-k},
+\qquad
+\binom{n}{k} = \binom{n-1}{k-1} + \binom{n-1}{k}
+\quad (1 \leq k \leq n-1),
+\qquad
+\sum_{k=0}^{n} \binom{n}{k} = 2^n .
+\]
+\end{proposition}
+
+\begin{proof}
+Eerste identiteit: $A \mapsto E \setminus A$ is een bijectie tussen
+$k$-deelverzamelingen en $(n-k)$-deelverzamelingen. Regel van Pascal\index{regel van Pascal}:
+kies een element $a \in E$; de $k$-deelverzamelingen splitsen zich in die welke
+$a$ bevatten (kies de $k - 1$ andere: $\binom{n-1}{k-1}$) en die welke
+$a$ mijden ($\binom{n-1}{k}$). Derde identiteit: beide leden tellen alle deelverzamelingen
+van $E$, links opgesplitst naar grootte
+(\cref{prop:b1:counting:rules}~(1) en (5)).
+\end{proof}
+
+\begin{theorem}[Binomiaalstelling]\label{thm:b1:counting:binomial}
+Voor alle $a, b$ in een commutatieve ring (zeg $\R$ of $\C$) en $n \in \N$:
+\[
+(a + b)^n = \sum_{k=0}^{n} \binom{n}{k} a^k b^{\,n-k} .
+\]
+\end{theorem}
+
+\begin{proof}
+Het distributief uitwerken van $(a+b)(a+b)\cdots(a+b)$ levert één term per
+keuze, in elke factor, van ofwel $a$ ofwel $b$: de term $a^k b^{n-k}$
+verschijnt eenmaal voor elke manier om te kiezen welke $k$ van de $n$ factoren
+$a$ bijdragen --- dat wil zeggen, $\binom nk$ keer. (Alternatief: doe inductie
+op $n$ met de regel van Pascal.)
+\end{proof}
+
+\begin{example}\label{ex:b1:counting:binomial}
+Twee klassieke specialisaties: $a = b = 1$ geeft $\sum_k \binom nk
+= 2^n$ terug; $a = -1$, $b = 1$ geeft $\sum_{k} (-1)^k \binom nk = 0$ voor
+$n \geq 1$: onder de deelverzamelingen van een niet-lege \omterm{def:b1:logic:sets}{verzameling} heeft precies de helft
+een even \omterm{def:b1:counting:card}{kardinaliteit}.
+\end{example}
+
+\begin{example}[Eén identiteit, twee bewijzen]\label{ex:b1:counting:threen}
+De specialisatie $a = 2$, $b = 1$ van de binomiaalstelling luidt
+\[
+\sum_{k=0}^{n} \binom nk\,2^k = 3^n .
+\]
+Hier is dezelfde identiteit zonder enige algebra. Het rechterlid
+telt de woorden van lengte $n$ over het alfabet $\{0, 1, 2\}$
+(productregel). Classificeer elk woord naar de \omterm{def:b1:logic:sets}{verzameling} $K$ van posities
+die een niet-nulletter dragen: het kiezen van $K$ met $\abs K = k$ kost
+$\binom nk$, dan draagt elke positie van $K$ onafhankelijk $1$
+of $2$: $2^k$ manieren. De somregel over $k$ geeft het linkerlid.
+Voorbij het genoegen van de overeenstemming hebben de twee bewijzen verschillende
+verdiensten: het algebraïsche veralgemeent naar elke waarde van $a$, het
+combinatorische \emph{verklaart} de formule en past zich aan aan
+beperkingen (verbied de letter $2$ op de laatste positie, zeg) die
+geen enkele substitutie vat. Beide technieken actief houden is de
+praktische vaardigheid die dit hoofdstuk traint.
+\end{example}
+
+\begin{method}[Welke telling is van toepassing?]\label{met:b1:counting:which}
+Beantwoord vóór het rekenen twee vragen over de selectie: doet de
+\emph{volgorde} ertoe, en zijn \emph{herhalingen} toegestaan?
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{l|c|c}
+ & volgorde telt & volgorde telt niet \\
+\hline
+geen herhaling & $\dfrac{n!}{(n-k)!}$ & $\dbinom{n}{k}$ \\[6pt]
+herhaling toegestaan & $n^k$ & (\cref{exo:b1:counting:10}) \\
+\end{tabular}
+\end{center}
+Zoek dan naar een bijectie of een \omterm{thm:b1:logic:partition}{partitie} die het probleem herleidt tot deze
+modeltellingen; een correcte telling is een vermomde bijectie.
+\end{method}
+
+\begin{remark}[Veelvoorkomende valkuilen bij het tellen]\label{rem:b1:counting:pitfalls}
+\begin{enumerate}
+  \item \emph{Niet-disjuncte gevallen optellen.} De somregel vereist een
+        \omterm{thm:b1:logic:partition}{partitie}; als configuraties twee gevallen tegelijk kunnen
+        voldoen, worden ze dubbel geteld --- de remedie is
+        inclusie--exclusie (\cref{thm:b1:counting:inclexcl}) of
+        een fijnere gevalsonderscheiding.
+  \item \emph{Geordend versus ongeordend.} Het kiezen van ``een commissie van
+        twee'' is $\binom n2$, niet $n(n-1)$: beslis \emph{vóór het
+        rekenen} of de selectie een volgorde draagt, en als
+        een geordende telling gemakkelijker is, deel dan aan het einde door het aantal
+        ordeningen --- maar alleen wanneer elk ongeordend
+        object uit \emph{hetzelfde} aantal geordende ontstaat.
+  \item \emph{Meertraps keuzes die niet onafhankelijk zijn.}
+        De productregel vereist dat het aantal opties bij elke trap
+        onafhankelijk is van de voorgaande keuzes. ``Kies een
+        kapitein, dan een verschillende vicekapitein'' is prima ($n(n-1)$);
+        ``kies twee spelers die met elkaar overweg kunnen'' is helemaal geen
+        tweetraps product.
+  \item \emph{Dubbeltelling door constructie.} Elk
+        object twee keer opbouwen --- bijv.\ handen met \emph{ten minste}
+        één aas tellen als (kies een aas) $\times$ (kies $4$ verdere
+        kaarten) --- telt handen met twee azen te veel. ``Ten minste''
+        vraagt bijna altijd om het complement
+        (\cref{ex:b1:counting:complement}).
+\end{enumerate}
+\end{remark}
+
+\begin{example}[Telling in pokerstijl]\label{ex:b1:counting:poker}
+Uit een spel van $52$ kaarten is het aantal handen van $5$ kaarten
+$\binom{52}{5} = 2\,598\,960$. Handen die precies één aas bevatten:
+kies de aas ($4$ manieren) dan $4$ kaarten onder de $48$ niet-azen:
+$4 \binom{48}{4} = 778\,320$. De productregel is van toepassing omdat de
+keuze uiteenvalt in onafhankelijke trappen.
+\end{example}
+
+\begin{method}[Dubbeltelling]\label{met:b1:counting:doublecount}
+Om een identiteit tussen twee teluitdrukkingen te bewijzen, zoek één enkele
+\omterm{def:b1:counting:card}{eindige verzameling} die beide leden tellen --- typisch een \omterm{def:b1:logic:sets}{verzameling} van \emph{paren}
+--- en evalueer haar \omterm{def:b1:counting:card}{kardinaliteit} in twee verschillende volgordes. Het
+prototype is het \emph{handdruklemma}: tel op een feest de paren
+(persoon, geschudde hand). Sommeren over personen geeft $\sum_p d_p$ (het
+aantal handdrukken $d_p$ van elke persoon $p$); sommeren over handdrukken geeft
+tweemaal het aantal handdrukken (elk betreft twee personen). Dus
+is $\sum_p d_p$ even --- zodat het aantal personen dat een oneven
+aantal handen schudde altijd even is, een niet-triviale conclusie verkregen
+zonder enige formule. Dezelfde machine drijft
+\cref{exo:b1:counting:12} en verscheidene vragen van het weekendprobleem
+hieronder aan.
+\end{method}
+
+\begin{example}[De gemiddelde deelverzameling]\label{ex:b1:counting:averagesubset}
+Wat is de gemiddelde \omterm{def:b1:counting:card}{kardinaliteit} van een deelverzameling van een $n$-elements \omterm{def:b1:logic:sets}{verzameling}
+$E$, waarbij alle $2^n$ deelverzamelingen even waarschijnlijk zijn? Dubbeltel de
+paren $(A, a)$ met $a \in A$: sommeren over deelverzamelingen geeft
+$\sum_A \abs A$, het totaal dat we willen; sommeren over elementen geeft
+$n \cdot 2^{n-1}$ (elk van de $n$ elementen ligt in precies de helft
+van de deelverzamelingen --- koppel elke $A$ die $a$ bevat aan $A
+\setminus \{a\}$). Dus
+\[
+\frac{1}{2^n}\sum_{A \subseteq E} \abs A
+= \frac{n\,2^{n-1}}{2^n} = \frac n2 :
+\]
+deelverzamelingen zijn gemiddeld half gevuld --- zoals de symmetrie $A
+\leftrightarrow \overline A$ (die groottes $k$ en $n - k$ koppelt)
+eveneens voorspelt. Twee bewijzen, één antwoord, en beide vermijden de rechtstreekse
+berekening $\sum_k k\binom nk$ van \cref{exo:b1:counting:5}: een
+goedgekozen koppeling vervangt vaak een identiteit.
+\end{example}
+
+\section{Inclusie--exclusie}
+
+\begin{theorem}[Inclusie--exclusie]\label{thm:b1:counting:inclexcl}
+Voor \omterm{def:b1:counting:card}{eindige verzamelingen} $A_1, \dots, A_p$:
+\[
+\Bigl|\, \bigcup_{i=1}^{p} A_i \,\Bigr|
+= \sum_{\emptyset \neq I \subseteq \intint{1}{p}}
+(-1)^{\abs{I}+1} \Bigl|\, \bigcap_{i \in I} A_i \,\Bigr| .
+\]
+Voor $p = 3$:
+$\abs{A \cup B \cup C} = \abs A + \abs B + \abs C - \abs{A \cap B} -
+\abs{A \cap C} - \abs{B \cap C} + \abs{A \cap B \cap C}$.
+\end{theorem}
+
+\begin{proof}
+Neem een element $x$ van de vereniging en tel zijn bijdrage aan het
+rechterlid. Zij $J = \{i : x \in A_i\}$, van \omterm{def:b1:counting:card}{kardinaliteit} $m \geq
+1$. Het element $x$ wordt eenmaal geteld in $\abs{\bigcap_{i \in I} A_i}$
+precies wanneer $\emptyset \neq I \subseteq J$, met teken
+$(-1)^{\abs I + 1}$; zijn totale bijdrage is
+\[
+\sum_{k=1}^{m} \binom{m}{k} (-1)^{k+1}
+= 1 - \sum_{k=0}^{m} \binom mk (-1)^k = 1 - 0 = 1
+\]
+volgens \cref{ex:b1:counting:binomial}. Dus wordt elk element van de vereniging
+precies eenmaal geteld.
+\end{proof}
+
+\begin{example}[Relatief prieme gehele getallen tellen]\label{ex:b1:counting:coprime}
+Hoeveel gehele getallen van $\intint1{120}$ zijn relatief priem met $120 = 2^3
+\times 3 \times 5$? Een geheel getal deelt een factor met $120$ precies
+wanneer het deelbaar is door $2$, $3$ of $5$, dus tel het complement
+van $A_2 \cup A_3 \cup A_5$, waarbij $A_d$ de veelvouden van
+$d$ verzamelt. Binnen $\intint1{120}$ zijn er $120/d$ veelvouden van $d$
+telkens wanneer $d$ het getal $120$ deelt --- geen vloerfuncties nodig --- en
+$A_2 \cap A_3 = A_6$, enz. Inclusie--exclusie:
+\[
+\abs{A_2 \cup A_3 \cup A_5}
+= 60 + 40 + 24 - 20 - 12 - 8 + 4 = 88 ,
+\]
+dus $120 - 88 = 32$ gehele getallen zijn relatief priem met $120$. Het is
+leerzaam om de berekening te hergroeperen als een product:
+\[
+120 - 88 = 120\Bigl(1 - \frac12\Bigr)\Bigl(1 -
+\frac13\Bigr)\Bigl(1 - \frac15\Bigr) = 120 \cdot \frac12 \cdot
+\frac23 \cdot \frac45 = 32 :
+\]
+het uitwerken van de drie haakjes reproduceert precies de acht
+getekende termen van inclusie--exclusie, één per deelverzameling van $\{2, 3,
+5\}$. Deze productvorm definieert de totiëntfunctie van Euler, waarvan de
+rekenkundige rol met de congruenties van \cref{ch:b1:arith} verschijnt en
+ontwikkeld wordt in het volume van Jaar 2.
+\end{example}
+
+\begin{example}[Derangementen]\label{ex:b1:counting:derangement}
+Een \emph{derangement} is een \omterm{def:b1:counting:objects}{permutatie} zonder vast punt. Zij $A_i$
+de \omterm{def:b1:logic:sets}{verzameling} \omterm{def:b1:counting:objects}{permutaties} van $\intint{1}{n}$ die $i$ vastlaten;
+dan geldt $\abs{\bigcap_{i \in I} A_i} = (n - \abs I)!$, en
+inclusie--exclusie telt de \omterm{def:b1:counting:objects}{permutaties} met ten minste één vast
+punt; de derangementen zijn er
+\[
+D_n = n! \sum_{k=0}^{n} \frac{(-1)^k}{k!} .
+\]
+Aangezien $\sum (-1)^k / k! \to \eu^{-1}$ (zie \cref{ch:b1:series}), is ongeveer
+$37\%$ van alle \omterm{def:b1:counting:objects}{permutaties} een derangement, wat $n$ ook is.
+\end{example}
+
+\begin{remark}[Waar dit hoofdstuk gebruikt wordt]\label{rem:b1:counting:whereused}
+\omterm{def:b1:counting:objects}{Binomiaalcoëfficiënten} zijn de meest intensief hergebruikte objecten van dit
+hoofdstuk: ze drijven de binomiaalstelling in \cref{ch:b1:poly}
+(uitwerking van $(X + a)^n$) aan, de formule van Leibniz voor de $n$-de
+afgeleide van een product in \cref{ch:b1:derivative}, en de
+coëfficiënten van Taylorontwikkelingen in \cref{ch:b1:taylor}.
+\omterm{def:b1:counting:objects}{Permutaties} keren terug als een groep --- met de signatuur opgebouwd uit
+het tellen van inversies --- in \cref{ch:b1:structures}, en de
+signatuur definieert op haar beurt determinanten in \cref{ch:b1:det}.
+Inclusie--exclusie en de telprincipes zijn de eindige
+ruggengraat van de discrete kansrekening, ontwikkeld in het volume van Jaar 2;
+de derangementgetallen van \cref{ex:b1:counting:derangement} worden
+in de diepte bestudeerd in het weekendprobleem hieronder.
+\end{remark}
+
+\section{Oefeningen}
+
+\begin{exercise}[$\star$]\label{exo:b1:counting:1}
+Een nummerplaat bestaat uit twee letters (A--Z), dan drie cijfers, dan
+twee letters. Hoeveel platen zijn mogelijk? Hoeveel zonder herhaalde
+letter onder de vier?
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:counting:2}
+Hoeveel anagrammen (herschikkingen van de letters, zinvol of niet)
+heeft het woord \textsc{orange}? En \textsc{banana}?
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:counting:3}
+Een commissie van $4$ personen wordt gekozen uit $7$ vrouwen en $5$ mannen. Hoeveel
+commissies: in totaal? met precies $2$ vrouwen? met ten minste één
+man?
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:counting:4}
+Bewijs dat in elke groep van $13$ personen twee dezelfde geboortemaand delen;
+en dat onder elke $n + 1$ gehele getallen gekozen uit $\intint{1}{2n}$ twee opeenvolgend zijn. \emph{(Beide keren het duiventilprincipe: noem
+de vakjes.)}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:counting:5}
+Bereken $\sum_{k=0}^{n} k \binom{n}{k}$. \emph{Hint: leid
+$(1 + x)^n$ af, of gebruik $k \binom nk = n \binom{n-1}{k-1}$ (bewijs dit).}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:counting:6}
+Hoeveel strikt stijgende \omterm{def:b1:logic:map}{afbeeldingen} zijn er van $\intint{1}{k}$ naar $\intint{1}{n}$? Leid het aantal
+stijgende (niet noodzakelijk strikt) \omterm{def:b1:logic:map}{afbeeldingen} af. \emph{Hint voor de tweede
+telling: $f$ stijgend $\mapsto$ $g(i) = f(i) + i - 1$.}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:counting:7}
+(Vandermonde) Bewijs, door $k$-deelverzamelingen te tellen van een \omterm{def:b1:logic:sets}{verzameling} gesplitst in twee
+blokken van groottes $m$ en $n$:
+\[
+\binom{m+n}{k} = \sum_{j=0}^{k} \binom{m}{j} \binom{n}{k-j} .
+\]
+Leid $\sum_{j=0}^{n} \binom nj^2 = \binom{2n}{n}$ af.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:counting:8}
+Hoeveel gehele getallen in $\intint{1}{1000}$ zijn deelbaar door
+$2$ of $3$ of $5$? (Inclusie--exclusie; $\lfloor 1000/6 \rfloor$
+telt de veelvouden van $6$, enz.)
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:counting:9}
+Tel de surjecties van een \omterm{def:b1:logic:sets}{verzameling} van $4$ elementen op een \omterm{def:b1:logic:sets}{verzameling} van $2$
+elementen; dan op een \omterm{def:b1:logic:sets}{verzameling} van $3$ elementen. \emph{Hint: tel de
+niet-surjectieve \omterm{def:b1:logic:map}{afbeeldingen} met inclusie--exclusie op de gemiste waarden.}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:counting:10}
+(Sterren en staven) Bewijs dat het aantal $k$-selecties van $n$
+objecten \emph{met} herhaling, volgorde genegeerd --- equivalent, het
+aantal $(x_1, \dots, x_n) \in \N^n$ met $x_1 + \dots + x_n = k$
+--- gelijk is aan $\binom{n + k - 1}{k}$. \emph{Hint: codeer een oplossing als een rij
+van $k$ sterren en $n - 1$ staven.}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:counting:11}
+Bewijs de formule van \cref{ex:b1:counting:derangement} voor $D_n$ in
+detail, en leid $n! = \sum_{k=0}^{n} \binom{n}{k} D_{n-k}$ af (bewijs
+deze identiteit ook rechtstreeks door \omterm{def:b1:counting:objects}{permutaties} te classificeren naar hun
+vast-puntenverzameling).
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:counting:12}
+Voor $n \in \N^*$, bewijs door een dubbeltelling van paren (deelverzameling, gemarkeerd
+element):
+\[
+\sum_{k=1}^{n} k \binom{n}{k} = n\, 2^{n-1},
+\qquad\text{daarna}\qquad
+\sum_{k=1}^{n} k^2 \binom{n}{k} = n(n+1)\, 2^{n-2} .
+\]
+\emph{Voor de tweede: tel paren van gemarkeerde elementen, gelijk of niet.}
+\end{exercise}
+
+\section{Probleem: Derangementen, of de verkeerd geadresseerde brieven}
+
+\begin{problem}\label{pb:b1:counting:1}
+Een secretaris stopt $n$ brieven in $n$ geadresseerde enveloppen willekeurig:
+wat is de kans dat \emph{niemand} de juiste brief ontvangt?
+Deze klassieke vraag (Montmort, 1708) leidt tot de derangement\-getallen
+$D_n$ van \cref{ex:b1:counting:derangement}. De
+inclusie--exclusieformule is slechts de openingszet: dit probleem
+ontwikkelt de recurrenties die $D_n$ berekenen, twee verdere onafhankelijke
+bewijzen van de formule, de opvallende stelling dat $D_n$ het
+gehele getal is dat het dichtst bij $n!/\eu$ ligt, de volledige verdeling van vaste punten
+van een willekeurige \omterm{def:b1:counting:objects}{permutatie}, en de merkwaardige rekenkunde van de rij
+$(D_n)$.\index{derangement}
+Doorheen dit alles duidt $D_n$ het aantal derangementen (\omterm{def:b1:counting:objects}{permutaties} zonder
+vast punt) van $\intint1n$ aan, met de conventie $D_0 = 1$
+(de lege \omterm{def:b1:counting:objects}{permutatie} heeft geen vast punt).
+
+\medskip
+\noindent\textbf{Deel I --- Kleine gevallen en de telling van vaste
+punten.}
+\begin{enumerate}
+  \item Bereken $D_1, D_2, D_3$ rechtstreeks, en $D_4$ door de
+        derangementen van $\{1, 2, 3, 4\}$ op te sommen, gegroepeerd naar de waarde van
+        $\sigma(1)$. (Je zou $D_4 = 9$ moeten vinden.)
+  \item Voor $0 \leq k \leq n$, toon aan dat het aantal $P_k(n)$
+        \omterm{def:b1:counting:objects}{permutaties} van $\intint1n$ met \emph{precies} $k$ vaste
+        punten gelijk is aan $\binom nk D_{n-k}$.
+  \item Verifieer de telling voor $n = 4$: bereken $P_0(4), \dots,
+        P_4(4)$ en controleer dat ze sommeren tot $4! = 24$. Wat is waarschijnlijker
+        voor vier brieven: geen match, of precies één match?
+  \item Toon door dubbeltelling (\cref{met:b1:counting:doublecount})
+        van de paren $(\sigma, i)$ met $\sigma(i) = i$ aan dat
+        \[
+        \sum_{\sigma} \abs{\mathrm{Fix}(\sigma)} = n! :
+        \]
+        gemiddeld heeft een willekeurige \omterm{def:b1:counting:objects}{permutatie} \emph{precies één}
+        vast punt, wat $n \geq 1$ ook is.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel II --- Twee recurrenties en twee nieuwe bewijzen van
+de formule.}
+\begin{enumerate}[resume]
+  \item Bewijs combinatorisch, voor $n \geq 1$:
+        \[
+        D_{n+1} = n\,(D_n + D_{n-1}) .
+        \]
+        (Classificeer de derangementen $\sigma$ van $\intint1{n+1}$ naar
+        $j = \sigma(n+1)$, dan naar of $\sigma(j) = n + 1$; in
+        het geval $\sigma(j) \neq n+1$, bouw een bijectie met de
+        derangementen van $\intint1n$ door het \omterm{def:b1:logic:map}{origineel} van
+        $n + 1$ om te leiden naar $j$.) Controleer de recurrentie numeriek tot
+        $D_6$.
+  \item Stel $u_n = D_n - n D_{n-1}$, leid uit vraag 5
+        af dat $u_{n+1} = -u_n$, en besluit de tweede recurrentie:
+        \[
+        D_n = n D_{n-1} + (-1)^n \qquad (n \geq 1).
+        \]
+  \item Bewijs uit vraag 6 door inductie de formule van
+        \cref{ex:b1:counting:derangement},
+        \[
+        D_n = n! \sum_{k=0}^{n} \frac{(-1)^k}{k!},
+        \]
+        --- een bewijs geheel onafhankelijk van inclusie--exclusie.
+  \item (Binomiale inversie) Zij $(a_n)$ en $(b_n)$ twee
+        rijen zodat $a_n = \sum_{k=0}^n \binom nk b_k$ voor
+        alle $n$. Bewijs dat
+        \[
+        b_n = \sum_{k=0}^{n} (-1)^{n-k} \binom nk a_k
+        \qquad (n \in \N).
+        \]
+        (Stel eerst de \emph{trinomiale herschikking}
+        $\binom nk \binom kj = \binom nj \binom{n-j}{k-j}$ vast, gebruik
+        dan de alternerende rijsom van
+        \cref{ex:b1:counting:binomial}.)
+  \item Pas vraag 8 toe op de identiteit $n! = \sum_k \binom nk
+        D_{n-k}$ van \cref{exo:b1:counting:11} om een
+        \emph{derde} bewijs van de formule voor $D_n$ te verkrijgen.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel III --- Het dichtstbijzijnde gehele getal bij
+$n!/\eu$.} Neem voor dit deel aan --- de theorie wordt opgebouwd in
+\cref{ch:b1:series} --- dat
+$\eu^{-1} = \lim_{n \to \infty} s_n$ waarbij $s_n = \sum_{k=0}^{n}
+\frac{(-1)^k}{k!}$, met de strikte grens voor alternerende reeksen
+$\abs{\eu^{-1} - s_n} < \frac1{(n+1)!}$ voor elke $n$.
+\begin{enumerate}[resume]
+  \item Toon aan dat $\bigl| D_n - n!/\eu \bigr| < \frac1{n+1}$ voor
+        alle $n \in \N$.
+  \item Leid de kernstelling af: \emph{voor elke $n \geq 1$ is
+        $D_n$ het gehele getal dat het dichtst bij $n!/\eu$ ligt}. Waarom heeft het
+        argument $n \geq 1$ nodig?
+  \item Bepaal het teken van de fout: toon aan dat $D_n > n!/\eu$
+        precies wanneer $n$ even is. (Lokaliseer de eerste verwaarloosde term
+        van de alternerende reeks.)
+  \item Bereken $D_7$ tot en met $D_{10}$ met de recurrentie van
+        vraag 5, controleer dan $D_{10}$ tegen $10!/\eu$
+        ($10! = 3\,628\,800$, $\eu \approx 2.718281828$).
+  \item (De vestiaireprobabiliteit) Zij $p_n = D_n/n!$ de
+        kans dat een uniform willekeurige \omterm{def:b1:counting:objects}{permutatie} een
+        derangement is. Toon aan dat $\abs{p_n - \eu^{-1}} < \frac1{(n+1)!}$
+        en bereken $p_6$ tot vijf decimalen. Commentaar: waarom is het
+        antwoord op de vraag van Montmort in wezen onafhankelijk
+        van $n$ --- reeds voor een dozijn brieven?
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel IV --- De verdeling van vaste punten.}
+\begin{enumerate}[resume]
+  \item Zij $k \in \N$ vast. Toon aan dat het aandeel van de \omterm{def:b1:counting:objects}{permutaties}
+        van $\intint1n$ met precies $k$ vaste punten voldoet aan
+        \[
+        \frac{P_k(n)}{n!} = \frac{s_{n-k}}{k!}
+        \;\xrightarrow[n \to \infty]{}\; \frac{\eu^{-1}}{k!} .
+        \]
+        (Deze limietwaarden, sommerend tot $1$, vormen de
+        \emph{Poissonverdeling} van parameter $1$, een centraal
+        object van de cursus kansrekening in het volume van Jaar 2.)
+  \item Toon door dubbeltelling van de drietallen $(\sigma, i, j)$ waar $i
+        \neq j$ beide vastgelaten worden door $\sigma$ aan dat
+        $\sum_\sigma \abs{\mathrm{Fix}(\sigma)}\,
+        (\abs{\mathrm{Fix}(\sigma)} - 1) = n!$ voor $n \geq 2$.
+        Gecombineerd met vraag 4: het gemiddelde van
+        $\abs{\mathrm{Fix}}^2$ is $2$, dus de ``spreiding'' (variantie)
+        van het aantal vaste punten is gelijk aan $1$ --- opnieuw
+        onafhankelijk van $n$, opnieuw overeenkomend met de Poissonwet.
+  \item Bereken het aandeel van de \omterm{def:b1:counting:objects}{permutaties} met ten minste één
+        vast punt voor $n = 4, 5, 6$ (als breuken en tot vier
+        decimalen), en vergelijk met $1 - \eu^{-1} \approx
+        0.6321$.
+  \item Toon rechtstreeks aan --- zonder limieten --- dat $s_{n+2} - s_n
+        = (-1)^{n+1}\bigl(\frac1{(n+1)!} - \frac1{(n+2)!}\bigr)$,
+        en leid af dat de probabiliteiten $p_n = s_n$ van
+        vraag 14 oscilleren: $p_0 > p_2 > p_4 > \dots$ en
+        $p_1 < p_3 < p_5 < \dots$, waarbij de even (resp.\ oneven) waarden
+        dalen (resp.\ stijgen) naar de gemeenschappelijke limiet
+        $\eu^{-1}$.
+  \item (Secret Santa) $n$ personen trekken elk één naam uit een hoed;
+        als iemand zijn eigen naam trekt, wordt de \emph{hele} trekking
+        vanaf nul opnieuw gestart. Gebruik het standaardfeit dat een
+        gebeurtenis met probabiliteit $p$ gemiddeld $1/p$ pogingen kost,
+        schat het gemiddelde aantal volledige trekkingen dat nodig is,
+        en besluit dat de procedure gemiddeld ongeveer $\eu \approx
+        2.72$ trekkingen kost, in wezen onafhankelijk van
+        $n$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel V --- De rekenkunde van $D_n$, en een
+synthese.}
+\begin{enumerate}[resume]
+  \item Verfijn vraag 5: toon aan dat voor vaste $j \in
+        \intint2n$ de derangementen van $\intint1n$ met
+        $\sigma(1) = j$ er precies $D_{n-1} + D_{n-2}$ zijn,
+        onafhankelijk van $j$. Leid af dat $n - 1$ het getal $D_n$
+        deelt voor elke $n \geq 2$.
+  \item Bewijs dat $D_n$ oneven is dan en slechts dan als $n$ even is. (Werk
+        modulo $2$ in de recurrentie van vraag 6.)
+  \item Bewijs dat $D_n \equiv (-1)^n \pmod n$ voor $n \geq 1$, en
+        controleer de congruentie op het laatste cijfer van $D_{10}$.
+  \item Toon uit vraag 6 aan dat $\dfrac{D_n}{D_{n-1}} = n +
+        \dfrac{(-1)^n}{D_{n-1}}$ voor $n \geq 3$, zodat de verhouding van
+        opeenvolgende derangementgetallen \emph{bijna precies}
+        $n$ is; leg in één zin uit waarom dit consistent is met
+        $D_n \approx n!/\eu$.
+  \item Waar precies gebruikte dit probleem: (i) de product- en
+        somregel; (ii) dubbeltelling; (iii) de binomiaal\-stelling; (iv) de aangenomen grens voor alternerende reeksen? Eén
+        zin per stuk.
+  \item Synthese. De formule voor $D_n$ heeft nu drie bewijzen
+        (inclusie--exclusie, recurrentie plus inductie, binomiale
+        inversie). Vergelijk in een korte paragraaf wat elk bewijs
+        \emph{verklaart}: welk berekent het snelst, welk
+        veralgemeent naar andere tellingen van vaste punten, en welk
+        onthult waarom $\eu$ verschijnt in een probleem over enveloppen.
+\end{enumerate}
+\end{problem}

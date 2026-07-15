@@ -1,0 +1,767 @@
+\chapter{Matrices}\label{ch:b1:matrices}
+
+Een matrix is een \omterm{def:b1:linmaps:def}{lineaire afbeelding} uitgedrukt in \omterm{prop:b1:vspaces:coordinates}{coördinaten}. Dit
+hoofdstuk stelt het woordenboek op --- samenstelling wordt matrixproduct,
+bijectiviteit wordt inverteerbaarheid, \omterm{def:b1:matrices:changeofbasis}{basisverandering} wordt conjugatie
+--- en de algoritmische kant: \omterm{met:b1:matrices:gauss}{rij-operaties}, het berekenen van rangen en
+inversen. Voor het eerst ontmoet in het deel over de middelbare school,
+worden matrices nu gefundeerd in de theorie van
+\cref{ch:b1:vspaces,ch:b1:findim,ch:b1:linmaps}.
+
+\section{Matrices en lineaire afbeeldingen}
+
+\begin{definition}\label{def:b1:matrices:def}
+$\mathcal{M}_{n,p}(K)$ is de \omterm{def:b1:vspaces:def}{vectorruimte} van $n \times p$ tabellen $A
+= (a_{ij})$ van scalairen ($i$: rij, $j$: kolom), van dimensie $np$
+(\omterm{def:b1:vspaces:free}{basis}: de matrices $E_{ij}$ met één enkele $1$). Gegeven bases
+$\mathcal{B} = (e_1, \dots, e_p)$ van $E$ en $\mathcal{C}$ van $F$
+($\dim F = n$), is de \emph{matrix van $u \in \mathcal{L}(E, F)$} de
+tabel waarvan de $j$-de kolom de \omterm{prop:b1:vspaces:coordinates}{coördinaten} van $u(e_j)$ in
+$\mathcal{C}$ opsomt:
+\[
+\operatorname{Mat}_{\mathcal{B},\mathcal{C}}(u) = (a_{ij}),
+\qquad u(e_j) = \sum_{i=1}^{n} a_{ij}\, f_i .
+\]
+De \omterm{def:b1:logic:map}{afbeelding} $u \mapsto \operatorname{Mat}_{\mathcal{B},\mathcal{C}}(u)$
+is een isomorfisme van $\mathcal{L}(E, F)$ naar
+$\mathcal{M}_{n,p}(K)$ (\cref{prop:b1:linmaps:basis}: een \omterm{def:b1:linmaps:def}{lineaire
+afbeelding} is precies een keuze van \omterm{def:b1:linmaps:kerim}{beelden} van de $e_j$).
+\end{definition}
+
+\begin{example}[De afgeleide, als matrix]
+\label{ex:b1:matrices:derivative}
+Zij $D(P) = P'$ op $\R_3[X]$. In de monomiaalbasis $(1, X, X^2,
+X^3)$: $D(1) = 0$, $D(X) = 1$, $D(X^2) = 2X$, $D(X^3) = 3X^2$, dus
+\[
+\operatorname{Mat}(D) =
+\begin{pmatrix}
+0 & 1 & 0 & 0\\
+0 & 0 & 2 & 0\\
+0 & 0 & 0 & 3\\
+0 & 0 & 0 & 0
+\end{pmatrix}.
+\]
+In de \emph{gedeelde} \omterm{def:b1:vspaces:free}{basis} $\bigl(1,\ X,\ \frac{X^2}2,\
+\frac{X^3}6\bigr)$ beeldt elke basisvector af op de vorige
+($D\bigl(\frac{X^k}{k!}\bigr) = \frac{X^{k-1}}{(k-1)!}$), en wordt de
+matrix de zuivere verschuiving: enen op de superdiagonaal, nullen
+elders. Twee lessen: de matrix hoort bij het \emph{paar}
+(\omterm{def:b1:logic:map}{afbeelding}, \omterm{def:b1:vspaces:free}{basis}), niet bij de \omterm{def:b1:logic:map}{afbeelding} alleen; en een goede \omterm{def:b1:vspaces:free}{basis}
+maakt structuur in één oogopslag zichtbaar --- de verschuivingsvorm
+toont onmiddellijk dat $D^4 = 0$ op $\R_3[X]$, waarbij elke macht van
+de matrix haar diagonaal van enen een stap verder naar buiten duwt.
+\end{example}
+
+\begin{definition}[Product]\label{def:b1:matrices:product}
+Voor $A \in \mathcal{M}_{n,p}$ en $B \in \mathcal{M}_{p,q}$:
+\[
+(AB)_{ik} = \sum_{j=1}^{p} a_{ij}\, b_{jk}
+\qquad (1 \leq i \leq n,\ 1 \leq k \leq q).
+\]
+Dit is precies de matrix van de samenstelling:
+$\operatorname{Mat}(v \circ u) = \operatorname{Mat}(v)\,
+\operatorname{Mat}(u)$ (de bases sluiten in het midden op elkaar aan).
+Analoog, als $X$ de kolom van \omterm{prop:b1:vspaces:coordinates}{coördinaten} van $x$ is, is de kolom van
+$u(x)$ gelijk aan $AX$.
+\end{definition}
+
+\begin{proof}[Bewijs van de samenstellingsformule]
+\[
+v(u(e_k)) = v\Bigl(\sum_j b_{jk} f_j\Bigr) = \sum_j b_{jk}\, v(f_j)
+= \sum_j b_{jk} \sum_i a_{ij}\, g_i
+= \sum_i \Bigl(\sum_j a_{ij} b_{jk}\Bigr) g_i . \qedhere
+\]
+\end{proof}
+
+\begin{proposition}[De algebra $\mathcal{M}_n(K)$]\label{prop:b1:matrices:ring}
+Vierkante matrices $\mathcal{M}_n(K)$ vormen een (niet-commutatieve
+voor $n \geq 2$) \omterm{def:b1:structures:ring}{ring}, met eenheidselement $I_n$; haar \omterm{def:b1:structures:group}{groep} van
+eenheden is de \emph{algemene lineaire groep}\index{algemene lineaire
+groep} $GL_n(K)$, die overeenkomt met de bijectieve endomorfismen.
+Voor $A, B \in \mathcal{M}_n(K)$:
+\[
+AB = I_n \implies A \in GL_n(K) \text{ en } B = A^{-1}
+\]
+(eenzijdige inversen zijn tweezijdig, volgens
+\cref{cor:b1:linmaps:samedim}).
+\end{proposition}
+
+\begin{proof}
+De ringaxioma's dragen over vanuit $\mathcal{L}(E)$ via het
+isomorfisme van \cref{def:b1:matrices:def}: het zet samenstelling om
+in product en som in som, dus associativiteit, distributiviteit en de
+rol van $I_n$ worden overgeërfd van de overeenkomstige feiten over
+\omterm{def:b1:logic:map}{afbeeldingen}, zonder enige verificatie per element.
+Niet-commutativiteit: $E_{12}E_{21} = E_{11} \neq E_{22}
+= E_{21}E_{12}$. Als $AB = I_n$: het endomorfisme $a$ van $A$
+voldoet aan $a \circ b = \mathrm{id}$, dus $a$ is \omterm{def:b1:logic:inj}{surjectief} ($x =
+a(b(x))$ toont een \omterm{def:b1:logic:map}{origineel} van elke $x$), en dus \omterm{def:b1:logic:inj}{bijectief} in
+\omterm{def:b1:findim:def}{eindige dimensie} (\cref{cor:b1:linmaps:samedim}); samenstellen van $a
+\circ b = \mathrm{id}$ met $a^{-1}$ aan de linkerkant geeft $b =
+a^{-1}$, en dan geldt ook $b\circ a = \mathrm{id}$: de eenzijdige
+inverse was al die tijd tweezijdig --- een strikt
+eindigdimensionale gunst.
+\end{proof}
+
+\begin{definition}[Getransponeerde; spoor]\label{def:b1:matrices:transpose}
+De \emph{getransponeerde} van $A = (a_{ij}) \in \mathcal{M}_{n,p}$ is $A^{\mathsf T}
+= (a_{ji}) \in \mathcal{M}_{p,n}$; ze voldoet aan $(AB)^{\mathsf T} = B^{\mathsf T}
+A^{\mathsf T}$ en $(A^{\mathsf T})^{\mathsf T} = A$. Het
+\emph{spoor}\index{spoor} van een vierkante matrix is $\operatorname{tr} A
+= \sum_i a_{ii}$; het is \omterm{def:b1:linmaps:def}{lineair}, en
+\[
+\operatorname{tr}(AB) = \operatorname{tr}(BA)
+\qquad (A \in \mathcal{M}_{n,p},\ B \in \mathcal{M}_{p,n}).
+\]
+\end{definition}
+
+\begin{proof}[Bewijs van de identiteit van het spoor]
+$\operatorname{tr}(AB) = \sum_i \sum_j a_{ij} b_{ji}$ en
+$\operatorname{tr}(BA) = \sum_j \sum_i b_{ji} a_{ij}$: dezelfde
+dubbele som.
+\end{proof}
+
+\begin{example}[Het spoor aan het werk]
+\label{ex:b1:matrices:tracework}
+De \omterm{def:b1:linmaps:projection}{projectie} uit \cref{ch:b1:linmaps} op
+$\operatorname{Vect}(1,1)$ langs $\operatorname{Vect}(0,1)$,
+$p(x, y) = (x, x)$, heeft matrix $A = \begin{pmatrix} 1 & 0\\ 1 &
+0\end{pmatrix}$ in de canonieke \omterm{def:b1:vspaces:free}{basis}: inderdaad $A^2 = A$, en
+\[
+\operatorname{tr} A = 1 = \operatorname{rk} A ,
+\]
+wat \cref{exo:b1:matrices:8} illustreert: voor idempotenten \emph{telt}
+het \omterm{def:b1:matrices:transpose}{spoor} de dimensie van het \omterm{def:b1:linmaps:kerim}{beeld}, in welke scheve \omterm{def:b1:vspaces:free}{basis}
+de matrix ook geschreven wordt. Het invariantiemechanisme is de
+identiteit $\operatorname{tr}(AB) = \operatorname{tr}(BA)$:
+\[
+\operatorname{tr}\bigl(P^{-1}(AP)\bigr) =
+\operatorname{tr}\bigl((AP)P^{-1}\bigr) = \operatorname{tr} A ,
+\]
+dus alle matrices die gelijkvormig zijn met $A$ delen haar \omterm{def:b1:matrices:transpose}{spoor} ---
+de eerste \emph{numerieke invariant} van een endomorfisme, waarbij in
+\cref{ch:b1:det} de determinant zich zal voegen (het paar $(s, p)$ uit
+het weekendprobleem hieronder).
+\end{example}
+
+\begin{example}[Symmetrisch plus antisymmetrisch]
+\label{ex:b1:matrices:symsplit}
+Noem $A$ \emph{symmetrisch} wanneer $A^{\mathsf T} = A$,
+\emph{antisymmetrisch} wanneer $A^{\mathsf T} = -A$. Elke vierkante
+matrix splitst op unieke wijze als de ene plus de andere:
+\[
+A = \underbrace{\frac{A + A^{\mathsf T}}{2}}_{\text{symmetrisch}}
++ \underbrace{\frac{A - A^{\mathsf T}}{2}}_{\text{antisymmetrisch}},
+\]
+en een matrix die beide is, is nul ($A = -A$): de twee \omterm{def:b1:logic:sets}{verzamelingen}
+zijn \omterm{def:b1:vspaces:sum}{complementaire deelruimten} van $\mathcal{M}_n(K)$ --- het exacte
+analogon van de even/oneven splitsing van functies
+(\cref{ex:b1:vspaces:evenodd}), waarbij transpositie de rol van
+$x \mapsto -x$ speelt. Dimensies: een symmetrische matrix is \omterm{def:b1:vspaces:free}{vrij}
+op en boven de diagonaal, een antisymmetrische strikt erboven
+(nuldiagonaal):
+\[
+\frac{n(n+1)}{2} + \frac{n(n-1)}{2} = n^2 ,
+\]
+en de balans in de telling is Grassmanns bevestiging van de
+directheid. Voor $n = 2$: $\begin{pmatrix} 1 & 5\\ 1 &
+2\end{pmatrix} = \begin{pmatrix} 1 & 3\\ 3 & 2\end{pmatrix} +
+\begin{pmatrix} 0 & 2\\ -2 & 0\end{pmatrix}$. Symmetrische
+matrices keren terug als de tweede-afgeleidegegevens van
+\cref{ch:b1:multivar} (het Monge-drietal $r, s, t$), en de
+symmetrisch-orthogonale worden geclassificeerd in
+\cref{exo:b1:euclid:12}.
+\end{example}
+
+\section{Basisverandering}
+
+\begin{definition}\label{def:b1:matrices:changeofbasis}
+Zij $\mathcal{B}, \mathcal{B}'$ bases van $E$. De
+\emph{basisveranderingsmatrix}\index{basisverandering} $P =
+P_{\mathcal{B}\to\mathcal{B}'}$ heeft als kolommen de \omterm{prop:b1:vspaces:coordinates}{coördinaten} van
+de \emph{nieuwe} basisvectoren in de \emph{oude} \omterm{def:b1:vspaces:free}{basis}. Ze is
+inverteerbaar, $P^{-1} = P_{\mathcal{B}'\to\mathcal{B}}$, en
+\omterm{prop:b1:vspaces:coordinates}{coördinaten} transformeren volgens $X = PX'$ (oud $=$ $P\,\cdot$ nieuw).
+\end{definition}
+
+\begin{example}[De basisveranderingsmatrix aflezen]
+\label{ex:b1:matrices:changerun}
+In $\R^2$, van de canonieke $\mathcal B$ naar $\mathcal B' =
+\bigl((1,1), (1,-1)\bigr)$:
+\[
+P = P_{\mathcal B\to\mathcal B'} =
+\begin{pmatrix} 1 & 1\\ 1 & -1 \end{pmatrix}
+\]
+(nieuwe vectoren geschreven in oude \omterm{prop:b1:vspaces:coordinates}{coördinaten}, kolom voor kolom). De
+vector van oude \omterm{prop:b1:vspaces:coordinates}{coördinaten} $X = (3, 1)^{\mathsf T}$ heeft nieuwe
+\omterm{prop:b1:vspaces:coordinates}{coördinaten} $X' = P^{-1}X = \frac12(3 + 1,\ 3 - 1)^{\mathsf T} =
+(2, 1)^{\mathsf T}$: inderdaad $2(1,1) + 1(1,-1) = (3,1)$. Let op de
+richting --- de matrix $P$ is opgebouwd uit de \emph{nieuwe} \omterm{def:b1:vspaces:free}{basis}
+maar zet \emph{nieuwe naar oude} \omterm{prop:b1:vspaces:coordinates}{coördinaten} om ($X = PX'$); van oud
+naar nieuw gaan kost de inverse. Na elke omzetting de controle
+$2(1,1) + (1,-1) = (3,1)$ opschrijven, betrapt de omgekeerde-$P$-fout,
+die de meest voorkomende vergissing van het hoofdstuk is.
+\end{example}
+
+\begin{theorem}[Basisverandering voor een afbeelding]\label{thm:b1:matrices:conjugation}
+Zij $u \in \mathcal{L}(E)$ met matrix $A$ in $\mathcal{B}$ en $A'$
+in $\mathcal{B}'$, en $P = P_{\mathcal{B}\to\mathcal{B}'}$. Dan
+\[
+A' = P^{-1} A\, P .
+\]
+Twee matrices die zo verband houden zijn \emph{gelijkvormig}\index{gelijkvormige
+matrices}. (Voor $u \colon E \to F$ met twee paren bases is de
+formule $A' = Q^{-1} A P$ --- \emph{equivalente}
+matrices\index{equivalente matrices}.)
+\end{theorem}
+
+\begin{proof}
+Voor elke $x$: $X = PX'$ en het \omterm{def:b1:linmaps:kerim}{beeld} voldoet aan $Y = AX$, $Y = PY'$.
+Dus $PY' = APX'$, d.w.z.\ $Y' = (P^{-1}AP)X'$ voor alle $X'$: de matrix
+van $u$ in de nieuwe \omterm{def:b1:vspaces:free}{basis} is $P^{-1}AP$ (neem voor $X'$ de canonieke
+kolommen).
+\end{proof}
+
+\begin{example}[Een goede basis maakt een afbeelding doorzichtig]
+\label{ex:b1:matrices:conjugationrun}
+Zij $u(x, y) = (y, x)$ (verwisseling), met matrix $A = \begin{pmatrix} 0
+& 1\\ 1 & 0\end{pmatrix}$ in de canonieke \omterm{def:b1:vspaces:free}{basis}. In de \omterm{def:b1:vspaces:free}{basis}
+$\mathcal B' = \bigl((1,1), (1,-1)\bigr)$:
+\[
+P = \begin{pmatrix} 1 & 1\\ 1 & -1 \end{pmatrix},
+\qquad
+P^{-1} = \frac12\begin{pmatrix} 1 & 1\\ 1 & -1 \end{pmatrix},
+\qquad
+P^{-1} A P = \begin{pmatrix} 1 & 0\\ 0 & -1 \end{pmatrix}.
+\]
+Er was eigenlijk geen matrixproduct nodig: $u$ houdt $(1,1)$ vast en
+keert $(1,-1)$ om, dus in $\mathcal B'$ \emph{moet} haar matrix
+$\operatorname{diag}(1, -1)$ zijn --- de verwisseling is de spiegeling
+om de rechte $y = x$. Voor een gegeven endomorfisme een
+\omterm{def:b1:vspaces:free}{basis} vinden waarin zijn matrix diagonaal wordt, is het centrale probleem
+van het deel van Jaar~2 (reductietheorie); het weekendprobleem
+hieronder toont hoe ver veeltermidentiteiten alleen al reiken.
+\end{example}
+
+\begin{example}[Basisverandering, achterstevoren uitgevoerd]
+\label{ex:b1:matrices:reverserun}
+De \omterm{def:b1:linmaps:projection}{projectie} op $F = \operatorname{Vect}(1,1)$ langs $G =
+\operatorname{Vect}(1,-1)$ heeft, in de aangepaste \omterm{def:b1:vspaces:free}{basis} $\mathcal
+B' = \bigl((1,1),(1,-1)\bigr)$, de doorzichtige matrix $A' =
+\operatorname{diag}(1, 0)$. Om haar matrix in de canonieke \omterm{def:b1:vspaces:free}{basis} te
+krijgen, passen we \cref{thm:b1:matrices:conjugation} achterstevoren
+toe, $A = P A' P^{-1}$:
+\[
+P = \begin{pmatrix} 1 & 1\\ 1 & -1\end{pmatrix},
+\quad
+P^{-1} = \frac12\begin{pmatrix} 1 & 1\\ 1 & -1\end{pmatrix},
+\quad
+A = P\begin{pmatrix} 1 & 0\\ 0 & 0\end{pmatrix}P^{-1}
+= \frac12\begin{pmatrix} 1 & 1\\ 1 & 1\end{pmatrix}.
+\]
+Controle: $A^2 = A$ (idempotent), $\operatorname{tr} A = 1 =
+\operatorname{rk} A$, en $A\binom{1}{1} = \binom11$,
+$A\binom{1}{-1} = 0$, zoals voorgeschreven. Deze omgekeerde richting
+--- ontwerp de matrix in de goede \omterm{def:b1:vspaces:free}{basis}, en conjugeer dan terug --- is
+hoe rotatie-, spiegelings- en projectiematrices in de praktijk
+daadwerkelijk geproduceerd worden.
+\end{example}
+
+\begin{theorem}[Rangnormaalvorm]\label{thm:b1:matrices:rank}
+De \emph{rang} van een matrix (de rang van haar kolommen, equivalent
+van de bijbehorende \omterm{def:b1:linmaps:def}{lineaire afbeelding}) is de enige invariant van
+equivalentie: elke $A \in \mathcal{M}_{n,p}$ van rang $r$ is
+equivalent met
+\[
+J_r = \begin{pmatrix} I_r & 0 \\ 0 & 0 \end{pmatrix},
+\]
+en $\operatorname{rk}(A^{\mathsf T}) = \operatorname{rk}(A)$: rijrang
+is gelijk aan kolomrang.
+\end{theorem}
+
+\begin{proof}
+Zij $u \colon E \to F$ van rang $r$. Kies een complement $S$ van
+$\ker u$ ($\dim S = r$, \cref{thm:b1:linmaps:ranknullity}) met
+\omterm{def:b1:vspaces:free}{basis} $(e_1, \dots, e_r)$, aangevuld met een \omterm{def:b1:vspaces:free}{basis} van $\ker u$ tot een
+\omterm{def:b1:vspaces:free}{basis} van $E$; de \omterm{def:b1:linmaps:kerim}{beelden} $f_i = u(e_i)$, $i \leq r$, vormen een \omterm{def:b1:vspaces:free}{basis} van
+$\operatorname{im} u$ (de beperking is een isomorfisme), aangevuld
+tot een \omterm{def:b1:vspaces:free}{basis} van $F$. In deze bases is de matrix van $u$ precies
+$J_r$. Dus $A = Q J_r P^{-1}$ voor inverteerbare $P, Q$.
+
+Transponeren: $A^{\mathsf T} = (P^{-1})^{\mathsf T} J_r^{\mathsf T} Q^{\mathsf T}$
+met $J_r^{\mathsf T}$ van dezelfde vorm (rang $r$) en de buitenste
+factoren inverteerbaar (de getransponeerde van een inverteerbare is
+inverteerbaar, uit $(AB)^{\mathsf T} = B^{\mathsf T}A^{\mathsf T}$ toegepast op $AA^{-1} = I$):
+$\operatorname{rk} A^{\mathsf T} = r$.
+\end{proof}
+
+\section{Rij-operaties}
+
+\begin{method}[Gauss-eliminatie op matrices]\label{met:b1:matrices:gauss}
+De drie \emph{elementaire rij-operaties}\index{rij-operaties} ---
+twee rijen verwisselen, een rij vermenigvuldigen met $\lambda \neq 0$,
+een veelvoud van een rij bij een andere optellen --- veranderen de rang
+niet (elk is linkervermenigvuldiging met een inverteerbare matrix).
+Algoritme: maak een pivot (meest linkse niet-nul element), veeg de
+kolom eronder schoon, ga naar de volgende rij en kolom; het aantal
+pivots van de resulterende trapvorm is de rang.
+
+\emph{Berekening van de inverse:} voer het algoritme uit op het blok
+$(A \mid I_n)$ tot het linkerblok $I_n$ wordt (mogelijk desda $A$
+inverteerbaar is); het rechterblok is dan $A^{-1}$ --- inderdaad, het
+product van de gebruikte elementaire matrices is gelijk aan $A^{-1}$.
+\end{method}
+
+\begin{example}\label{ex:b1:matrices:inverse}
+$A = \begin{pmatrix} 1 & 2 \\ 3 & 4 \end{pmatrix}$: herleid $(A \mid
+I_2)$:
+\[
+\begin{pmatrix} 1 & 2 & 1 & 0\\ 3 & 4 & 0 & 1 \end{pmatrix}
+\to
+\begin{pmatrix} 1 & 2 & 1 & 0\\ 0 & -2 & -3 & 1 \end{pmatrix}
+\to
+\begin{pmatrix} 1 & 0 & -2 & 1\\ 0 & 1 & \tfrac32 & -\tfrac12
+\end{pmatrix},
+\]
+(operaties: $L_2 \leftarrow L_2 - 3L_1$; daarna $L_1 \leftarrow L_1
++ L_2$, $L_2 \leftarrow -\frac12 L_2$). Dus $A^{-1} =
+\begin{pmatrix} -2 & 1 \\ \tfrac32 & -\tfrac12\end{pmatrix}$.
+\emph{Controle:} $AA^{-1} = I_2$.
+\end{example}
+
+\begin{example}[Rang met een parameter, alleen met rijen]
+\label{ex:b1:matrices:rankparameter}
+Voor $m \in \R$, de rang van
+$M_m = \begin{pmatrix} 1 & 1 & m\\ 1 & m & 1\\ m & 1 &
+1\end{pmatrix}$. Herleid: $L_2 \leftarrow L_2 - L_1$ en $L_3
+\leftarrow L_3 - mL_1$ geven de rijen
+\[
+(1,\ 1,\ m), \qquad (0,\ m - 1,\ 1 - m), \qquad
+(0,\ 1 - m,\ 1 - m^2).
+\]
+\emph{Geval $m = 1$}: de laatste twee rijen verdwijnen --- één pivot,
+$\operatorname{rk} M_1 = 1$ (alle drie de oorspronkelijke rijen waren
+gelijk). \emph{Geval $m \neq 1$}: schaal $L_2$ met $\frac1{m-1}$ en
+$L_3$ met $\frac1{1-m}$ om $(0, 1, -1)$ en $(0, 1, 1 + m)$ te krijgen,
+dan $L_3 \leftarrow L_3 - L_2 = (0, 0, m + 2)$. Als $m = -2$:
+twee pivots, rang $2$; anders drie pivots, rang $3$. Samenvatting:
+\[
+\operatorname{rk} M_m =
+\begin{cases}
+1 & m = 1,\\
+2 & m = -2,\\
+3 & \text{anders}.
+\end{cases}
+\]
+Dezelfde drempelwaarden zullen uit één determinantberekening
+in \cref{ch:b1:det} rollen (de \omterm{def:b1:poly:def}{veelterm} $-(m+2)(m-1)^2$ uit
+\cref{exo:b1:det:7}) --- maar merk op wat eliminatie geeft en
+de determinant niet: de \emph{waarde} van de rang in de
+gedegenereerde gevallen, niet enkel het feit dat hij daalde.
+\end{example}
+
+\begin{example}[Machten berekenen]\label{ex:b1:matrices:powers}
+$A = \begin{pmatrix} 1 & 1 \\ 0 & 1\end{pmatrix} = I + N$ met $N =
+E_{12}$, $N^2 = 0$. Aangezien $I$ en $N$ commuteren, breekt het
+binomium van Newton (\cref{prop:b1:structures:binomial}) af:
+\[
+A^k = I + kN = \begin{pmatrix} 1 & k \\ 0 & 1 \end{pmatrix}
+\qquad (k \in \N, \text{ en } k \in \Z \text{ met } A^{-1} = I -
+N).
+\]
+\end{example}
+
+\begin{method}[$A^n$ berekenen: de drie routes]
+\label{met:b1:matrices:powers}
+\begin{enumerate}
+  \item \emph{Binomiumroute}: als $A = \lambda I + N$ met $N$
+        nilpotent, breekt het binomium van Newton af
+        (\cref{ex:b1:matrices:powers}, \cref{exo:b1:matrices:5});
+        het is van toepassing omdat $\lambda I$ met alles commuteert.
+  \item \emph{Veeltermroute}: vind een veeltermidentiteit
+        waaraan $A$ voldoet (in dimensie $2$ altijd $A^2 = sA -
+        pI$) en herleid $X^n$ modulo deze; het weekendprobleem
+        hieronder bouwt deze route volledig op.
+  \item \emph{Gelijkvormigheidsroute}: vind een inverteerbare $P$ met
+        $P^{-1}AP = D$ eenvoudig (diagonaal, of verschuiving), bereken
+        $D^n$, en maak ongedaan: $A^n = P D^n P^{-1}$
+        (\cref{thm:b1:matrices:conjugation},
+        \cref{ex:b1:matrices:conjugationrun}); het systematisch
+        zoeken naar zo'n $P$ is de reductietheorie van Jaar~2.
+\end{enumerate}
+Welke route ook, controleer het resultaat op $n = 0, 1, 2$: drie
+goedkope tests die bijna elke vergissing betrappen.
+\end{method}
+
+\begin{remark}[Veelvoorkomende valkuilen: de prijs van niet-commutativiteit]
+\label{rem:b1:matrices:pitfalls}
+Elke identiteit van de scalaire algebra waarvan het bewijs factoren
+herordent, sterft in $\mathcal{M}_n(K)$, $n \geq 2$.
+\emph{Kwadraten}: $(A + B)^2 = A^2 + AB + BA + B^2$, en het
+middelste valt alleen samen tot $2AB$ als $AB = BA$
+(\cref{exo:b1:matrices:1}).
+\emph{Machten van producten}: $(AB)^k$ is $ABAB\cdots$, niet
+$A^kB^k$.
+\emph{Nuldelers}: $E_{12}E_{12} = 0$ met $E_{12} \neq 0$;
+bijgevolg \emph{geen schrapping}: $AB = AC$ impliceert $B = C$
+enkel wanneer $A$ inverteerbaar is (vermenigvuldig met $A^{-1}$ ---
+aan de juiste kant).
+\emph{Sporen}: $\operatorname{tr}(AB) = \operatorname{tr}(BA)$
+altijd, maar $\operatorname{tr}(AB) \neq
+\operatorname{tr}A\operatorname{tr}B$ in het algemeen (neem $A = B =
+I_2$: $2 \neq 4$), en $\operatorname{tr}(ABC) =
+\operatorname{tr}(BCA)$ (cyclisch) terwijl $\operatorname{tr}(ACB)$
+kan verschillen.
+\emph{Getransponeerden keren om}: $(AB)^{\mathsf T} = B^{\mathsf
+T}A^{\mathsf T}$ --- de omkering vergeten is de meest voorkomende
+fout in orthogonaliteitsberekeningen (\cref{ch:b1:euclid}).
+Bij twijfel, test elke beweerde identiteit op $E_{12}$ en
+$E_{21}$: het kleinste niet-commuterende paar weerlegt de meeste
+valse formules in één regel.
+\end{remark}
+
+\begin{remark}[Waar het woordenboek heen gaat]
+\label{rem:b1:matrices:whereused}
+Het matrixwoordenboek wordt op elke overige pagina van dit deel
+gebruikt: \cref{ch:b1:det} kent aan elke vierkante matrix één enkel
+getal toe dat de inverteerbaarheid bepaalt, en lost $AX = B$
+systematisch op; \cref{ch:b1:euclid} zondert de matrices af die
+lengten behouden (orthogonale matrices); en in
+\cref{ch:b1:multivar} is het tweede-ordegedrag van een functie van
+twee variabelen een symmetrische $2 \times 2$ matrix. Het \omterm{def:b1:matrices:transpose}{spoor},
+hierboven bijna terloops ingevoerd, wordt een krachtige invariant:
+\cref{exo:b1:matrices:6,exo:b1:matrices:8} geven een eerste
+voorproefje, en het deel van Jaar~2 bouwt er de eigenwaardetheorie op.
+Het weekendprobleem ontwikkelt het andere werkpaard: veeltermidentiteiten
+waaraan een matrix voldoet, die het berekenen van $A^n$ omzetten in
+een \omterm{pb:b1:matrices:1}{lineaire recurrentie} met twee termen.
+\end{remark}
+
+\begin{remark}[Perspectieven binnen Boek 3]
+\label{rem:b1:matrices:perspectives}
+Drie matrixfamilies die hier zijn ingevoerd hebben afspraken
+verderop in dit deel. \emph{Symmetrische matrices}
+(\cref{ex:b1:matrices:symsplit}) dragen de tweede-ordegegevens van
+functies van twee variabelen: de Monge-test van
+\cref{ch:b1:multivar} is een \omterm{def:b1:logic:statement}{uitspraak} over het tekengedrag van
+een symmetrische $2\times2$ matrix, en haar determinant $rt - s^2$
+wordt berekend door de machinerie van \cref{ch:b1:det}. \emph{Orthogonale
+matrices} ($A^{\mathsf T}A = I$) zijn de isometrieën van
+\cref{ch:b1:euclid}, waar de getransponeerde eindelijk haar
+meetkundige betekenis verwerft: ze is de algebraïsche schaduw van het
+inwendig product. \emph{Inverteerbare matrices} ondergaan hun
+praktische test in \cref{ch:b1:det} --- één getal, $\det A \neq 0$ ---
+wat de zoektocht afsluit die dit hoofdstuk met rijherleiding begon.
+\omterm{def:b1:matrices:transpose}{Spoor} en determinant reizen dan als het invariante paar $(s, p)$ van
+het weekendprobleem, helemaal tot aan de eigenwaardetheorie van
+Jaar~2.
+\end{remark}
+
+\section{Oefeningen}
+
+\begin{exercise}[$\star$]\label{exo:b1:matrices:1}
+Zij $A = \begin{pmatrix} 1 & 2 \\ 0 & 1 \end{pmatrix}$ en $B =
+\begin{pmatrix} 0 & 1 \\ 1 & 0\end{pmatrix}$. Bereken $AB$, $BA$,
+$A^2 - B^2$ en $(A+B)(A-B)$; leg uit waarom de laatste twee verschillen.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:matrices:2}
+Bereken de rang van
+\[
+M = \begin{pmatrix}
+1 & 2 & 3\\
+2 & 4 & 6\\
+1 & 1 & 1
+\end{pmatrix},
+\qquad
+N = \begin{pmatrix}
+1 & 1 & 0 & 2\\
+0 & 1 & 1 & 1\\
+1 & 2 & 1 & 3
+\end{pmatrix}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:matrices:3}
+Inverteer, door rijherleiding, $A = \begin{pmatrix} 1 & 0 & 1\\ 2 & 1 &
+1\\ 1 & 1 & 1 \end{pmatrix}$, en controleer op één product.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:matrices:4}
+Schrijf de matrix, in de canonieke \omterm{def:b1:vspaces:free}{basis} van $\R_2[X]$, van het
+endomorfisme $u(P) = P(X + 1)$. Leg uit, zonder berekening, waarom
+het inverteerbaar is, en geef de matrix van $u^{-1}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:matrices:5}
+Zij $A = \begin{pmatrix} 2 & 1 \\ 0 & 2\end{pmatrix}$. Schrijf $A =
+2I + N$, bereken $N^2$, en leid $A^k$ af voor alle $k \in \N$ met het
+binomium van Newton.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:matrices:6}
+Bewijs dat er geen matrices $A, B \in \mathcal{M}_n(K)$ bestaan (met
+$K = \R$ of $\C$) zodat $AB - BA = I_n$. \emph{(Neem sporen.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:matrices:7}
+Een matrix $A$ is \emph{nilpotent} wanneer $A^m = 0$ voor een zekere
+$m$. Bewijs dat $I - A$ dan inverteerbaar is, met
+\[
+(I - A)^{-1} = I + A + A^2 + \dots + A^{m-1} .
+\]
+Toepassing: inverteer $\begin{pmatrix} 1 & 2 & 3\\ 0 & 1 & 2\\ 0 & 0 &
+1\end{pmatrix}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:matrices:8}
+Zij $A \in \mathcal{M}_n(\R)$ met $A^2 = A$ (idempotent). Bewijs
+dat $\operatorname{tr} A = \operatorname{rk} A$. \emph{(Interpreteer
+$A$ als een \omterm{def:b1:linmaps:projection}{projectie} en kies een aangepaste \omterm{def:b1:vspaces:free}{basis};
+\cref{thm:b1:matrices:conjugation} zegt dat het \omterm{def:b1:matrices:transpose}{spoor}
+basisonafhankelijk is aangezien $\operatorname{tr}(P^{-1}MP) =
+\operatorname{tr} M$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:matrices:9}
+Zij $J \in \mathcal{M}_n(\R)$ de matrix met overal enen. Bereken $J^2$,
+en leid, voor $a, b \in \R$, de voorwaarde voor inverteerbaarheid van $M
+= aI + bJ$ af samen met $M^{-1}$ \emph{(zoek een inverse van dezelfde
+vorm $\alpha I + \beta J$)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:matrices:10}
+(Rangongelijkheden) Voor $A, B \in \mathcal{M}_n(K)$, bewijs
+\[
+\operatorname{rk}(A + B) \leq \operatorname{rk} A +
+\operatorname{rk} B,
+\qquad
+\operatorname{rk}(AB) \geq \operatorname{rk} A + \operatorname{rk}
+B - n .
+\]
+\emph{(Voor de tweede --- de ongelijkheid van Sylvester --- pas
+rang--nulliteit toe op de beperking van de \omterm{def:b1:logic:map}{afbeelding} van $A$ tot
+$\operatorname{im} B$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:matrices:11}
+Zij $D = \operatorname{diag}(d_1, \dots, d_n)$ met de $d_i$
+\emph{paarsgewijs verschillend}.
+\begin{enumerate}
+  \item Bewijs dat een matrix $A$ met $D$ commuteert desda
+        $A$ diagonaal is. \emph{(Vergelijk de $(i,j)$-elementen van
+        $AD$ en $DA$.)}
+  \item Leid het \emph{centrum} van $\mathcal{M}_n(K)$ af: de
+        matrices die met \emph{elke} matrix commuteren zijn precies
+        de scalaire matrices $\lambda I_n$. \emph{(Test tegen
+        $D$, dan tegen de matrices $E_{ij}$.)}
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:matrices:12}
+(Rang-één matrices) Zij $A \in \mathcal{M}_n(K)$, $A \neq 0$.
+\begin{enumerate}
+  \item Bewijs dat $\operatorname{rk} A = 1$ desda $A =
+        CL$ voor een niet-nul kolom $C \in \mathcal{M}_{n,1}$ en een
+        niet-nul rij $L \in \mathcal{M}_{1,n}$.
+  \item Voor zo'n $A$, bewijs $A^2 = (\operatorname{tr} A)\,A$;
+        leid af dat een rang-één matrix nilpotent is desda
+        haar \omterm{def:b1:matrices:transpose}{spoor} nul is.
+  \item Als $\operatorname{tr} A \neq -1$, bewijs dat $I_n + A$ is
+        inverteerbaar met
+        \[
+        (I_n + A)^{-1} = I_n - \frac{1}{1 + \operatorname{tr}
+        A}\,A ,
+        \]
+        en dat $I_n + A$ \emph{niet} inverteerbaar is wanneer
+        $\operatorname{tr} A = -1$. \emph{(Vind een vector die
+        door $I_n + A$ op nul wordt afgebeeld.)}
+\end{enumerate}
+\end{exercise}
+
+\section{Probleem: machten van een matrix via veeltermdeling}
+
+\begin{problem}\label{pb:b1:matrices:1}
+$A^{100}$ element voor element berekenen is hopeloos; het berekenen
+via een veeltermidentiteit waaraan $A$ voldoet is drie regels.
+Dit probleem bouwt de methode van nul op: euclidische deling
+van $X^n$, de identiteit $A^2 - sA + pI = 0$ waaraan elke $2
+\times 2$ matrix voldoet (de stelling van Cayley--Hamilton in
+dimensie $2$), en het woordenboek tussen matrixmachten en \omterm{pb:b1:matrices:1}{lineaire
+recurrenties} --- met de Fibonacci-getallen als doorlopend voorbeeld.
+\index{stelling van Cayley--Hamilton (dimensie 2)}
+\index{Fibonacci-getallen}\index{lineaire recurrentie}
+
+\medskip
+\noindent\textbf{Deel I --- De restrekening.} Leg $s, p
+\in K$ vast en $D = X^2 - sX + p$.
+\begin{enumerate}
+  \item Verantwoord dat er voor elke $n \in \N$ unieke $Q_n
+        \in K[X]$ en $(a_n, b_n) \in K^2$ bestaan met
+        \[
+        X^n = Q_n\,D + a_n X + b_n ,
+        \]
+        en bereken $(a_0, b_0)$ en $(a_1, b_1)$.
+  \item Vermenigvuldig met $X$ en deel opnieuw, en stel de
+        recurrenties
+        \[
+        a_{n+1} = s\,a_n + b_n,
+        \qquad
+        b_{n+1} = -p\,a_n ,
+        \]
+        op, en leid $a_{n+2} = s\,a_{n+1} - p\,a_n$ af: de
+        coëfficiëntenrij gehoorzaamt aan de \omterm{pb:b1:matrices:1}{lineaire recurrentie} die
+        bij $D$ hoort.
+  \item Veronderstel dat $D$ twee verschillende wortels $\lambda \neq \mu$
+        heeft. Bewijs, door de delingsidentiteit te evalueren,
+        \[
+        a_n = \frac{\lambda^n - \mu^n}{\lambda - \mu},
+        \qquad
+        b_n = \frac{\lambda\mu^n - \mu\lambda^n}{\lambda - \mu} .
+        \]
+  \item Veronderstel $D = (X - \lambda)^2$. Bewijs, met behulp van
+        de \omterm{def:b1:derivative:def}{afgeleide} van de delingsidentiteit, $a_n = n\lambda^{n-1}$ en
+        $b_n = (1 - n)\lambda^{n}$.
+  \item Toon aan dat het substitueren van een vaste matrix $M \in
+        \mathcal{M}_k(K)$ in \omterm{def:b1:poly:def}{veeltermen} sommen en producten
+        respecteert: $(PQ)(M) = P(M)\,Q(M)$. Leid af dat als $D(M) =
+        0$, dan
+        \[
+        M^n = a_n\,M + b_n\,I \qquad (n \in \N).
+        \]
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel II --- Dimensie 2: \omterm{def:b1:matrices:transpose}{spoor}, determinantgetal,
+Cayley--Hamilton.} Voor $A = \begin{pmatrix} a & b\\ c &
+d\end{pmatrix}$ stel $s = a + d = \operatorname{tr} A$ en $p = ad
+- bc$ (het getal dat \cref{ch:b1:det} de determinant zal noemen).
+\begin{enumerate}[resume]
+  \item Verifieer door directe berekening de \emph{Cayley--Hamilton-identiteit
+        in dimensie $2$}:
+        \[
+        A^2 - s\,A + p\,I_2 = 0 .
+        \]
+  \item Bewijs door directe uitwerking dat $p$ multiplicatief is:
+        met voor de hand liggende notatie, $p(AB) = p(A)\,p(B)$. Toon
+        vervolgens aan: $A$ is inverteerbaar desda $p \neq 0$, in
+        welk geval
+        \[
+        A^{-1} = \frac1p\,\bigl(s\,I_2 - A\bigr).
+        \]
+  \item Zij $A = \begin{pmatrix} 1 & 1\\ 0 & 2\end{pmatrix}$.
+        Bereken $s$, $p$, de wortels van $D$, en leid een \omterm{def:b1:topology:closed}{gesloten}
+        formule voor $A^n$ af; controleer ze tegen een directe
+        berekening van $A^2$.
+  \item Zij $A = \begin{pmatrix} 3 & 1\\ -1 & 1\end{pmatrix}$.
+        Toon aan dat $D$ een dubbele wortel heeft en bereken $A^n$;
+        controleer bij $n = 2$.
+  \item Zij $F = \begin{pmatrix} 1 & 1\\ 1 & 0\end{pmatrix}$ en
+        definieer de Fibonacci-getallen door $F_0 = 0$, $F_1 = 1$,
+        $F_{n+2} = F_{n+1} + F_n$. Bewijs
+        \[
+        F^n = \begin{pmatrix} F_{n+1} & F_n\\ F_n &
+        F_{n-1}\end{pmatrix} \quad (n \geq 1),
+        \]
+        leid de formule van Binet $F_n = \dfrac{\varphi^n -
+        \psi^n}{\sqrt5}$ af waarbij $\varphi = \frac{1 + \sqrt5}2$,
+        $\psi = \frac{1 - \sqrt5}2$, en, met behulp van vraag 7,
+        de identiteit van Cassini $F_{n+1}F_{n-1} - F_n^2 = (-1)^n$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel III --- \omterm{pb:b1:matrices:1}{Lineaire recurrenties}, structureel.}
+Leg $s, p \in K$ vast met $p \neq 0$, en zij $E_D$ de \omterm{def:b1:logic:sets}{verzameling} van
+rijen met $u_{n+2} = s\,u_{n+1} - p\,u_n$ voor alle $n$.
+\begin{enumerate}[resume]
+  \item Toon aan dat $E_D$ een \omterm{def:b1:vspaces:def}{vectorruimte} van dimensie $2$ is
+        (pas \cref{exo:b1:findim:10} aan).
+  \item Toon aan dat de rij $(a_n)$ uit Deel I het element
+        van $E_D$ is met beginwaarden $0, 1$, en dat elke $u
+        \in E_D$ voldoet aan
+        \[
+        u_n = u_1\,a_n + u_0\,b_n \qquad (n \in \N),
+        \]
+        met $(b_n)$ zoals in Deel I: de delingsresten lossen
+        \emph{alle} recurrenties tegelijk op.
+  \item Als $\lambda \neq \mu$ de wortels van $D$ zijn, toon aan dat
+        $\bigl((\lambda^n), (\mu^n)\bigr)$ een \omterm{def:b1:vspaces:free}{basis} van $E_D$ is;
+        als $D = (X-\lambda)^2$ met $\lambda \neq 0$, toon aan dat
+        $\bigl((\lambda^n), (n\lambda^n)\bigr)$ er een is.
+  \item Los volledig op: $u_{n+2} = u_{n+1} + 6u_n$, $u_0 = 1$,
+        $u_1 = 8$; controleer het antwoord op $u_2$ en $u_3$.
+  \item Zij $C = \begin{pmatrix} 0 & 1\\ -p & s\end{pmatrix}$
+        (de \emph{begeleidende matrix} van $D$). Toon aan dat
+        \[
+        \begin{pmatrix} u_{n}\\ u_{n+1}\end{pmatrix}
+        = C^n \begin{pmatrix} u_0\\ u_1\end{pmatrix}
+        \quad (u \in E_D),
+        \]
+        en dat $\operatorname{tr} C = s$ en $p(C) = p$: de
+        recurrentie en de matrix dragen dezelfde \omterm{def:b1:poly:def}{veelterm} $D$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel IV --- Graad drie.} Zij $D_3 = X^3 -
+\alpha X^2 - \beta X - \gamma$ en
+\[
+C_3 = \begin{pmatrix} 0 & 1 & 0\\ 0 & 0 & 1\\ \gamma & \beta &
+\alpha \end{pmatrix}.
+\]
+\begin{enumerate}[resume]
+  \item Toon aan dat $D_3(C_3) = 0$. \emph{(Bereken de \omterm{def:b1:linmaps:kerim}{beelden} van
+        de canonieke basisvectoren onder machten van $C_3$: de
+        \omterm{def:b1:logic:map}{afbeelding} van $C_3$ stuurt $e_1 \mapsto \dots \mapsto$ een
+        combinatie die door de laatste rij wordt afgedwongen.)}
+  \item Toon aan dat als $D_3$ drie verschillende wortels $\lambda_1,
+        \lambda_2, \lambda_3$ heeft, de rest $R_n$ van $X^n$
+        gedeeld door $D_3$ de \emph{Lagrange-interpolant} is van
+        de waarden $\lambda_i^n$ in de knopen $\lambda_i$
+        (\cref{thm:b1:poly:lagrange}); leid af dat elk element
+        van $C_3^{\,n}$ een vaste lineaire combinatie is van
+        $\lambda_1^n, \lambda_2^n, \lambda_3^n$.
+  \item Los op: $u_{n+3} = 2u_{n+2} + u_{n+1} - 2u_n$ met $u_0 =
+        0$, $u_1 = 1$, $u_2 = 1$. \emph{(Ontbind $D_3 = (X - 1)(X
+        + 1)(X - 2)$.)} Controleer op $u_3$.
+  \item Bereken de rest van $X^n$ modulo $(X -
+        \lambda)^3$ \emph{(Taylorontwikkeling van $X^n$ in
+        $\lambda$)}, en leid een formule voor $(\lambda I +
+        N)^n$ af wanneer $N^3 = 0$ en $N$ commuteert met alles in
+        zicht; controleer ze tegen het binomium van Newton.
+  \item Toon aan dat voor $D_3$ met verschillende wortels de algemene
+        oplossing van de recurrentie van orde $3$ gelijk is aan $u_n = c_1
+        \lambda_1^n + c_2\lambda_2^n + c_3\lambda_3^n$: bewijs
+        dat de drie meetkundige rijen een \omterm{def:b1:vspaces:free}{basis} van de
+        oplossingsruimte vormen. \emph{(Voor de vrijheid, evalueer een
+        nulcombinatie in $n = 0, 1, 2$ en herken een
+        interpolatiestelsel in de verschillende knopen
+        $\lambda_i$.)}
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel V --- Fibonacci-deeltallen, en synthese.}
+\begin{enumerate}[resume]
+  \item Bewijs $F_1 + F_2 + \dots + F_n = F_{n+2} - 1$.
+  \item Leid uit $F^{m+n} = F^m F^n$ de optelformule
+        \[
+        F_{m+n} = F_{m+1}F_n + F_m F_{n-1},
+        \]
+        af, en leid $F_{2n} = F_n(F_{n+1} + F_{n-1})$ af.
+  \item Bewijs dat $F_n$ het dichtstbijzijnde gehele getal bij
+        $\varphi^n/\sqrt5$ is voor elke $n \geq 0$.
+  \item Zij $t_n = \operatorname{tr}(F^n) = F_{n+1} + F_{n-1}$
+        (de \emph{Lucas-getallen} $L_n$). Toon aan $t_{n+2} =
+        t_{n+1} + t_n$, $t_1 = 1$, $t_2 = 3$, dat $L_n =
+        \varphi^n + \psi^n$, en herwin $F_{2n} = F_n L_n$.
+  \item Synthese, in vier zinnen: waarom de machten van een $2
+        \times 2$ matrix in het vlak
+        $\operatorname{Vect}(I, A)$ van $\mathcal{M}_2(K)$ leven (welk
+        dimensieargument een kwadratische identiteit garandeert, en
+        welke expliciete identiteit Deel II opleverde); hoe euclidische
+        deling machtsverheffing omzet in een recurrentie met twee
+        termen; welke \omterm{def:b1:logic:statement}{uitspraak} van dit probleem het geval $n =
+        2$ is van een stelling die in alle dimensies geldt (noem ze,
+        en zeg waar ze in deze \omterm{def:b1:series:def}{reeks} bewezen wordt); en wat de
+        constructie van de begeleidende matrix aan het plaatje toevoegt.
+\end{enumerate}
+\end{problem}

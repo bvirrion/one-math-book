@@ -1,0 +1,835 @@
+\chapter{Veeltermen}\label{ch:b1:poly}
+
+\omterm{def:b1:poly:def}{Veeltermen} zijn de favoriete functies van de algebraïcus --- behalve
+dat ze hier niet als functies worden behandeld, maar als formele
+uitdrukkingen in een onbepaalde $X$, opgeteld en vermenigvuldigd
+volgens de regels van een commutatieve \omterm{def:b1:structures:ring}{ring}. De theorie loopt
+opvallend parallel met \cref{ch:b1:arith}: een euclidische deling,
+een ggd en Bézout-relaties, irreducibele elementen en een unieke
+ontbinding. Overal duidt $K$ hierbij $\Q$, $\R$ of $\C$ aan.
+
+\section{De ring $K[X]$}
+
+\begin{definition}[Veelterm, graad]\label{def:b1:poly:def}
+Een \emph{veelterm}\index{veelterm} met coëfficiënten in $K$ is een
+formele som
+\[
+P = a_0 + a_1 X + a_2 X^2 + \dots + a_n X^n
+= \sum_{k} a_k X^k,
+\]
+met $a_k \in K$ alle nul vanaf een zekere index. Met de natuurlijke
+optelling en het product
+\[
+\Bigl(\sum_i a_i X^i\Bigr)\Bigl(\sum_j b_j X^j\Bigr)
+= \sum_k \Bigl(\sum_{i+j=k} a_i b_j\Bigr) X^k,
+\]
+is de \omterm{def:b1:logic:sets}{verzameling} $K[X]$ een commutatieve \omterm{def:b1:structures:ring}{ring}. De \emph{graad}
+$\deg P$ van $P \neq 0$ is de grootste $n$ met $a_n \neq 0$; $a_n$ is
+de \emph{leidende coëfficiënt} ($P$ is \emph{monisch}\index{monische
+veelterm} wanneer $a_n = 1$), en per afspraak is $\deg 0 = -\infty$.
+Elke veelterm bepaalt een functie $x \mapsto P(x)$ op $K$ door
+substitutie.
+\end{definition}
+
+\begin{proposition}[Graadregels; integriteitsdomein]\label{prop:b1:poly:degree}
+Voor $P, Q \in K[X]$:
+\[
+\deg(P + Q) \leq \max(\deg P, \deg Q),
+\qquad
+\deg(PQ) = \deg P + \deg Q .
+\]
+Bijgevolg is $K[X]$ een \omterm{def:b1:structures:field}{integriteitsdomein}, en zijn eenheden zijn de
+niet-nulconstanten.
+\end{proposition}
+
+\begin{proof}
+De somregel is duidelijk (coëfficiënten voorbij het maximum
+verdwijnen). Voor het product, laat $a_m$ en $b_n$ de leidende
+coëfficiënten zijn: de coëfficiënt van $X^{m+n}$ in $PQ$ is $a_m b_n
+\neq 0$ ($K$ is een \omterm{def:b1:structures:field}{lichaam}, dus een \omterm{def:b1:structures:field}{integriteitsdomein}), en alle
+hogere coëfficiënten verdwijnen. Als $P, Q \neq 0$ dan is $\deg PQ =
+\deg P + \deg Q \geq 0$, dus $PQ \neq 0$: \omterm{def:b1:structures:field}{integriteitsdomein}. Als $PQ
+= 1$ dan dwingt $\deg P + \deg Q = 0$ dat $\deg P = \deg Q = 0$: de
+inverteerbare elementen zijn de inverteerbare constanten, d.w.z.\ heel
+$K^*$.
+\end{proof}
+
+\begin{theorem}[Euclidische deling]\label{thm:b1:poly:division}
+Laat $A, B \in K[X]$ met $B \neq 0$. Er is precies één paar $(Q,
+R)$ van \omterm{def:b1:poly:def}{veeltermen} met
+\[
+A = BQ + R, \qquad \deg R < \deg B .
+\]
+\end{theorem}
+
+\begin{proof}
+\emph{Bestaan}, door sterke inductie op $\deg A$. Als $\deg A < \deg
+B$, neem $(Q, R) = (0, A)$. Schrijf anders $A = a X^m + \dots$, $B =
+b X^n + \dots$ met $m \geq n$; de \omterm{def:b1:poly:def}{veelterm} $A_1 = A - \frac ab
+X^{m-n} B$ heeft graad $< m$ (de leidende termen heffen elkaar op),
+dus per inductie $A_1 = BQ_1 + R$ met $\deg R < \deg B$, en $A = B(Q_1
++ \frac ab X^{m-n}) + R$.
+
+\emph{Uniciteit}: als $BQ + R = BQ' + R'$, dan $B(Q - Q') = R' - R$
+met $\deg(R' - R) < \deg B$; volgens de graadregel dwingt dit $Q - Q'
+= 0$, en dan $R = R'$.
+\end{proof}
+
+\begin{example}\label{ex:b1:poly:division}
+Deel $A = X^4 + X^3 - 2X + 1$ door $B = X^2 + 1$:
+\[
+X^4 + X^3 - 2X + 1 = (X^2 + 1)(X^2 + X - 1) + (-3X + 2).
+\]
+(Reken na: trek $X^2 B$ af, dan $X B$, dan $-B$; de rest
+$-3X + 2$ heeft graad $1 < 2$.)
+\end{example}
+
+\begin{method}[Schema van Horner]\label{met:b1:poly:horner}
+Om $P = a_nX^n + \dots + a_0$ te evalueren in $x$, of om $P$ door
+$X - x$ te delen, vermijd je het berekenen van machten: lees de
+coëfficiënten van links naar rechts, en herhaal \emph{vermenigvuldig
+met $x$, tel de volgende coëfficiënt op}:
+\[
+b_n = a_n, \qquad b_{k} = a_{k} + x\,b_{k+1}
+\quad (k = n-1, \dots, 0) .
+\]
+Dan is $b_0 = P(x)$, en de eerdere $b_k$ zijn de coëfficiënten van
+het quotiënt: $P = (X - x)(b_nX^{n-1} + \dots + b_1) + b_0$
+(werk uit en vergelijk). Voorbeeld: $P = X^4 - 5X^3 + 6X^2 + 4X - 8$
+in $x = 2$: de $b$'s zijn $1, -3, 0, 4, 0$, dus $P(2) = 0$ en $P
+= (X-2)(X^3 - 3X^2 + 4)$ --- één regel in plaats van een lange
+deling, en $n$ vermenigvuldigingen in plaats van de $\approx n^2/2$
+van de naïeve evaluatie. Het schema herhalen in hetzelfde punt
+haalt \omterm{def:b1:poly:derivative}{multipliciteiten} eruit (vergelijk
+\cref{ex:b1:poly:multexample}).
+\end{method}
+
+\begin{remark}[{Rekenkunde van $K[X]$}]
+Met de euclidische deling in de hand draagt de volledige rekenkunde
+van \cref{ch:b1:arith} over op $K[X]$, met dezelfde bewijzen, waarbij
+de graad de rol van absolute waarde speelt: ggd (genormaliseerd tot
+\omterm{def:b1:poly:def}{monisch}), uitgebreid \omterm{met:b1:arith:euclid}{algoritme van Euclides}, identiteit van Bézout,
+lemma van Gauss, irreducibele \omterm{def:b1:poly:def}{veeltermen} en unieke ontbinding. We
+gebruiken deze overgedragen resultaten vrijelijk, en
+\cref{exo:b1:poly:6} oefent er één in.
+\end{remark}
+
+\section{Wortels}
+
+\begin{theorem}[Factorstelling]\label{thm:b1:poly:factor}
+Laat $P \in K[X]$ en $a \in K$. De rest van $P$ bij deling door
+$X - a$ is de constante $P(a)$. In het bijzonder
+\[
+P(a) = 0 \iff (X - a) \mid P .
+\]
+Meer algemeen geven verschillende wortels $a_1, \dots, a_r$ van $P$ de
+ontbinding $P = (X - a_1)\cdots(X - a_r)\, Q$.
+\end{theorem}
+
+\begin{proof}
+Deel: $P = (X - a) Q + R$ met $\deg R < 1$, dus $R$ is een constante
+$c$; substitutie van $X = a$ (substitutie respecteert sommen en
+producten) geeft $P(a) = c$. De equivalentie volgt. Voor meerdere
+wortels, induceer op $r$: het geval $r = 1$ is de zojuist bewezen
+equivalentie. Neem de \omterm{def:b1:logic:statement}{uitspraak} aan voor $r - 1$ wortels en laat
+$a_1, \dots, a_r$ verschillende wortels van $P$ zijn. Schrijf $P = (X
+- a_1)Q_1$; voor elke $i \geq 2$, substitutie van $a_i$:
+\[
+0 = P(a_i) = (a_i - a_1)\,Q_1(a_i),
+\qquad a_i - a_1 \neq 0 ,
+\]
+en aangezien $K$ geen nuldelers heeft, $Q_1(a_i) = 0$: de $r - 1$
+verschillende punten $a_2, \dots, a_r$ zijn wortels van $Q_1$. De
+inductiehypothese ontbindt $Q_1 = (X - a_2)\cdots(X - a_r)\,Q$,
+en terugsubstitutie geeft de bewering.
+\end{proof}
+
+\begin{corollary}[Een veelterm van graad $n$ heeft ten hoogste $n$ wortels]\label{cor:b1:poly:nroots}
+Een niet-nulveelterm $P \in K[X]$ van graad $n$ heeft ten hoogste $n$
+verschillende wortels in $K$. Bijgevolg is een \omterm{def:b1:poly:def}{veelterm} (van graad
+$\leq n$) die verdwijnt in $n + 1$ verschillende punten de
+nulveelterm, en zijn twee \omterm{def:b1:poly:def}{veeltermen} van graad $\leq n$ die in $n+1$
+punten overeenkomen gelijk.
+\end{corollary}
+
+\begin{proof}
+Als $a_1, \dots, a_r$ verschillende wortels zijn, geeft
+\cref{thm:b1:poly:factor} $P = (X-a_1)\cdots(X-a_r) Q$, dus $n = \deg
+P \geq r$. De twee gevolgen volgen door tegenspraak en door verschil.
+\end{proof}
+
+\begin{example}[De truc met de hulpveelterm]\label{ex:b1:poly:auxiliary}
+Laat $P$ de \omterm{def:b1:poly:def}{veelterm} van graad $\leq n$ zijn met
+\[
+P(k) = \frac{k}{k+1} \qquad (k = 0, 1, \dots, n) ;
+\]
+hij bestaat en is uniek volgens de \omterm{thm:b1:poly:lagrange}{Lagrange-interpolatie} hieronder.
+Wat is $P(n+1)$? Werk de noemers weg: de \omterm{def:b1:poly:def}{veelterm} $Q = (X+1)P - X$
+heeft graad $\leq n + 1$ en verdwijnt in de $n + 1$ punten $0, 1,
+\dots, n$, dus volgens \cref{thm:b1:poly:factor}
+\[
+Q = c\,X(X-1)(X-2)\cdots(X-n)
+\]
+voor een zekere constante $c$. Evalueer waar $Q$ onafhankelijk bekend
+is: in $X = -1$ is $Q(-1) = 0 \cdot P(-1) + 1 = 1$, terwijl het
+product gelijk is aan $(-1)(-2)\cdots(-1-n) = (-1)^{n+1}(n+1)!$; dus
+$c = \frac{(-1)^{n+1}}{(n+1)!}$. Evalueer nu in $X = n + 1$:
+\[
+(n+2)\,P(n+1) - (n+1) = Q(n+1) = c\,(n+1)! = (-1)^{n+1} ,
+\]
+dus $P(n+1) = \dfrac{(n+1) + (-1)^{n+1}}{n+2}$: gelijk aan $1$ voor
+oneven $n$, en aan $\frac{n}{n+2}$ voor even $n$ --- de
+interpolerende \omterm{def:b1:poly:def}{veelterm} zet het patroon $\frac{n+1}{n+2}$
+\emph{niet} voort. De te onthouden truc: codeer de gegevens als
+wortels van een hulpveelterm, bepaal de onbekende constante in een
+punt buiten de gegevens, en oogst.
+\end{example}
+
+\begin{definition}[Afgeleide, multipliciteit]\label{def:b1:poly:derivative}
+De \emph{formele afgeleide} van $P = \sum a_k X^k$ is $P' = \sum_{k
+\geq 1} k\,a_k X^{k-1}$; ze voldoet aan de gebruikelijke regels $(P+Q)'
+= P' + Q'$, $(PQ)' = P'Q + PQ'$ (gecontroleerd op monomen en
+uitgebreid door lineariteit). Een wortel $a$ van $P$ heeft
+\emph{multipliciteit}\index{multipliciteit van een wortel} $m \geq 1$
+wanneer $(X-a)^m \mid P$ maar $(X-a)^{m+1} \nmid P$; de wortel is
+\emph{enkelvoudig} als $m = 1$, \emph{meervoudig} als $m \geq 2$.
+\end{definition}
+
+\begin{proposition}[Multipliciteit via afgeleiden]\label{prop:b1:poly:multiplicity}
+$a$ is een wortel van $P$ van \omterm{def:b1:poly:derivative}{multipliciteit} $\geq m$ dan en slechts
+dan als
+\[
+P(a) = P'(a) = \dots = P^{(m-1)}(a) = 0 .
+\]
+In het bijzonder is $a$ een meervoudige wortel van $P$ dan en slechts
+dan als $P(a) = P'(a) = 0$.
+\end{proposition}
+
+\begin{proof}
+Schrijf $P = (X - a)^m Q + R$ waarbij $R$ de rest is van de deling
+door $(X-a)^m$, $\deg R < m$. Door $k \leq m - 1$ keer af te leiden en
+in $a$ te evalueren: de eerste term levert $0$ (elke afgeleide behoudt
+een factor $(X-a)$), dus $P^{(k)}(a) = R^{(k)}(a)$.
+
+Nu is een \omterm{def:b1:poly:def}{veelterm} $R$ van graad $< m$ bepaald door $R(a), R'(a),
+\dots, R^{(m-1)}(a)$: door $R = \sum_{k < m} c_k (X - a)^k$ te
+schrijven (mogelijk: werk machten van $X = (X - a) + a$ uit), vindt
+men $R^{(k)}(a) = k!\, c_k$. Dus: alle $P^{(k)}(a) = 0$ voor $k < m$
+$\iff$ alle $c_k = 0$ $\iff$ $R = 0$ $\iff$ $(X-a)^m \mid P$.
+\end{proof}
+
+\begin{example}[Een multipliciteit berekenen]\label{ex:b1:poly:multexample}
+Wat is de \omterm{def:b1:poly:derivative}{multipliciteit} van de wortel $2$ in $P = X^4 - 5X^3 + 6X^2
++ 4X - 8$? Evalueer de opeenvolgende afgeleiden in $2$:
+\[
+P(2) = 16 - 40 + 24 + 8 - 8 = 0, \qquad
+P'(2) = 32 - 60 + 24 + 4 = 0,
+\]
+\[
+P''(2) = 48 - 60 + 12 = 0, \qquad
+P'''(2) = 48 - 30 = 18 \neq 0
+\]
+(met $P' = 4X^3 - 15X^2 + 12X + 4$, $P'' = 12X^2 - 30X + 12$,
+$P''' = 24X - 30$). Drie verdwijnende waarden en dan een niet-nulwaarde:
+\omterm{def:b1:poly:derivative}{multipliciteit} precies $3$. Delen geeft $P = (X - 2)^3(X + 1)$ ---
+wat men nagaat door $(X-2)^3 = X^3 - 6X^2 + 12X - 8$ uit te werken en
+met $X + 1$ te vermenigvuldigen. Het inzicht: \omterm{def:b1:poly:derivative}{multipliciteiten} worden
+afgelezen uit \emph{evaluaties}, geen ontbinding nodig --- precies
+zoals men ze detecteert wanneer de ontbinding onbereikbaar is.
+\end{example}
+
+\begin{example}[Meervoudige wortels detecteren met een ggd]\label{ex:b1:poly:gcdmultiple}
+Wanneer geen wortel bekend is, geeft \cref{prop:b1:poly:multiplicity}
+nog steeds een \emph{globale} detector van meervoudige wortels: $a$
+is een meervoudige wortel van $P$ dan en slechts dan als het een
+gemeenschappelijke wortel is van $P$ en $P'$, dus $P$ heeft een
+meervoudige wortel (in $\C$) dan en slechts dan als $\gcd(P, P') \neq
+1$ --- berekenbaar via het \omterm{met:b1:arith:euclid}{algoritme van Euclides} zonder iets op te
+lossen. Voorbeeld: $P = X^3 - 3X + 2$, $P' = 3X^2 - 3 = 3(X - 1)(X +
+1)$. Toets de wortels $\pm1$ van $P'$ in $P$: $P(1) = 0$ maar $P(-1)
+= 4$, dus
+\[
+\gcd(P, P') = X - 1 :
+\]
+de wortel $1$ is meervoudig; twee keer delen geeft $P = (X - 1)^2(X +
+2)$. De ggd rapporteert zelfs de volledige \omterm{def:b1:logic:sets}{verzameling} meervoudige
+wortels, elk met de \omterm{def:b1:poly:derivative}{multipliciteit} met één verlaagd --- het feit dat
+elk computeralgebrasysteem uitbuit om ``kwadraatvrij te ontbinden''
+vóór enige worteljacht, en de veeltermtweeling van de argumenten
+zonder meervoudige wortel in \cref{exo:b1:poly:9}.
+\end{example}
+
+\begin{theorem}[Hoofdstelling van de algebra]\label{thm:b1:poly:fta}
+Elke niet-constante \omterm{def:b1:poly:def}{veelterm} van $\C[X]$ heeft een wortel in
+$\C$.\index{hoofdstelling van de algebra}
+\end{theorem}
+\admitted
+
+\begin{remark}
+Ondanks zijn naam is de stelling een \omterm{def:b1:logic:statement}{uitspraak} van de
+\emph{analyse}: elk bekend bewijs gebruikt de volledigheid van $\R$
+in een of andere vorm, en geen enkel is zuiver algebraïsch --- het
+eerlijke bewijs wordt gegeven in het volume van Jaar 3, zodra ofwel
+complexe integratie ofwel compactheidsargumenten beschikbaar zijn.
+Wat dit hoofdstuk werkelijk bewijst, is de \emph{reductie}: gegeven
+één wortel voor elke niet-constante \omterm{def:b1:poly:def}{veelterm}, volgen de volledige
+ontbindingen over $\C$ en $\R$ hieronder door zuivere algebra.
+\end{remark}
+
+\begin{corollary}[Ontbinding over $\C$ en over $\R$]\label{cor:b1:poly:factorization}
+\begin{enumerate}
+  \item Elke niet-nulveelterm $P \in \C[X]$ ontbindt als
+        \[
+        P = c\, (X - a_1)^{m_1} \cdots (X - a_r)^{m_r},
+        \]
+        met $c$ de leidende coëfficiënt, $a_i$ de verschillende
+        complexe wortels, $\sum m_i = \deg P$: \emph{geteld met
+        \omterm{def:b1:poly:derivative}{multipliciteit} heeft een \omterm{def:b1:poly:def}{veelterm} van graad $n$ precies $n$
+        complexe wortels}.
+  \item Elke niet-nulveelterm $P \in \R[X]$ ontbindt over $\R$ als
+        \[
+        P = c \prod_i (X - a_i)^{m_i} \prod_j (X^2 + p_j X +
+        q_j)^{n_j},
+        \]
+        waarbij de kwadratische factoren verschillend zijn met $p_j^2
+        - 4q_j < 0$ (geen reële wortels).
+\end{enumerate}
+\end{corollary}
+
+\begin{proof}
+(1) Inductie op de graad, waarbij telkens één wortel wordt
+afgesplitst via \cref{thm:b1:poly:factor}; de telling van de graden
+klopt bij elke stap.
+
+(2) Laat $P$ reële coëfficiënten hebben. Als $z$ een complexe wortel
+van \omterm{def:b1:poly:derivative}{multipliciteit} $m$ is, dan ook $\conj z$: het toevoegen van $P(z)
+= 0$ geeft $P(\conj z) = \conj{P(z)} = 0$ (de coëfficiënten zijn hun
+eigen toegevoegden), en hetzelfde geldt voor de afgeleiden
+(\cref{prop:b1:poly:multiplicity}). Groepeer de niet-reële wortels in
+toegevoegde paren: elk paar draagt bij
+\[
+(X - z)(X - \conj z) = X^2 - 2\Re(z)\, X + \abs z^2 ,
+\]
+een reële kwadratische met negatieve discriminant. De reële wortels
+dragen de lineaire factoren bij.
+\end{proof}
+
+\begin{example}\label{ex:b1:poly:factorexample}
+$X^4 + 4$ werd over $\R$ ontbonden in \cref{exo:b1:complex:5} door de
+vier complexe wortels $\pm 1 \pm \iu$ te paren:
+$X^4 + 4 = (X^2 - 2X + 2)(X^2 + 2X + 2)$. Geen van beide kwadratische
+factoren splitst over $\R$ (discriminanten $-4$). Merk op: een
+\emph{irreducibele} reële \omterm{def:b1:poly:def}{veelterm} heeft graad $1$ of $2$ --- dit is
+precies wat de ontbindingsstelling zegt. Dezelfde toevoegd-paren-methode
+toegepast op $X^4 + 1$, waarvan de wortels $\eu^{\pm\iu\pi/4}$ en
+$\eu^{\pm3\iu\pi/4}$ zijn: elk paar draagt bij $X^2 -
+2\cos\theta\,X + 1$, dus
+\[
+X^4 + 1 = \bigl(X^2 - \sqrt2\,X + 1\bigr)
+\bigl(X^2 + \sqrt2\,X + 1\bigr) ,
+\]
+een identiteit die onzichtbaar is voor naïeve ontbindingspogingen
+over $\Q$ --- de prijs van het aandringen op reële (hier zelfs
+irrationale) coëfficiënten, en een standaardinvoer voor het
+integreren van $\frac1{x^4 + 1}$ in \cref{ch:b1:integration}.
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}[xscale=2.6, yscale=1.35]
+  \draw[->, thin] (-1.15,0) -- (1.2,0) node[below] {$x$};
+  \draw[->, thin] (0,-1.35) -- (0,1.4) node[left] {$y$};
+  \draw[dashed, gray] (-1,1) -- (1,1);
+  \draw[dashed, gray] (-1,-1) -- (1,-1);
+  \draw[gray, thin] (-1,-1.1) -- (-1,1.1) (1,-1.1) -- (1,1.1);
+  \draw[omThm, very thick, domain=-1:1, samples=300, smooth]
+    plot (\x, {16*\x^5 - 20*\x^3 + 5*\x});
+  \node[right, font=\small] at (1.02,1) {$1$};
+  \node[right, font=\small] at (1.02,-1) {$-1$};
+  \fill[omThm] (-1,-1) circle (0.018) (-0.809,1) circle (0.018)
+    (-0.309,-1) circle (0.018) (0.309,1) circle (0.018)
+    (0.809,-1) circle (0.018) (1,1) circle (0.018);
+\end{tikzpicture}
+
+{\small De \omterm{pb:b1:poly:1}{Tsjebysjev-veelterm} $T_5 = 16X^5 - 20X^3 + 5X$ op
+$\intcc{-1}1$: hij oscilleert precies tussen $-1$ en $1$,
+en raakt de grenzen in zes punten (gemarkeerd). Deze
+\emph{equioscillatie} maakt $2^{-4}T_5$ tot de monische
+vijfdegraadsveelterm met de kleinste supnorm op het interval
+(\cref{exo:b1:poly:10} en het weekendprobleem).}
+\end{omfigure}
+
+\begin{remark}[Veelvoorkomende valkuilen bij veeltermen]\label{rem:b1:poly:pitfalls}
+\begin{enumerate}
+  \item \emph{\omterm{def:b1:poly:def}{Veelterm} versus functie.} Over $K = \Q, \R, \C$
+        vallen de twee begrippen samen (gelijke functies hebben
+        gelijke coëfficiënten, volgens \cref{cor:b1:poly:nroots} en
+        de oneindigheid van $K$), maar conceptueel is een \omterm{def:b1:poly:def}{veelterm}
+        zijn lijst van coëfficiënten: over het \omterm{def:b1:structures:field}{lichaam} $\Z/2\Z$ met
+        twee elementen uit \cref{ch:b1:structures} verdwijnt $X^2 +
+        X$ in beide punten, en toch is het niet de nulveelterm.
+  \item \emph{Graden onder optelling.} $\deg(P + Q)$ kan onder
+        $\max(\deg P, \deg Q)$ zakken wanneer de leidende termen
+        elkaar opheffen; ``$\deg(P + Q) = \max(\dots)$'' schrijven is
+        alleen veilig voor verschillende graden.
+  \item \emph{Wortels correct geteld.} ``$n$ wortels'' in
+        \cref{cor:b1:poly:factorization} betekent \emph{met
+        \omterm{def:b1:poly:derivative}{multipliciteit}, in $\C$}: $X^2 + 1$ heeft geen reële
+        wortels, en $(X-1)^2$ heeft één verschillende wortel maar
+        twee met \omterm{def:b1:poly:derivative}{multipliciteit}. Uitspraken die de drie tellingen
+        door elkaar halen zijn de meest voorkomende bron van foute
+        bewijzen.
+  \item \emph{Irreducibiliteit hangt af van het \omterm{def:b1:structures:field}{lichaam}.} $X^2 - 2$
+        is irreducibel over $\Q$, splitst over $\R$; $X^2 + 1$ is
+        irreducibel over $\R$, splitst over $\C$. Het kale woord
+        ``irreducibel'' betekent niets tot het \omterm{def:b1:structures:field}{lichaam} van de
+        coëfficiënten genoemd is.
+\end{enumerate}
+\end{remark}
+
+\section{Coëfficiënten en wortels}
+
+\begin{theorem}[Formules van Vieta]\label{thm:b1:poly:vieta}
+Laat $P = X^n + c_{n-1} X^{n-1} + \dots + c_0$ \omterm{def:b1:poly:def}{monisch} zijn met
+wortels $a_1, \dots, a_n \in \C$ (met \omterm{def:b1:poly:derivative}{multipliciteit}). Dan\index{Vieta's
+formulas}
+\[
+\sum_i a_i = -c_{n-1},
+\qquad
+\sum_{i < j} a_i a_j = c_{n-2},
+\qquad \dots, \qquad
+a_1 a_2 \cdots a_n = (-1)^n c_0 ,
+\]
+waarbij de $k$-de symmetrische functie van de wortels $(-1)^k c_{n-k}$
+is.
+\end{theorem}
+
+\begin{proof}
+Volgens \cref{cor:b1:poly:factorization} is $P = (X - a_1)\cdots(X -
+a_n)$ (\omterm{def:b1:poly:def}{monisch}, alle wortels opgesomd). Het distributief uitwerken
+van het product levert één term per manier om, in elke factor, ofwel
+$X$ ofwel de wortelterm $-a_i$ te kiezen: het kiezen van de wortels in
+de factoren met index $i_1 < \dots < i_k$ en van $X$ in de $n - k$
+overige levert $(-a_{i_1})\cdots(-a_{i_k})\,X^{n-k}$ op. Groeperen
+naar de macht van $X$:
+\[
+P = \sum_{k=0}^{n} (-1)^k
+\Bigl(\sum_{i_1 < \dots < i_k} a_{i_1}\cdots a_{i_k}\Bigr)
+X^{n-k} ,
+\]
+en identificeren met $P = \sum_k c_{n-k}X^{n-k}$ (coëfficiënten zijn
+uniek, \cref{def:b1:poly:def}) geeft $c_{n-k} = (-1)^k \sigma_k$,
+d.w.z.\ $\sigma_k = (-1)^kc_{n-k}$, waarbij $\sigma_k$ de $k$-de
+symmetrische functie aanduidt die hierboven weergegeven is. De drie
+weergegeven gevallen zijn $k = 1$, $k = 2$ en $k = n$.
+\end{proof}
+
+\begin{example}\label{ex:b1:poly:vieta}
+Voor de kwadratische $X^2 - sX + p$: som van de wortels $s$, product
+$p$ --- al herhaaldelijk gebruikt (\cref{exo:b1:complex:8}). Voor een
+monische derdegraadsveelterm $X^3 + aX^2 + bX + c$ met wortels
+$\alpha, \beta, \gamma$:
+\[
+\alpha + \beta + \gamma = -a,
+\quad
+\alpha\beta + \beta\gamma + \gamma\alpha = b,
+\quad
+\alpha\beta\gamma = -c ,
+\]
+wat het berekenen van symmetrische grootheden zoals $\alpha^2 +
+\beta^2 + \gamma^2 = a^2 - 2b$ mogelijk maakt zonder op te lossen.
+\end{example}
+
+\begin{example}[De wortels transformeren zonder ze te vinden]\label{ex:b1:poly:transformroots}
+Laat $\alpha, \beta$ de wortels van $X^2 - 3X + 1$ zijn. Welke
+monische kwadratische heeft wortels $\alpha^2, \beta^2$? Volgens Vieta
+is $\alpha + \beta = 3$ en $\alpha\beta = 1$, dus
+\[
+\alpha^2 + \beta^2 = (\alpha+\beta)^2 - 2\alpha\beta = 7,
+\qquad
+\alpha^2\beta^2 = (\alpha\beta)^2 = 1 :
+\]
+het antwoord is $X^2 - 7X + 1$ --- verkregen zonder $\alpha =
+\frac{3 + \sqrt5}2$ te berekenen. (Controle: $\alpha^2 = \frac{7 +
+3\sqrt5}2$ en inderdaad $\alpha^2 + \beta^2 = 7$.) Dezelfde
+strategie behandelt inverses ($X^2 - \frac ba X + \frac
+ca$-type transformaties), verschuivingen, en elk symmetrisch gegeven:
+Vieta zet vragen over \emph{onbekende} wortels om in algebra op
+\emph{bekende} coëfficiënten. Het zal voortdurend van pas komen
+wanneer de wortels eigenwaarden zijn (\cref{ch:b1:det}).
+\end{example}
+
+\begin{example}[Palindromische vergelijkingen]\label{ex:b1:poly:palindrome}
+Los $X^4 + X^3 - 4X^2 + X + 1 = 0$ op. De coëfficiënten lezen in
+beide richtingen hetzelfde, dus $0$ is geen wortel en delen door
+$X^2$ verliest geen oplossingen:
+\[
+X^2 + X - 4 + \frac1X + \frac1{X^2} = 0 .
+\]
+Stel $y = X + \frac1X$: dan $X^2 + \frac1{X^2} = y^2 - 2$, en de
+vergelijking valt terug tot
+\[
+y^2 + y - 6 = 0 \iff (y + 3)(y - 2) = 0 .
+\]
+Ontvouw elke waarde via $X^2 - yX + 1 = 0$: voor $y = 2$ geeft $X^2 -
+2X + 1 = (X - 1)^2$ de dubbele wortel $1$; voor $y = -3$ geeft
+$X^2 + 3X + 1 = 0$ $X = \frac{-3 \pm \sqrt5}2$. Vier wortels met
+\omterm{def:b1:poly:derivative}{multipliciteit} voor een vierdegraadsveelterm, zoals
+\cref{cor:b1:poly:factorization} vereist --- verkregen door twee
+kwadratische vergelijkingen op te lossen. De truc dekt elke
+\emph{palindromische} \omterm{def:b1:poly:def}{veelterm}: hun wortels komen in inverse paren
+$\{x, 1/x\}$ (vervang $X$ door $1/X$ en werk de noemers weg), en $y =
+X + \frac1X$ is precies de grootheid die constant is op zulke paren,
+wat de graad halveert.
+\end{example}
+
+\begin{theorem}[Lagrange-interpolatie]\label{thm:b1:poly:lagrange}
+Laat $x_0, \dots, x_n$ verschillende punten van $K$ zijn en $y_0,
+\dots, y_n \in K$. Er is precies één $P \in K[X]$ van graad $\leq n$
+met $P(x_i) = y_i$ voor alle $i$, namelijk\index{Lagrange-interpolatie}
+\[
+P = \sum_{i=0}^{n} y_i\, L_i,
+\qquad
+L_i = \prod_{j \neq i} \frac{X - x_j}{x_i - x_j} .
+\]
+\end{theorem}
+
+\begin{proof}
+Elke $L_i$ heeft graad $n$ en voldoet aan $L_i(x_i) = 1$, $L_i(x_j) =
+0$ voor $j \neq i$ (elke factor verdwijnt in de overeenkomstige
+$x_j$). Dus de weergegeven $P$ heeft graad $\leq n$ en interpoleert.
+Uniciteit: twee interpolerende \omterm{def:b1:poly:def}{veeltermen} van graad $\leq n$ komen
+overeen in de $n+1$ punten $x_i$, dus zijn ze gelijk
+(\cref{cor:b1:poly:nroots}).
+\end{proof}
+
+\begin{remark}[Intermezzo: veeltermen zijn ook vectoren]\label{rem:b1:poly:interlude}
+Een gezichtspuntswisseling die \cref{ch:b1:vspaces} officieel zal
+maken: de \omterm{def:b1:poly:def}{veeltermen} van graad $\leq n$ vormen een ruimte waarin
+optelling en schaling zich precies gedragen als coördinaten --- een
+\omterm{def:b1:poly:def}{veelterm} \emph{is} zijn lijst van $n + 1$ coëfficiënten. Drie
+uitspraken van dit hoofdstuk zijn stiekem lineaire algebra.
+\omterm{thm:b1:poly:lagrange}{Lagrange-interpolatie} (\cref{thm:b1:poly:lagrange}) zegt dat de
+evaluatiegegevens $(P(x_0), \dots, P(x_n))$ $P$ uniek bepalen:
+evaluatie in $n + 1$ punten is een lineaire bijectie, en de $L_i$ zijn
+de daaraan aangepaste basis. De ontwikkeling $R = \sum c_k(X - a)^k$
+in het bewijs van \cref{prop:b1:poly:multiplicity} zegt dat de machten
+van $(X - a)$ een ander coördinatenstelsel vormen, met $c_k =
+R^{(k)}(a)/k!$ als coördinaten. En \cref{cor:b1:poly:nroots} --- meer
+wortels dan de graad dwingt de nulveelterm af --- is de motor van alle
+uniciteit: het zal ``een lineaire \omterm{def:b1:logic:map}{afbeelding} \omterm{def:b1:logic:inj}{injectief} op een ruimte
+van dimensie $n + 1$'' worden in \cref{ch:b1:findim}. Wanneer die
+hoofdstukken aanbreken, zal de ruimte $K_n[X]$ hun favoriete voorbeeld
+zijn; het loont de moeite er al vloeiend in aan te komen.
+\end{remark}
+
+\begin{remark}[Waar dit hoofdstuk gebruikt wordt]\label{rem:b1:poly:whereused}
+Ontbinding over $\R$ en $\C$ (\cref{cor:b1:poly:factorization}) is de
+motor van de splitsing in partiële breuken in \cref{ch:b1:fractions},
+en dus van een grote klasse integralen in \cref{ch:b1:integration}. De
+ontwikkeling van een \omterm{def:b1:poly:def}{veelterm} in machten van $(X - a)$, aangetroffen
+in het bewijs van \cref{prop:b1:poly:multiplicity}, is de algebraïsche
+schaduw van de Taylor-formules van \cref{ch:b1:taylor}.
+\omterm{def:b1:diffeq:linear2}{Karakteristieke veeltermen} verschenen al bij
+differentiaalvergelijkingen (\cref{ch:b1:diffeq}) en keren terug voor
+matrices in \cref{ch:b1:det}; \omterm{thm:b1:poly:lagrange}{Lagrange-interpolatie} is de eerste
+bestaans-en-uniciteitsstelling van de numerieke analyse, en de
+\omterm{pb:b1:poly:1}{Tsjebysjev-veeltermen} van \cref{exo:b1:poly:10} --- waarvan het
+weekendprobleem hieronder de optimaliteit vaststelt --- vertellen die
+discipline \emph{waar} te interpoleren. Ten slotte voedt de hele
+rekenkunde van $K[X]$, gekopieerd van \cref{ch:b1:arith}, de studie
+van $K[X]$-idealen en quotiëntringen in het volume van Jaar 2.
+\end{remark}
+
+\section{Oefeningen}
+
+\begin{exercise}[$\star$]\label{exo:b1:poly:1}
+Voer de euclidische delingen uit: $X^5 - 1$ door $X^2 + X + 1$; dan
+$2X^4 + X^3 - X + 3$ door $X^2 - 2$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:poly:2}
+Voor welke $n \in \N$ \omterm{def:b1:arith:divides}{deelt} $X^2 + X + 1$ de \omterm{def:b1:poly:def}{veelterm} $X^{2n} + X^n +
+1$? \emph{Hint: de wortels van $X^2 + X + 1$ zijn $j$ en $j^2$ met $j
+= \eu^{2\iu\pi/3}$; bespreek $n$ mod $3$.}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:poly:3}
+Bepaal de reële $a, b$ zodat $(X-1)^2$ de \omterm{def:b1:poly:def}{veelterm} $P = X^4 + aX^3 +
+bX^2 + 1$ \omterm{def:b1:arith:divides}{deelt}, en ontbind dan $P$ over $\R$ voor deze waarden.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:poly:4}
+Ontbind over $\C$ en over $\R$: $X^3 - 1$; $\;X^4 + X^2 + 1$;
+$\;X^6 - 1$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:poly:5}
+Laat $P = X^3 - 6X^2 + 11X - 6$.
+\begin{enumerate}
+  \item Vind de rationale wortels \emph{(een rationale wortel $p/q$
+        in laagste termen van een monische gehele \omterm{def:b1:poly:def}{veelterm} is een
+        geheel getal dat de constante term \omterm{def:b1:arith:divides}{deelt} --- bewijs dit)},
+        en ontbind $P$.
+  \item Bereken zonder op te lossen de som van de kwadraten en de
+        som van de inversen van de wortels via Vieta, en controleer
+        op de ontbinding.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:poly:6}
+Bereken $\gcd(X^4 - 1,\; X^3 - X^2 + X - 1)$ met het \omterm{met:b1:arith:euclid}{algoritme van
+Euclides}, en schrijf het als een combinatie $AU + BV$ van de twee
+\omterm{def:b1:poly:def}{veeltermen}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:poly:7}
+Laat $P \in \R[X]$ met $P(x) \geq 0$ voor alle $x \in \R$. Bewijs dat
+$P$ een som van twee kwadraten van reële \omterm{def:b1:poly:def}{veeltermen} is: $P = A^2 +
+B^2$. \emph{Hint: in de reële ontbinding hebben reële wortels even
+\omterm{def:b1:poly:derivative}{multipliciteit}; schrijf de kwadratische factoren als $(X - z)(X -
+\conj z)$ en gebruik $\abs{\,\cdot\,}^2 = (\Re)^2 + (\Im)^2$ op het
+product van de $(X - z)$'s.}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:poly:8}
+Vind de \omterm{def:b1:poly:def}{veelterm} $P$ van graad $\leq 2$ met $P(0) = 1$, $P(1) = 3$,
+$P(2) = 2$, eerst met de formule van Lagrange, dan door het lineaire
+stelsel op de coëfficiënten op te lossen. Controleer dat beide
+antwoorden overeenkomen.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:poly:9}
+Bewijs dat $P = X^{2n+1} - 1$ precies één reële wortel heeft, en dat
+voor elke $n \geq 1$ de \omterm{def:b1:poly:def}{veelterm} $1 + X + \frac{X^2}{2!} + \dots +
+\frac{X^n}{n!}$ geen meervoudige wortel heeft \emph{(vergelijk $P$ en
+$P'$)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:poly:10}
+(\omterm{pb:b1:poly:1}{Tsjebysjev-veeltermen}) Definieer $T_0 = 1$, $T_1 = X$ en $T_{n+1} =
+2X\,T_n - T_{n-1}$.
+\begin{enumerate}
+  \item Bewijs door inductie dat $T_n(\cos\theta) = \cos n\theta$ voor
+        alle $\theta$.
+  \item Leid de $n$ wortels van $T_n$ en zijn leidende coëfficiënt af.
+  \item Bewijs dat $\sup_{x \in \intcc{-1}{1}} \abs{T_n(x)} = 1$,
+        bereikt in $n + 1$ punten van $\intcc{-1}{1}$.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:poly:11}
+Laat $P \in \C[X]$ niet-constant zijn met verschillende wortels $a_1,
+\dots, a_r$ (\omterm{def:b1:poly:derivative}{multipliciteiten} $m_1, \dots, m_r$). Bewijs de identiteit
+van rationale functies
+\[
+\frac{P'(X)}{P(X)} = \sum_{i=1}^{r} \frac{m_i}{X - a_i},
+\]
+en leid de stelling van Gauss--Lucas af: elke wortel van $P'$ ligt in
+het convexe omhulsel van de wortels van $P$ \emph{(evalueer de
+identiteit in een wortel $w$ van $P'$ die geen wortel van $P$ is,
+neem toegevoegden, en lees het resultaat af als $w$ een gewogen
+gemiddelde van de $a_i$)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:poly:12}
+(Filter met \omterm{def:b1:complex:unity}{eenheidswortels}) Laat $n \in \N^*$ en $j = \eu^{2\iu\pi/3}$.
+Bewijs door $(1 + X)^n$ in $1$, $j$ en $j^2$ te evalueren dat
+\[
+\sum_{k \geq 0} \binom{n}{3k}
+= \frac{2^n + 2\cos\frac{n\pi}{3}}{3} ,
+\]
+en controleer de formule voor $n = 3$ en $n = 6$. \emph{Hint: $1 +
+j^m + j^{2m}$ is gelijk aan $3$ als $3 \mid m$ en $0$ anders; en $1 +
+j = \eu^{\iu\pi/3}$.}
+\end{exercise}
+
+\section{Probleem: Tsjebysjev-veeltermen en de vlakste veelterm}
+
+\begin{problem}\label{pb:b1:poly:1}
+Van alle \emph{monische} \omterm{def:b1:poly:def}{veeltermen} van graad $n$, welke blijft het
+dichtst bij nul op $\intcc{-1}1$? Het antwoord --- de stelling van
+Tsjebysjev, de geboorteakte van de approximatietheorie --- is
+$2^{1-n}T_n$, waarbij $T_n$ de \omterm{pb:b1:poly:1}{Tsjebysjev-veelterm} van
+\cref{exo:b1:poly:10} is, en geen enkele monische concurrent kan zijn
+afwijking $2^{1-n}$ verslaan.\index{Tsjebysjev-veeltermen} Dit
+probleem ontwikkelt de algebra van de familie $(T_n)$
+(samenstellingswet, expliciete coëfficiënten, de tweedesoortfamilie
+$U_n$, een differentiaalvergelijking), bewijst de extremaliteitsstelling
+met haar gelijkheidsgeval, en verzamelt toepassingen: optimale
+interpolatieknopen, de exacte waarde van $\cos 36^\circ$, en een
+\omterm{def:b1:arith:congruence}{congruentie} $T_p \equiv X^p \pmod p$. Overal is $T_0 = 1$, $T_1 = X$,
+$T_{n+1} = 2X\,T_n - T_{n-1}$, en gebruiken we vrijelijk
+$T_n(\cos\theta) = \cos n\theta$ uit \cref{exo:b1:poly:10}.
+
+\medskip
+\noindent\textbf{Deel I --- De familie $(T_n)$.}
+\begin{enumerate}
+  \item Bereken $T_2, T_3, T_4, T_5$ uit de recurrentie. (Vergelijk
+        $T_3$ met de identiteit $\cos3\theta = 4\cos^3\theta -
+        3\cos\theta$ uit \cref{ex:b1:complex:cos3}.)
+  \item Bewijs door inductie: $\deg T_n = n$ met leidende
+        coëfficiënt $2^{n-1}$ voor $n \geq 1$, en $T_n$ heeft de
+        pariteit van $n$ (alleen even of alleen oneven machten
+        verschijnen).
+  \item Bewijs het uniciteitsprincipe: $T_n$ is de \emph{enige}
+        \omterm{def:b1:poly:def}{veelterm} die voldoet aan $P(\cos\theta) = \cos n\theta$ voor
+        alle $\theta$. (Twee \omterm{def:b1:poly:def}{veeltermen} die op $\intcc{-1}1$
+        overeenkomen, komen overal overeen: \cref{cor:b1:poly:nroots}.)
+  \item Leid de samenstellings- en productwetten af:
+        \[
+        T_m \circ T_n = T_{mn},
+        \qquad
+        2\,T_m T_n = T_{m+n} + T_{\abs{m-n}} .
+        \]
+  \item Herinner uit \cref{exo:b1:poly:10} de wortels $x_k =
+        \cos\frac{(2k+1)\pi}{2n}$ en de equioscillatiepunten
+        $y_k = \cos\frac{k\pi}n$ met $T_n(y_k) = (-1)^k$. Schrijf de
+        volledige ontbinding van $T_n$ over $\R$ op, en verantwoord
+        dat de $y_k$ afwisselen met de $x_k$: $y_n < x_{n-1} < y_{n-1}
+        < \dots < x_0 < y_0$.
+  \item Bewijs dat $T_n(\cosh t) = \cosh(nt)$ voor alle $t \in \R$
+        (dezelfde inductie, met behulp van
+        \cref{prop:b1:functions:hyprules}), en leid voor $x
+        \geq 1$ de gesloten vorm af
+        \[
+        T_n(x) = \frac{\bigl(x + \sqrt{x^2 - 1}\bigr)^n +
+        \bigl(x - \sqrt{x^2 - 1}\bigr)^n}{2} ,
+        \]
+        zodat $T_n(x) > 1$ voor $x > 1$: buiten $\intcc{-1}1$
+        ontsnapt de \omterm{def:b1:poly:def}{veelterm} onmiddellijk.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel II --- Coëfficiënten, de familie $U_n$, een
+differentiaalvergelijking.}
+\begin{enumerate}[resume]
+  \item Bewijs uit de formule van de Moivre
+        (\cref{cor:b1:complex:demoivre}) de expliciete uitdrukking
+        \[
+        T_n(x) = \sum_{0 \leq 2j \leq n} \binom{n}{2j}\,
+        x^{\,n-2j}\,(x^2 - 1)^j ,
+        \]
+        en verifieer haar voor $n = 3$.
+  \item Bereken $T_n(1)$, $T_n(-1)$ en $T_n(0)$ voor alle $n$.
+  \item Definieer $U_n$ (\emph{tweede soort}) door $U_0 = 1$, $U_1 =
+        2X$, $U_{n+1} = 2X\,U_n - U_{n-1}$. Bewijs dat
+        $U_n(\cos\theta) = \frac{\sin(n+1)\theta}{\sin\theta}$
+        voor $\theta \notin \pi\Z$, en dat $T_n' = n\,U_{n-1}$
+        voor $n \geq 1$.
+  \item Bewijs dat $\abs{\sin n\theta} \leq n\,\abs{\sin\theta}$
+        voor alle $\theta$ (inductie), en leid de
+        Markov-achtige grens af
+        \[
+        \abs{T_n'(x)} \leq n^2
+        \quad\text{op } \intcc{-1}1,
+        \qquad\text{met } T_n'(\pm1) = (\pm1)^{n-1}\,n^2 .
+        \]
+  \item Toon aan dat $y = T_n$ voldoet aan de
+        differentiaalvergelijking
+        \[
+        (1 - x^2)\,y'' - x\,y' + n^2\,y = 0 ,
+        \]
+        door de identiteit $\sin\theta\,
+        T_n'(\cos\theta) = n\sin n\theta$ af te leiden naar
+        $\theta$; verifieer rechtstreeks voor $T_2$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel III --- De extremaliteitsstelling van
+Tsjebysjev.}
+Laat $\widetilde T_n = 2^{1-n}\,T_n$ (\omterm{def:b1:poly:def}{monisch} volgens vraag 2) en
+schrijf $\norm{P}_\infty = \sup_{x \in \intcc{-1}1}\abs{P(x)}$.
+\begin{enumerate}[resume]
+  \item Verantwoord $\norm{\widetilde T_n}_\infty = 2^{1-n}$, bereikt
+        met afwisselende tekens in de $n + 1$ punten $y_n < \dots
+        < y_0$.
+  \item Veronderstel dat een monische $P$ van graad $n$ zou voldoen
+        aan $\norm P_\infty < 2^{1-n}$, en stel $D = \widetilde T_n -
+        P$. Toon aan dat $\deg D \leq n - 1$, en dat $D(y_k)$ het
+        strikte teken van $(-1)^k$ heeft voor elke $k = 0, \dots, n$.
+  \item Leid af dat $D$ ten minste $n$ verschillende reële wortels
+        heeft (één in elke tussenruimte, volgens de
+        tussenwaarde-eigenschap, hier gebruikt op middelbareschoolniveau
+        en bewezen in \cref{ch:b1:continuity}), en concludeer de
+        \emph{stelling van Tsjebysjev}: elke monische $P$ van graad
+        $n$ voldoet aan
+        \[
+        \norm{P}_\infty \geq 2^{1-n} .
+        \]
+  \item (Gelijkheidsgeval, eerste stap) Veronderstel nu $\norm
+        P_\infty = 2^{1-n}$ exact, $P$ \omterm{def:b1:poly:def}{monisch} van graad $n$, en laat
+        $D = \widetilde T_n - P$. Toon aan dat $(-1)^kD(y_k) \geq 0$
+        voor alle $k$, en dat als $D(y_k) = 0$ voor een \emph{inwendig}
+        punt $y_k$ ($0 < k < n$), dan $D'(y_k) = 0$ eveneens.
+        \emph{(In een inwendig $y_k$ bereiken zowel $\widetilde T_n$
+        als $P$ een extremum van absolute waarde $\norm{\cdot}
+        _\infty$; een afleidbare functie heeft nulafgeleide in een
+        inwendig extremum --- gebruikt op middelbareschoolniveau,
+        bewezen in \cref{ch:b1:derivative}.)}
+  \item (Gelijkheidsgeval, conclusie) Tel de wortels van $D$ met
+        \omterm{def:b1:poly:derivative}{multipliciteit} om aan te tonen dat $D = 0$: de minimalisator
+        is \emph{uniek}, $P = \widetilde T_n$.
+  \item Breng over naar een willekeurig segment $\intcc ab$: toon aan
+        dat de minimale supnorm van een \omterm{def:b1:poly:def}{monische veelterm} van graad
+        $n$ op $\intcc ab$ gelijk is aan $2\bigl(\frac{b-a}4\bigr)^n$,
+        bereikt door een herschaalde \omterm{pb:b1:poly:1}{Tsjebysjev-veelterm}.
+        \emph{(Substitueer $x = \frac{a+b}2 + \frac{b-a}2\,t$ en volg
+        de leidende coëfficiënt.)}
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel IV --- Toepassingen.}
+\begin{enumerate}[resume]
+  \item Werk het geval $n = 3$ met de hand uit: lokaliseer de
+        extrema van $\widetilde T_3 = X^3 - \frac34X$ op
+        $\intcc{-1}1$, verifieer de viervoudige equioscillatie met
+        waarde $\frac14$, en concludeer dat geen enkele monische
+        derdegraadsveelterm het beter doet.
+  \item (Optimale interpolatieknopen) Voor $n + 1$ knopen $x_0,
+        \dots, x_n \in \intcc{-1}1$ wordt de interpolatiefout
+        beheerst door $\omega(X) = \prod_i (X - x_i)$ (zoals
+        \cref{ch:b1:taylor} zal kwantificeren). Bewijs dat de keuze
+        die $\norm\omega_\infty$ minimaliseert de \omterm{def:b1:logic:sets}{verzameling} $n + 1$
+        wortels van $T_{n+1}$ is, met $\norm\omega_\infty = 2^{-n}$:
+        Tsjebysjev-knopen zijn de juiste plaatsen om te interpoleren.
+  \item Bewijs met behulp van $T_5$ dat $c = \cos 36^\circ$ voldoet
+        aan $16c^5 - 20c^3 + 5c + 1 = 0$, ontbind deze \omterm{def:b1:poly:def}{veelterm} als
+        $(x + 1)(4x^2 - 2x - 1)^2$, en concludeer
+        \[
+        \cos 36^\circ = \frac{1 + \sqrt5}4 .
+        \]
+        Controleer de consistentie met $\cos 72^\circ =
+        \frac{\sqrt5 - 1}4$ uit \cref{exo:b1:complex:8}.
+  \item Schat $T_{10}(1.1)$ met de gesloten vorm van vraag 6 (twee
+        significante cijfers volstaan), en interpreteer: een \omterm{def:b1:poly:def}{veelterm}
+        begrensd door $1$ op $\intcc{-1}1$ kan al meer dan $40$
+        overschrijden in $x = 1.1$. (Dat $T_n$ het \emph{snelst}
+        groeit onder zulke \omterm{def:b1:poly:def}{veeltermen} is nog een extremale
+        eigenschap van de familie, buiten dit probleem.)
+  \item Bewijs de \omterm{def:b1:arith:congruence}{congruentie}: voor elk oneven \omterm{def:b1:arith:prime}{priemgetal} $p$ zijn
+        alle coëfficiënten van $T_p - X^p$ \omterm{def:b1:arith:divides}{deelbaar} door $p$.
+        \emph{(Gebruik vraag 7 en $p \mid \binom p{2j}$ voor $0 <
+        2j < p$, uit het bewijs van
+        \cref{thm:b1:arith:fermat}.)} Verifieer op $T_3$ en $T_5$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel V --- Synthese.}
+\begin{enumerate}[resume]
+  \item Bereken expliciet de monische kwadratische met minimale
+        supnorm op $\intcc01$ en haar afwijking. (Vraag 17
+        met $n = 2$.)
+  \item Waar gebruikte het probleem precies: (i) de starheid van
+        \omterm{def:b1:poly:def}{veeltermen} (\cref{cor:b1:poly:nroots}); (ii) de
+        trigonometrie van \cref{ch:b1:complex} en
+        \cref{ch:b1:functions}; (iii) de rekenkunde van
+        \omterm{def:b1:counting:objects}{binomiaalcoëfficiënten} uit \cref{ch:b1:arith}? Eén zin elk.
+  \item Synthese, in een korte alinea: de stelling zegt dat de
+        vlakste \omterm{def:b1:poly:def}{monische veelterm} degene is die \emph{equioscilleert},
+        en het bewijs zet optimaliteit om in worteltelling. Becommentarieer
+        dit mechanisme, de rol van de substitutie $x = \cos\theta$ als
+        brug tussen algebra en trigonometrie, en noem de twee plaatsen
+        waar het probleem analysefeiten (tussenwaardestelling, inwendig
+        extremum) nodig had die latere hoofdstukken bewijzen.
+\end{enumerate}
+\end{problem}

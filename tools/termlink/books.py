@@ -18,7 +18,8 @@ ENTRY = {
 }
 
 LANGS = {1: ("en", "fr", "nl"), 2: ("en", "fr", "nl"),
-         3: ("en",), 4: ("en",), 5: ("en",)}
+         3: ("en", "fr", "nl"), 4: ("en", "fr", "nl"),
+         5: ("en", "fr", "nl")}
 
 
 def years(book):

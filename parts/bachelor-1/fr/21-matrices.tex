@@ -1,0 +1,785 @@
+\chapter{Matrices}\label{ch:b1:matrices}
+
+Une matrice est une \omterm{def:b1:linmaps:def}{application linéaire} écrite en \omterm{prop:b1:vspaces:coordinates}{coordonnées}. Ce
+chapitre met en place le dictionnaire --- la composition devient produit
+matriciel, la \omterm{def:b1:logic:inj}{bijectivité} devient inversibilité, le \omterm{def:b1:matrices:changeofbasis}{changement de base}
+devient conjugaison --- ainsi que le versant algorithmique~: \omterm{met:b1:matrices:gauss}{opérations
+sur les lignes}, calcul de rangs et d'inverses. Rencontrées pour la
+première fois dans le volume de Terminale, les matrices reposent
+désormais sur la théorie des
+\cref{ch:b1:vspaces,ch:b1:findim,ch:b1:linmaps}.
+
+\section{Matrices et applications linéaires}
+
+\begin{definition}\label{def:b1:matrices:def}
+$\mathcal{M}_{n,p}(K)$ est l'\omterm{def:b1:vspaces:def}{espace vectoriel} des tableaux $n \times p$
+$A = (a_{ij})$ de scalaires ($i$~: ligne, $j$~: colonne), de dimension
+$np$ (\omterm{def:b1:vspaces:free}{base}~: les matrices $E_{ij}$ n'ayant qu'un seul $1$). Étant
+données des \omterm{def:b1:vspaces:free}{bases} $\mathcal{B} = (e_1, \dots, e_p)$ de $E$ et
+$\mathcal{C}$ de $F$ ($\dim F = n$), la \emph{matrice de $u \in
+\mathcal{L}(E, F)$} est le tableau dont la $j$-ième colonne donne les
+\omterm{prop:b1:vspaces:coordinates}{coordonnées} de $u(e_j)$ dans $\mathcal{C}$~:
+\[
+\operatorname{Mat}_{\mathcal{B},\mathcal{C}}(u) = (a_{ij}),
+\qquad u(e_j) = \sum_{i=1}^{n} a_{ij}\, f_i .
+\]
+L'\omterm{def:b1:logic:map}{application} $u \mapsto \operatorname{Mat}_{\mathcal{B},\mathcal{C}}(u)$
+est un isomorphisme de $\mathcal{L}(E, F)$ sur
+$\mathcal{M}_{n,p}(K)$ (\cref{prop:b1:linmaps:basis}~: une \omterm{def:b1:linmaps:def}{application
+linéaire}, c'est exactement un choix des \omterm{def:b1:linmaps:kerim}{images} des $e_j$).
+\end{definition}
+
+\begin{example}[La dérivée, vue comme matrice]
+\label{ex:b1:matrices:derivative}
+Soit $D(P) = P'$ sur $\R_3[X]$. Dans la \omterm{def:b1:vspaces:free}{base} des monômes $(1, X, X^2,
+X^3)$~: $D(1) = 0$, $D(X) = 1$, $D(X^2) = 2X$, $D(X^3) = 3X^2$, donc
+\[
+\operatorname{Mat}(D) =
+\begin{pmatrix}
+0 & 1 & 0 & 0\\
+0 & 0 & 2 & 0\\
+0 & 0 & 0 & 3\\
+0 & 0 & 0 & 0
+\end{pmatrix}.
+\]
+Dans la \omterm{def:b1:vspaces:free}{base} \emph{divisée} $\bigl(1,\ X,\ \frac{X^2}2,\
+\frac{X^3}6\bigr)$, chaque vecteur de \omterm{def:b1:vspaces:free}{base} est envoyé sur le précédent
+($D\bigl(\frac{X^k}{k!}\bigr) = \frac{X^{k-1}}{(k-1)!}$), et la
+matrice devient le décalage pur~: des $1$ sur la surdiagonale, des
+zéros ailleurs. Deux morales~: la matrice appartient au \emph{couple}
+(\omterm{def:b1:logic:map}{application}, \omterm{def:b1:vspaces:free}{base}), et non à l'\omterm{def:b1:logic:map}{application} seule~; et une bonne \omterm{def:b1:vspaces:free}{base}
+rend la structure visible d'un coup d'œil --- la forme de décalage
+montre instantanément que $D^4 = 0$ sur $\R_3[X]$, chaque puissance de
+la matrice repoussant sa diagonale de $1$ d'un cran vers l'extérieur.
+\end{example}
+
+\begin{definition}[Produit]\label{def:b1:matrices:product}
+Pour $A \in \mathcal{M}_{n,p}$ et $B \in \mathcal{M}_{p,q}$~:
+\[
+(AB)_{ik} = \sum_{j=1}^{p} a_{ij}\, b_{jk}
+\qquad (1 \leq i \leq n,\ 1 \leq k \leq q).
+\]
+C'est exactement la matrice de la composée~:
+$\operatorname{Mat}(v \circ u) = \operatorname{Mat}(v)\,
+\operatorname{Mat}(u)$ (les \omterm{def:b1:vspaces:free}{bases} se recollant au milieu). De même,
+si $X$ est la colonne des \omterm{prop:b1:vspaces:coordinates}{coordonnées} de $x$, la colonne de $u(x)$ est
+$AX$.
+\end{definition}
+
+\begin{proof}[Démonstration de la formule de composition]
+\[
+v(u(e_k)) = v\Bigl(\sum_j b_{jk} f_j\Bigr) = \sum_j b_{jk}\, v(f_j)
+= \sum_j b_{jk} \sum_i a_{ij}\, g_i
+= \sum_i \Bigl(\sum_j a_{ij} b_{jk}\Bigr) g_i . \qedhere
+\]
+\end{proof}
+
+\begin{proposition}[L'algèbre $\mathcal{M}_n(K)$]\label{prop:b1:matrices:ring}
+Les matrices carrées $\mathcal{M}_n(K)$ forment un \omterm{def:b1:structures:ring}{anneau} (non
+commutatif dès que $n \geq 2$), d'élément unité $I_n$~; son \omterm{def:b1:structures:group}{groupe} des
+inversibles est le \emph{groupe linéaire}\index{groupe linéaire}
+$GL_n(K)$, qui correspond aux endomorphismes \omterm{def:b1:logic:inj}{bijectifs}. Pour $A, B \in
+\mathcal{M}_n(K)$~:
+\[
+AB = I_n \implies A \in GL_n(K) \text{ et } B = A^{-1}
+\]
+(un inverse d'un seul côté est un inverse des deux côtés, d'après
+le \cref{cor:b1:linmaps:samedim}).
+\end{proposition}
+
+\begin{proof}
+Les axiomes d'\omterm{def:b1:structures:ring}{anneau} se transportent depuis $\mathcal{L}(E)$ par
+l'isomorphisme de la \cref{def:b1:matrices:def}~: il convertit la
+composition en produit et la somme en somme, de sorte que
+l'associativité, la distributivité et le rôle de $I_n$ sont hérités des
+faits correspondants sur les \omterm{def:b1:logic:map}{applications}, sans aucune vérification
+coefficient par coefficient. Non-commutativité~: $E_{12}E_{21} = E_{11}
+\neq E_{22} = E_{21}E_{12}$. Si $AB = I_n$~: l'endomorphisme $a$
+associé à $A$ vérifie $a \circ b = \mathrm{id}$, donc $a$ est
+\omterm{def:b1:logic:inj}{surjective} ($x = a(b(x))$ exhibe un antécédent de tout $x$), donc
+\omterm{def:b1:logic:inj}{bijective} en \omterm{def:b1:findim:def}{dimension finie} (\cref{cor:b1:linmaps:samedim})~; en
+composant $a \circ b = \mathrm{id}$ à gauche par $a^{-1}$, on obtient
+$b = a^{-1}$, et alors $b\circ a = \mathrm{id}$ aussi~: l'inverse d'un
+seul côté était depuis le début un inverse des deux côtés --- une
+faveur strictement propre à la \omterm{def:b1:findim:def}{dimension finie}.
+\end{proof}
+
+\begin{definition}[Transposée~; trace]\label{def:b1:matrices:transpose}
+La \emph{transposée} de $A = (a_{ij}) \in \mathcal{M}_{n,p}$ est $A^{\mathsf T}
+= (a_{ji}) \in \mathcal{M}_{p,n}$~; elle vérifie $(AB)^{\mathsf T} = B^{\mathsf T}
+A^{\mathsf T}$ et $(A^{\mathsf T})^{\mathsf T} = A$. La
+\emph{trace}\index{trace} d'une matrice carrée est $\operatorname{tr} A
+= \sum_i a_{ii}$~; elle est \omterm{def:b1:linmaps:def}{linéaire}, et
+\[
+\operatorname{tr}(AB) = \operatorname{tr}(BA)
+\qquad (A \in \mathcal{M}_{n,p},\ B \in \mathcal{M}_{p,n}).
+\]
+\end{definition}
+
+\begin{proof}[Démonstration de l'identité de la trace]
+$\operatorname{tr}(AB) = \sum_i \sum_j a_{ij} b_{ji}$ et
+$\operatorname{tr}(BA) = \sum_j \sum_i b_{ji} a_{ij}$~: la même
+somme double.
+\end{proof}
+
+\begin{example}[La trace à l'œuvre]
+\label{ex:b1:matrices:tracework}
+La \omterm{def:b1:linmaps:projection}{projection} du \cref{ch:b1:linmaps} sur
+$\operatorname{Vect}(1,1)$ parallèlement à $\operatorname{Vect}(0,1)$,
+$p(x, y) = (x, x)$, a pour matrice $A = \begin{pmatrix} 1 & 0\\ 1 &
+0\end{pmatrix}$ dans la \omterm{def:b1:vspaces:free}{base} canonique~: en effet $A^2 = A$, et
+\[
+\operatorname{tr} A = 1 = \operatorname{rk} A ,
+\]
+ce qui illustre l'\cref{exo:b1:matrices:8}~: pour les matrices
+idempotentes, la \omterm{def:b1:matrices:transpose}{trace} \emph{compte} la dimension de l'\omterm{def:b1:linmaps:kerim}{image}, quelle
+que soit la \omterm{def:b1:vspaces:free}{base} biscornue dans laquelle la matrice est écrite. Le
+mécanisme d'invariance est l'identité $\operatorname{tr}(AB) =
+\operatorname{tr}(BA)$~:
+\[
+\operatorname{tr}\bigl(P^{-1}(AP)\bigr) =
+\operatorname{tr}\bigl((AP)P^{-1}\bigr) = \operatorname{tr} A ,
+\]
+de sorte que toutes les \omterm{thm:b1:matrices:conjugation}{matrices semblables} à $A$ ont la même \omterm{def:b1:matrices:transpose}{trace} ---
+le premier \emph{invariant numérique} d'un endomorphisme, que le
+déterminant rejoindra au \cref{ch:b1:det} (le couple $(s, p)$ du
+devoir maison ci-dessous).
+\end{example}
+
+\begin{example}[Symétrique plus antisymétrique]
+\label{ex:b1:matrices:symsplit}
+On dit que $A$ est \emph{symétrique} lorsque $A^{\mathsf T} = A$,
+\emph{antisymétrique} lorsque $A^{\mathsf T} = -A$. Toute matrice
+carrée se décompose de manière unique comme somme de l'une et de
+l'autre~:
+\[
+A = \underbrace{\frac{A + A^{\mathsf T}}{2}}_{\text{symétrique}}
++ \underbrace{\frac{A - A^{\mathsf T}}{2}}_{\text{antisymétrique}},
+\]
+et une matrice qui est les deux à la fois est nulle ($A = -A$)~: les
+deux \omterm{def:b1:logic:sets}{ensembles} sont des \omterm{def:b1:vspaces:sum}{sous-espaces supplémentaires} de
+$\mathcal{M}_n(K)$ --- l'exact analogue de la décomposition
+paire/impaire des fonctions
+(\cref{ex:b1:vspaces:evenodd}), la transposition jouant le rôle de
+$x \mapsto -x$. Dimensions~: une matrice symétrique est \omterm{def:b1:vspaces:free}{libre} sur la
+diagonale et au-dessus, une matrice antisymétrique strictement
+au-dessus (diagonale nulle)~:
+\[
+\frac{n(n+1)}{2} + \frac{n(n-1)}{2} = n^2 ,
+\]
+et l'équilibre des comptes est la confirmation, par la \omterm{thm:b1:findim:grassmann}{formule de
+Grassmann}, du caractère direct de la somme. Pour $n = 2$~:
+$\begin{pmatrix} 1 & 5\\ 1 &
+2\end{pmatrix} = \begin{pmatrix} 1 & 3\\ 3 & 2\end{pmatrix} +
+\begin{pmatrix} 0 & 2\\ -2 & 0\end{pmatrix}$. Les matrices
+symétriques reviennent comme données du second ordre au
+\cref{ch:b1:multivar} (le triplet de Monge $r, s, t$), et celles qui
+sont à la fois symétriques et orthogonales sont classifiées à
+l'\cref{exo:b1:euclid:12}.
+\end{example}
+
+\section{Changement de base}
+
+\begin{definition}\label{def:b1:matrices:changeofbasis}
+Soient $\mathcal{B}, \mathcal{B}'$ deux \omterm{def:b1:vspaces:free}{bases} de $E$. La \emph{matrice
+de passage}\index{changement de base} $P =
+P_{\mathcal{B}\to\mathcal{B}'}$ a pour colonnes les \omterm{prop:b1:vspaces:coordinates}{coordonnées} des
+vecteurs de la \emph{nouvelle} \omterm{def:b1:vspaces:free}{base} dans l'\emph{ancienne}. Elle est
+inversible, $P^{-1} = P_{\mathcal{B}'\to\mathcal{B}}$, et les
+\omterm{prop:b1:vspaces:coordinates}{coordonnées} se transforment par $X = PX'$ (ancien $=$ $P\,\cdot$ nouveau).
+\end{definition}
+
+\begin{example}[Lire la matrice de passage]
+\label{ex:b1:matrices:changerun}
+Dans $\R^2$, de la \omterm{def:b1:vspaces:free}{base} canonique $\mathcal B$ à $\mathcal B' =
+\bigl((1,1), (1,-1)\bigr)$~:
+\[
+P = P_{\mathcal B\to\mathcal B'} =
+\begin{pmatrix} 1 & 1\\ 1 & -1 \end{pmatrix}
+\]
+(les nouveaux vecteurs écrits en anciennes \omterm{prop:b1:vspaces:coordinates}{coordonnées}, colonne par
+colonne). Le vecteur d'anciennes \omterm{prop:b1:vspaces:coordinates}{coordonnées} $X = (3, 1)^{\mathsf T}$ a
+pour nouvelles \omterm{prop:b1:vspaces:coordinates}{coordonnées} $X' = P^{-1}X = \frac12(3 + 1,\ 3 -
+1)^{\mathsf T} = (2, 1)^{\mathsf T}$~: en effet $2(1,1) + 1(1,-1) =
+(3,1)$. Attention au sens --- la matrice $P$ est construite à partir de
+la \emph{nouvelle} \omterm{def:b1:vspaces:free}{base}, mais elle convertit les \omterm{prop:b1:vspaces:coordinates}{coordonnées}
+\emph{nouvelles en anciennes} ($X = PX'$)~; passer des anciennes aux
+nouvelles coûte l'inverse. Écrire la vérification
+$2(1,1) + (1,-1) = (3,1)$ après chaque conversion permet de repérer
+l'erreur du $P$ inversé, qui est la faute la plus fréquente du
+chapitre.
+\end{example}
+
+\begin{theorem}[Changement de base pour une application]\label{thm:b1:matrices:conjugation}
+Soit $u \in \mathcal{L}(E)$, de matrice $A$ dans $\mathcal{B}$ et $A'$
+dans $\mathcal{B}'$, et soit $P = P_{\mathcal{B}\to\mathcal{B}'}$. Alors
+\[
+A' = P^{-1} A\, P .
+\]
+Deux matrices ainsi reliées sont dites \emph{semblables}\index{matrices
+semblables}. (Pour $u \colon E \to F$ avec deux couples de \omterm{def:b1:vspaces:free}{bases}, la
+formule est $A' = Q^{-1} A P$ --- matrices
+\emph{équivalentes}\index{matrices équivalentes}.)
+\end{theorem}
+
+\begin{proof}
+Pour tout $x$~: $X = PX'$ et l'\omterm{def:b1:linmaps:kerim}{image} vérifie $Y = AX$, $Y = PY'$.
+Donc $PY' = APX'$, c'est-à-dire $Y' = (P^{-1}AP)X'$ pour tout $X'$~: la
+matrice de $u$ dans la nouvelle \omterm{def:b1:vspaces:free}{base} est $P^{-1}AP$ (prendre pour $X'$
+les colonnes canoniques).
+\end{proof}
+
+\begin{example}[Une bonne base rend une application transparente]
+\label{ex:b1:matrices:conjugationrun}
+Soit $u(x, y) = (y, x)$ (l'échange), de matrice $A = \begin{pmatrix} 0
+& 1\\ 1 & 0\end{pmatrix}$ dans la \omterm{def:b1:vspaces:free}{base} canonique. Dans la \omterm{def:b1:vspaces:free}{base}
+$\mathcal B' = \bigl((1,1), (1,-1)\bigr)$~:
+\[
+P = \begin{pmatrix} 1 & 1\\ 1 & -1 \end{pmatrix},
+\qquad
+P^{-1} = \frac12\begin{pmatrix} 1 & 1\\ 1 & -1 \end{pmatrix},
+\qquad
+P^{-1} A P = \begin{pmatrix} 1 & 0\\ 0 & -1 \end{pmatrix}.
+\]
+Aucun produit matriciel n'était vraiment nécessaire~: $u$ fixe $(1,1)$
+et renverse $(1,-1)$, donc dans $\mathcal B'$ sa matrice \emph{doit}
+être $\operatorname{diag}(1, -1)$ --- l'échange est la symétrie par
+rapport à la droite $y = x$. Trouver, pour un endomorphisme donné, une
+\omterm{def:b1:vspaces:free}{base} dans laquelle sa matrice devient diagonale est le problème central
+du volume de Licence~2 (la théorie de la réduction)~; le devoir maison
+ci-dessous montre jusqu'où les seules identités polynomiales mènent
+déjà.
+\end{example}
+
+\begin{example}[Changement de base, pris à l'envers]
+\label{ex:b1:matrices:reverserun}
+La \omterm{def:b1:linmaps:projection}{projection} sur $F = \operatorname{Vect}(1,1)$ parallèlement à $G =
+\operatorname{Vect}(1,-1)$ a, dans la \omterm{def:b1:vspaces:free}{base} adaptée $\mathcal
+B' = \bigl((1,1),(1,-1)\bigr)$, la matrice transparente $A' =
+\operatorname{diag}(1, 0)$. Pour obtenir sa matrice dans la \omterm{def:b1:vspaces:free}{base}
+canonique, on lit le \cref{thm:b1:matrices:conjugation} à l'envers,
+$A = P A' P^{-1}$~:
+\[
+P = \begin{pmatrix} 1 & 1\\ 1 & -1\end{pmatrix},
+\quad
+P^{-1} = \frac12\begin{pmatrix} 1 & 1\\ 1 & -1\end{pmatrix},
+\quad
+A = P\begin{pmatrix} 1 & 0\\ 0 & 0\end{pmatrix}P^{-1}
+= \frac12\begin{pmatrix} 1 & 1\\ 1 & 1\end{pmatrix}.
+\]
+Vérification~: $A^2 = A$ (idempotente), $\operatorname{tr} A = 1 =
+\operatorname{rk} A$, et $A\binom{1}{1} = \binom11$,
+$A\binom{1}{-1} = 0$, comme prévu. Ce sens inverse --- concevoir la
+matrice dans la bonne \omterm{def:b1:vspaces:free}{base}, puis conjuguer pour revenir --- est la
+façon dont on produit en pratique les matrices de rotation, de symétrie
+et de \omterm{def:b1:linmaps:projection}{projection}.
+\end{example}
+
+\begin{theorem}[Forme normale du rang]\label{thm:b1:matrices:rank}
+Le \emph{rang} d'une matrice (le rang de ses colonnes, autrement dit
+celui de l'\omterm{def:b1:linmaps:def}{application linéaire} associée) est le seul invariant de
+l'équivalence~: toute $A \in \mathcal{M}_{n,p}$ de rang $r$ est
+équivalente à
+\[
+J_r = \begin{pmatrix} I_r & 0 \\ 0 & 0 \end{pmatrix},
+\]
+et $\operatorname{rk}(A^{\mathsf T}) = \operatorname{rk}(A)$~: le rang
+des lignes égale le rang des colonnes.
+\end{theorem}
+
+\begin{proof}
+Soit $u \colon E \to F$ de rang $r$. Choisissons dans $E$ un
+\omterm{def:b1:vspaces:sum}{supplémentaire} $S$ de $\ker u$~; il est de
+dimension $\dim S = r$ (\cref{thm:b1:linmaps:ranknullity}). Prenons-en une
+\omterm{def:b1:vspaces:free}{base}
+$(e_1, \dots, e_r)$, complétée par une \omterm{def:b1:vspaces:free}{base} de $\ker u$ en une \omterm{def:b1:vspaces:free}{base} de
+$E$~; les \omterm{def:b1:linmaps:kerim}{images} $f_i = u(e_i)$, $i \leq r$, forment une \omterm{def:b1:vspaces:free}{base} de
+$\operatorname{im} u$ (la restriction est un isomorphisme), que l'on
+complète en une \omterm{def:b1:vspaces:free}{base} de $F$. Dans ces \omterm{def:b1:vspaces:free}{bases}, la matrice de $u$ est
+exactement $J_r$. Donc $A = Q J_r P^{-1}$ avec $P, Q$ inversibles.
+
+En transposant~: $A^{\mathsf T} = (P^{-1})^{\mathsf T} J_r^{\mathsf T} Q^{\mathsf T}$
+avec $J_r^{\mathsf T}$ de la même forme (de rang $r$) et les facteurs
+extérieurs inversibles (la \omterm{def:b1:matrices:transpose}{transposée} d'une matrice inversible est
+inversible, d'après $(AB)^{\mathsf T} = B^{\mathsf T}A^{\mathsf T}$ appliqué à $AA^{-1} = I$)~:
+$\operatorname{rk} A^{\mathsf T} = r$.
+\end{proof}
+
+\section{Opérations sur les lignes}
+
+\begin{method}[Le pivot de Gauss sur les matrices]\label{met:b1:matrices:gauss}
+Les trois \emph{opérations élémentaires sur les
+lignes}\index{opérations sur les lignes} --- échanger deux lignes,
+multiplier une ligne par $\lambda \neq 0$, ajouter à une ligne un
+multiple d'une autre --- ne changent pas le rang (chacune est une
+multiplication à gauche par une matrice inversible). Algorithme~: créer
+un pivot (le coefficient non nul le plus à gauche), annuler sa colonne
+en dessous, passer à la ligne et à la colonne suivantes~; le nombre de
+pivots de la forme échelonnée obtenue est le rang.
+
+\emph{Calcul de l'inverse~:} on applique l'algorithme au bloc $(A \mid
+I_n)$ jusqu'à ce que le bloc de gauche devienne $I_n$ (c'est possible
+si et seulement si $A$ est inversible)~; le bloc de droite est alors
+$A^{-1}$ --- en effet le produit des matrices élémentaires utilisées
+vaut $A^{-1}$.
+\end{method}
+
+\begin{example}\label{ex:b1:matrices:inverse}
+$A = \begin{pmatrix} 1 & 2 \\ 3 & 4 \end{pmatrix}$~: réduisons $(A \mid
+I_2)$~:
+\[
+\begin{pmatrix} 1 & 2 & 1 & 0\\ 3 & 4 & 0 & 1 \end{pmatrix}
+\to
+\begin{pmatrix} 1 & 2 & 1 & 0\\ 0 & -2 & -3 & 1 \end{pmatrix}
+\to
+\begin{pmatrix} 1 & 0 & -2 & 1\\ 0 & 1 & \tfrac32 & -\tfrac12
+\end{pmatrix},
+\]
+(opérations~: $L_2 \leftarrow L_2 - 3L_1$~; puis $L_1 \leftarrow L_1
++ L_2$, $L_2 \leftarrow -\frac12 L_2$). Donc $A^{-1} =
+\begin{pmatrix} -2 & 1 \\ \tfrac32 & -\tfrac12\end{pmatrix}$.
+\emph{Vérification~:} $AA^{-1} = I_2$.
+\end{example}
+
+\begin{example}[Rang avec un paramètre, par les seules lignes]
+\label{ex:b1:matrices:rankparameter}
+Pour $m \in \R$, cherchons le rang de
+$M_m = \begin{pmatrix} 1 & 1 & m\\ 1 & m & 1\\ m & 1 &
+1\end{pmatrix}$. Réduisons~: $L_2 \leftarrow L_2 - L_1$ et $L_3
+\leftarrow L_3 - mL_1$ donnent les lignes
+\[
+(1,\ 1,\ m), \qquad (0,\ m - 1,\ 1 - m), \qquad
+(0,\ 1 - m,\ 1 - m^2).
+\]
+\emph{Cas $m = 1$}~: les deux dernières lignes s'annulent --- un seul
+pivot, $\operatorname{rk} M_1 = 1$ (les trois lignes de départ étaient
+égales). \emph{Cas $m \neq 1$}~: multiplions $L_2$ par $\frac1{m-1}$ et
+$L_3$ par $\frac1{1-m}$ pour obtenir $(0, 1, -1)$ et $(0, 1, 1 + m)$,
+puis $L_3 \leftarrow L_3 - L_2 = (0, 0, m + 2)$. Si $m = -2$~:
+deux pivots, rang $2$~; sinon trois pivots, rang $3$. En résumé~:
+\[
+\operatorname{rk} M_m =
+\begin{cases}
+1 & m = 1,\\
+2 & m = -2,\\
+3 & \text{sinon}.
+\end{cases}
+\]
+Les mêmes seuils sortiront d'un unique calcul de déterminant au
+\cref{ch:b1:det} (le \omterm{def:b1:poly:def}{polynôme} $-(m+2)(m-1)^2$ de
+l'\cref{exo:b1:det:7}) --- mais remarquons ce que l'élimination donne
+et que le déterminant ne donne pas~: la \emph{valeur} du rang dans les
+cas dégénérés, et non seulement le fait qu'il a chuté.
+\end{example}
+
+\begin{example}[Calcul de puissances]\label{ex:b1:matrices:powers}
+$A = \begin{pmatrix} 1 & 1 \\ 0 & 1\end{pmatrix} = I + N$ avec $N =
+E_{12}$, $N^2 = 0$. Comme $I$ et $N$ commutent, la formule du binôme
+(\cref{prop:b1:structures:binomial}) se tronque~:
+\[
+A^k = I + kN = \begin{pmatrix} 1 & k \\ 0 & 1 \end{pmatrix}
+\qquad (k \in \N, \text{ et } k \in \Z \text{ en utilisant } A^{-1} = I -
+N).
+\]
+\end{example}
+
+\begin{method}[Calculer $A^n$~: les trois voies]
+\label{met:b1:matrices:powers}
+\begin{enumerate}
+  \item \emph{Voie du binôme}~: si $A = \lambda I + N$ avec $N$
+        nilpotente, la formule du binôme se tronque
+        (\cref{ex:b1:matrices:powers}, \cref{exo:b1:matrices:5})~;
+        elle s'applique parce que $\lambda I$ commute avec tout.
+  \item \emph{Voie polynomiale}~: trouver une identité polynomiale
+        vérifiée par $A$ (en dimension $2$, toujours $A^2 = sA -
+        pI$) et réduire $X^n$ modulo celle-ci~; le devoir maison
+        ci-dessous construit entièrement cette voie.
+  \item \emph{Voie de la similitude}~: trouver une matrice inversible
+        $P$ telle que $P^{-1}AP = D$ soit simple (diagonale, ou
+        décalage), calculer $D^n$, puis revenir en arrière~: $A^n = P
+        D^n P^{-1}$ (\cref{thm:b1:matrices:conjugation},
+        \cref{ex:b1:matrices:conjugationrun})~; la recherche
+        systématique d'un tel $P$ est la théorie de la réduction de
+        Licence~2.
+\end{enumerate}
+Quelle que soit la voie, vérifier le résultat pour $n = 0, 1, 2$~:
+trois tests peu coûteux qui repèrent presque toutes les étourderies.
+\end{method}
+
+\begin{remark}[Pièges classiques~: le prix de la non-commutativité]
+\label{rem:b1:matrices:pitfalls}
+Toute identité de l'algèbre des scalaires dont la démonstration
+réordonne les facteurs meurt dans $\mathcal{M}_n(K)$, $n \geq 2$.
+\emph{Carrés}~: $(A + B)^2 = A^2 + AB + BA + B^2$, et le terme du
+milieu ne se réduit à $2AB$ que si $AB = BA$
+(\cref{exo:b1:matrices:1}).
+\emph{Puissances de produits}~: $(AB)^k$ vaut $ABAB\cdots$, et non
+$A^kB^k$.
+\emph{Diviseurs de zéro}~: $E_{12}E_{12} = 0$ avec $E_{12} \neq 0$~;
+par conséquent \emph{pas de simplification}~: $AB = AC$ entraîne
+$B = C$ seulement lorsque $A$ est inversible (multiplier par $A^{-1}$
+--- du bon côté).
+\emph{\omterm{def:b1:matrices:transpose}{Traces}}~: $\operatorname{tr}(AB) = \operatorname{tr}(BA)$
+toujours, mais $\operatorname{tr}(AB) \neq
+\operatorname{tr}A\operatorname{tr}B$ en général (prendre $A = B =
+I_2$~: $2 \neq 4$), et $\operatorname{tr}(ABC) =
+\operatorname{tr}(BCA)$ (invariance cyclique) tandis que
+$\operatorname{tr}(ACB)$ peut différer.
+\emph{Les \omterm{def:b1:matrices:transpose}{transposées} renversent}~: $(AB)^{\mathsf T} = B^{\mathsf
+T}A^{\mathsf T}$ --- oublier le renversement est l'erreur la plus
+fréquente dans les calculs d'orthogonalité (\cref{ch:b1:euclid}).
+Dans le doute, tester toute identité présumée sur $E_{12}$ et
+$E_{21}$~: la plus petite paire non commutante réfute la plupart des
+fausses formules en une ligne.
+\end{remark}
+
+\begin{remark}[Où mène le dictionnaire]
+\label{rem:b1:matrices:whereused}
+Le dictionnaire matriciel sert sur chacune des pages restantes de ce
+volume~: le \cref{ch:b1:det} attache à chaque matrice carrée un unique
+nombre qui décide de l'inversibilité, et résout $AX = B$
+systématiquement~; le \cref{ch:b1:euclid} isole les matrices qui
+préservent les longueurs (les matrices orthogonales)~; et au
+\cref{ch:b1:multivar}, le comportement au second ordre d'une fonction
+de deux variables est une matrice symétrique $2 \times 2$. La \omterm{def:b1:matrices:transpose}{trace},
+introduite ci-dessus presque en passant, devient un invariant
+puissant~: les \cref{exo:b1:matrices:6,exo:b1:matrices:8} en donnent un
+premier avant-goût, et le volume de Licence~2 y adosse la théorie des
+valeurs propres. Le devoir maison développe l'autre cheval de
+bataille~: les identités polynomiales vérifiées par une matrice, qui
+transforment le calcul de $A^n$ en une \omterm{pb:b1:matrices:1}{récurrence linéaire} à deux
+termes.
+\end{remark}
+
+\begin{remark}[Perspectives à l'intérieur du livre 3]
+\label{rem:b1:matrices:perspectives}
+Trois familles de matrices introduites ici ont rendez-vous plus loin
+dans ce volume. Les \emph{matrices symétriques}
+(\cref{ex:b1:matrices:symsplit}) portent les données du second ordre
+des fonctions de deux variables~: le test de Monge du
+\cref{ch:b1:multivar} est un énoncé sur le comportement du signe d'une
+matrice symétrique $2\times2$, et son déterminant $rt - s^2$
+se calcule par la machinerie du \cref{ch:b1:det}. Les \emph{matrices
+orthogonales} ($A^{\mathsf T}A = I$) sont les isométries du
+\cref{ch:b1:euclid}, où la \omterm{def:b1:matrices:transpose}{transposée} acquiert enfin son sens
+géométrique~: elle est l'ombre algébrique du produit scalaire. Les
+\emph{matrices inversibles} rencontrent leur test pratique au
+\cref{ch:b1:det} --- un seul nombre, $\det A \neq 0$ --- ce qui clôt
+la recherche que ce chapitre a \omterm{def:b1:topology:open}{ouverte} avec la réduction par lignes. La
+\omterm{def:b1:matrices:transpose}{trace} et le déterminant voyagent alors comme le couple d'invariants
+$(s, p)$ du devoir maison, jusqu'à la théorie des valeurs propres de
+Licence~2.
+\end{remark}
+
+\section{Exercices}
+
+\begin{exercise}[$\star$]\label{exo:b1:matrices:1}
+Soient $A = \begin{pmatrix} 1 & 2 \\ 0 & 1 \end{pmatrix}$ et $B =
+\begin{pmatrix} 0 & 1 \\ 1 & 0\end{pmatrix}$. Calculer $AB$, $BA$,
+$A^2 - B^2$ et $(A+B)(A-B)$~; expliquer pourquoi les deux derniers
+diffèrent.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:matrices:2}
+Calculer le rang de
+\[
+M = \begin{pmatrix}
+1 & 2 & 3\\
+2 & 4 & 6\\
+1 & 1 & 1
+\end{pmatrix},
+\qquad
+N = \begin{pmatrix}
+1 & 1 & 0 & 2\\
+0 & 1 & 1 & 1\\
+1 & 2 & 1 & 3
+\end{pmatrix}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:matrices:3}
+Inverser, par réduction par lignes, $A = \begin{pmatrix} 1 & 0 & 1\\ 2 & 1 &
+1\\ 1 & 1 & 1 \end{pmatrix}$, et vérifier sur un produit.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:matrices:4}
+Écrire la matrice, dans la \omterm{def:b1:vspaces:free}{base} canonique de $\R_2[X]$, de
+l'endomorphisme $u(P) = P(X + 1)$. Expliquer, sans calcul, pourquoi
+il est inversible, et donner la matrice de $u^{-1}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:matrices:5}
+Soit $A = \begin{pmatrix} 2 & 1 \\ 0 & 2\end{pmatrix}$. Écrire $A =
+2I + N$, calculer $N^2$, et en déduire $A^k$ pour tout $k \in \N$ par la
+formule du binôme.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:matrices:6}
+Démontrer qu'il n'existe pas de matrices $A, B \in \mathcal{M}_n(K)$
+(avec $K = \R$ ou $\C$) telles que $AB - BA = I_n$. \emph{(Prendre les
+\omterm{def:b1:matrices:transpose}{traces}.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:matrices:7}
+Une matrice $A$ est dite \emph{nilpotente} lorsque $A^m = 0$ pour un
+certain $m$. Démontrer que $I - A$ est alors inversible, avec
+\[
+(I - A)^{-1} = I + A + A^2 + \dots + A^{m-1} .
+\]
+Application~: inverser $\begin{pmatrix} 1 & 2 & 3\\ 0 & 1 & 2\\ 0 & 0 &
+1\end{pmatrix}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:matrices:8}
+Soit $A \in \mathcal{M}_n(\R)$ vérifiant $A^2 = A$ (idempotente).
+Démontrer que $\operatorname{tr} A = \operatorname{rk} A$.
+\emph{(Interpréter $A$ comme une \omterm{def:b1:linmaps:projection}{projection} et choisir une \omterm{def:b1:vspaces:free}{base}
+adaptée~; le \cref{thm:b1:matrices:conjugation} dit que la \omterm{def:b1:matrices:transpose}{trace} ne
+dépend pas de la \omterm{def:b1:vspaces:free}{base}, puisque $\operatorname{tr}(P^{-1}MP) =
+\operatorname{tr} M$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:matrices:9}
+Soit $J \in \mathcal{M}_n(\R)$ la matrice dont tous les coefficients
+valent $1$. Calculer $J^2$, et en déduire, pour $a, b \in \R$, la
+condition d'inversibilité de $M = aI + bJ$ ainsi que $M^{-1}$
+\emph{(chercher un inverse de la même forme $\alpha I + \beta J$)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:matrices:10}
+(Inégalités sur le rang) Pour $A, B \in \mathcal{M}_n(K)$, démontrer
+\[
+\operatorname{rk}(A + B) \leq \operatorname{rk} A +
+\operatorname{rk} B,
+\qquad
+\operatorname{rk}(AB) \geq \operatorname{rk} A + \operatorname{rk}
+B - n .
+\]
+\emph{(Pour la seconde --- l'inégalité de Sylvester --- appliquer le
+\omterm{thm:b1:linmaps:ranknullity}{théorème du rang} à la restriction de l'\omterm{def:b1:logic:map}{application} de $A$ à
+$\operatorname{im} B$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:matrices:11}
+Soit $D = \operatorname{diag}(d_1, \dots, d_n)$ avec les $d_i$
+\emph{deux à deux distincts}.
+\begin{enumerate}
+  \item Démontrer qu'une matrice $A$ commute avec $D$ si et seulement
+        si $A$ est diagonale. \emph{(Comparer les coefficients $(i,j)$
+        de $AD$ et de $DA$.)}
+  \item En déduire le \emph{centre} de $\mathcal{M}_n(K)$~: les
+        matrices qui commutent avec \emph{toute} matrice sont
+        exactement les matrices scalaires $\lambda I_n$. \emph{(Tester
+        contre $D$, puis contre les matrices $E_{ij}$.)}
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:matrices:12}
+(Matrices de rang $1$) Soit $A \in \mathcal{M}_n(K)$, $A \neq 0$.
+\begin{enumerate}
+  \item Démontrer que $\operatorname{rk} A = 1$ si et seulement si $A =
+        CL$ pour une colonne non nulle $C \in \mathcal{M}_{n,1}$ et une
+        ligne non nulle $L \in \mathcal{M}_{1,n}$.
+  \item Pour une telle $A$, démontrer que $A^2 = (\operatorname{tr}
+        A)\,A$~; en déduire qu'une matrice de rang $1$ est nilpotente
+        si et seulement si sa \omterm{def:b1:matrices:transpose}{trace} est nulle.
+  \item Si $\operatorname{tr} A \neq -1$, démontrer que $I_n + A$ est
+        inversible, avec
+        \[
+        (I_n + A)^{-1} = I_n - \frac{1}{1 + \operatorname{tr}
+        A}\,A ,
+        \]
+        et que $I_n + A$ n'est \emph{pas} inversible lorsque
+        $\operatorname{tr} A = -1$. \emph{(Trouver un vecteur annulé
+        par $I_n + A$.)}
+\end{enumerate}
+\end{exercise}
+
+\section{Problème~: puissances d'une matrice par division polynomiale}
+
+\begin{problem}\label{pb:b1:matrices:1}
+Calculer $A^{100}$ coefficient par coefficient est sans espoir~; le
+calculer à l'aide d'une identité polynomiale vérifiée par $A$ tient en
+trois lignes. Ce problème construit la méthode à partir de rien~:
+division euclidienne de $X^n$, identité $A^2 - sA + pI = 0$ vérifiée
+par toute matrice $2 \times 2$ (le théorème de Cayley--Hamilton en
+dimension $2$), et dictionnaire entre puissances de matrices et
+\omterm{pb:b1:matrices:1}{récurrences linéaires} --- avec les \omterm{pb:b1:matrices:1}{nombres de Fibonacci} comme exemple
+fil rouge.
+\index{théorème de Cayley--Hamilton (dimension 2)}
+\index{nombres de Fibonacci}\index{récurrence linéaire}
+
+\medskip
+\noindent\textbf{Partie I --- Le calcul des restes.} Fixons $s, p
+\in K$ et $D = X^2 - sX + p$.
+\begin{enumerate}
+  \item Justifier que pour chaque $n \in \N$ il existe un unique $Q_n
+        \in K[X]$ et un unique $(a_n, b_n) \in K^2$ tels que
+        \[
+        X^n = Q_n\,D + a_n X + b_n ,
+        \]
+        et calculer $(a_0, b_0)$ et $(a_1, b_1)$.
+  \item En multipliant par $X$ et en divisant de nouveau, établir les
+        récurrences
+        \[
+        a_{n+1} = s\,a_n + b_n,
+        \qquad
+        b_{n+1} = -p\,a_n ,
+        \]
+        et en déduire $a_{n+2} = s\,a_{n+1} - p\,a_n$~: la suite des
+        coefficients obéit à la \omterm{pb:b1:matrices:1}{récurrence linéaire} attachée
+        à $D$.
+  \item Supposons que $D$ ait deux racines distinctes $\lambda \neq \mu$.
+        En évaluant l'identité de division, démontrer que
+        \[
+        a_n = \frac{\lambda^n - \mu^n}{\lambda - \mu},
+        \qquad
+        b_n = \frac{\lambda\mu^n - \mu\lambda^n}{\lambda - \mu} .
+        \]
+  \item Supposons $D = (X - \lambda)^2$. En dérivant l'identité de
+        division, démontrer que $a_n = n\lambda^{n-1}$ et
+        $b_n = (1 - n)\lambda^{n}$.
+  \item Montrer que la substitution d'une matrice fixée $M \in
+        \mathcal{M}_k(K)$ dans les \omterm{def:b1:poly:def}{polynômes} respecte les sommes et les
+        produits~: $(PQ)(M) = P(M)\,Q(M)$. En déduire que si $D(M) =
+        0$, alors
+        \[
+        M^n = a_n\,M + b_n\,I \qquad (n \in \N).
+        \]
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie II --- Dimension 2~: \omterm{def:b1:matrices:transpose}{trace}, nombre
+déterminant, Cayley--Hamilton.} Pour $A = \begin{pmatrix} a & b\\ c &
+d\end{pmatrix}$, posons $s = a + d = \operatorname{tr} A$ et $p = ad
+- bc$ (le nombre que le \cref{ch:b1:det} nommera le
+déterminant).
+\begin{enumerate}[resume]
+  \item Vérifier par un calcul direct l'\emph{identité de
+        Cayley--Hamilton en dimension $2$}~:
+        \[
+        A^2 - s\,A + p\,I_2 = 0 .
+        \]
+  \item Démontrer par développement direct que $p$ est multiplicatif~:
+        avec des notations évidentes, $p(AB) = p(A)\,p(B)$. Montrer
+        ensuite~: $A$ est inversible si et seulement si $p \neq 0$, et
+        dans ce cas
+        \[
+        A^{-1} = \frac1p\,\bigl(s\,I_2 - A\bigr).
+        \]
+  \item Soit $A = \begin{pmatrix} 1 & 1\\ 0 & 2\end{pmatrix}$.
+        Calculer $s$, $p$, les racines de $D$, et en déduire une
+        formule close pour $A^n$~; la vérifier sur un calcul direct
+        de $A^2$.
+  \item Soit $A = \begin{pmatrix} 3 & 1\\ -1 & 1\end{pmatrix}$.
+        Montrer que $D$ a une racine double et calculer $A^n$~;
+        vérifier pour $n = 2$.
+  \item Soit $F = \begin{pmatrix} 1 & 1\\ 1 & 0\end{pmatrix}$ et
+        définissons les \omterm{pb:b1:matrices:1}{nombres de Fibonacci} par $F_0 = 0$, $F_1 = 1$,
+        $F_{n+2} = F_{n+1} + F_n$. Démontrer que
+        \[
+        F^n = \begin{pmatrix} F_{n+1} & F_n\\ F_n &
+        F_{n-1}\end{pmatrix} \quad (n \geq 1),
+        \]
+        en déduire la formule de Binet $F_n = \dfrac{\varphi^n -
+        \psi^n}{\sqrt5}$ où $\varphi = \frac{1 + \sqrt5}2$,
+        $\psi = \frac{1 - \sqrt5}2$, puis, à l'aide de la question 7,
+        l'identité de Cassini $F_{n+1}F_{n-1} - F_n^2 = (-1)^n$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie III --- Les \omterm{pb:b1:matrices:1}{récurrences linéaires}, structurellement.}
+Fixons $s, p \in K$ avec $p \neq 0$, et soit $E_D$ l'\omterm{def:b1:logic:sets}{ensemble} des
+suites vérifiant $u_{n+2} = s\,u_{n+1} - p\,u_n$ pour tout $n$.
+\begin{enumerate}[resume]
+  \item Montrer que $E_D$ est un \omterm{def:b1:vspaces:def}{espace vectoriel} de dimension $2$
+        (adapter l'\cref{exo:b1:findim:10}).
+  \item Montrer que la suite $(a_n)$ de la partie I est l'élément
+        de $E_D$ de valeurs initiales $0, 1$, et que tout $u
+        \in E_D$ vérifie
+        \[
+        u_n = u_1\,a_n + u_0\,b_n \qquad (n \in \N),
+        \]
+        avec $(b_n)$ comme dans la partie I~: les restes de division
+        résolvent \emph{toutes} les récurrences d'un seul coup.
+  \item Si $\lambda \neq \mu$ sont les racines de $D$, montrer que
+        $\bigl((\lambda^n), (\mu^n)\bigr)$ est une \omterm{def:b1:vspaces:free}{base} de $E_D$~;
+        si $D = (X-\lambda)^2$ avec $\lambda \neq 0$, montrer que
+        $\bigl((\lambda^n), (n\lambda^n)\bigr)$ en est une.
+  \item Résoudre complètement~: $u_{n+2} = u_{n+1} + 6u_n$, $u_0 = 1$,
+        $u_1 = 8$~; vérifier la réponse sur $u_2$ et $u_3$.
+  \item Soit $C = \begin{pmatrix} 0 & 1\\ -p & s\end{pmatrix}$
+        (la \emph{matrice compagnon} de $D$). Montrer que
+        \[
+        \begin{pmatrix} u_{n}\\ u_{n+1}\end{pmatrix}
+        = C^n \begin{pmatrix} u_0\\ u_1\end{pmatrix}
+        \quad (u \in E_D),
+        \]
+        et que $\operatorname{tr} C = s$ et $p(C) = p$~: la
+        récurrence et la matrice portent le même \omterm{def:b1:poly:def}{polynôme} $D$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie IV --- Le degré trois.} Soit $D_3 = X^3 -
+\alpha X^2 - \beta X - \gamma$ et
+\[
+C_3 = \begin{pmatrix} 0 & 1 & 0\\ 0 & 0 & 1\\ \gamma & \beta &
+\alpha \end{pmatrix}.
+\]
+\begin{enumerate}[resume]
+  \item Montrer que $D_3(C_3) = 0$. \emph{(Calculer les \omterm{def:b1:linmaps:kerim}{images} des
+        vecteurs de la \omterm{def:b1:vspaces:free}{base} canonique par les puissances de $C_3$~:
+        l'\omterm{def:b1:logic:map}{application} de $C_3$ envoie $e_1 \mapsto \dots \mapsto$ une
+        combinaison imposée par la dernière ligne.)}
+  \item Montrer que si $D_3$ a trois racines distinctes $\lambda_1,
+        \lambda_2, \lambda_3$, le reste $R_n$ de la division de $X^n$
+        par $D_3$ est l'\emph{interpolant de Lagrange} des valeurs
+        $\lambda_i^n$ aux nœuds $\lambda_i$
+        (\cref{thm:b1:poly:lagrange})~; en déduire que chaque
+        coefficient de $C_3^{\,n}$ est une combinaison linéaire fixe de
+        $\lambda_1^n, \lambda_2^n, \lambda_3^n$.
+  \item Résoudre~: $u_{n+3} = 2u_{n+2} + u_{n+1} - 2u_n$ avec $u_0 =
+        0$, $u_1 = 1$, $u_2 = 1$. \emph{(Factoriser $D_3 = (X - 1)(X
+        + 1)(X - 2)$.)} Vérifier sur $u_3$.
+  \item Calculer le reste de $X^n$ modulo $(X -
+        \lambda)^3$ \emph{(\omterm{thm:b1:taylor:integral}{formule de Taylor} de $X^n$ en
+        $\lambda$)}, et en déduire une formule pour $(\lambda I +
+        N)^n$ lorsque $N^3 = 0$ et que $N$ commute avec tout ce qui
+        est en vue~; la comparer à la formule du binôme.
+  \item Montrer que pour $D_3$ à racines distinctes, la solution
+        générale de la récurrence d'ordre $3$ est $u_n = c_1
+        \lambda_1^n + c_2\lambda_2^n + c_3\lambda_3^n$~: démontrer
+        que les trois suites géométriques forment une \omterm{def:b1:vspaces:free}{base} de
+        l'espace des solutions. \emph{(Pour la liberté, évaluer une
+        combinaison nulle en $n = 0, 1, 2$ et reconnaître un système
+        d'interpolation aux nœuds distincts
+        $\lambda_i$.)}
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie V --- Les dividendes de Fibonacci, et synthèse.}
+\begin{enumerate}[resume]
+  \item Démontrer que $F_1 + F_2 + \dots + F_n = F_{n+2} - 1$.
+  \item À partir de $F^{m+n} = F^m F^n$, obtenir la formule d'addition
+        \[
+        F_{m+n} = F_{m+1}F_n + F_m F_{n-1},
+        \]
+        et en déduire $F_{2n} = F_n(F_{n+1} + F_{n-1})$.
+  \item Démontrer que $F_n$ est l'entier le plus proche de
+        $\varphi^n/\sqrt5$ pour tout $n \geq 0$.
+  \item Soit $t_n = \operatorname{tr}(F^n) = F_{n+1} + F_{n-1}$
+        (les \emph{nombres de Lucas} $L_n$). Montrer que $t_{n+2} =
+        t_{n+1} + t_n$, $t_1 = 1$, $t_2 = 3$, que $L_n =
+        \varphi^n + \psi^n$, et retrouver $F_{2n} = F_n L_n$.
+  \item Synthèse, en quatre phrases~: pourquoi les puissances d'une
+        matrice $2 \times 2$ vivent dans le plan
+        $\operatorname{Vect}(I, A)$ de $\mathcal{M}_2(K)$ (quel
+        argument de dimension garantit une identité quadratique, et
+        quelle identité explicite la partie II a produite)~; comment
+        la division euclidienne convertit l'exponentiation en une
+        récurrence à deux termes~; quel énoncé de ce problème est le
+        cas $n = 2$ d'un théorème valable en toute dimension (le
+        nommer, et dire où il est démontré dans cette \omterm{def:b1:series:def}{série})~; et ce
+        que la construction de la matrice compagnon ajoute au tableau.
+\end{enumerate}
+\end{problem}

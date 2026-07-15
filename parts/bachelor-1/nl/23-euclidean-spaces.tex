@@ -1,0 +1,769 @@
+\chapter{Euclidische ruimten}\label{ch:b1:euclid}
+
+Door een \omterm{def:b1:euclid:def}{inwendig product} toe te voegen aan een reële \omterm{def:b1:vspaces:def}{vectorruimte}
+verwerf je de meetkundige begrippen --- lengtes, hoeken,
+orthogonaliteit, afstanden --- en één stelling die boven het
+hoofdstuk uittorent: elke \omterm{def:b1:vspaces:subspace}{deelruimte} laat een \omterm{thm:b1:euclid:projection}{orthogonale projectie}
+toe, berekenbaar via Gram--Schmidt, die de kortste afstand realiseert.
+De isometrieën van het vlak sluiten het hoofdstuk en de meetkunde van
+het jaar af.
+
+Doorheen dit hoofdstuk is $E$ een \emph{reële} \omterm{def:b1:vspaces:def}{vectorruimte}.
+
+\section{Inwendige producten}
+
+\begin{definition}\label{def:b1:euclid:def}
+Een \emph{inwendig product}\index{inwendig product} op $E$ is een
+\omterm{def:b1:logic:map}{afbeelding} $\langle\cdot,\cdot\rangle \colon E \times E \to \R$ die
+bilineair, symmetrisch en positief definiet is ($\langle x, x\rangle >
+0$ voor $x \neq 0$). Een eindigdimensionale ruimte die hiermee is
+uitgerust, is een \emph{euclidische ruimte}\index{euclidische ruimte}.
+De \emph{norm} van $x$ is $\norm{x} = \sqrt{\langle x, x\rangle}$, en
+$d(x, y) = \norm{x - y}$.
+\end{definition}
+
+\begin{example}\label{ex:b1:euclid:examples}
+Op $\R^n$: het canonieke product $\langle x, y\rangle = \sum x_i
+y_i$. Op $C(\intcc{a}{b})$: $\langle f, g \rangle = \int_a^b fg$
+(positieve definietheid is \cref{thm:b1:integration:props}~(4)). Op
+$\R_n[X]$: $\langle P, Q\rangle = \int_0^1 PQ$, of $\sum_{i}
+P(x_i)Q(x_i)$ over $n+1$ verschillende punten.
+\end{example}
+
+\begin{example}[De hoek tussen twee veeltermen]
+\label{ex:b1:euclid:polyangle}
+Zodra een \omterm{def:b1:euclid:def}{inwendig product} gekozen is, hebben \emph{om het even}
+welke twee niet-nulvectoren een hoek, via $\cos\theta = \frac{\langle
+x, y\rangle}{\norm x\,\norm y}$ (een legitieme cosinus door
+Cauchy--Schwarz). Voor $X$ en $X^2$ in $\int_0^1$:
+\[
+\langle X, X^2\rangle = \frac14, \qquad
+\norm X = \frac1{\sqrt3}, \qquad \norm{X^2} = \frac1{\sqrt5},
+\qquad
+\cos\theta = \frac{1/4}{1/\sqrt{15}} = \frac{\sqrt{15}}{4}
+\approx 0.968 :
+\]
+een hoek van ongeveer $14.5$ graden --- op $\intcc{0}{1}$ zijn de
+grafieken van $x$ en $x^2$ ``bijna evenwijdig'' in de
+kwadratisch-gemiddelde zin, en dat is waarom het verwijderen van die
+gedeelde richting (Gram--Schmidt, hieronder) enkel de kleine
+correctie $X^2 - X + \frac16$ overlaat.
+\end{example}
+
+\begin{theorem}[Cauchy--Schwarz; eigenschappen van de norm]\label{thm:b1:euclid:cs}
+Voor alle $x, y \in E$:\index{Cauchy--Schwarz-ongelijkheid}
+\[
+\abs{\langle x, y\rangle} \leq \norm x\, \norm y ,
+\]
+met gelijkheid dan en slechts dan als $x, y$ evenredig zijn. Bijgevolg
+voldoet $\norm\cdot$ aan de driehoeksongelijkheid $\norm{x + y} \leq
+\norm x + \norm y$ (en $\norm{\lambda x} = \abs\lambda \norm x$,
+$\norm x = 0 \iff x = 0$). Bovendien:
+\[
+\norm{x+y}^2 = \norm x^2 + 2\langle x, y\rangle + \norm y^2,
+\qquad
+\langle x, y \rangle = \tfrac14\bigl(\norm{x+y}^2 -
+\norm{x-y}^2\bigr) .
+\]
+\end{theorem}
+
+\begin{proof}
+Als $y = 0$ is alles triviaal. Anders is de kwadratische vorm $t
+\mapsto \norm{x + ty}^2 = \norm x^2 + 2t\langle x, y\rangle + t^2
+\norm y^2$ voor alle $t$ groter dan of gelijk aan $0$: haar
+discriminant is $\leq 0$, wat Cauchy--Schwarz is; gelijkheid betekent
+een dubbele wortel $t_0$, d.w.z.\ $x + t_0 y = 0$ (definietheid):
+evenredigheid. Driehoeksongelijkheid: uitwerken,
+\[
+\norm{x + y}^2 = \norm x^2 + 2\langle x, y\rangle + \norm y^2
+\leq \norm x^2 + 2\norm x\,\norm y + \norm y^2
+= \bigl(\norm x + \norm y\bigr)^2 ,
+\]
+waarbij de tussenstap Cauchy--Schwarz is; gelijkheid dwingt $\langle
+x, y\rangle = \norm x\norm y$ af, het \emph{positieve} geval van
+gelijkheid, d.w.z.\ evenredigheid met niet-negatieve verhouding ---
+meetkundig ontaardt de driehoek enkel wanneer de twee vectoren
+dezelfde kant op wijzen. De laatste twee identiteiten zijn directe
+uitwerkingen (de tweede, de \emph{polarisatie-identiteit}, wint het
+product terug uit de norm).
+\end{proof}
+
+\section{Orthogonaliteit}
+
+\begin{definition}\label{def:b1:euclid:orthogonal}
+$x \perp y$ wanneer $\langle x, y \rangle = 0$. Een familie is
+\emph{orthogonaal} wanneer haar vectoren paarsgewijs orthogonaal zijn,
+\emph{orthonormaal}\index{orthonormale familie} wanneer bovendien elke
+norm $1$ heeft. Het \emph{orthogonaal complement} van een \omterm{def:b1:vspaces:subspace}{deelruimte}
+$F$ is
+\[
+F^{\perp} = \{x \in E : \forall y \in F,\ \langle x, y\rangle =
+0\},
+\]
+een \omterm{def:b1:vspaces:subspace}{deelruimte} van $E$.\index{orthogonaal complement}
+\end{definition}
+
+\begin{proposition}\label{prop:b1:euclid:orthfree}
+(Pythagoras\index{stelling van Pythagoras}) Als $x \perp y$ dan
+$\norm{x+y}^2 = \norm x^2 + \norm y^2$. Een orthogonale familie van
+niet-nulvectoren is \omterm{def:b1:vspaces:free}{vrij}. In een orthonormale \omterm{def:b1:vspaces:free}{basis} $(e_1, \dots,
+e_n)$ zijn de \omterm{prop:b1:vspaces:coordinates}{coördinaten} en producten
+\[
+x = \sum_{i} \langle x, e_i\rangle\, e_i,
+\qquad
+\langle x, y \rangle = \sum_i \langle x, e_i\rangle \langle y,
+e_i\rangle,
+\qquad
+\norm x^2 = \sum_i \langle x, e_i\rangle^2 .
+\]
+\end{proposition}
+
+\begin{proof}
+Pythagoras: uitwerken. Vrijheid: neem $\langle\,\cdot\,, x_j\rangle$
+van een nulcombinatie: $\lambda_j \norm{x_j}^2 = 0$. \omterm{prop:b1:vspaces:coordinates}{Coördinaten}:
+schrijf $x = \sum \lambda_i e_i$ en neem het product met $e_j$:
+$\lambda_j = \langle x, e_j\rangle$; de twee formules volgen uit
+bilineariteit.
+\end{proof}
+
+\begin{example}[Orthonormale coördinaten, met een Parseval-controle]
+\label{ex:b1:euclid:parsevalcheck}
+Ontwikkel $x = (1, 2, 3)$ in de orthonormale \omterm{def:b1:vspaces:free}{basis} van
+\cref{exo:b1:euclid:3},
+\[
+e_1 = \tfrac{1}{\sqrt2}(1,1,0), \quad
+e_2 = \tfrac{1}{\sqrt6}(1,-1,2), \quad
+e_3 = \tfrac{1}{\sqrt3}(-1,1,1).
+\]
+Geen stelsel op te lossen --- drie \omterm{def:b1:topology:closure}{inwendige} producten:
+\[
+\langle x, e_1\rangle = \frac{3}{\sqrt2},
+\qquad
+\langle x, e_2\rangle = \frac{1 - 2 + 6}{\sqrt6} =
+\frac{5}{\sqrt6},
+\qquad
+\langle x, e_3\rangle = \frac{-1 + 2 + 3}{\sqrt3} =
+\frac{4}{\sqrt3}.
+\]
+Certificering via de normformule van de propositie:
+\[
+\frac{9}{2} + \frac{25}{6} + \frac{16}{3}
+= \frac{27 + 25 + 32}{6} = 14 = \norm{x}^2 = 1 + 4 + 9 .
+\]
+Deze controle op de som van gekwadrateerde \omterm{prop:b1:vspaces:coordinates}{coördinaten} (een eindige
+Parseval-identiteit) kost enkele seconden en vangt teken- en
+normalisatiefouten met bijna zekerheid op --- maak er een gewoonte
+van telkens wanneer een orthonormale ontwikkeling wordt berekend; haar
+oneindigdimensionale versie, voor de Fouriercoëfficiënten van
+\cref{ex:b1:euclid:trigortho}, is een stelling van het volume van
+Jaar~3.
+\end{example}
+
+\begin{theorem}[Gram--Schmidt]\label{thm:b1:euclid:gramschmidt}
+Elke \omterm{def:b1:euclid:def}{euclidische ruimte} heeft orthonormale bases. Expliciet: uit om
+het even welke \omterm{def:b1:vspaces:free}{basis} $(v_1, \dots, v_n)$ produceert het
+recept\index{Gram--Schmidt-procedure}
+\[
+w_k = v_k - \sum_{i=1}^{k-1} \langle v_k, e_i\rangle\, e_i ,
+\qquad
+e_k = \frac{w_k}{\norm{w_k}}
+\]
+een orthonormale \omterm{def:b1:vspaces:free}{basis} $(e_1, \dots, e_n)$ met
+$\operatorname{Vect}(e_1, \dots, e_k) = \operatorname{Vect}(v_1,
+\dots, v_k)$ voor elke $k$.
+\end{theorem}
+
+\begin{proof}
+Inductie op $k$. Stel $(e_1, \dots, e_{k-1})$ \omterm{def:b1:euclid:orthogonal}{orthonormaal} en
+opspannend $\operatorname{Vect}(v_1, \dots, v_{k-1})$: de vector
+$w_k$ is per constructie orthogonaal op elke $e_j$ ($j < k$)
+($\langle w_k, e_j \rangle = \langle v_k, e_j\rangle - \langle v_k,
+e_j\rangle$), en $w_k \neq 0$ aangezien $v_k \notin
+\operatorname{Vect}(v_1, \dots, v_{k-1})$. Normeren behoudt de
+orthogonaliteit; de \omterm{def:b1:logic:statement}{uitspraak} over het \omterm{def:b1:vspaces:span}{opspansel} geldt aangezien
+$e_k$ een combinatie is van $v_k$ en eerdere $e_i$'s, inverteerbaar.
+\end{proof}
+
+\begin{example}[Gram--Schmidt op veeltermen, volledig]
+\label{ex:b1:euclid:legendre}
+Orthonormaliseer $(1, X, X^2)$ in $\R_2[X]$ met $\langle P,
+Q\rangle = \int_0^1 PQ$. \emph{Stap 1}: $\norm{1}^2 = 1$, dus
+$e_1 = 1$. \emph{Stap 2}: $w_2 = X - \langle X, 1\rangle\,1 = X -
+\frac12$, en $\norm{w_2}^2 = \int_0^1\bigl(x - \frac12\bigr)^2
+\dd x = \frac1{12}$: $e_2 = \sqrt{12}\,\bigl(X - \frac12\bigr)$.
+\emph{Stap 3}: $\langle X^2, e_1\rangle = \frac13$ en
+\[
+\langle X^2, e_2\rangle
+= \sqrt{12}\int_0^1 x^2\Bigl(x - \frac12\Bigr)\dd x
+= \frac{\sqrt{12}}{12},
+\qquad\text{dus}\qquad
+w_3 = X^2 - \frac13 - \Bigl(X - \frac12\Bigr)
+= X^2 - X + \frac16 .
+\]
+Haar norm werd berekend in \cref{exo:b1:euclid:9}: $\norm{w_3}^2 =
+\frac1{180}$, waaruit $e_3 = \sqrt{180}\,\bigl(X^2 - X +
+\frac16\bigr)$. De \omterm{def:b1:poly:def}{veeltermen} $1$, $X - \frac12$, $X^2 - X +
+\frac16$ zijn, op schaal na, de eerste \emph{\omterm{def:b1:poly:def}{Legendre-veeltermen}}
+van het \omterm{prop:b1:reals:intervals}{interval} $\intcc{0}{1}$; de constructie gaat één graad per
+keer verder, elke nieuwe \omterm{def:b1:poly:def}{veelterm} orthogonaal op al haar
+voorgangers. Merk op hoe het algoritme eerder werk hergebruikt: de
+\omterm{def:b1:linmaps:projection}{projectie} die bij stap 3 wordt afgetrokken, is precies de beste
+affiene benadering van $X^2$ gevonden in
+\cref{ex:b1:euclid:bestapprox} --- Gram--Schmidt \emph{is}
+geïtereerde \omterm{thm:b1:euclid:projection}{orthogonale projectie}.
+\end{example}
+
+\begin{theorem}[Orthogonale projectie]\label{thm:b1:euclid:projection}
+Zij $F$ een \omterm{def:b1:vspaces:subspace}{deelruimte} van de \omterm{def:b1:euclid:def}{euclidische ruimte} $E$. Dan
+\[
+E = F \oplus F^{\perp},
+\]
+en de bijbehorende \omterm{def:b1:linmaps:projection}{projectie} $p_F$ op $F$ (de \emph{orthogonale
+projectie}\index{orthogonale projectie}) wordt, in om het even welke
+orthonormale \omterm{def:b1:vspaces:free}{basis} $(e_1, \dots, e_k)$ van $F$, gegeven door $p_F(x) =
+\sum_i \langle x, e_i\rangle e_i$. Zij realiseert de afstand tot $F$:
+voor alle $y \in F$,
+\[
+\norm{x - p_F(x)} \leq \norm{x - y},
+\]
+met gelijkheid enkel voor $y = p_F(x)$; men schrijft $d(x, F) =
+\norm{x - p_F(x)}$.
+\end{theorem}
+
+\begin{proof}
+Neem een orthonormale \omterm{def:b1:vspaces:free}{basis} $(e_i)_{i \leq k}$ van $F$
+(\cref{thm:b1:euclid:gramschmidt} binnen $F$) en stel $\pi(x) =
+\sum \langle x, e_i\rangle e_i \in F$. Dan is $x - \pi(x) \perp e_j$
+voor elke $j$ (dezelfde opheffing als hierboven), dus $x - \pi(x) \in
+F^\perp$: $E = F + F^\perp$. En $F \cap F^\perp = \{0\}$: zo'n
+vector voldoet aan $\langle x, x\rangle = 0$. Dus de som is direct en
+$\pi = p_F$.
+
+Afstand: voor $y \in F$, ontbind $x - y = (x - p_F(x)) + (p_F(x) -
+y)$, orthogonale stukken ($F^\perp$ en $F$); Pythagoras:
+\[
+\norm{x - y}^2 = \norm{x - p_F(x)}^2 + \norm{p_F(x) - y}^2
+\geq \norm{x - p_F(x)}^2,
+\]
+gelijkheid dan en slechts dan als $y = p_F(x)$.
+\end{proof}
+
+\begin{example}[Projecties verlengen nooit]
+\label{ex:b1:euclid:bessel}
+Pas Pythagoras toe op de opsplitsing $x = p_F(x) + (x - p_F(x))$:
+\[
+\norm{p_F(x)}^2 = \norm x^2 - \norm{x - p_F(x)}^2 \leq
+\norm x^2 ,
+\]
+met gelijkheid dan en slechts dan als $x \in F$. In een orthonormale
+\omterm{def:b1:vspaces:free}{basis} $(e_1, \dots, e_k)$ van $F$ luidt dit $\sum_{i \leq k}\langle x,
+e_i\rangle^2 \leq \norm x^2$ (een \emph{Bessel-ongelijkheid}): hoeveel
+orthonormale richtingen men ook meet, de gekwadrateerde \omterm{prop:b1:vspaces:coordinates}{coördinaten}
+overschrijden nooit de gekwadrateerde lengte --- vergelijk de exacte
+gelijkheid van \cref{ex:b1:euclid:parsevalcheck} wanneer de familie
+een volledige \omterm{def:b1:vspaces:free}{basis} is. Deze eenregelige ongelijkheid is wat
+Fouriercoëfficiënten sommeerbaar maakt in het volume van Jaar~3; hier
+verklaart ze al waarom het toevoegen van meer basisfuncties aan een
+kleinste-kwadratenpassing het residu enkel kan verkleinen.
+\end{example}
+
+\begin{example}[Beste kwadratische benadering]\label{ex:b1:euclid:bestapprox}
+In $C(\intcc{0}{1})$ met $\langle f, g\rangle = \int_0^1 fg$ is de
+\omterm{def:b1:poly:def}{veelterm} van graad $\leq 1$ die het dichtst bij $f(x) = x^2$ ligt in
+de bijbehorende (kwadratisch-gemiddelde) afstand $p_F(f)$, waarbij $F
+= \R_1[X]$. Gram--Schmidt op $(1, X)$: $e_1 = 1$, $w_2 = X -
+\frac12$, $\norm{w_2}^2 = \int_0^1 (x - \frac12)^2 = \frac{1}{12}$,
+$e_2 = \sqrt{12}\,(X - \tfrac12)$. Dan
+\[
+p_F(f) = \langle f, e_1\rangle e_1 + \langle f, e_2\rangle e_2
+= \frac13 + 12\Bigl(\int_0^1 x^2\bigl(x - \tfrac12\bigr)\dd
+x\Bigr)\bigl(X - \tfrac12\bigr)
+= X - \frac{1}{6},
+\]
+met gebruik van $\int_0^1 x^2(x - \frac12)\dd x = \frac14 - \frac16 =
+\frac{1}{12}$. Het idee van de ``kleinste kwadraten'' in één regel
+lineaire algebra.
+\end{example}
+
+\begin{method}[Drie wegen naar een afstand $d(x, F)$]
+\label{met:b1:euclid:distance}
+\begin{enumerate}
+  \item \emph{Orthonormale \omterm{def:b1:vspaces:free}{basis} van $F$}: dan is $p_F(x) = \sum_i
+        \langle x, e_i\rangle e_i$ en, via Pythagoras,
+        \[
+        d(x, F)^2 = \norm{x}^2 - \norm{p_F(x)}^2
+        = \norm x^2 - \sum_i \langle x, e_i\rangle^2 ,
+        \]
+        vaak goedkoper dan $x - p_F(x)$ zelf te berekenen.
+  \item \emph{Normaalvergelijkingen}: met om het even welke
+        voortbrengende familie van $F$, los $\langle x - p,
+        v_j\rangle = 0$ op voor de coëfficiënten van $p$
+        (\cref{exo:b1:euclid:5}) --- geen orthonormalisatie nodig.
+  \item \emph{Via het complement}: als $F^\perp$ kleiner is dan
+        $F$ (bv.\ $F$ een \omterm{def:b1:linmaps:forms}{hypervlak}, $F^\perp$ een rechte
+        $\operatorname{Vect}(n)$), projecteer dan in plaats daarvan
+        op $F^\perp$:
+        \[
+        d(x, F) = \norm{p_{F^\perp}(x)} =
+        \frac{\abs{\langle x, n\rangle}}{\norm n} ,
+        \]
+        wat de klassieke formule voor de afstand tot een vlak is
+        (\cref{exo:b1:multivar:8} gebruikt haar).
+\end{enumerate}
+Weg 3 is een bijzonder geval van een algemene reflex: projecteer
+altijd op diegene van $F$, $F^\perp$ met de kleinste dimensie.
+\end{method}
+
+\begin{example}[Trigonometrische orthogonaliteit: een Fourier-voorproefje]
+\label{ex:b1:euclid:trigortho}
+Op $C(\intcc{0}{2\pi})$ met $\langle f, g\rangle =
+\frac1\pi\int_0^{2\pi} fg$ is de familie
+\[
+\Bigl(\frac{1}{\sqrt2},\ \cos x,\ \sin x,\ \cos 2x,\ \sin 2x,\
+\dots\Bigr)
+\]
+\omterm{def:b1:euclid:orthogonal}{orthonormaal}: bijvoorbeeld $\langle \cos px, \cos qx\rangle =
+\frac1\pi\int_0^{2\pi}\cos px\cos qx\,\dd x = 0$ voor $p \neq q$
+(lineariseer het product tot $\frac12[\cos(p{-}q)x +
+\cos(p{+}q)x]$ en integreer over volledige perioden), terwijl
+$\frac1\pi\int_0^{2\pi}\cos^2 px\,\dd x = 1$. De \omterm{thm:b1:euclid:projection}{orthogonale
+projectie} op het \omterm{def:b1:vspaces:span}{opspansel} van de eerste $2N + 1$ van deze functies
+heeft daarom \omterm{prop:b1:vspaces:coordinates}{coördinaten} $\langle f, e_i\rangle$ --- integralen tegen
+cosinussen en sinussen. Dit zijn de \emph{Fouriercoëfficiënten} van
+$f$, en de \omterm{def:b1:linmaps:projection}{projectie} is haar beste kwadratisch-gemiddelde
+trigonometrische benadering; het volume van Jaar~3 bestudeert hun
+convergentie. De orthogonaliteit doet al het werk: de formules voor
+de coëfficiënten zijn woordelijk \cref{thm:b1:euclid:projection}.
+\end{example}
+
+\section{Isometrieën van het vlak}
+
+\begin{definition}\label{def:b1:euclid:isometry}
+Een endomorfisme $u$ van een \omterm{def:b1:euclid:def}{euclidische ruimte} is een
+\emph{isometrie}\index{isometrie} (of orthogonale \omterm{def:b1:logic:map}{afbeelding}) wanneer
+het de norm behoudt: $\norm{u(x)} = \norm x$ voor alle $x$ ---
+equivalent (polarisatie) behoudt het het \omterm{def:b1:euclid:def}{inwendig product}; equivalent
+voldoet zijn matrix $A$ in een orthonormale \omterm{def:b1:vspaces:free}{basis} aan $A^{\mathsf T} A
+= I$. Isometrieën vormen een \omterm{def:b1:structures:group}{groep}, de orthogonale \omterm{def:b1:structures:group}{groep} $O(E)$.
+\end{definition}
+
+\begin{example}[Een isometrie op het zicht herkennen]
+\label{ex:b1:euclid:recognize}
+Is $A = \dfrac15\begin{pmatrix} 3 & -4\\ 4 & 3\end{pmatrix}$
+orthogonaal? Kolommen: normen $\frac15\sqrt{9 + 16} = 1$ en
+$\frac15\sqrt{16 + 9} = 1$; product $\frac1{25}(3\cdot(-4) +
+4\cdot3) = 0$. Ja --- en $\det A = \frac{9 + 16}{25} = 1$, dus
+het is de rotatie $R_\theta$ met $\cos\theta = \frac35$,
+$\sin\theta = \frac45$ (de ``$3$-$4$-$5$-rotatie'', waarvan de
+hoek geen opmerkelijke breuk van $\pi$ is). Daarentegen heeft $B =
+\frac{1}{\sqrt2}\begin{pmatrix} 1 & 1\\ 0 & 1\end{pmatrix}$ een
+uiterlijk met determinant-op-schaal maar een niet-eenheids eerste
+kolom ($\frac1{\sqrt2}$): niet orthogonaal --- de determinant
+$\pm1$ alleen certificeert niets, de kolommen moeten worden
+gecontroleerd.
+\end{example}
+
+\begin{theorem}[Isometrieën van het vlak]\label{thm:b1:euclid:plane}
+In een orthonormale \omterm{def:b1:vspaces:free}{basis} van een euclidisch vlak zijn de matrices
+van isometrieën precies
+\[
+R_\theta = \begin{pmatrix}
+\cos\theta & -\sin\theta\\ \sin\theta & \cos\theta
+\end{pmatrix}
+\quad (\text{rotatie over hoek } \theta,\ \det = 1),
+\]
+\[
+S_\theta = \begin{pmatrix}
+\cos\theta & \sin\theta\\ \sin\theta & -\cos\theta
+\end{pmatrix}
+\quad (\det = -1),
+\]
+waarbij de laatste de spiegeling in de rechte is die hoek
+$\frac\theta2$ maakt met de eerste basisvector.
+\end{theorem}
+
+\begin{proof}
+Zij $A = \begin{pmatrix} a & c\\ b & d\end{pmatrix}$ met
+$A^{\mathsf T}A = I$: de kolommen zijn eenheidsvectoren en
+orthogonaal. De eerste kolom is $(\cos\theta, \sin\theta)$ voor een
+zekere $\theta$; de tweede, eenheidsvector en orthogonaal erop, is
+$\pm(-\sin\theta, \cos\theta)$. Het teken $+$ geeft $R_\theta$; het
+teken $-$ geeft $S_\theta$. Men gaat na dat $S_\theta^2 = I$ en dat
+de vector $(\cos\frac\theta2, \sin\frac\theta2)$ vast blijft terwijl
+zijn orthogonale wordt omgekeerd: een spiegeling. (En $R_\alpha
+R_\beta = R_{\alpha+\beta}$: de rotatiegroep is de hoekgroep ---
+vergelijk \cref{thm:b1:complex:funceq}.)
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=1.15]
+  \draw[->, thin] (-1.2,0) -- (2.9,0) node[below] {$x$};
+  \draw[->, thin] (0,-1.2) -- (0,2.6) node[left] {$y$};
+  \draw[omDef, very thick] (-0.9,0) -- (2.6,0)
+    node[below, pos=0.9, font=\small] {as van $r_1$};
+  \draw[omThm, very thick] (-0.9,-0.9) -- (2.3,2.3)
+    node[right, pos=0.97, font=\small] {as van $r_2$};
+  \fill (2,0.5) circle (0.05) node[right, font=\small] {$M$};
+  \fill (2,-0.5) circle (0.05)
+    node[right, font=\small] {$r_1(M)$};
+  \fill (-0.5,2) circle (0.05)
+    node[above, font=\small] {$r_2(r_1(M))$};
+  \draw[omDef, dashed] (2,0.5) -- (2,-0.5);
+  \draw[omThm, dashed] (2,-0.5) -- (-0.5,2);
+  \draw[omProp, thick, ->] (0.9,0) arc (0:45:0.9);
+  \node[omProp, font=\small] at (1.15,0.32) {$\frac\pi4$};
+\end{tikzpicture}
+
+{\small Twee spiegelingen maken een rotatie: $M = (2, 0.5)$
+spiegelen in de $x$-as, daarna in de rechte $y = x$, landt op
+$(-0.5, 2)$ --- het \omterm{def:b1:linmaps:kerim}{beeld} van $M$ onder de rotatie over hoek
+$\frac\pi2$ om de oorsprong, \emph{tweemaal} de hoek $\frac\pi4$
+tussen de assen. Het weekendprobleem maakt van dit \omterm{def:b1:linmaps:kerim}{beeld} de
+samenstellingswet van alle isometrieën van het vlak.}
+\end{omfigure}
+
+\begin{remark}[Veelvoorkomende valkuilen]
+\label{rem:b1:euclid:pitfalls}
+\emph{De projectieformule vereist een orthonormale \omterm{def:b1:vspaces:free}{basis}}: voor een
+louter voortbrengende familie $(v_i)$ van $F$ is de som $\sum_i\langle
+x, v_i\rangle v_i$ \emph{niet} $p_F(x)$ (test $F = \R^2$, $v_1
+= e_1$, $v_2 = e_1 + e_2$); met een niet-orthonormale familie los je
+in plaats daarvan de normaalvergelijkingen op
+(\cref{met:b1:euclid:distance}~(2)).
+\emph{Orthogonale families moeten $0$ vermijden om \omterm{def:b1:vspaces:free}{vrij} te zijn}: de
+nulvector is orthogonaal op alles, inclusief op zichzelf --- vrijheid
+in \cref{prop:b1:euclid:orthfree} vereist niet-nulvectoren.
+\emph{$F^\perp$ hangt af van het \omterm{def:b1:euclid:def}{inwendig product}}: in $\R_1[X]$ is
+het complement van $\operatorname{Vect}(X)$ voor $\int_0^1 PQ$ niet de
+constanten maar $\operatorname{Vect}(1 - \frac32 X)$ --- bereken
+$\int_0^1 x(1 - \frac32 x) = \frac12 - \frac12 = 0$;
+``loodrecht'' is betekenisloos zolang het product niet benoemd is.
+\emph{Werk $\norm{x + y}$ niet \omterm{def:b1:linmaps:def}{lineair} uit}: de juiste identiteit is
+$\norm{x+y}^2 = \norm x^2 + 2\langle x, y\rangle + \norm y^2$; de
+kruisterm verdwijnt enkel bij orthogonaliteit (Pythagoras), en de
+driehoeksongelijkheid is een \emph{ongelijkheid}.
+\emph{Eenheidsvectoren naar eenheidsvectoren sturen volstaat niet}:
+$u(x, y) = (x + y,\ 0)$ beeldt beide canonieke basisvectoren af op de
+eenheidsvector $(1, 0)$, maar toch $\norm{u(1,1)} = 2 \neq \sqrt2$:
+geen \omterm{def:b1:euclid:isometry}{isometrie}. De definitie eist $\norm{u(x)} = \norm x$ voor
+\emph{alle} $x$; in matrixtermen $A^{\mathsf T}A = I$, d.w.z.\
+kolommen die eenheidsvectoren \emph{en paarsgewijs orthogonaal} zijn
+--- beide voorwaarden, samen gecontroleerd.
+\end{remark}
+
+\begin{remark}[Waar het inwendig product naartoe gaat]
+\label{rem:b1:euclid:whereused}
+\omterm{thm:b1:euclid:projection}{Orthogonale projectie} is de meest toegepaste stelling van het
+hoofdstuk: ze ligt aan de \omterm{def:b1:vspaces:free}{basis} van de kleinste kwadraten (het
+weekendprobleem van \cref{ch:b1:multivar} bouwt er regressierechten
+op), van Fouriercoëfficiënten (\cref{ex:b1:euclid:trigortho}), en van
+de normaalvergelijkingen van \cref{exo:b1:euclid:5}, die de numerieke
+analyse op grote schaal oplost. De classificatie $R_\theta /
+S_\theta$ wordt hieronder voltooid: het weekendprobleem classificeert
+\emph{alle} afstandsbewarende transformaties van het vlak, \omterm{def:b1:linmaps:def}{lineair} of
+niet, en hun eindige \omterm{def:b1:structures:group}{groepen} --- de wiskunde van rozetten en regelmatige
+veelhoeken. In het volume van Jaar~2 ontmoet het \omterm{def:b1:euclid:def}{inwendig product} de
+eigenwaardetheorie (symmetrische matrices, kwadratische vormen); in
+Jaar~3 wordt oneindigdimensionale euclidische meetkunde de theorie van
+de Hilbertruimte.
+\end{remark}
+
+\begin{remark}[Perspectieven binnen Boek 3]
+\label{rem:b1:euclid:perspectives}
+Twee bruggen verlaten dit hoofdstuk. \emph{Achterwaarts}, naar de
+lineaire algebra: de Gram-matrix van \cref{exo:b1:euclid:11} verpakt
+\omterm{def:b1:topology:closure}{inwendige} producten in de determinantmachinerie van
+\cref{ch:b1:det}, en \omterm{thm:b1:euclid:projection}{orthogonale projectie} is de bijzondere projector
+van \cref{ch:b1:linmaps} waarvan de kern $F^\perp$ is --- al haar
+algebra ($p^2 = p$, $s = 2p - \mathrm{id}$) geldt woordelijk, nu met
+de bonus dat $\norm{x - p(x)}$ een \emph{afstand} is.
+\emph{Voorwaarts}, naar de analyse: \cref{ch:b1:curves} meet
+booglengte met de norm van dit hoofdstuk en classificeert niets zonder
+zijn isometrieën; \cref{ch:b1:multivar} leest de gradiënt af via
+Cauchy--Schwarz (steilste stijging) en sluit het volume af met de
+kleinste kwadraten, wat \cref{thm:b1:euclid:projection} toegepast op
+een datavector in $\R^n$ is. Het \omterm{def:b1:euclid:def}{inwendig product} is het punt waar de
+algebra en de analyse van het boek elkaar eindelijk ontmoeten.
+\end{remark}
+
+\section{Oefeningen}
+
+\begin{exercise}[$\star$]\label{exo:b1:euclid:1}
+In $\R^3$ canoniek: bereken $\langle u, v\rangle$, $\norm u$,
+$\norm v$ en de hoek tussen $u = (1, 2, 2)$ en $v = (2, -2,
+1)$. Verifieer Cauchy--Schwarz numeriek.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:euclid:2}
+Bewijs de parallellogramidentiteit $\norm{x+y}^2 + \norm{x-y}^2 =
+2\norm x^2 + 2\norm y^2$ in om het even welke \omterm{def:b1:euclid:def}{euclidische ruimte}, en
+gebruik haar om aan te tonen dat de sup-norm op $\R^2$,
+$\norm{(x,y)}_\infty = \max(\abs x, \abs y)$, niet van een \omterm{def:b1:euclid:def}{inwendig
+product} komt.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:euclid:3}
+Pas Gram--Schmidt toe op $\bigl((1,1,0), (1,0,1), (0,1,1)\bigr)$ in
+canoniek $\R^3$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:euclid:4}
+In $\R^3$, zij $F = \operatorname{Vect}\bigl((1,1,1)\bigr)$.
+Bepaal $F^\perp$ (vergelijking en \omterm{def:b1:vspaces:free}{basis}), de matrix van $p_F$ in
+de canonieke \omterm{def:b1:vspaces:free}{basis}, en $d\bigl((1, 2, 3), F\bigr)$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:euclid:5}
+(Normaalvergelijkingen) Zij $F =
+\operatorname{Vect}\bigl((1,0,1),(0,1,1)\bigr) \subseteq \R^3$ en
+$x = (1, 1, 4)$. Bereken $p_F(x)$ door $\langle x - p, v
+\rangle = 0$ op te lossen voor de twee voortbrengers ($p = \alpha(1,0,1) +
+\beta(0,1,1)$), daarna $d(x, F)$. Waarom is Gram--Schmidt hier
+onnodig?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:euclid:6}
+Bewijs, voor $f$ \omterm{def:b1:continuity:continuous}{continu} op $\intcc{0}{1}$,
+\[
+\Bigl(\int_0^1 f\Bigr)^{\!2} \leq \int_0^1 f^2 ,
+\]
+met het geval van gelijkheid, als een instantie van Cauchy--Schwarz in
+$C(\intcc{0}{1})$. Bewijs daarna $\bigl(\sum_{i=1}^n a_i\bigr)^2 \leq
+n \sum a_i^2$ voor reële $a_i$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:euclid:7}
+Bewijs dat voor elke \omterm{def:b1:vspaces:subspace}{deelruimte} $F$ van een \omterm{def:b1:euclid:def}{euclidische ruimte}:
+$(F^{\perp})^{\perp} = F$ en $\dim F^{\perp} = \dim E - \dim F$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:euclid:8}
+Identificeer de isometrieën van het vlak met matrices
+\[
+A = \frac{1}{\sqrt 2}\begin{pmatrix} 1 & -1\\ 1 & 1\end{pmatrix},
+\qquad
+B = \frac{1}{5}\begin{pmatrix} 3 & 4\\ 4 & -3\end{pmatrix}
+\]
+(type, hoek of as). Bereken $A^8$ en $B^2$ zonder matrices te
+vermenigvuldigen.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:euclid:9}
+(Minimum als \omterm{def:b1:linmaps:projection}{projectie}) Bereken
+\[
+\min_{(a, b) \in \R^2} \int_0^1 \bigl(x^2 - a - bx\bigr)^2 \dd x ,
+\]
+met behulp van \cref{ex:b1:euclid:bestapprox}: het minimum is
+$\norm{f - p_F(f)}^2$ voor $f = X^2$, $F = \R_1[X]$.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:euclid:10}
+Zij $u$ een \omterm{def:b1:euclid:isometry}{isometrie} van een \omterm{def:b1:euclid:def}{euclidische ruimte} $E$. Bewijs dat
+$\ker(u - \mathrm{id}) \perp \operatorname{im}(u - \mathrm{id})$,
+en leid $E = \ker(u - \mathrm{id}) \oplus \operatorname{im}(u -
+\mathrm{id})$ af. \emph{(Bereken $\langle x - u(x), y\rangle$ voor
+$u(y) = y$, met gebruik van het behoud van het product.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:euclid:11}
+(Gram-matrix) Voor vectoren $v_1, \dots, v_k$ van een \omterm{def:b1:euclid:def}{euclidische
+ruimte}, zij $G = \bigl(\langle v_i, v_j\rangle\bigr)_{1 \leq i, j
+\leq k}$ hun \emph{Gram-matrix}.
+\begin{enumerate}
+  \item Bewijs dat $(v_1, \dots, v_k)$ \omterm{def:b1:vspaces:free}{vrij} is dan en slechts dan als
+        $G$ inverteerbaar is. \emph{(Als $Gc = 0$, bereken
+        $\norm{\sum_i c_i v_i}^2$.)}
+  \item Bereken de Gram-matrix van $(1, X, X^2)$ in $\R_2[X]$
+        met $\langle P, Q\rangle = \int_0^1 PQ$, herken de
+        \omterm{pb:b1:det:1}{Hilbert-matrix} $H_3$ van het weekendprobleem van
+        \cref{ch:b1:det}, en besluit vrijheid uit $\det H_3 =
+        \frac1{2160} \neq 0$.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:euclid:12}
+Zij $u$ een endomorfisme van een \omterm{def:b1:euclid:def}{euclidische ruimte} $E$ waarvan de
+matrix $A$ in een orthonormale \omterm{def:b1:vspaces:free}{basis} zowel orthogonaal ($A^{\mathsf T}A
+= I$) als symmetrisch ($A^{\mathsf T} = A$) is.
+\begin{enumerate}
+  \item Toon $A^2 = I$, en leid (via
+        \cref{thm:b1:linmaps:projchar}) $E = \ker(u -
+        \mathrm{id}) \oplus \ker(u + \mathrm{id})$ af.
+  \item Toon dat de twee \omterm{def:b1:vspaces:subspace}{deelruimten} orthogonaal zijn, zodat $u$
+        de \emph{orthogonale symmetrie} is ten opzichte van $F =
+        \ker(u - \mathrm{id})$: spiegeling door $F$.
+        \emph{(Voor $u(x) = x$ en $u(y) = -y$, bereken $\langle
+        x, y\rangle$ op twee manieren.)}
+  \item Classificeer het geval van het vlak: welke matrices van
+        \cref{thm:b1:euclid:plane} zijn symmetrisch, en wat zijn
+        de bijbehorende \omterm{def:b1:logic:map}{afbeeldingen}?
+\end{enumerate}
+\end{exercise}
+
+\section{Probleem: isometrieën van het vlak en de stelling van Leonardo}
+
+\begin{problem}\label{pb:b1:euclid:1}
+Een \emph{\omterm{def:b1:euclid:isometry}{isometrie} van het vlak} is om het even welke \omterm{def:b1:logic:map}{afbeelding} $f
+\colon \R^2 \to \R^2$ die afstanden behoudt: $\norm{f(x) - f(y)} =
+\norm{x - y}$ voor alle $x, y$ --- zonder aanname van lineariteit. Dit
+probleem bewijst dat zulke \omterm{def:b1:logic:map}{afbeeldingen} precies de translaties,
+rotaties, spiegelingen en \omterm{pb:b1:euclid:1}{glijspiegelingen} zijn (de classificatie van
+de isometrieën van het vlak), berekent hun samenstellingen, en bepaalt
+al hun \emph{eindige} \omterm{def:b1:structures:group}{groepen}: de stelling van Leonardo, de wiskunde
+achter rozetpatronen. Vanaf Deel II identificeren we $\R^2$ met $\C$
+(\cref{ch:b1:complex}): het canonieke \omterm{def:b1:euclid:def}{inwendig product} is $\langle z,
+w\rangle = \operatorname{Re}(z\conj w)$ en de norm is de
+\omterm{def:b1:complex:field}{modulus}.\index{isometrie}\index{glijspiegeling}
+\index{stelling van Leonardo}\index{diëdergroep}
+
+\medskip
+\noindent\textbf{Deel I --- Elke \omterm{def:b1:euclid:isometry}{isometrie} is affien.}
+\begin{enumerate}
+  \item Ga na dat translaties $t_a(x) = x + a$, lineaire
+        isometrieën, en al hun samenstellingen isometrieën zijn,
+        en dat de isometrieën een \omterm{def:b1:structures:group}{groep} vormen onder samenstelling.
+  \item Zij $f$ een \omterm{def:b1:euclid:isometry}{isometrie} met $f(0) = 0$. Toon dat $f$ normen
+        behoudt, en vervolgens --- door polarisatie,
+        \cref{thm:b1:euclid:cs} --- dat $\langle f(x),
+        f(y)\rangle = \langle x, y\rangle$ voor alle $x, y$.
+  \item Nog steeds met $f(0) = 0$: werk $\norm{f(x + y) - f(x) -
+        f(y)}^2$ en $\norm{f(\lambda x) - \lambda f(x)}^2$ uit
+        met behulp van vraag 2, en besluit dat $f$
+        \emph{\omterm{def:b1:linmaps:def}{lineair}} is: $f \in O(\R^2)$.
+  \item Leid af dat elke \omterm{def:b1:euclid:isometry}{isometrie} $f$ zich \emph{op unieke wijze}
+        schrijft als $f = t_a \circ g$ met $a = f(0)$ en $g$ een
+        lineaire \omterm{def:b1:euclid:isometry}{isometrie} (het \emph{lineaire deel} van $f$).
+  \item Noem $f$ \emph{direct} als $\det g = 1$, \emph{indirect}
+        als $\det g = -1$. Toon dat het lineaire deel van een
+        samenstelling de samenstelling van de lineaire delen is, en
+        formuleer de resulterende tekenregel
+        (direct/indirect stellen samen als $+1/-1$).
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel II --- De vier types.} Via
+\cref{thm:b1:euclid:plane} zijn de lineaire isometrieën van $\C$ $z
+\mapsto az$ en $z \mapsto a\conj z$ met $\abs a = 1$; dus elke
+\omterm{def:b1:euclid:isometry}{isometrie} van het vlak is
+\[
+f(z) = a z + b \quad (\text{direct}) \qquad\text{of}\qquad
+f(z) = a\conj z + b \quad (\text{indirect}), \qquad \abs a = 1 .
+\]
+\begin{enumerate}[resume]
+  \item Verifieer het woordenboek: $R_\theta$ is $z \mapsto
+        \eu^{\iu\theta}z$ en $S_\theta$ is $z \mapsto
+        \eu^{\iu\theta}\conj z$ (controleer beide op $1$ en $\iu$).
+  \item (Direct geval) Zij $f(z) = az + b$, $\abs a = 1$. Toon:
+        als $a = 1$, is $f$ een translatie; als $a \neq 1$, heeft
+        $f$ het unieke vaste punt $z_0 = b/(1 - a)$ en $f(z) - z_0
+        = a(z - z_0)$: een \emph{rotatie} met centrum $z_0$ en
+        hoek $\arg a$.
+  \item (Indirect geval) Zij $f(z) = a\conj z + b$, en $v =
+        a\conj b + b$. Toon $f \circ f = t_v$ en $f \circ t_v =
+        t_v \circ f$. Als $v = 0$: toon dat het midden van $z$
+        en $f(z)$ een vast punt is, en dat $f$ een
+        \emph{spiegeling} in een rechte is. Als $v \neq 0$: toon dat $r
+        = t_{-v/2}\circ f$ een spiegeling is waarvan de as
+        evenwijdig is met $v$, zodat $f = t_{v/2} \circ r$ een
+        \emph{\omterm{pb:b1:euclid:1}{glijspiegeling}} is. Besluit: elke \omterm{def:b1:euclid:isometry}{isometrie} van het vlak
+        is een translatie, een rotatie, een spiegeling of een
+        \omterm{pb:b1:euclid:1}{glijspiegeling} (de classificatie van de isometrieën van het
+        vlak).
+  \item (Samenstellingen) Toon: de samenstelling van rotaties over
+        hoeken $\alpha$ en $\beta$ is een rotatie over hoek
+        $\alpha + \beta$ (een translatie als $\alpha + \beta \in
+        2\pi\Z$); de samenstelling van twee spiegelingen is een
+        rotatie over tweemaal de hoek tussen de assen (een
+        translatie als de assen evenwijdig zijn).
+  \item Leid af dat elke \omterm{def:b1:euclid:isometry}{isometrie} van het vlak een samenstelling
+        van hoogstens drie spiegelingen is.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel III --- Drie identificaties.}
+\begin{enumerate}[resume]
+  \item Classificeer $f(z) = \iu\conj z + 1 + \iu$ volledig:
+        type, as, glijvector.
+  \item Zij $f$ de rotatie over hoek $\frac\pi2$ om $0$
+        en $g$ de rotatie over hoek $\frac\pi2$ om $1$.
+        Bereken $g \circ f$ in de vorm $z \mapsto az + b$ en
+        identificeer haar (type, centrum, hoek).
+  \item Zij $r_1(z) = \conj z$ (spiegeling in de reële as) en
+        $r_2(z) = \iu\conj z$ (spiegeling in de rechte $y = x$).
+        Bereken $r_2 \circ r_1$ en controleer vraag 9 op dit
+        voorbeeld.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel IV --- Eindige \omterm{def:b1:structures:group}{groepen}: de stelling van Leonardo.}
+Zij $G$ een \emph{eindige} \omterm{def:b1:structures:group}{groep} van isometrieën van het vlak.
+\begin{enumerate}[resume]
+  \item Toon dat isometrieën baricentra behouden: als
+        $\lambda_1 + \dots + \lambda_m = 1$ en $f = t_a \circ
+        g$ ($g$ \omterm{def:b1:linmaps:def}{lineair}), dan $f\bigl(\sum_i \lambda_i
+        x_i\bigr) = \sum_i \lambda_i f(x_i)$.
+  \item Stel $c = \frac{1}{\abs G}\sum_{g \in G} g(x_0)$ voor om
+        het even welke gekozen $x_0$. Toon dat elke $h \in G$ $c$
+        vast houdt: een eindige \omterm{def:b1:structures:group}{groep} van isometrieën heeft een
+        gemeenschappelijk vast punt.
+  \item Leid af dat men, na conjugatie met $t_{-c}$, mag
+        aannemen dat $G \subseteq O(\R^2)$. Zij $G^{+} = \{g \in G :
+        \det g = 1\}$; toon dat ofwel $G = G^{+}$ ofwel $G^{+}$
+        precies index $2$ heeft in $G$ (geef een bijectie $G^+
+        \to G \setminus G^+$).
+  \item Toon dat een eindige \omterm{def:b1:structures:group}{groep} van \emph{rotaties} om $c$
+        cyclisch is: kies onder haar elementen de rotatie
+        $R_{\theta_0}$ met de kleinste hoek $\theta_0 \in
+        \intoo{0}{2\pi}$, en gebruik euclidische deling van hoeken
+        om te bewijzen dat ze voortbrengt; besluit $\theta_0 =
+        \frac{2\pi}n$ en $G^{+} = \{R_{\theta_0}^{\,k}\} \cong
+        C_n$.
+  \item Stel $G \neq G^{+}$ en kies een spiegeling $s \in G$.
+        Toon $G = G^{+} \cup sG^{+}$, dat $s r s = r^{-1}$ voor
+        elke rotatie $r \in G^{+}$, en dat alle $n$ elementen
+        van $sG^{+}$ spiegelingen zijn: $G$ is de
+        \emph{\omterm{pb:b1:euclid:1}{diëdergroep}} $D_n$ van orde $2n$.
+  \item Besluit (\emph{stelling van Leonardo}): elke eindige \omterm{def:b1:structures:group}{groep}
+        van isometrieën van het vlak is cyclisch $C_n$ of
+        diëdrisch $D_n$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel V --- Dividenden, en synthese.}
+\begin{enumerate}[resume]
+  \item Toon rechtstreeks dat een eindige \omterm{def:b1:structures:group}{groep} van isometrieën
+        geen enkele translatie en geen enkele \omterm{pb:b1:euclid:1}{glijspiegeling}
+        anders dan de identiteit kan bevatten (beschouw de machten
+        van zo'n element).
+  \item Zij $P_n$ de regelmatige $n$-hoek met als hoekpunten de
+        $n$-de \omterm{def:b1:complex:unity}{eenheidswortels} ($n \geq 3$). Toon dat haar
+        symmetriegroep precies $D_n$ is: de $n$ rotaties $z
+        \mapsto \omega^k z$ en de $n$ spiegelingen $z \mapsto
+        \omega^k \conj z$, $\omega = \eu^{2\iu\pi/n}$, en geen
+        andere.
+  \item Geef vlakke figuren waarvan de symmetriegroepen $C_1$,
+        $D_1$, $D_2$ en $C_3$ respectievelijk zijn.
+  \item Som de acht elementen op van de symmetriegroep van het
+        vierkant met hoekpunten $\pm1, \pm\iu$ als \omterm{def:b1:logic:map}{afbeeldingen} $z \mapsto
+        \omega^k z$ of $z \mapsto \omega^k\conj z$, en geef
+        de as van elk van de vier spiegelingen.
+  \item Zij $f, g$ rotaties over dezelfde hoek $\theta
+        \notin 2\pi\Z$ om \emph{verschillende} centra $c_1 \neq
+        c_2$. Bereken $f\circ g - g\circ f$ puntsgewijs en toon
+        $f\circ g \neq g\circ f$; toon bovendien dat $(f \circ
+        g)\circ(g\circ f)^{-1}$ een niet-triviale translatie is,
+        zodat elke \omterm{def:b1:structures:group}{groep} die $f$ en $g$ bevat oneindig is ---
+        een tweede verklaring van het enige centrum in de stelling
+        van Leonardo.
+  \item Synthese, in vier zinnen: welke twee structurele
+        resultaten willekeurige isometrieën tot lineaire algebra
+        herleiden (vragen 3--4) en willekeurige eindige \omterm{def:b1:structures:group}{groepen} tot
+        \omterm{def:b1:structures:subgroup}{deelgroepen} van $O(2)$ (vraag 15); wat de volledige lijst
+        van isometrieën van het vlak is en welke invarianten
+        (direct/indirect, vaste punten) de vier types scheiden;
+        waarom de samenstellingsregels van vraag 9 spiegelingen
+        de voortbrengers van alles maken; en wat de stelling van
+        Leonardo toevoegt op de eindige schaal. Noem de twee
+        stellingen die in Delen II en IV bewezen zijn.
+\end{enumerate}
+\end{problem}
