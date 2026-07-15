@@ -2,7 +2,7 @@
 
 <p align="center">
   <a href="https://www.one-course.com">
-    <img src="assets/one-course-logo.svg" alt="One Course" width="112" height="112">
+    <img src="assets/one-course-logo.svg" alt="One Course — one-course.com" width="420">
   </a>
 </p>
 
