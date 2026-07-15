@@ -6,12 +6,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 A series of five LaTeX math books (Grades 1–9, Grades 10–12, University
 Year 1, University Year 2, University Year 3) built from **one shared `parts/` tree**, one
-entry file per book at the repo root, and a single style file. The primary
-school volumes also exist in full French and Dutch translations
-(`*_fr.tex` / `*_nl.tex` entry files; bodies under `parts/grade-N/fr/`
-and `parts/grade-N/nl/` for Grades 1–12). Everything is written in
-English for an international audience; FR/NL editions translate the
-primary, middle, and high school content.
+entry file per book at the repo root, and a single style file. Several
+volumes also exist in full French and Dutch translations (`*_fr.tex` /
+`*_nl.tex` entry files; bodies under `parts/<year>/<lang>/`): the primary,
+middle, and high school books (Grades 1–12, `parts/grade-N/{fr,nl}/`) and,
+of the university books, **Book 3 (University Year 1)** in both FR and NL
+(`parts/bachelor-1/{fr,nl}/`). Books 4–5 FR/NL are in progress. Everything
+is written in English for an international audience; the FR/NL editions
+translate that content, keeping identical labels, order, and structure.
 `CONTRIBUTING.md` holds the authoritative style/structure conventions;
 `THEME.md` documents the One Course cover brand. Read both before writing
 chapters.
@@ -80,13 +82,42 @@ CI (`.github/workflows/build.yml`) builds all books on every push;
 3. Add entry file `one_math_book_<N>_<slug>_<lang>.tex` with
    `\newcommand{\booklang}{<lang>}` before `\usepackage{styles/onemath}`.
 4. Register the entry in `latexmkrc` and both GitHub workflows.
+5. Write `tools/term_config/book<N>_<lang>.py` (curated, NOT a translation of
+   the English config — see the termlink notes below), then generate `\omterm`
+   links: `python3 tools/link_defined_terms.py --book N --lang <lang> --apply`.
 
 Reference implementations:
 
 - `one_math_book_1_primary_middle_school_fr.tex` / `_nl.tex`
 - `one_math_book_2_high_school_fr.tex` / `_nl.tex`
+- `one_math_book_3_university_year_1_fr.tex` / `_nl.tex` (+ `book3_{fr,nl}.py`)
 
 PDFs: `build/one_math_book_<N>_<slug>[_<lang>].pdf`.
+
+**Verify a translation** — a clean build proves almost nothing (`\ominput`
+silently falls back to English, `\omstr` to empty). Gate on:
+
+- `bash tools/check_translation.sh <year> <lang>` — completeness + identical
+  labels/order + env/figure census vs English + UTF-8 (no `\'e` escapes).
+- **Link-target parity**: the translated `\omterm` *targets* must be the same
+  set as English (a term must link to the same definition). Compare
+  `grep -rho '\omterm{[^}]*}' <lang>/ | sort -u` against the English tree;
+  investigate every divergence (wrong-sense link vs. a curation choice).
+
+**Translation gotchas (cost real time on the bachelor books):**
+
+- Translators leave English `\index{}` keys while translating the visible
+  `\emph{}` — orphan-splits the index. Normalise so the EN∩<lang> index-key
+  intersection is only genuinely-identical terms (argument, basis, ring, …).
+- Dutch `NOT_A_TERM` must use the "X van Y" PHRASE forms (`"stelling van"`,
+  `"formule van"`), never bare nouns — substring matching would filter solid
+  compounds (kettingregel, quotiëntcriterium, hoofdstelling).
+- The index-only harvest needs a space in the term (`" " not in d → skip`), so
+  Dutch solid/hyphenated compounds (Riemannsommen, Gauss-eliminatie) are never
+  harvested — declare each in the config's `EXTRA` → target.
+- Overfull boxes from longer translated prose (no babel FR/NL here): a
+  `\hyphenation{...}` block (with UTF-8 accents) + `\setlength{\emergencystretch}
+  {3em}` in the entry file. Convert `\"o`→`ö` in prose; keep index keys ASCII.
 
 ## Invariants to verify after writing/editing chapters
 

@@ -1,6 +1,17 @@
 # One Math Book
 
+<p align="center">
+  <a href="https://www.one-course.com">
+    <img src="assets/one-course-logo.svg" alt="One Course" width="112" height="112">
+  </a>
+</p>
+
 *The One Math Book to Rule Them All.*
+
+> **One Math Book** is part of the **One Course** project — one coherent
+> course covering mathematics from kindergarten to the end of the bachelor's
+> degree. Discover the whole project at
+> **[www.one-course.com](https://www.one-course.com)**.
 
 A series of mathematics books, written in English for readers anywhere in
 the world (with full **French** and **Dutch** editions of the school
