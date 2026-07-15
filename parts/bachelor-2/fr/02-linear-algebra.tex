@@ -1,0 +1,903 @@
+\chapter{Algèbre linéaire}\label{ch:b2:linalg}
+
+L'\omterm{def:b2:structures:algebra}{algèbre} linéaire du volume de première année travaillait sur $\R$ ou
+$\C$ en dimension finie, et admettait le \omterm{def:b2:linalg:det}{déterminant} général. Ce
+chapitre lève ces trois restrictions~: la théorie est énoncée sur un
+corps quelconque $K$, l'interaction entre un espace et son
+\emph{\omterm{def:b2:linalg:dual}{dual}} est développée systématiquement (\omterm{def:b2:linalg:dual}{bases duales}, \omterm{def:b2:linalg:annihilator}{annulateurs},
+\omterm{def:b2:linalg:transpose}{transposées}), et le \omterm{def:b2:linalg:det}{déterminant} est enfin \emph{construit} à partir des
+formes multilinéaires \omterm{def:b2:linalg:alternating}{alternées} et de la signature du
+\cref{ch:b2:structures} --- soldant chaque admission de première année.
+
+Partout, $K$ est un corps ($\Q$, $\R$, $\C$, ou $\Z/p\Z$ --- la
+théorie ne s'en soucie pas) et, sauf mention contraire, les espaces
+sont de dimension finie sur $K$. Les résultats de première année
+(bases, dimension, théorème du rang, matrices) se transposent mot pour
+mot~: leurs démonstrations n'utilisaient rien d'autre que les axiomes
+de corps.
+
+\section{Espace dual}
+
+\begin{definition}[Espace dual, base duale]\label{def:b2:linalg:dual}
+Le \emph{dual}\index{espace dual} de $E$ est $E^* = \mathcal{L}(E,
+K)$, l'espace des formes linéaires. Si $\mathcal{B} = (e_1, \dots, e_n)$
+est une base de $E$, les \emph{formes coordonnées} $e_1^*, \dots, e_n^*$
+définies par $e_i^*(e_j) = \delta_{ij}$ (Kronecker~: $1$ si $i = j$,
+sinon $0$) forment la \emph{base duale}\index{base duale}
+$\mathcal{B}^*$ de $E^*$~; en particulier $\dim E^* = \dim E$, et
+\[
+x = \sum_{i=1}^{n} e_i^*(x)\, e_i \quad (x \in E),
+\qquad
+\varphi = \sum_{i=1}^{n} \varphi(e_i)\, e_i^* \quad (\varphi \in
+E^*).
+\]
+\end{definition}
+
+\begin{proof}[Démonstration que $\mathcal{B}^*$ est une base]
+Libre~: appliquer une combinaison nulle $\sum \lambda_i e_i^* = 0$ à
+$e_j$ donne $\lambda_j = 0$. Génératrice~: pour $\varphi \in E^*$, la
+forme $\varphi - \sum_i \varphi(e_i) e_i^*$ annule tout $e_j$, donc
+est nulle (une application linéaire s'annulant sur une base est nulle).
+Les deux formules encadrées sont les mêmes calculs lus à l'endroit.
+\end{proof}
+
+\begin{example}\label{ex:b2:linalg:dualexamples}
+Sur $K_n[X]$ avec la base $(1, X, \dots, X^n)$~: la \omterm{def:b2:linalg:dual}{base duale} est $P
+\mapsto \frac{P^{(k)}(0)}{k!}$ (coefficients de Taylor). Une autre base
+du \omterm{def:b2:linalg:dual}{dual}~: les évaluations $P \mapsto P(x_i)$ en $n + 1$ points
+distincts --- sa base «~préduale~» dans $K_n[X]$ est exactement la
+famille des polynômes de Lagrange $L_i$ (volume de première année),
+puisque $L_i(x_j) = \delta_{ij}$. L'interpolation \emph{est} la
+dualité.
+\end{example}
+
+\begin{method}[Bases duale et antéduale en pratique]\label{met:b2:linalg:dualbasis}
+Pour décomposer une forme $\varphi$ sur une base $(e_i)$ de $E$~: les
+coordonnées sont les \emph{valeurs} $\varphi(e_i)$ --- aucun système à
+résoudre. Pour trouver la base $(u_j)$ de $E$ dont la duale est une
+base donnée $(\varphi_1, \dots, \varphi_n)$ de $E^*$ (l'\emph{antéduale})~:
+résoudre les $n$ systèmes linéaires
+\[
+\varphi_i(u_j) = \delta_{ij} \qquad (1 \leq i \leq n),
+\]
+une colonne $u_j$ à la fois~; en termes matriciels, si les lignes de
+$M$ listent les coefficients des $\varphi_i$ dans une base connue de
+$E^*$, les colonnes de $M^{-1}$ sont les $u_j$. L'existence et
+l'unicité de l'antéduale sont démontrées dans le problème du week-end
+de ce chapitre~; le calcul est toujours cette inversion.
+\end{method}
+
+\begin{example}[Une base duale de $\R^2$, entièrement calculée]\label{ex:b2:linalg:dualbasis2d}
+Pour la base $b_1 = (1, 1)$, $b_2 = (1, -1)$ de $\R^2$~: la
+\omterm{def:b2:linalg:dual}{base duale} $(b_1^*, b_2^*)$ doit vérifier $b_i^*(b_j) =
+\delta_{ij}$. En écrivant $b_1^*(x, y) = \alpha x + \beta y$, les
+conditions $\alpha + \beta = 1$ et $\alpha - \beta = 0$ donnent
+\[
+b_1^*(x, y) = \frac{x + y}{2},
+\qquad\text{et de même}\qquad
+b_2^*(x, y) = \frac{x - y}{2} .
+\]
+Vérifications de bon sens~: $b_1^*$ n'est \emph{pas} $e_1^* + e_2^*$
+évalué naïvement --- la \omterm{def:b2:linalg:dual}{base duale} dépend de la base entière, pas de
+chaque vecteur séparément (remplacer $b_2$ par $(0, 1)$ change
+$b_1^*$ en $x \mapsto x$). Et la formule de décomposition marche~:
+$(x, y) = \frac{x+y}2\,b_1 + \frac{x-y}2\,b_2$, la décomposition
+paire/impaire d'un couple --- les \omterm{def:b2:linalg:dual}{bases duales} sont des extracteurs
+de coordonnées, et celle-ci extrait les parties symétrique et
+antisymétrique.
+\end{example}
+
+\begin{definition}[Annulateur]\label{def:b2:linalg:annihilator}
+Pour un sous-espace $F \subseteq E$, l'\emph{annulateur}\index{annulateur} est
+\[
+F^{\circ} = \{\varphi \in E^* : \varphi|_F = 0\},
+\]
+un sous-espace de $E^*$.
+\end{definition}
+
+\begin{theorem}[Dimension de l'annulateur]\label{thm:b2:linalg:annihilator}
+$\dim F^{\circ} = \dim E - \dim F$. De plus $F \mapsto F^\circ$
+renverse les inclusions, et $F$ se retrouve à partir de son \omterm{def:b2:linalg:annihilator}{annulateur}~:
+\[
+F = \{x \in E : \forall\varphi \in F^\circ,\ \varphi(x) = 0\}.
+\]
+Par conséquent tout sous-espace de dimension $p$ en dimension $n$ est
+l'ensemble des solutions de $n - p$ équations linéaires indépendantes
+--- et réciproquement.
+\end{theorem}
+
+\begin{proof}
+Choisir une base $(e_1, \dots, e_p)$ de $F$ complétée en une base de
+$E$. Une forme $\varphi = \sum \varphi(e_i) e_i^*$ annule $F$ ssi
+ses $p$ premiers coefficients s'annulent~: $F^\circ =
+\operatorname{Vect}(e_{p+1}^*, \dots, e_n^*)$, de dimension $n - p$.
+Le renversement des inclusions est immédiat. Pour la reconstitution~: le
+membre de droite contient $F$~; réciproquement, si $x \notin F$,
+compléter une base de $F$ par $x$ et d'autres vecteurs~; la forme
+coordonnée de $x$ dans cette base annule $F$ mais pas $x$. La lecture
+«~équations~» prend une base $(\varphi_1, \dots, \varphi_{n-p})$ de
+$F^\circ$~: alors $F = \bigcap \ker\varphi_j$, une intersection de $n
+- p$ hyperplans indépendants.
+\end{proof}
+
+\begin{example}[Un annulateur, dans les deux sens]\label{ex:b2:linalg:annihilatorwork}
+Soit $F = \operatorname{Vect}\bigl((1, 2, 1),\ (1, 0, -1)\bigr)
+\subseteq \R^3$. Une forme $\varphi = a\,e_1^* + b\,e_2^* + c\,e_3^*$
+annule $F$ ssi
+\[
+a + 2b + c = 0
+\qquad\text{et}\qquad
+a - c = 0 ,
+\]
+c'est-à-dire $c = a$ et $b = -a$~: $F^\circ = \R\,(e_1^* - e_2^* +
+e_3^*)$, de dimension $3 - 2 = 1$ comme
+le~\cref{thm:b2:linalg:annihilator} l'exige. Lu à l'envers~:
+$F = \{(x, y, z) : x - y + z = 0\}$ --- le plan retrouvé comme
+noyau de l'unique forme engendrant $F^\circ$. Passer d'une famille
+génératrice à des équations \emph{est} calculer un \omterm{def:b2:linalg:annihilator}{annulateur}~;
+passer des équations à un paramétrage est calculer un
+préannulateur. (Vérification~: les deux vecteurs générateurs vérifient
+$x - y + z = 0$.)
+\end{example}
+
+\begin{definition}[Application transposée]\label{def:b2:linalg:transpose}
+Pour $u \in \mathcal{L}(E, F)$, la \emph{transposée}\index{application
+transposée} $u^{\mathsf T} \in \mathcal{L}(F^*, E^*)$ est
+\[
+u^{\mathsf T}(\psi) = \psi \circ u .
+\]
+Elle vérifie $(v \circ u)^{\mathsf T} = u^{\mathsf T} \circ v^{\mathsf
+T}$, et dans les \omterm{def:b2:linalg:dual}{bases duales}, la matrice de $u^{\mathsf T}$ est la
+matrice transposée de $u$ --- ce qui \emph{explique} enfin la
+transposée de première année.
+\end{definition}
+
+\begin{example}[La transposée, coefficient par coefficient]\label{ex:b2:linalg:transposework}
+Soit $u \colon \R^2 \to \R^3$ de matrice $A =
+\begin{psmallmatrix} 1 & 2\\ 0 & 1\\ 3 & 0\end{psmallmatrix}$ dans
+les bases canoniques. Pour $\psi = b_1f_1^* + b_2f_2^* + b_3f_3^*
+\in (\R^3)^*$, calculons $u^{\mathsf T}(\psi) = \psi \circ u$ sur
+la base de $\R^2$~:
+\[
+(\psi \circ u)(e_1) = \psi(1, 0, 3) = b_1 + 3b_3,
+\qquad
+(\psi \circ u)(e_2) = \psi(2, 1, 0) = 2b_1 + b_2 .
+\]
+Ainsi $u^{\mathsf T}(\psi) = (b_1 + 3b_3)\,e_1^* + (2b_1 +
+b_2)\,e_2^*$, et dans les \omterm{def:b2:linalg:dual}{bases duales} la matrice de $u^{\mathsf T}$
+est
+\[
+\begin{pmatrix} 1 & 0 & 3\\ 2 & 1 & 0\end{pmatrix}
+= A^{\mathsf T} :
+\]
+la \omterm{def:b2:linalg:transpose}{transposée} abstraite \emph{est} la matrice retournée, sans aucun
+calcul à croire sur parole. Notons le mécanisme~: la
+$j$-ème \emph{colonne} de $A$ est devenue la $j$-ème \emph{ligne} de la
+nouvelle matrice parce que $\psi \circ u$ lit les sorties de $u$ à
+travers les coefficients de $\psi$.
+\end{example}
+
+\begin{proposition}\label{prop:b2:linalg:transposerank}
+$\ker u^{\mathsf T} = (\operatorname{im} u)^{\circ}$ et
+$\operatorname{im} u^{\mathsf T} = (\ker u)^{\circ}$. Par conséquent
+$\operatorname{rk}(u^{\mathsf T}) = \operatorname{rk}(u)$~: le rang par
+lignes égale le rang par colonnes, démontré structurellement.
+\end{proposition}
+
+\begin{proof}
+$\psi \in \ker u^{\mathsf T} \iff \psi \circ u = 0 \iff \psi$ annule
+$\operatorname{im} u$~: la première identité. Pour la seconde~: $u^{\mathsf
+T}(\psi) = \psi \circ u$ annule toujours $\ker u$, donc
+$\operatorname{im} u^{\mathsf T} \subseteq (\ker u)^\circ$~;
+les dimensions coïncident par le théorème du rang et
+le~\cref{thm:b2:linalg:annihilator}~:
+\[
+\operatorname{rk} u^{\mathsf T} = \dim F^* - \dim\ker u^{\mathsf T}
+= \dim F - \bigl(\dim F - \operatorname{rk} u\bigr)
+= \operatorname{rk} u
+= \dim (\ker u)^{\circ} . \qedhere
+\]
+\end{proof}
+
+\begin{example}[Le rang lu des deux côtés]\label{ex:b2:linalg:rankbothsides}
+Soit
+\[
+A = \begin{pmatrix}
+1 & 2 & 0 & 1\\
+0 & 1 & 1 & 1\\
+1 & 3 & 1 & 2
+\end{pmatrix} .
+\]
+\emph{Rang par colonnes~:} la troisième ligne est la somme des deux
+premières, donc $\operatorname{rk} A \leq 2$~; les colonnes $1$ et $2$
+sont libres~: $\operatorname{rk} A = 2$. \emph{Le noyau de la
+\omterm{def:b2:linalg:transpose}{transposée}~:} résoudre $A^{\mathsf T}y = 0$ donne $y \in \R\,(1, 1, -1)$,
+donc $\ker A^{\mathsf T}$ est de dimension $1 = 3 - 2$~: exactement
+$(\operatorname{im} A)^\circ$ sous l'identification de
+$(\R^3)^*$ avec les vecteurs lignes, comme
+la~\cref{prop:b2:linalg:transposerank} l'affirme --- l'unique
+relation «~ligne$_3$ = ligne$_1$ + ligne$_2$~» \emph{est}
+l'\omterm{def:b2:linalg:annihilator}{annulateur} de l'espace des colonnes. Le rang par lignes ($2$ lignes
+libres) et le rang par colonnes coïncident non par hasard mais parce
+que les deux égalent $\operatorname{rk} A = \operatorname{rk} A^{\mathsf T}$.
+\end{example}
+
+\begin{example}[La dualité lit une règle de quadrature]\label{ex:b2:linalg:quadratureread}
+Pourquoi une règle comme celle de Simpson (\cref{exo:b2:linalg:4})
+existe-t-elle et pourquoi est-elle unique~? La dualité répond avant
+tout calcul. Sur $E = \R_2[X]$, l'intégrale $P \mapsto \int_0^1 P$ est
+un vecteur bien précis du \omterm{def:b2:linalg:dual}{dual} $E^*$ de dimension trois~; les
+évaluations en $0$, $\frac12$, $1$ forment une \emph{base} de
+$E^*$~; donc l'intégrale se décompose de manière unique sur elles ---
+cette décomposition \emph{est} la règle de Simpson, coefficients
+inclus. Un décompte de dimensions calibre aussi les attentes~: sur
+$\R_3[X]$, quatre dimensions de formes ne peuvent en général être
+engendrées par trois évaluations, donc l'exactitude sur les cubiques
+n'est pas due par la dualité~; que Simpson intègre malgré tout les
+cubiques exactement est une symétrie en prime (annulation de degré
+impair autour de $\frac12$), à vérifier à la main. Les règles à $n +
+1$ nœuds sont les décompositions de la forme d'intégration dans une
+base d'évaluation de $\R_n[X]^*$~: existence et unicité coûtent un
+théorème de \omterm{def:b2:linalg:dual}{base duale}~; seuls les degrés en prime coûtent du travail.
+\end{example}
+
+\section{Formes multilinéaires alternées}
+
+\begin{definition}\label{def:b2:linalg:alternating}
+Une application $f \colon E^n \to K$ est \emph{$n$-linéaire} quand elle
+est linéaire en chaque variable, et \emph{alternée}\index{forme alternée}
+quand elle s'annule dès que deux arguments sont égaux. Le caractère
+alterné implique le caractère \emph{antisymétrique}~: échanger deux
+arguments change le signe (développer $f(\dots, x + y, \dots, x + y,
+\dots) = 0$)~; plus généralement, pour $\sigma \in \mathfrak{S}_n$,
+\[
+f(x_{\sigma(1)}, \dots, x_{\sigma(n)}) =
+\varepsilon(\sigma)\, f(x_1, \dots, x_n),
+\]
+en décomposant $\sigma$ en \omterm{def:b2:structures:sn}{transpositions}
+(\cref{thm:b2:structures:signature}).
+\end{definition}
+
+\begin{theorem}[Le théorème fondamental des déterminants]\label{thm:b2:linalg:detspace}
+Soit $\dim E = n$ et $\mathcal{B} = (e_1, \dots, e_n)$ une base.
+L'espace des formes $n$-linéaires \omterm{def:b2:linalg:alternating}{alternées} sur $E$ est de dimension
+$1$~: toute telle forme est un multiple de
+\[
+\det{}_{\mathcal{B}}(x_1, \dots, x_n)
+= \sum_{\sigma \in \mathfrak{S}_n} \varepsilon(\sigma)
+\prod_{i=1}^{n} a_{\sigma(i),\,i},
+\qquad
+x_j = \sum_{i} a_{ij} e_i ,
+\]
+et $\det_{\mathcal{B}}$ est l'unique prenant la valeur $1$ sur
+$\mathcal{B}$.\index{déterminant!construction}
+\end{theorem}
+
+\begin{proof}
+Soit $f$ une forme $n$-linéaire \omterm{def:b2:linalg:alternating}{alternée}. En développant chaque
+argument sur $\mathcal{B}$ par multilinéarité,
+\[
+f(x_1, \dots, x_n)
+= \sum_{i_1, \dots, i_n} a_{i_1,1}\cdots a_{i_n,n}\,
+f(e_{i_1}, \dots, e_{i_n}).
+\]
+Les termes avec un indice répété s'annulent (caractère alterné)~; les
+tuples $(i_1, \dots, i_n)$ survivants sont les injectifs, c'est-à-dire
+$i_k = \sigma(k)$ pour une permutation $\sigma$, et l'antisymétrie
+réordonne $f(e_{\sigma(1)}, \dots, e_{\sigma(n)}) = \varepsilon(\sigma)
+f(e_1, \dots, e_n)$. Donc
+\[
+f = f(e_1, \dots, e_n) \cdot \det{}_{\mathcal{B}} :
+\]
+toute \omterm{def:b2:linalg:alternating}{forme alternée} est ce multiple, pourvu que
+$\det_{\mathcal{B}}$ lui-même (la somme encadrée) \emph{soit}
+$n$-linéaire alterné et prenne la valeur $1$ sur $\mathcal B$.
+La multilinéarité est claire (chaque terme est linéaire en chaque
+colonne). Valeur sur $\mathcal B$~: le seul terme non nul est $\sigma =
+\mathrm{id}$. Caractère alterné~: supposons $x_j = x_k$ ($j \neq k$),
+de sorte que les colonnes de coordonnées vérifient $a_{i j} = a_{i k}$
+pour tout $i$. Apparions chaque $\sigma$ avec $\sigma' = \sigma\circ(j\,k)$
+--- une involution sans point fixe sur $\mathfrak{S}_n$. Les
+produits appariés coïncident~:
+\[
+\prod_i a_{\sigma'(i),\,i}
+= a_{\sigma(k),\,j}\; a_{\sigma(j),\,k}
+\prod_{i \neq j,k} a_{\sigma(i),\,i}
+= a_{\sigma(k),\,k}\; a_{\sigma(j),\,j}
+\prod_{i \neq j,k} a_{\sigma(i),\,i}
+= \prod_i a_{\sigma(i),\,i},
+\]
+en utilisant l'égalité des colonnes $j$ et $k$~; tandis que
+$\varepsilon(\sigma') = -\varepsilon(\sigma)$. Chaque paire
+contribue pour zéro~: la somme s'annule.
+\end{proof}
+
+\begin{example}[Sarrus, dérivé et démoli]\label{ex:b2:linalg:sarrus}
+Pour $n = 3$ la formule des permutations a exactement $3! = 6$ termes.
+Lister $\mathfrak{S}_3$ par signature ---
+$\mathrm{id}$, $(1\,2\,3)$, $(1\,3\,2)$ paires~;
+$(1\,2)$, $(1\,3)$, $(2\,3)$ impaires --- donne
+\[
+\det A = a_{11}a_{22}a_{33} + a_{21}a_{32}a_{13} +
+a_{31}a_{12}a_{23}
+- a_{21}a_{12}a_{33} - a_{31}a_{22}a_{13} -
+a_{11}a_{32}a_{23} :
+\]
+précisément la règle des «~diagonales~» de Sarrus enseignée à l'école
+--- désormais un théorème, avec les signes mystérieux identifiés comme
+des signatures. La démolition~: pour $n = 4$ il y a $24$
+permutations, dont seulement $8$ sont ramassées par un quelconque
+schéma de tracé de diagonales~; Sarrus n'a pas de version de degré
+$4$, et le développement par cofacteurs (\cref{thm:b2:linalg:detrules}~(4))
+prend le relais. Compter les termes est aussi un avertissement~: la
+formule des permutations a $n!$ sommands, c'est donc une
+\emph{définition}, pas un algorithme --- le pivot de Gauss calcule
+$\det$ en $O(n^3)$ opérations à la place.
+\end{example}
+
+\begin{definition}[Déterminants]\label{def:b2:linalg:det}
+Le \emph{déterminant d'une famille}\index{déterminant} dans une base
+est $\det_{\mathcal{B}}(x_1, \dots, x_n)$~; le \emph{déterminant d'une
+matrice} $A$ est le déterminant de ses colonnes dans la base canonique
+--- la formule des permutations ci-dessus~; le \emph{déterminant d'un
+endomorphisme} $u$ est le scalaire $\det u$ tel que
+\[
+\det{}_{\mathcal{B}}\bigl(u(x_1), \dots, u(x_n)\bigr)
+= \det u \cdot \det{}_{\mathcal{B}}(x_1, \dots, x_n)
+\quad \text{pour tous } x_i
+\]
+(le membre de gauche est $n$-linéaire alterné, donc un multiple de
+$\det_\mathcal{B}$ par le~\cref{thm:b2:linalg:detspace}~; le facteur ne
+dépend pas de $\mathcal{B}$).
+\end{definition}
+
+\begin{theorem}[Le calcul des déterminants, démontré]\label{thm:b2:linalg:detrules}
+\begin{enumerate}
+  \item $\det(uv) = \det u\,\det v$~; $\;\det(AB) = \det A \det B$.
+  \item $u$ est inversible $\iff \det u \neq 0$~; une famille est une
+        base $\iff$ son \omterm{def:b2:linalg:det}{déterminant} dans une base est non nul.
+  \item $\det(A^{\mathsf T}) = \det A$.
+  \item Le développement par cofacteurs suivant toute ligne ou colonne,
+        tel qu'énoncé dans le volume de première année, est valide~;
+        des matrices semblables partagent leur \omterm{def:b2:linalg:det}{déterminant}.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) Appliquer deux fois la relation de définition~:
+$\det_{\mathcal B}(uv(x_i)) = \det u \cdot \det_{\mathcal
+B}(v(x_i)) = \det u \det v \cdot \det_{\mathcal B}(x_i)$.
+
+(2) Si $u$ est inversible, $\det u \det u^{-1} = \det \mathrm{id} =
+1 \neq 0$. Sinon, les images $u(e_i)$ sont liées~; en exprimant l'une
+par les autres et en développant, $\det_{\mathcal B}(u(e_i)) = 0$
+(le caractère alterné tue les directions répétées), donc $\det u = 0$.
+Le critère de base est le même énoncé pour les familles.
+
+(3) Dans la formule des permutations, réindexer chaque produit par $j =
+\sigma(i)$, c'est-à-dire $i = \tau(j)$ avec $\tau = \sigma^{-1}$~: les
+facteurs sont les mêmes nombres dans un \omterm{def:b2:structures:generated}{ordre} différent, donc
+\[
+\prod_{i=1}^{n} a_{\sigma(i),\,i} = \prod_{j=1}^{n}
+a_{j,\,\tau(j)} ,
+\]
+et $\varepsilon(\tau) = \varepsilon(\sigma)^{-1} =
+\varepsilon(\sigma)$ (les valeurs sont $\pm1$~; $\varepsilon$ est un
+morphisme). Sommer sur $\sigma$ revient à sommer sur $\tau$
+(l'inversion est une bijection de $\mathfrak{S}_n$)~:
+\[
+\det A = \sum_{\tau}\varepsilon(\tau)\prod_j a_{j,\tau(j)}
+= \det(A^{\mathsf T}),
+\]
+la dernière somme étant la formule des permutations appliquée aux
+coefficients transposés $(A^{\mathsf T})_{ij} = a_{ji}$.
+
+(4) Fixer la colonne $j$ et scinder $x_j = \sum_i a_{ij} e_i$ par
+linéarité~: $\det A = \sum_i a_{ij}\, \det(\dots, e_i, \dots)$, et
+déplacer $e_i$ en dernière position ($n - i$ \omterm{def:b2:structures:sn}{transpositions} de lignes,
+$n - j$ de colonnes, via (3)) identifie $\det(\dots, e_i, \dots) =
+(-1)^{i+j}\Delta_{ij}$ au mineur~: exactement la règle des cofacteurs
+de première année. Similitude~: $\det(P^{-1}AP) = \det P^{-1}\det A \det P =
+\det A$ par (1).
+\end{proof}
+
+\begin{example}[Développement par cofacteurs, exécuté]\label{ex:b2:linalg:cofactorwork}
+Calculons
+\[
+\det\begin{pmatrix}
+2 & 1 & 3\\
+0 & 4 & 1\\
+1 & 2 & 0
+\end{pmatrix}
+\]
+suivant la première colonne (deux zéros de paresse~: un seul).
+Les signes suivent le damier $(-1)^{i+j}$~:
+\[
+2\,\det\begin{pmatrix}4 & 1\\ 2 & 0\end{pmatrix}
+- 0
++ 1\cdot\det\begin{pmatrix}1 & 3\\ 4 & 1\end{pmatrix}
+= 2(0 - 2) + (1 - 12) = -15 .
+\]
+Contre-vérification par Sarrus (\cref{ex:b2:linalg:sarrus})~: $0 + 1 + 0
+- 12 - 0 - 4 = -15$. Stratégie, pas doctrine~: développer suivant la
+ligne comptant le plus de zéros, et quand aucune n'en a, en fabriquer
+d'abord par opérations sur les lignes --- une passe d'élimination coûte
+moins que deux couches de cofacteurs.
+\end{example}
+
+\begin{example}[Un déterminant par les règles]\label{ex:b2:linalg:onesmatrix}
+Soit $J \in \mathcal{M}_n(K)$ la matrice de uns et $a \in K$~;
+calculons $\det(aI_n + J)$ avec les outils qui viennent d'être
+démontrés. Chaque colonne de $aI_n + J$ se somme de la même façon~:
+ajouter toutes les lignes à la première (le \omterm{def:b2:linalg:det}{déterminant} est inchangé
+--- ajouter à une ligne un multiple d'une autre ajoute un terme à
+direction répétée, tué par le caractère alterné). La première ligne
+devient $(a + n, a + n, \dots, a + n)$~; factoriser $a + n$ par
+linéarité dans cette ligne, puis soustraire la première colonne à
+toute autre colonne~: il reste une matrice triangulaire de diagonale
+$(1, a, \dots, a)$. Donc
+\[
+\det(aI_n + J) = (a + n)\,a^{\,n-1}.
+\]
+L'éclairage final~: les racines $a = 0$ (multiplicité $n - 1$) et
+$a = -n$ disent que $J$ a la valeur propre $0$ avec multiplicité $n - 1$
+et la valeur propre $n$ une fois --- le spectre de la matrice de rang
+un $J$, un chapitre en avance (le~\cref{ch:b2:reduction} rendra ceci
+systématique).
+\end{example}
+
+\begin{example}[Un déterminant par la formule des permutations]\label{ex:b2:linalg:permexample}
+Pour une matrice avec beaucoup de zéros la formule est praticable par
+elle-même~: dans
+\[
+A = \begin{pmatrix}
+0 & a & 0 & 0\\
+0 & 0 & b & 0\\
+0 & 0 & 0 & c\\
+d & 0 & 0 & 0
+\end{pmatrix},
+\]
+la seule permutation ramassant des coefficients non nuls est le
+$4$-cycle $\sigma = (1\,2\,3\,4)$ envoyant la colonne $1 \to$ ligne $4$,
+etc.~; $\varepsilon(\sigma) = (-1)^3 = -1$, donc $\det A = -abcd$.
+(Vérification via trois échanges de colonnes pour atteindre une matrice
+diagonale.)
+\end{example}
+
+\begin{example}[Un Vandermonde par la formule du produit]\label{ex:b2:linalg:vandermondework}
+Pour les nœuds $0, 1, 2$ (utilisés par des règles de quadrature comme
+celle de l'\cref{exo:b2:linalg:4}), le \omterm{def:b2:linalg:det}{déterminant} de Vandermonde de
+l'\cref{exo:b2:linalg:11} s'évalue d'un coup d'œil~:
+\[
+\det\begin{pmatrix}
+1 & 1 & 1\\
+0 & 1 & 2\\
+0 & 1 & 4
+\end{pmatrix}
+= (1 - 0)(2 - 0)(2 - 1) = 2 ,
+\]
+et par développement direct suivant la première colonne~: $1\cdot(4 - 2)
+= 2$~: accord. La non-annulation pour des nœuds distincts est toute la
+théorie de l'interpolation dans un \omterm{def:b2:linalg:det}{déterminant}~: les formes
+d'évaluation $P \mapsto P(a_i)$ sont une base du \omterm{def:b2:linalg:dual}{dual} exactement quand
+ce \omterm{def:b2:linalg:det}{déterminant} est non nul, c'est-à-dire toujours pour des $a_i$
+distincts --- l'\cref{ex:b2:linalg:dualexamples} quantifié.
+\end{example}
+
+\section{La trace, revisitée}
+
+\begin{proposition}\label{prop:b2:linalg:trace}
+La trace $\operatorname{tr} \colon \mathcal{M}_n(K) \to K$ est
+l'unique forme linéaire avec $\operatorname{tr}(AB) =
+\operatorname{tr}(BA)$ et $\operatorname{tr}(I_n) = n$ (pour
+$\operatorname{char} K = 0$)~; la trace d'un endomorphisme est
+bien définie via toute représentation matricielle, et
+\[
+\operatorname{tr}(u) = \sum_{i} e_i^*\bigl(u(e_i)\bigr)
+\]
+dans toute base --- la dualité écrit la trace sans référence à une base.
+\end{proposition}
+
+\begin{proof}
+$\operatorname{tr}(AB) = \operatorname{tr}(BA)$ et l'invariance par
+changement de base ont été démontrées en première année. Unicité~: une
+forme linéaire $t$ avec $t(AB) = t(BA)$ annule tout commutateur $AB -
+BA$. Nous affirmons que les commutateurs engendrent l'hyperplan de
+trace nulle, de dimension $n^2 - 1$. Deux familles de commutateurs
+suffisent. La règle de multiplication des matrices élémentaires est
+$E_{ab}E_{cd} = \delta_{bc}E_{ad}$. Pour $i \neq j$ elle donne
+\[
+E_{ii}E_{ij} - E_{ij}E_{ii} = E_{ij} - 0 = E_{ij}
+\]
+(le second produit est $E_{ij}E_{ii} = \delta_{ji}E_{ii} = 0$
+puisque $j \neq i$)~: tout $E_{ij}$ hors diagonale est un commutateur.
+Et
+\[
+E_{ij}E_{ji} - E_{ji}E_{ij} = E_{ii} - E_{jj} .
+\]
+Les $E_{ij}$ ($i \neq j$, au nombre de $n^2 - n$) avec les
+$E_{11} - E_{jj}$ ($j \geq 2$, au nombre de $n - 1$) forment $n^2 - 1$
+matrices de trace nulle linéairement indépendantes~: elles engendrent
+l'hyperplan $\ker\operatorname{tr}$. Donc $t$ s'annule là où
+$\operatorname{tr}$ s'annule et se factorise à travers elle~: $t =
+c\operatorname{tr}$~; puis $t(I) = n$ force $c = 1$. La formule
+encadrée~: le $i$-ème coefficient diagonal de la matrice de $u$ est
+précisément $e_i^*(u(e_i))$.
+\end{proof}
+
+\begin{remark}[Pièges courants]\label{rem:b2:linalg:pitfalls}
+(i) Le \omterm{def:b2:linalg:det}{déterminant} est $n$-linéaire en les \emph{colonnes}, pas
+linéaire en la matrice~: $\det(A + B) \neq \det A + \det B$ en
+général, et $\det(\lambda A) = \lambda^n\det A$, pas
+$\lambda\det A$. (ii) La \omterm{def:b2:structures:sn}{transposition} renverse les produits~:
+$(vu)^{\mathsf T} = u^{\mathsf T}v^{\mathsf T}$~; oublier le
+renversement ruine tout calcul impliquant des inverses. (iii)
+L'\omterm{def:b2:linalg:annihilator}{annulateur} $F^\circ$ vit dans $E^*$, pas dans $E$~: il devient le
+familier «~complément orthogonal~» seulement après qu'un produit
+scalaire identifie $E$ à $E^*$ (\cref{ch:b2:quadratic})~; aucune telle
+identification n'est canonique. (iv) «~Le rang par lignes égale le
+rang par colonnes~» ne signifie pas que l'\emph{espace} des lignes égale
+l'espace des colonnes --- les deux vivent dans des espaces différents
+($K^n$ et $K^m$) et sont reliés par la~\cref{prop:b2:linalg:transposerank},
+pas égaux. (v) La formule des permutations est un instrument de
+démonstration~: pour des nombres, utiliser les opérations sur les
+lignes et les cofacteurs (\cref{ex:b2:linalg:sarrus}).
+\end{remark}
+
+\begin{example}[L'accouplement de trace scinde l'espace des matrices]\label{ex:b2:linalg:tracepairing}
+Sur $\mathcal{M}_2(\R)$ avec l'accouplement $\langle A, B\rangle =
+\operatorname{tr}(AB)$ de l'\cref{exo:b2:linalg:9}~: décomposons $M =
+\begin{psmallmatrix}1 & 4\\ 2 & 3\end{psmallmatrix}$ en parties
+symétrique et antisymétrique,
+\[
+M = S + A, \qquad
+S = \tfrac12(M + M^{\mathsf T}) =
+\begin{pmatrix}1 & 3\\ 3 & 3\end{pmatrix},
+\qquad
+A = \tfrac12(M - M^{\mathsf T}) =
+\begin{pmatrix}0 & 1\\ -1 & 0\end{pmatrix}.
+\]
+Alors $\operatorname{tr}(SA) = \operatorname{tr}
+\begin{psmallmatrix}-3 & 1\\ -3 & 3\end{psmallmatrix} = 0$~: les
+deux parties sont «~orthogonales~» pour l'accouplement de trace ---
+une instance du fait général (démontré dans le problème du week-end
+de ce chapitre) que les matrices antisymétriques forment exactement
+l'\omterm{def:b2:linalg:annihilator}{annulateur} des symétriques. La dualité voit la décomposition
+$\mathcal{M}_n = \mathcal{S}_n \oplus
+\mathcal{A}_n$ avant tout choix de produit scalaire.
+\end{example}
+
+\begin{remark}[Perspectives au sein de ce volume]\label{rem:b2:linalg:perspectives}
+Regardez les trois constructions de ce chapitre changer de costume
+plus loin. La \emph{\omterm{def:b2:linalg:transpose}{transposée}} revient dans
+le~\cref{ch:b2:reduction}~: $u$ et $u^{\mathsf T}$ partagent leurs
+valeurs propres avec des multiplicités géométriques égales (le
+problème du week-end de ce chapitre, question 15), ce qui explique
+pourquoi les analyses par lignes et par colonnes d'une matrice ne se
+contredisent jamais. Le \emph{\omterm{def:b2:linalg:det}{déterminant}}
+devient une fonction d'un paramètre dans le~\cref{ch:b2:reduction}
+($\chi_u(X) = \det(X\,\mathrm{id} - u)$) et un jacobien dans
+le~\cref{ch:b2:multint}, où sa multilinéarité se transforme en le
+facteur de changement de variables. La \emph{trace} sème les
+invariants de similitude~: c'est le deuxième coefficient de
+$\chi_u$, la somme des valeurs propres, et à terme l'intégrale
+de la diagonale dans des identités à la manière du~\cref{ch:b2:fourier}.
+Un chapitre d'\omterm{def:b2:structures:algebra}{algèbre} linéaire, trois longues ombres.
+\end{remark}
+
+\begin{remark}[Où ce chapitre est utilisé]
+L'\omterm{def:b2:linalg:dual}{espace dual} n'est pas une abstraction pour elle-même~: \omterm{def:b2:linalg:annihilator}{annulateurs}
+et \omterm{def:b2:linalg:transpose}{transposées} font tourner la théorie de la résolubilité des systèmes
+linéaires (le problème du week-end de ce chapitre démontre l'alternative
+de Fredholm en dimension finie à partir d'eux), des accouplements non
+dégénérés réapparaissent comme la forme polaire dans
+le~\cref{ch:b2:quadratic} et l'adjoint dans
+le~\cref{ch:b2:hermitian}, et le \omterm{def:b2:linalg:det}{déterminant} construit ici alimente
+tout le~\cref{ch:b2:reduction}. Dans le volume de troisième année la
+même dualité, transportée en dimension infinie, devient le théorème de
+représentation de Riesz et la théorie de Fredholm sur les espaces de
+Hilbert --- avec la compacité remplaçant les décomptes de dimension
+utilisés ici.
+\end{remark}
+
+\section{Exercices}
+
+\begin{exercise}[$\star$]\label{exo:b2:linalg:1}
+Dans $\R^3$, soient $\varphi_1(x,y,z) = x + y$, $\varphi_2 = y + z$,
+$\varphi_3 = x + z$. Montrer que $(\varphi_1, \varphi_2, \varphi_3)$
+est une base de $(\R^3)^*$ et trouver la base de $\R^3$ dont elle est
+la duale.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:linalg:2}
+Calculer par la formule des permutations les \omterm{def:b2:linalg:det}{déterminants} de
+\[
+\begin{pmatrix} 0 & 0 & a\\ 0 & b & 0\\ c & 0 & 0 \end{pmatrix},
+\qquad
+\begin{pmatrix}
+a & b & 0 & 0\\
+c & d & 0 & 0\\
+0 & 0 & e & f\\
+0 & 0 & g & h
+\end{pmatrix},
+\]
+et énoncer la règle diagonale par blocs que le second suggère.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:linalg:3}
+Soit $F = \{(x,y,z,t) \in \R^4 : x + y = z + t \text{ et } x = 2y\}$.
+Donner une base de $F^\circ$ et vérifier
+le~\cref{thm:b2:linalg:annihilator} sur les dimensions.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:linalg:4}
+Soient $a_0, \dots, a_n$ des points distincts de $K$ et $\varphi_i \colon
+P \mapsto P(a_i)$ sur $K_n[X]$. Montrer que $(\varphi_0, \dots,
+\varphi_n)$ est une base de $K_n[X]^*$, identifier sa base préduale,
+et décomposer la forme $P \mapsto \int_0^1 P(t)\,\dd t$ (pour $K = \R$,
+$n = 2$, $a_i = 0, \frac12, 1$) dans cette base --- en reconnaissant
+la règle de Simpson.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:linalg:5}
+Soit $u \in \mathcal{L}(E)$ avec $\dim E = n$ et $\operatorname{rk} u
+= 1$. Montrer que $u = \varphi(\cdot)\, a$ pour un vecteur $a$ et une
+forme $\varphi$~; que $\operatorname{tr} u = \varphi(a)$~; et que
+$u^2 = (\operatorname{tr} u)\, u$. En déduire $\det(I + u) = 1 +
+\operatorname{tr} u$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:linalg:6}
+Montrer que tout hyperplan de $\mathcal{M}_n(K)$ ($n \geq 2$)
+contient une matrice inversible. \emph{Indication~: un hyperplan est $\{M :
+\operatorname{tr}(AM) = 0\}$ pour un certain $A \neq 0$
+(\cref{exo:b2:linalg:9}). Si $A$ est scalaire, exhiber une matrice
+inversible de trace nulle~; sinon, trouver un $M$ inversible rendant
+$AM$ de diagonale nulle --- une matrice de type permutation y suffit.}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:linalg:7}
+(Dérivée du \omterm{def:b2:linalg:det}{déterminant}) Pour $A \in \mathcal{M}_n(\R)$, montrer
+à partir de la multilinéarité que
+\[
+\frac{\dd}{\dd t}\Big|_{t=0} \det(I_n + tA) = \operatorname{tr} A ,
+\]
+et en déduire $\det(\eu^{tA}) = \eu^{t\operatorname{tr} A}$ en supposant
+la dérivabilité de $t \mapsto \det(\eu^{tA})$ et la propriété de groupe
+$\eu^{(s+t)A} = \eu^{sA}\eu^{tA}$ (établie dans
+le~\cref{ch:b2:diffeq}).
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:linalg:8}
+(Circulante, $3 \times 3$) Soient $j = \eu^{2\iu\pi/3}$ et
+\[
+C = \begin{pmatrix}
+a & b & c\\
+c & a & b\\
+b & c & a
+\end{pmatrix} \in \mathcal{M}_3(\C).
+\]
+Vérifier que les colonnes de la matrice de Vandermonde de $1, j, j^2$
+sont des vecteurs propres de $C$, et en déduire
+\[
+\det C = (a + b + c)(a + bj + cj^2)(a + bj^2 + cj).
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:linalg:9}
+Montrer que toute forme linéaire $t$ sur $\mathcal{M}_n(K)$ est $M \mapsto
+\operatorname{tr}(AM)$ pour un unique $A$~: l'application $A \mapsto
+\operatorname{tr}(A\,\cdot)$ est un isomorphisme de
+$\mathcal{M}_n(K)$ sur son \omterm{def:b2:linalg:dual}{dual}. En déduire à nouveau l'énoncé
+d'unicité de la~\cref{prop:b2:linalg:trace}.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:linalg:10}
+Soient $u, v \in \mathcal{L}(E)$ avec $u \circ v - v \circ u = u$.
+Montrer que $u$ est nilpotent. \emph{Indication~: montrer que
+$\operatorname{tr}(u^k) = 0$ pour tout $k \geq 1$ (calculer $u^k v -
+v u^k$ par récurrence), puis utiliser le fait suivant, à démontrer via
+les identités de Newton ou par récurrence sur la dimension~: un
+endomorphisme d'un $\C$-espace vectoriel dont toutes les puissances ont
+une trace nulle est nilpotent. Travailler sur $\C$.}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:linalg:11}
+(Vandermonde) Pour $a_0, \dots, a_n \in K$, montrer
+\[
+\det\begin{pmatrix}
+1 & 1 & \cdots & 1\\
+a_0 & a_1 & \cdots & a_n\\
+\vdots & \vdots & & \vdots\\
+a_0^n & a_1^n & \cdots & a_n^n
+\end{pmatrix}
+= \prod_{0 \leq i < j \leq n} (a_j - a_i).
+\]
+\emph{(Voir le \omterm{def:b2:linalg:det}{déterminant} comme un polynôme en $a_n$~: identifier son
+degré, ses racines et son coefficient dominant~; récurrence.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:linalg:12}
+Soient $A, B, C, D \in \mathcal{M}_n(K)$ avec $K$ infini, et
+supposons $CD = DC$. Montrer que
+\[
+\det\begin{pmatrix} A & B\\ C & D\end{pmatrix}
+= \det(AD - BC).
+\]
+\emph{(Traiter d'abord $D$ inversible, en multipliant à droite par
+$\begin{psmallmatrix} I & 0\\ -D^{-1}C & I\end{psmallmatrix}$~;
+puis remplacer $D$ par $D + tI$ et comparer deux polynômes en $t$.)}
+\end{exercise}
+
+\section{Problème~: l'alternative de Fredholm}
+
+Quand le système linéaire $u(x) = b$ a-t-il une solution~? La réponse
+complète est un énoncé de dualité~: \emph{exactement quand $b$ est
+annulé par toute forme linéaire qui annule l'image de
+$u$} --- et ces formes sont calculables, étant le noyau de la
+\omterm{def:b2:linalg:transpose}{transposée}. Ce problème du week-end construit le dictionnaire complet
+de la dualité en dimension finie (factorisation des formes, bidualité,
+calcul des \omterm{def:b2:linalg:annihilator}{annulateurs}, la \omterm{def:b2:linalg:transpose}{transposée}), démontre l'\emph{alternative de
+Fredholm} en dimension finie, et se clôt avec la forme trace et une
+caractérisation~: la trace est le seul invariant linéaire de
+similitude. Partout, $E$ et $F$ sont des $K$-espaces vectoriels de
+dimension finie, $n = \dim E$.
+
+\begin{problem}[{Problème du week-end --- dualité en dimension finie
+et alternative de Fredholm}]
+\label{pb:b2:linalg:1}
+Notation~: pour $S \subseteq E^*$, le \emph{préannulateur} est
+$S_\circ = \{x \in E : \varphi(x) = 0 \text{ pour tout } \varphi
+\in S\}$~; les \omterm{def:b2:linalg:annihilator}{annulateurs} $F^\circ$ et les \omterm{def:b2:linalg:transpose}{transposées} $u^{\mathsf T}$
+sont ceux de la~\cref{def:b2:linalg:annihilator} et de la
+\cref{def:b2:linalg:transpose}.
+
+\medskip
+\noindent\textbf{Partie I --- Le lemme de factorisation.} Soient
+$\varphi_1, \dots, \varphi_p, \varphi \in E^*$.
+\begin{enumerate}
+  \item Soit $\Phi \colon E \to K^p$, $x \mapsto (\varphi_1(x),
+        \dots, \varphi_p(x))$. Identifier $\ker\Phi$, montrer que
+        $\Phi^{\mathsf T}$ envoie les formes coordonnées de $K^p$ sur
+        les $\varphi_i$, et en déduire
+        \[
+        \dim \bigl(\ker\varphi_1 \cap \dots \cap
+        \ker\varphi_p\bigr) = n - \dim
+        \operatorname{Vect}(\varphi_1, \dots, \varphi_p).
+        \]
+  \item (Lemme de factorisation) Démontrer l'équivalence~:
+        \[
+        \varphi \in \operatorname{Vect}(\varphi_1, \dots,
+        \varphi_p)
+        \iff
+        \ker\varphi_1 \cap \dots \cap \ker\varphi_p \subseteq
+        \ker\varphi .
+        \]
+  \item En déduire~: $(\varphi_1, \dots, \varphi_p)$ est libre ssi
+        $\bigcap_i \ker\varphi_i$ est de dimension $n - p$~; et un
+        sous-espace de codimension $p$ est une intersection de $p$
+        hyperplans, jamais moins.
+  \item Dans $\R^4$, soient $\varphi_1 = x + y - z$, $\varphi_2 = y +
+        z - t$, $\psi = x + 2y - t$ et $\psi' = x + y + t$.
+        Décider, par le lemme de factorisation, si $\psi$ et
+        $\psi'$ appartiennent à $\operatorname{Vect}(\varphi_1,
+        \varphi_2)$.
+  \item Sur $E = \R_2[X]$, montrer que $\psi_0 \colon P \mapsto
+        P(0)$, $\psi_1 \colon P \mapsto P(1)$, $\psi_2 \colon P
+        \mapsto \int_0^1 P(t)\dd t$ forment une base de $E^*$,
+        calculer la base $(P_0, P_1, P_2)$ de $E$ dont elle est
+        la duale, et trouver l'unique $P \in \R_2[X]$ avec $P(0)
+        = 1$, $P(1) = 2$, $\int_0^1 P = \frac32$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie II --- Bidualité et calcul des
+\omterm{def:b2:linalg:annihilator}{annulateurs}.}
+\begin{enumerate}[resume]
+  \item Montrer que l'\emph{application d'évaluation} $J \colon E \to
+        E^{**}$, $J(x)(\varphi) = \varphi(x)$, est linéaire et
+        injective, donc un isomorphisme en dimension finie.
+  \item (Double \omterm{def:b2:linalg:annihilator}{annulateur}) Montrer $J(F) = F^{\circ\circ} :=
+        (F^\circ)^\circ$ pour tout sous-espace $F \subseteq E$~: sous
+        l'identification $J$, l'\omterm{def:b2:linalg:annihilator}{annulateur} de l'\omterm{def:b2:linalg:annihilator}{annulateur}
+        est le sous-espace lui-même.
+  \item Démontrer le calcul des \omterm{def:b2:linalg:annihilator}{annulateurs}~: $(F + G)^\circ = F^\circ
+        \cap G^\circ$ et $(F \cap G)^\circ = F^\circ + G^\circ$.
+  \item En déduire (et redémontrer directement)~: deux formes non
+        nulles de même noyau sont proportionnelles.
+  \item (Base antéduale) Montrer que pour toute base $(\varphi_1,
+        \dots, \varphi_n)$ de $E^*$ il existe une unique base
+        $(u_1, \dots, u_n)$ de $E$ avec $\varphi_i(u_j) =
+        \delta_{ij}$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie III --- Le calcul de la \omterm{def:b2:linalg:transpose}{transposée}.}
+\begin{enumerate}[resume]
+  \item Montrer que $u \mapsto u^{\mathsf T}$ est une bijection
+        linéaire de $\mathcal{L}(E, F)$ sur $\mathcal{L}(F^*, E^*)$,
+        et que $(u^{-1})^{\mathsf T} = (u^{\mathsf T})^{-1}$
+        quand $u$ est inversible.
+  \item (Naturalité) Montrer que $u^{\mathsf T\mathsf T} \circ J_E
+        = J_F \circ u$~: sous les isomorphismes d'évaluation, la
+        double \omterm{def:b2:linalg:transpose}{transposée} \emph{est} $u$.
+  \item Montrer~: $u$ est surjective ssi $u^{\mathsf T}$ est injective~;
+        $u$ est injective ssi $u^{\mathsf T}$ est surjective.
+  \item Pour $u \in \mathcal{L}(E)$~: un sous-espace $F$ est stable
+        sous $u$ si et seulement si $F^\circ$ est stable sous
+        $u^{\mathsf T}$.
+  \item Montrer que $\ker(u^{\mathsf T} - \lambda\,
+        \mathrm{id}_{E^*}) = \bigl(\operatorname{im}(u - \lambda\,
+        \mathrm{id}_E)\bigr)^\circ$, et en déduire que $u$ et
+        $u^{\mathsf T}$ ont les mêmes valeurs propres avec les mêmes
+        multiplicités géométriques.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie IV --- L'alternative de Fredholm.}
+\begin{enumerate}[resume]
+  \item Démontrer que $\operatorname{im} u = (\ker u^{\mathsf
+        T})_\circ$ pour $u \in \mathcal{L}(E, F)$, et en déduire
+        l'\emph{alternative de Fredholm} en dimension finie~: l'équation
+        $u(x) = b$ a une solution si et seulement si tout
+        $\psi \in F^*$ avec $u^{\mathsf T}\psi = 0$ vérifie
+        $\psi(b) = 0$.
+  \item Forme matricielle~: pour $A \in \mathcal{M}_{m,n}(K)$ et $b \in
+        K^m$, exactement l'une des propositions suivantes est vraie~: (i) $Ax = b$
+        a une solution~; (ii) il existe $y \in K^m$ avec
+        $A^{\mathsf T}y = 0$ et $y^{\mathsf T}b = 1$. Démontrer à la fois
+        le «~au plus une~» et le «~au moins une~».
+  \item Trouver tous les $b \in \R^3$ pour lesquels le système
+        \[
+        x + y = b_1, \qquad y + z = b_2, \qquad x + 2y + z = b_3
+        \]
+        a une solution, en calculant le noyau de la matrice
+        \omterm{def:b2:linalg:transpose}{transposée}.
+  \item (Un problème de Neumann discret) Sur $E = \R^n$ ($n \geq 3$),
+        définir $L$ par $(Lx)_k = x_k - \frac12(x_{k-1} +
+        x_{k+1})$, indices modulo $n$. Montrer $L^{\mathsf T} = L$
+        (identifications canoniques), montrer que $\ker L$ est la
+        droite des vecteurs constants \emph{(regarder une coordonnée
+        maximale)}, et conclure~: $Lx = b$ est résoluble ssi
+        $\sum_k b_k = 0$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie V --- La forme trace et le théorème
+d'invariance.} Rappelons de l'\cref{exo:b2:linalg:9} que $A \mapsto
+\operatorname{tr}(A\,\cdot)$ identifie $\mathcal{M}_n(K)$ à
+son \omterm{def:b2:linalg:dual}{dual}. On suppose $\operatorname{char} K = 0$ (par exemple $K = \Q, \R,
+\C$).
+\begin{enumerate}[resume]
+  \item Sous cette identification, montrer que l'\omterm{def:b2:linalg:annihilator}{annulateur} du
+        sous-espace $\mathcal{S}_n$ des matrices symétriques est le
+        sous-espace $\mathcal{A}_n$ des matrices antisymétriques, et
+        réciproquement.
+  \item Montrer que l'\omterm{def:b2:linalg:annihilator}{annulateur} de l'hyperplan
+        $\mathfrak{sl}_n = \{M : \operatorname{tr} M = 0\}$ est
+        la droite $K I_n$~; de manière équivalente, une forme linéaire
+        s'annulant sur toutes les matrices de trace nulle est un
+        multiple de la trace.
+  \item Montrer que toute matrice de $\mathcal{M}_n(K)$ est la somme
+        de deux matrices inversibles.
+  \item (La trace est le seul invariant linéaire de similitude) Soit
+        $t$ une forme linéaire sur $\mathcal{M}_n(K)$ avec
+        $t(PMP^{-1}) = t(M)$ pour tout $M$ et tout $P$ inversible.
+        Montrer d'abord $t(PX) = t(XP)$ pour $P$ inversible, puis
+        $t(BX) = t(XB)$ pour \emph{tout} $B$, et conclure $t = c
+        \operatorname{tr}$ pour un certain $c \in K$.
+  \item Montrer que $\operatorname{rk} u \leq r$ si et seulement si $u$
+        est une somme de $r$ applications de rang $\leq 1$, c'est-à-dire $u =
+        \sum_{i=1}^{r} \psi_i(\cdot)\,f_i$ avec $\psi_i \in E^*$,
+        $f_i \in F$~; en déduire $\operatorname{rk}(u + v) \leq
+        \operatorname{rk} u + \operatorname{rk} v$.
+  \item (Synthèse) Dresser le dictionnaire démontré dans ce
+        problème~: sous-espaces contre \omterm{def:b2:linalg:annihilator}{annulateurs}, sommes contre
+        intersections, applications contre \omterm{def:b2:linalg:transpose}{transposées}, résolubilité contre
+        orthogonalité au noyau transposé, trace contre
+        similitude. Pour chaque entrée, citer la question qui l'a
+        démontrée, et énoncer en une phrase ce qui remplace les décomptes
+        de dimension quand la dimension devient infinie (le volume de
+        troisième année le rend précis sur les espaces de Hilbert).
+\end{enumerate}
+\end{problem}

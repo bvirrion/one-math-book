@@ -1,0 +1,992 @@
+\chapter{Probabilités sur les espaces dénombrables}\label{ch:b2:proba}
+
+Les trois derniers chapitres développent la théorie des probabilités
+du programme moderne de MP*~: \omterm{def:b2:proba:space}{mesures de probabilité} sur des \omterm{def:b2:proba:space}{univers}
+\omterm{def:b2:structures:countable}{dénombrables}, variables aléatoires discrètes et \omterm{ex:b2:powerseries:fibonacci}{fonctions génératrices}.
+La théorie finie du volume de lycée acquiert toute son
+infrastructure~: la $\sigma$-additivité remplace l'additivité finie,
+et la machinerie des \omterm{def:b2:series:summable}{familles sommables} du \cref{ch:b2:series} est
+exactement ce qui rend maniables les \omterm{def:b2:proba:space}{univers} infinis. Les résultats
+centraux ici sont la continuité de la probabilité le long des suites
+monotones d'\omterm{def:b2:proba:space}{événements} et le lemme de Borel--Cantelli.
+
+\section{Espaces probabilisés}
+
+\begin{definition}[Espace probabilisé dénombrable]\label{def:b2:proba:space}
+Soit $\Omega$ un ensemble non vide fini ou \omterm{def:b2:structures:countable}{dénombrable} (l'\emph{univers}\index{univers}).
+Une \emph{mesure de probabilité}\index{mesure de probabilité} sur $\Omega$ est
+une application $\P$ de l'ensemble $\mathcal{P}(\Omega)$ de toutes les parties de
+$\Omega$ (les \emph{événements}\index{événement}) dans $[0, 1]$ telle que~:
+\begin{enumerate}
+\item $\P(\Omega) = 1$~;
+\item ($\sigma$-additivité) pour toute suite $(A_n)_{n\in\N}$
+d'événements deux à deux disjoints,
+\[
+\P\Bigl(\,\bigcup_{n \in \N} A_n\Bigr)
+= \sum_{n=0}^{\infty} \P(A_n) .
+\]
+\end{enumerate}
+Le couple $(\Omega, \P)$ est un \emph{espace probabilisé}\index{espace probabilisé} (\omterm{def:b2:structures:countable}{dénombrable}).
+\end{definition}
+
+\begin{remark}
+Sur un $\Omega$ \omterm{def:b2:structures:countable}{dénombrable}, on peut prendre toutes les parties comme
+\omterm{def:b2:proba:space}{événements}~; sur les espaces non \omterm{def:b2:structures:countable}{dénombrables} (comme il en faut pour les
+modèles \omterm{def:b2:metric:continuity}{continus} en Année~3), cela n'est plus possible, et l'on restreint
+$\P$ à une collection convenable d'\omterm{def:b2:proba:space}{événements}, une \emph{$\sigma$-algèbre}.
+Toutes les formules de ce chapitre survivent à cette généralisation
+mot pour mot.
+\end{remark}
+
+\begin{proposition}[Règles élémentaires]\label{prop:b2:proba:rules}
+Pour des \omterm{def:b2:proba:space}{événements} $A, B$ et une \omterm{def:b2:proba:space}{mesure de probabilité} $\P$~:
+$\P(\emptyset) = 0$~; $\P$ est finiment additive~; $\P(A^c) = 1 -
+\P(A)$~; si $A \subseteq B$ alors $\P(A) \leq \P(B)$~; et
+\[
+\P(A \cup B) = \P(A) + \P(B) - \P(A \cap B) .
+\]
+\end{proposition}
+
+\begin{proof}
+En appliquant la $\sigma$-additivité à $A_0 = \Omega$, $A_n = \emptyset$
+($n \geq 1$), on obtient $1 = 1 + \sum_{n\geq1}\P(\emptyset)$, donc
+$\P(\emptyset) = 0$~; compléter une union disjointe finie par des
+ensembles vides donne alors l'additivité finie. Le reste suit comme dans
+le cas fini (volume de lycée)~: $1 = \P(A) + \P(A^c)$ à partir de
+$\Omega = A \sqcup A^c$~; $\P(B) = \P(A) + \P(B \setminus A)
+\geq \P(A)$ lorsque $A \subseteq B$~; et en décomposant en trois
+morceaux disjoints,
+\begin{align*}
+\P(A \cup B) &= \P(A \setminus B) + \P(B \setminus A) +
+\P(A \cap B)\\
+&= \bigl(\P(A) - \P(A\cap B)\bigr) + \bigl(\P(B) - \P(A\cap
+B)\bigr) + \P(A \cap B),
+\end{align*}
+qui est le principe d'inclusion--exclusion~; la version générale à
+$n$ ensembles est l'\cref{exo:b2:proba:4}.
+\end{proof}
+
+\begin{proposition}[Lois sur un espace
+dénombrable]\label{prop:b2:proba:distribution}
+Se donner une \omterm{def:b2:proba:space}{mesure de probabilité} sur un $\Omega =
+\{\omega_0, \omega_1, \dots\}$ \omterm{def:b2:structures:countable}{dénombrable} revient exactement à se donner
+des poids $p_i = \P(\{\omega_i\}) \geq 0$ avec $\sum_i p_i = 1$~; alors pour
+tout $A \subseteq \Omega$,
+\[
+\P(A) = \sum_{\omega \in A} \P(\{\omega\}) ,
+\]
+une sous-somme (\omterm{def:b2:series:def}{absolument} convergente) de la famille $(p_i)$.
+\end{proposition}
+
+\begin{proof}
+Étant donné $\P$, les singletons $\{\omega\}$, $\omega \in A$, forment un
+recouvrement disjoint \omterm{def:b2:structures:countable}{dénombrable} de $A$, de sorte que la
+$\sigma$-additivité impose
+\[
+\P(A) = \sum_{\omega\in A}\P(\{\omega\}),
+\]
+une sous-somme inconditionnelle de la \omterm{def:b2:series:summable}{famille sommable} positive
+$(p_i)$ --- le réarrangement est sans conséquence précisément parce que les
+termes sont positifs (\cref{ch:b2:series})~; en particulier
+$\sum_ip_i = \P(\Omega) = 1$.
+Réciproquement, étant donné des poids positifs de somme totale $1$, on
+définit $\P(A) = \sum_{\omega \in A}p_\omega$~: la famille est \omterm{def:b2:series:summable}{sommable}, et
+la $\sigma$-additivité est exactement le théorème de sommation par paquets
+du \cref{ch:b2:series} appliqué à la partition de $\bigcup A_n$
+en les $A_n$.
+\end{proof}
+
+\begin{example}[Modèle géométrique~: l'attente du premier
+pile]\label{ex:b2:proba:geometric}
+On lance répétées une pièce de probabilité de pile $p \in \intoo{0}{1}$,
+et l'on pose $\Omega = \N^* \cup \{\infty\}$ pour enregistrer le rang du
+premier pile. Les poids naturels sont
+\[
+\P(\{k\}) = (1 - p)^{k-1}p
+\quad (k \in \N^*),
+\qquad
+\P(\{\infty\}) = 0 ,
+\]
+une \omterm{def:b2:proba:space}{mesure de probabilité} puisque $\sum_{k\geq1}(1-p)^{k-1}p =
+\frac{p}{1 - (1-p)} = 1$~: avec probabilité $1$ le jeu se termine ---
+mais l'\omterm{def:b2:proba:space}{univers} doit tout de même contenir la possibilité qu'il ne se
+termine pas. L'additivité \omterm{def:b2:structures:countable}{dénombrable} est ce qui nous permet d'affirmer
+$\P(\text{le jeu se termine}) = \sum_k \P(\{k\})$.
+\end{example}
+
+\begin{theorem}[Continuité monotone]\label{thm:b2:proba:continuity}
+Soit $(A_n)$ une suite d'\omterm{def:b2:proba:space}{événements}.
+\begin{enumerate}
+\item Si $A_n \subseteq A_{n+1}$ pour tout $n$
+(\emph{croissante}), alors
+$\P\bigl(\bigcup_n A_n\bigr) = \lim_{n\to\infty} \P(A_n)$.
+\item Si $A_n \supseteq A_{n+1}$ pour tout $n$
+(\emph{décroissante}), alors
+$\P\bigl(\bigcap_n A_n\bigr) = \lim_{n\to\infty} \P(A_n)$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\emph{1.} Disjonction~: posons $B_0 = A_0$ et $B_n = A_n \setminus
+A_{n-1}$. Les $B_n$ sont deux à deux disjoints avec $\bigcup_{k \leq n}
+B_k = A_n$ et $\bigcup_n B_n = \bigcup_n A_n$. Par
+$\sigma$-additivité et additivité finie,
+\[
+\P\Bigl(\bigcup_n A_n\Bigr)
+= \sum_{n=0}^\infty \P(B_n)
+= \lim_{N\to\infty}\sum_{n=0}^N \P(B_n)
+= \lim_{N\to\infty}\P(A_N) .
+\]
+\emph{2.} On passe aux complémentaires~: $(A_n^c)$ est croissante d'union
+$\bigl(\bigcap A_n\bigr)^c$, et l'on applique la partie~1~:
+$1 - \P(\bigcap A_n) = \lim (1 - \P(A_n))$.
+\end{proof}
+
+\begin{corollary}[Sous-additivité dénombrable]\label{cor:b2:proba:subadd}
+Pour toute suite d'\omterm{def:b2:proba:space}{événements}, $\P\bigl(\bigcup_n A_n\bigr) \leq
+\sum_{n=0}^\infty \P(A_n)$.
+\end{corollary}
+
+\begin{proof}
+La sous-additivité finie $\P(A_0 \cup \dots \cup A_N) \leq
+\sum_0^N \P(A_n)$ découle de l'inclusion--exclusion par récurrence
+(ou de l'additivité sur les $B_n \subseteq A_n$ disjonctés).
+Faisons $N \to \infty$~: le membre de gauche \omterm{def:b2:integration:improper}{converge} vers
+$\P(\bigcup_n A_n)$ par continuité monotone appliquée à la suite
+croissante $C_N = A_0 \cup \dots \cup A_N$.
+\end{proof}
+
+\begin{example}[La borne de l'union~: grossière mais
+indestructible]\label{ex:b2:proba:unionbound}
+La sous-additivité avec un nombre fini d'\omterm{def:b2:proba:space}{événements} --- la \emph{borne de
+l'union} --- échange la précision contre l'universalité. Pour le
+problème des anniversaires avec $23$ personnes, borner la probabilité de
+collision par la somme sur les paires donne
+\[
+\P(\text{collision}) \leq \binom{23}2\cdot\frac1{365}
+= \frac{253}{365} \approx 0.693 ,
+\]
+contre la vraie valeur $0.507$~: éloignée d'une large marge, car les
+collisions se recouvrent. Pourtant la borne ne requiert \emph{aucune}
+indépendance, aucune loi jointe, rien d'autre que les probabilités des
+paires --- c'est pourquoi, dans le devoir du week-end et tout au long du
+\cref{ch:b2:randomvar}, la borne de l'union est le premier outil
+dégainé~: lorsqu'elle se trouve être petite, l'affaire est réglée sans
+autre modélisation.
+\end{example}
+
+\begin{example}[Un six finit par sortir]\label{ex:b2:proba:sixeventually}
+Lançons un dé équilibré indéfiniment et posons $B_n = {}$«~au moins un six
+parmi les $n$ premiers lancers~», une suite croissante d'\omterm{def:b2:proba:space}{événements}
+avec $\P(B_n) = 1 - (5/6)^n$. La continuité monotone donne
+\[
+\P(\text{un six finit par apparaître})
+= \P\Bigl(\bigcup_nB_n\Bigr)
+= \lim_n\bigl(1 - (5/6)^n\bigr) = 1 .
+\]
+Le point n'est pas la limite (évidente) mais l'étape logique~:
+«~finir par~» est un \omterm{def:b2:proba:space}{événement} portant sur \emph{une infinité} de
+lancers, hors de portée de l'additivité finie, et la continuité
+monotone --- c'est-à-dire la $\sigma$-additivité --- est précisément
+l'axiome qui lui attribue une probabilité. Tout énoncé presque sûr dans
+la suite de ce livre passe par cette même porte étroite.
+\end{example}
+
+\section{Conditionnement et indépendance}
+
+\begin{definition}[Probabilité conditionnelle]\label{def:b2:proba:conditional}
+Pour des \omterm{def:b2:proba:space}{événements} $A, B$ avec $\P(B) > 0$, la \emph{probabilité
+conditionnelle}\index{probabilité conditionnelle} de $A$ sachant $B$ est
+\[
+\P(A \mid B) = \frac{\P(A \cap B)}{\P(B)} .
+\]
+L'application $A \mapsto \P(A \mid B)$ est elle-même une \omterm{def:b2:proba:space}{mesure de
+probabilité} sur $\Omega$.
+\end{definition}
+
+\begin{remark}
+Que $A \mapsto \pcond BA$ soit à nouveau une \omterm{def:b2:proba:space}{mesure de probabilité}
+mérite un instant~: $\pcond B\Omega = 1$ et la $\sigma$-additivité
+passent au quotient parce que l'intersection avec $B$
+respecte les unions disjointes. La conséquence pratique~: toute
+identité de ce chapitre --- inclusion--exclusion, continuité
+monotone, Borel--Cantelli --- peut s'appliquer \emph{après}
+conditionnement, sans nouvelles démonstrations. Les probabilistes
+«~travaillent sous $\pcond B{\cdot}$~» constamment pour exactement cette
+raison.
+\end{remark}
+
+\begin{example}[Le conditionnement peut créer de
+l'uniformité]\label{ex:b2:proba:sumseven}
+Lançons deux dés équilibrés et conditionnons par le fait que la somme
+vaut $7$~: pour chaque $k \in \intint16$,
+\[
+\pcond{\{S = 7\}}{X = k}
+= \frac{\P(X = k,\ Y = 7 - k)}{\P(S = 7)}
+= \frac{1/36}{6/36} = \frac16 :
+\]
+sachant une somme de $7$, le premier dé est exactement uniforme ---
+$7$ est le seul total compatible avec chaque face, de sorte que le
+conditionnement efface toute information sur $X$. Tout autre total
+biaise la loi (sachant $S = 4$, le premier dé est uniforme
+sur $\{1, 2, 3\}$ seulement). Calculer une loi conditionnelle revient à
+renormaliser les poids joints le long de l'\omterm{def:b2:proba:space}{événement} de
+conditionnement, rien de plus.
+\end{example}
+
+\begin{example}[Le second tirage vaut le
+premier]\label{ex:b2:proba:seconddraw}
+Une urne contient $3$ boules blanches et $2$ noires~; on tire deux boules
+sans remise. Tout le monde s'accorde sur $\P(W_1) = \frac35$~; que vaut
+$\P(W_2)$~? Probabilité totale le long du premier tirage~:
+\[
+\P(W_2) = \pcond{W_1}{W_2}\,\P(W_1) +
+\pcond{B_1}{W_2}\,\P(B_1)
+= \frac24\cdot\frac35 + \frac34\cdot\frac25
+= \frac{12}{20} = \frac35 :
+\]
+exactement $\P(W_1)$. Aucun calcul n'était nécessaire~: par symétrie,
+chaque boule a la même probabilité d'être la seconde tirée, de sorte que
+le second tirage --- \emph{inconditionnellement} --- a la même
+loi que le premier. Conditionner par le premier résultat change
+les cotes~; l'ignorer ne les change pas. Cet argument
+d'échangeabilité revient au chapitre suivant pour l'échantillonnage sans
+remise, où il donne la moyenne hypergéométrique $np$
+sans aucune identité binomiale.
+\end{example}
+
+\begin{theorem}[Probabilités composées, probabilités totales,
+Bayes]\label{thm:b2:proba:bayes}
+\leavevmode
+\begin{enumerate}
+\item (Règle des probabilités composées) Si $\P(A_1 \cap \dots \cap A_{n-1}) > 0$,
+\[
+\P(A_1 \cap \dots \cap A_n)
+= \P(A_1)\,\P(A_2 \mid A_1)\cdots
+\P(A_n \mid A_1 \cap \dots \cap A_{n-1}) .
+\]
+\item (Probabilités totales) Si $(B_i)_{i \in I}$ est une partition finie ou
+\omterm{def:b2:structures:countable}{dénombrable} de $\Omega$ avec $\P(B_i) > 0$, alors pour tout
+\omterm{def:b2:proba:space}{événement} $A$~:
+\[
+\P(A) = \sum_{i \in I} \P(A \mid B_i)\,\P(B_i) .
+\]
+\item (Bayes) Sous les mêmes hypothèses, si de plus $\P(A) > 0$~:
+\[
+\P(B_j \mid A)
+= \frac{\P(A \mid B_j)\,\P(B_j)}
+       {\sum_{i \in I} \P(A \mid B_i)\,\P(B_i)} .
+\]
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\emph{1.} Écrivons chaque \omterm{def:b2:proba:conditional}{probabilité conditionnelle} comme un quotient~:
+le membre de droite vaut
+\[
+\P(A_1)\cdot\frac{\P(A_1 \cap A_2)}{\P(A_1)}\cdot
+\frac{\P(A_1 \cap A_2 \cap A_3)}{\P(A_1 \cap A_2)}\cdots
+\frac{\P(A_1 \cap \dots \cap A_n)}{\P(A_1 \cap \dots \cap
+A_{n-1})},
+\]
+un produit télescopique~: chaque dénominateur simplifie le numérateur
+précédent, laissant $\P(A_1 \cap \dots \cap A_n)$.
+Tous les dénominateurs sont $\geq \P(A_1 \cap \dots \cap A_{n-1}) >
+0$ par monotonie, de sorte que rien ne s'annule. (L'hypothèse
+garde exactement cela~: conditionner par un \omterm{def:b2:proba:space}{événement} de probabilité
+nulle n'a pas de sens.)
+\emph{2.} Les ensembles $A \cap B_i$ sont deux à deux disjoints d'union
+$A$~; on applique la ($\sigma$-)additivité et la définition du
+conditionnement.
+\emph{3.} Les deux membres de $\P(B_j \mid A)\P(A) = \P(A \mid
+B_j)\P(B_j)$ valent $\P(A \cap B_j)$~; on divise par $\P(A)$ et on
+développe $\P(A)$ par les probabilités totales.
+\end{proof}
+
+\begin{example}[La collision d'anniversaires, par la règle des
+probabilités composées]\label{ex:b2:proba:birthday}
+Avec $n$ personnes dont les anniversaires sont \omterm{def:b2:proba:independence}{indépendants} et uniformes
+sur $365$ jours, posons $D_n = {}$«~les $n$ anniversaires sont tous distincts~».
+En conditionnant personne par personne (règle des probabilités composées)~:
+\[
+\P(D_n) = \prod_{k=1}^{n-1}\Bigl(1 - \frac{k}{365}\Bigr),
+\]
+chaque nouvelle personne devant éviter les $k$ jours déjà pris.
+Pour $n = 23$~: $\P(D_{23}) \approx 0.493$ --- un
+anniversaire partagé est déjà plus probable qu'improbable. L'heuristique qui
+explique la petitesse de $23$~: en prenant les logarithmes, $-\ln
+\P(D_n) \approx \sum_{k<n}\frac k{365} =
+\frac{\binom n2}{365}$, et $\binom{23}2 = 253$ donne
+$253/365 \approx 0.693 \approx \ln 2$. Ce qui importe, c'est le
+nombre de \emph{paires}, qui croît quadratiquement~: les problèmes de
+collision vivent à l'échelle $n \sim \sqrt{365}$, non $n \sim
+365$ --- le paradoxe des anniversaires est une racine carrée déguisée.
+\end{example}
+
+\begin{example}[Monty Hall, par Bayes]\label{ex:b2:proba:montyhall}
+Un prix se cache derrière l'une de trois portes, \omterm{def:b2:funcseq:def}{uniformément}. Vous choisissez
+la porte $1$~; l'animateur, qui sait où est le prix, ouvre l'une des
+autres portes, toujours vide (en choisissant \omterm{def:b2:funcseq:def}{uniformément} lorsqu'il a le
+choix), disons la porte $3$. Posons $B_i = {}$«~le prix est derrière la porte
+$i$~» et $A = {}$«~l'animateur ouvre la porte $3$~». Alors
+$\pcond{B_1}{A} = \frac12$, $\pcond{B_2}{A} = 1$,
+$\pcond{B_3}{A} = 0$, de sorte que par Bayes
+(\cref{thm:b2:proba:bayes}),
+\[
+\P(B_2 \mid A)
+= \frac{1\cdot\frac13}
+{\frac12\cdot\frac13 + 1\cdot\frac13 + 0\cdot\frac13}
+= \frac23 :
+\]
+changer de porte fait gagner deux fois sur trois. Le calcul
+localise exactement la confusion populaire~: le geste de l'animateur est
+\emph{informatif} (il ne pourrait pas ouvrir la porte $2$ si le prix
+s'y trouvait), et la formule de Bayes est le dispositif comptable
+qui convertit cette asymétrie en le $\frac23$. Conditionner
+par «~ce qui a été vu~» plutôt que par «~ce qui est vrai~» est tout
+l'art de la formule.
+\end{example}
+
+\begin{example}[Les deux paris du Chevalier de
+Méré]\label{ex:b2:proba:demere}
+Deux paris du dix-septième siècle, réglés par l'indépendance. Pari
+un~: au moins un six en $4$ lancers d'un dé,
+\[
+\P = 1 - \Bigl(\frac56\Bigr)^{\!4} \approx 0.518 > \frac12 .
+\]
+Pari deux~: au moins un double-six en $24$ lancers de deux dés,
+\[
+\P = 1 - \Bigl(\frac{35}{36}\Bigr)^{\!24} \approx 0.491 <
+\frac12 .
+\]
+De Méré raisonnait que $24$ lancers à chance $\frac1{36}$
+devaient égaler $4$ lancers à chance $\frac16$ (même rapport
+$\frac{24}{36} = \frac46$)~; l'échec de cette
+proportionnalité --- les probabilités d'unions ne varient pas
+linéairement --- aurait, dit-on, motivé sa lettre à Pascal,
+et par là la naissance de la théorie des probabilités. La comparaison
+correcte se fait par les logarithmes~: $n$ essais à chance $p$
+réussissent au moins une fois avec probabilité $1 - (1-p)^n \approx
+1 - \eu^{-np}$, de sorte que l'invariant honnête est $np$~: ici
+$4\cdot\frac16 = \frac23$ contre $24\cdot\frac1{36} =
+\frac23$ --- égaux~! Les deux paris ne diffèrent qu'au second
+\omterm{def:b2:structures:generated}{ordre} en $p$, et juste assez pour faire passer l'un de part et d'autre de
+la ligne des cinquante pour cent~: les petites probabilités sont un domaine où
+l'intuition a besoin de l'exponentielle, non de la règle graduée.
+\end{example}
+
+\begin{remark}[Erreurs courantes de conditionnement]
+Trois confusions récurrentes, toutes visibles dans les exemples
+ci-dessus. (i) \emph{Inversion}~: $\pcond BA$ et $\pcond AB$
+diffèrent du facteur $\P(A)/\P(B)$ --- un test
+$99\%$ exact sur les malades peut tout de même laisser un patient positif
+presque certainement en bonne santé lorsque la maladie est rare
+(\cref{exo:b2:proba:3})~; citer $\pcond{\text{malade}}{
+\text{positif}}$ là où $\pcond{\text{positif}}{
+\text{malade}}$ est visé est l'erreur du taux de base. (ii)
+\emph{Conditionner par le mauvais \omterm{def:b2:proba:space}{événement}}~: dans Monty Hall, le
+bon \omterm{def:b2:proba:space}{événement} de conditionnement est «~l'animateur a \omterm{def:b2:metric:topology}{ouvert} la porte $3$~»,
+et non «~le prix n'est pas derrière la porte $3$~»~; les deux portent
+des informations différentes, et tout le $\frac23$ repose sur cette
+différence. (iii) \emph{Disjoint contre indépendant}~:
+des \omterm{def:b2:proba:space}{événements} disjoints de probabilité positive ne sont jamais
+\omterm{def:b2:proba:independence}{indépendants} ($\P(A\cap B) = 0 \neq \P(A)\P(B)$) ---
+l'indépendance est une compatibilité d'information, non l'absence de
+recouvrement.
+\end{remark}
+
+\begin{definition}[Indépendance]\label{def:b2:proba:independence}
+Deux \omterm{def:b2:proba:space}{événements} $A$ et $B$ sont \emph{indépendants}\index{événements indépendants} si $\P(A \cap B) =
+\P(A)\P(B)$. Une famille $(A_i)_{i \in I}$ d'\omterm{def:b2:proba:space}{événements} est
+\emph{(mutuellement) indépendante} si pour toute partie finie $J
+\subseteq I$,
+\[
+\P\Bigl(\bigcap_{i \in J} A_i\Bigr)
+= \prod_{i \in J} \P(A_i) .
+\]
+\end{definition}
+
+\begin{remark}
+L'indépendance mutuelle est strictement plus forte que l'indépendance deux à
+deux~: avec deux lancers de pièce équilibrée, les \omterm{def:b2:proba:space}{événements} «~le premier est
+pile~», «~le second est pile~», «~les deux coïncident~» sont deux à deux
+\omterm{def:b2:proba:independence}{indépendants} (chaque paire a une probabilité d'intersection $\frac14 =
+\frac12\cdot\frac12$), pourtant l'intersection triple a une probabilité
+$\frac14 \neq \frac18$. Notons aussi que si $A, B$ sont \omterm{def:b2:proba:independence}{indépendants},
+alors $A, B^c$ le sont aussi (calcul~: $\P(A \cap B^c) = \P(A) - \P(A\cap B) =
+\P(A)(1 - \P(B))$), donc aussi $A^c, B^c$.
+\end{remark}
+
+\begin{example}[Indépendance lue sur une structure de
+produit]\label{ex:b2:proba:productindep}
+Lançons deux dés équilibrés~: $\Omega = \intint16^2$ avec des poids
+uniformes. Posons $A = {}$«~premier dé pair~» et $B = {}$«~second
+dé au moins $5$~». Dénombrement~: $\abs A = 3\cdot6 = 18$,
+$\abs B = 6\cdot2 = 12$, $\abs{A\cap B} = 3\cdot2 = 6$, de sorte que
+\[
+\P(A\cap B) = \frac6{36} = \frac{18}{36}\cdot\frac{12}{36} =
+\P(A)\,\P(B) :
+\]
+\omterm{def:b2:proba:independence}{indépendants}, et le mécanisme est visible --- $A$ ne contraint
+que la première coordonnée, $B$ que la seconde, et la mesure
+uniforme sur un ensemble produit fait multiplier les dénombrements par
+coordonnée. Toute affirmation du type «~des \omterm{def:b2:proba:space}{événements} dépendant de
+groupes disjoints de lancers sont \omterm{def:b2:proba:independence}{indépendants}~» (utilisée massivement
+dans le devoir du week-end) est ce calcul, avec davantage
+d'indices.
+\end{example}
+
+\begin{example}[Analyse au premier pas]\label{ex:b2:proba:firststep}
+Pour le modèle géométrique de l'\cref{ex:b2:proba:geometric},
+quelle est la probabilité $u$ que le premier pile tombe à un rang
+\emph{pair}~? Conditionnons par le premier lancer~: avec probabilité
+$p$ le rang est $1$ (impair)~; avec probabilité $q = 1 - p$ le
+jeu recommence avec toutes les parités inversées, de sorte que
+\[
+u = p\cdot0 + q\,(1 - u)
+\qquad\Longrightarrow\qquad
+u = \frac{q}{1 + q} .
+\]
+Une ligne, aucune série --- et cela concorde avec la sommation
+directe de l'\cref{exo:b2:proba:9}, qui donne $1 - u =
+\frac1{1+q}$. Cette technique «~au premier pas~» (conditionner par
+la première expérience, reconnaître une copie décalée du
+problème) est la forme probabiliste d'une récurrence, et elle est
+le moteur des équations de durée de jeu de
+l'\cref{exo:b2:proba:6} et des calculs de premier passage du
+devoir du week-end.
+\end{example}
+
+\section{Le lemme de Borel--Cantelli}
+
+\begin{definition}[Limite supérieure d'événements]\label{def:b2:proba:limsup}
+Pour une suite $(A_n)$ d'\omterm{def:b2:proba:space}{événements}, l'\omterm{def:b2:proba:space}{événement}
+\[
+\limsup_n A_n
+= \bigcap_{N=0}^{\infty}\ \bigcup_{n \geq N} A_n
+= \{\omega \in \Omega : \omega \in A_n
+\text{ pour une infinité de } n\}
+\]
+est l'\omterm{def:b2:proba:space}{événement} «~$A_n$ se produit une infinité de fois~».
+\end{definition}
+
+\begin{example}[Traduire «~une infinité de fois~» et
+«~à partir d'un certain rang~»]\label{ex:b2:proba:limsuplang}
+Le complémentaire de $\limsup_nA_n$ est, par de Morgan,
+\[
+\Bigl(\bigcap_N\bigcup_{n\geq N}A_n\Bigr)^{\!c}
+= \bigcup_N\bigcap_{n\geq N}A_n^c
+= \{\omega : \omega \notin A_n \text{ pour tout $n$ assez grand}\},
+\]
+l'\omterm{def:b2:proba:space}{événement} «~\emph{à partir d'un certain rang}, $A_n$ échoue~» (noté
+$\liminf_nA_n^c$). Ainsi «~$A_n$ une infinité de fois~» et
+«~$A_n^c$ à partir d'un certain rang~» sont complémentaires --- garder ce
+dictionnaire au clair prévient la plupart des accidents de quantificateurs.
+Traductions types pour le lancer de pièce~: «~une infinité de
+piles~» est $\limsup\{X_n = H\}$~; «~seulement un nombre fini de suites
+de $100$ piles~» est le complémentaire d'une limsup~; «~la
+fréquence courante \omterm{def:b2:integration:improper}{converge} vers $\frac12$~» est
+$\bigcap_j\bigcup_N\bigcap_{n\geq N}\{\abs{\widehat p_n -
+\tfrac12} < \tfrac1j\}$ --- des opérations \omterm{def:b2:structures:countable}{dénombrables} partout,
+donc toutes celles-ci sont d'honnêtes \omterm{def:b2:proba:space}{événements}.
+\end{example}
+
+\begin{theorem}[Borel--Cantelli]\label{thm:b2:proba:borelcantelli}
+\leavevmode
+\begin{enumerate}
+\item Si $\sum_{n} \P(A_n) < \infty$, alors
+$\P\bigl(\limsup_n A_n\bigr) = 0$.
+\item Si les \omterm{def:b2:proba:space}{événements} $A_n$ sont \omterm{def:b2:proba:independence}{indépendants} et $\sum_n \P(A_n) =
+\infty$, alors $\P\bigl(\limsup_n A_n\bigr) = 1$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\emph{1.} Posons $C_N = \bigcup_{n \geq N}A_n$~; la suite $(C_N)$
+est décroissante d'intersection $\limsup A_n$, et par sous-additivité
+\omterm{def:b2:structures:countable}{dénombrable} (\cref{cor:b2:proba:subadd})
+\[
+\P(C_N) \leq \sum_{n \geq N}\P(A_n)
+\xrightarrow[N\to\infty]{} 0
+\]
+(reste d'une série convergente). La continuité monotone
+(\cref{thm:b2:proba:continuity}) conclut~: $\P(\limsup A_n) =
+\lim_N \P(C_N) = 0$.
+
+\emph{2.} Il suffit de montrer $\P\bigl(\bigcup_{n\geq N}A_n\bigr)
+= 1$ pour tout $N$~: en effet, si des \omterm{def:b2:proba:space}{événements} $B_N$ ont tous
+probabilité $1$, alors
+\[
+\P\Bigl(\Bigl(\bigcap_NB_N\Bigr)^{\!c}\Bigr)
+= \P\Bigl(\bigcup_NB_N^c\Bigr)
+\leq \sum_N\P(B_N^c) = 0
+\]
+par sous-additivité \omterm{def:b2:structures:countable}{dénombrable}
+(\cref{cor:b2:proba:subadd}), de sorte que l'intersection \omterm{def:b2:structures:countable}{dénombrable}
+$\limsup A_n = \bigcap_N\bigcup_{n\geq N}A_n$ a encore
+probabilité $1$. Fixons $N$, et considérons pour $M > N$ le
+complémentaire~:
+\[
+\P\Bigl(\bigcap_{n=N}^{M} A_n^c\Bigr)
+= \prod_{n=N}^{M}\bigl(1 - \P(A_n)\bigr)
+\leq \prod_{n=N}^{M} e^{-\P(A_n)}
+= \exp\Bigl(-\sum_{n=N}^M \P(A_n)\Bigr) ,
+\]
+en utilisant l'indépendance des complémentaires et la borne de convexité $1 -
+x \leq e^{-x}$. Lorsque $M \to \infty$ l'exposant tend vers $-\infty$
+par divergence de la série, de sorte que par continuité monotone
+(suite décroissante) $\P\bigl(\bigcap_{n \geq N}A_n^c\bigr) = 0$,
+c'est-à-dire $\P\bigl(\bigcup_{n \geq N}A_n\bigr) = 1$.
+\end{proof}
+
+\begin{example}[Suites infinies de piles]\label{ex:b2:proba:runs}
+Lançons une pièce équilibrée indéfiniment, et soit $A_n$ l'\omterm{def:b2:proba:space}{événement} «~les lancers $n,
+n+1, \dots, n + k - 1$ sont tous piles~» (une suite de $k$ piles
+commençant à l'instant $n$), pour $k$ fixé. Les \omterm{def:b2:proba:space}{événements} $A_{jk}$ ($j =
+1, 2, \dots$), dépendant de blocs disjoints de lancers, sont
+\omterm{def:b2:proba:independence}{indépendants}, chacun de probabilité $2^{-k}$, et $\sum_j 2^{-k} =
+\infty$~: par Borel--Cantelli~2, avec probabilité $1$ une infinité
+de blocs sont tout-piles --- \emph{tout} motif fixé se reproduit
+une infinité de fois, presque sûrement. Réciproquement, si l'on laisse la \omterm{def:b2:curves:length}{longueur}
+de la suite croître, $B_n = {}$«~une suite de $2\log_2 n$ piles commence à
+$n$~» a $\P(B_n) = n^{-2}$ \omterm{def:b2:series:summable}{sommable}, de sorte que presque sûrement seul un
+nombre fini de telles longues suites commencent~: Borel--Cantelli calibre
+précisément \emph{quelle \omterm{def:b2:curves:length}{longueur}} ont les plus longues suites.
+\end{example}
+
+\begin{example}[Le singe infini, quantifié]
+Un singe tape des lettres uniformes indépendantes d'un
+alphabet de $26$ lettres. Découpons le texte tapé en blocs disjoints
+de quatre lettres~; les \omterm{def:b2:proba:space}{événements} $A_j = {}$«~le bloc $j$ épelle
+MATH~» sont \omterm{def:b2:proba:independence}{indépendants} avec $\P(A_j) = 26^{-4}$, et
+$\sum_j\P(A_j) = \infty$~: par Borel--Cantelli~2 le singe
+tape MATH une infinité de fois, presque sûrement --- et il en va de même
+pour tout texte fixé de toute \omterm{def:b2:curves:length}{longueur}, blocs ajustés.
+La note de bas de page quantitative dégonfle le miracle~: $26^4 =
+456\,976$, de sorte que le premier MATH prend environ un demi-million
+de frappes en moyenne, et une pièce de Shakespeare de $10^5$
+caractères attend de l'\omterm{def:b2:structures:generated}{ordre} de $26^{10^5}$ blocs --- presque sûr
+est un énoncé sur l'horizon $\infty$, non sur un
+horizon qu'un singe rencontrera. Borel--Cantelli certifie la
+limite~; la taille des sommandes raconte l'histoire aux échelles humaines.
+\end{example}
+
+\begin{remark}
+Dans l'\cref{ex:b2:proba:runs}, l'\omterm{def:b2:proba:space}{univers} sous-jacent (suites infinies
+de lancers) est non \omterm{def:b2:structures:countable}{dénombrable}, de sorte qu'à proprement parler
+l'exemple vit dans le cadre de la théorie de la mesure de l'Année~3~; les
+\emph{calculs}, cependant, n'utilisent que les règles démontrées dans ce
+chapitre, appliquées à des \omterm{def:b2:proba:space}{événements} déterminés par un nombre fini de lancers et
+leurs combinaisons \omterm{def:b2:structures:countable}{dénombrables}. C'est la convention MP* standard~:
+la théorie est énoncée sur des espaces \omterm{def:b2:structures:countable}{dénombrables}, et les exemples de
+jeu infini sont traités avec le même arsenal.
+\end{remark}
+
+\begin{remark}[Perspectives au sein de ce volume]
+La machinerie de ce chapitre est consommée en gros par les deux
+suivants. Les indicatrices transforment les \omterm{def:b2:proba:space}{événements} en variables aléatoires, et
+la $\sigma$-additivité devient la sommabilité qui définit
+l'espérance (\cref{ch:b2:randomvar})~; Borel--Cantelli plus une
+borne de reste \omterm{def:b2:series:summable}{sommable} est exactement la façon dont la loi forte des grands
+nombres pour les pièces s'y démontre. Au
+\cref{ch:b2:genfun}, la continuité monotone réapparaît au
+moment décisif~: la probabilité d'extinction d'un processus de
+branchement est \emph{définie} comme la limite monotone
+$\lim\P(Z_n = 0)$, et l'équation de point fixe qu'elle satisfait
+s'obtient en passant à la limite dans cette suite croissante
+--- le dernier théorème du livre repose sur le premier théorème de ce
+chapitre.
+\end{remark}
+
+\begin{remark}[Méthode~: trois voies vers la probabilité un]
+Les énoncés presque sûrs se démontrent avec trois leviers, par \omterm{def:b2:structures:generated}{ordre}
+croissant de force. \emph{Continuité monotone}~:
+exhiber l'\omterm{def:b2:proba:space}{événement} comme une union croissante (ou une intersection
+décroissante) d'\omterm{def:b2:proba:space}{événements} à horizon fini de probabilités
+calculables (\cref{ex:b2:proba:sixeventually}).
+\emph{Unions nulles}~: une union \omterm{def:b2:structures:countable}{dénombrable} d'\omterm{def:b2:proba:space}{événements} de probabilité
+nulle est nulle (sous-additivité \omterm{def:b2:structures:countable}{dénombrable}), de sorte qu'il suffit de
+tuer chaque mauvais \omterm{def:b2:proba:space}{événement} séparément --- c'est ainsi que «~pour tout
+$j$, à partir d'un certain rang $\abs{\widehat p_n - p} < 1/j$~» s'assemble
+en la convergence. \emph{Borel--Cantelli}~: lorsque l'\omterm{def:b2:proba:space}{événement} est une
+limsup, sommer les probabilités~; la convergence le tue
+(aucune indépendance nécessaire), et la divergence plus l'indépendance
+le certifie. Choisir le bon levier est en général toute la
+démonstration~; le devoir du week-end fait tourner les trois dans un unique
+argument.
+\end{remark}
+
+\begin{remark}[Où cela est utilisé]
+La continuité monotone et Borel--Cantelli sont les deux leviers de
+tout énoncé «~presque sûr~»~: ils gouvernent la récurrence de
+la \omterm{pb:b2:proba:1}{marche aléatoire} dans le devoir du week-end de ce chapitre, le
+versant presque sûr de la loi des grands nombres
+(\cref{ch:b2:randomvar}), et l'analyse d'extinction des
+processus de branchement (\cref{ch:b2:genfun}). Le volume de l'Année~3
+reconstruit la théorie sur les $\sigma$-algèbres et l'intégration de
+Lebesgue, où les \omterm{def:b2:proba:space}{univers} non \omterm{def:b2:structures:countable}{dénombrables} utilisés
+informellement ici deviennent pleinement rigoureux.
+\end{remark}
+
+\section{Exercices}
+
+\begin{exercise}[$\star$]\label{exo:b2:proba:1}
+Une urne contient $n$ boules numérotées. On tire les boules une à une
+sans remise. Calculer la probabilité que la boule numéro $1$
+soit tirée avant la boule numéro $2$. Généraliser~: la probabilité que
+la boule $1$ soit tirée en premier parmi les boules $1, \dots, k$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:proba:2}
+Montrer que sur $\Omega = \N^*$ les poids $p_k = \frac{1}{k(k+1)}$
+définissent une \omterm{def:b2:proba:space}{mesure de probabilité}, et calculer $\P(2\N^*)$ (résultats
+pairs) comme une série~; montrer qu'elle vaut $1 - \ln 2$.
+\emph{(Télescoper $\frac{1}{2j(2j+1)} = \frac{1}{2j} -
+\frac{1}{2j+1}$ et utiliser la série harmonique \omterm{def:b2:linalg:alternating}{alternée},
+\cref{ch:b2:series}.)}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:proba:3}
+(Faux positifs) Une maladie affecte une personne sur $10\,000$. Un
+test la détecte avec probabilité $0.99$ sur les malades, et donne un
+faux positif avec probabilité $0.01$ sur les bien portants. Calculer
+la probabilité d'être malade sachant un test positif, et commenter.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:proba:4}
+Soient $A_1, \dots, A_n$ des \omterm{def:b2:proba:space}{événements}. Démontrer la formule
+d'inclusion--exclusion
+\[
+\P\Bigl(\bigcup_{i=1}^n A_i\Bigr)
+= \sum_{\emptyset \neq J \subseteq \{1,\dots,n\}}
+(-1)^{\abs J + 1}\,\P\Bigl(\bigcap_{i \in J}A_i\Bigr)
+\]
+en intégrant l'identité $1 - \prod_{i=1}^n(1 -
+\mathbf{1}_{A_i}) = \mathbf{1}_{\bigcup A_i}$ sur $\Omega$
+(c'est-à-dire en sommant pondéré par $\P(\{\omega\})$).
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:proba:5}
+(Problème des rencontres, par inclusion--exclusion) $n$ lettres sont placées
+\omterm{def:b2:funcseq:def}{uniformément} au hasard dans $n$ \omterm{pb:b2:curves:1}{enveloppes}, une chacune. En utilisant
+l'\cref{exo:b2:proba:4}, montrer que la probabilité d'\emph{aucune}
+correspondance correcte est $\sum_{k=0}^n \frac{(-1)^k}{k!} \to e^{-1}$, et
+en déduire la probabilité d'exactement une correspondance.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:proba:6}
+Une pièce biaisée (probabilité de pile $p \in \intoo{0}{1}$) est lancée
+jusqu'à ce que deux piles consécutifs apparaissent. Soit $q_n$ la probabilité
+que le jeu dure plus de $n$ lancers. Montrer, en conditionnant par
+le(s) premier(s) lancer(s), que $q_n = (1-p)\,q_{n-1} + p(1-p)\,q_{n-2}$
+pour $n \geq 2$, et en déduire que le jeu se termine avec probabilité
+$1$. \emph{(Montrer $q_n \to 0$ en comparant avec une suite
+géométrique~: les deux racines de l'équation caractéristique sont
+dans $\intoo{0}{1}$ en valeur absolue.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:proba:7}
+(Records) Tirer une suite infinie de classements uniformes \omterm{def:b2:proba:independence}{indépendants},
+au sens combinatoire suivant~: pour chaque $n$, l'\omterm{def:b2:structures:generated}{ordre}
+relatif des $n$ premiers tirages est uniforme parmi les $n!$
+possibilités, et $R_n = {}$«~le $n$-ième tirage est un record (plus grand
+que tous les précédents)~». En admettant que les \omterm{def:b2:proba:space}{événements} $R_n$ sont
+\omterm{def:b2:proba:independence}{indépendants} avec $\P(R_n) = 1/n$ (démontrer au moins cette dernière
+égalité par symétrie), montrer à l'aide de Borel--Cantelli qu'une infinité
+de records se produisent presque sûrement, mais que les records à des instants
+\emph{consécutifs} $n, n+1$ se produisent une infinité de fois avec
+probabilité --- calculer $\sum_n \P(R_n \cap R_{n+1})$ et
+conclure ce que donne Borel--Cantelli~1.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:proba:8}
+(Saveur de Kochen--Stone, version plus facile) Soit $(A_n)$ des
+\omterm{def:b2:proba:independence}{événements indépendants} avec $\P(A_n) = \frac{1}{n+1}$. Montrer que
+$\P(\limsup A_n) = 1$, bien que $\P(A_n) \to 0$~: «~individuellement
+rares, collectivement certains~». Réciproquement, exhiber une suite
+d'\omterm{def:b2:proba:space}{événements} (dépendants) avec $\sum\P(A_n) = \infty$ et
+$\P(\limsup A_n) = 0$, montrant que l'indépendance ne peut être abandonnée dans
+Borel--Cantelli~2.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:proba:9}
+Une pièce de probabilité de pile $p \in \intoo01$ est lancée jusqu'au
+premier pile. Calculer la probabilité que cela arrive à un
+rang impair, et l'évaluer pour une pièce équilibrée.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:proba:10}
+Soit $(A_n)_{n\geq1}$ des \omterm{def:b2:proba:independence}{événements indépendants} avec $\P(A_n) =
+p_n < 1$. Montrer que
+\[
+\P\Bigl(\bigcap_{n\geq1}A_n^c\Bigr)
+= \prod_{n\geq1}(1 - p_n)
+:= \lim_{N\to\infty}\prod_{n=1}^N(1 - p_n),
+\]
+et que cette limite est $> 0$ si et seulement si $\sum p_n <
+\infty$. Réconcilier avec Borel--Cantelli~: lorsque $\sum p_n =
+\infty$, non seulement un certain $A_n$ se produit presque sûrement ---
+une infinité s'en produisent.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:proba:11}
+(La boîte d'allumettes de Banach) Un fumeur garde une boîte de $n$ allumettes dans
+chaque poche et plonge la main dans une poche \omterm{def:b2:funcseq:def}{uniformément} au hasard à chaque
+fois. Lorsqu'il trouve pour la première fois une boîte vide, quelle est la probabilité
+que l'autre boîte contienne exactement $k$ allumettes~? Montrer que la
+réponse est $\binom{2n-k}{n}2^{-(2n-k)}$ et vérifier que ces
+probabilités somment à $1$ pour $n = 1$.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:proba:12}
+(La $\sigma$-additivité est un vrai axiome)
+(a) Montrer qu'il n'existe pas de \omterm{def:b2:proba:space}{mesure de probabilité} sur $(\N,
+\mathcal P(\N))$ donnant à tous les singletons le même poids.
+(b) Pour $A \subseteq \N^*$, soit $d(A) =
+\lim_n\frac{\abs{A\cap\intint1n}}{n}$ lorsque la limite existe
+(la \emph{densité naturelle}). Montrer que $d$ est finiment additive
+sur les paires où les trois densités existent, donne à chaque
+singleton la densité $0$ et à $\N^*$ la densité $1$ --- et conclure
+que $d$ n'est pas $\sigma$-additive.
+(c) Exhiber un ensemble sans densité. \emph{(Alterner les blocs
+$\intint{2^{2k}}{2^{2k+1}-1}$ dedans et dehors.)}
+\end{exercise}
+
+\section{Problème~: la marche aléatoire simple sur $\Z$ est récurrente}
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=0.42, y=0.9cm]
+  \draw[->] (0,0) -- (25,0) node[below] {$n$};
+  \draw[->] (0,-2.6) -- (0,2.9) node[left] {$S_n$};
+  \draw[omDef, thick] plot coordinates {(0,0) (1,1) (2,0)
+    (3,-1) (4,0) (5,1) (6,2) (7,1) (8,2) (9,1) (10,0) (11,-1)
+    (12,-2) (13,-1) (14,0) (15,-1) (16,0) (17,1) (18,2) (19,1)
+    (20,0) (21,1) (22,0) (23,1) (24,2)};
+  \foreach \t in {2,4,10,14,16,20,22}
+    \fill[omThm] (\t,0) circle (5pt);
+  \fill (0,0) circle (5pt);
+\end{tikzpicture}
+
+{\small Vingt-quatre pas d'une \omterm{pb:b2:proba:1}{marche aléatoire simple}~; les points
+rouges marquent les retours à l'origine. Le problème montre que,
+avec probabilité $1$, ces points ne cessent jamais d'apparaître --- pourtant
+le temps d'attente entre eux a une moyenne divergente.}
+\end{omfigure}
+
+\begin{problem}[{Devoir du week-end --- le théorème de récurrence de
+Pólya sur $\Z$, avec le problème du scrutin et la saveur de
+l'arcsinus en chemin}]\label{pb:b2:proba:1}
+Lançons une pièce équilibrée indéfiniment~; soit $X_i = \pm1$ le $i$-ième pas
+et $S_n = X_1 + \dots + X_n$ la \emph{marche aléatoire
+simple}\index{marche aléatoire} sur $\Z$, $S_0 = 0$. Comme dans
+l'\cref{ex:b2:proba:runs}, tous les \omterm{def:b2:proba:space}{événements} ci-dessous sont déterminés par
+un nombre fini de lancers ou sont des combinaisons \omterm{def:b2:structures:countable}{dénombrables} de tels
+\omterm{def:b2:proba:space}{événements}, et l'indépendance des \omterm{def:b2:proba:space}{événements} dépendant de blocs disjoints
+de lancers fait partie du modèle. On note $u_n =
+\P(S_{2n} = 0)$ et $N_n(k)$ le nombre de chemins $\pm1$ de
+\omterm{def:b2:curves:length}{longueur} $n$ de $0$ à $k$.
+
+\medskip
+\noindent\textbf{Partie I --- Dénombrer les chemins.}
+\begin{enumerate}
+  \item Montrer que $N_n(k) = \binom{n}{(n+k)/2}$ lorsque $n + k$
+        est pair et $\abs k \leq n$, et $0$ sinon~; en déduire
+        $\P(S_n = k) = N_n(k)\,2^{-n}$. Pourquoi chaque
+        chemin individuel de \omterm{def:b2:curves:length}{longueur} $n$ est-il équiprobable~?
+  \item Montrer $S_{2n+1} \neq 0$, $u_n =
+        \binom{2n}{n}4^{-n}$, et calculer $u_1, u_2, u_3$.
+  \item Démontrer $u_n = \frac{2n-1}{2n}\,u_{n-1}$~; en déduire que
+        $(u_n)$ décroît vers $0$, et à partir de
+        l'\cref{ex:b2:comparison:centralbinomial} que
+        \[
+        u_n \sim \frac{1}{\sqrt{\pi n}},
+        \qquad\text{donc}\qquad
+        \sum_n u_n = \infty .
+        \]
+  \item (Principe de réflexion) Pour $k \geq 1$, montrer que les
+        chemins de \omterm{def:b2:curves:length}{longueur} $n$ de $1$ à $k$ qui touchent $0$
+        sont en bijection avec les chemins de $-1$ à $k$~;
+        en déduire que le nombre de chemins de $0$ à $k$ qui
+        restent $> 0$ après l'instant $0$ est $N_{n-1}(k-1) -
+        N_{n-1}(k+1)$.
+  \item (Théorème du scrutin) En déduire que
+        \[
+        \P\bigl(S_1 > 0, \dots, S_{n-1} > 0 \bigm| S_n =
+        k\bigr) = \frac kn \qquad (k \geq 1) :
+        \]
+        dans un dépouillement où le vainqueur mène par $k$ sur $n$
+        bulletins, la probabilité que le vainqueur ait mené tout au long
+        du dépouillement est $k/n$. Vérifier à la main pour $n = 3$, $k =
+        1$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie II --- Retour à l'origine.}
+\begin{enumerate}[resume]
+  \item Démontrer l'identité clé
+        \[
+        \P(S_1 \neq 0,\ S_2 \neq 0,\ \dots,\ S_{2n} \neq 0) =
+        u_n
+        \]
+        \emph{(conditionner par le premier pas, sommer les dénombrements
+        de la question~4 sur le point d'arrivée, et télescoper~; finir
+        avec $2\binom{2n-1}{n} = \binom{2n}{n}$)}.
+  \item Déduire de la continuité monotone
+        (\cref{thm:b2:proba:continuity}) que la marche
+        revient à $0$ au moins une fois avec probabilité $1$,
+        et que $f_n := \P(\text{premier retour à l'instant }2n)$
+        satisfait
+        \[
+        f_n = u_{n-1} - u_n = \frac{u_n}{2n-1},
+        \qquad \sum_{n\geq1}f_n = 1 .
+        \]
+  \item Montrer que $\sum_n 2n\,f_n = \infty$~: le retour est
+        certain, mais la série qui calculerait le temps d'attente
+        moyen diverge (dans le vocabulaire du
+        \cref{ch:b2:randomvar}, le temps de retour a une
+        espérance infinie).
+  \item Démontrer que pour tout $k \geq 1$, $\P(\text{au moins }
+        k\text{ retours à }0) = 1$ \emph{(décomposer sur les
+        instants des $k$ premiers retours~: les blocs de
+        lancers correspondants sont disjoints, de sorte que les probabilités
+        se multiplient et somment à $(\sum_nf_n)^k$)}~; conclure avec
+        la continuité monotone~:
+        \[
+        \P(S_n = 0 \text{ pour une infinité de } n) = 1 :
+        \]
+        la \omterm{pb:b2:proba:1}{marche aléatoire simple} sur $\Z$ est \emph{récurrente}.
+  \item Montrer que la marche visite chaque site $k \in \Z$
+        presque sûrement, donc (par récurrence, redémarrée au
+        premier passage) une infinité de fois. \emph{(Les signes
+        des excursions successives à partir de $0$ sont des pièces
+        équilibrées indépendantes~; une excursion positive visite $1$.)}
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie III --- Borel--Cantelli et la marche
+biaisée.}
+\begin{enumerate}[resume]
+  \item Les \omterm{def:b2:proba:space}{événements} $A_n = \{S_{2n} = 0\}$ satisfont $\sum\P(A_n)
+        = \infty$~; expliquer pourquoi Borel--Cantelli~2 ne
+        s'applique \emph{pas} à eux, et ce que Borel--Cantelli~1
+        donnerait si la série convergeait. (C'est la
+        stratégie de toute la Partie.)
+  \item Laissons maintenant la pièce avoir un biais $p \neq \frac12$, $q = 1 -
+        p$. Montrer $\P(S_{2n} = 0) = \binom{2n}n(pq)^n =
+        u_n\,(4pq)^n$ avec $4pq < 1$, en déduire
+        $\sum_n\P(S_{2n} = 0) < \infty$, et conclure par
+        Borel--Cantelli~1 que la marche biaisée revient à $0$
+        seulement un nombre fini de fois, presque sûrement.
+  \item Toujours pour $p \neq \frac12$~: montrer $\P(S_n = k) \leq
+        \binom{n}{\floor{n/2}}\,(pq)^{n/2}\,(p/q)^{k/2}$ pour
+        chaque $k$ fixé, en déduire que chaque site est visité
+        un nombre fini de fois presque sûrement, et conclure
+        $\abs{S_n} \to \infty$ presque sûrement~: la marche biaisée
+        est \emph{transiente}.
+  \item Retour à la pièce équilibrée~: en utilisant la question~6, calculer la
+        probabilité que $200$ lancers ne produisent \emph{aucune} égalité
+        ($S_n \neq 0$ pour $1 \leq n \leq 200$), numériquement
+        $u_{100} \approx 0.056$. Commenter la lente
+        décroissance en $1/\sqrt{\pi n}$~: les égalités sont certaines à long
+        terme mais plus rares que l'intuition ne le suggère.
+  \item (Premier passage) Soit $T_1$ le premier instant où la marche
+        atteint $1$. En utilisant le principe de réflexion pour le maximum
+        $M_n = \max_{i\leq n}S_i$ (démontré à la question~16,
+        qui ne dépend pas de celle-ci), ou directement
+        à partir de la question~7 en conditionnant par le premier pas,
+        montrer $\P(T_1 = 2n - 1) = f_n$~; en déduire $\P(T_1 <
+        \infty) = 1$ tandis que la série des temps moyens
+        $\sum(2n-1)f_n$ diverge.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie IV --- Maxima, dernier zéro, longues avances.}
+\begin{enumerate}[resume]
+  \item (Réflexion pour le maximum) Pour $k \geq 1$, démontrer
+        \[
+        \P(M_n \geq k) = 2\,\P(S_n > k) + \P(S_n = k)
+        \]
+        en réfléchissant le chemin après son premier passage au
+        niveau $k$.
+  \item En déduire $\P(M_{2n} \geq 1) = 1 - u_n$, c'est-à-dire
+        $\P(S_i \leq 0 \text{ pour tout } i \leq 2n) = u_n$~:
+        la probabilité de n'être jamais en tête égale la
+        probabilité de n'être jamais à zéro (question~6) ---
+        deux \omterm{def:b2:proba:space}{événements} différents, une seule probabilité.
+  \item (Dernier zéro) Soit $L_{2n} = \max\{k \leq 2n : S_k =
+        0\}$ (pair). En combinant la question~6 avec l'indépendance
+        des blocs de lancers disjoints, montrer
+        \[
+        \P(L_{2n} = 2k) = u_k\,u_{n-k}
+        \qquad (0 \leq k \leq n),
+        \]
+        et en déduire, sans aucun autre calcul, l'identité
+        binomiale $\sum_{k=0}^n u_ku_{n-k} = 1$.
+  \item Montrer que la loi de $L_{2n}$ est \omterm{def:b2:quadratic:adjoint}{symétrique} ($\P(L =
+        2k) = \P(L = 2n - 2k)$) et, en utilisant $u_j \sim
+        1/\sqrt{\pi j}$, que ses extrêmes sont ses valeurs les
+        plus probables. Tabuler pour $n = 5$~: $\P(L_{10} = 0)
+        = u_5 \approx 0.246$ contre $\P(L_{10} = 4) = u_2u_3
+        \approx 0.117$. Interpréter~: dans un long jeu équilibré, la
+        dernière égalité tend à être très précoce ou très tardive ---
+        les longues avances sont la règle, non l'exception.
+  \item Assembler les questions~16--19 en un paragraphe sur l'image
+        des fluctuations de la marche équilibrée~: l'échelle diffusive
+        suggérée par la question~3, la certitude du
+        retour contre le temps d'attente moyen divergent, et
+        la persistance des avances, à saveur d'arcsinus.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie V --- L'identité de renouvellement et le
+théorème de Pólya.}
+\begin{enumerate}[resume]
+  \item Démontrer, en partitionnant $\{S_{2n} = 0\}$ sur l'instant
+        du premier retour, l'\emph{identité de renouvellement}
+        \[
+        u_n = \sum_{k=1}^n f_k\,u_{n-k} \quad (n \geq 1),
+        \qquad\text{donc}\qquad
+        U(x)\bigl(1 - F(x)\bigr) = 1 \quad (0 \leq x < 1),
+        \]
+        où $U(x) = \sum_{n\geq0}u_nx^n$ et $F(x) =
+        \sum_{n\geq1}f_nx^n$ (justifier les rayons et le
+        produit de séries avec le \cref{ch:b2:powerseries}).
+  \item En déduire la \emph{dichotomie de récurrence}~: en faisant $x
+        \to 1^-$ (limites monotones de séries à coefficients
+        positifs),
+        \[
+        \sum_n u_n = \infty \iff \sum_n f_n = 1 ,
+        \]
+        et la vérifier sur les questions~3, 7 (marche équilibrée) et
+        12 (marche biaisée).
+  \item (Dimension $2$) La marche simple sur $\Z^2$ fait des pas
+        $(\pm1, 0)$, $(0, \pm1)$ \omterm{def:b2:funcseq:def}{uniformément}. Montrer que les
+        coordonnées tournées $U_n = X_n + Y_n$ et $V_n = X_n
+        - Y_n$ effectuent des marches équilibrées \emph{indépendantes} sur
+        $\Z$, en déduire
+        \[
+        \P\bigl(S^{(2)}_{2n} = (0,0)\bigr) = u_n^2 \sim
+        \frac1{\pi n},
+        \qquad \sum_n u_n^2 = \infty ,
+        \]
+        et conclure avec les questions~21--22 (dont les démonstrations
+        se transfèrent mot pour mot) que la marche sur $\Z^2$ est
+        récurrente.
+  \item (Dimension $3$) Pour la marche simple sur $\Z^3$, admettre
+        l'estimation locale $\P(S^{(3)}_{2n} = 0) \leq
+        C\,n^{-3/2}$ (démontrée avec le théorème limite local dans
+        le volume de l'Année~3). En déduire de Borel--Cantelli~1
+        que la marche sur $\Z^3$ est transiente, et énoncer le
+        résultat \omterm{def:b2:metric:complete}{complet}~: le \emph{théorème de Pólya} --- la \omterm{pb:b2:proba:1}{marche
+        aléatoire simple} est récurrente en dimensions $1$ et $2$,
+        transiente en dimension $3$ et au-delà.
+  \item Synthèse. Lister le rôle exact joué par~: le
+        dénombrement de chemins et la réflexion~; la continuité monotone~;
+        l'indépendance des blocs de lancers disjoints~;
+        Borel--Cantelli~1~; l'identité de renouvellement. Quel unique
+        fait \omterm{def:b2:powerseries:analytic}{analytique} ($u_n \sim 1/\sqrt{\pi n}$, donc
+        $\sum u_n = \infty$ mais $\sum u_n^2 = \infty$ et
+        $\sum n^{-3/2} < \infty$) décide entre récurrence
+        et transience en chaque dimension~?
+\end{enumerate}
+\end{problem}

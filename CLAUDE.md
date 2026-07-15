@@ -11,7 +11,8 @@ volumes also exist in full French and Dutch translations (`*_fr.tex` /
 `*_nl.tex` entry files; bodies under `parts/<year>/<lang>/`): the primary,
 middle, and high school books (Grades 1–12, `parts/grade-N/{fr,nl}/`) and,
 of the university books, **Book 3 (University Year 1)** in both FR and NL
-(`parts/bachelor-1/{fr,nl}/`). Books 4–5 FR/NL are in progress. Everything
+(`parts/bachelor-1/{fr,nl}/`) and **Book 4 (University Year 2) in FR**
+(`parts/bachelor-2/fr/`). Book 4 NL and Book 5 FR/NL are in progress. Everything
 is written in English for an international audience; the FR/NL editions
 translate that content, keeping identical labels, order, and structure.
 `CONTRIBUTING.md` holds the authoritative style/structure conventions;
@@ -109,12 +110,21 @@ silently falls back to English, `\omstr` to empty). Gate on:
 - Translators leave English `\index{}` keys while translating the visible
   `\emph{}` — orphan-splits the index. Normalise so the EN∩<lang> index-key
   intersection is only genuinely-identical terms (argument, basis, ring, …).
-- Dutch `NOT_A_TERM` must use the "X van Y" PHRASE forms (`"stelling van"`,
-  `"formule van"`), never bare nouns — substring matching would filter solid
-  compounds (kettingregel, quotiëntcriterium, hoofdstelling).
+- Each FR/NL config needs its own `NOT_A_TERM` (the default keywords are
+  English, so French/Dutch result-names slip through and over-link). French uses
+  bare heads (`"théorème"`, `"lemme"`, `"inégalité"`, `"règle"`, …); **Dutch must
+  use the "X van Y" PHRASE forms** (`"stelling van"`, `"formule van"`), never
+  bare nouns — Dutch substring-matches solid compounds (kettingregel,
+  quotiëntcriterium, hoofdstelling), French does not. Keep bare `"loi"` in FR
+  (the distribution *definition*). Result-names reaching via `\emph{}\index{}`
+  bypass `NOT_A_TERM` — hand-`DROP` those.
 - The index-only harvest needs a space in the term (`" " not in d → skip`), so
-  Dutch solid/hyphenated compounds (Riemannsommen, Gauss-eliminatie) are never
-  harvested — declare each in the config's `EXTRA` → target.
+  Dutch solid/hyphenated compounds (Riemannsommen, Gauss-eliminatie) — and any FR
+  compound the harvest drops as ambiguous (bare "courbure") — are never linked;
+  declare each in the config's `EXTRA` → target.
+- FR `\cref` used as a noun needs its article, keyed by label prefix (`le~` thm,
+  `la~` prop/def, `l'` ex/exo, contractions du/au) with a non-breaking `~`. Give
+  translators this map up front — retrofitting it is ~200 edits per book.
 - Overfull boxes from longer translated prose (no babel FR/NL here): a
   `\hyphenation{...}` block (with UTF-8 accents) + `\setlength{\emergencystretch}
   {3em}` in the entry file. Convert `\"o`→`ö` in prose; keep index keys ASCII.

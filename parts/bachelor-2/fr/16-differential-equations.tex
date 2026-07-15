@@ -1,0 +1,855 @@
+\chapter{Équations différentielles}\label{ch:b2:diffeq}
+
+L'année 1 a résolu les équations linéaires qui admettent des
+formules. Ce chapitre fournit ce que les formules ne peuvent
+donner~: le \emph{théorème de Cauchy--Lipschitz} --- existence et
+unicité pour $y' = f(t, y)$ --- démontré à l'aide du théorème du
+point fixe de Banach, exactement comme promis au~\cref{ch:b2:metric}~;
+puis la théorie complète des \emph{systèmes linéaires} $X' = A(t)X +
+B(t)$, avec l'\omterm{ex:b2:nvs:matrixexp}{exponentielle de matrice} et le \omterm{def:b2:diffeq:wronskian}{wronskien} comme moteurs
+de calcul.
+
+\section{Le théorème de Cauchy--Lipschitz}
+
+\begin{theorem}[Cauchy--Lipschitz, version lipschitzienne globale]\label{thm:b2:diffeq:cauchylipschitz}
+Soient $I$ un segment et $f \colon I \times \R^n \to \R^n$ \omterm{def:b2:metric:continuity}{continue}
+et \emph{\omterm{def:b2:metric:continuity}{lipschitzienne} en la seconde variable}, \omterm{def:b2:funcseq:def}{uniformément} en la
+première~: $\norm{f(t, y) - f(t, z)} \leq k\,\norm{y - z}$ pour tout
+$t \in I$. Alors pour tout $(t_0, y_0) \in I \times \R^n$, le
+problème de Cauchy\index{théorème de Cauchy--Lipschitz}
+\[
+y' = f(t, y), \qquad y(t_0) = y_0
+\]
+admet exactement une solution $y \colon I \to \R^n$ de classe $C^1$.
+\end{theorem}
+
+\begin{proof}
+\emph{Reformulation.} Une fonction \omterm{def:b2:metric:continuity}{continue} $y$ résout le problème
+si et seulement si elle satisfait l'équation intégrale
+\[
+y(t) = y_0 + \int_{t_0}^{t} f\bigl(s, y(s)\bigr)\,\dd s
+=: T(y)(t)
+\]
+(théorème fondamental de l'analyse dans les deux sens~; une solution
+\omterm{def:b2:metric:continuity}{continue} de l'équation intégrale est automatiquement $C^1$).
+
+\emph{Une contraction, après renormalisation.} Sur l'\omterm{def:b2:nvs:banach}{espace de
+Banach} $E = C(I, \R^n)$ muni de la \omterm{def:b2:nvs:norm}{norme} \emph{pondérée}
+\[
+N(y) = \sup_{t \in I}\; \eu^{-2k\abs{t - t_0}}\,\norm{y(t)} ,
+\]
+(équivalente à la \omterm{def:b2:nvs:norm}{norme} sup~: le poids est borné supérieurement et
+inférieurement sur le segment $I$, donc $E$ reste \omterm{def:b2:metric:complete}{complet}),
+estimons pour $y, z \in E$ et, disons, $t \geq t_0$~:
+\[
+\norm{T(y)(t) - T(z)(t)}
+\leq \int_{t_0}^{t} k\,\norm{y(s) - z(s)}\,\dd s
+\leq k\,N(y - z)\int_{t_0}^{t} \eu^{2k(s - t_0)}\dd s
+\leq \frac{N(y-z)}{2}\,\eu^{2k(t - t_0)} .
+\]
+En multipliant par $\eu^{-2k(t - t_0)}$ et en prenant le sup (le cas
+$t < t_0$ est \omterm{def:b2:quadratic:adjoint}{symétrique})~: $N\bigl(T(y) - T(z)\bigr) \leq \frac12 N(y -
+z)$~: $T$ est une $\frac12$-contraction de l'espace \omterm{def:b2:metric:complete}{complet} $(E, N)$.
+Le théorème du point fixe de Banach (\cref{thm:b2:metric:banach})
+fournit un unique point fixe~: l'unique solution.
+\end{proof}
+
+\begin{remark}
+Pour $f$ seulement $C^1$ (localement \omterm{def:b2:metric:continuity}{lipschitzienne}), le théorème
+vaut \emph{localement}, avec une solution maximale sur un intervalle
+\omterm{def:b2:metric:topology}{ouvert} maximal~; les solutions peuvent exploser en temps fini ($y' =
+y^2$, $y(0) = 1$~: $y(t) = \frac{1}{1-t}$, disparue en $t = 1$).
+C'est l'hypothèse \omterm{def:b2:metric:continuity}{lipschitzienne} globale qui garantit le segment tout
+entier. Deux conséquences à graver dans la mémoire~: les courbes
+intégrales d'une EDO à champ \omterm{def:b2:metric:continuity}{lipschitzien} \emph{ne se croisent
+jamais}~; et la fonction nulle est la seule solution d'une équation
+linéaire homogène qui s'annule quelque part.
+\end{remark}
+
+\begin{example}[L'unicité est un théorème~: un champ qui fuit]\label{ex:b2:diffeq:leaky}
+Considérons $y' = 2\sqrt{\abs y}$ avec $y(0) = 0$. La fonction
+nulle en est solution~; il en va de même de
+\[
+y(t) = \begin{cases} 0 & t \leq 0,\\ t^2 & t \geq 0,
+\end{cases}
+\]
+qui est $C^1$ (les deux morceaux ont une dérivée nulle au point
+de raccord) et vérifie $y'(t) = 2t = 2\sqrt{t^2}$ pour $t > 0$ ---
+en effet, retarder le décollage fournit une solution pour
+\emph{chaque} instant de départ $c \geq 0$~: une infinité de
+solutions issues des mêmes données initiales. Aucune contradiction
+avec le~\cref{thm:b2:diffeq:cauchylipschitz}~: au voisinage de $y =
+0$,
+\[
+\frac{\abs{2\sqrt y - 2\sqrt z}}{\abs{y - z}}
+= \frac{2}{\sqrt y + \sqrt z} \longrightarrow +\infty ,
+\]
+le champ n'est pas \omterm{def:b2:metric:continuity}{lipschitzien} en $y$, et le théorème reste
+muet. Éclairage final~: la lecture physique est celle d'un seau
+qui se vide sous l'effet de la gravité, le temps remonté ---
+depuis l'état vide, on ne peut dire quand il a commencé à se
+remplir~; le déterminisme des EDO est exactement la condition de
+Lipschitz, non une loi de la nature.
+\end{example}
+
+\section{Systèmes linéaires}
+
+\begin{theorem}[Structure des systèmes linéaires]\label{thm:b2:diffeq:linear}
+Soient $A \colon I \to \mathcal{M}_n(\R)$ et $B \colon I \to \R^n$
+\omterm{def:b2:metric:continuity}{continues} sur un intervalle $I$. Pour tout $(t_0, X_0)$, le problème
+\[
+X' = A(t)X + B(t), \qquad X(t_0) = X_0
+\]
+admet exactement une solution sur $I$ \emph{tout entier}. Les
+solutions du système homogène ($B = 0$) forment un espace vectoriel
+$\mathcal{S}_H$ de dimension exactement $n$, et l'évaluation $X
+\mapsto X(t_0)$ est un isomorphisme $\mathcal{S}_H \to \R^n$~;
+solution générale $=$ particulière $+$ homogène.
+\end{theorem}
+
+\begin{proof}
+Sur tout segment $J \subseteq I$ contenant $t_0$~: $f(t, X) =
+A(t)X + B(t)$ est \omterm{def:b2:metric:continuity}{continue}, et \omterm{def:b2:metric:continuity}{lipschitzienne} en $X$ de constante $k
+= \sup_J \vertiii{A(t)}$ (finie~: \omterm{def:b2:metric:continuity}{continue} sur un segment)~:
+le~\cref{thm:b2:diffeq:cauchylipschitz} s'applique sur $J$~; en faisant
+croître $J$ jusqu'à épuiser $I$, l'unicité recolle les solutions en
+une seule sur $I$. La linéarité de l'ensemble des solutions et de
+l'application d'évaluation est claire~; l'évaluation est bijective
+par existence (surjective) et unicité (injective)~: $\dim
+\mathcal{S}_H = n$. La structure affine est l'argument de l'année 1,
+mot pour mot.
+\end{proof}
+
+\begin{example}[L'isomorphisme d'évaluation, concrètement]\label{ex:b2:diffeq:evaliso}
+Pour $y'' + y = 0$, vue comme le système $X' =
+\begin{pmatrix} 0 & 1\\ -1 & 0\end{pmatrix}X$ avec $X = (y,
+y')$~: le théorème dit que l'espace des solutions est un plan, et
+que $X \mapsto X(0) = (y(0), y'(0))$ est un isomorphisme sur
+$\R^2$. Les solutions $\cos$ et $\sin$ s'évaluent en $(1, 0)$
+et $(0, 1)$ --- la base canonique de $\R^2$ --- elles forment
+donc une base de l'espace des solutions, et \emph{toute} solution
+s'écrit
+\[
+y(t) = y(0)\cos t + y'(0)\sin t ,
+\]
+avec les coefficients lus directement sur les données initiales,
+sans aucun système linéaire à résoudre. Éclairage final~: choisir
+le \omterm{def:b2:diffeq:wronskian}{système fondamental} dont les valeurs initiales forment la base
+canonique (ici $\cos, \sin$) revient exactement à choisir les
+colonnes de $\eu^{tA}$~; l'isomorphisme d'évaluation explique
+pourquoi les conditions initiales paramètrent les trajectoires ---
+le contenu géométrique de la «~dynamique déterministe~» pour les
+équations linéaires.
+\end{example}
+
+\begin{definition}[Wronskien]\label{def:b2:diffeq:wronskian}
+Pour des solutions $X_1, \dots, X_n$ du système homogène, le
+\emph{wronskien}\index{wronskien} est $W(t) = \det\bigl(X_1(t),
+\dots, X_n(t)\bigr)$. D'après l'isomorphisme ci-dessus, ou bien $W$
+s'annule identiquement (la famille est liée), ou bien ne s'annule
+jamais (un \emph{système fondamental}\index{système fondamental})~;
+quantitativement, $W' = \operatorname{tr}\bigl(A(t)\bigr)
+W$, donc
+\[
+W(t) = W(t_0)\,\exp\Bigl(\int_{t_0}^{t}
+\operatorname{tr} A(s)\,\dd s\Bigr)
+\quad \text{(formule de Liouville)}.
+\]
+\end{definition}
+
+\begin{example}[Liouville vérifiée sur une équation d'Euler]\label{ex:b2:diffeq:eulerwronskian}
+Sur $\intoo{0}{\infty}$, l'équation $t^2y'' + ty' - y = 0$ a pour
+solutions $y_1(t) = t$ et $y_2(t) = \frac1t$ (par substitution).
+Leur \omterm{def:b2:diffeq:wronskian}{wronskien}~:
+\[
+W(t) = \det\begin{pmatrix} t & \tfrac1t\\[2pt]
+1 & -\tfrac{1}{t^2}\end{pmatrix}
+= -\frac1t - \frac1t = -\frac2t ,
+\]
+jamais nul~: un \omterm{def:b2:diffeq:wronskian}{système fondamental}. Vérifions maintenant
+Liouville~: sous forme normalisée $y'' + \frac1t\,y' -
+\frac{1}{t^2}\,y = 0$, la matrice compagnon $A(t) =
+\begin{pmatrix} 0 & 1\\ \frac{1}{t^2}
+& -\frac1t\end{pmatrix}$ a pour trace $-\frac1t$, donc
+\[
+W(t) = W(1)\exp\Bigl(-\int_1^t\frac{\dd s}{s}\Bigr)
+= -2\,\eu^{-\ln t} = -\frac2t . \checkmark
+\]
+Éclairage final~: Liouville prédit la \emph{forme} du \omterm{def:b2:diffeq:wronskian}{wronskien}
+avant même de connaître aucune solution --- ici, que $W$ doit
+valoir $\frac{c}{t}$~; c'est ce qui alimente la méthode
+d'abaissement de l'\omterm{def:b2:structures:generated}{ordre}
+(\cref{prop:b2:diffeq:secondorder}), où la connaissance de $y_1$
+et de la forme du \omterm{def:b2:diffeq:wronskian}{wronskien} détermine $y_2$ par une seule
+quadrature.
+\end{example}
+
+\begin{proof}[Démonstration de la formule de Liouville]
+$W(t) = \det M(t)$ avec $M' = AM$. En dérivant le \omterm{def:b2:linalg:det}{déterminant}
+comme fonction multilinéaire des colonnes,
+\[
+W'(t) = \sum_j \det(X_1, \dots, X_j', \dots, X_n)
+= \sum_j \det(X_1, \dots, AX_j, \dots, X_n) .
+\]
+Or l'application $(C_1, \dots, C_n) \mapsto \sum_j \det(C_1, \dots,
+AC_j, \dots, C_n)$ est $n$-linéaire et \omterm{def:b2:linalg:alternating}{alternée} (avec deux colonnes
+égales $C_i = C_k$, les termes $j \notin \{i, k\}$ s'annulent
+d'emblée, et les termes $j = i$ et $j = k$ se compensent deux à deux
+après un échange de colonnes)~: d'après le théorème d'unicité
+(\cref{thm:b2:linalg:detspace}), elle vaut $c \cdot \det$, avec $c$
+lu sur les colonnes canoniques~: $c = \sum_j \det(e_1, \dots, Ae_j,
+\dots, e_n) = \sum_j a_{jj} = \operatorname{tr} A$. Ainsi $W' =
+\operatorname{tr}\bigl(A(t)\bigr)W$~: une EDO linéaire scalaire,
+résolue par la formule de l'année 1.
+\end{proof}
+
+\section{Coefficients constants~: l'exponentielle de matrice}
+
+\begin{theorem}\label{thm:b2:diffeq:matrixexp}
+Pour $A \in \mathcal{M}_n(\R)$ (ou $\C$), l'exponentielle $\eu^{tA}
+= \sum_k \frac{(tA)^k}{k!}$ (\cref{ex:b2:nvs:matrixexp}) vérifie~:
+$t \mapsto \eu^{tA}$ est $C^1$ (et même $C^\infty$),
+avec\index{exponentielle de matrice}
+\[
+\frac{\dd}{\dd t}\,\eu^{tA} = A\,\eu^{tA} = \eu^{tA}A ,
+\qquad
+\eu^{(s+t)A} = \eu^{sA}\,\eu^{tA},
+\qquad
+(\eu^{A})^{-1} = \eu^{-A} ;
+\]
+et $\eu^{A + B} = \eu^A\eu^B$ \emph{lorsque} $AB = BA$. Le problème
+de Cauchy $X' = AX$, $X(0) = X_0$ a pour unique solution $X(t) =
+\eu^{tA}X_0$~; avec un second membre, la formule de \emph{variation
+des constantes} vaut~:
+\[
+X(t) = \eu^{(t - t_0)A}X_0 + \int_{t_0}^{t} \eu^{(t-s)A}B(s)\,\dd
+s .
+\]
+\end{theorem}
+
+\begin{proof}
+\emph{Différentiabilité~:} la série $\sum \frac{t^kA^k}{k!}$ et
+sa série dérivée terme à terme $\sum \frac{t^{k-1}A^k}{(k-1)!} = A\sum
+\frac{(tA)^{k-1}}{(k-1)!}$ convergent \omterm{def:b2:funcseq:series}{normalement} sur tout segment
+(\omterm{def:b2:nvs:norm}{normes} $\leq \frac{(\abs t\,\vertiii A)^k}{k!}$)~: on dérive terme
+à terme (\cref{thm:b2:funcseq:seriestransfer}, à valeurs
+vectorielles). Les deux \omterm{def:b2:structures:generated}{ordres} $A\eu^{tA}$ et $\eu^{tA}A$
+coïncident, puisque toute somme partielle commute avec $A$.
+
+\emph{Loi de groupe~:} pour $A, B$ qui commutent, le \omterm{thm:b2:series:fubini}{produit de
+Cauchy} des deux séries exponentielles se réorganise par la formule
+du binôme exactement comme dans l'\cref{ex:b2:series:exp} (la
+convergence absolue dans l'\omterm{def:b2:structures:algebra}{algèbre} de Banach le justifie)~:
+$\eu^{A+B} = \eu^A\eu^B$~; avec $B = sA$ on obtient la loi de groupe
+à un paramètre, et avec $B = -A$ l'inverse.
+
+\emph{Problème de Cauchy~:} $X(t) = \eu^{tA}X_0$ en est solution
+(dériver)~; unicité par le~\cref{thm:b2:diffeq:linear}. Variation
+des constantes~: posons $Y(t) = \eu^{-tA}X(t)$~; en dérivant, $Y' =
+\eu^{-tA}(X' - AX) = \eu^{-tA}B(t)$~; intégrer de $t_0$ à $t$ et
+multiplier à nouveau par $\eu^{tA}$.
+\end{proof}
+
+\begin{method}[Calcul de $\eu^{tA}$]\label{met:b2:diffeq:computeexp}
+Réduire $A$ (\cref{ch:b2:reduction})~: si $A = PDP^{-1}$ est
+diagonale, $\eu^{tA} = P\,\eu^{tD}P^{-1}$ avec $\eu^{tD}$ diagonale
+formée des $\eu^{t\lambda_i}$~; en général, utiliser Dunford $A = D
++ N$ (qui commutent)~: $\eu^{tA} = \eu^{tD}\,\eu^{tN}$ avec
+$\eu^{tN}$ un \emph{polynôme} en $t$ (la nilpotence tronque la
+série). Les \omterm{def:b2:reduction:eigen}{valeurs propres} complexes s'apparient en blocs
+rotation-fois-exponentielle (\cref{exo:b2:diffeq:5}).
+\end{method}
+
+\begin{remark}[Pièges classiques]
+\emph{(i) $\eu^{A+B} \neq \eu^A\eu^B$ sans commutation~:}
+prenons $A = \begin{pmatrix} 0 & 1\\ 0 & 0\end{pmatrix}$, $B =
+\begin{pmatrix} 0 & 0\\ 1 & 0\end{pmatrix}$. Alors $\eu^A = I +
+A$, $\eu^B = I + B$ (nilpotence), donc
+\[
+\eu^A\eu^B = \begin{pmatrix} 2 & 1\\ 1 & 1\end{pmatrix},
+\qquad\text{tandis que}\qquad
+\eu^{A+B} = \cosh(1)\,I + \sinh(1)\,(A + B)
+= \begin{pmatrix} \cosh 1 & \sinh 1\\ \sinh 1 & \cosh 1
+\end{pmatrix},
+\]
+en utilisant $(A+B)^2 = I$~; et $\cosh 1 \approx 1.54 \neq 2$. La
+loi de groupe du~\cref{thm:b2:diffeq:matrixexp} porte une
+véritable hypothèse. \emph{(ii) Intuition non linéaire en terrain
+linéaire~:} les solutions d'un système \emph{linéaire} à
+coefficients \omterm{def:b2:metric:continuity}{continus} vivent sur l'intervalle tout entier
+(\cref{thm:b2:diffeq:linear}) --- si une solution candidate
+explose à l'intérieur de $I$, l'équation n'était pas linéaire ou
+le calcul est faux~; réciproquement, pour les équations non
+linéaires, ne jamais promettre la globalité sans argument ($y' =
+y^2$). \emph{(iii) Diviser par l'inconnue~:} séparer les variables
+dans $y' = y(1-y)$ écarte silencieusement les solutions constantes
+$0$ et $1$ --- précisément celles qui organisent la droite des
+phases (\cref{exo:b2:diffeq:3})~; lister d'abord les solutions
+constantes. \emph{(iv) Les données initiales fixent des vecteurs,
+non des scalaires~:} une équation scalaire d'\omterm{def:b2:structures:generated}{ordre} $n$ nécessite
+$n$ conditions ($y, y', \dots$ en $t_0$)~; n'imposer que $y(t_0)$
+laisse une famille à $(n-1)$ paramètres, source classique de
+constantes «~perdues~».
+\end{remark}
+
+\begin{example}[Une exponentielle $3\times3$ par Dunford]\label{ex:b2:diffeq:dunford3}
+Résolvons $X' = AX$ pour $A = \begin{pmatrix} 2 & 1 & 0\\ 0 & 2 &
+0\\ 0 & 0 & 3\end{pmatrix}$. Dunford par blocs~: $A = D + N$
+avec $D = \operatorname{diag}(2, 2, 3)$ et $N = E_{12}$, qui
+commutent ($N$ vit à l'intérieur du bloc associé à la \omterm{def:b2:reduction:eigen}{valeur
+propre} $2$), et $N^2 = 0$~:
+\[
+\eu^{tA} = \eu^{tD}\,\eu^{tN}
+= \begin{pmatrix}
+\eu^{2t} & t\,\eu^{2t} & 0\\
+0 & \eu^{2t} & 0\\
+0 & 0 & \eu^{3t}
+\end{pmatrix} .
+\]
+La solution générale se lit colonne par colonne~: $X(t) =
+\bigl(\eu^{2t}(x_0 + ty_0),\ \eu^{2t}y_0,\
+\eu^{3t}z_0\bigr)$. Vérifications~: en $t = 0$ la matrice vaut
+$I$~; son \omterm{def:b2:linalg:det}{déterminant} est $\eu^{7t} =
+\eu^{t\operatorname{tr}A}$, comme l'exige Liouville~; et le
+facteur $t$ apparaît exactement là où la \omterm{def:b2:reduction:eigen}{valeur propre} $2$ est
+défectueuse. Éclairage final~: les polynômes fois exponentielles
+ne sont pas une supposition à mémoriser --- ce sont les séries
+tronquées $\eu^{tN}$, et leur degré est borné par l'indice de
+nilpotence, jamais plus.
+\end{example}
+
+\begin{method}[Résoudre $X' = AX + B(t)$, de bout en bout]\label{met:b2:diffeq:solvelinear}
+\begin{enumerate}
+  \item \omterm{def:b2:reduction:eigen}{Spectre} de $A$~; puis $\eu^{tA}$ par
+        la~\cref{met:b2:diffeq:computeexp} (diagonaliser~; ou
+        Dunford comme dans l'\cref{ex:b2:diffeq:dunford3}~; ou une
+        astuce polynomiale du type $A^2 = -I$).
+  \item Une solution particulière~: la variation des constantes
+        $\int_{t_0}^t\eu^{(t-s)A}B(s)\dd s$ marche toujours~;
+        pour $B$ exponentielle-polynôme, un ansatz de même
+        forme (degré relevé en cas de \omterm{pb:b2:diffeq:1}{résonance},
+        \cref{exo:b2:diffeq:10}) est plus rapide.
+  \item Solution générale $= \eu^{(t-t_0)A}X_0 +$ particulière~;
+        ajuster les données initiales \emph{en dernier}, sur la
+        formule complète.
+  \item Vérifications~: $X(t_0)$ correct~; la croissance de la
+        partie homogène correspond aux parties réelles des
+        \omterm{def:b2:reduction:eigen}{valeurs propres} (\cref{exo:b2:diffeq:8})~; et le $\det$
+        d'une matrice fondamentale obéit à Liouville.
+\end{enumerate}
+\end{method}
+
+\begin{example}[Un portrait de phase]\label{ex:b2:diffeq:phaseportrait}
+$X' = AX$ avec $A = \begin{pmatrix} 0 & 1\\ -1 & 0\end{pmatrix}$~:
+$A^2 = -I$, donc la série se scinde en
+\[
+\eu^{tA} = (\cos t)\,I + (\sin t)\,A
+= \begin{pmatrix} \cos t & \sin t\\ -\sin t & \cos t
+\end{pmatrix} :
+\]
+les trajectoires sont des cercles parcourus dans le sens horaire ---
+l'oscillateur harmonique $x'' + x = 0$ en habit du premier \omterm{def:b2:structures:generated}{ordre}.
+\omterm{def:b2:reduction:eigen}{Valeurs propres} $\pm\iu$ sur l'axe imaginaire~: un \emph{centre}.
+Plus généralement, les parties réelles des \omterm{def:b2:reduction:eigen}{valeurs propres} de $A$
+décident de la croissance ou de la décroissance de $\norm{X(t)}$
+(\cref{exo:b2:diffeq:8}).
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=6.4cm, height=6.4cm,
+    xmin=-2.3, xmax=2.3, ymin=-2.3, ymax=2.3,
+    xtick={-1,1}, ytick={-1,1}]
+  \addplot[omDef, thick, domain=0:360, samples=90, smooth]
+    ({cos(x)}, {-sin(x)});
+  \addplot[omDef!60, thick, domain=0:360, samples=90, smooth]
+    ({1.7*cos(x)}, {-1.7*sin(x)});
+  \draw[-Stealth, omThm, thick] (axis cs:1,0) -- (axis cs:0.995,-0.12);
+  \draw[-Stealth, omThm, thick] (axis cs:1.7,0) -- (axis cs:1.695,-0.12);
+\end{axis}
+\end{tikzpicture}
+\hspace{6mm}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=6.4cm, height=6.4cm,
+    xmin=-2.3, xmax=2.3, ymin=-2.3, ymax=2.3,
+    xtick={-1,1}, ytick={-1,1}]
+  % A = diag(-1,-2)-type stable node: trajectories y = c x^2
+  \addplot[omMeth, thick, domain=-1.5:1.5, samples=60] {x^2};
+  \addplot[omMeth, thick, domain=-1.5:1.5, samples=60] {-x^2};
+  \addplot[omMeth, thick, domain=-2.2:2.2, samples=2] {0};
+  \addplot[omMeth!60, thick, domain=-1.2:1.2, samples=60] {2*x^2};
+  \draw[-Stealth, omThm, thick] (axis cs:1.2,1.44) --
+    (axis cs:1.05,1.1);
+  \draw[-Stealth, omThm, thick] (axis cs:-1.2,-1.44) --
+    (axis cs:-1.05,-1.1);
+\end{axis}
+\end{tikzpicture}
+
+{\small Deux portraits de phase linéaires. À gauche~: un
+\emph{centre} (\omterm{def:b2:reduction:eigen}{valeurs propres} $\pm\iu$) --- orbites circulaires
+fermées de l'oscillateur harmonique. À droite~: un \emph{nœud
+stable} (\omterm{def:b2:reduction:eigen}{valeurs propres} $-1, -2$) --- toutes les trajectoires
+tombent vers l'origine tangentiellement à la direction propre
+lente.}
+\end{omfigure}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=9.6cm, height=6.4cm,
+    xmin=-3.2, xmax=3.2, ymin=-1.6, ymax=2.6,
+    xtick={0}, ytick={0},
+    xlabel={$\tau = \operatorname{tr}A$},
+    ylabel={$\delta = \det A$}]
+  \addplot[omThm, very thick, domain=-3:3, samples=100]
+    {x^2/4};
+  \node[font=\small, omThm] at (axis cs:2.45,2.1)
+    {$\delta = \tau^2/4$};
+  \node[font=\small] at (axis cs:0,-0.9) {selles};
+  \node[font=\small] at (axis cs:-2.45,0.7)
+    {nœuds stables};
+  \node[font=\small] at (axis cs:2.45,0.7)
+    {nœuds instables};
+  \node[font=\small] at (axis cs:-1.05,1.9)
+    {foyers stables};
+  \node[font=\small] at (axis cs:1.05,1.9)
+    {foyers instables};
+  \node[font=\small, omDef] at (axis cs:0,2.35) {centres};
+  \draw[omDef, very thick] (axis cs:0,0) -- (axis cs:0,2.55);
+\end{axis}
+\end{tikzpicture}
+
+{\small Le plan trace--déterminant pour $X' = AX$ en dimension
+$2$~: sous l'axe horizontal, les selles~; entre l'axe et
+la parabole $\delta = \tau^2/4$, les nœuds~; à l'intérieur de la
+parabole, les foyers~; sur le demi-axe $\delta$ positif, les
+centres. Le problème du week-end démontre cette classification et
+en suit une droite verticale --- l'oscillateur amorti --- jusqu'à
+la \omterm{pb:b2:diffeq:1}{résonance}.}
+\end{omfigure}
+
+\begin{remark}[Où cela sert]
+Les systèmes linéaires sont le modèle local de tout ce qui est non
+linéaire~: au voisinage d'un équilibre, un champ de vecteurs
+régulier se comporte (dans les cas hyperboliques) comme sa
+linéarisation, dont le plan trace--déterminant classe le portrait.
+Le problème du week-end développe entièrement l'histoire de
+l'oscillateur --- amortissement, forçage, \omterm{pb:b2:diffeq:1}{résonance}, et théorèmes
+de comparaison de Sturm pour les coefficients variables --- les
+mathématiques derrière les amortisseurs, les circuits à courant
+alternatif et les trous spectraux. Le volume de l'année 3 y revient
+avec la théorie qualitative (flots, stabilité, intégrales
+premières) sur les variétés.
+\end{remark}
+
+\section{Second ordre à coefficients variables}
+
+\begin{proposition}\label{prop:b2:diffeq:secondorder}
+L'équation $y'' + a(t)y' + b(t)y = c(t)$ ($a, b, c$ \omterm{def:b2:metric:continuity}{continues} sur
+$I$) est le système $X' = A(t)X + B(t)$ pour $X = (y, y')$~: les
+solutions existent et sont uniques sur $I$ tout entier pour toute
+donnée initiale $(y(t_0), y'(t_0))$~; les solutions homogènes
+forment un plan. Si l'on connaît une solution homogène $y_1$ ne
+s'annulant pas, on en trouve une seconde, indépendante, par
+\emph{abaissement de l'\omterm{def:b2:structures:generated}{ordre}}~: poser $y = y_1 z$ transforme
+l'équation homogène en une équation du premier \omterm{def:b2:structures:generated}{ordre} en $z'$,
+résolue par quadratures.
+\end{proposition}
+
+\begin{proof}
+La mise sous forme de système et le~\cref{thm:b2:diffeq:linear}
+donnent tout ce qui est structurel. Abaissement~: en substituant $y
+= y_1z$,
+\[
+y_1 z'' + (2y_1' + a y_1)z' + \underbrace{(y_1'' + ay_1' +
+by_1)}_{=\,0}\,z = 0 :
+\]
+une équation linéaire du premier \omterm{def:b2:structures:generated}{ordre} en $u = z'$, résoluble par la
+formule de l'année 1~; intégrer $u$ donne $z$, d'où $y_2 = y_1 z$,
+indépendante de $y_1$ dès que $z$ n'est pas constante.
+\end{proof}
+
+\begin{example}\label{ex:b2:diffeq:lowering}
+$t^2y'' - 2y = 0$ sur $\intoo{0}{\infty}$~: $y_1 = t^2$ est
+solution. Substituons $y = t^2z$~: de $y' = t^2z' + 2tz$ et $y''
+= t^2z'' + 4tz' + 2z$,
+\[
+t^2y'' - 2y = t^4 z'' + 4t^3z' = 0,
+\qquad\text{c.-à-d.}\qquad \frac{z''}{z'} = -\frac4t :
+\]
+$z' = t^{-4}$ (à une constante près), $z = -\frac{1}{3t^3}$, et
+$y_2 = t^2z = -\frac{1}{3t}$. Solution générale~: $y = \alpha t^2 +
+\frac{\beta}{t}$.
+\end{example}
+
+\section{Exercices}
+
+\begin{exercise}[$\star$]\label{exo:b2:diffeq:1}
+Résoudre $X' = AX$, $X(0) = (1, 0)^{\mathsf T}$, pour $A =
+\begin{pmatrix} 1 & 1\\ 0 & 2\end{pmatrix}$ (diagonaliser) et $A =
+\begin{pmatrix} 2 & 1\\ 0 & 2 \end{pmatrix}$ (Dunford).
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:diffeq:2}
+Quels problèmes de Cauchy ont des solutions globales uniques sur
+$\R$ d'après le~\cref{thm:b2:diffeq:cauchylipschitz}~? $y' =
+\sin(ty)$~; $\;y' = y^2$~; $\;y' = \abs y$. Pour le dernier,
+résoudre explicitement avec $y(0) = 0$ et $y(0) = 1$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:diffeq:3}
+Montrer que deux solutions maximales distinctes de $y' = f(t,y)$
+($f$ \omterm{def:b2:metric:continuity}{lipschitzienne} en $y$) ne prennent jamais la même valeur au
+même instant, et en déduire que les solutions de $y' = y(1 - y)$
+partant dans $\intoo{0}{1}$ y restent pour toujours.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:diffeq:4}
+Calculer $\eu^{tA}$ pour $A = \begin{pmatrix} 3 & 1\\ -1 &
+1\end{pmatrix}$ \emph{(Dunford~: $(A - 2I)^2 = 0$)}, et résoudre $X'
+= AX + \begin{pmatrix} \eu^{2t}\\ 0\end{pmatrix}$, $X(0) = 0$, par
+variation des constantes.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:diffeq:5}
+Pour $A = \begin{pmatrix} \alpha & -\beta\\ \beta &
+\alpha\end{pmatrix}$, montrer que $\eu^{tA} =
+\eu^{\alpha t}\begin{pmatrix} \cos\beta t & -\sin\beta t\\
+\sin\beta t & \cos\beta t\end{pmatrix}$ --- trajectoires en spirale
+--- de deux façons~: par la série (écrire $A = \alpha I + \beta J$,
+$J^2 = -I$), et par l'identification complexe $z' = (\alpha +
+\iu\beta)z$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:diffeq:6}
+(Lemme de Gronwall) Soit $u$ \omterm{def:b2:metric:continuity}{continue} positive vérifiant $u(t)
+\leq C + k\int_{t_0}^{t} u(s)\,\dd s$ sur $\intco{t_0}{T}$. Montrer
+que $u(t) \leq C\,\eu^{k(t - t_0)}$ \emph{(dériver $v(t) =
+\eu^{-kt}\int_{t_0}^t u$)}. En déduire de nouveau l'unicité dans
+Cauchy--Lipschitz et la dépendance \omterm{def:b2:metric:continuity}{continue} $\norm{y(t) -
+z(t)} \leq \norm{y_0 - z_0}\,\eu^{k\abs{t - t_0}}$ pour deux
+solutions de données initiales différentes.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:diffeq:7}
+Sachant que $y_1(t) = \frac{\sin t}{t}$ résout $ty'' + 2y' + ty =
+0$ sur $\intoo{0}{\pi}$, trouver une seconde solution indépendante
+par abaissement de l'\omterm{def:b2:structures:generated}{ordre}, et donner la solution générale.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:diffeq:8}
+Soit $A \in \mathcal{M}_n(\C)$ dont toutes les \omterm{def:b2:reduction:eigen}{valeurs propres} sont
+de partie réelle (strictement) négative. Montrer que toute solution
+de $X' = AX$ tend vers $0$ lorsque $t \to +\infty$, à un taux
+exponentiel~: $\norm{X(t)} \leq C\,\eu^{-\alpha t}$ pour un certain
+$\alpha > 0$.
+\emph{(Trigonaliser~; traiter le système triangulaire à partir de
+la dernière ligne en remontant, ou utiliser Dunford~: $\eu^{tA} =
+\eu^{tD}\eu^{tN}$ avec $\norm{\eu^{tD}} \leq \eu^{-\alpha' t}$ et
+$\eu^{tN}$ polynomial en $t$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:diffeq:9}
+(Pas d'échappement en temps fini pour une croissance linéaire)
+Supposons $f$ \omterm{def:b2:metric:continuity}{continue} avec $\norm{f(t, y)} \leq a\norm y + b$ sur
+$\intco{0}{\infty} \times \R^n$, localement \omterm{def:b2:metric:continuity}{lipschitzienne} en $y$.
+À l'aide de Gronwall (\cref{exo:b2:diffeq:6}) sur la forme
+intégrale, montrer que les solutions maximales sont globales
+(définies sur $\intco{0}{\infty}$ tout entier).
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:diffeq:10}
+Résoudre $y'' - 3y' + 2y = \eu^{t}$~: solutions homogènes, puis une
+solution particulière de la forme $\alpha t\,\eu^{t}$ \emph{(pourquoi
+la supposition naïve $\alpha\eu^t$ échoue-t-elle~?)}~; solution
+générale et la solution vérifiant $y(0) = y'(0) = 0$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:diffeq:11}
+Calculer $\eu^{tA}$ pour le bloc de Jordan
+\[
+A = \begin{pmatrix} \lambda & 1 & 0\\ 0 & \lambda & 1\\
+0 & 0 & \lambda\end{pmatrix},
+\]
+et décrire toutes les solutions de $X' = AX$~: des exponentielles
+fois des vecteurs polynomiaux, de degrés allant jusqu'à $2$. D'où
+vient le degré du polynôme~?
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:diffeq:12}
+(Forçage périodique, réponse périodique) Soient $A \in
+\mathcal{M}_n(\R)$ et $B \colon \R \to \R^n$ \omterm{def:b2:metric:continuity}{continue} et
+$T$-périodique.
+\begin{enumerate}
+  \item Montrer qu'une solution de $X' = AX + B(t)$ est
+        $T$-périodique si et seulement si $X(T) = X(0)$
+        \emph{(comparer $X(\cdot + T)$ et $X$)}.
+  \item Montrer que les \omterm{def:b2:reduction:eigen}{valeurs propres} de $\eu^{TA}$ sont les
+        $\eu^{T\lambda}$, $\lambda \in \operatorname{Sp}A$
+        \emph{(trigonaliser sur $\C$)}. En déduire~: si aucune
+        \omterm{def:b2:reduction:eigen}{valeur propre} de $A$ n'appartient à
+        $\frac{2\iu\pi}{T}\Z$, alors $I - \eu^{TA}$ est
+        inversible.
+  \item Sous cette hypothèse, montrer que le système a
+        exactement une solution $T$-périodique, avec
+        \[
+        X(0) = \bigl(I - \eu^{TA}\bigr)^{-1}
+        \int_0^{T}\eu^{(T-s)A}B(s)\,\dd s .
+        \]
+        À quoi correspond le cas exclu, pour l'oscillateur
+        harmonique~? (Le problème du week-end répond~: la
+        \omterm{pb:b2:diffeq:1}{résonance}.)
+\end{enumerate}
+\end{exercise}
+
+\section{Problème~: oscillations, résonance et théorèmes de
+comparaison de Sturm}
+
+\begin{problem}\label{pb:b2:diffeq:1}
+Une seule équation régit le monde mécanique et électrique~:
+\[
+x'' + 2\zeta\omega\,x' + \omega^2 x = F(t),
+\qquad \omega > 0,\ \zeta \geq 0 .
+\]
+Ce problème l'étudie complètement --- via la
+classification trace--déterminant des systèmes linéaires plans,
+les trois régimes d'amortissement, la réponse en régime permanent
+à un forçage périodique avec son pic de
+\emph{résonance}\index{résonance} et la catastrophe de \omterm{pb:b2:diffeq:1}{résonance}
+--- puis quitte les coefficients constants pour les \emph{théorèmes
+de séparation et de comparaison de Sturm}\index{théorème de
+comparaison de Sturm}, qui contrôlent les zéros des solutions de
+$y'' + q(t)y = 0$ sans aucune formule.
+
+\medskip
+\noindent\textbf{Partie I --- Le plan trace--déterminant.} Soient
+$A \in \mathcal M_2(\R)$, $\tau = \operatorname{tr}A$, $\delta
+= \det A$, $\Delta = \tau^2 - 4\delta$.
+\begin{enumerate}
+  \item Montrer que les \omterm{def:b2:reduction:eigen}{valeurs propres} de $A$ sont
+        $\frac{\tau\pm\sqrt\Delta}{2}$ et classer~: deux \omterm{def:b2:reduction:eigen}{valeurs
+        propres} réelles de signes opposés ssi $\delta < 0$~;
+        \omterm{def:b2:reduction:eigen}{valeurs propres} réelles de même signe ssi $\delta > 0$,
+        $\Delta \geq 0$ (signe de $\tau$)~; paire conjuguée non
+        réelle ssi $\Delta < 0$ (partie réelle $\frac\tau2$).
+  \item (Selle, $\delta < 0$) Avec les \omterm{def:b2:reduction:eigen}{valeurs propres} $\mu < 0
+        < \lambda$ et les vecteurs propres $v_\pm$, écrire la
+        solution générale et décrire les trajectoires~: deux
+        demi-droites stables et deux instables, toutes les autres
+        orbites asymptotes aux deux. Pourquoi aucune solution
+        autre que $0$ ne peut-elle rester bornée sur $\R$ tout
+        entier~?
+  \item (Nœuds, $\delta > 0$, $\Delta > 0$) Pour $\mu < \lambda
+        < 0$~: montrer que toute solution non nulle tend vers $0$
+        et que toutes les orbites, sauf celles sur l'axe rapide,
+        arrivent \emph{tangentiellement à la direction propre
+        lente} \emph{(comparer $\eu^{\mu t}$ et $\eu^{\lambda
+        t}$)}.
+  \item (Foyers et centres, $\Delta < 0$) En écrivant les
+        \omterm{def:b2:reduction:eigen}{valeurs propres} $\alpha \pm \iu\beta$, utiliser
+        l'\cref{exo:b2:diffeq:5} (après un changement de base
+        réel, admis dans cette généralité ou démontré pour les
+        systèmes de la partie II, qui sont ceux utilisés
+        ci-dessous) pour décrire les orbites~: des spirales
+        convergeant pour $\alpha = \frac\tau2 < 0$, divergeant
+        pour $\tau > 0$, des courbes fermées (centre) pour $\tau
+        = 0$.
+  \item (Cas limites) Pour une \omterm{def:b2:reduction:eigen}{valeur propre} double ($\Delta =
+        0$)~: montrer que $\eu^{tA} = \eu^{\lambda t}(I + tN)$
+        avec $N = A - \lambda I$ nilpotent, et distinguer
+        l'étoile ($N = 0$) du nœud impropre ($N \neq 0$).
+        Résumer la partie I dans le dessin trace--déterminant de
+        la figure de ce chapitre.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie II --- L'oscillateur amorti.} Maintenant $F
+= 0$~: $x'' + 2\zeta\omega x' + \omega^2x = 0$, c'est-à-dire $X' =
+AX$ avec $A = \begin{pmatrix} 0 & 1\\ -\omega^2 &
+-2\zeta\omega\end{pmatrix}$.
+\begin{enumerate}[resume]
+  \item Calculer $\tau, \delta, \Delta$ et placer les trois
+        régimes dans le plan trace--déterminant~:
+        \emph{sous-amorti} $0 < \zeta < 1$ (foyer stable),
+        \emph{amortissement critique} $\zeta = 1$ (\omterm{def:b2:reduction:eigen}{valeur propre}
+        double), \emph{sur-amorti} $\zeta > 1$ (nœud stable)~;
+        $\zeta = 0$ est le centre.
+  \item Résoudre explicitement les trois régimes~:
+        \[
+        \zeta < 1:\ \eu^{-\zeta\omega t}\bigl(a\cos\omega_d t
+        + b\sin\omega_dt\bigr),\ \omega_d =
+        \omega\sqrt{1-\zeta^2};
+        \qquad
+        \zeta = 1:\ (a + bt)\,\eu^{-\omega t};
+        \]
+        $\zeta > 1$~: deux exponentielles réelles. Définir la
+        pseudo-période $\frac{2\pi}{\omega_d}$ et montrer que
+        le rapport des maxima successifs de $\abs x$ est la
+        constante $\eu^{-2\pi\zeta/\sqrt{1-\zeta^2}}$ (le
+        décrément logarithmique).
+  \item (Le principe du ferme-porte) Pour $\zeta \geq 1$, le
+        taux de décroissance est régi par la plus lente des
+        \omterm{def:b2:reduction:eigen}{valeurs propres} $\lambda_{\mathrm{slow}} = -\omega\bigl(\zeta -
+        \sqrt{\zeta^2-1}\bigr)$. Montrer que
+        $\abs{\lambda_{\mathrm{slow}}} =
+        \frac{\omega}{\zeta + \sqrt{\zeta^2 - 1}}$ est une
+        fonction \emph{décroissante} de $\zeta \geq 1$~:
+        l'amortissement critique $\zeta = 1$ donne le retour au
+        repos non oscillant le plus rapide.
+  \item (Énergie) Posons $E(t) = \frac12x'^2 +
+        \frac12\omega^2x^2$. Montrer que $E' = -2\zeta\omega\,x'^2
+        \leq 0$, et en déduire que pour $\zeta > 0$ l'équation
+        n'a aucune solution périodique non nulle \emph{(une
+        période forcerait $E$ à être constante, donc $x' \equiv
+        0$)}.
+  \item Expliquer en deux phrases pourquoi le centre $\zeta = 0$
+        est \emph{structurellement fragile}~: tout $\zeta > 0$,
+        aussi petit soit-il, détruit la périodicité --- et où
+        cela se voit dans le plan trace--déterminant (la droite
+        des centres est d'intérieur vide).
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie III --- Oscillations forcées et
+\omterm{pb:b2:diffeq:1}{résonance}.} Maintenant $F(t) = F\cos(\gamma t)$ avec $F, \gamma > 0$.
+\begin{enumerate}[resume]
+  \item ($\zeta > 0$~: le régime permanent) Chercher $x_p =
+        \Re\bigl(z\,\eu^{\iu\gamma t}\bigr)$~: montrer que
+        \[
+        z = \frac{F}{\omega^2 - \gamma^2 +
+        2\iu\zeta\omega\gamma},
+        \qquad
+        A(\gamma) := \abs z = \frac{F}{\sqrt{(\omega^2 -
+        \gamma^2)^2 + 4\zeta^2\omega^2\gamma^2}} ,
+        \]
+        et écrire $x_p = A(\gamma)\cos(\gamma t - \varphi)$
+        avec $\tan\varphi =
+        \frac{2\zeta\omega\gamma}{\omega^2-\gamma^2}$.
+  \item Montrer que \emph{toute} solution est $x_p$ plus un
+        transitoire issu de la partie II, qui tend vers $0$~:
+        quelles que soient les données initiales, le système se
+        cale sur le régime permanent --- amplitude $A(\gamma)$,
+        déphasage $\varphi$.
+  \item (La courbe de \omterm{pb:b2:diffeq:1}{résonance}) Maximiser $A$~: montrer que
+        $A(\gamma)$ a un maximum intérieur ssi $\zeta <
+        \frac{1}{\sqrt2}$, en
+        \[
+        \gamma_* = \omega\sqrt{1 - 2\zeta^2},
+        \qquad
+        A(\gamma_*) =
+        \frac{F}{2\zeta\omega^2\sqrt{1-\zeta^2}} ,
+        \]
+        et que pour $\zeta$ petit le pic amplifie la réponse
+        statique $A(0) = \frac F{\omega^2}$ du facteur $\approx
+        \frac{1}{2\zeta}$.
+  \item ($\zeta = 0$, hors \omterm{pb:b2:diffeq:1}{résonance}) Pour $\gamma \neq \omega$,
+        montrer que la solution vérifiant $x(0) = x'(0) = 0$ est
+        \[
+        x(t) = \frac{F}{\omega^2 -
+        \gamma^2}\bigl(\cos\gamma t - \cos\omega t\bigr)
+        = \frac{2F}{\omega^2-\gamma^2}
+        \sin\frac{(\omega-\gamma)t}{2}
+        \sin\frac{(\omega+\gamma)t}{2} :
+        \]
+        bornée, avec des \emph{battements} --- une oscillation
+        rapide sous une enveloppe lente --- lorsque $\gamma$ est
+        proche de $\omega$.
+  \item ($\zeta = 0$, \omterm{pb:b2:diffeq:1}{résonance}) Pour $\gamma = \omega$, montrer
+        que $x_p(t) = \frac{F}{2\omega}\,t\sin(\omega t)$ est
+        une solution, et la retrouver comme limite de la question
+        14 quand $\gamma \to \omega$~: l'amplitude croît
+        linéairement sans fin --- la catastrophe de \omterm{pb:b2:diffeq:1}{résonance}.
+  \item (Lien avec Fourier) Un forçage périodique général se
+        décompose en harmoniques (le chapitre de Fourier)~; par
+        linéarité, le régime permanent est la somme des réponses
+        harmoniques. Pour un oscillateur non amorti de fréquence
+        $\omega = 3$ forcé par le signal carré du type de
+        l'\cref{exo:b2:fourier:1} (harmoniques à tous les entiers
+        impairs), quelle harmonique entre en \omterm{pb:b2:diffeq:1}{résonance}~? Une
+        phrase sur les raisons pour lesquelles les ingénieurs
+        craignent les signaux carrés.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie IV --- Les théorèmes de Sturm.} Considérons
+$y'' + q(t)\,y = 0$ sur un intervalle $I$, $q$ \omterm{def:b2:metric:continuity}{continue}. (Toute
+équation $y'' + ay' + by = 0$ se ramène à cette forme normale par
+la substitution $y = u\exp\bigl(-\frac12\int a\bigr)$~; la question
+21 montre une variante de l'astuce à l'œuvre.)
+\begin{enumerate}[resume]
+  \item Pour deux solutions $y_1, y_2$, montrer que le \omterm{def:b2:diffeq:wronskian}{wronskien}
+        $W = y_1y_2' - y_1'y_2$ est \emph{constant}, nul ssi
+        les solutions sont proportionnelles~; et qu'une solution
+        non nulle n'a que des zéros \emph{simples et isolés}.
+  \item (Séparation de Sturm) Soient $y_1, y_2$ deux solutions
+        indépendantes et $a < b$ deux zéros consécutifs de $y_1$.
+        Montrer que $y_2$ s'annule exactement une fois dans
+        $\intoo{a}{b}$ \emph{(évaluer la constante $W$ en $a$
+        et $b$~: $W = y_1'y_2$ en ces points, et $y_1'(a)$,
+        $y_1'(b)$ sont de signes opposés)}~: les zéros de
+        solutions indépendantes s'entrelacent.
+  \item (Comparaison de Sturm) Soient $q_1 \leq q_2$ sur $I$, $y
+        \neq 0$ avec $y'' + q_1y = 0$, $z \neq 0$ avec $z'' +
+        q_2z = 0$, et $a < b$ deux zéros consécutifs de $y$.
+        Montrer que $z$ s'annule dans $\intcc{a}{b}$ ---
+        strictement à l'intérieur si $q_1 < q_2$ quelque part sur
+        $\intoo ab$ \emph{(si $z \neq 0$ sur $\intoo ab$, étudier
+        $(yz' - y'z)' = (q_1 - q_2)yz$ avec des signes fixes pour
+        $y, z$ et comparer les valeurs aux bords)}.
+  \item En déduire les \emph{bornes d'espacement}~: si $0 < m^2
+        \leq q(t) \leq M^2$ sur $I$, alors deux zéros consécutifs
+        $a < b$ d'une solution non nulle de $y'' + qy = 0$
+        vérifient
+        \[
+        \frac{\pi}{M} \;\leq\; b - a \;\leq\; \frac{\pi}{m}
+        \]
+        \emph{(comparer avec $u'' + M^2u = 0$ et $u'' + m^2u
+        = 0$, dont les zéros sont espacés de $\frac\pi M$ et
+        $\frac\pi m$)}. Vérifier sur l'oscillateur harmonique.
+  \item Transformer $ty'' + 2y' + ty = 0$
+        (\cref{exo:b2:diffeq:7}) par $u = ty$ en $u'' + u =
+        0$, retrouver aussitôt ses solutions $\frac{\sin t}t$,
+        $\frac{\cos t}{t}$, et conclure que les zéros de toute
+        solution non nulle sont espacés exactement de $\pi$~: la
+        vision du monde de Sturm --- les zéros sont contrôlés par
+        le coefficient $q$, formules ou pas.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie V --- Duhamel et la frontière de
+bornitude.}
+\begin{enumerate}[resume]
+  \item (Duhamel pour l'oscillateur) Montrer que pour $F$
+        \omterm{def:b2:metric:continuity}{continue}, la solution de $x'' + \omega^2x =
+        F(t)$ vérifiant $x(0) = x'(0) = 0$ est
+        \[
+        x(t) = \frac1\omega\int_0^t\sin\bigl(\omega(t -
+        s)\bigr)F(s)\,\dd s ,
+        \]
+        et en redériver la solution résonante de la question 15
+        avec $F(s) = F\cos(\omega s)$
+        \emph{(produit en somme)}.
+  \item ($\zeta > 0$~: entrée bornée, sortie bornée) Montrer
+        que pour $\zeta > 0$ et \emph{toute} fonction \omterm{def:b2:metric:continuity}{continue}
+        bornée $F$, toute solution de l'équation amortie est
+        bornée sur $\intco{0}{\infty}$ \emph{(variation des
+        constantes plus la décroissance exponentielle
+        $\vertiii{\eu^{tA}} \leq C\eu^{-\alpha t}$ de
+        l'\cref{exo:b2:diffeq:8})}.
+  \item ($\zeta = 0$) Montrer que sans amortissement, un forçage
+        périodique borné maintient toutes les solutions bornées
+        \emph{sauf} exactement à la \omterm{pb:b2:diffeq:1}{résonance} ($\gamma =
+        \omega$, question 15 contre question 14)~: c'est
+        l'amortissement qui transforme la frontière de bornitude
+        en stabilité uniforme.
+  \item Synthèse. En une phrase chacune~: (i) comment le
+        plan trace--déterminant organise les parties I--II et
+        où le forçage (partie III) le quitte~; (ii) le
+        sens physique de $\gamma_*$, $A(\gamma_*)$ et
+        du facteur $\frac1{2\zeta}$~; (iii) ce que les
+        théorèmes de Sturm disent que les formules explicites ne
+        peuvent dire~; (iv) lesquels des deux résultats de ce
+        problème le reste du livre réutilisera discrètement
+        (\omterm{def:b2:diffeq:wronskian}{wronskiens} constants par Liouville~; stabilité entrée
+        bornée).
+\end{enumerate}
+\end{problem}

@@ -1,0 +1,767 @@
+\chapter{Suites et séries}\label{ch:b2:series}
+
+La théorie des séries numériques (volume de Licence~1) mûrit ici dans
+trois directions~: les séries à valeurs dans les \omterm{def:b2:nvs:banach}{espaces de Banach}, où
+la convergence absolue fait le travail~; les critères plus fins pour
+les séries réelles (\omterm{thm:b2:series:abel}{transformation d'Abel})~; et les \emph{\omterm{def:b2:series:summable}{familles
+sommables}} --- la sommation affranchie de l'\omterm{def:b2:structures:generated}{ordre} des termes --- avec
+le théorème de Fubini pour les sommes doubles et le \omterm{thm:b2:series:fubini}{produit de Cauchy}.
+Ces outils portent tous les chapitres de séries de fonctions à venir.
+
+\section{Séries dans les espaces normés}
+
+\begin{definition}\label{def:b2:series:def}
+Pour une suite $(u_n)$ dans un espace normé $E$, la série $\sum u_n$
+converge lorsque ses sommes partielles convergent~; elle converge
+\emph{absolument}\index{convergence absolue!dans un espace de Banach}
+lorsque $\sum \norm{u_n} < \infty$. Dans un espace de \emph{Banach},
+la convergence absolue implique la convergence
+(\cref{thm:b2:nvs:absoluteconvergence})~; dans un espace non \omterm{def:b2:metric:complete}{complet},
+cela peut être faux (\cref{exo:b2:series:9}).
+\end{definition}
+
+\begin{example}\label{ex:b2:series:neumann}
+Dans $\mathcal{M}_n(K)$ (ou $\mathcal{L}_c(E)$, $E$ de Banach)~: pour
+$\vertiii A < 1$, la \emph{série de Neumann} $\sum A^k$ converge
+\omterm{def:b2:series:def}{absolument} vers $(I - A)^{-1}$ (démontré à l'\cref{exo:b2:nvs:5})~;
+$\sum \frac{A^k}{k!}$ converge \omterm{def:b2:series:def}{absolument} vers $\eu^A$ pour tout $A$
+(\cref{ex:b2:nvs:matrixexp}). Les séries géométrique et exponentielle
+à valeurs opérateurs se comportent comme leurs modèles scalaires ---
+tout l'intérêt du cadre de Banach.
+\end{example}
+
+\section{Transformation d'Abel}
+
+\begin{theorem}[Transformation et critère d'Abel]\label{thm:b2:series:abel}
+(Sommation par parties) Pour des scalaires $a_n$ et des vecteurs
+$b_n$, avec $B_n = \sum_{k=0}^{n} b_k$~:\index{transformation d'Abel}
+\[
+\sum_{n=0}^{N} a_n b_n
+= a_N B_N - \sum_{n=0}^{N-1} (a_{n+1} - a_n) B_n .
+\]
+(Critère d'Abel) Si $(a_n)$ est une suite réelle, décroissant vers
+$0$, et si les sommes partielles $B_n$ sont \emph{bornées} (dans un
+\omterm{def:b2:nvs:banach}{espace de Banach}), alors $\sum a_n b_n$ converge.
+\end{theorem}
+
+\begin{proof}
+L'identité, pas à pas~: avec $B_{-1} = 0$, écrivons $b_n = B_n -
+B_{n-1}$ et scindons,
+\[
+\sum_{n=0}^{N} a_nb_n
+= \sum_{n=0}^{N} a_nB_n - \sum_{n=0}^{N} a_nB_{n-1}
+= \sum_{n=0}^{N} a_nB_n - \sum_{n=0}^{N-1} a_{n+1}B_{n} ,
+\]
+en réindexant la deuxième somme par $n \mapsto n + 1$ (le terme
+$B_{-1}$ s'annule)~; en regroupant sur la plage commune $0 \leq n
+\leq N-1$, il reste $a_NB_N$ plus $\sum_{n\leq N-1}(a_n -
+a_{n+1})B_n$~: la formule annoncée. C'est l'intégration par parties
+discrète, avec $(B_n)$ comme primitive de $(b_n)$ et la différence
+$a_{n+1} - a_n$ comme dérivée de $(a_n)$. Pour le critère, avec
+$\norm{B_n} \leq M$~: le terme de bord $a_N B_N \to 0$~; la série
+$\sum (a_n - a_{n+1})B_n$ converge \omterm{def:b2:series:def}{absolument}, car
+\[
+\sum_n \norm{(a_{n+1} - a_n)B_n} \leq M \sum_n (a_n - a_{n+1})
+= M a_0 < \infty
+\]
+(télescopage, $a_n \downarrow 0$). Les deux morceaux de l'identité
+convergent, donc $\sum a_n b_n$ aussi.
+\end{proof}
+
+\begin{example}\label{ex:b2:series:sinn}
+$\sum \frac{\sin n}{n}$ converge~: $a_n = \frac1n \downarrow 0$ et
+$B_n = \sum_{k=1}^{n} \sin k$ est bornée --- en effet $B_n =
+\Im\sum_{k \leq n} \eu^{\iu k} = \Im\,\frac{\eu^{\iu}(\eu^{\iu n} -
+1)}{\eu^{\iu} - 1}$, de module $\leq \frac{2}{\abs{\eu^{\iu} - 1}}$.
+Elle ne converge \emph{pas} \omterm{def:b2:series:def}{absolument} ($\abs{\sin n} \geq \sin^2 n
+= \frac{1 - \cos 2n}{2}$, et $\sum \frac{1 - \cos 2n}{2n}$ diverge
+puisque $\sum \frac{\cos 2n}{n}$ converge par le même critère d'Abel
+tandis que $\sum \frac{1}{2n}$ diverge). Le critère spécial des
+séries \omterm{def:b2:linalg:alternating}{alternées} est le cas particulier $b_n = (-1)^n$.
+\end{example}
+
+\begin{example}[Abel sur le cercle de convergence]\label{ex:b2:series:abelboundary}
+Pour quels complexes $z$ avec $\abs z = 1$ la série $\sum_{n \geq 1}
+\frac{z^n}{n}$ converge-t-elle~? En $z = 1$, c'est la série
+harmonique~: divergente. Pour $z \neq 1$ sur le cercle, le critère
+d'Abel s'applique avec $a_n = \frac1n \downarrow 0$ et $b_n = z^n$,
+dont les sommes partielles sont bornées indépendamment de $N$~:
+\[
+\Bigl|\sum_{n=1}^{N} z^n\Bigr|
+= \Bigl|\frac{z(z^N - 1)}{z - 1}\Bigr|
+\leq \frac{2}{\abs{z - 1}} .
+\]
+Convergente --- mais jamais \omterm{def:b2:series:def}{absolument} ($\sum\frac1n$). Une seule
+série, tout un cercle de comportements~: divergence en un unique
+point, semi-convergence partout ailleurs. C'est le comportement au
+bord standard des séries entières (\cref{ch:b2:powerseries}),
+rencontré ici à mains nues~; en $z = -1$, on retrouve la série
+harmonique \omterm{def:b2:linalg:alternating}{alternée}, et en $z = \eu^{\iu\theta}$ ses parties réelle
+et imaginaire sont les séries $\sum\frac{\cos n\theta}{n}$ et
+$\sum\frac{\sin n\theta}{n}$ de l'\cref{exo:b2:series:4}.
+\end{example}
+
+\begin{example}[Une série alternée piégée]\label{ex:b2:series:trap}
+La série $\sum_{n\geq2} \dfrac{(-1)^n}{\sqrt n + (-1)^n}$
+converge-t-elle~? Les signes alternent et les termes tendent vers
+$0$ --- pourtant le critère des séries \omterm{def:b2:linalg:alternating}{alternées} ne s'applique
+\emph{pas}~: les modules $\frac{1}{\sqrt n + (-1)^n}$ ne sont pas
+décroissants (ils font un saut vers le haut à chaque $n$ impair).
+Développons plutôt~:
+\[
+\frac{(-1)^n}{\sqrt n + (-1)^n}
+= \frac{(-1)^n}{\sqrt n}\cdot
+\frac{1}{1 + \frac{(-1)^n}{\sqrt n}}
+= \frac{(-1)^n}{\sqrt n} - \frac{1}{n}
++ O\Bigl(\frac{1}{n^{3/2}}\Bigr).
+\]
+Le premier morceau converge (critère des séries \omterm{def:b2:linalg:alternating}{alternées},
+honnêtement appliqué à $\frac1{\sqrt n}\downarrow0$), le troisième
+converge \omterm{def:b2:series:def}{absolument} --- mais le morceau du milieu est la série
+harmonique divergente~: la somme \emph{diverge} vers $-\infty$. La
+leçon finale~: quand la monotonie fait défaut, développez jusqu'à
+ce que chaque morceau soit soit \omterm{def:b2:series:def}{absolument} convergent, soit un cas
+d'école bien net~; le $-\frac1n$ caché est invisible au simple
+comptage des signes.
+\end{example}
+
+\begin{remark}[Pièges courants]\label{rem:b2:series:pitfalls}
+(i) «~Les termes tendent vers $0$~» ne prouve rien~: la série
+harmonique diverge. (ii) Le critère des séries \omterm{def:b2:linalg:alternating}{alternées} exige des
+modules \emph{décroissants} --- l'\cref{ex:b2:series:trap} en est le
+contre-exemple canonique, et la troisième série de
+l'\cref{exo:b2:series:1} l'exercice d'entraînement. (iii) Les séries
+semi-convergentes ne peuvent pas être réordonnées
+(\cref{ex:b2:series:rearrange}), et leurs \omterm{thm:b2:series:fubini}{produits de Cauchy} peuvent
+diverger~: pour le carré de $\sum\frac{(-1)^n}{\sqrt{n+1}}$, les
+termes diagonaux vérifient
+\[
+\abs{c_k} = \sum_{m=0}^{k}
+\frac{1}{\sqrt{(m+1)(k-m+1)}}
+\geq (k+1)\cdot\frac{2}{k+2} \longrightarrow 2 \neq 0
+\]
+(chaque facteur vaut au plus $\frac{k+2}2$ par l'inégalité
+arithmético-géométrique), donc $\sum c_k$ diverge --- la convergence
+absolue d'au moins un facteur (\cref{exo:b2:series:8}) n'est pas un
+luxe. (iv) La sommabilité porte sur des bornes \emph{absolues} par
+définition~: il n'existe pas de famille \omterm{def:b2:series:summable}{semi-sommable}.
+\end{remark}
+
+\section{Familles sommables}
+
+\begin{definition}\label{def:b2:series:summable}
+Soit $I$ un ensemble d'indices \omterm{def:b2:structures:countable}{dénombrable}. Une famille $(u_i)_{i
+\in I}$ de \emph{réels positifs} est \emph{sommable}\index{famille
+sommable} lorsque les sommes partielles finies sont bornées~; sa
+somme est
+\[
+\sum_{i \in I} u_i = \sup_{F \subseteq I \text{ finie}} \sum_{i
+\in F} u_i \in \intcc{0}{+\infty} .
+\]
+Une famille de réels ou de complexes (ou de vecteurs de Banach) est
+sommable lorsque $(\norm{u_i})$ l'est~; sa somme est alors définie en
+la scindant en parties positive/négative (ou réelle/imaginaire) ---
+de manière équivalente, comme la valeur commune de $\sum_{n}
+u_{\sigma(n)}$ sur toutes les énumérations $\sigma$ de $I$ (voir
+ci-dessous).
+\end{definition}
+
+\begin{method}[Choisir un critère]\label{met:b2:series:choosing}
+Face à $\sum u_n$, dans l'\omterm{def:b2:structures:generated}{ordre}~: (1) si $u_n \not\to 0$, divergence,
+on s'arrête. (2) Si les termes sont de signe constant, on compare~:
+on cherche un équivalent (\cref{ch:b2:comparison}) et on le place sur
+la carte de Riemann--Bertrand. (3) Si les signes alternent avec des
+modules \emph{décroissants}, le critère des séries \omterm{def:b2:linalg:alternating}{alternées}~; si les
+modules ne sont pas monotones, on développe le terme jusqu'à ce que
+chaque morceau soit \omterm{def:b2:series:def}{absolument} convergent ou un cas d'école bien net
+(\cref{ex:b2:series:trap}). (4) Si le motif des signes est oscillant
+mais structuré ($\sin n\theta$, $\eu^{\iu n\theta}$, puissances de
+matrices), le critère d'Abel avec des sommes partielles bornées. (5)
+La convergence absolue vaut toujours la peine d'être examinée en
+premier~: elle est plus forte, insensible à l'\omterm{def:b2:structures:generated}{ordre}, et débloque les
+\omterm{thm:b2:series:fubini}{produits de Cauchy} et Fubini.
+\end{method}
+
+\begin{example}[Sommabilité par comptage diagonal]\label{ex:b2:series:diagonalcount}
+Pour quels $s > 0$ la famille $\bigl((m + n)^{-s}\bigr)_{m, n \geq
+1}$ est-elle \omterm{def:b2:series:summable}{sommable}~? Regroupons les sommes partielles finies par
+diagonales $m + n = k$~: la diagonale $k$ porte $k - 1$ couples,
+contribuant chacun $k^{-s}$, de sorte que les sommes finies sont
+exactement bornées par (et épuisent)
+\[
+\sum_{k \geq 2} \frac{k - 1}{k^{s}} ,
+\]
+une série à termes positifs équivalente à $k^{1-s}$~: \omterm{def:b2:series:summable}{sommable} si et
+seulement si $s - 1 > 1$, c'est-à-dire $s > 2$. L'indice
+bidimensionnel dévore une puissance entière~: un plan de termes est
+«~divergent d'une dimension de plus~» qu'une droite --- c'est la
+géométrie de comptage de l'ensemble d'indices, et non la taille des
+termes individuels, qui décide de la sommabilité. (Le même
+recensement montre que $\bigl((m^2 + n^2)^{-1}\bigr)$ n'est pas
+\omterm{def:b2:series:summable}{sommable}~: sur la diagonale $m + n = k$, chaque terme vaut au moins
+$k^{-2}$, et $(k-1)\cdot k^{-2}$ se somme comme la série harmonique.)
+\end{example}
+
+\begin{theorem}[Sommabilité et ordre]\label{thm:b2:series:rearrangement}
+\begin{enumerate}
+  \item Pour les familles positives, la somme est invariante par
+        toute énumération~: $\sum_{i} u_i = \sum_{n=0}^{\infty}
+        u_{\sigma(n)}$ pour toute bijection $\sigma \colon \N \to I$.
+  \item Une série réelle ou complexe $\sum u_n$ est \emph{commutativement
+        convergente} (tout réordonnancement converge, avec la même
+        somme) si et seulement si elle est \omterm{def:b2:series:def}{absolument} convergente.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) Toute somme partielle $\sum_{n \leq N} u_{\sigma(n)}$ est une
+somme partielle finie de la famille (donc $\leq$ le sup)~; tout
+ensemble fini $F$ est contenu dans un $\{\sigma(0), \dots,
+\sigma(N)\}$ (donc le sup $\leq$ la limite de la série). Les deux
+bornes coïncident.
+
+(2) Si $\sum\abs{u_n} < \infty$~: pour tout réordonnancement $\sigma$
+et tout $\varepsilon > 0$, choisissons $N$ tel que $\sum_{n >
+N}\abs{u_n} \leq \varepsilon$~; au-delà du rang où $\sigma$ a épuisé
+$\intint{0}{N}$, les sommes partielles réordonnées diffèrent de la
+limite initiale d'au plus $\varepsilon$~: même somme. Si $\sum
+\abs{u_n} = \infty$ mais $\sum u_n$ converge (cas réel~; le cas
+complexe suit coordonnée par coordonnée)~: les parties positive et
+négative divergent toutes deux, et l'on peut réordonner pour
+atteindre n'importe quelle limite prescrite --- le théorème de
+Riemann, mené dans l'\cref{exo:b2:series:5} --- de sorte que la
+convergence commutative échoue.
+\end{proof}
+
+\begin{example}[Un réordonnancement pris la main dans le sac]\label{ex:b2:series:rearrange}
+La série harmonique \omterm{def:b2:linalg:alternating}{alternée} a pour somme
+$\sum_{n\geq1}\frac{(-1)^{n-1}}{n} = \ln 2$ (volume de
+Licence~1). Réordonnons-la en «~un positif, deux négatifs~»~:
+\[
+1 - \frac12 - \frac14 + \frac13 - \frac16 - \frac18 + \frac15 -
+\cdots
+\]
+En regroupant chaque bloc de trois,
+\[
+\frac{1}{2k-1} - \frac{1}{4k-2} - \frac1{4k}
+= \frac{1}{4k-2} - \frac{1}{4k}
+= \frac12\Bigl(\frac{1}{2k-1} - \frac1{2k}\Bigr),
+\]
+de sorte que la série réordonnée converge vers $\frac12\ln 2$ --- la
+moitié de la somme initiale, avec exactement les mêmes termes. Les
+séries non \omterm{def:b2:series:def}{absolument} convergentes se souviennent de l'\omterm{def:b2:structures:generated}{ordre} de
+leurs termes~; les \omterm{def:b2:series:summable}{familles sommables} sont précisément celles qui ne
+s'en souviennent pas.
+\end{example}
+
+\begin{example}[Regrouper est sûr, dégrouper ne l'est pas]\label{ex:b2:series:grouping}
+Regrouper les termes consécutifs d'une série \emph{convergente} ne
+change jamais la somme~: les sommes partielles regroupées forment une
+sous-suite des sommes initiales. L'opération inverse est interdite~:
+\[
+(1 - 1) + (1 - 1) + (1 - 1) + \cdots = 0 + 0 + \cdots = 0,
+\]
+alors que la série dégroupée $1 - 1 + 1 - 1 + \cdots$ diverge (les
+sommes partielles oscillent entre $1$ et $0$). Dégrouper n'est
+légitime que sous une hypothèse compensatrice --- par exemple, des
+termes tendant vers $0$ avec des longueurs de paquets bornées~:
+alors, entre deux sommes partielles regroupées, les sommes initiales
+dérivent d'au plus une somme de $o(1)$ termes en nombre borné, et la
+convergence se transfère en retour. C'est exactement la clause sous
+laquelle le calcul par blocs de l'\cref{ex:b2:series:rearrange} est
+une preuve et non un tour de passe-passe.
+\end{example}
+
+\begin{theorem}[Fubini pour les familles~; produits de Cauchy]\label{thm:b2:series:fubini}
+Soit $(u_{m,n})_{(m,n) \in \N^2}$ une famille double \omterm{def:b2:series:summable}{sommable}
+(c'est-à-dire $\sup_F \sum_F \abs{u_{m,n}} < \infty$).
+Alors\index{théorème de Fubini pour les séries}
+\[
+\sum_{(m,n)} u_{m,n}
+= \sum_{m=0}^{\infty}\Bigl(\sum_{n=0}^{\infty} u_{m,n}\Bigr)
+= \sum_{n=0}^{\infty}\Bigl(\sum_{m=0}^{\infty} u_{m,n}\Bigr)
+= \sum_{k=0}^{\infty}\Bigl(\sum_{m+n=k} u_{m,n}\Bigr),
+\]
+toutes les séries internes convergeant (\omterm{def:b2:series:def}{absolument}). En particulier,
+si $\sum a_m$ et $\sum b_n$ convergent \omterm{def:b2:series:def}{absolument}, leur \emph{produit
+de Cauchy}\index{produit de Cauchy} converge \omterm{def:b2:series:def}{absolument} avec
+\[
+\Bigl(\sum_m a_m\Bigr)\Bigl(\sum_n b_n\Bigr)
+= \sum_{k=0}^{\infty} c_k,
+\qquad
+c_k = \sum_{m=0}^{k} a_m b_{k-m} .
+\]
+\end{theorem}
+
+\begin{proof}
+\emph{Cas positif.} Chaque regroupement (par lignes, colonnes ou
+diagonales) calcule le même supremum~: tout ensemble fini de couples
+est contenu dans un bloc fini de lignes (minorant chaque somme
+regroupée par des sommes partielles finies et la majorant par le
+total), et la convergence monotone des sommes partielles fait le
+reste --- concrètement, pour les lignes~: $\sum_{m \leq M}\sum_{n
+\leq N} u_{m,n} \leq S$ donne, en faisant $N \to \infty$ puis $M \to
+\infty$, $\sum_m \sum_n u_{m,n} \leq S$~; réciproquement, tout
+ensemble fini $F$ se loge dans un tel rectangle, donc $S \leq
+\sum_m\sum_n u_{m,n}$. Diagonales~: les deux mêmes bornes avec des
+triangles au lieu de rectangles.
+
+\emph{Cas général.} On scinde en parties positive et négative (réelle
+et imaginaire), chacune une famille positive \omterm{def:b2:series:summable}{sommable}~; les quatre
+regroupements coïncident sur chaque partie, donc sur la différence~;
+la convergence absolue des séries internes vient du cas positif
+appliqué à $\abs{u_{m,n}}$.
+
+\emph{\omterm{thm:b2:series:fubini}{Produit de Cauchy}.} La famille $u_{m,n} = a_m b_n$ est
+\omterm{def:b2:series:summable}{sommable}~: les sommes partielles finies de $\abs{a_mb_n}$ sont
+bornées par $\bigl(\sum\abs{a_m}\bigr)\bigl(\sum\abs{b_n}\bigr)$. Les
+lignes donnent $\bigl(\sum a_m\bigr)\bigl(\sum b_n\bigr)$~; les
+diagonales donnent $\sum_k c_k$.
+\end{proof}
+
+\begin{example}[L'identité exponentielle, honnêtement]\label{ex:b2:series:exp}
+Pour $a, b \in \C$ (ou des matrices qui commutent)~:
+\[
+\Bigl(\sum_m \frac{a^m}{m!}\Bigr)\Bigl(\sum_n
+\frac{b^n}{n!}\Bigr)
+= \sum_k \sum_{m+n=k} \frac{a^m b^n}{m!\,n!}
+= \sum_k \frac{(a + b)^k}{k!},
+\]
+par la formule du binôme sur chaque diagonale~: $\eu^a \eu^b =
+\eu^{a+b}$ --- l'équation fonctionnelle de $\exp$ obtenue à partir de
+la seule série. (La commutation sert dans l'étape du binôme~; pour
+des matrices qui ne commutent pas, l'identité est réellement fausse,
+\cref{ch:b2:diffeq}.)
+\end{example}
+
+\begin{example}[Les produits de Cauchy comme outil de calcul]\label{ex:b2:series:squaresum}
+À partir de la série géométrique et du $\sum_{n \geq 1} nz^n =
+\frac{z}{(1-z)^2}$ ($\abs z < 1$) de l'\cref{exo:b2:series:2}, un
+\omterm{thm:b2:series:fubini}{produit de Cauchy} de plus achève le moment d'\omterm{def:b2:structures:generated}{ordre} deux. Multiplions
+$\sum_m mz^m$ par $\sum_n z^n$~: le coefficient diagonal est
+$\sum_{m=0}^k m = \frac{k(k+1)}2$, donc
+\[
+\frac{z}{(1-z)^3} = \sum_{k\geq0}\frac{k(k+1)}{2}\,z^k ,
+\]
+et l'identité $n^2 = 2\cdot\frac{n(n+1)}2 - n$ assemble
+\[
+\sum_{n\geq1} n^2z^n = \frac{2z}{(1-z)^3} - \frac{z}{(1-z)^2}
+= \frac{z(1+z)}{(1-z)^3} .
+\]
+En $z = \frac12$~: $\sum_{n\geq1}\frac{n^2}{2^n} =
+\frac{\frac12\cdot\frac32}{\frac18} = 6$ --- une valeur close sans la
+moindre dérivation, rien que des séries \omterm{def:b2:series:def}{absolument} convergentes
+multipliées comme des polynômes. Le même télescopage d'identités
+calcule tout $\sum n^dz^n$, et les probabilistes reconnaîtront le
+moment factoriel d'\omterm{def:b2:structures:generated}{ordre} deux de la loi géométrique
+(\cref{ch:b2:genfun}).
+\end{example}
+
+\begin{example}[Une évaluation de somme double]\label{ex:b2:series:doublesum}
+Pour $s > 1$ réel, posons $\zeta(s) = \sum_{n\geq1} n^{-s}$. En
+comptant les diviseurs par sommation double --- la famille
+$(m^{-s}n^{-s})$ sur $(m,n) \in (\N^*)^2$ est \omterm{def:b2:series:summable}{sommable} (produit de
+séries positives convergentes) --- et en regroupant par le produit
+$q = mn$~:
+\[
+\zeta(s)^2 = \sum_{m,n} \frac{1}{(mn)^s}
+= \sum_{q=1}^{\infty} \frac{d(q)}{q^s},
+\]
+où $d(q)$ est le nombre de diviseurs de $q$. Les \omterm{def:b2:series:summable}{familles sommables}
+transforment la combinatoire en analyse.
+\end{example}
+
+\begin{example}[Une évaluation par Fubini~: $\sum_n (\zeta(n) - 1) = 1$]\label{ex:b2:series:zetasum}
+Pour $n \geq 2$ entier, $\zeta(n) - 1 = \sum_{k \geq 2} k^{-n}$. La
+famille double $(k^{-n})_{k, n \geq 2}$ est \omterm{def:b2:series:summable}{sommable}~: en sommant
+d'abord les colonnes géométriques,
+\[
+\sum_{k\geq2}\sum_{n\geq2} \frac{1}{k^n}
+= \sum_{k\geq2} \frac{1/k^2}{1 - 1/k}
+= \sum_{k\geq2} \frac{1}{k(k-1)} = 1
+\]
+(télescopage), et tous les termes sont positifs, de sorte que
+le~\cref{thm:b2:series:fubini} autorise à sommer par lignes à la
+place~:
+\[
+\sum_{n\geq2}\bigl(\zeta(n) - 1\bigr) = 1 .
+\]
+Les valeurs $\zeta$ en nombre infini, chacune d'allure transcendante,
+ont des restes qui s'additionnent pour donner exactement $1$. Leçon
+finale~: quand une somme double a des termes positifs, calculez-la
+dans l'\omterm{def:b2:structures:generated}{ordre} qui s'effondre --- ici les colonnes sont géométriques,
+les lignes mystérieuses, et Fubini transfère l'effondrement.
+\end{example}
+
+\begin{example}[La série géométrique résout une équation]\label{ex:b2:series:neumannsolve}
+Dans l'\omterm{def:b2:nvs:banach}{espace de Banach} $\bigl(C(\intcc01),
+\norm\cdot_\infty\bigr)$, résolvons $x - K(x) = y$ où $K(f)$ est la
+fonction constante $\frac12\int_0^1 f$. La \omterm{thm:b2:nvs:continuouslinear}{norme d'opérateur} vaut
+$\vertiii K \leq \frac12 < 1$, donc la série de Neumann s'applique
+(\cref{ex:b2:series:neumann})~: $x = \sum_{n\geq0} K^n(y)$. Calculons
+les itérées~: $K(y) = \frac12\int_0^1 y$ (une constante), et
+l'application de $K$ à une constante $c$ donne $\frac c2$, donc
+$K^n(y) = \frac{1}{2^{n-1}}\cdot\frac12\int_0^1 y$ pour $n \geq 1$.
+En sommant les constantes géométriques~:
+\[
+x = y + \Bigl(\int_0^1 y\Bigr)
+\sum_{n\geq1}\frac{1}{2^n} = y + \int_0^1 y .
+\]
+Vérification~: $x - K(x) = y + \int y - \frac12\bigl(\int y + \int
+y\bigr) = y$. Une série infinie, une réponse finie, et une
+vérification en une ligne --- la série géométrique est un algorithme
+d'inversion, pas seulement un énoncé de convergence.
+\end{example}
+
+\begin{example}[Télescopage par décomposition en éléments simples]\label{ex:b2:series:telescope}
+La sommation exacte est rare~; le télescopage en est le principal
+fournisseur. Décomposons
+\[
+\frac{1}{n(n+1)(n+2)}
+= \frac{1}{2}\Bigl(\frac{1}{n(n+1)} -
+\frac{1}{(n+1)(n+2)}\Bigr),
+\]
+(à vérifier par réduction au même dénominateur), de sorte que les
+sommes partielles s'effondrent~:
+\[
+\sum_{n=1}^{N}\frac{1}{n(n+1)(n+2)}
+= \frac12\Bigl(\frac{1}{1\cdot2} -
+\frac{1}{(N+1)(N+2)}\Bigr)
+\longrightarrow \frac14 .
+\]
+Le même schéma --- écrire le terme sous la forme $c(u_n - u_{n+1})$
+pour un $(u_n)$ explicite --- a résolu l'\cref{exo:b2:series:10}
+(arctangentes) et calcule tout $\sum\frac{1}{n(n+1)\cdots(n + k)} =
+\frac{1}{k\cdot k!}$. Lorsqu'une somme exacte existe à ce niveau, un
+télescope se cache généralement dans le terme.
+\end{example}
+
+\begin{remark}[Perspectives au sein de ce volume]\label{rem:b2:series:perspectives}
+Trois chapitres à venir en sont des clients directs. Pour
+le~\cref{ch:b2:funcseq}~: la convergence normale de $\sum f_n$ est la
+convergence absolue de $\sum\norm{f_n}_\infty$ dans l'\omterm{def:b2:nvs:banach}{espace de
+Banach} $\bigl(C, \norm\cdot_\infty\bigr)$ --- le~\cref{thm:b2:nvs:absoluteconvergence}
+de ce chapitre déguisé. Pour le~\cref{ch:b2:powerseries}~: à
+l'intérieur du disque de convergence tout est absolu et \omterm{def:b2:series:summable}{sommable}, de
+sorte que les \omterm{thm:b2:series:fubini}{produits de Cauchy} et les réordonnancements sont libres
+(c'est pourquoi les séries entières se multiplient comme des
+polynômes)~; au bord, le critère d'Abel prend le relais
+(\cref{ex:b2:series:abelboundary}). Pour le~\cref{ch:b2:genfun}~: les
+fonctions génératrices des probabilités sont des séries entières dont
+les manipulations --- produits pour les sommes de variables
+indépendantes, sommes doubles pour les lois composées --- sont toutes
+autorisées par le~\cref{thm:b2:series:fubini}. Les \omterm{def:b2:series:summable}{familles sommables}
+sont le service juridique de l'analyse à venir.
+\end{remark}
+
+\begin{remark}[Où ce chapitre est utilisé]
+Tout ce qui comporte une somme infinie passe par ici~: les séries
+entières (\cref{ch:b2:powerseries}) sont des \omterm{def:b2:series:summable}{familles sommables}
+déguisées, les coefficients de Fourier se multiplient par des
+\omterm{thm:b2:series:fubini}{produits de Cauchy} et se réordonnent par Parseval
+(\cref{ch:b2:fourier}), et les fonctions génératrices des
+probabilités (\cref{ch:b2:genfun}) sont le théorème de Fubini
+appliqué aux espérances. Le volume de Licence~3 absorbe les \omterm{def:b2:series:summable}{familles
+sommables} dans l'intégration de Lebesgue par rapport à la mesure de
+comptage --- où le~\cref{thm:b2:series:fubini} devient un cas
+particulier du théorème de Fubini--Tonelli.
+\end{remark}
+
+\section{Exercices}
+
+\begin{exercise}[$\star$]\label{exo:b2:series:1}
+Nature de~: $\sum \dfrac{\cos n}{n}$~; $\;\sum \dfrac{(-1)^n}{\ln
+n}$~; $\;\sum \dfrac{(-1)^n}{n^{3/4} + \cos n}$ \emph{(développer
+comme dans le piège de première année~: le critère des séries
+\omterm{def:b2:linalg:alternating}{alternées} exige la monotonie)}.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:series:2}
+Montrer que pour $\abs z < 1$~: $\sum_{n\geq1} n z^{n} =
+\dfrac{z}{(1-z)^2}$, via le \omterm{thm:b2:series:fubini}{produit de Cauchy} de $\sum z^n$ par
+elle-même.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:series:3}
+(Lemme de type Kronecker) Soit $\sum b_n$ une série réelle
+convergente. Montrer, par la \omterm{thm:b2:series:abel}{transformation d'Abel}, que
+$\dfrac{1}{n}\sum_{k=1}^{n} k\,b_k \to 0$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:series:4}
+Étudier la convergence de $\sum \dfrac{\sin(n\theta)}{n^\alpha}$
+($\theta \in \R$, $\alpha > 0$) --- pour quels $(\theta, \alpha)$
+est-elle \omterm{def:b2:series:def}{absolument} convergente, semi-convergente, divergente~?
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:series:5}
+(Réordonnancement de Riemann) Soit $\sum u_n$ une série réelle
+convergente mais non \omterm{def:b2:series:def}{absolument} convergente, et $\ell \in \R$.
+Montrer qu'un certain réordonnancement de $\sum u_n$ converge vers
+$\ell$. \emph{(Montrer que les deux sous-séries des termes positifs
+et négatifs divergent~; puis alterner gloutonnement~: prendre des
+termes positifs jusqu'à dépasser $\ell$, puis des négatifs jusqu'à
+passer en dessous, et ainsi de suite~; les termes tendent vers $0$,
+ce qui force la convergence vers $\ell$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:series:6}
+Montrer que la famille
+$\Bigl(\dfrac{x^{m+n}}{m!\,n!}\Bigr)_{(m,n)\in\N^2}$ est \omterm{def:b2:series:summable}{sommable}
+pour tout $x \in \R$, et retrouver l'identité $(\eu^x)^2 = \eu^{2x}$
+en regroupant la somme double le long des diagonales $m + n = k$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:series:7}
+Montrer que la famille $\bigl(\frac{1}{m^2 n^2}\bigr)_{m,n \geq 1}$
+est \omterm{def:b2:series:summable}{sommable}, et qu'en regroupant par le $\gcd$~: avec $q =
+\gcd(m,n)$,
+\[
+\zeta(2)^2 = \sum_{q\geq1} \frac{1}{q^4}
+\sum_{\substack{a,b \geq 1\\ \gcd(a,b)=1}} \frac{1}{a^2b^2}
+= \zeta(4) \cdot S,
+\]
+où $S = \sum_{\gcd(a,b)=1} \frac{1}{a^2b^2}$~: en déduire $S =
+\zeta(2)^2/\zeta(4)$. \emph{(Tout couple $(m,n)$ s'écrit de manière
+unique $(qa, qb)$ avec $\gcd(a,b) = 1$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:series:8}
+(Théorème d'Abel sur les produits, version allégée) Supposons que
+$\sum a_n$ converge \omterm{def:b2:series:def}{absolument} et que $\sum b_n$ converge. Montrer
+que leur \omterm{thm:b2:series:fubini}{produit de Cauchy} $\sum c_n$ converge, avec $\sum c_n =
+(\sum a_n)(\sum b_n)$. \emph{(Écrire $C_N = \sum_{k\leq N} c_k =
+\sum_n a_n B_{N-n}$ avec $B$ les sommes partielles de $b$~; scinder
+selon $n \leq N/2$ ou non, en utilisant le caractère borné de $(B_m)$
+et le reste absolu de $(a_n)$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:series:9}
+Dans l'espace (non \omterm{def:b2:metric:complete}{complet}) $E$ des suites réelles nulles à partir
+d'un certain rang, muni de la \omterm{def:b2:nvs:norm}{norme} sup, exhiber une série \omterm{def:b2:series:def}{absolument}
+convergente qui ne converge pas dans $E$. \emph{(Essayer $u_n = 2^{-n}
+e_n$ avec $(e_n)$ les suites canoniques.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:series:10}
+Vérifier l'identité $\arctan(n+1) - \arctan(n) =
+\arctan\dfrac{1}{n^2 + n + 1}$, et en déduire la valeur exacte de
+\[
+\sum_{n=1}^{\infty} \arctan\frac{1}{n^2 + n + 1} .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:series:11}
+Déterminer la nature (avec équivalents) de
+\[
+\sum_n \bigl(\sqrt{n+1} - \sqrt n\bigr)^{\alpha}
+\ (\alpha > 0), \qquad
+\sum_n \Bigl(1 - \cos\frac1n\Bigr), \qquad
+\sum_n \Bigl(\eu - \Bigl(1 + \frac1n\Bigr)^{\!n}\Bigr).
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:series:12}
+Soit $(a_n)$ positive et \emph{décroissante} avec $\sum a_n$
+convergente. Montrer que $n\,a_n \to 0$ \emph{(majorer $n a_{2n}$ par
+un reste)}. Montrer que la réciproque est fausse, et que la monotonie
+est essentielle, avec des contre-exemples explicites.
+\end{exercise}
+
+\section{Problème~: le $\zeta(2) = \pi^2/6$ d'Euler, par la somme
+des cotangentes de Cauchy}
+
+L'identité la plus célèbre d'Euler, $1 + \frac14 + \frac19 + \cdots =
+\frac{\pi^2}6$, admet une preuve entièrement élémentaire, due à
+Cauchy~: la formule de de Moivre produit un polynôme dont les racines
+sont les nombres $\cot^2\frac{k\pi}{2n+1}$, Viète en somme les
+racines exactement, et l'encadrement $\cot^2\theta < \frac{1}{\theta^2}
+< 1 + \cot^2\theta$ écrase les sommes partielles de $\sum\frac1{k^2}$
+entre deux bornes rationnelles explicites. Nous menons la preuve en
+entier, extrayons $\zeta(4) = \frac{\pi^4}{90}$ par la même méthode,
+puis cartographions toute la frontière entre convergence et
+divergence à l'aide des séries de Bertrand --- et prouvons que la
+frontière ne porte aucune série convergente la plus lente.
+
+\begin{problem}[{Problème du week-end --- $\zeta(2) = \pi^2/6$ et le
+panorama de Bertrand}]
+\label{pb:b2:series:1}
+Dans tout ce qui suit, $n \geq 1$ et $\theta_k = \dfrac{k\pi}{2n+1}$
+pour $k = 1, \dots, n$~; noter que $0 < \theta_k < \frac\pi2$.
+
+\medskip
+\noindent\textbf{Partie~I --- L'identité de la cotangente.}
+\begin{enumerate}
+  \item Prouver la formule de de Moivre $(\cos\theta +
+        \iu\sin\theta)^m = \cos m\theta + \iu\sin m\theta$ ($m
+        \in \N$), et en déduire, pour $m = 2n + 1$,
+        \[
+        \sin\bigl((2n{+}1)\theta\bigr) = \sum_{j=0}^{n}
+        (-1)^j\binom{2n+1}{2j+1}\cos^{2(n-j)}\theta\,
+        \sin^{2j+1}\theta .
+        \]
+  \item En déduire que pour $\theta \in \intoo{0}{\frac\pi2}$,
+        \[
+        \sin\bigl((2n{+}1)\theta\bigr) =
+        \sin^{2n+1}\theta\; P_n(\cot^2\theta),
+        \qquad
+        P_n(x) = \sum_{j=0}^{n}
+        (-1)^j\binom{2n+1}{2j+1}x^{\,n-j},
+        \]
+        un polynôme de degré $n$ de coefficient dominant $2n + 1$.
+  \item Montrer que $x_k = \cot^2\theta_k$, $k = 1, \dots, n$, sont
+        $n$ racines \emph{distinctes} de $P_n$ --- donc toutes ses
+        racines.
+  \item Par Viète, prouver l'identité exacte
+        \[
+        \sum_{k=1}^{n} \cot^2\frac{k\pi}{2n+1}
+        = \frac{n(2n-1)}{3}.
+        \]
+  \item En déduire aussi $\displaystyle\sum_{k=1}^{n}
+        \frac{1}{\sin^2\theta_k} = \frac{2n(n+1)}{3}$.
+  \item Prouver l'encadrement~: $\cot^2\theta < \dfrac1{\theta^2} <
+        \dfrac{1}{\sin^2\theta}$ pour $\theta \in
+        \intoo{0}{\frac\pi2}$ \emph{(à partir de $\sin\theta < \theta
+        < \tan\theta$)}.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie~II --- L'encadrement se referme~: le théorème
+d'Euler.}
+\begin{enumerate}[resume]
+  \item En sommant la question~6 sur $k = 1, \dots, n$ avec $\theta =
+        \theta_k$, établir
+        \[
+        \frac{n(2n-1)}{3} \;<\;
+        \frac{(2n+1)^2}{\pi^2}\sum_{k=1}^{n}\frac1{k^2}
+        \;<\; \frac{2n(n+1)}{3}.
+        \]
+  \item Conclure (\emph{théorème d'Euler, par la preuve de
+        Cauchy})~:
+        \[
+        \zeta(2) = \sum_{k=1}^{\infty}\frac{1}{k^2} =
+        \frac{\pi^2}{6}.
+        \]
+  \item Extraire une vitesse de l'encadrement~: montrer
+        \[
+        \Bigl|\sum_{k=1}^{n}\frac1{k^2} - \frac{\pi^2}6\Bigr|
+        = O\Bigl(\frac1n\Bigr),
+        \]
+        en cohérence avec le reste exact $\sum_{k>n}k^{-2} =
+        \frac1n - \frac{1}{2n^2} + O(n^{-3})$ de
+        \cref{exo:b2:comparison:11}.
+  \item Faire tourner la machine un étage plus haut~: en utilisant la
+        deuxième fonction symétrique de Viète de $P_n$, montrer
+        \[
+        \sum_{k=1}^{n}\cot^4\theta_k =
+        \Bigl(\frac{n(2n-1)}3\Bigr)^{\!2} -
+        \frac{2n(2n-1)(2n-2)(2n-3)}{60}
+        \;\sim\; \frac{8n^4}{45},
+        \]
+        et encadrer avec $\cot^4 < \theta^{-4} < (1 +
+        \cot^2)^2$ pour obtenir $\zeta(4) = \dfrac{\pi^4}{90}$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie~III --- Dividendes.}
+\begin{enumerate}[resume]
+  \item Déduire de $\zeta(2) = \frac{\pi^2}6$~:
+        \[
+        \sum_{k\geq0}\frac{1}{(2k+1)^2} = \frac{\pi^2}{8},
+        \qquad
+        \sum_{k\geq1}\frac{(-1)^{k-1}}{k^2} = \frac{\pi^2}{12}.
+        \]
+  \item Combiner avec l'\cref{exo:b2:series:7}~: calculer $S =
+        \sum_{\gcd(a,b)=1}\frac{1}{a^2b^2} =
+        \frac{\zeta(2)^2}{\zeta(4)} = \frac52$, et interpréter
+        $\frac{1}{\zeta(2)} = \frac{6}{\pi^2} \approx 0.608$ comme
+        la densité des couples premiers entre eux (énoncer
+        l'heuristique honnêtement~: le comptage rigoureux relève du
+        volume de Licence~3).
+  \item (Accélération certifiée) La formule du reste de la question~9
+        donne $\sum_{k\leq n}k^{-2} + \frac1n - \frac1{2n^2} =
+        \frac{\pi^2}6 + O(n^{-3})$. Comparer le travail nécessaire
+        pour six chiffres de $\zeta(2)$~: sommation directe contre
+        somme corrigée en $n = 100$ (où l'erreur est
+        $1.7\cdot10^{-7}$).
+  \item Vérifier la question~4 à la main en $n = 1$ et $n = 2$ (les
+        valeurs $\cot^2\frac\pi3 = \frac13$ et
+        $\cot^2\frac\pi5 + \cot^2\frac{2\pi}5 = 2$), en utilisant
+        $\cos\frac\pi5 = \frac{1+\sqrt5}4$ ou une évaluation
+        numérique.
+  \item Prouver l'identité compagne
+        \[
+        \sum_{k=1}^{n}\tan^2\frac{k\pi}{2n+1} = n(2n+1)
+        \]
+        \emph{(les nombres $\tan^2\theta_k$ sont les racines du
+        polynôme renversé $x^nP_n(1/x)$)}, et la vérifier en $n = 1$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie~IV --- Le panorama de Bertrand.} Pour
+$\alpha, \beta \in \R$, considérons les \emph{séries de Bertrand}
+\[
+\sum_{n \geq 3} \frac{1}{n^{\alpha}(\ln n)^{\beta}} .
+\]
+\begin{enumerate}[resume]
+  \item Montrer que pour $\alpha > 1$ la série converge, quel que
+        soit $\beta$ \emph{(comparer avec $n^{-(1+\alpha)/2}$)}.
+  \item Montrer que pour $\alpha < 1$ elle diverge, quel que soit
+        $\beta$.
+  \item Pour $\alpha = 1$~: à l'aide de la comparaison série--intégrale
+        (\cref{thm:b2:comparison:seriesintegral}) avec $f(t) =
+        \frac{1}{t(\ln t)^\beta}$, prouver la convergence si et
+        seulement si $\beta > 1$.
+  \item Itérer la frontière~: montrer que $\sum\frac{1}{n\ln n\,\ln\ln
+        n}$ diverge tandis que $\sum\frac{1}{n\ln n\,(\ln\ln n)^2}$
+        converge.
+  \item Deux pièges~: déterminer la nature de
+        \[
+        \sum_n \frac{1}{n^{1 + 1/\ln n}}
+        \qquad\text{et}\qquad
+        \sum_n \frac{1}{n^{1 + 1/\ln\ln n}}
+        \]
+        \emph{(calculer $n^{1/\ln n}$ exactement~; comparer
+        $n^{1/\ln\ln n}$ avec toute puissance de $\ln n$)}.
+  \item (Aucune série convergente la plus lente) Soit $\sum a_n$ une
+        série convergente quelconque avec $a_n > 0$, et $R_n =
+        \sum_{k \geq n}a_k$ ses restes. Montrer que $\sum
+        \frac{a_n}{\sqrt{R_n}}$ \emph{converge} encore
+        \emph{(comparer avec le télescopage $2(\sqrt{R_n} -
+        \sqrt{R_{n+1}})$)}, bien que $\frac{a_n/\sqrt{R_n}}{a_n}
+        \to \infty$~: toute série convergente est strictement
+        dominée par une autre série convergente. La frontière de la
+        convergence n'est pas une courbe mais un brouillard.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie~V --- Vérifications croisées et synthèse.}
+\begin{enumerate}[resume]
+  \item (Condensation de Cauchy) Prouver~: pour $(a_n)$ positive
+        décroissante, $\sum a_n$ converge si et seulement si $\sum
+        2^k a_{2^k}$ converge. En redériver la frontière de la
+        question~18.
+  \item (Le coût de la lenteur) Pour $\sum\frac1{n(\ln n)^2}$,
+        majorer le reste par une intégrale et montrer que sommer
+        jusqu'à $N = 10^6$ laisse encore une erreur supérieure à
+        $0.07$~: une convergence certifiée par la théorie peut être
+        inutile pour le calcul numérique --- à contraster avec la
+        question~13.
+  \item Classer (avec des justifications d'une ligne)~:
+        $\sum\frac1{n\ln n}$, $\sum\frac1{n^{1.01}}$,
+        $\sum\frac{(\ln n)^{100}}{n^{1.001}}$,
+        $\sum\frac1{n(\ln n)(\ln\ln n)^{3}}$.
+  \item (Synthèse) Une phrase pour chaque point~: comment de Moivre a
+        transformé une identité trigonométrique en un polynôme aux
+        sommes de racines calculables~; où l'encadrement a eu besoin
+        d'identités \emph{exactes} aux extrémités plutôt que
+        d'équivalents~; quel outil du \cref{ch:b2:comparison} a
+        alimenté la partie~IV~; et ce que la question~21 dit du rêve
+        d'un «~test de comparaison universel~». Nommer les deux
+        sommets~: le $\zeta(2) = \frac{\pi^2}6$ d'Euler (et son étage
+        supérieur, $\zeta(4) = \frac{\pi^4}{90}$), et la
+        classification de Bertrand. Noter où $\zeta(2)$ sera de
+        nouveau prouvé~: par Parseval au \cref{ch:b2:fourier} --- un
+        seul théorème, deux civilisations.
+\end{enumerate}
+\end{problem}

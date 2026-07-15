@@ -1,0 +1,827 @@
+\chapter{Séries entières}\label{ch:b2:powerseries}
+
+Les séries entières sont les séries de fonctions les mieux
+élevées des mathématiques~: à l'intérieur de leur disque de
+convergence, elles convergent \omterm{def:b2:funcseq:series}{normalement} sur les \omterm{def:b2:metric:compact}{compacts},
+peuvent être dérivées et intégrées terme à terme sans la moindre
+hésitation, et leurs sommes --- les \emph{\omterm{def:b2:powerseries:analytic}{fonctions analytiques}}
+--- sont déterminées par leurs coefficients. Ce chapitre démontre
+tout ce paquet et reprend, honnêtement cette fois, chaque série de
+Taylor du volume de première année~; les \omterm{ex:b2:powerseries:fibonacci}{fonctions génératrices} le
+referment avec des dividendes algébriques.
+
+\section{Rayon de convergence}
+
+\begin{lemma}[Abel]\label{lem:b2:powerseries:abel}
+Si la suite $(a_n z_0^n)$ est bornée pour un certain $z_0 \neq 0$,
+alors $\sum a_n z^n$ \omterm{def:b2:integration:improper}{converge} \omterm{def:b2:series:def}{absolument} pour tout $\abs z < \abs
+{z_0}$, et \omterm{def:b2:funcseq:series}{normalement} sur tout disque $\abs z \leq r < \abs{z_0}$.
+\end{lemma}
+
+\begin{proof}
+Avec $\abs{a_n z_0^n} \leq M$ et $\abs z \leq r$~:
+\[
+\abs{a_n z^n} = \abs{a_n z_0^n}\,\Bigl|\frac{z}{z_0}\Bigr|^n
+\leq M\Bigl(\frac{r}{\abs{z_0}}\Bigr)^{\!n},
+\]
+une majoration géométrique convergente, uniforme sur le disque.
+\end{proof}
+
+\begin{definition}[Rayon de convergence]\label{def:b2:powerseries:radius}
+Le \emph{rayon de convergence}\index{rayon de convergence} de
+$\sum a_n z^n$ est
+\[
+R = \sup\{r \geq 0 : (a_n r^n) \text{ bornée}\} \in
+\intcc{0}{+\infty} .
+\]
+D'après le~\cref{lem:b2:powerseries:abel}~: convergence absolue pour
+$\abs z < R$ (normale sur les sous-disques \omterm{def:b2:metric:compact}{compacts}), divergence ---
+avec des termes non bornés, même --- pour $\abs z > R$. Sur le
+cercle bord, tout peut arriver (\cref{exo:b2:powerseries:2}). En
+pratique, $R$ se calcule par la règle de d'Alembert appliquée à
+$\abs{a_n}\abs z^n$ ou par comparaison.
+\end{definition}
+
+\begin{example}[Un rayon sans règle du quotient]\label{ex:b2:powerseries:sinn}
+Quel est le rayon de $\sum \sin(n)\,z^n$~? Le quotient
+$\abs{\sin(n+1)/\sin n}$ n'a pas de limite, mais la définition
+fonctionne directement. \emph{$R \geq 1$~:} $\abs{\sin n} \leq 1$,
+donc $(\sin n\cdot r^n)$ est bornée pour tout $r < 1$ --- et même
+pour $r = 1$. \emph{$R \leq 1$~:} il suffit que $\sin n \not\to 0$.
+Supposons $\sin n \to 0$~; la formule d'addition
+\[
+\sin(n+1) = \sin n\cos 1 + \cos n\sin 1
+\]
+forcerait $\cos n \to 0$ (résoudre en $\cos n$~: $\sin 1 \neq
+0$), en contradiction avec $\sin^2 n + \cos^2 n = 1$. Ainsi les
+termes $\sin(n)\,1^n$ ne tendent pas vers $0$~: la série diverge en
+$z = 1$, et $R \leq 1$. Conclusion~: $R = 1$. Idée à retenir~: le
+rayon est une affirmation sur le caractère borné de
+$\abs{a_n}r^n$ --- aucune limite de quotients n'est jamais requise,
+et les arguments de bornitude règlent des cas que la règle du
+quotient ne peut pas toucher (comparer avec les coefficients
+oscillants de l'\cref{exo:b2:powerseries:1}).
+\end{example}
+
+\begin{proposition}[Opérations]\label{prop:b2:powerseries:operations}
+Soient $\sum a_nz^n$, $\sum b_nz^n$ de rayons $R_a, R_b$. Alors, pour
+$\abs z < \min(R_a, R_b)$~:
+\[
+\sum (a_n + b_n)z^n = \sum a_nz^n + \sum b_nz^n,
+\qquad
+\Bigl(\sum a_nz^n\Bigr)\Bigl(\sum b_nz^n\Bigr) = \sum c_n z^n,
+\quad c_n = \sum_{k=0}^{n} a_kb_{n-k},
+\]
+les deux séries ayant un rayon $\geq \min(R_a, R_b)$. (Le produit est
+le \omterm{thm:b2:series:fubini}{produit de Cauchy}, légitime par convergence absolue et
+d'après le~\cref{thm:b2:series:fubini}.)
+\end{proposition}
+
+\begin{proof}
+La formule de la somme est la linéarité des séries convergentes, et
+$(a_n + b_n)r^n$ est bornée dès que $a_nr^n$ et $b_nr^n$ le
+sont~: rayon $\geq \min(R_a, R_b)$. Pour le produit, fixons $\abs z
+< \min(R_a, R_b)$~: les deux séries convergent \emph{\omterm{def:b2:series:def}{absolument}}
+là (\cref{lem:b2:powerseries:abel}), donc la famille doublement
+indexée $(a_kz^k\,b_lz^l)_{k,l}$ est \omterm{def:b2:series:summable}{sommable}, et
+le~\cref{thm:b2:series:fubini} autorise tout regroupement. En
+regroupant par $k + l = n$~:
+\[
+\Bigl(\sum_k a_kz^k\Bigr)\Bigl(\sum_l b_lz^l\Bigr)
+= \sum_{n\geq0}\Bigl(\sum_{k+l=n}a_kb_l\Bigr)z^n
+= \sum_{n\geq0}c_nz^n ,
+\]
+\omterm{def:b2:series:def}{absolument} convergente pour tout tel $z$~: la série produit
+a elle aussi un rayon $\geq \min(R_a, R_b)$.
+\end{proof}
+
+\begin{example}[Un carré de Cauchy, vérifié par recoupement]\label{ex:b2:powerseries:cauchysquare}
+Élevons au carré la série géométrique~: pour $\abs x < 1$, le
+coefficient de $x^n$ dans $\bigl(\sum x^k\bigr)^2$ est $c_n =
+\sum_{k+l=n} 1\cdot1 = n + 1$, donc
+\[
+\frac{1}{(1-x)^2} = \sum_{n\geq0}(n+1)\,x^n .
+\]
+Recoupement par dérivation terme à terme
+(\cref{thm:b2:powerseries:calculus} ci-dessous)~: dériver
+$\frac{1}{1-x} = \sum x^n$ donne $\frac{1}{(1-x)^2} = \sum
+nx^{n-1} = \sum(n+1)x^n$ --- la même série par deux mécanismes
+sans rapport. Idée à retenir~: quand une identité entre coefficients
+semble mystérieuse, l'un de ces deux moteurs (convolution ou
+dérivation) la produit d'ordinaire en une ligne~; la question du
+problème du week-end sur $\sum\binom{2k}k\binom{2n-2k}{n-k} = 4^n$
+fait tourner le moteur de convolution à plein régime.
+\end{example}
+
+\begin{example}[Multiplier par $\frac{1}{1-x}$ somme les coefficients]\label{ex:b2:powerseries:partialsums}
+Un \omterm{thm:b2:series:fubini}{produit de Cauchy} contre la série géométrique a un sens
+mémorable~: pour toute $\sum a_nx^n$ de rayon $R > 0$ et $\abs x <
+\min(R, 1)$,
+\[
+\frac{1}{1-x}\sum_{n\geq0}a_nx^n
+= \sum_{n\geq0}\Bigl(\sum_{k=0}^{n}a_k\Bigr)x^n :
+\]
+la multiplication par $\frac{1}{1-x}$ remplace les coefficients par
+leurs sommes partielles (convolution avec la suite constante égale
+à un). Exemple~: $\dfrac{\eu^x}{1-x} = \sum_n s_n x^n$ avec $s_n =
+\sum_{k\leq n}\frac{1}{k!}$, les sommes partielles de $\eu$ ---
+comparer avec l'\cref{exo:b2:powerseries:11}, où le même produit
+avec $\eu^{-x}$ encode les nombres de dérangements. Idée à
+retenir~: les opérations sur les séries entières sont des
+opérations déguisées sur les suites de coefficients (multiplier par
+$\frac1{1-x}$~: sommer~; multiplier par $x$~: décaler~; dériver~:
+multiplier par $n$ et décaler) --- un dictionnaire que le chapitre
+sur les \omterm{ex:b2:powerseries:fibonacci}{fonctions génératrices} lira couramment.
+\end{example}
+
+\section{Régularité de la somme}
+
+\begin{theorem}[Calcul terme à terme]\label{thm:b2:powerseries:calculus}
+Soit $f(x) = \sum_{n\geq0} a_n x^n$ de rayon $R > 0$ (variable
+réelle $x \in \intoo{-R}{R}$).
+\begin{enumerate}
+  \item La série dérivée $\sum n\,a_n x^{n-1}$ a le \emph{même}
+        rayon $R$, et $f$ est $C^1$ avec $f'(x) = \sum_{n \geq 1}
+        n a_n x^{n-1}$. En itérant, $f$ est $C^\infty$ et
+        \[
+        a_n = \frac{f^{(n)}(0)}{n!} :
+        \]
+        les coefficients d'une série entière sont uniques (deux
+        séries de même somme près de $0$ ont les mêmes coefficients).
+  \item Primitive terme à terme~: $\sum \frac{a_n}{n+1}x^{n+1}$ a
+        pour rayon $R$ et pour dérivée $f$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\emph{Même rayon~:} si $(a_nr^n)$ est bornée et $r' < r$, alors
+$n\abs{a_n} r'^{\,n-1} = \frac{n}{r'}\abs{a_nr^n}
+\bigl(\frac{r'}{r}\bigr)^n$ est bornée (et même $\to 0$~: la
+géométrique bat $n$), donc $R' \geq R$~; réciproquement $\abs{a_n x^n}
+\leq \abs x \cdot n\abs{a_n}\abs x^{n-1}$ donne $R \geq R'$.
+
+\emph{Dérivation~:} sur $\intcc{-r}{r}$, $r < R$, la série dérivée
+\omterm{def:b2:integration:improper}{converge} \omterm{def:b2:funcseq:series}{normalement} ($n\abs{a_n}r^{n-1}$ \omterm{def:b2:series:summable}{sommable} par le calcul
+du rayon)~; l'originale \omterm{def:b2:integration:improper}{converge} en $x = 0$~: le théorème de
+dérivation des séries
+(\cref{thm:b2:funcseq:seriestransfer}) s'applique sur chaque tel
+segment, donc sur $\intoo{-R}{R}$. En itérant $k$ fois et
+en évaluant en $0$~: explicitement, la $k$-ième série dérivée est
+\[
+f^{(k)}(x) = \sum_{n\geq k} n(n-1)\cdots(n-k+1)\,a_n\,x^{n-k},
+\]
+et en $x = 0$ chaque terme avec $n > k$ s'annule, ne laissant que
+le terme constant $k(k-1)\cdots1\cdot a_k$~: $f^{(k)}(0) =
+k!\,a_k$. L'unicité des coefficients en découle~: deux séries
+entières de même somme près de $0$ ont les mêmes dérivées en $0$,
+donc les mêmes $a_k$. Primitives~: même rayon par le même
+calcul, et on dérive terme à terme pour revenir.
+\end{proof}
+
+\begin{example}[Évaluer une série en un point]\label{ex:b2:powerseries:evaluate}
+Que vaut $\sum_{n\geq1}\dfrac{n^2}{2^n}$~? C'est la somme
+$\sum n^2x^n$ de l'\cref{exo:b2:powerseries:3} évaluée
+\emph{à l'intérieur} du disque, en $x = \frac12 < 1 = R$, où chaque
+manipulation utilisée pour dériver la forme close était
+légitime~:
+\[
+\sum_{n\geq1} n^2x^n = \frac{x(1+x)}{(1-x)^3}
+\quad\Longrightarrow\quad
+\sum_{n\geq1}\frac{n^2}{2^n}
+= \frac{\frac12\cdot\frac32}{(\frac12)^3}
+= \frac{3/4}{1/8} = 6 .
+\]
+Même moteur, autres réglages~: $x = \frac13$ donne
+$\sum\frac{n^2}{3^n} = \frac{\frac13\cdot\frac43}{(2/3)^3} =
+\frac32$. Idée à retenir~: une identité entre séries entières est une
+machine, pas une seule formule --- une dérivation évalue chaque
+série numérique $\sum n^2q^n$ d'un coup, pour tout $\abs q < 1$~;
+c'est ainsi que le chapitre sur les \omterm{ex:b2:powerseries:fibonacci}{fonctions génératrices} calculera
+espérances et variances en gros.
+\end{example}
+
+\begin{example}[Les classiques, cette fois honnêtement]\label{ex:b2:powerseries:classics}
+$\displaystyle\frac{1}{1 - x} = \sum x^n$ ($R = 1$)~; en intégrant
+terme à terme (\cref{thm:b2:powerseries:calculus}~(2))~:
+\[
+-\ln(1 - x) = \sum_{n\geq1} \frac{x^n}{n},
+\qquad
+\arctan x = \sum_{n \geq 0} \frac{(-1)^n x^{2n+1}}{2n+1}
+\quad (\abs x < 1),
+\]
+la seconde en deux étapes~: substituer $-x^2$ dans la série
+géométrique donne $\frac{1}{1+x^2} = \sum(-1)^nx^{2n}$ (rayon
+$1$, puisque $\abs{x^2} < 1 \iff \abs x < 1$), puis prendre la
+primitive terme à terme s'annulant en $0$~; les deux membres sont
+des primitives de la même fonction avec la même valeur en $0$,
+donc égaux sur $\intoo{-1}{1}$. Et $\exp$~:
+la série $E(x) = \sum \frac{x^n}{n!}$ ($R = \infty$) vérifie
+$E' = E$, $E(0) = 1$ par dérivation terme à terme, donc $E = \exp$ par
+l'unicité de première année. Chaque «~développement usuel~» du
+volume de première année est désormais un théorème sur sa série
+entière complète.
+\end{example}
+
+\begin{example}[Un logarithme calculé depuis l'intérieur du disque]\label{ex:b2:powerseries:lntwo}
+En évaluant $-\ln(1-x) = \sum\frac{x^n}{n}$ au point intérieur
+$x = \frac12$~:
+\[
+\sum_{n\geq1}\frac{1}{n\,2^n} = \ln 2 ,
+\]
+une représentation de $\ln 2$ à convergence rapide (dix termes
+donnent déjà $0{,}69306\ldots$ contre $\ln 2 = 0{,}69314\ldots$),
+bien meilleure que la série \omterm{def:b2:linalg:alternating}{alternée} $1 - \frac12 + \frac13 -
+\dots$ disponible seulement au bord. Idée à retenir~:
+chaque fois qu'une constante est atteignable à la fois sur le bord
+et strictement à l'intérieur du disque, l'intérieur l'emporte
+numériquement --- décroissance géométrique contre décroissance
+harmonique.
+\end{example}
+
+\begin{example}[La dérivation préserve le rayon, pas le bord]\label{ex:b2:powerseries:boundaryloss}
+La série $\sum_{n\geq1}\frac{x^n}{n^2}$ a pour rayon $1$ et
+\omterm{def:b2:integration:improper}{converge} aux \emph{deux} extrémités ($\sum\frac1{n^2}$ et son
+jumeau alterné). Sa série dérivée,
+\[
+\sum_{n\geq1}\frac{x^{n-1}}{n} ,
+\]
+a le même rayon $1$ --- comme
+le~\cref{thm:b2:powerseries:calculus} le garantit --- mais diverge
+désormais en $x = 1$ (série harmonique) tout en convergeant encore
+en $x = -1$ (\omterm{def:b2:linalg:alternating}{alternée}). Une dérivation de plus donne
+$\sum_{n\geq2}\frac{n-1}{n}x^{n-2}$, divergente aux deux
+extrémités (les termes ne tendent pas vers $0$). Idée à retenir~:
+chaque dérivation multiplie les coefficients par $n$, ce qui
+ne déplace jamais le rayon (la géométrique bat le polynôme) mais
+mange un \omterm{def:b2:structures:generated}{ordre} de décroissance au bord~; le calcul terme à terme est
+un sport d'intérieur, et ce qui se passe sur le bord doit être
+réexaminé --- la théorie d'Abel--Tauber du problème du week-end est
+exactement ce réexamen.
+\end{example}
+
+\begin{example}[Découper une série par résidus --- mené jusqu'au bout]\label{ex:b2:powerseries:quarter}
+Calculer $f(x) = \sum_{n\geq0} \dfrac{x^{4n}}{(4n)!}$ sous forme
+close. $\cosh x = \sum \frac{x^{2m}}{(2m)!}$ et $\cos x =
+\sum \frac{(-1)^m x^{2m}}{(2m)!}$ ont tous deux un rayon $\infty$,
+donc leur moyenne peut se calculer terme à terme~:
+\[
+\frac{\cosh x + \cos x}{2}
+= \sum_{m\geq0}\frac{1 + (-1)^m}{2}\,\frac{x^{2m}}{(2m)!}
+= \sum_{m \text{ pair}}\frac{x^{2m}}{(2m)!}
+= \sum_{n\geq0}\frac{x^{4n}}{(4n)!} = f(x) .
+\]
+Le filtre $\frac{1+(-1)^m}{2}$ garde exactement les $m$ pairs~: c'est
+l'avatar réel du filtre par racines de l'unité (la version complexe,
+avec $\iu^n$, extrait les résidus modulo $4$ d'un seul coup). Vérification
+finale~: $f$ résout $f'''' = f$ avec $f(0) = 1$,
+$f'(0) = f''(0) = f'''(0) = 0$ --- dériver la série quatre
+fois (\cref{thm:b2:powerseries:calculus}) et la regarder se
+reproduire~; $\frac{\cosh + \cos}{2}$ vérifie les mêmes
+données.
+\end{example}
+
+\begin{definition}[Fonctions analytiques]\label{def:b2:powerseries:analytic}
+$f$ est \emph{analytique}\index{fonction analytique} en $x_0$ quand
+elle est la somme d'une série entière en $(x - x_0)$ sur un voisinage~; sur un
+intervalle, quand elle l'est en tout point. Les sommes de séries entières sont analytiques
+à l'intérieur de leur disque (réarrangement du développement ---
+admis à ce niveau pour le recentrage, le cas $x_0 = 0$ étant
+le~\cref{thm:b2:powerseries:calculus}). Analytique implique $C^\infty$~;
+la réciproque est \emph{fausse}~: la fonction plate $\eu^{-1/x^2}$
+(\cref{exo:b2:powerseries:7}).
+\end{definition}
+
+\begin{example}[Recentrer, et le rayon comme distance]\label{ex:b2:powerseries:recenter}
+Développons $f(x) = \frac{1}{1-x}$ autour de $x_0 = \frac12$~: en
+posant $x = \frac12 + h$,
+\[
+\frac{1}{1 - x} = \frac{1}{\frac12 - h}
+= \frac{2}{1 - 2h}
+= \sum_{n\geq0} 2^{n+1}\,h^n
+= \sum_{n\geq0} 2^{n+1}\Bigl(x - \frac12\Bigr)^{\!n},
+\]
+valable pour $\abs{2h} < 1$, c'est-à-dire $\abs{x - \frac12} < \frac12$.
+Le nouveau rayon est exactement la distance du nouveau centre à
+la singularité $x = 1$~: recentrer rétrécit (ou agrandit) le
+disque pour l'ajuster à l'obstruction la plus proche. Idée à
+retenir~: voilà l'image derrière la définition de l'analyticité ---
+une seule fonction, plusieurs séries entières locales, chacune vivant
+sur le plus grand disque évitant l'ennui~; le volume de troisième
+année transforme l'heuristique «~rayon $=$ distance à la
+singularité complexe la plus proche~» en théorème.
+\end{example}
+
+\begin{remark}[Pièges courants]
+\emph{(i) La règle du quotient est suffisante, pas nécessaire~:}
+lorsque $\abs{a_{n+1}/a_n}$ n'a pas de limite
+(\cref{ex:b2:powerseries:sinn}, \cref{exo:b2:powerseries:1}),
+revenir à la définition~: $R = \sup\{r : (a_nr^n)$
+bornée$\}$. \emph{(ii) Rien ne franchit le bord gratuitement~:}
+la dérivation et l'intégration terme à terme sont des théorèmes
+\emph{à l'intérieur} du disque \omterm{def:b2:metric:topology}{ouvert}~; en $\abs x = R$ chaque série doit
+être réexaminée (c'est tout le sujet du problème du week-end).
+\emph{(iii) Rayon d'une somme~:} $\min(R_a, R_b)$ n'est
+qu'une minoration --- des compensations peuvent l'agrandir ($a_n = 1$,
+$b_n = -1$~: somme identiquement $0$, rayon $\infty$). \emph{(iv)
+$C^\infty$ n'est pas \omterm{def:b2:powerseries:analytic}{analytique}~:} une série de Taylor convergente peut
+converger vers la \emph{mauvaise} fonction
+(\cref{exo:b2:powerseries:7})~; avant d'écrire $f(x) = \sum
+\frac{f^{(n)}(0)}{n!}x^n$, le prouver --- via une équation
+différentielle (\cref{met:b2:powerseries:ode}), une majoration du
+reste, ou une formule intégrale.
+\end{remark}
+
+\begin{remark}[Où cela sert]
+Les séries entières sont le cheval de bataille de trois chapitres
+ultérieurs~: le chapitre sur les équations différentielles résout
+les équations différentielles linéaires en injectant
+$\sum a_nx^n$ (l'encadré méthode ci-dessous, industrialisé)~; le
+chapitre sur les \omterm{ex:b2:powerseries:fibonacci}{fonctions génératrices} convertit des identités sur
+des probabilités en identités sur des séries entières et
+réciproquement~; et le volume de troisième année officialise la
+variable complexe, où l'analyticité devient équivalente à la
+dérivabilité complexe et où le «~recentrage admis~» ci-dessus reçoit sa
+preuve honnête. Le problème du week-end explore le seul endroit où les
+théorèmes de ce chapitre restent muets~: le bord $\abs x = R$
+lui-même.
+\end{remark}
+
+\begin{method}[Développer via une équation différentielle]\label{met:b2:powerseries:ode}
+Pour développer une fonction $f$ en série entière~: trouver une
+équation différentielle linéaire à coefficients polynomiaux
+vérifiée par $f$~; injecter $\sum a_nx^n$~; identifier les
+coefficients pour obtenir une récurrence sur $(a_n)$~; résoudre, et
+vérifier rayon et conditions initiales. Exemple --- la série
+du binôme~: $f(x) = (1+x)^\alpha$ vérifie $(1+x)f' = \alpha f$, $f(0)
+= 1$~; l'injection donne $(n+1)a_{n+1} = (\alpha - n)a_n$, donc $a_n =
+\binom{\alpha}{n}$, rayon $1$ (règle du quotient), et la somme,
+vérifiant la même équation différentielle avec la même valeur
+initiale, égale $(1 + x)^\alpha$
+par le théorème d'unicité des équations différentielles linéaires
+(volume de première année).
+\end{method}
+
+\begin{example}[La méthode sur une équation avec second membre]\label{ex:b2:powerseries:odeforced}
+Résoudre $y' = y + x$, $y(0) = 0$, par séries entières. En injectant
+$y = \sum a_nx^n$~:
+\[
+\sum_{n\geq0}(n+1)a_{n+1}x^n
+= \sum_{n\geq0}a_nx^n + x ,
+\]
+et en identifiant les coefficients~: $a_1 = a_0 = 0$, $2a_2 = a_1 + 1
+= 1$, et $(n+1)a_{n+1} = a_n$ pour $n \geq 2$. Donc $a_2 =
+\frac{1}{2!}$ et, par récurrence, $a_n = \frac{1}{n!}$ pour tout
+$n \geq 2$~: rayon $\infty$, et
+\[
+y(x) = \sum_{n\geq2}\frac{x^n}{n!} = \eu^x - 1 - x .
+\]
+Vérification~: $y' = \eu^x - 1 = y + x$ et $y(0) = 0$. Idée à
+retenir~: la récurrence \emph{est} l'équation, coefficient par
+coefficient~; le second membre ne perturbe qu'un nombre fini de
+coefficients initiaux, après quoi le schéma homogène prend le
+relais --- une ombre discrète de «~solution particulière plus
+solution homogène~».
+\end{example}
+
+\section{Fonctions génératrices}
+
+\begin{example}[Fibonacci]\label{ex:b2:powerseries:fibonacci}
+Soit $F(x) = \sum_{n\geq0} F_n x^n$ (nombres de Fibonacci, $F_0 = 0$,
+$F_1 = 1$). La récurrence $F_{n+2} = F_{n+1} + F_n$ se traduit,
+en multipliant par $x^{n+2}$ et en sommant, par
+\[
+F(x) - x = x\,F(x) + x^2 F(x)
+\quad\Longrightarrow\quad
+F(x) = \frac{x}{1 - x - x^2} ,
+\]
+valable là où la série \omterm{def:b2:integration:improper}{converge}. Le rayon est
+$\frac{1}{\varphi}$~: à partir de $F_n \sim
+\frac{\varphi^n}{\sqrt5}$ (Binet, exemple suivant --- ou la
+récurrence grossière $F_n \leq 2^n$ jointe à la relation de
+récurrence), la règle du quotient donne
+\[
+\frac{F_{n+1}\abs x^{n+1}}{F_n\abs x^n}
+\longrightarrow \varphi\abs x ,
+\qquad\text{convergence ssi } \abs x < \frac1\varphi
+\approx 0{,}618 .
+\] La décomposition en éléments simples de
+$\frac{x}{1 - x - x^2}$ et la série géométrique redonnent la formule
+de Binet --- les \omterm{ex:b2:powerseries:fibonacci}{fonctions génératrices} industrialisent les
+récurrences linéaires.\index{fonction génératrice}
+\end{example}
+
+\begin{example}[La formule de Binet, menée à bien]\label{ex:b2:powerseries:binet}
+Soient $\varphi = \frac{1+\sqrt5}{2}$ et $\psi =
+\frac{1-\sqrt5}{2}$, les racines de $X^2 = X + 1$~; comme $\varphi
++ \psi = 1$ et $\varphi\psi = -1$,
+\[
+1 - x - x^2 = (1 - \varphi x)(1 - \psi x) .
+\]
+Éléments simples~: en cherchant $\frac{x}{(1-\varphi x)(1-\psi x)} =
+\frac{A}{1 - \varphi x} + \frac{B}{1 - \psi x}$, le terme
+constant donne $A + B = 0$ et le coefficient de $x$ donne $-A\psi - B\varphi
+= 1$, donc $A(\varphi - \psi) = 1$~: $A = \frac{1}{\sqrt5} = -B$.
+Deux séries géométriques plus tard,
+\[
+F(x) = \frac{1}{\sqrt5}\sum_{n\geq0}
+\bigl(\varphi^n - \psi^n\bigr)x^n
+\quad\Longrightarrow\quad
+F_n = \frac{\varphi^n - \psi^n}{\sqrt5}
+\]
+par unicité des coefficients
+(\cref{thm:b2:powerseries:calculus}). Comme $\abs\psi < 1$, le
+terme $\frac{\psi^n}{\sqrt5}$ a une valeur absolue $< \frac12$~:
+$F_n$ est l'\emph{entier le plus proche} de
+$\frac{\varphi^n}{\sqrt5}$. Idée à retenir~: le rayon
+$\frac1\varphi$ de $F$ est l'inverse de la racine dominante
+--- croissance des coefficients et \omterm{def:b2:powerseries:radius}{rayon de convergence} sont la
+même information lue en sens opposés.
+\end{example}
+
+\begin{example}[Nombres de Catalan]\label{ex:b2:powerseries:catalan}
+Les \omterm{ex:b2:powerseries:catalan}{nombres de Catalan} $C_n$ (nombre de triangulations, de
+parenthésages, de chemins de Dyck, \dots) vérifient $C_0 = 1$ et
+$C_{n+1} = \sum_{k=0}^n C_kC_{n-k}$. La \omterm{ex:b2:powerseries:fibonacci}{fonction génératrice} $C(x) =
+\sum C_nx^n$ vérifie alors (\omterm{thm:b2:series:fubini}{produit de Cauchy}~!)
+\[
+C(x) = 1 + x\,C(x)^2
+\quad\Longrightarrow\quad
+C(x) = \frac{1 - \sqrt{1 - 4x}}{2x} ,
+\]
+en choisissant la racine avec $C(0) = 1$~: résoudre l'équation du
+second degré $xC^2 - C + 1 = 0$ donne les deux candidats $\frac{1 \pm
+\sqrt{1-4x}}{2x}$, et quand $x \to 0$ la racine «~$+$~» explose
+comme $\frac1x$ tandis que la racine «~$-$~» tend vers $1$ (développer
+$\sqrt{1-4x} = 1 - 2x + O(x^2)$) --- seul le signe moins peut
+porter une série entière avec $C_0 = 1$. Développer $\sqrt{1 - 4x}$ par la
+série du binôme donne la forme close
+\[
+C_n = \frac{1}{n+1}\binom{2n}{n} ,
+\]
+menée à bien dans l'\cref{exo:b2:powerseries:8}.\index{nombres de Catalan}
+\end{example}
+
+\begin{remark}[Séries formelles contre séries convergentes]
+Chaque calcul par \omterm{ex:b2:powerseries:fibonacci}{fonction génératrice} ci-dessus se termine en invoquant
+l'unicité des coefficients, et ce théorème vit
+\emph{à l'intérieur} d'un disque de rayon strictement positif~: avant
+de «~lire~» $F_n$ ou $C_n$, il faut savoir $R > 0$. Une majoration
+a priori grossière suffit --- $F_n \leq 2^n$ (récurrence immédiate)
+donne $R \geq \frac12$ pour Fibonacci~; $C_n \leq 4^n$ (chaque nombre
+de Catalan compte des ensembles de chemins) donne $R \geq \frac14$.
+Attention au bout dégénéré de l'échelle~: $\sum n!\,x^n$ a un rayon $0$,
+et le manipuler comme une fonction n'a aucun sens --- les identités
+faisant intervenir de telles séries relèvent du calcul \emph{formel} des
+coefficients, un jeu purement algébrique avec ses propres règles
+(différentes). À ce niveau~: toujours s'assurer d'un rayon strictement
+positif d'abord, puis calculer librement à l'intérieur.
+\end{remark}
+
+\begin{remark}[Perspectives au sein de ce volume]
+Les séries entières sont l'une des deux grandes machines de
+développement du livre~; l'autre est la série de Fourier des
+chapitres harmoniques, et les comparer est instructif. Une série
+entière est rigide~: ses coefficients sont forcés ($a_n = f^{(n)}(0)/n!$),
+sa convergence est impitoyable (normale à l'intérieur, sans espoir à
+l'extérieur), et sa somme est \omterm{def:b2:powerseries:analytic}{analytique} --- infiniment rigide
+(\cref{def:b2:powerseries:analytic}). Une série de Fourier est
+souple~: elle représente de simples signaux continûment lisses par
+morceaux, au prix de délicates questions de convergence au bord de la
+régularité. Les deux théories se rencontrent dans le problème du
+week-end de ce chapitre~: les sommations de Cesàro et d'Abel,
+développées ici pour le cercle bord, reviennent dans le chapitre de
+Fourier comme noyaux de Fejér et de Poisson. Pendant ce temps, le
+chapitre sur les équations différentielles consomme directement les
+séries entières ($\eu^{tA}$, solutions en série), et le chapitre sur
+les \omterm{ex:b2:powerseries:fibonacci}{fonctions génératrices} transforme l'astuce de
+l'\cref{ex:b2:powerseries:fibonacci} en un calcul systématique
+pour les probabilités.
+\end{remark}
+
+\section{Exercices}
+
+\begin{exercise}[$\star$]\label{exo:b2:powerseries:1}
+\omterm{def:b2:powerseries:radius}{Rayons de convergence}~:
+$\sum \dfrac{n^2}{2^n}z^n$~; $\;\sum \dfrac{z^n}{\binom{2n}{n}}$~;
+$\;\sum z^{n!}$~; $\;\sum \bigl(2 + (-1)^n\bigr)^n z^n$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:powerseries:2}
+Montrer que $\sum z^n$, $\sum \frac{z^n}{n}$, $\sum \frac{z^n}{n^2}$
+ont toutes pour rayon $1$ mais se comportent différemment en $z = 1$ et $z = -1$~:
+divergence/divergence, divergence/convergence,
+convergence/convergence.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:powerseries:3}
+Calculer les sommes, pour $\abs x < 1$~:
+\[
+\sum_{n\geq0} n x^n,
+\qquad
+\sum_{n\geq0} n^2 x^n,
+\qquad
+\sum_{n\geq0} \frac{x^{2n+1}}{2n+1} .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:powerseries:4}
+Développer en série entière en $0$, avec le rayon~: $\dfrac{1}{(1-x)(2-x)}$
+(éléments simples)~; $\;\ln(1 + x + x^2)$ \emph{(écrire $1 + x + x^2
+= \frac{1 - x^3}{1 - x}$)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:powerseries:5}
+Démontrer que $f(x) = \sum_{n\geq1} H_n x^n = -\dfrac{\ln(1 -
+x)}{1 - x}$ pour $\abs x < 1$, où $H_n$ est le nombre harmonique
+\emph{(\omterm{thm:b2:series:fubini}{produit de Cauchy} de $\sum x^n$ et $\sum \frac{x^n}{n}$)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:powerseries:6}
+Résoudre par \omterm{ex:b2:powerseries:fibonacci}{fonction génératrice} la récurrence $u_0 = 1$, $u_{n+1} =
+2u_n + n$~: calculer $U(x) = \sum u_nx^n$ sous forme close, décomposer,
+et lire $u_n = 2^{n+1} - n - 1$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:powerseries:7}
+Soit $f(x) = \eu^{-1/x^2}$ pour $x \neq 0$, $f(0) = 0$. Démontrer que
+$f$ est $C^\infty$ sur $\R$ avec $f^{(n)}(0) = 0$ pour tout $n$
+\emph{(montrer par récurrence que $f^{(n)}(x) = P_n\bigl(\frac1x\bigr)
+\eu^{-1/x^2}$ pour des polynômes $P_n$, et utiliser la comparaison de
+croissances)}. En conclure que $f$ n'est pas \omterm{def:b2:powerseries:analytic}{analytique} en $0$~: sa
+série de Taylor en $0$ \omterm{def:b2:integration:improper}{converge} --- vers la mauvaise fonction.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:powerseries:8}
+Compléter l'\cref{ex:b2:powerseries:catalan}~: développer $\sqrt{1 - 4x}$
+par la série du binôme, en montrant
+\[
+\binom{1/2}{n+1}(-4)^{n+1} = -\frac{2}{n+1}\binom{2n}{n},
+\]
+et en déduire $C_n = \frac{1}{n+1}\binom{2n}{n}$~; déterminer le \omterm{def:b2:powerseries:radius}{rayon
+de convergence} de $C(x)$ et l'asymptotique de $C_n$ via
+Stirling.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:powerseries:9}
+(Théorème de la limite radiale d'Abel, cas particulier) Supposons que $\sum a_n$
+\omterm{def:b2:integration:improper}{converge}. Démontrer que $\lim_{x \to 1^-} \sum_{n} a_n x^n = \sum_n
+a_n$. \emph{(\omterm{thm:b2:series:abel}{Transformation d'Abel}~: avec $A_n$ les sommes partielles et $A =
+\lim A_n$, écrire $\sum a_nx^n = (1 - x)\sum A_n x^n$~; puis $\sum
+a_nx^n - A = (1-x)\sum (A_n - A)x^n$, couper la somme à un grand
+$N$.)} Application~: $\sum \frac{(-1)^{n-1}}{n} = \ln 2$ et $\sum
+\frac{(-1)^n}{2n+1} = \frac\pi4$, redémontrées à partir de la série
+entière.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:powerseries:10}
+Montrer que $\displaystyle\sum_{n\geq1}\frac{x^n}{n(n+1)} = 1 +
+\frac{1-x}{x}\,\ln(1-x)$ pour $0 < \abs x < 1$, déterminer le
+rayon, et vérifier que la convergence est normale sur
+$\intcc{-1}{1}$~; vérifier que la valeur en $x = 1$ prédite par
+la continuité concorde avec la somme télescopique $\sum
+\frac{1}{n(n+1)} = 1$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:powerseries:11}
+(Dérangements) Soit $D_n$ le nombre de permutations de $n$
+objets sans point fixe ($D_0 = 1$). En triant les
+permutations de $\{1, \dots, n\}$ par leur ensemble de points fixes,
+on obtient $n! = \sum_{k=0}^{n}\binom nk D_{n-k}$. Multiplier par
+$\frac{x^n}{n!}$, sommer, et reconnaître un \omterm{thm:b2:series:fubini}{produit de Cauchy} pour obtenir
+la \omterm{ex:b2:powerseries:fibonacci}{fonction génératrice} exponentielle
+\[
+\sum_{n\geq0} D_n\,\frac{x^n}{n!} = \frac{\eu^{-x}}{1-x}
+\qquad (\abs x < 1),
+\]
+puis lire la forme close $\dfrac{D_n}{n!} =
+\sum_{k=0}^{n}\dfrac{(-1)^k}{k!}$ et la limite $\dfrac{D_n}{n!}
+\to \eu^{-1}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:powerseries:12}
+Démontrer, avec la série du binôme de
+la~\cref{met:b2:powerseries:ode}, que
+\[
+\frac{1}{\sqrt{1 - 4x}} = \sum_{n\geq0}\binom{2n}{n}x^n
+\qquad \Bigl(\abs x < \frac14\Bigr),
+\]
+et en déduire, par élévation au carré (\omterm{thm:b2:series:fubini}{produit de Cauchy} contre
+$\frac{1}{1-4x} = \sum 4^nx^n$), l'identité de convolution
+\[
+\sum_{k=0}^{n}\binom{2k}{k}\binom{2n-2k}{n-k} = 4^n .
+\]
+\end{exercise}
+
+\section{Problème~: Abel, Tauber et le bord de convergence}
+
+\begin{problem}\label{pb:b2:powerseries:1}
+À l'intérieur du disque de convergence tout est facile~; tout le
+drame des séries entières se joue \emph{sur} le bord. Ce
+problème construit la théorie du bord dans la variable réelle~: le
+théorème d'Abel sous sa forme uniforme, sa réciproque sous la
+condition de Tauber, la hiérarchie Cesàro--Abel des méthodes de
+sommation (avec le théorème de Frobenius), l'intégration terme à
+terme jusqu'au bord avec des constantes classiques en dividendes, et
+enfin la rigidité des \omterm{def:b2:powerseries:analytic}{fonctions analytiques} --- le théorème
+d'identité.\index{théorème d'Abel}\index{théorème de Tauber}
+Dans tout le problème, $(a_n)$ est une suite réelle, $f(x) = \sum_{n\geq0}
+a_nx^n$, et $A_n = a_0 + \dots + a_n$.
+
+\medskip
+\noindent\textbf{Partie I --- Le théorème d'Abel, \omterm{def:b2:funcseq:def}{uniformément}.} On
+suppose dans cette partie que $\sum a_n$ \omterm{def:b2:integration:improper}{converge}, et on pose $r_n =
+\sum_{k\geq n} a_k$ (donc $r_n \to 0$ et $a_n = r_n -
+r_{n+1}$).
+\begin{enumerate}
+  \item Démontrer, par sommation par parties, que pour tout $0 \leq x
+        \leq 1$ et $N \leq M$~:
+        \[
+        \Bigl|\sum_{n=N}^{M} a_n x^n\Bigr|
+        \leq 2\sup_{n \geq N}\,\abs{r_n} .
+        \]
+  \item En déduire que $\sum a_nx^n$ \omterm{def:b2:integration:improper}{converge} \emph{\omterm{def:b2:funcseq:def}{uniformément}} sur
+        $\intcc{0}{1}$, que sa somme y est \omterm{def:b2:metric:continuity}{continue}, et
+        retrouver la limite radiale de
+        l'\cref{exo:b2:powerseries:9}~: $f(x) \to \sum a_n$ quand $x
+        \to 1^-$.
+  \item (Théorème d'Abel pour les \omterm{thm:b2:series:fubini}{produits de Cauchy}) Soient $\sum a_n = A$,
+        $\sum b_n = B$ et supposons que le \omterm{thm:b2:series:fubini}{produit de Cauchy} $\sum
+        c_n$, $c_n = \sum_{k} a_kb_{n-k}$, \emph{\omterm{def:b2:integration:improper}{converge}},
+        de somme $C$. Démontrer $C = AB$ \emph{(à l'intérieur du disque
+        l'identité du produit vaut d'après
+        la~\cref{prop:b2:powerseries:operations}~; faire $x \to
+        1^-$)}.
+  \item Montrer que l'hypothèse compte~: pour $a_n = b_n =
+        \frac{(-1)^n}{\sqrt{n+1}}$, les deux séries convergent, et pourtant
+        $\abs{c_n} \geq \frac{2(n+1)}{n+2} \geq 1$ \emph{(majorer
+        chaque facteur $\sqrt{(k+1)(n-k+1)}$ par l'inégalité arithmético-géométrique)}~: le
+        \omterm{thm:b2:series:fubini}{produit de Cauchy} de deux séries convergentes peut diverger.
+  \item (Un dividende de l'\cref{exo:b2:powerseries:5}) Montrer que
+        $\bigl(\ln(1-x)\bigr)^2 = 2\sum_{n\geq1}
+        \frac{H_n}{n+1}x^{n+1}$ sur $\intoo{-1}{1}$, vérifier que
+        $\bigl(\frac{H_n}{n+1}\bigr)_{n\geq1}$ décroît vers
+        $0$, et conclure avec Abel~:
+        \[
+        \sum_{n\geq1} (-1)^{n+1}\,\frac{H_n}{n+1}
+        = \frac{(\ln 2)^2}{2} .
+        \]
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie II --- La réciproque de Tauber.} On dit que $\sum
+a_n$ est \emph{\omterm{def:b2:series:summable}{Abel-sommable}} vers $L$ quand $f(x) \to L$ quand $x \to
+1^-$.
+\begin{enumerate}[resume]
+  \item Montrer que $\sum (-1)^n$ est \omterm{def:b2:series:summable}{Abel-sommable} vers $\frac12$
+        tout en étant divergente~: le théorème d'Abel n'a pas de
+        réciproque inconditionnelle.
+  \item (Lemme de Cesàro) Si $u_n \to 0$ alors $\frac{u_1 + \dots
+        + u_N}{N} \to 0$ \emph{(couper la somme à un $m$ fixé)}.
+  \item Supposons maintenant $n\,a_n \to 0$ et $f(x) \to L$. Avec $x_N =
+        1 - \frac1N$, démontrer les deux estimations
+        \[
+        \Bigl|\sum_{n=0}^{N} a_n\bigl(1 - x_N^n\bigr)\Bigr|
+        \leq \frac{1}{N}\sum_{n=1}^{N} n\,\abs{a_n},
+        \qquad
+        \Bigl|\sum_{n>N} a_n x_N^n\Bigr|
+        \leq \sup_{n>N}\bigl(n\abs{a_n}\bigr)
+        \]
+        \emph{(pour la première, $1 - x^n \leq n(1-x)$~; pour la
+        seconde, $\abs{a_n} \leq \frac{1}{N}\sup_{m>N}
+        m\abs{a_m}$ et $\sum x_N^n \leq N$)}.
+  \item Conclure le \emph{théorème de Tauber}~: si $n\,a_n \to 0$ et
+        $\sum a_n$ est \omterm{def:b2:series:summable}{Abel-sommable} vers $L$, alors $\sum a_n$
+        \omterm{def:b2:integration:improper}{converge} vers $L$.
+  \item (Le théorème taubérien facile pour les coefficients positifs) Si $a_n
+        \geq 0$ et $f$ est bornée sur $\intco{0}{1}$, montrer que
+        $\sum a_n$ \omterm{def:b2:integration:improper}{converge} et $\sum a_n = \lim_{x\to1^-}
+        f(x)$ \emph{(majorer $\sum_{n\leq N}a_nx^n \leq f(x)$ et
+        faire $x \to 1^-$, puis utiliser Abel)}.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie III --- Moyennes de Cesàro et théorème de
+Frobenius.} On dit que $\sum a_n$ est \emph{\omterm{def:b2:series:summable}{Cesàro-sommable}} vers $L$ quand
+$\sigma_N = \frac{A_0 + \dots + A_{N-1}}{N} \to L$.
+\begin{enumerate}[resume]
+  \item Montrer qu'une série convergente est \omterm{def:b2:series:summable}{Cesàro-sommable} vers
+        sa somme \emph{(question 7 appliquée à $A_n - L$)}.
+  \item Calculer la valeur de Cesàro de $\sum(-1)^n$ et vérifier qu'elle
+        concorde avec la valeur d'Abel $\frac12$ de la question 6.
+  \item Avec $S_n = A_0 + \dots + A_n = (n+1)\,\sigma_{n+1}$,
+        démontrer les deux identités, pour $0 \leq x < 1$~:
+        \[
+        f(x) = (1-x)^2\sum_{n\geq0}(n+1)\,\sigma_{n+1}x^n,
+        \qquad
+        (1-x)^2\sum_{n\geq0}(n+1)x^n = 1 .
+        \]
+  \item (Frobenius) En déduire~: si $\sigma_N \to L$ alors $f(x) \to
+        L$ quand $x \to 1^-$ --- \omterm{def:b2:series:summable}{Cesàro-sommable} implique
+        \omterm{def:b2:series:summable}{Abel-sommable}, vers la même valeur \emph{(soustraire les deux
+        identités et couper la somme à un grand $N$, comme dans
+        l'\cref{exo:b2:powerseries:9})}.
+  \item Montrer que la hiérarchie
+        \[
+        \text{convergente} \;\Longrightarrow\;
+        \text{Cesàro-sommable} \;\Longrightarrow\;
+        \text{Abel-sommable}
+        \]
+        est stricte aux deux flèches~: question 6 pour la première~;
+        pour la seconde, montrer que $\sum(-1)^n(n+1)$ est
+        \omterm{def:b2:series:summable}{Abel-sommable} vers $\frac14$ (calculer $f$) mais non
+        \omterm{def:b2:series:summable}{Cesàro-sommable} (calculer $\sigma_N$ séparément pour
+        $N$ pair et $N$ impair).
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie IV --- Intégrer jusqu'au bord.}
+\begin{enumerate}[resume]
+  \item Supposons que $\sum a_nx^n$ \omterm{def:b2:integration:improper}{converge} sur $\intco{0}{1}$ et
+        que $\sum \frac{a_n}{n+1}$ \omterm{def:b2:integration:improper}{converge}. Démontrer que
+        l'\omterm{def:b2:integration:improper}{intégrale impropre} $\int_0^1 f$ existe et
+        \[
+        \int_0^1 \Bigl(\sum_{n\geq0} a_nx^n\Bigr)\dd x
+        = \sum_{n\geq0}\frac{a_n}{n+1}
+        \]
+        \emph{(la primitive $F(x) = \sum\frac{a_n}{n+1}x^{n+1}$
+        est \omterm{def:b2:metric:continuity}{continue} en $1$ par la partie I)}.
+  \item Soit $\eta = \sum_{n\geq1}\frac{(-1)^{n-1}}{n^2}$. Montrer
+        $\int_0^1 \frac{\ln(1+x)}{x}\dd x = \eta$ et, en
+        séparant indices pairs et impairs dans la série \omterm{def:b2:series:def}{absolument}
+        convergente $\sum \frac1{n^2}$, que $\eta =
+        \frac12\sum_{n\geq1}\frac{1}{n^2}$. (Le problème du week-end du
+        chapitre de Fourier évalue
+        $\sum\frac1{n^2} = \frac{\pi^2}{6}$.)
+  \item Démontrer
+        \[
+        \sum_{n\geq0}\frac{(-1)^n}{3n+1}
+        = \int_0^1\frac{\dd x}{1+x^3}
+        = \frac13\Bigl(\ln 2 + \frac{\pi}{\sqrt3}\Bigr)
+        \]
+        \emph{(la série \omterm{def:b2:integration:improper}{converge} par Leibniz~; intégrer la
+        série géométrique $\sum(-1)^nx^{3n}$ avec la question 16~;
+        puis éléments simples~: $\frac{1}{1+x^3} =
+        \frac{1/3}{1+x} + \frac{(2-x)/3}{x^2-x+1}$)}.
+  \item À partir de la série du binôme de $(1-t)^{-1/2}$
+        (\cref{exo:b2:powerseries:12}) dériver
+        \[
+        \arcsin x = \sum_{n\geq0}
+        \frac{\binom{2n}{n}}{4^n(2n+1)}\,x^{2n+1}
+        \quad(\abs x < 1),
+        \qquad\text{puis}\qquad
+        \sum_{n\geq0}\frac{\binom{2n}{n}}{4^n(2n+1)}
+        = \frac\pi2 ,
+        \]
+        en justifiant la valeur au bord par convergence
+        \emph{normale} sur $\intcc{-1}{1}$ (utiliser
+        $\binom{2n}n4^{-n} \sim \frac{1}{\sqrt{\pi n}}$,
+        \cref{ex:b2:comparison:centralbinomial}) --- ici même
+        Abel n'est pas nécessaire.
+  \item (Catalan au bord) Montrer que $\sum C_n 4^{-n} =
+        2$~: la série de Catalan de
+        l'\cref{ex:b2:powerseries:catalan} \omterm{def:b2:integration:improper}{converge} \emph{en}
+        son rayon $\frac14$ (asymptotique de
+        l'\cref{exo:b2:powerseries:8}), sa somme est \omterm{def:b2:metric:continuity}{continue} sur
+        $\intcc{0}{\frac14}$, et la forme close y a pour limite $2$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie V --- Rigidité~: le théorème d'identité.}
+\begin{enumerate}[resume]
+  \item (Zéros isolés) Soit $f = \sum a_nx^n$ de rayon $R >
+        0$ et non tous les $a_n$ nuls~; soit $m$ le plus petit indice
+        avec $a_m \neq 0$. Montrer $f(x) = x^m g(x)$ avec $g$ une
+        série entière de rayon $R$, $g(0) = a_m \neq 0$, et
+        en déduire que $f$ n'a aucun zéro dans un voisinage
+        épointé de $0$.
+  \item (Théorème d'identité) Soient $f, h$ des sommes de séries entières
+        près de $0$ et $(x_k)$ une suite de points \emph{non nuls}
+        avec $x_k \to 0$ et $f(x_k) = h(x_k)$. Démontrer
+        que $f$ et $h$ ont les mêmes coefficients, donc
+        coïncident près de $0$.
+  \item Trouver \emph{toutes} les fonctions $f$ \omterm{def:b2:powerseries:analytic}{analytiques} près de $0$ avec
+        \[
+        f\Bigl(\frac1k\Bigr) = \frac{k^2}{k^2+1}
+        \qquad\text{pour tout grand entier } k .
+        \]
+  \item Montrer qu'une \omterm{def:b2:powerseries:analytic}{fonction analytique} sur un intervalle \omterm{def:b2:metric:topology}{ouvert} $I$
+        qui s'annule sur un sous-intervalle s'annule identiquement sur
+        $I$ \emph{(l'ensemble des points autour desquels $f$ s'annule
+        identiquement est \omterm{def:b2:metric:topology}{ouvert} et, par le théorème d'identité
+        appliqué aux points d'accumulation, fermé dans $I$)}.
+        En conclure qu'aucune \omterm{def:b2:powerseries:analytic}{fonction analytique} non nulle sur $\R$ n'a
+        un support \omterm{def:b2:metric:compact}{compact} --- alors que les fonctions plateau $C^\infty$
+        existent (\cref{exo:b2:powerseries:7} fournit la
+        brique élémentaire)~: l'analyticité est rigide, la régularité
+        est molle.
+  \item Synthèse. En une phrase chacune~: (i) ce que le théorème d'Abel
+        ajoute au paquet de \omterm{def:b2:funcseq:series}{convergence normale} de
+        la~\cref{lem:b2:powerseries:abel}~; (ii) les hypothèses
+        exactes sous lesquelles la réciproque vaut (Tauber) et
+        le barreau intermédiaire (Frobenius)~; (iii) une constante de bord
+        de la partie IV que vous pourriez maintenant dériver pour un
+        ami en deux lignes~; (iv) où les moyennes de Cesàro
+        réapparaîtront dans ce livre, pour des séries d'un genre
+        très différent.
+\end{enumerate}
+\end{problem}

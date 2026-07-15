@@ -1,0 +1,874 @@
+\chapter{Espaces vectoriels normés}\label{ch:b2:nvs}
+
+Lorsque l'\omterm{def:b2:metric:def}{espace métrique} est un espace vectoriel et que la distance
+provient d'une \omterm{def:b2:nvs:norm}{norme}, la topologie et l'\omterm{def:b2:structures:algebra}{algèbre} linéaire commencent à
+interagir~: les applications linéaires sont \omterm{def:b2:metric:continuity}{continues} exactement
+lorsqu'elles sont bornées sur la boule unité, la dimension finie force
+toutes les \omterm{def:b2:nvs:norm}{normes} à coïncider, et la complétude transforme les séries
+absolument convergentes en séries convergentes. La distinction
+dimension finie/infinie --- cristallisée dans le théorème de Riesz ---
+est la leçon la plus profonde du chapitre.
+
+Dans tout le chapitre, $E, F$ sont des espaces vectoriels sur $K = \R$
+ou $\C$.
+
+\section{Normes}
+
+\begin{definition}\label{def:b2:nvs:norm}
+Une \emph{norme}\index{norme} sur $E$ est une application $\norm{\,\cdot\,} \colon E
+\to \R_+$ vérifiant, pour tous $x, y \in E$, $\lambda \in K$~:
+\[
+\norm x = 0 \iff x = 0,
+\qquad
+\norm{\lambda x} = \abs\lambda\,\norm x,
+\qquad
+\norm{x + y} \leq \norm x + \norm y .
+\]
+Alors $d(x, y) = \norm{x - y}$ est une distance, et tout le
+\cref{ch:b2:metric} s'applique. L'inégalité triangulaire inversée
+$\bigl|\norm x - \norm y\bigr| \leq \norm{x - y}$ rend la norme
+elle-même $1$-lipschitzienne~; l'addition et la multiplication par un
+scalaire sont \omterm{def:b2:metric:continuity}{continues} (estimations $\norm{(x + y) - (x' + y')} \leq
+\norm{x - x'} + \norm{y - y'}$, etc.).
+\end{definition}
+
+\begin{example}\label{ex:b2:nvs:examples}
+Sur $K^n$~:
+\[
+\norm{x}_1 = \sum_i \abs{x_i},
+\qquad
+\norm{x}_2 = \Bigl(\sum_i \abs{x_i}^2\Bigr)^{1/2},
+\qquad
+\norm{x}_\infty = \max_i \abs{x_i}
+\]
+($\norm\cdot_2$ est une \omterm{def:b2:nvs:norm}{norme} d'après Cauchy--Schwarz, volume de
+première année). Sur $C(\intcc{a}{b})$~:
+\[
+\norm f_\infty = \sup \abs f,
+\qquad
+\norm f_1 = \int_a^b \abs f,
+\qquad
+\norm f_2 = \Bigl(\int_a^b \abs f^2\Bigr)^{1/2},
+\]
+les deux dernières étant des \omterm{def:b2:nvs:norm}{normes} grâce à la stricte positivité de
+l'intégrale et à l'inégalité de Cauchy--Schwarz intégrale (volume de
+première année). Sur les matrices~: n'importe quelle \omterm{def:b2:nvs:norm}{norme} sur
+$\mathcal M_n(K) \simeq K^{n^2}$~; les \omterm{thm:b2:nvs:continuouslinear}{normes d'opérateur} ci-dessous
+sont les plus importantes structurellement.
+\end{example}
+
+\begin{definition}[Normes équivalentes]\label{def:b2:nvs:equivalent}
+Deux \omterm{def:b2:nvs:norm}{normes} $N_1, N_2$ sur $E$ sont \emph{équivalentes}\index{normes
+équivalentes} lorsqu'il existe des constantes $c, C > 0$ telles que
+\[
+c\,N_1 \leq N_2 \leq C\, N_1 .
+\]
+Deux \omterm{def:b2:nvs:norm}{normes} équivalentes ont les mêmes \omterm{def:b2:metric:topology}{ouverts}, les mêmes suites
+convergentes et de Cauchy, les mêmes parties \omterm{def:b2:metric:compact}{compactes} et complètes~:
+la même analyse.
+\end{definition}
+
+\begin{example}[Non-équivalence en dimension infinie]\label{ex:b2:nvs:nonequivalent}
+Sur $C(\intcc{0}{1})$~: $\norm f_1 \leq \norm f_\infty$ toujours, mais
+aucune borne inverse ne tient~: $f_n(x) = x^n$ vérifie $\norm{f_n}_\infty = 1$
+et $\norm{f_n}_1 = \frac{1}{n+1} \to 0$. Ainsi $f_n \to 0$ pour
+$\norm\cdot_1$ mais pas pour $\norm\cdot_\infty$~: les deux \omterm{def:b2:nvs:norm}{normes}
+sont en désaccord sur la convergence elle-même.
+\end{example}
+
+\begin{example}[Constantes explicites en dimension $n$]\label{ex:b2:nvs:constants}
+Sur $K^n$, les trois \omterm{def:b2:nvs:norm}{normes} classiques sont \omterm{def:b2:nvs:equivalent}{équivalentes} avec des
+constantes optimales~:
+\[
+\norm x_\infty \leq \norm x_2 \leq \norm x_1
+\leq \sqrt n\,\norm x_2 \leq n\,\norm x_\infty ,
+\]
+la borne médiane $\norm x_1 \leq \sqrt n\norm x_2$ provenant de
+Cauchy--Schwarz contre le vecteur constant égal à $1$. Vecteurs
+extrémaux~: $e_1$ rend les deux premières inégalités des égalités,
+$(1, 1, \dots, 1)$ les deux dernières. La dimension $n$ figure
+visiblement dans les constantes --- la graine quantitative de l'échec
+en dimension infinie~: lorsque $n \to \infty$, aucune constante
+uniforme ne survit, ce qui est exactement ce que l'\cref{ex:b2:nvs:nonequivalent}
+exhibe sur les espaces de fonctions.
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=1.5]
+  \draw[->] (-1.45,0) -- (1.5,0) node[below, font=\small] {$x$};
+  \draw[->] (0,-1.45) -- (0,1.5) node[left, font=\small] {$y$};
+  \draw[omProp, very thick]
+    (1,1) -- (-1,1) -- (-1,-1) -- (1,-1) -- cycle;
+  \draw[omThm, very thick] (0,0) circle (1);
+  \draw[omDef, very thick]
+    (1,0) -- (0,1) -- (-1,0) -- (0,-1) -- cycle;
+  \node[omDef, font=\small] at (0.36,0.28)
+    {$\norm\cdot_1$};
+  \node[omThm, font=\small] at (0.55,0.92)
+    {$\norm\cdot_2$};
+  \node[omProp, font=\small] at (1.24,1.13)
+    {$\norm\cdot_\infty$};
+\end{tikzpicture}
+
+{\small Les boules unités des trois \omterm{def:b2:nvs:norm}{normes} classiques de $\R^2$,
+emboîtées comme le dictent les inégalités de l'\cref{ex:b2:nvs:constants}~:
+plus la boule est petite, plus la \omterm{def:b2:nvs:norm}{norme} est grande. La rotondité
+compte~: les côtés plats du losange et du carré sont exactement les
+défauts de stricte convexité exploités dans le problème du week-end du
+\cref{ch:b2:realfun} et dans celui de ce chapitre (question 4).}
+\end{omfigure}
+
+\section{Applications linéaires continues}
+
+\begin{theorem}[Caractérisation]\label{thm:b2:nvs:continuouslinear}
+Pour une application linéaire $u \colon E \to F$ entre espaces normés,
+les propriétés suivantes sont \omterm{def:b2:nvs:equivalent}{équivalentes}~:
+\begin{enumerate}
+  \item $u$ est \omterm{def:b2:metric:continuity}{continue}~;
+  \item $u$ est \omterm{def:b2:metric:continuity}{continue} en $0$~;
+  \item $u$ est bornée sur la boule unité fermée~: $\sup_{\norm x \leq
+        1} \norm{u(x)} < \infty$~;
+  \item il existe $C \geq 0$ tel que $\norm{u(x)} \leq C \norm x$ pour
+        tout $x$~;
+  \item $u$ est \omterm{def:b2:metric:continuity}{lipschitzienne}.
+\end{enumerate}
+Le plus petit tel $C$ est la \emph{norme d'opérateur}\index{norme d'opérateur}
+$\vertiii{u} = \sup_{\norm x \leq 1}\norm{u(x)} = \sup_{x \neq 0}
+\frac{\norm{u(x)}}{\norm x}$~; elle fait de l'espace $\mathcal{L}_c(E,
+F)$ des applications linéaires \omterm{def:b2:metric:continuity}{continues} un espace normé, avec
+\[
+\vertiii{v \circ u} \leq \vertiii v\, \vertiii u .
+\]
+\end{theorem}
+
+\begin{proof}
+(1 $\Rightarrow$ 2) trivial. (2 $\Rightarrow$ 3)~: la continuité en $0$
+avec $\varepsilon = 1$ fournit $\delta$ tel que $\norm x \leq \delta
+\Rightarrow \norm{u(x)} \leq 1$~; l'homogénéité ramène alors tout $x$
+vérifiant $\norm x \leq 1$ dans cette boule puis en revient~:
+\[
+\norm{u(x)} = \frac1\delta\,\norm{u(\delta x)} \leq
+\frac1\delta ,
+\]
+car $\norm{\delta x} \leq \delta$. (3 $\Rightarrow$ 4)~:
+pour $x \neq 0$, appliquer la borne à $\frac{x}{\norm x}$. (4
+$\Rightarrow$ 5)~: $\norm{u(x) - u(y)} = \norm{u(x - y)} \leq
+C\norm{x - y}$. (5 $\Rightarrow$ 1) connu.
+
+Axiomes de \omterm{def:b2:nvs:norm}{norme} pour $\vertiii\cdot$~: l'homogénéité et la séparation
+sont claires ($\vertiii u = 0$ force $u = 0$ sur la boule, donc
+partout)~; l'inégalité triangulaire vient de $\norm{(u + v)(x)} \leq
+\norm{u(x)} + \norm{v(x)}$. Sous-multiplicativité~: $\norm{v(u(x))}
+\leq \vertiii v\,\norm{u(x)} \leq \vertiii v \vertiii u \norm x$.
+\end{proof}
+
+\begin{example}\label{ex:b2:nvs:operatornorms}
+Sur $\bigl(C(\intcc{0}{1}), \norm\cdot_\infty\bigr)$~: l'évaluation
+$f \mapsto f(0)$ a pour \omterm{thm:b2:nvs:continuouslinear}{norme d'opérateur} $1$~; l'intégration $f \mapsto
+\int_0^1 f$ a pour \omterm{def:b2:nvs:norm}{norme} $1$~; l'application $f \mapsto \int_0^1 t f(t)\dd t$
+a pour \omterm{def:b2:nvs:norm}{norme} $\int_0^1 t\,\dd t = \frac12$ (borne supérieure par
+l'inégalité triangulaire pour les intégrales~; atteinte en $f \equiv 1$).
+Mais la dérivation, de $(C^1, \norm\cdot_\infty)$ vers $(C^0,
+\norm\cdot_\infty)$, n'est \emph{pas} \omterm{def:b2:metric:continuity}{continue}~: $\norm{\sin(nx)}_\infty
+= 1$ tandis que la dérivée a pour \omterm{def:b2:nvs:norm}{norme} sup $n$. Linéaire n'implique pas
+\omterm{def:b2:metric:continuity}{continue} en dimension infinie.
+\end{example}
+
+\begin{example}[Deux normes, deux verdicts sur une même suite]\label{ex:b2:nvs:sqrtnxn}
+Sur $C(\intcc01)$, posons $g_n(x) = \sqrt{n}\,x^n$. Alors
+\[
+\norm{g_n}_1 = \frac{\sqrt n}{n + 1} \longrightarrow 0,
+\qquad
+\norm{g_n}_2^2 = \frac{n}{2n + 1} \longrightarrow \frac12,
+\qquad
+\norm{g_n}_\infty = \sqrt n \longrightarrow \infty :
+\]
+une seule suite, trois \omterm{def:b2:nvs:norm}{normes}, trois comportements --- convergence vers
+zéro, absence de convergence (les \omterm{def:b2:nvs:norm}{normes} se stabilisent à $\frac1{\sqrt2}$
+mais la limite simple est $0$), et explosion. La masse qui se concentre
+près de $x = 1$ est invisible pour $\norm\cdot_1$, à demi visible pour
+$\norm\cdot_2$, dominante pour $\norm\cdot_\infty$. En dimension infinie,
+«~converge-t-elle~?~» n'est pas une question portant sur une suite~:
+c'est une question portant sur une suite \emph{et} une \omterm{def:b2:nvs:norm}{norme}.
+\end{example}
+
+\begin{method}[Calculer une norme d'opérateur]\label{met:b2:nvs:opnorm}
+Toujours en deux temps. \emph{Borne supérieure~:} estimer
+$\norm{u(x)}$ par $C\norm x$ à l'aide d'inégalités triangulaires, de
+Cauchy--Schwarz ou de bornes intégrales --- cela prouve $\vertiii u
+\leq C$. \emph{Témoin~:} exhiber soit un $x_0 \neq 0$ précis vérifiant
+$\norm{u(x_0)} = C\norm{x_0}$ (la borne est atteinte), soit une
+suite de vecteurs unitaires $x_n$ avec $\norm{u(x_n)} \to C$ (la
+borne est approchée). Les deux temps sont obligatoires~: une borne
+supérieure seule ne donne que $\vertiii u \leq C$, un témoin seul que
+$\vertiii u \geq C$. En dimension infinie, le témoin peut devoir être
+une suite --- le supremum n'a pas à être atteint
+(\cref{exo:b2:nvs:8}).
+\end{method}
+
+\begin{example}[Les opérateurs diagonaux voient toutes les normes de la même façon]\label{ex:b2:nvs:diagonalnorm}
+Pour $D = \operatorname{diag}(d_1, \dots, d_n)$ sur $K^n$ muni de
+\emph{l'une quelconque} des \omterm{def:b2:nvs:norm}{normes} $\norm\cdot_1, \norm\cdot_2,
+\norm\cdot_\infty$~: de $\abs{d_ix_i} \leq
+\bigl(\max_j\abs{d_j}\bigr)\abs{x_i}$ coordonnée par coordonnée,
+$\norm{Dx} \leq \max_j\abs{d_j}\,\norm x$~; et $x = e_{j_0}$
+(un indice maximisant) l'atteint. Donc $\vertiii D =
+\max_j\abs{d_j}$ dans les trois cas~: pour les applications
+diagonales, toutes les \omterm{def:b2:nvs:norm}{normes} raisonnables racontent la même
+histoire, le plus grand facteur d'étirement. Toute la difficulté des
+\omterm{thm:b2:nvs:continuouslinear}{normes d'opérateur} porte sur le comportement \emph{non} diagonal ---
+c'est pourquoi les \omterm{def:b2:nvs:norm}{normes} adaptées du problème du week-end de ce
+chapitre (question 22) fonctionnent en forçant d'abord une matrice à
+devenir diagonale.
+\end{example}
+
+\begin{example}[Sommes de colonnes~: le jumeau en norme $1$ de l'\cref{exo:b2:nvs:4}]\label{ex:b2:nvs:columnsums}
+Sur $(\R^n, \norm\cdot_1)$, la \omterm{thm:b2:nvs:continuouslinear}{norme d'opérateur} d'une matrice $A$ est
+la plus grande somme de \emph{colonne} en valeur absolue. Déroulons la
+méthode~: pour $\norm x_1 \leq 1$,
+\[
+\norm{Ax}_1 = \sum_i\Bigl|\sum_j a_{ij}x_j\Bigr|
+\leq \sum_j \abs{x_j}\sum_i\abs{a_{ij}}
+\leq \Bigl(\max_j\sum_i\abs{a_{ij}}\Bigr)\norm x_1 ,
+\]
+et la borne est atteinte en $x = e_{j_0}$ pour une colonne maximisante
+$j_0$ --- le témoin le plus net qui soit. Ainsi pour $A =
+\begin{psmallmatrix}1 & -2\\ 3 & 1\end{psmallmatrix}$~:
+$\vertiii A_1 = \max(1 + 3,\ 2 + 1) = 4$, tandis que
+$\vertiii A_\infty = 4$ également (lignes) --- une coïncidence ici, non
+une loi~: transposez les coefficients de la matrice de façon
+asymétrique et les deux \omterm{def:b2:nvs:norm}{normes} se séparent. Les lignes pour
+$\norm\cdot_\infty$, les colonnes pour $\norm\cdot_1$~: le moyen
+mnémotechnique est que les vecteurs unitaires de chaque \omterm{def:b2:nvs:norm}{norme} (motifs
+de signes, resp.\ vecteurs de base) sélectionnent les sommes
+correspondantes.
+\end{example}
+
+\begin{proposition}[Applications bilinéaires]\label{prop:b2:nvs:bilinear}
+Une application bilinéaire $b \colon E \times F \to G$ est \omterm{def:b2:metric:continuity}{continue} si
+et seulement si $\norm{b(x,y)} \leq C\norm x\,\norm y$ pour un certain
+$C$~; elle est alors \omterm{def:b2:metric:continuity}{lipschitzienne} sur les parties bornées. (Même
+schéma de preuve~; le produit $(u, v) \mapsto v \circ u$ et la
+multiplication matricielle en sont les exemples clés.)
+\end{proposition}
+
+\begin{proof}
+Si la borne est vérifiée~:
+\[
+b(x,y) - b(x_0,y_0) = b(x - x_0,\, y) + b(x_0,\, y - y_0),
+\]
+donc $\norm{b(x,y) - b(x_0,y_0)} \leq C\norm{x - x_0}\norm y +
+C\norm{x_0}\norm{y - y_0}$~: continuité en $(x_0, y_0)$, et une
+borne \omterm{def:b2:metric:continuity}{lipschitzienne} là où $\norm x, \norm y \leq R$. Réciproquement,
+la continuité en $(0,0)$ fournit $\delta$ tel que $\norm{b(x,y)} \leq 1$
+sur $\norm x, \norm y \leq \delta$~; on dilate les deux variables.
+\end{proof}
+
+\section{Dimension finie}
+
+\begin{theorem}[Équivalence des normes en dimension finie]\label{thm:b2:nvs:finitedim}
+Sur un espace de dimension finie, \emph{toutes les \omterm{def:b2:nvs:norm}{normes} sont
+\omterm{def:b2:nvs:equivalent}{équivalentes}}.\index{équivalence des normes} Par conséquent, en
+dimension finie~: la convergence, le caractère \omterm{def:b2:metric:topology}{ouvert}, la compacité, la
+complétude sont des notions indépendantes de la \omterm{def:b2:nvs:norm}{norme}~; \omterm{def:b2:metric:compact}{compact} $=$
+fermé et borné~; l'espace est \omterm{def:b2:metric:complete}{complet}~; et toute application linéaire
+(ou multilinéaire) \emph{issue d'}un espace de dimension finie est
+\omterm{def:b2:metric:continuity}{continue}.
+\end{theorem}
+
+\begin{proof}
+Fixons une base et identifions $E \simeq K^n$~; il suffit de comparer
+toute \omterm{def:b2:nvs:norm}{norme} $N$ à $\norm\cdot_\infty$.
+
+\emph{Un sens relève de l'\omterm{def:b2:structures:algebra}{algèbre}~:} $N(x) = N(\sum x_i e_i) \leq
+\sum \abs{x_i} N(e_i) \leq C \norm x_\infty$ avec $C = \sum N(e_i)$.
+Ceci montre aussi que $N$ est \omterm{def:b2:metric:continuity}{continue} sur $(K^n, \norm\cdot_\infty)$
+(elle est $C$-lipschitzienne~: $\abs{N(x) - N(y)} \leq N(x - y)$).
+
+\emph{L'autre relève de la topologie~:} la sphère unité $S = \{x :
+\norm{x}_\infty = 1\}$ est fermée et bornée dans $(K^n,
+\norm\cdot_\infty)$, donc compacte
+(\cref{thm:b2:metric:compactprops}~(2), valable pour $\C^n \simeq
+\R^{2n}$). La fonction \omterm{def:b2:metric:continuity}{continue} $N$ atteint son minimum $c$ sur
+$S$~; $c > 0$ car $N$ ne s'annule qu'en $0 \notin S$. L'homogénéité
+propage la borne~: $N(x) \geq c \norm{x}_\infty$ pour tout $x$.
+
+Conséquences~: tous les énoncés se ramènent à $(K^n,
+\norm\cdot_\infty)$, où ils sont connus
+(\cref{thm:b2:metric:rncomplete},
+\cref{thm:b2:metric:compactprops})~; une application linéaire $u$
+issue d'un $E$ de dimension finie vérifie $\norm{u(x)} \leq \sum\abs{x_i}
+\norm{u(e_i)} \leq C'\norm{x}_\infty$~: la borne (4) du
+\cref{thm:b2:nvs:continuouslinear}.
+\end{proof}
+
+\begin{corollary}\label{cor:b2:nvs:closedsubspace}
+Tout sous-espace de dimension finie d'un espace normé quelconque est
+fermé.
+\end{corollary}
+
+\begin{proof}
+Il est \omterm{def:b2:metric:complete}{complet} pour la \omterm{def:b2:nvs:norm}{norme} induite
+(\cref{thm:b2:nvs:finitedim}), et les parties complètes sont fermées
+(\cref{def:b2:metric:complete}).
+\end{proof}
+
+\begin{example}[Une meilleure approximation calculée par symétrie]\label{ex:b2:nvs:bestaffine}
+Dans $\bigl(C(\intcc{-1}{1}), \norm\cdot_\infty\bigr)$, à quelle
+distance $f(x) = \abs x$ se trouve-t-elle du sous-espace (fermé, de
+dimension deux) des fonctions affines $a + bx$~? Par symétrie,
+remplacer $a + bx$ par $a - bx$ laisse $\norm{f - (a \pm bx)}_\infty$
+inchangée, et le milieu $a$ fait au moins aussi bien (inégalité
+triangulaire sur la moyenne)~: il suffit de considérer les constantes.
+Pour une constante $a$~:
+\[
+\norm{\abs x - a}_\infty = \max\,(1 - a,\ a)
+\geq \frac12 ,
+\]
+minimisée en $a = \frac12$~: la distance vaut $\frac12$, atteinte
+par la constante $\frac12$. Remarquons la courbe d'erreur $\abs x -
+\frac12$~: elle atteint $\pm\frac12$ alternativement en $x = -1, 0,
+1$ --- trois extrema de signes alternés pour une meilleure
+approximation issue d'une famille à deux paramètres. Ce schéma
+d'\emph{équioscillation} n'est pas fortuit~; c'est la signature
+d'optimalité que le problème du week-end de ce chapitre transforme en
+théorème de Tchebychev.
+\end{example}
+
+\begin{example}[Sous-espaces fermés contre sous-espaces denses]\label{ex:b2:nvs:closeddense}
+Dans $E = \bigl(C(\intcc{0}{1}), \norm\cdot_\infty\bigr)$~: chaque
+$\R_n[X]$ (polynômes de degré $\leq n$, restreints à
+$\intcc01$) est un sous-espace de dimension finie, donc \emph{fermé}
+--- une limite uniforme de polynômes de degré $\leq n$ en est un. Mais
+la réunion $\R[X]$ de tous ces sous-espaces est \emph{dense} dans $E$
+(le théorème d'approximation de Weierstrass, démontré au
+\cref{ch:b2:funcseq}), et des sous-espaces propres denses sont aussi
+peu fermés qu'on puisse l'être. La morale~: la fermeture des
+sous-espaces est un privilège de la dimension finie~; empiler des
+étages fermés peut construire un gratte-ciel dense.
+\end{example}
+
+\begin{theorem}[Riesz]\label{thm:b2:nvs:riesz}
+La boule unité fermée d'un espace normé $E$ est compacte \emph{si et
+seulement si} $\dim E < \infty$.\index{théorème de Riesz}
+\end{theorem}
+
+\begin{proof}
+Dimension finie~: fermée et bornée suffit
+(\cref{thm:b2:nvs:finitedim}).
+
+Réciproquement, supposons $\dim E = \infty$. \emph{Lemme de Riesz~:}
+pour tout sous-espace fermé propre $F \subsetneq E$ et tout $\varepsilon \in
+\intoo{0}{1}$, il existe un vecteur unitaire $x$ tel que $d(x, F) \geq 1 -
+\varepsilon$. Preuve~: choisir $y \notin F$, poser $\delta = d(y, F) > 0$
+($F$ fermé), choisir $f \in F$ tel que $\norm{y - f} \leq
+\frac{\delta}{1 - \varepsilon}$, et poser $x = \frac{y - f}{\norm{y -
+f}}$~: pour tout $g \in F$,
+\[
+\norm{x - g} = \frac{\norm{y - (f + \norm{y-f}\,g)}}{\norm{y - f}}
+\geq \frac{\delta}{\norm{y-f}} \geq 1 - \varepsilon ,
+\]
+le numérateur étant une distance de $y$ à un point de $F$.
+
+Construisons maintenant des vecteurs unitaires $x_1, x_2, \dots$ par
+récurrence~: $F_k = \operatorname{Vect}(x_1, \dots, x_k)$ est de
+dimension finie, donc fermé (\cref{cor:b2:nvs:closedsubspace}) et
+propre~; le lemme de Riesz avec $\varepsilon = \frac12$ fournit un
+vecteur unitaire $x_{k+1}$ tel que $d(x_{k+1}, F_k) \geq \frac12$. La
+suite vérifie $\norm{x_p - x_q} \geq \frac12$ pour $p \neq q$~: aucune
+sous-suite convergente --- la boule unité n'est pas compacte.
+\end{proof}
+
+\begin{example}[Riesz comme détecteur de dimension]\label{ex:b2:nvs:rieszdetector}
+$C(\intcc01)$ est-il de dimension finie~? Riesz répond sans exhiber
+aucune famille libre infinie explicite~: la suite $f_n(x) = x^n$
+appartient à la boule unité fermée et vérifie, pour $m > n$,
+$\norm{f_n - f_m}_\infty \geq f_n(x_0) - f_m(x_0) > 0$ en des points
+bien choisis --- quantifié proprement dans le problème du week-end de
+ce chapitre (question 16), où une sous-suite reste à distance mutuelle
+$\geq \frac14$. Aucune sous-suite convergente, donc la boule n'est pas
+compacte, donc $\dim C(\intcc01) = \infty$ d'après le
+\cref{thm:b2:nvs:riesz}. La compacité de la boule unité est une
+dichotomie parfaite~: elle a lieu en dimension finie, échoue en
+dimension infinie, sans terrain intermédiaire --- la géométrie seule
+lit le type de dimension.
+\end{example}
+
+\section{Espaces de Banach}
+
+\begin{definition}\label{def:b2:nvs:banach}
+Un \emph{espace de Banach}\index{espace de Banach} est un espace normé
+\omterm{def:b2:metric:complete}{complet}. Exemples~: tout espace normé de dimension finie
+(\cref{thm:b2:nvs:finitedim})~; $\bigl(C(\intcc{a}{b}),
+\norm\cdot_\infty\bigr)$ (\cref{thm:b2:metric:rncomplete})~;
+$\mathcal{L}_c(E, F)$ lorsque $F$ est de Banach (même schéma de preuve
+que pour les fonctions \omterm{def:b2:metric:continuity}{continues}). Contre-exemple~: $\bigl(C(\intcc{0}{1}),
+\norm\cdot_1\bigr)$ (\cref{exo:b2:nvs:7}).
+\end{definition}
+
+\begin{example}[La norme d'opérateur de l'intégration]\label{ex:b2:nvs:integrationnorm}
+Sur $\bigl(C(\intcc01), \norm\cdot_\infty\bigr)$, posons $T(f)(x) =
+\int_0^x f(t)\,\dd t$ (un endomorphisme~: $T(f)$ est \omterm{def:b2:metric:continuity}{continue}).
+Déroulons la~\cref{met:b2:nvs:opnorm}. Borne supérieure~:
+\[
+\abs{T(f)(x)} \leq \int_0^x\abs f \leq x\,\norm f_\infty \leq
+\norm f_\infty ,
+\]
+donc $\vertiii T \leq 1$. Témoin~: $f \equiv 1$ donne $T(f)(x) =
+x$ et $\norm{T(f)}_\infty = 1 = \norm f_\infty$~: atteinte,
+$\vertiii T = 1$. Mais notons $\vertiii{T^2} = \frac12 \neq
+\vertiii T^2$~: en effet $T^2(f)(x) = \int_0^x(x - t)f(t)\dd t$ vérifie
+$\abs{T^2(f)(x)} \leq \frac{x^2}2\norm f_\infty$, atteinte de nouveau
+en $f \equiv 1$~; et plus généralement $\vertiii{T^n} = \frac1{n!}$ ---
+la borne sous-multiplicative $\vertiii T^n = 1$ se trompe d'une
+factorielle. C'est exactement le phénomène que l'astuce d'itération du
+problème du week-end du~\cref{ch:b2:metric} convertit en résolubilité
+globale des équations différentielles linéaires.
+\end{example}
+
+\begin{theorem}[Convergence absolue dans les espaces de Banach]\label{thm:b2:nvs:absoluteconvergence}
+Dans un \omterm{def:b2:nvs:banach}{espace de Banach}, si $\sum \norm{u_n} < \infty$ alors $\sum u_n$
+converge, et $\norm{\sum u_n} \leq \sum\norm{u_n}$. (La théorie
+complète des séries dans les espaces normés fait l'objet du
+\cref{ch:b2:series}.)
+\end{theorem}
+
+\begin{proof}
+Sommes partielles $S_N$~: pour $q > p$, $\norm{S_q - S_p} \leq
+\sum_{n=p+1}^{q}\norm{u_n}$, qui tend vers $0$ (critère de Cauchy
+pour la série réelle des \omterm{def:b2:nvs:norm}{normes})~: $(S_N)$ est de Cauchy, donc
+convergente. L'inégalité passe à la limite depuis l'inégalité
+triangulaire finie.
+\end{proof}
+
+\begin{example}[Exponentielle de matrice, premier contact]\label{ex:b2:nvs:matrixexp}
+L'\emph{exponentielle de matrice}\index{exponentielle de matrice}~:
+$\mathcal{M}_n(K)$ munie de n'importe quelle \omterm{def:b2:nvs:norm}{norme} sous-multiplicative
+($\vertiii{AB} \leq \vertiii A \vertiii B$) est de Banach (dimension
+finie). Alors, pour tout $A$,
+\[
+\eu^A = \sum_{k=0}^{\infty} \frac{A^k}{k!}
+\]
+converge absolument ($\vertiii{A^k/k!} \leq \vertiii A^k /k!$,
+sommable)~: bien définie. Le~\cref{ch:b2:diffeq} l'exploite
+systématiquement.
+\end{example}
+
+\begin{example}[Une série de Neumann qui s'arrête]\label{ex:b2:nvs:neumannfinite}
+Pour $A = \begin{psmallmatrix}0 & \frac12\\ 0 &
+0\end{psmallmatrix}$~: $\vertiii A < 1$ dans toute \omterm{thm:b2:nvs:continuouslinear}{norme d'opérateur}
+construite sur les \omterm{def:b2:nvs:norm}{normes} de l'\cref{ex:b2:nvs:examples}, et $A^2 = 0$,
+donc la série géométrique s'effondre~:
+\[
+(I - A)^{-1} = \sum_{k \geq 0} A^k = I + A =
+\begin{pmatrix}1 & \tfrac12\\ 0 & 1\end{pmatrix},
+\]
+vérifié par $(I - A)(I + A) = I - A^2 = I$. La nilpotence
+tronque la série exactement comme elle a tronqué l'exponentielle au
+\cref{ch:b2:reduction}~; et l'exemple calibre les attentes~: l'inverse
+de Neumann est une série infinie en général, un polynôme précisément
+lorsque la perturbation est nilpotente, et l'erreur après $N$ termes
+est toujours majorée par le reste géométrique $\vertiii A^{N+1}/(1 -
+\vertiii A)$.
+\end{example}
+
+\begin{example}[L'exponentielle d'un générateur de rotation]\label{ex:b2:nvs:rotationexp}
+Prenons $A = \begin{psmallmatrix}0 & -\theta\\ \theta &
+0\end{psmallmatrix}$. Alors $A^2 = -\theta^2 I$, donc les puissances
+cyclent avec une période quatre, et la série se scinde en parties
+paire et impaire~:
+\[
+\eu^{A} = \sum_{k}\frac{A^k}{k!}
+= \Bigl(\sum_{j}\frac{(-1)^j\theta^{2j}}{(2j)!}\Bigr) I
++ \Bigl(\sum_{j}\frac{(-1)^j\theta^{2j+1}}{(2j+1)!}\Bigr)
+\frac{A}{\theta}
+= \begin{pmatrix}
+\cos\theta & -\sin\theta\\
+\sin\theta & \cos\theta
+\end{pmatrix},
+\]
+tous les réarrangements étant autorisés par la convergence absolue. L'
+exponentielle d'un générateur antisymétrique est une rotation ---
+calculée ici purement à partir de la série, trois chapitres avant que
+l'équation différentielle $x' = Ax$ (\cref{ch:b2:diffeq}) n'explique
+\emph{pourquoi}~: $\eu^{tA}$ est un mouvement circulaire uniforme.
+L'éclairage final~: les identités entre séries matricielles se
+démontrent exactement comme les scalaires, dès qu'une \omterm{def:b2:nvs:norm}{norme}
+sous-multiplicative certifie la convergence absolue.
+\end{example}
+
+\begin{example}[La norme sup signifie uniforme~: le dictionnaire]\label{ex:b2:nvs:uniformdictionary}
+L'énoncé $\norm{f_n - f}_\infty \to 0$ \emph{est} la convergence
+uniforme~: un seul nombre, $\sup_x\abs{f_n(x) - f(x)}$, majore
+l'erreur en tout point simultanément. Le dictionnaire à l'œuvre sur
+$f_n(x) = x^n$ sur $\intcc{0}{1}$~: simplement, $f_n
+\to 0$ sur $\intco{0}{1}$ et $f_n(1) = 1$~; en \omterm{def:b2:nvs:norm}{norme},
+$\norm{f_n - 0}_\infty = 1 \not\to 0$, et de fait la limite simple
+est discontinue, donc hors de portée d'une limite en
+$\norm\cdot_\infty$ dans $C(\intcc01)$ (qui est fermé
+pour les limites uniformes, \cref{thm:b2:metric:rncomplete}). Sur
+$\intcc{0}{a}$, $a < 1$~: $\norm{f_n}_\infty = a^n \to 0$ ---
+la convergence uniforme rétablie en rétrécissant le domaine. Tout
+énoncé de convergence du~\cref{ch:b2:funcseq} est un énoncé
+sur cette unique \omterm{def:b2:nvs:norm}{norme}~; garder le dictionnaire en tête réduit de
+moitié ce chapitre.
+\end{example}
+
+\begin{remark}[Pièges courants]\label{rem:b2:nvs:pitfalls}
+(i) Une \omterm{thm:b2:nvs:continuouslinear}{norme d'opérateur} dépend des \emph{deux} \omterm{def:b2:nvs:norm}{normes} choisies~: la
+même matrice a une $\vertiii\cdot_\infty$ donnée par les sommes de
+lignes (\cref{exo:b2:nvs:4}) et une $\vertiii\cdot_1$ différente
+(sommes de colonnes)~; parler de «~la~» \omterm{def:b2:nvs:norm}{norme} d'une matrice sans nommer
+les \omterm{def:b2:nvs:norm}{normes} sous-jacentes n'a pas de sens. (ii) $\vertiii{AB} \leq
+\vertiii A\,\vertiii B$ est une inégalité, en général stricte ---
+les puissances peuvent décroître bien plus vite que ne le suggère la
+borne $\vertiii A^k$, ce qui est tout l'intérêt des \omterm{def:b2:nvs:norm}{normes} adaptées (
+problème du week-end de ce chapitre, question 22). (iii) «~Linéaire
+implique \omterm{def:b2:metric:continuity}{continue}~» est un privilège de la dimension finie~: la
+dérivation sur les polynômes est linéaire et non bornée
+(\cref{ex:b2:nvs:operatornorms}). (iv) La convergence absolue de
+$\sum u_n$ n'est utile que lorsque l'espace est \omterm{def:b2:metric:complete}{complet}
+(l'\cref{exo:b2:series:9} construit le contre-exemple). (v) En
+dimension infinie, un supremum sur la boule unité est un vrai
+supremum~: ne pas supposer qu'il est atteint
+(\cref{exo:b2:nvs:8}).
+\end{remark}
+
+\begin{remark}[Perspectives au sein de ce volume]\label{rem:b2:nvs:perspectives}
+Trois rendez-vous sont désormais fixés. Avec le~\cref{ch:b2:series}~:
+dans un \omterm{def:b2:nvs:banach}{espace de Banach}, les séries absolument convergentes
+convergent, si bien que les séries géométrique et exponentielle
+d'opérateurs deviennent des outils quotidiens --- inverser $I - A$,
+définir $\eu^{A}$ (\cref{ex:b2:series:neumann}). Avec le
+\cref{ch:b2:funcseq} et le~\cref{ch:b2:powerseries}~: la convergence
+des suites de fonctions et des séries entières est la convergence dans
+$\bigl(C, \norm\cdot_\infty\bigr)$ (\cref{ex:b2:nvs:uniformdictionary}),
+et le rayon de convergence est un énoncé sur les séries géométriques
+qui dominent. Avec le~\cref{ch:b2:fourier}~: les \omterm{def:b2:nvs:norm}{normes}
+$\norm\cdot_2$ et $\norm\cdot_\infty$ sont réellement en désaccord sur
+$C(\intcc{0}{1})$ (\cref{ex:b2:nvs:sqrtnxn}), ce qui explique
+exactement pourquoi la convergence en moyenne quadratique des séries
+de Fourier et la convergence uniforme sont deux théorèmes différents
+avec deux prix différents.
+\end{remark}
+
+\begin{remark}[Où ce chapitre est utilisé]
+Les \omterm{thm:b2:nvs:continuouslinear}{normes d'opérateur} et la série géométrique animent les arguments
+de perturbation du~\cref{ch:b2:diffcalc} (théorème d'inversion locale)
+et l'\omterm{ex:b2:nvs:matrixexp}{exponentielle de matrice} du~\cref{ch:b2:diffeq}~; l'\omterm{thm:b2:nvs:finitedim}{équivalence
+des normes} autorise silencieusement tout argument «~choisissez votre
+\omterm{def:b2:nvs:norm}{norme} préférée~» du~\cref{ch:b2:funcseq} et au-delà~; et la
+distinction dimension finie/infinie du théorème de Riesz --- rendue
+quantitative dans le problème du week-end de ce chapitre --- est la
+raison pour laquelle le volume de troisième année a besoin de nouveaux
+outils (convergence faible, Arzelà--Ascoli, projections dans les
+espaces de Hilbert) là où ce volume pouvait encore extraire des
+sous-suites convergentes.
+\end{remark}
+
+\section{Exercices}
+
+\begin{exercise}[$\star$]\label{exo:b2:nvs:1}
+Sur $\R^2$, dessiner les boules unités de $\norm\cdot_1$, $\norm\cdot_2$,
+$\norm\cdot_\infty$, et démontrer les inégalités $\norm x_\infty
+\leq \norm x_2 \leq \norm x_1 \leq 2\norm x_\infty$ avec les meilleures
+constantes en dimension $2$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:nvs:2}
+$N(f) = \abs{f(0)} + \norm{f'}_\infty$ est-elle une \omterm{def:b2:nvs:norm}{norme} sur
+$C^1(\intcc{0}{1})$~? La comparer à $\norm{f}_\infty$~: une
+inégalité tient, l'autre échoue (l'exhiber).
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:nvs:3}
+Calculer la \omterm{thm:b2:nvs:continuouslinear}{norme d'opérateur} de $u(f) = \int_0^1 f(t)\,\eu^t\,\dd t$
+sur $\bigl(C(\intcc{0}{1}), \norm\cdot_\infty\bigr) \to \R$, et du
+décalage $S(x_1, x_2, \dots, x_n) = (x_2, \dots, x_n, 0)$ sur
+$(K^n, \norm\cdot_\infty)$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:nvs:4}
+Sur $(\R^n, \norm\cdot_\infty)$, démontrer que la \omterm{thm:b2:nvs:continuouslinear}{norme d'opérateur}
+d'une matrice $A$ vaut $\vertiii A_\infty = \max_i \sum_j \abs{a_{ij}}$
+(la plus grande somme de ligne en valeur absolue). La calculer pour
+$\begin{pmatrix} 1 & -2\\ 3 & 1\end{pmatrix}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:nvs:5}
+Démontrer que $GL_n(K)$ est \omterm{def:b2:metric:topology}{ouvert} dans $\mathcal{M}_n(K)$ et que $A
+\mapsto A^{-1}$ y est \omterm{def:b2:metric:continuity}{continue}. \emph{Indication~: pour l'ouverture, si
+$\vertiii H < \frac{1}{\vertiii{A^{-1}}}$ alors $A + H = A(I +
+A^{-1}H)$ avec $\vertiii{A^{-1}H} < 1$, et $I + B$ est inversible
+pour $\vertiii B < 1$ par la série géométrique
+(\cref{thm:b2:nvs:absoluteconvergence})~; pour la continuité, majorer
+$(A+H)^{-1} - A^{-1}$ à l'aide de la même série.}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:nvs:6}
+Soit $\varphi$ une forme linéaire sur un espace normé $E$. Démontrer que
+$\varphi$ est \omterm{def:b2:metric:continuity}{continue} si et seulement si $\ker\varphi$ est fermé.
+\emph{(Si $\ker\varphi$ est fermé et $\varphi \neq 0$, choisir $a$
+tel que $\varphi(a) = 1$ et $r > 0$ tel que $B(a, r) \cap \ker\varphi =
+\emptyset$~; en déduire $\abs{\varphi(h)} \leq \frac{1}{r}\norm h$ par un
+argument d'homogénéité sur $a - \frac{h}{\varphi(h)}$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:nvs:7}
+Démontrer que $\bigl(C(\intcc{0}{1}), \norm\cdot_1\bigr)$ n'est pas
+\omterm{def:b2:metric:complete}{complet}~: montrer que les fonctions $f_n$, rampes affines de $0$ à
+$1$ sur $\bigl[\frac12 - \frac1n, \frac12\bigr]$ (valeur $0$
+avant, $1$ après), forment une suite de Cauchy sans limite \omterm{def:b2:metric:continuity}{continue} en
+$\norm\cdot_1$.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:nvs:8}
+Sur $E = C(\intcc{0}{1})$ muni de $\norm\cdot_\infty$, considérer
+\[
+\varphi(f) = \sum_{n \geq 1} (-1)^n\, 2^{-n} f\bigl(\tfrac1n\bigr).
+\]
+Démontrer que $\varphi$ est une forme linéaire \omterm{def:b2:metric:continuity}{continue} bien définie avec
+$\vertiii\varphi = 1$, mais que le supremum définissant
+$\vertiii\varphi$ n'est \emph{pas atteint} sur la boule unité fermée.
+\emph{(Borne supérieure~: inégalité triangulaire. \omterm{def:b2:nvs:norm}{Norme} $= 1$~: construire
+une fonction \omterm{def:b2:metric:continuity}{continue} $f_K$ avec $\norm{f_K}_\infty \leq 1$ et $f_K(\frac1n)
+= (-1)^n$ pour $n \leq K$ --- les points $\frac1n$ sont isolés les uns
+des autres. Non-atteinte~: l'égalité forcerait $f(\frac1n) =
+(-1)^n$ pour tout $n$, incompatible avec la continuité de $f$ en $0$
+puisque $\frac1n \to 0$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:nvs:9}
+Soit $E$ un espace normé dans lequel la boule unité fermée est compacte.
+Redémontrer, sans invoquer le~\cref{thm:b2:nvs:riesz}, que toute
+suite bornée admet une sous-suite convergente, et démontrer que toute
+forme linéaire sur $E$ est \omterm{def:b2:metric:continuity}{continue} si et seulement si $\dim E < \infty$.
+\emph{(Pour la dimension infinie, construire une forme discontinue en
+la définissant librement sur une suite normalisée libre et en la
+prolongeant --- en admettant l'existence d'un supplémentaire
+algébrique.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:nvs:10}
+Sur $C(\intcc{0}{1})$, démontrer $\norm f_1 \leq \norm f_2 \leq \norm
+f_\infty$ \emph{(Cauchy--Schwarz pour la première)}, et montrer à l'aide
+de la famille $f_n(x) = x^n$ qu'aucune inégalité ne peut être inversée
+à une constante près~: les trois \omterm{def:b2:nvs:norm}{normes} sont deux à deux non
+\omterm{def:b2:nvs:equivalent}{équivalentes}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:nvs:11}
+(Distance à un hyperplan) Soit $\varphi$ une forme linéaire \omterm{def:b2:metric:continuity}{continue}
+non nulle sur un espace normé $E$. Démontrer que
+\[
+d\bigl(x, \ker\varphi\bigr) =
+\frac{\abs{\varphi(x)}}{\vertiii\varphi}
+\qquad (x \in E),
+\]
+et vérifier sur l'\cref{exo:b2:nvs:8} que l'infimum peut n'être
+atteint par aucun point de l'hyperplan.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:nvs:12}
+Sur $E = \R[X]$ (tous les polynômes), posons $N_1(P) =
+\sup_{\intcc{0}{1}}\abs P$ et $N_2(P) =
+\sup_{\intcc{0}{2}}\abs P$. Montrer que $N_1 \leq N_2$ mais que
+$N_1$ et $N_2$ ne sont \emph{pas} \omterm{def:b2:nvs:equivalent}{équivalentes}~; en déduire que
+l'identité $(E, N_2) \to (E, N_1)$ est une bijection linéaire \omterm{def:b2:metric:continuity}{continue}
+dont l'inverse est discontinu. Montrer enfin que $(E, N_1)$ n'est
+pas \omterm{def:b2:metric:complete}{complet} \emph{(sommes partielles de Taylor de $\eu^x$)}. Ces trois
+phénomènes sont impossibles en dimension finie --- dire pourquoi.
+\end{exercise}
+
+\section{Problème~: meilleure approximation et théorème de Tchebychev}
+
+Avec quelle qualité une fonction peut-elle être approchée par des
+polynômes d'un degré donné, et quel polynôme le fait le mieux~? Du
+côté de l'existence, la réponse relève de ce chapitre~: la compacité
+en dimension finie fait exister les meilleures approximations. Du côté
+explicite, un cas non trivial peut se résoudre complètement à la main
+--- parmi tous les polynômes \emph{unitaires} de degré $n$, celui de
+plus petite \omterm{def:b2:nvs:norm}{norme} sup sur $\intcc{-1}{1}$ est le polynôme de Tchebychev
+(normalisé), de \omterm{def:b2:nvs:norm}{norme} $2^{1-n}$~: le \emph{théorème extrémal de
+Tchebychev}. Le problème démontre les deux côtés, puis mesure à quel
+point la compacité échoue en dimension infinie~: la boule unité de
+$C(\intcc{0}{1})$ contient des constellations infinies de points à
+distance mutuelle $1$.
+
+\begin{problem}[{Problème du week-end --- théorème extrémal de Tchebychev
+et géométrie de la boule unité}]
+\label{pb:b2:nvs:1}
+Les \omterm{def:b2:nvs:norm}{normes} sans indice sont des \omterm{def:b2:nvs:norm}{normes} sup sur le segment indiqué.
+
+\medskip
+\noindent\textbf{Partie I --- Meilleure approximation dans les espaces
+normés.}
+\begin{enumerate}
+  \item Soit $F$ un sous-espace de dimension finie d'un espace normé
+        $E$ et $x \in E$. Démontrer que la distance $d(x,
+        F) = \inf_{f \in F}\norm{x - f}$ est \emph{atteinte}
+        \emph{(se ramener à une partie fermée bornée de $F$ et utiliser
+        le~\cref{thm:b2:nvs:finitedim})}.
+  \item Une \omterm{def:b2:nvs:norm}{norme} est \emph{strictement convexe} lorsque $\norm u = \norm v
+        = 1$ et $u \neq v$ impliquent $\bigl\Vert\frac{u +
+        v}2\bigr\Vert < 1$. Montrer que $\norm\cdot_2$ sur $\R^n$
+        est strictement convexe \emph{(identité du parallélogramme)}, et
+        que $\norm\cdot_1$ et $\norm\cdot_\infty$ ne le sont pas pour
+        $n \geq 2$.
+  \item Démontrer que pour une \omterm{def:b2:nvs:norm}{norme} strictement convexe, la meilleure
+        approximation de la question 1 est \emph{unique}.
+  \item Dans $(\R^2, \norm\cdot_\infty)$, calculer toutes les meilleures
+        approximations de $x = (0, 1)$ par la droite $F =
+        \operatorname{Vect}\bigl((1,0)\bigr)$~: un intervalle de
+        minimiseurs.
+  \item Dans $\bigl(C(\intcc{a}{b}), \norm\cdot_\infty\bigr)$,
+        montrer que la meilleure approximation de $f$ par des
+        \emph{constantes} est unique, égale à $c^* = \frac{\max f
+        + \min f}{2}$, de distance $\frac{\max f - \min
+        f}{2}$~; calculer les deux pour $f(x) = x^2$ sur
+        $\intcc{0}{1}$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie II --- Polynômes de Tchebychev.}
+\begin{enumerate}[resume]
+  \item Montrer qu'il existe exactement un polynôme $T_n$ tel que
+        $T_n(\cos\theta) = \cos n\theta$ pour tout $\theta$
+        \emph{(récurrence $T_{n+1} = 2XT_n - T_{n-1}$ issue de la
+        formule d'addition du cosinus)}, que $\deg T_n = n$, et que
+        son coefficient dominant vaut $2^{n-1}$ pour $n \geq 1$.
+  \item Montrer $\abs{T_n} \leq 1$ sur $\intcc{-1}{1}$, avec
+        $T_n(\eta_k) = (-1)^k$ aux $n + 1$ points $\eta_k =
+        \cos\frac{k\pi}{n}$ ($k = 0, \dots, n$), et que les
+        racines de $T_n$ sont les $n$ points
+        $\cos\frac{(2k-1)\pi}{2n}$, entrelacées avec les $\eta_k$.
+  \item Calculer $T_2, T_3, T_4$, et vérifier l'alternance de
+        $T_3$ en $\eta_0, \dots, \eta_3 = 1, \frac12, -\frac12,
+        -1$ par évaluation directe.
+  \item Pour $\abs x \geq 1$, démontrer
+        \[
+        T_n(x) = \frac{\bigl(x + \sqrt{x^2 - 1}\bigr)^n +
+        \bigl(x - \sqrt{x^2 - 1}\bigr)^n}{2},
+        \]
+        et en déduire $T_n(x) \sim \frac12\bigl(x + \sqrt{x^2 -
+        1}\bigr)^n \to \infty$ géométriquement pour $x > 1$ fixé.
+  \item Démontrer la loi de composition $T_m \circ T_n = T_{mn}$
+        \emph{(vérifier sur $\intcc{-1}{1}$ et invoquer la rigidité
+        des polynômes)}.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie III --- Théorème extrémal de Tchebychev.}
+Posons $Q_n = 2^{1-n}T_n$ (unitaire, d'après la question 6).
+\begin{enumerate}[resume]
+  \item Soit $P$ unitaire de degré $n \geq 1$ vérifiant $\sup_{\intcc{-1}{1}}\abs P < 2^{1-n}$. En évaluant $D
+        = Q_n - P$ aux points $\eta_k$ et en comptant les
+        changements de signe, aboutir à une contradiction. Conclure~:
+        \[
+        \sup_{\intcc{-1}{1}}\abs P \;\geq\; 2^{1-n}
+        \qquad\text{pour tout } P \text{ unitaire de degré } n.
+        \]
+  \item (Cas d'égalité) Supposons $\sup_{\intcc{-1}{1}}\abs P =
+        2^{1-n}$ avec $P$ unitaire de degré $n$, et posons $D = Q_n
+        - P \neq 0$. Montrer $(-1)^kD(\eta_k) \geq 0$ pour tout $k$~;
+        montrer que chacun des $n$ intervalles
+        $\intcc{\eta_{k}}{\eta_{k-1}}$ contient un zéro de $D$,
+        et qu'un zéro partagé par deux intervalles consécutifs est
+        un point \emph{intérieur} $\eta_k$ où $D' = 0$ également. En
+        conclure que $D$ possède $n$ zéros comptés avec
+        multiplicité, donc $D = 0$~: le minimiseur est exactement
+        $Q_n$ --- le \emph{théorème extrémal de Tchebychev}.
+  \item Reformuler le théorème comme une distance~: sur $\intcc{-1}{1}$,
+        \[
+        d_\infty\bigl(X^n,\ \R_{n-1}[X]\bigr) = 2^{1-n},
+        \]
+        avec pour unique meilleure approximation $X^n - Q_n$~; et montrer
+        par la substitution affine $x = \frac{1+t}2$ que sur
+        $\intcc{0}{1}$ la distance devient $2^{1-2n}$.
+  \item (Nœuds d'interpolation optimaux) Pour $n$ nœuds $x_1, \dots,
+        x_n \in \intcc{-1}{1}$, le polynôme nodal
+        $\omega(x) = \prod_i(x - x_i)$ est unitaire de degré $n$.
+        Déduire de la question 12 quel choix de nœuds minimise
+        $\sup_{\intcc{-1}{1}}\abs\omega$, le facteur dépendant des
+        nœuds dans la majoration classique de l'erreur
+        d'interpolation, et donner la valeur minimale.
+  \item Vérifier le cas $n = 2$ du théorème à la main (trouver
+        directement $\inf_c \sup_{\intcc{-1}{1}}\abs{x^2 - c}$),
+        et calculer numériquement la distance de la question 13 sur
+        $\intcc{0}{1}$ pour $n = 10$. Que dit sa taille
+        sur le graphe de $x^{10}$~?
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie IV --- La boule unité de
+$C(\intcc{0}{1})$.}
+\begin{enumerate}[resume]
+  \item Soit $g_k(x) = x^{2^k}$. Montrer $\norm{g_k}_\infty = 1$ et
+        $\norm{g_k - g_j}_\infty \geq \frac14$ pour $j > k$
+        \emph{(évaluer au point où $x^{2^k} =
+        \frac12$)}~: une suite bornée explicite sans sous-suite
+        convergente --- la boule unité fermée n'est pas
+        compacte, à la main.
+  \item (Lemme de Riesz, affiné) Soit $F$ un
+        sous-espace propre de \emph{dimension finie} d'un espace normé
+        $E$. À l'aide de la question 1, produire un vecteur unitaire $x$
+        tel que $d(x, F) = 1$ exactement --- et non seulement $\geq 1 -
+        \varepsilon$ comme dans le lemme du~\cref{thm:b2:nvs:riesz}.
+  \item En déduire~: dans tout espace normé de dimension infinie, il
+        existe une suite de vecteurs unitaires de distances
+        mutuelles $\geq 1$, et en redémontrer le théorème de Riesz.
+  \item Dans $C(\intcc{0}{1})$, exhiber une telle constellation
+        explicitement~: les fonctions triangles $h_n$ à support dans
+        $\bigl[\frac1{n+1}, \frac1n\bigr]$ de valeur maximale $1$.
+        Vérifier $\norm{h_n} = 1$, $\norm{h_n - h_m} = 1$ pour $n
+        \neq m$, et remarquer que $h_n \to 0$ simplement mais pas
+        uniformément.
+  \item (La précompacité échoue) Montrer que la boule unité
+        fermée de $C(\intcc{0}{1})$ ne peut être recouverte par un
+        nombre fini de boules de rayon $\frac13$ \emph{(chaque telle
+        boule contient au plus un $h_n$)} --- à comparer avec
+        l'étape de précompacité dans la preuve du
+        \cref{thm:b2:metric:borellebesgue}.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie V --- Les \omterm{def:b2:nvs:norm}{normes} à l'œuvre sur les matrices, et
+synthèse.}
+\begin{enumerate}[resume]
+  \item Démontrer que toute \omterm{def:b2:reduction:eigen}{valeur propre} $\lambda$ de $A \in
+        \mathcal{M}_n(\C)$ vérifie $\abs\lambda \leq
+        \vertiii A$ pour toute \omterm{thm:b2:nvs:continuouslinear}{norme d'opérateur}~; appliquer
+        l'\cref{exo:b2:nvs:4} pour majorer les \omterm{def:b2:reduction:eigen}{valeurs propres} de
+        $\begin{psmallmatrix}1 & -2\\ 3 & 1\end{psmallmatrix}$
+        et comparer à leur module véritable.
+  \item (\omterm{def:b2:nvs:norm}{Normes} adaptées) Soit $A$ \omterm{def:b2:reduction:diag}{diagonalisable}, $A =
+        P\,\mathrm{diag}(\lambda_1, \dots, \lambda_n)\,P^{-1}$.
+        Montrer que $N_P(x) = \norm{P^{-1}x}_\infty$ est une \omterm{def:b2:nvs:norm}{norme} dont la
+        \omterm{thm:b2:nvs:continuouslinear}{norme d'opérateur} vérifie $\vertiii A_{N_P} =
+        \max_i\abs{\lambda_i}$.
+  \item En déduire~: pour $A$ \omterm{def:b2:reduction:diag}{diagonalisable}, $A^k \to 0$ si et
+        seulement si toutes les \omterm{def:b2:reduction:eigen}{valeurs propres} vérifient $\abs{\lambda_i} < 1$ ---
+        l'\omterm{thm:b2:nvs:finitedim}{équivalence des normes} rend la conclusion
+        indépendante de la \omterm{def:b2:nvs:norm}{norme}. Vérifier sur $A =
+        \frac14\begin{psmallmatrix}1 & 2\\ 2 &
+        1\end{psmallmatrix}$.
+  \item (Les constantes d'équivalence explosent) Sur $\R_n[X]$,
+        comparer $N_c(P) = \max_k \abs{a_k}$ (coefficients) et
+        $\norm{P}_{\intcc{0}{1}}$~: ce sont deux \omterm{def:b2:nvs:norm}{normes}, donc
+        \omterm{def:b2:nvs:equivalent}{équivalentes} pour chaque $n$ fixé~; mais montrer, à l'aide du
+        minimiseur unitaire de la question 13 sur $\intcc{0}{1}$, que la
+        meilleure constante $C_n$ dans $N_c \leq
+        C_n\norm\cdot_{\intcc{0}{1}}$ vérifie $C_n \geq
+        2^{2n-1}$. Conclure en une phrase pourquoi «~toutes les \omterm{def:b2:nvs:norm}{normes}
+        sont \omterm{def:b2:nvs:equivalent}{équivalentes}~» meurt en dimension infinie.
+  \item (Synthèse) Une phrase pour chaque point~: où la compacité des
+        boules de dimension finie a fonctionné (questions 1, 12)~; ce
+        que gouverne la stricte convexité~; ce que la constellation
+        des questions 18--19 détruit~; et comment la question 24
+        quantifie l'échec. Nommer le sommet (le théorème extrémal de
+        Tchebychev) et dire où la meilleure approximation
+        trouve sa maison moderne (le théorème de projection sur les
+        espaces de Hilbert, volume de troisième année, où la complétude
+        remplace la compacité).
+\end{enumerate}
+\end{problem}

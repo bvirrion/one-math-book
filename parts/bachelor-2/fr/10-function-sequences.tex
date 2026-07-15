@@ -1,0 +1,896 @@
+\chapter{Suites et séries de fonctions}\label{ch:b2:funcseq}
+
+Lorsque des fonctions convergent vers une fonction, quelles propriétés
+survivent au passage à la limite~? La \omterm{def:b2:funcseq:def}{convergence simple} ne préserve
+presque rien~; la convergence \emph{uniforme} --- la convergence en \omterm{def:b2:nvs:norm}{norme}
+sup --- préserve la continuité, les intégrales sur les segments et, à une
+nuance près, les dérivées. Ce chapitre démontre les trois théorèmes de
+transfert, leurs versions en séries, et les couronne par le théorème
+d'approximation de Weierstrass, démontré grâce aux magnifiques polynômes
+probabilistes de Bernstein.
+
+\section{Convergence simple et uniforme}
+
+\begin{definition}\label{def:b2:funcseq:def}
+Soient $f_n, f \colon X \to \R$ (ou $\C$, ou un espace normé), $X$ un
+ensemble quelconque. $(f_n)$ \omterm{def:b2:integration:improper}{converge} vers $f$
+\emph{simplement}\index{convergence simple} lorsque $f_n(x) \to
+f(x)$ pour tout $x$~; \emph{uniformément}\index{convergence uniforme}
+lorsque
+\[
+\norm{f_n - f}_\infty = \sup_{x \in X}\, \abs{f_n(x) - f(x)}
+\xrightarrow[n \to \infty]{} 0 .
+\]
+La convergence uniforme entraîne la convergence simple~; sur
+$C(\intcc{a}{b})$, la convergence uniforme est exactement la convergence
+dans l'\omterm{def:b2:nvs:banach}{espace de Banach}
+$\bigl(C(\intcc{a}{b}), \norm\cdot_\infty\bigr)$ du
+\cref{ch:b2:nvs}.
+\end{definition}
+
+\begin{example}\label{ex:b2:funcseq:xn}
+Sur $\intcc{0}{1}$, $f_n(x) = x^n$ \omterm{def:b2:integration:improper}{converge} \omterm{def:b2:funcseq:def}{simplement} vers la limite
+\emph{discontinue} $f = \mathbf{1}_{\{1\}}$~; la convergence
+n'est pas uniforme~: $\norm{f_n - f}_\infty \geq f_n\bigl(1 -
+\tfrac1n\bigr) = (1 - \tfrac1n)^n \to \eu^{-1} \neq 0$. Sur
+$\intcc{0}{a}$ avec $a < 1$ elle l'\emph{est} ($\sup = a^n \to
+0$)~: l'uniformité est une propriété du domaine autant que de la
+suite.
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=8.2cm, height=5.6cm,
+    xmin=0, xmax=1.08, ymin=0, ymax=1.15,
+    xtick={0,1}, ytick={1}]
+  \addplot[omDef!40, thick, domain=0:1, samples=80] {x^2};
+  \addplot[omDef!60, thick, domain=0:1, samples=80] {x^5};
+  \addplot[omDef, thick, domain=0:1, samples=120] {x^15};
+  \addplot[omThm, very thick, domain=0:1, samples=160] {x^40};
+  \node[font=\small, omDef] at (axis cs:0.62,0.5) {$x^2$};
+  \node[font=\small, omDef] at (axis cs:0.83,0.48) {$x^5$};
+  \node[font=\small, omThm] at (axis cs:0.987,0.5) {$x^{40}$};
+\end{axis}
+\end{tikzpicture}
+
+{\small La suite $x^n$ sur $\intcc{0}{1}$~: les graphes s'affaissent
+vers $0$ mais doivent tous grimper jusqu'à $1$ en $x = 1$ --- la
+distance sup à la limite simple discontinue ne descend jamais sous une
+constante.}
+\end{omfigure}
+
+\begin{example}[Deux limites qui refusent de commuter]\label{ex:b2:funcseq:doublelimit}
+Tout le chapitre porte sur l'interversion de limites, voici donc le
+plus petit échec possible. Posons $a_{n,m} = \dfrac{n}{n+m}$ pour
+$n, m \geq 1$. Alors
+\[
+\lim_{m\to\infty}\Bigl(\lim_{n\to\infty}a_{n,m}\Bigr)
+= \lim_{m\to\infty} 1 = 1,
+\qquad
+\lim_{n\to\infty}\Bigl(\lim_{m\to\infty}a_{n,m}\Bigr)
+= \lim_{n\to\infty} 0 = 0 :
+\]
+les deux limites itérées existent et diffèrent. Chaque théorème de
+transfert de ce chapitre est un permis d'intervertir deux limites ---
+$\lim_n$ avec $\lim_{x\to a}$ (continuité), avec $\int$
+(intégration), avec $\frac{\dd}{\dd x}$ (dérivation) --- et la
+\omterm{def:b2:funcseq:def}{convergence uniforme} est précisément le prix qui rend l'interversion
+licite. Éclairage final~: chaque fois qu'une «~démonstration~»
+échange silencieusement deux opérations de limite, ce tableau de deux
+lignes est le contre-exemple à lui opposer~; les bosses glissantes de
+l'\cref{exo:b2:funcseq:2} sont le même phénomène affublé d'un signe
+intégral.
+\end{example}
+
+\section{Les trois théorèmes de transfert}
+
+\begin{theorem}[Continuité]\label{thm:b2:funcseq:continuity}
+Si chaque $f_n$ est \omterm{def:b2:metric:continuity}{continue} en $a$ et $f_n \to f$ \omterm{def:b2:funcseq:def}{uniformément} sur un
+voisinage de $a$, alors $f$ est \omterm{def:b2:metric:continuity}{continue} en $a$. Une limite uniforme
+de fonctions \omterm{def:b2:metric:continuity}{continues} est \omterm{def:b2:metric:continuity}{continue}.
+\end{theorem}
+
+\begin{proof}
+L'argument en $3\varepsilon$ déjà utilisé dans le
+\cref{thm:b2:metric:rncomplete}~: on choisit $n$ tel que $\norm{f_n -
+f}_\infty \leq \varepsilon$, puis $\delta$ par la continuité de
+$f_n$ en $a$~; pour $\abs{x - a} \leq \delta$,
+\[
+\abs{f(x) - f(a)} \leq \abs{f(x) - f_n(x)} + \abs{f_n(x) - f_n(a)}
++ \abs{f_n(a) - f(a)} \leq 3\varepsilon . \qedhere
+\]
+\end{proof}
+
+\begin{example}[L'uniformité échoue exactement là où la limite se brise]\label{ex:b2:funcseq:threshold}
+Sur $\intcc{0}{2}$, posons $f_n(x) = \dfrac{x^n}{1 + x^n}$. La
+limite simple est une fonction en trois morceaux~:
+\[
+f(x) = \begin{cases} 0 & 0 \leq x < 1,\\[2pt]
+\tfrac12 & x = 1,\\[2pt]
+1 & 1 < x \leq 2, \end{cases}
+\]
+discontinue en $1$, donc d'après le \cref{thm:b2:funcseq:continuity}
+la convergence ne peut être uniforme sur $\intcc{0}{2}$. Sur les
+morceaux fermés évitant le seuil elle l'est~: pour $0 \leq x \leq
+a < 1$,
+\[
+\sup_{\intcc{0}{a}}\abs{f_n - 0}
+= \frac{a^n}{1 + a^n} \leq a^n \to 0 ,
+\]
+et pour $1 < b \leq x \leq 2$,
+\[
+\sup_{\intcc{b}{2}}\abs{f_n - 1}
+= \frac{1}{1 + b^n} \leq b^{-n} \to 0 ,
+\]
+les deux suprema étant calculés par monotonie de $u \mapsto
+\frac{u}{1+u}$ et de $x \mapsto x^n$. Éclairage final~: l'échec de
+l'uniformité est localisé à la discontinuité de la limite --- la même
+géométrie que l'\cref{ex:b2:funcseq:xn}, et la raison pour laquelle la
+discipline «~uniforme sur tout segment intérieur~» revient tout au
+long du chapitre.
+\end{example}
+
+\begin{theorem}[Intégration sur un segment]\label{thm:b2:funcseq:integration}
+Si $f_n \to f$ \omterm{def:b2:funcseq:def}{uniformément} sur $\intcc{a}{b}$, avec $f_n$ \omterm{def:b2:metric:continuity}{continue}
+par morceaux ($f$ de même), alors
+\[
+\int_a^b f_n \longrightarrow \int_a^b f .
+\]
+\end{theorem}
+
+\begin{proof}
+La linéarité et l'inégalité triangulaire pour les intégrales donnent
+\[
+\Bigl|\int_a^b f_n - \int_a^b f\Bigr|
+= \Bigl|\int_a^b (f_n - f)\Bigr|
+\leq \int_a^b\abs{f_n - f}
+\leq (b - a)\,\norm{f_n - f}_\infty \longrightarrow 0 .
+\]
+Le facteur de longueur $(b - a)$ est l'endroit où la compacité du
+segment intervient~: sur les intervalles non \omterm{def:b2:metric:compact}{compacts}, la même
+estimation produit la borne inutile $\infty\cdot0$, et la conclusion
+échoue véritablement sans domination --- les bosses plates $f_n =
+\frac1n\mathbf 1_{\intcc{0}{n}}$ convergent \omterm{def:b2:funcseq:def}{uniformément} vers $0$ sur
+$\intco{0}{\infty}$ tout en conservant $\int f_n = 1$ (remarque sur
+les pièges ci-dessous), et les bosses glissantes de la remarque du
+\cref{ch:b2:integration} font de même avec la \omterm{def:b2:funcseq:def}{convergence simple}~; la
+\omterm{def:b2:funcseq:def}{convergence uniforme} contrôle les hauteurs, jamais les largeurs.
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=8.6cm, height=5.4cm,
+    xmin=0, xmax=1.05, ymin=0, ymax=1.9,
+    xtick={0,1}, ytick={1}]
+  \addplot[omDef!45, thick, domain=0:1.05, samples=120]
+    {2*x*exp(-2*x^2)};
+  \addplot[omDef!70, thick, domain=0:1.05, samples=120]
+    {5*x*exp(-5*x^2)};
+  \addplot[omDef, thick, domain=0:1.05, samples=160]
+    {15*x*exp(-15*x^2)};
+  \node[font=\small, omDef] at (axis cs:0.62,0.42) {$n=2$};
+  \node[font=\small, omDef] at (axis cs:0.40,0.80) {$n=5$};
+  \node[font=\small, omDef] at (axis cs:0.24,1.55) {$n=15$};
+\end{axis}
+\end{tikzpicture}
+
+{\small Les bosses $g_n(x) = nx\,\eu^{-nx^2}$ de
+l'\cref{exo:b2:funcseq:1}~: elles convergent vers $0$ en tout point,
+mais les pics (de hauteur $\sim\sqrt{n/(2\eu)}$, dérivant vers
+$0$) croissent sans borne --- \omterm{def:b2:funcseq:def}{convergence simple} avec
+$\norm{g_n}_\infty \to \infty$, et $\int_0^1 g_n \to \frac12
+\neq 0$~: la masse se cache sous le pic mobile.}
+\end{omfigure}
+
+\begin{theorem}[Dérivation]\label{thm:b2:funcseq:differentiation}
+Soit $f_n$ de classe $C^1$ sur un intervalle $I$, avec~: $(f_n')$
+convergeant \emph{\omterm{def:b2:funcseq:def}{uniformément}} sur $I$ (ou sur tout segment de $I$)
+vers un $g$, et $(f_n(x_0))$ convergeant en un point $x_0$. Alors
+$(f_n)$ \omterm{def:b2:integration:improper}{converge} (\omterm{def:b2:funcseq:def}{uniformément} sur les segments) vers une fonction $f$
+de classe $C^1$, et $f' = g$~: on peut dériver la limite.
+\end{theorem}
+
+\begin{proof}
+Définissons $f(x) = \lim f_n(x_0) + \int_{x_0}^x g$~: légitime, $g$
+étant \omterm{def:b2:metric:continuity}{continue} --- en effet $g$ est la limite \emph{uniforme} sur les
+segments des $f_n'$ \omterm{def:b2:metric:continuity}{continues}, donc le
+\cref{thm:b2:funcseq:continuity} s'applique, et l'intégrale d'une
+fonction \omterm{def:b2:metric:continuity}{continue} est bien définie avec, par le théorème fondamental
+de l'analyse,
+\[
+f'(x) = g(x) \qquad (x \in I) :
+\]
+la limite candidate est de classe $C^1$ avec la bonne dérivée
+\emph{par construction}, avant toute preuve de convergence. Par le
+théorème fondamental de nouveau, $f_n(x) = f_n(x_0) + \int_{x_0}^x
+f_n'$~; en soustrayant,
+\[
+\abs{f_n(x) - f(x)} \leq \abs{f_n(x_0) - \lim f_n(x_0)}
++ \abs{x - x_0}\,\norm{f_n' - g}_{\infty} ,
+\]
+qui tend vers $0$ \omterm{def:b2:funcseq:def}{uniformément} sur tout segment. Et $f$ est de classe
+$C^1$ avec $f' = g$ par construction.
+\end{proof}
+
+\begin{example}[Pourquoi l'hypothèse porte sur les dérivées]\label{ex:b2:funcseq:sqrtabs}
+Posons $F_n(x) = \sqrt{x^2 + \frac1n}$ sur $\R$. Chaque $F_n$ est
+de classe $C^1$ (et même $C^\infty$), et la convergence vers $\abs x$
+est uniforme sur tout $\R$~:
+\[
+0 \leq F_n(x) - \abs x
+= \frac{(x^2 + \frac1n) - x^2}{\sqrt{x^2+\frac1n} + \abs x}
+= \frac{1/n}{\sqrt{x^2 + \frac1n} + \abs x}
+\leq \frac{1/n}{1/\sqrt n} = \frac{1}{\sqrt n} .
+\]
+Pourtant la limite $\abs x$ n'est pas dérivable en $0$~: la
+\omterm{def:b2:funcseq:def}{convergence uniforme} des \emph{fonctions}, si rapide soit-elle, ne
+transfère aucune dérivabilité. L'échec est visible sur les dérivées~:
+\[
+F_n'(x) = \frac{x}{\sqrt{x^2 + \frac1n}}
+\longrightarrow \begin{cases} 1 & x > 0,\\ 0 & x = 0,\\
+-1 & x < 0, \end{cases}
+\]
+une limite simple discontinue, donc $(F_n')$ ne peut converger
+\omterm{def:b2:funcseq:def}{uniformément} près de $0$ (le \cref{thm:b2:funcseq:continuity} de
+nouveau). Éclairage final~:
+le \cref{thm:b2:funcseq:differentiation} suppose délibérément la
+\omterm{def:b2:funcseq:def}{convergence uniforme} des $f_n'$, non des $f_n$ ---
+cet exemple en est la raison.
+\end{example}
+
+\section{Séries de fonctions}
+
+\begin{definition}\label{def:b2:funcseq:series}
+Une série de fonctions $\sum u_n$ \omterm{def:b2:integration:improper}{converge} \omterm{def:b2:funcseq:def}{simplement}/\omterm{def:b2:funcseq:def}{uniformément}
+lorsque ses sommes partielles le font. Elle \omterm{def:b2:integration:improper}{converge}
+\emph{normalement}\index{convergence normale} (sur $X$) lorsque $\sum
+\norm{u_n}_\infty < \infty$. La convergence normale entraîne la
+\omterm{def:b2:funcseq:def}{convergence uniforme} (dans l'\omterm{def:b2:nvs:banach}{espace de Banach} des fonctions bornées~:
+\cref{thm:b2:nvs:absoluteconvergence}), qui entraîne la \omterm{def:b2:funcseq:def}{convergence
+simple}~; les deux implications sont strictes.
+\end{definition}
+
+\begin{example}[Une série, trois verdicts]\label{ex:b2:funcseq:threemodes}
+Prenons $u_n(x) = \frac{x^n}{n}$ sur $\intco{0}{1}$. \emph{\omterm{def:b2:funcseq:def}{Simplement}~:}
+\omterm{def:b2:integration:improper}{converge} pour tout $x \in \intco01$ (comparaison avec la
+série géométrique). \emph{\omterm{def:b2:funcseq:series}{Normalement} sur $\intcc{0}{a}$, $a < 1$~:}
+$\norm{u_n}_{\infty,\intcc0a} = \frac{a^n}{n}$, \omterm{def:b2:series:summable}{sommable}.
+\emph{Pas \omterm{def:b2:funcseq:series}{normalement} sur $\intco{0}{1}$~:}
+$\norm{u_n}_{\infty,\intco01} = \frac1n$, et $\sum\frac1n$
+diverge. \emph{Pas même \omterm{def:b2:funcseq:def}{uniformément} sur $\intco{0}{1}$~:} le
+reste résiste près de $1$,
+\[
+R_N(x) = \sum_{n>N}\frac{x^n}{n}
+\geq \sum_{n=N+1}^{2N}\frac{x^n}{n}
+\geq \frac{N\,x^{2N}}{2N} = \frac{x^{2N}}{2}
+\xrightarrow[x\to1^-]{} \frac12 ,
+\]
+donc $\sup_{\intco01}\abs{R_N} \geq \frac12$ pour tout $N$.
+Éclairage final~: les quatre verdicts coexistent paisiblement --- la
+somme $-\ln(1-x)$ est \omterm{def:b2:metric:continuity}{continue} sur $\intco{0}{1}$ car la
+continuité ne requiert l'uniformité que \emph{près de chaque point},
+c.-à-d.\ sur les segments $\intcc0a$~; exploser au bord est le droit
+de la somme.
+\end{example}
+
+\begin{theorem}[Transfert pour les séries]\label{thm:b2:funcseq:seriestransfer}
+Si $\sum u_n$ \omterm{def:b2:integration:improper}{converge} \omterm{def:b2:funcseq:def}{uniformément} (par exemple \omterm{def:b2:funcseq:series}{normalement}) sur
+l'ensemble concerné~: la continuité de tous les $u_n$ en $a$ passe à
+la somme~; l'intégration sur un segment peut se faire terme à terme~;
+et si $\sum u_n(x_0)$ \omterm{def:b2:integration:improper}{converge} tandis que $\sum u_n'$ \omterm{def:b2:integration:improper}{converge}
+\omterm{def:b2:funcseq:def}{uniformément} sur les segments, la somme est de classe $C^1$ de dérivée
+$\sum u_n'$.
+\end{theorem}
+
+\begin{proof}
+Tout est le théorème correspondant appliqué aux sommes partielles
+$S_N = \sum_{n\leq N}u_n$, qui sont des sommes finies de fonctions
+ayant la régularité voulue. Continuité~: chaque $S_N$ est \omterm{def:b2:metric:continuity}{continue} en
+$a$ et $S_N \to \sum u_n$ \omterm{def:b2:funcseq:def}{uniformément}~:
+\cref{thm:b2:funcseq:continuity}. Intégration~: sur le segment,
+\[
+\int_a^b \sum_{n\geq0} u_n
+= \lim_N \int_a^b S_N
+= \lim_N \sum_{n=0}^{N}\int_a^b u_n
+= \sum_{n\geq0}\int_a^b u_n
+\]
+par le \cref{thm:b2:funcseq:integration} (première égalité) et la
+linéarité de l'intégrale (seconde). Dérivation~: les
+$S_N$ sont de classe $C^1$, $S_N(x_0)$ \omterm{def:b2:integration:improper}{converge}, et $S_N' =
+\sum_{n\leq N}u_n'$ \omterm{def:b2:integration:improper}{converge} \omterm{def:b2:funcseq:def}{uniformément} sur les segments~: le
+\cref{thm:b2:funcseq:differentiation} donne que la somme est de
+classe $C^1$ de dérivée $\lim S_N' = \sum u_n'$.
+\end{proof}
+
+\begin{remark}[Pièges classiques]
+Quatre pièges, tous vus dans des copies d'examen. \emph{(i)
+Suprema à moitié vérifiés~:} évaluer $f_n$ le long d'une suite
+$x_n$ bien choisie ne fournit qu'une \emph{minoration} de
+$\norm{f_n - f}_\infty$ --- suffisante pour infirmer l'uniformité
+(comme dans l'\cref{ex:b2:funcseq:xn}), jamais pour l'établir~; pour
+l'établir, majorer le sup par un calcul valable pour \emph{tout} $x$.
+\emph{(ii) Uniformité sur le mauvais ensemble~:} la \omterm{def:b2:funcseq:series}{convergence
+normale} ou uniforme vaut souvent sur tout $\intcc{-a}{a}$ ou
+$\intco\delta\infty$ mais échoue sur la réunion ouverte~; ce n'est pas
+un obstacle --- la continuité et la dérivabilité sont locales, donc la
+discipline segment par segment de l'\cref{ex:b2:funcseq:zeta} les
+donne sur tout l'\omterm{def:b2:metric:topology}{ouvert}. \emph{(iii) Intégrer sur des non-segments~:}
+le \cref{thm:b2:funcseq:integration} est un énoncé sur les segments~;
+sur $\intco0\infty$, la \omterm{def:b2:funcseq:def}{convergence uniforme} n'empêche pas la masse de
+s'échapper à l'infini ($f_n =
+\frac1n\mathbf 1_{\intcc{0}{n}}$ \omterm{def:b2:integration:improper}{converge} \omterm{def:b2:funcseq:def}{uniformément} vers $0$,
+avec $\int f_n = 1$) --- utiliser là la convergence dominée.
+\emph{(iv) Dériver la limite~:}
+\cref{ex:b2:funcseq:sqrtabs}~; l'hypothèse de dérivée porte sur
+$(f_n')$, et aucune vitesse de convergence de $(f_n)$ ne peut la
+remplacer.
+\end{remark}
+
+\begin{example}[La fonction $\zeta$ de Riemann]\label{ex:b2:funcseq:zeta}
+$\zeta(s) = \sum_{n\geq1} n^{-s}$ \omterm{def:b2:integration:improper}{converge} \omterm{def:b2:funcseq:series}{normalement} sur toute
+demi-droite $\intco{a}{+\infty}$, $a > 1$ ($\norm{n^{-s}}_\infty =
+n^{-a}$, \omterm{def:b2:series:summable}{sommable})~: $\zeta$ est \omterm{def:b2:metric:continuity}{continue} sur $\intoo{1}{+\infty}$~;
+en dérivant terme à terme (la série dérivée $\sum -\ln n\; n^{-s}$
+\omterm{def:b2:integration:improper}{converge} elle aussi \omterm{def:b2:funcseq:series}{normalement} sur $\intco{a}{\infty}$), $\zeta$ est
+de classe $C^1$ --- et, par itération, $C^\infty$ --- avec
+$\zeta'(s) = -\sum \frac{\ln n}{n^s}$. Noter la discipline~: la
+\omterm{def:b2:funcseq:series}{convergence normale} se vérifie sur des \emph{sous}-demi-droites,
+jamais sur l'\omterm{def:b2:metric:topology}{ouvert} $\intoo{1}{\infty}$ lui-même, où elle échoue.
+\end{example}
+
+\begin{example}[Une série logarithmique, traitée jusqu'au bout]\label{ex:b2:funcseq:logseries}
+Posons $F(x) = \sum_{n\geq1} \frac{\eu^{-nx}}{n}$ sur
+$\intoo{0}{\infty}$. Chaque terme est borné sur $\intco{\delta}
+\infty$ par $\frac{\eu^{-n\delta}}{n} \leq \eu^{-n\delta}$, une
+série géométrique convergente~: \omterm{def:b2:funcseq:series}{convergence normale} sur tout
+$\intco\delta\infty$, donc $F$ est \omterm{def:b2:metric:continuity}{continue} sur
+$\intoo{0}{\infty}$. La série dérivée $\sum -\eu^{-nx}$ est
+de même \omterm{def:b2:funcseq:series}{normalement} convergente sur $\intco\delta\infty$
+($\norm{\eu^{-nx}}_{\infty,\intco\delta\infty} =
+\eu^{-n\delta}$), donc $F$ est de classe $C^1$ de dérivée géométrique~:
+\[
+F'(x) = -\sum_{n\geq1}\eu^{-nx}
+= \frac{-\eu^{-x}}{1 - \eu^{-x}}
+= \frac{-1}{\eu^{x} - 1} .
+\]
+Par itération, $F$ est de classe $C^\infty$. En intégrant $F'$ (aussi
+bien $F$ que $x \mapsto -\ln(1 - \eu^{-x})$ s'annulent en $+\infty$ et
+ont la même dérivée sur $\intoo0\infty$)~:
+\[
+F(x) = -\ln\bigl(1 - \eu^{-x}\bigr),
+\]
+la série logarithmique en $t = \eu^{-x}$. Éclairage final~: lorsque $x
+\to 0^+$, $F(x) = -\ln(x + O(x^2)) = \ln\frac1x + O(x)$ --- la
+série diverge logarithmiquement au bord, exactement comme la série
+harmonique qu'elle devient en $x = 0$~; la \omterm{def:b2:funcseq:series}{convergence normale} sur
+$\intco\delta\infty$ mais non sur $\intoo0\infty$ en est le
+symptôme.
+\end{example}
+
+\begin{method}[Prouver ou réfuter la convergence uniforme]\label{met:b2:funcseq:uniform}
+Pour $f_n \to f$ \omterm{def:b2:funcseq:def}{simplement} sur $X$~:
+\begin{enumerate}
+  \item Calculer ou majorer $\norm{f_n - f}_\infty$~: étudier la
+        fonction $x \mapsto \abs{f_n(x) - f(x)}$ (dérivée,
+        monotonie) pour localiser son maximum~; une majoration
+        valable pour tout $x$ qui tend vers $0$ prouve l'uniformité.
+  \item Pour \emph{réfuter}~: exhiber des points $x_n$ avec
+        $\abs{f_n(x_n) - f(x_n)} \not\to 0$ (souvent $x_n$ suit
+        la bosse mobile, comme dans l'\cref{exo:b2:funcseq:1})~; ou
+        invoquer un théorème de transfert par contraposée --- une
+        limite discontinue de fonctions \omterm{def:b2:metric:continuity}{continues}
+        (\cref{ex:b2:funcseq:threshold}), ou $\int f_n
+        \not\to \int f$ sur un segment.
+  \item Pour les séries, tenter d'abord la \omterm{def:b2:funcseq:series}{convergence normale}
+        ($\sum\sup\abs{u_n} < \infty$)~; si elle échoue globalement,
+        la tester sur les sous-segments qui comptent
+        (\cref{ex:b2:funcseq:threemodes})~; si elle échoue
+        partout, la \omterm{def:b2:funcseq:def}{convergence uniforme} peut encore valoir via la
+        majoration du reste alterné
+        (\cref{exo:b2:funcseq:4}) ou la sommation par parties.
+\end{enumerate}
+\end{method}
+
+\section{Le théorème d'approximation de Weierstrass}
+
+\begin{theorem}[Weierstrass, via Bernstein]\label{thm:b2:funcseq:weierstrass}
+Toute fonction \omterm{def:b2:metric:continuity}{continue} $f \colon \intcc{0}{1} \to \R$ est limite
+uniforme de polynômes --- explicitement, de ses \emph{polynômes de
+Bernstein}\index{polynômes de Bernstein}\index{théorème d'approximation de Weierstrass}
+\[
+B_n(f)(x) = \sum_{k=0}^{n} f\Bigl(\frac kn\Bigr)\binom nk x^k
+(1-x)^{n-k} .
+\]
+\end{theorem}
+
+\begin{proof}
+Fixons $x \in \intcc{0}{1}$ et posons $p_k(x) = \binom nk x^k(1 -
+x)^{n-k}$. Trois identités binomiales, obtenues en évaluant
+$(x + y)^n$ et ses deux dérivées en $x$ au point $y = 1 - x$~:
+\[
+\sum_k p_k = 1,
+\qquad
+\sum_k k\,p_k = nx,
+\qquad
+\sum_k k(k-1) p_k = n(n-1)x^2 .
+\]
+En détail~: $(x+y)^n = \sum_k\binom nk x^ky^{n-k}$ en $y = 1-x$
+est la première~; en dérivant en $x$,
+\[
+n(x+y)^{n-1} = \sum_k k\binom nk x^{k-1}y^{n-k} ,
+\]
+puis en multipliant par $x$ et en posant $y = 1 - x$ on obtient la
+deuxième~; en dérivant deux fois et en multipliant par $x^2$ on
+obtient la troisième. En développant $(k - nx)^2 = k(k-1) + k(1 - 2nx) +
+n^2x^2$ et en combinant les trois~:
+\[
+\sum_k (k - nx)^2 p_k
+= n(n-1)x^2 + nx(1 - 2nx) + n^2x^2
+= nx(1 - x) \leq \frac n4 ,
+\]
+l'\emph{identité de variance}.
+
+Estimons maintenant, en utilisant $\sum p_k = 1$~:
+\[
+\abs{B_n(f)(x) - f(x)}
+\leq \sum_{k} \Bigl| f\Bigl(\frac kn\Bigr) - f(x)\Bigr|\, p_k(x)
+= \Sigma_{\text{proche}} + \Sigma_{\text{loin}} ,
+\]
+en séparant selon que $\abs{\frac kn - x} \leq \delta$ ou non.
+Étant donné $\varepsilon > 0$, la continuité uniforme de $f$ (Heine)
+fournit $\delta$ avec $\Sigma_{\text{proche}} \leq \varepsilon$. Pour la
+somme lointaine, avec $M = \norm f_\infty$~: par l'identité de variance
+et l'astuce de comptage de Tchebychev,
+\[
+\Sigma_{\text{loin}} \leq 2M \sum_{\abs{k - nx} > n\delta} p_k
+\leq 2M\,\frac{\sum_k (k - nx)^2 p_k}{n^2\delta^2}
+\leq \frac{2M}{4 n \delta^2} \cdot 1
+= \frac{M}{2n\delta^2}
+\xrightarrow[n\to\infty]{} 0 ,
+\]
+\omterm{def:b2:funcseq:def}{uniformément} en $x$. Donc $\norm{B_n(f) - f}_\infty \leq \varepsilon +
+\frac{M}{2n\delta^2} \leq 2\varepsilon$ pour $n$ grand.
+\end{proof}
+
+\begin{remark}
+Par substitution affine le théorème vaut sur tout segment
+$\intcc{a}{b}$. Il échoue sur $\R$ (une limite uniforme de polynômes
+sur $\R$ est un polynôme~: \cref{exo:b2:funcseq:8}). La lecture
+probabiliste --- $B_n(f)(x)$ est l'espérance de $f$ en une moyenne
+binomiale, et la borne de variance est l'inégalité de Tchebychev ---
+est rendue honnête au \cref{ch:b2:genfun}.
+\end{remark}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=8.6cm, height=6.0cm,
+    xmin=0, xmax=1.05, ymin=0, ymax=1.08,
+    xtick={0,1}, ytick={1}]
+  \addplot[omThm, very thick, domain=0:1, samples=80] {x^2};
+  \addplot[omDef!45, thick, domain=0:1, samples=2] {x};
+  \addplot[omDef!70, thick, domain=0:1, samples=80]
+    {x^2 + x*(1-x)/2};
+  \addplot[omDef, thick, domain=0:1, samples=80]
+    {x^2 + x*(1-x)/6};
+  \node[font=\small, omDef] at (axis cs:0.30,0.37) {$B_1f$};
+  \node[font=\small, omDef] at (axis cs:0.52,0.46) {$B_2f$};
+  \node[font=\small, omDef] at (axis cs:0.76,0.56) {$B_6f$};
+  \node[font=\small, omThm] at (axis cs:0.88,0.68) {$f$};
+\end{axis}
+\end{tikzpicture}
+
+{\small Approximation de Bernstein de $f(x) = x^2$ (en rouge),
+utilisant la formule exacte $B_nf = x^2 + \frac{x(1-x)}{n}$ de
+l'\cref{exo:b2:funcseq:7}~: $B_1f$ est la corde, et chaque doublement
+de $n$ divise l'écart par deux. Fiable mais lent --- la saturation en
+$\frac1n$ que le théorème de Voronovskaya (problème du week-end) rend
+exacte.}
+\end{omfigure}
+
+\begin{remark}[Où cela sert]
+L'approximation de Weierstrass est le théorème de densité de l'analyse
+classique~: elle rend $C(\intcc ab)$ séparable, permet de vérifier des
+identités intégrales sur les seuls polynômes (problèmes de moments),
+et sous-tend la version trigonométrique démontrée dans le chapitre de
+Fourier via le noyau de Fejér. Le problème du week-end de ce chapitre
+extrait le contenu quantitatif de la preuve de Bernstein --- des
+vitesses de convergence régies par le module de continuité --- puis
+isole ce qui l'a vraiment fait fonctionner, dans le théorème de
+Korovkin~: positivité et trois fonctions test. Le volume de troisième
+année généralise l'énoncé de densité à des \omterm{def:b2:structures:algebra}{sous-algèbres} quelconques
+(Stone--Weierstrass) et aux espaces \omterm{def:b2:metric:compact}{compacts}.
+\end{remark}
+
+\begin{example}[Approximation polygonale, avec une vitesse]\label{ex:b2:funcseq:polygonal}
+Pour $f$ $L$-lipschitzienne sur $\intcc{0}{1}$, soit $I_nf$
+l'interpolant affine par morceaux aux nœuds $\frac kn$. Sur une
+maille $\intcc{\frac kn}{\frac{k+1}n}$, à la fois $f(x)$ et
+$I_nf(x)$ se situent entre les valeurs extrêmes qu'une fonction
+$L$-lipschitzienne peut prendre étant données les deux valeurs
+nodales, donc pour $x$ dans la maille, en posant $x_k = \frac kn$~:
+\[
+\abs{I_nf(x) - f(x)}
+\leq \abs{I_nf(x) - f(x_k)} + \abs{f(x_k) - f(x)}
+\leq L\,\abs{x - x_k} + L\,\abs{x - x_k}
+\leq \frac{2L}{n}
+\]
+(l'interpolant est lui-même $L$-lipschitzien sur la maille~: sa
+pente est un taux d'accroissement de $f$). D'où $\norm{I_nf -
+f}_\infty \leq \frac{2L}{n}$~: l'approximation polygonale des
+fonctions \omterm{def:b2:metric:continuity}{lipschitziennes} \omterm{def:b2:integration:improper}{converge} à la vitesse $\frac1n$ ---
+\emph{plus rapide} que le $\frac{1}{\sqrt n}$ de Bernstein pour la
+même classe (problème du week-end, Partie~II). Éclairage final~: le
+polygone interpole mais n'est pas régulier, Bernstein est régulier
+mais lent~; il n'y a pas de repas gratuit entre régularité de
+l'approximant et vitesse --- un compromis rendu précis par les
+résultats de saturation du problème du week-end.
+\end{example}
+
+\begin{remark}[Perspectives dans ce volume]
+La \omterm{def:b2:funcseq:def}{convergence uniforme} est le cheval de bataille de ce livre à partir
+d'ici. Le chapitre sur les séries entières fonctionne entièrement sur
+la \omterm{def:b2:funcseq:series}{convergence normale} sur les sous-disques \omterm{def:b2:metric:compact}{compacts} --- chaque
+théorème terme à terme qui y figure est un cas particulier des
+théorèmes de transfert de ce chapitre. Le chapitre de Fourier vit un
+étage au-dessus~: ses sommes partielles $S_N$ échouent exactement là
+où ce chapitre prévient qu'elles le pourraient (simple mais non
+uniforme aux sauts), et ses moyennes de Fejér réussissent par la même
+mécanique en $3\varepsilon$ qui a prouvé le
+\cref{thm:b2:funcseq:continuity}. Le chapitre sur les équations
+différentielles définit $\eu^{tA}$ par une série \omterm{def:b2:funcseq:series}{normalement}
+convergente et la dérive terme à terme --- littéralement le
+\cref{thm:b2:funcseq:seriestransfer} appliqué aux coefficients
+matriciels. En cas de doute plus loin dans le livre sur «~pourquoi
+peut-on faire cela~», la réponse est en général un théorème de ce
+chapitre.
+\end{remark}
+
+\section{Exercices}
+
+\begin{exercise}[$\star$]\label{exo:b2:funcseq:1}
+Étudier la \omterm{def:b2:funcseq:def}{convergence simple} et uniforme sur $\intcc{0}{1}$, puis
+sur $\intcc{0}{a}$ ($a < 1$) ou $\intco{\delta}{1}$ selon le cas, de~:
+\[
+f_n(x) = \frac{x}{1 + nx},
+\qquad
+g_n(x) = n x\,\eu^{-n x^2},
+\qquad
+h_n(x) = x^n(1 - x^n).
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:funcseq:2}
+Prouver que $\displaystyle\int_0^1 g_n \not\to \int_0^1 \lim g_n$
+pour les $g_n$ de l'\cref{exo:b2:funcseq:1}, et réconcilier avec le
+\cref{thm:b2:funcseq:integration}.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:funcseq:3}
+Prouver que $S(x) = \sum_{n\geq1} \dfrac{x^n}{n^2}$ est \omterm{def:b2:metric:continuity}{continue} sur
+$\intcc{-1}{1}$, et que $S$ est de classe $C^1$ sur $\intoo{-1}{1}$
+avec $S'(x) = -\frac{\ln(1-x)}{x}$ pour $0 < \abs x < 1$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:4}
+Soit $F(x) = \sum_{n \geq 0} \dfrac{(-1)^n}{n + x}$ sur
+$\intoo{0}{+\infty}$. Prouver la \omterm{def:b2:funcseq:def}{convergence uniforme} (non normale)
+sur $\intco{\delta}{\infty}$ via la majoration du reste des séries
+\omterm{def:b2:linalg:alternating}{alternées}, la continuité, et l'équation fonctionnelle $F(x) + F(x + 1) =
+\frac1x$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:5}
+(Dini) Soit $f_n \colon K \to \R$ \omterm{def:b2:metric:continuity}{continue} sur un \omterm{def:b2:metric:def}{espace métrique}
+\emph{\omterm{def:b2:metric:compact}{compact}}, avec $f_n \to f$ \emph{\omterm{def:b2:funcseq:def}{simplement}}, $f$ \omterm{def:b2:metric:continuity}{continue},
+et $(f_n(x))$ \emph{décroissante} en $n$ pour chaque $x$. Prouver que
+la convergence est uniforme. \emph{(Étant donné $\varepsilon$, les
+\omterm{def:b2:metric:topology}{ouverts} $U_n = \{x : f_n(x) - f(x) < \varepsilon\}$ croissent et
+recouvrent $K$~; extraire un sous-recouvrement fini ---
+\cref{thm:b2:metric:borellebesgue}.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:6}
+Prouver que $\displaystyle\lim_{n\to\infty} \int_0^1
+\frac{n\,f(x)}{1 + n^2x^2}\,\dd x = \frac{\pi}{2} f(0)$ pour toute
+fonction $f$ \omterm{def:b2:metric:continuity}{continue} sur $\intcc{0}{1}$. \emph{(Substituer $u = nx$~;
+isoler $f(0)$~; dominer.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:7}
+Calculer explicitement les \omterm{thm:b2:funcseq:weierstrass}{polynômes de Bernstein} de $f(x) = x^2$ et
+vérifier l'erreur uniforme $\norm{B_n f - f}_\infty =
+O\bigl(\frac1n\bigr)$ prédite par la preuve du
+\cref{thm:b2:funcseq:weierstrass} --- ici exactement $\frac{x(1 -
+x)}{n}$ en chaque point.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:8}
+Prouver que si des polynômes $P_n$ convergent \omterm{def:b2:funcseq:def}{uniformément} \emph{sur
+tout $\R$} vers $f$, alors $f$ est un polynôme. \emph{(Pour $m, n$
+grands, $P_n - P_m$ est un polynôme borné sur $\R$, donc constant~;
+ainsi la suite se stabilise modulo des constantes.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:funcseq:9}
+(Une fonction \omterm{def:b2:metric:continuity}{continue}, nulle part dérivable --- guidé) Soit
+$\varphi$ la distance à l'entier le plus proche ($1$-périodique,
+$\norm{\varphi}_\infty = \frac12$, $1$-lipschitzienne) et
+\[
+W(x) = \sum_{n=0}^{\infty} \Bigl(\frac{3}{4}\Bigr)^{\!n}
+\varphi(4^n x) .
+\]
+Prouver~: (a) $W$ est \omterm{def:b2:metric:continuity}{continue} sur $\R$ (\omterm{def:b2:funcseq:series}{convergence normale})~; (b)
+pour tout $x$ et tout $m$, en choisissant $h_m = \pm\frac12\cdot 4^{-m}$
+avec le signe rendant $\varphi$ affine sur le segment de $4^m x$
+à $4^m(x + h_m)$, le taux d'accroissement vérifie
+\[
+\Bigl|\frac{W(x + h_m) - W(x)}{h_m}\Bigr| \geq 3^m -
+\sum_{n<m} 3^n \geq \frac{3^m + 1}{2} \xrightarrow[m\to\infty]{}
+\infty
+\]
+(les termes $n > m$ s'annulent par périodicité~; le terme $n = m$
+contribue exactement $3^m$~; les termes $n < m$ sont bornés par la
+propriété de Lipschitz). Conclure que $W$ n'est dérivable nulle part.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:funcseq:10}
+Soit $u_n(x) = (-1)^n x^n(1 - x)$ sur $\intcc{0}{1}$. Montrer que
+$\sum u_n$ \omterm{def:b2:integration:improper}{converge} \omterm{def:b2:funcseq:def}{simplement} sur $\intcc{0}{1}$ et calculer sa
+somme~; montrer que la convergence est uniforme sur $\intcc{0}{1}$
+\emph{(majorer le reste $R_N(x) = \sum_{n > N} u_n(x)$, une
+queue géométrique, par son premier terme et maximiser $x^{N+1}(1-x)$)}
+mais \emph{non} normale \emph{(calculer $\norm{u_n}_\infty$)}~:
+la \omterm{def:b2:funcseq:def}{convergence uniforme} est strictement plus faible que la \omterm{def:b2:funcseq:series}{convergence
+normale}. Contraster avec $\sum x^n(1-x)$, dont la somme est
+discontinue en $1$~: là, même l'uniformité échoue.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:11}
+Soit $f_n \to f$ \omterm{def:b2:funcseq:def}{uniformément} sur un \omterm{def:b2:metric:def}{espace métrique} $X$, chaque $f_n$
+\omterm{def:b2:metric:continuity}{continue}, et soit $x_n \to x$ dans $X$. Prouver $f_n(x_n) \to
+f(x)$. Montrer par un exemple sur $X = \intcc{0}{1}$ que la
+\omterm{def:b2:funcseq:def}{convergence simple} ne suffit pas, même avec $f$ \omterm{def:b2:metric:continuity}{continue}
+\emph{(utiliser les bosses $g_n$ de l'\cref{exo:b2:funcseq:1} et $x_n =
+\frac{1}{\sqrt{2n}}$)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:funcseq:12}
+(Une équation intégrale de Volterra par séries) Pour $f \in
+C(\intcc{0}{1})$ définir $Tf(x) = \int_0^x f(t)\,\dd t$.
+\begin{enumerate}
+  \item Montrer par récurrence que pour $n \geq 1$~:
+        \[
+        T^n f(x) = \int_0^x \frac{(x -
+        t)^{n-1}}{(n-1)!}\,f(t)\,\dd t,
+        \qquad
+        \norm{T^n f}_\infty \leq \frac{\norm f_\infty}{n!} .
+        \]
+  \item En déduire que $S = \sum_{n\geq0} T^n f$ \omterm{def:b2:integration:improper}{converge} \omterm{def:b2:funcseq:series}{normalement}
+        sur $\intcc{0}{1}$ et résout l'équation intégrale $S = f
+        + TS$.
+  \item Vérifier que $S(x) = f(x) + \int_0^x \eu^{x-t}f(t)\,\dd
+        t$ résout la même équation, et prouver l'unicité des
+        solutions \omterm{def:b2:metric:continuity}{continues} \emph{(si $S = TS$ alors
+        $\norm{S}_\infty \leq \norm{T^nS}_\infty \to 0$)}~:
+        conclure la forme close de la somme.
+\end{enumerate}
+\end{exercise}
+
+\section{Problème~: vitesses d'approximation et théorème de Korovkin}
+
+\begin{problem}\label{pb:b2:funcseq:1}
+La preuve de Bernstein du \cref{thm:b2:funcseq:weierstrass} recèle
+deux trésors. D'abord, elle est \emph{quantitative}~: la vitesse à
+laquelle $B_nf \to f$ est régie par le module de continuité de $f$,
+la vitesse optimale étant atteinte par $\abs{x - \frac12}$. Ensuite,
+elle est \emph{structurelle}~: tout ce qui a compté est que $B_n$ est
+un opérateur linéaire positif se comportant bien sur $1$, $x$, $x^2$
+--- cette observation, isolée, est le \emph{théorème de
+Korovkin}\index{théorème de Korovkin}. Ce problème démontre les deux,
+et se clôt sur l'asymptotique exacte de Voronovskaya. Partout,
+$f \in C(\intcc{0}{1})$, $M = \norm f_\infty$, $p_k(x) = \binom
+nk x^k(1-x)^{n-k}$, et $e_j$ désigne $x \mapsto x^j$.
+
+\medskip
+\noindent\textbf{Partie~I --- L'opérateur de Bernstein.}
+\begin{enumerate}
+  \item Montrer que $B_n$ est linéaire, \emph{positif} ($f \geq 0
+        \Rightarrow B_nf \geq 0$), donc monotone ($f \leq g
+        \Rightarrow B_nf \leq B_ng$), avec
+        $\norm{B_nf}_\infty \leq \norm f_\infty$, et que
+        $B_nf$ interpole $f$ aux deux extrémités.
+  \item Redémontrer les identités $B_n e_0 = e_0$, $B_n e_1 =
+        e_1$ et $B_n e_2 = e_2 + \frac{e_1 - e_2}{n}$
+        \emph{(dériver $(x + y)^n$ deux fois et poser $y = 1 -
+        x$)}.
+  \item En déduire l'identité de variance $\sum_k \bigl(\frac kn -
+        x\bigr)^2 p_k(x) = \frac{x(1-x)}{n}$ et, par
+        Cauchy--Schwarz, la borne de premier moment
+        \[
+        \sum_{k=0}^{n}\Bigl|\frac kn - x\Bigr|\,p_k(x)
+        \leq \sqrt{\frac{x(1-x)}{n}} \leq \frac{1}{2\sqrt n} .
+        \]
+  \item Montrer que si $f$ est convexe alors $B_nf \geq f$ sur
+        $\intcc{0}{1}$ \emph{(inégalité de Jensen finie pour les
+        poids $p_k(x)$)}.
+  \item (Borne de comptage de Tchebychev, reformulée) Pour $\delta > 0$
+        montrer
+        \[
+        \sum_{\abs{k/n - x} > \delta} p_k(x)
+        \leq \frac{x(1-x)}{n\delta^2}
+        \leq \frac{1}{4n\delta^2} ,
+        \]
+        et donner la lecture probabiliste~: $B_nf(x)$ moyenne
+        $f$ sur une moyenne empirique binomiale qui se concentre en $x$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie~II --- Vitesses~: le module de continuité.}
+Pour $\delta > 0$ posons $\omega(\delta) = \sup\{\abs{f(s) - f(t)}
+: s, t \in \intcc{0}{1},\ \abs{s - t} \leq \delta\}$.
+\begin{enumerate}[resume]
+  \item Montrer~: $\omega$ est finie, croissante,
+        $\omega(\delta) \to 0$ quand $\delta \to 0^+$ (Heine),
+        sous-additive ($\omega(\delta_1 + \delta_2) \leq
+        \omega(\delta_1) + \omega(\delta_2)$), et
+        $\omega(\lambda\delta) \leq (1 +
+        \lambda)\,\omega(\delta)$ pour tout $\lambda > 0$.
+  \item Prouver l'estimation maîtresse, pour tout $\delta > 0$~:
+        \[
+        \abs{B_nf(x) - f(x)}
+        \leq \sum_k \omega\Bigl(\Bigl|\frac kn -
+        x\Bigr|\Bigr)p_k(x)
+        \leq \Bigl(1 + \frac1\delta\sum_k\Bigl|\frac kn -
+        x\Bigr|p_k(x)\Bigr)\,\omega(\delta) .
+        \]
+  \item Choisir $\delta = n^{-1/2}$ et conclure le
+        \emph{théorème de Weierstrass quantitatif}~:
+        \[
+        \norm{B_nf - f}_\infty \leq
+        \frac32\,\omega\Bigl(\frac{1}{\sqrt n}\Bigr)
+        \xrightarrow[n\to\infty]{} 0 .
+        \]
+  \item En déduire les vitesses~: $\norm{B_nf - f}_\infty \leq
+        \frac{3L}{2\sqrt n}$ pour $f$ $L$-lipschitzienne, et $\leq
+        \frac32 C n^{-\alpha/2}$ pour $f$ $\alpha$-höldérienne
+        ($\abs{f(s) - f(t)} \leq C\abs{s-t}^\alpha$).
+  \item (L'exemple optimal --- une identité binomiale) Pour $m
+        \geq 1$ prouver
+        \[
+        \sum_{k=m+1}^{2m} (k - m)\binom{2m}{k}
+        = \frac{m}{2}\binom{2m}{m},
+        \qquad\text{d'où}\qquad
+        \sum_{k=0}^{2m}\abs{k - m}\binom{2m}{k}
+        = m\binom{2m}{m}
+        \]
+        \emph{(utiliser $k\binom{2m}k = 2m\binom{2m-1}{k-1}$ et la
+        symétrie de la ligne binomiale, qui donne
+        $\sum_{j=m}^{2m-1}\binom{2m-1}{j} = 2^{2m-2}$)}.
+  \item Pour $f(t) = \abs{t - \frac12}$ en déduire la valeur exacte
+        et son asymptotique (binomial central,
+        \cref{ex:b2:comparison:centralbinomial})~:
+        \[
+        B_{2m}f\Bigl(\frac12\Bigr) - f\Bigl(\frac12\Bigr)
+        = \frac{\binom{2m}{m}}{2\cdot4^{m}}
+        \;\sim\; \frac{1}{2\sqrt{\pi m}} :
+        \]
+        la vitesse $\omega(n^{-1/2})$ de la question~8 est atteinte
+        (à une constante près) --- pour $f$ seulement \omterm{def:b2:metric:continuity}{continue},
+        le $n^{-1/2}$ de Bernstein est honnête.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie~III --- Théorème de Korovkin.} Soit $(L_n)$
+une suite d'opérateurs \emph{linéaires positifs} de
+$C(\intcc{0}{1})$ dans lui-même telle que $L_ne_j \to e_j$
+\omterm{def:b2:funcseq:def}{uniformément} pour $j = 0, 1, 2$.
+\begin{enumerate}[resume]
+  \item Montrer qu'un opérateur linéaire positif $L$ est monotone et
+        vérifie $\abs{Lf} \leq L\abs f$ ponctuellement.
+  \item Montrer~: pour tout $\varepsilon > 0$ il existe $\delta > 0$
+        tel que pour \emph{tous} $s, x \in \intcc{0}{1}$~:
+        \[
+        \abs{f(s) - f(x)} \leq \varepsilon +
+        \frac{2M}{\delta^2}(s - x)^2
+        \]
+        \emph{(traiter $\abs{s - x} \leq \delta$ par Heine et
+        $\abs{s-x} > \delta$ par la borne grossière $2M$)}.
+  \item Fixer $x$, appliquer $L_n$ à l'inégalité de la question~13
+        dans la variable $s$, et en déduire
+        \[
+        \abs{L_nf(x) - f(x)\,L_ne_0(x)}
+        \leq \varepsilon\,L_ne_0(x) + \frac{2M}{\delta^2}
+        \bigl(L_ne_2(x) - 2x\,L_ne_1(x) + x^2 L_ne_0(x)\bigr).
+        \]
+  \item Montrer que $\sup_x \bigl(L_ne_2(x) - 2x\,L_ne_1(x) + x^2
+        L_ne_0(x)\bigr) \to 0$, puis assembler le
+        \emph{théorème de Korovkin}~: $L_nf \to f$ \omterm{def:b2:funcseq:def}{uniformément} pour
+        \emph{toute} $f \in C(\intcc{0}{1})$.
+  \item Vérifier que $(B_n)$ satisfait les hypothèses de Korovkin~:
+        Weierstrass une troisième fois, à partir de trois monômes.
+  \item Soit $I_n$ l'opérateur d'interpolation affine par morceaux
+        aux nœuds $\frac kn$. Montrer que $I_n$ est
+        linéaire positif, $I_ne_0 = e_0$, $I_ne_1 = e_1$, et
+        $\norm{I_ne_2 - e_2}_\infty = \frac{1}{4n^2}$
+        \emph{(sur chaque maille l'erreur de l'interpolation affine
+        de $t^2$ est $(t - a)(b - t)$)}. Conclure par Korovkin~: les
+        interpolants polygonaux convergent \omterm{def:b2:funcseq:def}{uniformément} pour toute
+        fonction $f$ \omterm{def:b2:metric:continuity}{continue}.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie~IV --- Dividendes~: densité, moments,
+dérivées.}
+\begin{enumerate}[resume]
+  \item Montrer que les polynômes à coefficients \emph{rationnels}
+        sont denses dans $\bigl(C(\intcc{0}{1}),
+        \norm\cdot_\infty\bigr)$~: cet \omterm{def:b2:nvs:banach}{espace de Banach} est
+        séparable.
+  \item (Les moments déterminent la fonction) Soit $f \in
+        C(\intcc{0}{1})$ avec $\int_0^1 f(t)\,t^n \dd t = 0$
+        pour tout $n \in \N$. Montrer $\int_0^1 f P = 0$ pour tout
+        polynôme, puis $\int_0^1 f^2 = 0$, puis $f = 0$.
+  \item Prouver l'identité de dérivée
+        \[
+        (B_nf)'(x) = n\sum_{k=0}^{n-1}\Bigl(
+        f\Bigl(\frac{k+1}{n}\Bigr) -
+        f\Bigl(\frac kn\Bigr)\Bigr)\,
+        \binom{n-1}{k}x^k(1-x)^{n-1-k}
+        \]
+        \emph{(dériver $p_k$ et réindexer --- une \omterm{thm:b2:series:abel}{transformation
+        d'Abel})}.
+  \item Supposons $f$ de classe $C^1$. En utilisant le théorème des
+        accroissements finis dans chaque incrément et en comparant
+        avec $B_{n-1}(f')$, montrer $(B_nf)' \to f'$ \omterm{def:b2:funcseq:def}{uniformément} sur
+        $\intcc{0}{1}$. En déduire~: pour $f \in C^1$ il existe des
+        polynômes convergeant vers $f$ \emph{en même temps que} leurs
+        dérivées.
+  \item Supposons $f$ de classe $C^2$. Par Taylor--Lagrange en $x$
+        montrer
+        \[
+        \abs{B_nf(x) - f(x)} \leq
+        \frac{\norm{f''}_\infty}{2}\cdot\frac{x(1-x)}{n}
+        \leq \frac{\norm{f''}_\infty}{8n} :
+        \]
+        la régularité améliore la vitesse de $n^{-1/2}$ à
+        $n^{-1}$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Partie~V --- Saturation~: le théorème de
+Voronovskaya.}
+\begin{enumerate}[resume]
+  \item Prouver l'identité de quatrième moment
+        \[
+        \sum_k (k - nx)^4 p_k(x)
+        = nx(1-x)\bigl(1 + 3(n-2)x(1-x)\bigr) \leq n^2
+        \quad (n \geq 1)
+        \]
+        \emph{(développer $k^4$ en factorielles décroissantes
+        $k(k-1)\cdots$ et utiliser deux fois de plus l'astuce de
+        dérivation de la question~2)}.
+  \item (Voronovskaya) Soit $f$ de classe $C^2$ et $x \in
+        \intcc{0}{1}$. En écrivant $f(t) = f(x) + f'(x)(t-x) +
+        \frac{f''(x)}2(t-x)^2 + \eta(t)(t-x)^2$ avec $\eta$
+        bornée et $\eta(t) \to 0$ quand $t \to x$, prouver
+        \[
+        n\bigl(B_nf(x) - f(x)\bigr)
+        \xrightarrow[n\to\infty]{}
+        \frac{x(1-x)}{2}\,f''(x)
+        \]
+        \emph{(scinder la somme des $\eta$ en $\abs{t - x} \leq
+        \delta$~; contrôler la partie lointaine avec la question~23)}.
+        Ainsi l'erreur de la question~22 est exacte en \omterm{def:b2:structures:generated}{ordre}
+        \emph{et} en constante~: $B_n$ \emph{sature} à $\frac1n$, si
+        régulière que soit $f$ --- comparer
+        l'\cref{exo:b2:funcseq:7}.
+  \item Synthèse. En une phrase chacun~: (i) ce que la positivité
+        seule a apporté (Parties~I et III)~; (ii) où la compacité
+        de $\intcc{0}{1}$ est intervenue dans chaque partie~; (iii)
+        pourquoi trois fonctions test suffisent dans le théorème de
+        Korovkin~; (iv) le compromis que fait Bernstein (un
+        $n^{-1/2}$ robuste pour $f$ irrégulière, mais un plafond en
+        $\frac1n$ pour $f$ régulière), et quel chapitre de ce livre
+        jouera le même jeu avec des polynômes trigonométriques.
+\end{enumerate}
+\end{problem}
