@@ -1,0 +1,831 @@
+\chapter{Differentiaalvergelijkingen}\label{ch:b2:diffeq}
+
+Jaar~1 loste de lineaire vergelijkingen op die formules toelaten. Dit
+hoofdstuk levert wat formules niet kunnen: de \emph{stelling van
+Cauchy--Lipschitz} --- bestaan en eenduidigheid voor $y' = f(t, y)$ ---
+bewezen met de vastpuntstelling van Banach, precies zoals beloofd in
+\cref{ch:b2:metric}; daarna de volledige theorie van \emph{lineaire
+stelsels} $X' = A(t)X + B(t)$, met de \omterm{ex:b2:nvs:matrixexp}{matrixexponentiaal} en de
+\omterm{def:b2:diffeq:wronskian}{Wronskiaan} als rekenmachines.
+
+\section{De stelling van Cauchy--Lipschitz}
+
+\begin{theorem}[Cauchy--Lipschitz, globaal Lipschitz-versie]\label{thm:b2:diffeq:cauchylipschitz}
+Zij $I$ een segment, $f \colon I \times \R^n \to \R^n$ continu
+en \emph{\omterm{def:b2:metric:continuity}{Lipschitz} in de tweede variabele}, uniform in de
+eerste: $\norm{f(t, y) - f(t, z)} \leq k\,\norm{y - z}$ voor alle $t
+\in I$. Dan heeft voor elke $(t_0, y_0) \in I \times \R^n$ het
+Cauchy-probleem\index{stelling van Cauchy--Lipschitz}
+\[
+y' = f(t, y), \qquad y(t_0) = y_0
+\]
+precies één oplossing $y \colon I \to \R^n$ van klasse $C^1$.
+\end{theorem}
+
+\begin{proof}
+\emph{Herformulering.} Een continue $y$ lost het probleem op dan en
+slechts dan als ze voldoet aan de integraalvergelijking
+\[
+y(t) = y_0 + \int_{t_0}^{t} f\bigl(s, y(s)\bigr)\,\dd s
+=: T(y)(t)
+\]
+(fundamentele stelling van de analyse beide kanten; een continue
+oplossing van de integraalvergelijking is automatisch $C^1$).
+
+\emph{Een contractie, na hernormering.} Op de \omterm{def:b2:nvs:banach}{Banachruimte} $E =
+C(I, \R^n)$ met de \emph{gewogen} \omterm{def:b2:nvs:norm}{norm}
+\[
+N(y) = \sup_{t \in I}\; \eu^{-2k\abs{t - t_0}}\,\norm{y(t)} ,
+\]
+(equivalent met de \omterm{def:b2:nvs:norm}{sup-norm}: het gewicht is van boven en onder begrensd
+op het segment $I$, dus $E$ blijft \omterm{def:b2:metric:complete}{volledig}), schat voor $y, z \in
+E$ en, zeg, $t \geq t_0$:
+\[
+\norm{T(y)(t) - T(z)(t)}
+\leq \int_{t_0}^{t} k\,\norm{y(s) - z(s)}\,\dd s
+\leq k\,N(y - z)\int_{t_0}^{t} \eu^{2k(s - t_0)}\dd s
+\leq \frac{N(y-z)}{2}\,\eu^{2k(t - t_0)} .
+\]
+Vermenigvuldigen met $\eu^{-2k(t - t_0)}$ en de sup nemen (het geval $t
+< t_0$ is \omterm{def:b2:quadratic:adjoint}{symmetrisch}): $N\bigl(T(y) - T(z)\bigr) \leq \frac12 N(y -
+z)$: $T$ is een $\frac12$-contractie van de complete $(E, N)$. De
+vastpuntstelling van Banach (\cref{thm:b2:metric:banach}) levert een
+uniek vast punt: de unieke oplossing.
+\end{proof}
+
+\begin{remark}
+Voor $f$ slechts $C^1$ (lokaal \omterm{def:b2:metric:continuity}{Lipschitz}) geldt de stelling
+\emph{lokaal}, met een maximale oplossing op een maximaal open interval;
+oplossingen kunnen in eindige tijd exploderen ($y' = y^2$, $y(0) = 1$: $y(t)
+= \frac{1}{1-t}$, weg bij $t = 1$). De globale Lipschitz-hypothese
+is wat het hele segment koopt. Twee gevolgen om in te graveren:
+oplossingskrommen van een DV met Lipschitz-veld \emph{kruisen nooit};
+en de nulfunctie is de enige oplossing die ergens verdwijnt van een
+lineaire homogene vergelijking.
+\end{remark}
+
+\begin{example}[Eenduidigheid is een stelling: een veld dat lekt]\label{ex:b2:diffeq:leaky}
+Beschouw $y' = 2\sqrt{\abs y}$ met $y(0) = 0$. De nulfunctie
+lost haar op; zo ook
+\[
+y(t) = \begin{cases} 0 & t \leq 0,\\ t^2 & t \geq 0,
+\end{cases}
+\]
+die $C^1$ is (beide stukken hebben afgeleide $0$ in het
+lijmpunt) en voldoet aan $y'(t) = 2t = 2\sqrt{t^2}$ voor $t > 0$ ---
+inderdaad, het opstijgen vertragen geeft een oplossing voor \emph{elke}
+vrijgavetijd $c \geq 0$: oneindig veel oplossingen door dezelfde
+beginwaarden. Geen tegenspraak met
+\cref{thm:b2:diffeq:cauchylipschitz}: nabij $y = 0$,
+\[
+\frac{\abs{2\sqrt y - 2\sqrt z}}{\abs{y - z}}
+= \frac{2}{\sqrt y + \sqrt z} \longrightarrow +\infty ,
+\]
+het veld is niet \omterm{def:b2:metric:continuity}{Lipschitz} in $y$, en de stelling zwijgt.
+Slotinzicht: de fysische lezing is een emmer die onder zwaartekracht
+leegloopt, achterstevoren --- vanuit de lege toestand kan men niet
+zeggen wanneer het vullen begon; determinisme van DV's is precies de
+Lipschitz-voorwaarde, geen natuurwet.
+\end{example}
+
+\section{Lineaire stelsels}
+
+\begin{theorem}[Structuur van lineaire stelsels]\label{thm:b2:diffeq:linear}
+Zij $A \colon I \to \mathcal{M}_n(\R)$ en $B \colon I \to \R^n$
+continu op een interval $I$. Voor elke $(t_0, X_0)$ heeft het probleem
+\[
+X' = A(t)X + B(t), \qquad X(t_0) = X_0
+\]
+precies één oplossing op \emph{heel} $I$. De oplossingen van het
+homogene stelsel ($B = 0$) vormen een vectorruimte $\mathcal{S}_H$ van
+dimensie precies $n$, en evaluatie $X \mapsto X(t_0)$ is een
+isomorfisme $\mathcal{S}_H \to \R^n$; algemene oplossing $=$
+particuliere $+$ homogene.
+\end{theorem}
+
+\begin{proof}
+Op elk segment $J \subseteq I$ dat $t_0$ bevat: $f(t, X) =
+A(t)X + B(t)$ is continu, en \omterm{def:b2:metric:continuity}{Lipschitz} in $X$ met constante $k
+= \sup_J \vertiii{A(t)}$ (eindig: continu op een segment):
+\cref{thm:b2:diffeq:cauchylipschitz} past op $J$; $J$ laten
+uitputten tot $I$, eenduidigheid lijmt de oplossingen tot één op $I$.
+Lineariteit van de oplossingsverzameling en van de evaluatieafbeelding
+zijn duidelijk; evaluatie is bijectief door bestaan (surjectief) en
+eenduidigheid (injectief): $\dim \mathcal{S}_H = n$. De affiene
+structuur is het argument van Jaar~1 woordelijk.
+\end{proof}
+
+\begin{example}[Het evaluatie-isomorfisme, concreet]\label{ex:b2:diffeq:evaliso}
+Voor $y'' + y = 0$, gezien als het stelsel $X' =
+\begin{pmatrix} 0 & 1\\ -1 & 0\end{pmatrix}X$ met $X = (y,
+y')$: de stelling zegt dat de oplossingsruimte een vlak is, en dat
+$X \mapsto X(0) = (y(0), y'(0))$ een isomorfisme is op
+$\R^2$. De oplossingen $\cos$ en $\sin$ evalueren tot $(1, 0)$
+en $(0, 1)$ --- de canonieke basis van $\R^2$ --- dus vormen ze
+een basis van de oplossingsruimte, en \emph{elke} oplossing is
+\[
+y(t) = y(0)\cos t + y'(0)\sin t ,
+\]
+met de coëfficiënten rechtstreeks afgelezen uit de beginwaarden, geen
+lineair stelsel op te lossen. Slotinzicht: het fundamentele stelsel
+kiezen waarvan de beginwaarden de canonieke basis zijn (hier $\cos,
+\sin$) is precies de kolommen van $\eu^{tA}$ kiezen; het
+evaluatie-isomorfisme is waarom beginvoorwaarden banen parametriseren
+--- de meetkundige inhoud van ``deterministische dynamica'' voor
+lineaire vergelijkingen.
+\end{example}
+
+\begin{definition}[Wronskiaan]\label{def:b2:diffeq:wronskian}
+Voor oplossingen $X_1, \dots, X_n$ van het homogene stelsel is de
+\emph{Wronskiaan}\index{Wronskiaan} $W(t) = \det\bigl(X_1(t),
+\dots, X_n(t)\bigr)$. Door het isomorfisme hierboven verdwijnt $W$ ofwel
+identiek (de familie is lineair afhankelijk) of nooit (een
+\emph{fundamenteel stelsel}\index{fundamenteel stelsel});
+kwantitatief is $W' = \operatorname{tr}\bigl(A(t)\bigr)
+W$, dus
+\[
+W(t) = W(t_0)\,\exp\Bigl(\int_{t_0}^{t}
+\operatorname{tr} A(s)\,\dd s\Bigr)
+\quad \text{(formule van Liouville)}.
+\]
+\end{definition}
+
+\begin{example}[Liouville gecontroleerd op een Euler-vergelijking]\label{ex:b2:diffeq:eulerwronskian}
+Op $\intoo{0}{\infty}$ heeft de vergelijking $t^2y'' + ty' - y = 0$
+de oplossingen $y_1(t) = t$ en $y_2(t) = \frac1t$ (substitueer).
+Hun \omterm{def:b2:diffeq:wronskian}{Wronskiaan}:
+\[
+W(t) = \det\begin{pmatrix} t & \tfrac1t\\[2pt]
+1 & -\tfrac{1}{t^2}\end{pmatrix}
+= -\frac1t - \frac1t = -\frac2t ,
+\]
+nooit nul: een \omterm{def:b2:diffeq:wronskian}{fundamenteel stelsel}. Controleer nu Liouville: in
+genormaliseerde vorm $y'' + \frac1t\,y' - \frac{1}{t^2}\,y = 0$, de
+begeleidende matrix $A(t) = \begin{pmatrix} 0 & 1\\ \frac{1}{t^2}
+& -\frac1t\end{pmatrix}$ heeft spoor $-\frac1t$, dus
+\[
+W(t) = W(1)\exp\Bigl(-\int_1^t\frac{\dd s}{s}\Bigr)
+= -2\,\eu^{-\ln t} = -\frac2t . \checkmark
+\]
+Slotinzicht: Liouville voorspelt de \emph{vorm} van de
+\omterm{def:b2:diffeq:wronskian}{Wronskiaan} voordat enige oplossing bekend is --- hier, dat $W$
+$\frac{c}{t}$ moet zijn; dit is wat de
+methode van ordeverlaging aandrijft
+(\cref{prop:b2:diffeq:secondorder}), waar $y_1$ kennen en
+de vorm van de \omterm{def:b2:diffeq:wronskian}{Wronskiaan} $y_2$ door één kwadratuur bepaalt.
+\end{example}
+
+\begin{proof}[Bewijs van de formule van Liouville]
+$W(t) = \det M(t)$ met $M' = AM$. Differentiëren van de \omterm{def:b2:linalg:det}{determinant}
+als multilinaire functie van de kolommen,
+\[
+W'(t) = \sum_j \det(X_1, \dots, X_j', \dots, X_n)
+= \sum_j \det(X_1, \dots, AX_j, \dots, X_n) .
+\]
+Nu is de afbeelding $(C_1, \dots, C_n) \mapsto \sum_j \det(C_1, \dots,
+AC_j, \dots, C_n)$ $n$-lineair en alternerend (met twee gelijke
+kolommen $C_i = C_k$ verdwijnen de termen $j \notin \{i, k\}$ meteen,
+en de termen $j = i$ en $j = k$ heffen elkaar paarsgewijs op na één
+kolomverwisseling): door de eenduidigheidsstelling
+(\cref{thm:b2:linalg:detspace}) is ze $c \cdot \det$, met $c$
+afgelezen op de canonieke kolommen: $c = \sum_j \det(e_1, \dots, Ae_j, \dots,
+e_n) = \sum_j a_{jj} = \operatorname{tr} A$. Dus $W' =
+\operatorname{tr}\bigl(A(t)\bigr)W$: een scalaire lineaire DV, opgelost
+door de formule van Jaar~1.
+\end{proof}
+
+\section{Constante coëfficiënten: de matrixexponentiaal}
+
+\begin{theorem}\label{thm:b2:diffeq:matrixexp}
+Voor $A \in \mathcal{M}_n(\R)$ (of $\C$) voldoet de exponentiaal $\eu^{tA}
+= \sum_k \frac{(tA)^k}{k!}$ (\cref{ex:b2:nvs:matrixexp}):
+$t \mapsto \eu^{tA}$ is van klasse $C^1$ (inderdaad $C^\infty$)
+met\index{matrixexponentiaal}
+\[
+\frac{\dd}{\dd t}\,\eu^{tA} = A\,\eu^{tA} = \eu^{tA}A ,
+\qquad
+\eu^{(s+t)A} = \eu^{sA}\,\eu^{tA},
+\qquad
+(\eu^{A})^{-1} = \eu^{-A} ;
+\]
+en $\eu^{A + B} = \eu^A\eu^B$ \emph{wanneer} $AB = BA$. Het
+Cauchy-probleem $X' = AX$, $X(0) = X_0$ heeft de unieke oplossing $X(t) =
+\eu^{tA}X_0$; met een bron geldt de formule van \emph{variatie van
+constanten}:
+\[
+X(t) = \eu^{(t - t_0)A}X_0 + \int_{t_0}^{t} \eu^{(t-s)A}B(s)\,\dd
+s .
+\]
+\end{theorem}
+
+\begin{proof}
+\emph{Differentieerbaarheid:} de reeks $\sum \frac{t^kA^k}{k!}$ en
+haar term-afgeleide reeks $\sum \frac{t^{k-1}A^k}{(k-1)!} = A\sum
+\frac{(tA)^{k-1}}{(k-1)!}$ convergeren normaal op elk segment
+(\omterm{def:b2:nvs:norm}{normen} $\leq \frac{(\abs t\,\vertiii A)^k}{k!}$): differentieer
+term voor term (\cref{thm:b2:funcseq:seriestransfer}, vectorwaardig).
+De twee ordeningen $A\eu^{tA}$ en $\eu^{tA}A$ stemmen overeen omdat
+elke partiële som met $A$ commuteert.
+
+\emph{Groepswet:} voor commuterende $A, B$ reorganiseert het
+\omterm{thm:b2:series:fubini}{Cauchy-product} van de twee exponentiaalreeksen door de binomiaalstelling
+precies als in \cref{ex:b2:series:exp} (absolute convergentie in de
+Banachalgebra rechtvaardigt het): $\eu^{A+B} = \eu^A\eu^B$; met $B = sA$
+geeft dit de éénparameter-groepswet, en $B = -A$ de inverse.
+
+\emph{Cauchy-probleem:} $X(t) = \eu^{tA}X_0$ lost het op (differentieer);
+eenduidigheid door \cref{thm:b2:diffeq:linear}. Variatie van constanten:
+stel $Y(t) = \eu^{-tA}X(t)$; differentiëren, $Y' = \eu^{-tA}(X' -
+AX) = \eu^{-tA}B(t)$; integreer van $t_0$ tot $t$ en vermenigvuldig
+terug met $\eu^{tA}$.
+\end{proof}
+
+\begin{method}[$\eu^{tA}$ berekenen]\label{met:b2:diffeq:computeexp}
+Reduceer $A$ (\cref{ch:b2:reduction}): als $A = PDP^{-1}$ diagonaal,
+$\eu^{tA} = P\,\eu^{tD}P^{-1}$ met $\eu^{tD}$ diagonaal van
+$\eu^{t\lambda_i}$; in het algemeen gebruik Dunford $A = D + N$
+(commuterend): $\eu^{tA} = \eu^{tD}\,\eu^{tN}$ met $\eu^{tN}$ een
+\emph{polynoom} in $t$ (nilpotentie knipt de reeks af). Complexe
+\omterm{def:b2:reduction:eigen}{eigenwaarden} paren tot rotatie-maal-exponentiaal-blokken
+(\cref{exo:b2:diffeq:5}).
+\end{method}
+
+\begin{remark}[Veelvoorkomende valkuilen]
+\emph{(i) $\eu^{A+B} \neq \eu^A\eu^B$ zonder commutatie:}
+neem $A = \begin{pmatrix} 0 & 1\\ 0 & 0\end{pmatrix}$, $B =
+\begin{pmatrix} 0 & 0\\ 1 & 0\end{pmatrix}$. Dan $\eu^A = I +
+A$, $\eu^B = I + B$ (nilpotentie), dus
+\[
+\eu^A\eu^B = \begin{pmatrix} 2 & 1\\ 1 & 1\end{pmatrix},
+\qquad\text{terwijl}\qquad
+\eu^{A+B} = \cosh(1)\,I + \sinh(1)\,(A + B)
+= \begin{pmatrix} \cosh 1 & \sinh 1\\ \sinh 1 & \cosh 1
+\end{pmatrix},
+\]
+met $(A+B)^2 = I$; en $\cosh 1 \approx 1{,}54 \neq 2$. De
+groepswet van \cref{thm:b2:diffeq:matrixexp} draagt een echte
+hypothese. \emph{(ii) Niet-lineaire intuïtie op lineair terrein:}
+oplossingen van een \emph{lineair} stelsel met continue
+coëfficiënten leven op het hele interval
+(\cref{thm:b2:diffeq:linear}) --- als een kandidaat-oplossing
+binnen $I$ explodeert, was de vergelijking niet lineair of is de
+berekening fout; omgekeerd, voor niet-lineaire vergelijkingen
+nooit globaliteit beloven zonder argument ($y' = y^2$).
+\emph{(iii) Delen door de onbekende:} variabelen scheiden in
+$y' = y(1-y)$ gooit stilzwijgend de constante oplossingen $0$ en
+$1$ weg --- precies die welke de faselijn organiseren
+(\cref{exo:b2:diffeq:3}); noteer constante oplossingen eerst.
+\emph{(iv) Beginwaarden fixeren vectoren, geen scalaren:} een
+$n$-de orde scalaire vergelijking heeft $n$ voorwaarden nodig ($y,
+y', \dots$ in $t_0$); alleen $y(t_0)$ matchen laat een
+$(n-1)$-parameterfamilie over, een klassieke bron van
+``verloren'' constanten.
+\end{remark}
+
+\begin{example}[Een $3\times3$-exponentiaal via Dunford]\label{ex:b2:diffeq:dunford3}
+Los $X' = AX$ op voor $A = \begin{pmatrix} 2 & 1 & 0\\ 0 & 2 &
+0\\ 0 & 0 & 3\end{pmatrix}$. Dunford per blokken: $A = D + N$
+met $D = \operatorname{diag}(2, 2, 3)$ en $N = E_{12}$, die
+commuten ($N$ leeft binnen het eigenwaarde-$2$-blok), en $N^2 =
+0$:
+\[
+\eu^{tA} = \eu^{tD}\,\eu^{tN}
+= \begin{pmatrix}
+\eu^{2t} & t\,\eu^{2t} & 0\\
+0 & \eu^{2t} & 0\\
+0 & 0 & \eu^{3t}
+\end{pmatrix} .
+\]
+De algemene oplossing leest kolom voor kolom: $X(t) =
+\bigl(\eu^{2t}(x_0 + ty_0),\ \eu^{2t}y_0,\
+\eu^{3t}z_0\bigr)$. Controles: in $t = 0$ is de matrix
+$I$; haar \omterm{def:b2:linalg:det}{determinant} is $\eu^{7t} =
+\eu^{t\operatorname{tr}A}$, zoals Liouville eist; en de
+factor $t$ verschijnt precies waar de \omterm{def:b2:reduction:eigen}{eigenwaarde} $2$
+defectief is. Slotinzicht: polynomen maal exponentiëlen zijn
+geen te onthouden giswerk --- ze zijn de afgekapte reeks
+$\eu^{tN}$, en hun graad is begrensd door de nilpotentie-index,
+nooit meer.
+\end{example}
+
+\begin{method}[$X' = AX + B(t)$ oplossen, van begin tot eind]\label{met:b2:diffeq:solvelinear}
+\begin{enumerate}
+  \item Spectrum van $A$; dan $\eu^{tA}$ via
+        \cref{met:b2:diffeq:computeexp} (diagonaliseer; of
+        Dunford zoals in \cref{ex:b2:diffeq:dunford3}; of een
+        polynoomtruc zoals $A^2 = -I$).
+  \item Een particuliere oplossing: variatie van constanten
+        $\int_{t_0}^t\eu^{(t-s)A}B(s)\dd s$ werkt altijd;
+        voor exponentieel-polynomiale $B$ is een ansatz van dezelfde
+        vorm (graad verhoogd bij \omterm{pb:b2:diffeq:1}{resonantie},
+        \cref{exo:b2:diffeq:10}) sneller.
+  \item Algemene oplossing $= \eu^{(t-t_0)A}X_0 +$ particuliere;
+        pas de beginwaarden \emph{laatst} aan, op de complete
+        formule.
+  \item Controles: $X(t_0)$ correct; de groei van het homogene deel
+        past bij de reële delen van de \omterm{def:b2:reduction:eigen}{eigenwaarden}
+        (\cref{exo:b2:diffeq:8}); en $\det$ van een fundamentele
+        matrix gehoorzaamt Liouville.
+\end{enumerate}
+\end{method}
+
+\begin{example}[Een faseportret]\label{ex:b2:diffeq:phaseportrait}
+$X' = AX$ met $A = \begin{pmatrix} 0 & 1\\ -1 & 0\end{pmatrix}$:
+$A^2 = -I$, dus de reeks splitst in
+\[
+\eu^{tA} = (\cos t)\,I + (\sin t)\,A
+= \begin{pmatrix} \cos t & \sin t\\ -\sin t & \cos t
+\end{pmatrix} :
+\]
+banen zijn cirkels met de klok mee --- de harmonische oscillator
+$x'' + x = 0$ in eerste-orde kleding. \omterm{def:b2:reduction:eigen}{Eigenwaarden} $\pm\iu$ op de
+imaginaire as: een \emph{centrum}. Algemener beslissen de reële
+delen van de \omterm{def:b2:reduction:eigen}{eigenwaarden} van $A$ over groei of verval van
+$\norm{X(t)}$ (\cref{exo:b2:diffeq:8}).
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=6.4cm, height=6.4cm,
+    xmin=-2.3, xmax=2.3, ymin=-2.3, ymax=2.3,
+    xtick={-1,1}, ytick={-1,1}]
+  \addplot[omDef, thick, domain=0:360, samples=90, smooth]
+    ({cos(x)}, {-sin(x)});
+  \addplot[omDef!60, thick, domain=0:360, samples=90, smooth]
+    ({1.7*cos(x)}, {-1.7*sin(x)});
+  \draw[-Stealth, omThm, thick] (axis cs:1,0) -- (axis cs:0.995,-0.12);
+  \draw[-Stealth, omThm, thick] (axis cs:1.7,0) -- (axis cs:1.695,-0.12);
+\end{axis}
+\end{tikzpicture}
+\hspace{6mm}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=6.4cm, height=6.4cm,
+    xmin=-2.3, xmax=2.3, ymin=-2.3, ymax=2.3,
+    xtick={-1,1}, ytick={-1,1}]
+  % A = diag(-1,-2)-type stable node: trajectories y = c x^2
+  \addplot[omMeth, thick, domain=-1.5:1.5, samples=60] {x^2};
+  \addplot[omMeth, thick, domain=-1.5:1.5, samples=60] {-x^2};
+  \addplot[omMeth, thick, domain=-2.2:2.2, samples=2] {0};
+  \addplot[omMeth!60, thick, domain=-1.2:1.2, samples=60] {2*x^2};
+  \draw[-Stealth, omThm, thick] (axis cs:1.2,1.44) --
+    (axis cs:1.05,1.1);
+  \draw[-Stealth, omThm, thick] (axis cs:-1.2,-1.44) --
+    (axis cs:-1.05,-1.1);
+\end{axis}
+\end{tikzpicture}
+
+{\small Twee lineaire faseportretten. Links: een \emph{centrum}
+(\omterm{def:b2:reduction:eigen}{eigenwaarden} $\pm\iu$) --- gesloten cirkelvormige banen van de
+harmonische oscillator. Rechts: een \emph{stabiele knoop}
+(\omterm{def:b2:reduction:eigen}{eigenwaarden} $-1, -2$) --- alle banen vallen in de oorsprong
+tangentieel aan de trage eigenrichting.}
+\end{omfigure}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=9.6cm, height=6.4cm,
+    xmin=-3.2, xmax=3.2, ymin=-1.6, ymax=2.6,
+    xtick={0}, ytick={0},
+    xlabel={$\tau = \operatorname{tr}A$},
+    ylabel={$\delta = \det A$}]
+  \addplot[omThm, very thick, domain=-3:3, samples=100]
+    {x^2/4};
+  \node[font=\small, omThm] at (axis cs:2.45,2.1)
+    {$\delta = \tau^2/4$};
+  \node[font=\small] at (axis cs:0,-0.9) {zadels};
+  \node[font=\small] at (axis cs:-2.45,0.7)
+    {stabiele knopen};
+  \node[font=\small] at (axis cs:2.45,0.7)
+    {instabiele knopen};
+  \node[font=\small] at (axis cs:-1.05,1.9)
+    {stabiele spiralen};
+  \node[font=\small] at (axis cs:1.05,1.9)
+    {instabiele spiralen};
+  \node[font=\small, omDef] at (axis cs:0,2.35) {centra};
+  \draw[omDef, very thick] (axis cs:0,0) -- (axis cs:0,2.55);
+\end{axis}
+\end{tikzpicture}
+
+{\small Het spoor--determinant-vlak voor $X' = AX$ in dimensie
+$2$: onder de horizontale as, zadels; tussen de as en
+de parabool $\delta = \tau^2/4$, knopen; binnen de parabool,
+spiralen; op de positieve $\delta$-as, centra. Het weekendprobleem
+bewijst deze classificatie en volgt één verticale lijn ervan ---
+de gedempte oscillator --- tot in \omterm{pb:b2:diffeq:1}{resonantie}.}
+\end{omfigure}
+
+\begin{remark}[Waar dit wordt gebruikt]
+Lineaire stelsels zijn het lokale model voor alles niet-lineairs:
+nabij een evenwicht gedraagt een glad vectorveld zich (in de
+hyperbolische gevallen) als zijn linearisatie, waarvan het portret
+het spoor--determinant-vlak classificeert. Het weekendprobleem
+werkt het oscillatorverhaal \omterm{def:b2:metric:complete}{volledig} uit --- demping, forcering,
+\omterm{pb:b2:diffeq:1}{resonantie}, en de vergelijkingsstellingen van Sturm voor variabele
+coëfficiënten --- de wiskunde achter schokdempers, wisselstroomkringen
+en spectrale gaps. Het volume Jaar~3 keert terug met de
+kwalitatieve theorie (stromen, stabiliteit, eerste integralen) op
+variëteiten.
+\end{remark}
+
+\section{Tweede orde met variabele coëfficiënten}
+
+\begin{proposition}\label{prop:b2:diffeq:secondorder}
+De vergelijking $y'' + a(t)y' + b(t)y = c(t)$ ($a, b, c$ continu op
+$I$) is het stelsel $X' = A(t)X + B(t)$ voor $X = (y, y')$: oplossingen
+bestaan en zijn eenduidig op heel $I$ voor willekeurige beginwaarden
+$(y(t_0), y'(t_0))$; homogene oplossingen vormen een vlak. Als één
+niet-verdwijnende homogene oplossing $y_1$ bekend is, wordt een tweede
+onafhankelijke gevonden door \emph{ordeverlaging}: $y = y_1 z$ stellen
+maakt van de homogene vergelijking een eerste-orde vergelijking voor
+$z'$, opgelost door kwadraturen.
+\end{proposition}
+
+\begin{proof}
+De stelselvorm en \cref{thm:b2:diffeq:linear} geven alles
+structureels. Ordeverlaging: substitueren $y = y_1z$,
+\[
+y_1 z'' + (2y_1' + a y_1)z' + \underbrace{(y_1'' + ay_1' +
+by_1)}_{=\,0}\,z = 0 :
+\]
+een eerste-orde lineaire vergelijking in $u = z'$, oplosbaar met de
+formule van Jaar~1; integreren van $u$ geeft $z$, dus $y_2 = y_1 z$,
+onafhankelijk van $y_1$ wanneer $z$ niet constant is.
+\end{proof}
+
+\begin{example}\label{ex:b2:diffeq:lowering}
+$t^2y'' - 2y = 0$ op $\intoo{0}{\infty}$: $y_1 = t^2$ is een
+oplossing. Substitueer $y = t^2z$: uit $y' = t^2z' + 2tz$ en $y''
+= t^2z'' + 4tz' + 2z$,
+\[
+t^2y'' - 2y = t^4 z'' + 4t^3z' = 0,
+\qquad\text{d.w.z.}\qquad \frac{z''}{z'} = -\frac4t :
+\]
+$z' = t^{-4}$ (tot op een constante), $z = -\frac{1}{3t^3}$, en $y_2
+= t^2z = -\frac{1}{3t}$. Algemene oplossing: $y = \alpha t^2 +
+\frac{\beta}{t}$.
+\end{example}
+
+\section{Oefeningen}
+
+\begin{exercise}[$\star$]\label{exo:b2:diffeq:1}
+Los $X' = AX$, $X(0) = (1, 0)^{\mathsf T}$, op voor $A =
+\begin{pmatrix} 1 & 1\\ 0 & 2\end{pmatrix}$ (diagonaliseer) en $A =
+\begin{pmatrix} 2 & 1\\ 0 & 2 \end{pmatrix}$ (Dunford).
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:diffeq:2}
+Welke Cauchy-problemen hebben unieke globale oplossingen op $\R$ door
+\cref{thm:b2:diffeq:cauchylipschitz}? $y' = \sin(ty)$; $\;y' =
+y^2$; $\;y' = \abs y$. Voor de laatste, los expliciet op met $y(0) =
+0$ en $y(0) = 1$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:diffeq:3}
+Bewijs dat twee verschillende maximale oplossingen van $y' = f(t,y)$ ($f$
+\omterm{def:b2:metric:continuity}{Lipschitz} in $y$) nooit dezelfde waarde op hetzelfde tijdstip aannemen, en
+leid af dat oplossingen van $y' = y(1 - y)$ die in
+$\intoo{0}{1}$ starten voor altijd in $\intoo{0}{1}$ blijven.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:diffeq:4}
+Bereken $\eu^{tA}$ voor $A = \begin{pmatrix} 3 & 1\\ -1 &
+1\end{pmatrix}$ \emph{(Dunford: $(A - 2I)^2 = 0$)}, en los $X' =
+AX + \begin{pmatrix} \eu^{2t}\\ 0\end{pmatrix}$, $X(0) = 0$, op door
+variatie van constanten.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:diffeq:5}
+Voor $A = \begin{pmatrix} \alpha & -\beta\\ \beta &
+\alpha\end{pmatrix}$, bewijs $\eu^{tA} =
+\eu^{\alpha t}\begin{pmatrix} \cos\beta t & -\sin\beta t\\
+\sin\beta t & \cos\beta t\end{pmatrix}$ --- spiraalbanen ---
+op twee manieren: via de reeks (schrijf $A = \alpha I + \beta J$, $J^2 =
+-I$), en via de complexe identificatie $z' = (\alpha +
+\iu\beta)z$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:diffeq:6}
+(Lemma van Gronwall) Zij $u$ continu en niet-negatief met $u(t)
+\leq C + k\int_{t_0}^{t} u(s)\,\dd s$ op $\intco{t_0}{T}$. Bewijs
+$u(t) \leq C\,\eu^{k(t - t_0)}$ \emph{(differentieer $v(t) =
+\eu^{-kt}\int_{t_0}^t u$)}. Leid opnieuw de eenduidigheid in
+Cauchy--Lipschitz af en de continue afhankelijkheid $\norm{y(t) -
+z(t)} \leq \norm{y_0 - z_0}\,\eu^{k\abs{t - t_0}}$ voor twee
+oplossingen met verschillende beginwaarden.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:diffeq:7}
+Wetende dat $y_1(t) = \frac{\sin t}{t}$ de vergelijking $ty'' + 2y' + ty =
+0$ oplost op $\intoo{0}{\pi}$, vind een tweede onafhankelijke oplossing
+door ordeverlaging, en geef de algemene oplossing.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:diffeq:8}
+Zij $A \in \mathcal{M}_n(\C)$ met alle \omterm{def:b2:reduction:eigen}{eigenwaarden} van (strikt)
+negatief reëel deel. Bewijs dat elke oplossing van $X' = AX$ naar
+$0$ neigt als $t \to +\infty$, met een exponentiële snelheid: $\norm{X(t)}
+\leq C\,\eu^{-\alpha t}$ voor zekere $\alpha > 0$.
+\emph{(Trigonaliseer; behandel het driehoekige stelsel van de laatste rij
+omhoog, of gebruik Dunford: $\eu^{tA} = \eu^{tD}\eu^{tN}$ met
+$\norm{\eu^{tD}} \leq \eu^{-\alpha' t}$ en $\eu^{tN}$ polynomiaal
+in $t$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:diffeq:9}
+(Geen ontsnapping in eindige tijd bij lineaire groei) Veronderstel dat $f$
+continu is met $\norm{f(t, y)} \leq a\norm y + b$ op
+$\intco{0}{\infty} \times \R^n$, lokaal \omterm{def:b2:metric:continuity}{Lipschitz} in $y$. Met
+Gronwall (\cref{exo:b2:diffeq:6}) op de integraalvorm, bewijs dat
+maximale oplossingen globaal zijn (gedefinieerd op heel
+$\intco{0}{\infty}$).
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:diffeq:10}
+Los $y'' - 3y' + 2y = \eu^{t}$ op: homogene oplossingen, dan een
+particuliere oplossing van de vorm $\alpha t\,\eu^{t}$ \emph{(waarom
+faalt de naïeve gissing $\alpha\eu^t$?)}; algemene oplossing en
+de oplossing met $y(0) = y'(0) = 0$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:diffeq:11}
+Bereken $\eu^{tA}$ voor het Jordanblok
+\[
+A = \begin{pmatrix} \lambda & 1 & 0\\ 0 & \lambda & 1\\
+0 & 0 & \lambda\end{pmatrix},
+\]
+en beschrijf alle oplossingen van $X' = AX$: exponentiëlen maal
+polynoomvectoren, met graden tot $2$. Waar komt de
+polynoomgraad vandaan?
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:diffeq:12}
+(Periodieke forcering, periodieke respons) Zij $A \in
+\mathcal{M}_n(\R)$ en $B \colon \R \to \R^n$ continu en
+$T$-periodiek.
+\begin{enumerate}
+  \item Toon aan dat een oplossing van $X' = AX + B(t)$
+        $T$-periodiek is dan en slechts dan als $X(T) = X(0)$
+        \emph{(vergelijk $X(\cdot + T)$ en $X$)}.
+  \item Toon aan dat de \omterm{def:b2:reduction:eigen}{eigenwaarden} van $\eu^{TA}$ de
+        $\eu^{T\lambda}$ zijn, $\lambda \in \operatorname{Sp}A$
+        \emph{(trigonaliseer over $\C$)}. Leid af: als geen
+        \omterm{def:b2:reduction:eigen}{eigenwaarde} van $A$ in $\frac{2\iu\pi}{T}\Z$ ligt, dan
+        is $I - \eu^{TA}$ inverteerbaar.
+  \item Onder die hypothese, bewijs dat het stelsel precies
+        één $T$-periodieke oplossing heeft, met
+        \[
+        X(0) = \bigl(I - \eu^{TA}\bigr)^{-1}
+        \int_0^{T}\eu^{(T-s)A}B(s)\,\dd s .
+        \]
+        Waarmee correspondeert het uitgesloten geval, voor de
+        harmonische oscillator? (Het weekendprobleem antwoordt:
+        \omterm{pb:b2:diffeq:1}{resonantie}.)
+\end{enumerate}
+\end{exercise}
+
+\section{Probleem: Oscillaties, resonantie, en de
+vergelijkingsstellingen van Sturm}
+
+\begin{problem}\label{pb:b2:diffeq:1}
+Eén vergelijking regeert de mechanische en elektrische wereld:
+\[
+x'' + 2\zeta\omega\,x' + \omega^2 x = F(t),
+\qquad \omega > 0,\ \zeta \geq 0 .
+\]
+Dit probleem bestudeert haar \omterm{def:b2:metric:complete}{volledig} --- via de
+spoor--determinant-classificatie van vlakke lineaire stelsels,
+de drie dempingsregimes, de stationaire respons op
+periodieke forcering met haar \emph{resonantie}\index{resonantie}-piek
+en de resonantieramp --- en verlaat daarna constante
+coëfficiënten voor de \emph{scheidings- en vergelijkingsstellingen
+van Sturm}\index{vergelijkingsstelling van Sturm}, die de
+nulpunten van oplossingen van $y'' + q(t)y = 0$ beheersen zonder
+enige formule.
+
+\medskip
+\noindent\textbf{Deel I --- Het spoor--determinant-vlak.} Zij
+$A \in \mathcal M_2(\R)$, $\tau = \operatorname{tr}A$, $\delta
+= \det A$, $\Delta = \tau^2 - 4\delta$.
+\begin{enumerate}
+  \item Toon aan dat de \omterm{def:b2:reduction:eigen}{eigenwaarden} van $A$
+        $\frac{\tau\pm\sqrt\Delta}{2}$ zijn en classificeer: twee reële
+        \omterm{def:b2:reduction:eigen}{eigenwaarden} van tegengesteld teken desda $\delta < 0$; reële
+        \omterm{def:b2:reduction:eigen}{eigenwaarden} van hetzelfde teken desda $\delta > 0$, $\Delta
+        \geq 0$ (teken van $\tau$); niet-reëel geconjugeerd paar desda
+        $\Delta < 0$ (reëel deel $\frac\tau2$).
+  \item (Zadel, $\delta < 0$) Met \omterm{def:b2:reduction:eigen}{eigenwaarden} $\mu < 0 <
+        \lambda$ en \omterm{def:b2:reduction:eigen}{eigenvectoren} $v_\pm$, schrijf de algemene
+        oplossing en beschrijf de banen: twee stabiele en
+        twee instabiele stralen, alle andere banen asymptotisch aan
+        beide. Waarom kan geen oplossing behalve $0$ begrensd
+        blijven op heel $\R$?
+  \item (Knopen, $\delta > 0$, $\Delta > 0$) Voor $\mu < \lambda
+        < 0$: toon aan dat elke niet-nuloplossing naar $0$ neigt en
+        dat alle banen behalve die op de snelle as aankomen
+        \emph{tangentieel aan de trage eigenrichting}
+        \emph{(vergelijk $\eu^{\mu t}$ en $\eu^{\lambda t}$)}.
+  \item (Spiralen en centra, $\Delta < 0$) Met de
+        \omterm{def:b2:reduction:eigen}{eigenwaarden} $\alpha \pm \iu\beta$, gebruik
+        \cref{exo:b2:diffeq:5} (na een reële basiswissel,
+        in die algemeenheid toegelaten of bewezen voor de stelsels
+        van Deel II, die hieronder gebruikt worden) om de
+        banen te beschrijven: spiralen convergerend voor $\alpha =
+        \frac\tau2 < 0$, divergerend voor $\tau > 0$, gesloten
+        krommen (centrum) voor $\tau = 0$.
+  \item (Randgevallen) Voor een dubbele \omterm{def:b2:reduction:eigen}{eigenwaarde} ($\Delta =
+        0$): toon aan $\eu^{tA} = \eu^{\lambda t}(I + tN)$ met $N
+        = A - \lambda I$ nilpotent, en onderscheid de ster
+        ($N = 0$) van de oneigenlijke knoop ($N \neq 0$).
+        Vat Deel I samen in het spoor--determinant-beeld van
+        de figuur van dit hoofdstuk.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel II --- De gedempte oscillator.} Nu $F =
+0$: $x'' + 2\zeta\omega x' + \omega^2x = 0$, d.w.z.\ $X' = AX$
+met $A = \begin{pmatrix} 0 & 1\\ -\omega^2 &
+-2\zeta\omega\end{pmatrix}$.
+\begin{enumerate}[resume]
+  \item Bereken $\tau, \delta, \Delta$ en plaats de drie
+        regimes in het spoor--determinant-vlak:
+        \emph{ondergedempt} $0 < \zeta < 1$ (stabiele spiraal),
+        \emph{kritisch gedempt} $\zeta = 1$ (dubbele
+        \omterm{def:b2:reduction:eigen}{eigenwaarde}), \emph{overgedempt} $\zeta > 1$ (stabiele
+        knoop); $\zeta = 0$ is het centrum.
+  \item Los de drie regimes expliciet op:
+        \[
+        \zeta < 1:\ \eu^{-\zeta\omega t}\bigl(a\cos\omega_d t
+        + b\sin\omega_dt\bigr),\ \omega_d =
+        \omega\sqrt{1-\zeta^2};
+        \qquad
+        \zeta = 1:\ (a + bt)\,\eu^{-\omega t};
+        \]
+        $\zeta > 1$: twee reële exponentiëlen. Definieer de
+        pseudo-periode $\frac{2\pi}{\omega_d}$ en toon aan dat
+        de verhouding van opeenvolgende maxima van $\abs x$ de
+        constante $\eu^{-2\pi\zeta/\sqrt{1-\zeta^2}}$ is (het
+        logaritmische decrement).
+  \item (Het deurdranger-principe) Voor $\zeta \geq 1$ wordt de
+        vervalsnelheid beheerst door de traagste \omterm{def:b2:reduction:eigen}{eigenwaarde}
+        $\lambda_{\mathrm{slow}} = -\omega\bigl(\zeta -
+        \sqrt{\zeta^2-1}\bigr)$. Toon aan dat
+        $\abs{\lambda_{\mathrm{slow}}} =
+        \frac{\omega}{\zeta + \sqrt{\zeta^2 - 1}}$ een
+        \emph{dalende} functie is van $\zeta \geq 1$:
+        kritische demping $\zeta = 1$ geeft de snelste
+        niet-oscillerende terugkeer naar rust.
+  \item (Energie) Zij $E(t) = \frac12x'^2 +
+        \frac12\omega^2x^2$. Bewijs $E' = -2\zeta\omega\,x'^2
+        \leq 0$, en leid af dat voor $\zeta > 0$ de vergelijking
+        geen niet-nul periodieke oplossing heeft \emph{(een
+        periode zou $E$ constant dwingen, dus $x' \equiv 0$)}.
+  \item Leg in twee zinnen uit waarom het centrum $\zeta = 0$
+        \emph{structureel fragiel} is: elke $\zeta > 0$,
+        hoe klein ook, vernietigt periodiciteit --- en waar
+        dat zich toont in het spoor--determinant-vlak (de
+        centrumlijn heeft leeg inwendige).
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel III --- Gedwongen oscillaties en
+\omterm{pb:b2:diffeq:1}{resonantie}.} Nu $F(t) = F\cos(\gamma t)$ met $F, \gamma > 0$.
+\begin{enumerate}[resume]
+  \item ($\zeta > 0$: de stationaire toestand) Zoek $x_p =
+        \Re\bigl(z\,\eu^{\iu\gamma t}\bigr)$: toon aan
+        \[
+        z = \frac{F}{\omega^2 - \gamma^2 +
+        2\iu\zeta\omega\gamma},
+        \qquad
+        A(\gamma) := \abs z = \frac{F}{\sqrt{(\omega^2 -
+        \gamma^2)^2 + 4\zeta^2\omega^2\gamma^2}} ,
+        \]
+        en schrijf $x_p = A(\gamma)\cos(\gamma t - \varphi)$
+        met $\tan\varphi =
+        \frac{2\zeta\omega\gamma}{\omega^2-\gamma^2}$.
+  \item Toon aan dat \emph{elke} oplossing $x_p$ plus een
+        transient uit Deel II is, die naar $0$ neigt: wat de
+        beginwaarden ook zijn, het stelsel vergrendelt op de
+        stationaire toestand --- amplitude $A(\gamma)$,
+        fasevertraging $\varphi$.
+  \item (De resonantiekromme) Maximaliseer $A$: toon aan dat
+        $A(\gamma)$ een inwendig maximum heeft desda $\zeta <
+        \frac{1}{\sqrt2}$, in
+        \[
+        \gamma_* = \omega\sqrt{1 - 2\zeta^2},
+        \qquad
+        A(\gamma_*) =
+        \frac{F}{2\zeta\omega^2\sqrt{1-\zeta^2}} ,
+        \]
+        en dat voor kleine $\zeta$ de piek de
+        statische respons $A(0) = \frac F{\omega^2}$ versterkt met de
+        factor $\approx \frac{1}{2\zeta}$.
+  \item ($\zeta = 0$, buiten \omterm{pb:b2:diffeq:1}{resonantie}) Voor $\gamma \neq \omega$,
+        toon aan dat de oplossing met $x(0) = x'(0) = 0$ is
+        \[
+        x(t) = \frac{F}{\omega^2 -
+        \gamma^2}\bigl(\cos\gamma t - \cos\omega t\bigr)
+        = \frac{2F}{\omega^2-\gamma^2}
+        \sin\frac{(\omega-\gamma)t}{2}
+        \sin\frac{(\omega+\gamma)t}{2} :
+        \]
+        begrensd, met \emph{zwevingen} --- een snelle oscillatie
+        onder een trage envelop --- wanneer $\gamma$ dicht bij
+        $\omega$ ligt.
+  \item ($\zeta = 0$, \omterm{pb:b2:diffeq:1}{resonantie}) Voor $\gamma = \omega$, toon aan
+        dat $x_p(t) = \frac{F}{2\omega}\,t\sin(\omega t)$ een
+        oplossing is, en herwin haar als de limiet van vraag
+        14 als $\gamma \to \omega$: de amplitude groeit
+        lineair voor altijd --- de resonantieramp.
+  \item (Fourier-link) Een algemene periodieke forcering ontbindt
+        in harmonischen (het Fourier-hoofdstuk); door lineariteit is
+        de stationaire toestand de som van de harmonische responsen. Voor
+        een ongedempte oscillator van frequentie $\omega = 3$
+        gedwongen door de blokgolf van
+        \cref{exo:b2:fourier:1}-type (harmonischen op alle oneven
+        gehele getallen), welke harmonische resoneert? Eén zin over
+        waarom ingenieurs blokgolven vrezen.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel IV --- De stellingen van Sturm.} Beschouw $y''
++ q(t)\,y = 0$ op een interval $I$, $q$ continu. (Elke
+vergelijking $y'' + ay' + by = 0$ reduceert tot deze normale vorm door
+de substitutie $y = u\exp\bigl(-\frac12\int a\bigr)$;
+vraag 21 toont een variant van de truc in actie.)
+\begin{enumerate}[resume]
+  \item Voor twee oplossingen $y_1, y_2$, toon aan dat de \omterm{def:b2:diffeq:wronskian}{Wronskiaan}
+        $W = y_1y_2' - y_1'y_2$ \emph{constant} is, nul desda
+        de oplossingen evenredig zijn; en dat een niet-nuloplossing
+        alleen \emph{enkelvoudige, geïsoleerde} nulpunten heeft.
+  \item (Scheiding van Sturm) Zij $y_1, y_2$ onafhankelijke
+        oplossingen en $a < b$ twee opeenvolgende nulpunten van $y_1$.
+        Bewijs dat $y_2$ precies éénmaal verdwijnt in
+        $\intoo{a}{b}$ \emph{(evalueer de constante $W$ in $a$
+        en $b$: $W = y_1'y_2$ daar, en $y_1'(a)$,
+        $y_1'(b)$ hebben tegengestelde tekens)}: nulpunten van
+        onafhankelijke oplossingen wisselen af.
+  \item (Vergelijking van Sturm) Zij $q_1 \leq q_2$ op $I$, $y \neq
+        0$ met $y'' + q_1y = 0$, $z \neq 0$ met $z'' + q_2z
+        = 0$, en $a < b$ opeenvolgende nulpunten van $y$. Toon aan dat
+        $z$ verdwijnt in $\intcc{a}{b}$ --- strikt binnenin als
+        $q_1 < q_2$ ergens op $\intoo ab$ \emph{(als $z \neq
+        0$ op $\intoo ab$, bestudeer $(yz' - y'z)' = (q_1 -
+        q_2)yz$ met vaste tekens voor $y, z$ en vergelijk de
+        randwaarden)}.
+  \item Leid de \emph{afstandsschattingen} af: als $0 < m^2 \leq
+        q(t) \leq M^2$ op $I$, dan voldoen twee opeenvolgende
+        nulpunten $a < b$ van een niet-nuloplossing van $y'' + qy = 0$
+        aan
+        \[
+        \frac{\pi}{M} \;\leq\; b - a \;\leq\; \frac{\pi}{m}
+        \]
+        \emph{(vergelijk met $u'' + M^2u = 0$ en $u'' + m^2u
+        = 0$, waarvan de nulpunten $\frac\pi M$ en
+        $\frac\pi m$ uit elkaar liggen)}. Controleer op de
+        harmonische oscillator.
+  \item Transformeer $ty'' + 2y' + ty = 0$
+        (\cref{exo:b2:diffeq:7}) door $u = ty$ in $u'' + u =
+        0$, herwin haar oplossingen $\frac{\sin t}t$,
+        $\frac{\cos t}{t}$ meteen, en concludeer dat de
+        nulpunten van elke niet-nuloplossing precies
+        $\pi$ uit elkaar liggen: het wereldbeeld van Sturm ---
+        nulpunten worden beheerst door de coëfficiënt $q$, formules
+        of niet.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel V --- Duhamel en de begrensdheidsgrens.}
+\begin{enumerate}[resume]
+  \item (Duhamel voor de oscillator) Toon aan dat voor
+        continue $F$ de oplossing van $x'' + \omega^2x =
+        F(t)$ met $x(0) = x'(0) = 0$ is
+        \[
+        x(t) = \frac1\omega\int_0^t\sin\bigl(\omega(t -
+        s)\bigr)F(s)\,\dd s ,
+        \]
+        en herleid de resonante oplossing van vraag 15
+        eruit met $F(s) = F\cos(\omega s)$
+        \emph{(product-naar-som)}.
+  \item ($\zeta > 0$: begrensde input, begrensde output) Toon aan
+        dat voor $\zeta > 0$ en \emph{elke} begrensde continue
+        $F$ elke oplossing van de gedempte vergelijking begrensd is
+        op $\intco{0}{\infty}$ \emph{(variatie van constanten
+        plus het exponentiële verval $\vertiii{\eu^{tA}} \leq
+        C\eu^{-\alpha t}$ van \cref{exo:b2:diffeq:8})}.
+  \item ($\zeta = 0$) Toon aan dat zonder demping begrensde
+        periodieke forcering alle oplossingen begrensd houdt
+        \emph{behalve} precies bij \omterm{pb:b2:diffeq:1}{resonantie} ($\gamma =
+        \omega$, vraag 15 versus vraag 14): demping is
+        wat de begrensdheidsgrens tot uniforme
+        stabiliteit maakt.
+  \item Synthese. In één zin elk: (i) hoe het
+        spoor--determinant-vlak Delen I--II organiseert en
+        waar forcering (Deel III) het verlaat; (ii) de
+        fysische betekenis van $\gamma_*$, $A(\gamma_*)$ en
+        de factor $\frac1{2\zeta}$; (iii) wat de stellingen van
+        Sturm zeggen wat expliciete formules niet kunnen; (iv)
+        welke twee resultaten van dit probleem de rest van het
+        boek stilzwijgend hergebruikt (Liouville-constante
+        Wronskianen; begrensde-input-stabiliteit).
+\end{enumerate}
+\end{problem}

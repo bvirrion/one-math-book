@@ -1,0 +1,912 @@
+\chapter{Rijen en reeksen van functies}\label{ch:b2:funcseq}
+
+Wanneer functies naar een functie convergeren, welke eigenschappen
+overleven de overgang naar de limiet? \omterm{def:b2:funcseq:def}{Puntsgewijze convergentie}
+bewaart bijna niets; \emph{uniforme} convergentie --- convergentie
+in de \omterm{def:b2:nvs:norm}{sup-norm} --- bewaart continuïteit, integralen op segmenten
+en, met één draai, afgeleiden. Dit hoofdstuk bewijst de drie
+overdrachtsstellingen, hun reeksversies, en kroont ze met de
+benaderingsstelling van Weierstrass, bewezen via de mooie
+probabilistische veeltermen van Bernstein.
+
+\section{Puntsgewijze en uniforme convergentie}
+
+\begin{definition}\label{def:b2:funcseq:def}
+Zij $f_n, f \colon X \to \R$ (of $\C$, of een genormeerde
+ruimte), $X$ een willekeurige verzameling. $(f_n)$ convergeert
+naar $f$ \emph{puntsgewijs}\index{puntsgewijze convergentie}
+wanneer $f_n(x) \to f(x)$ voor elke $x$;
+\emph{uniform}\index{uniforme convergentie} wanneer
+\[
+\norm{f_n - f}_\infty = \sup_{x \in X}\, \abs{f_n(x) - f(x)}
+\xrightarrow[n \to \infty]{} 0 .
+\]
+Uniform impliceert puntsgewijs; op $C(\intcc{a}{b})$ is uniforme
+convergentie precies convergentie in de \omterm{def:b2:nvs:banach}{Banachruimte}
+$\bigl(C(\intcc{a}{b}), \norm\cdot_\infty\bigr)$ van
+\cref{ch:b2:nvs}.
+\end{definition}
+
+\begin{example}\label{ex:b2:funcseq:xn}
+Op $\intcc{0}{1}$ convergeert $f_n(x) = x^n$ puntsgewijs naar de
+\emph{discontinue} limiet $f = \mathbf{1}_{\{1\}}$; de
+convergentie is niet \omterm{def:b2:funcseq:def}{uniform}: $\norm{f_n - f}_\infty \geq
+f_n\bigl(1 - \tfrac1n\bigr) = (1 - \tfrac1n)^n \to \eu^{-1}
+\neq 0$. Op $\intcc{0}{a}$ met $a < 1$ \emph{is} zij \omterm{def:b2:funcseq:def}{uniform}
+($\sup = a^n \to 0$): uniformiteit is een eigenschap van het
+domein evenzeer als van de rij.
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=8.2cm, height=5.6cm,
+    xmin=0, xmax=1.08, ymin=0, ymax=1.15,
+    xtick={0,1}, ytick={1}]
+  \addplot[omDef!40, thick, domain=0:1, samples=80] {x^2};
+  \addplot[omDef!60, thick, domain=0:1, samples=80] {x^5};
+  \addplot[omDef, thick, domain=0:1, samples=120] {x^15};
+  \addplot[omThm, very thick, domain=0:1, samples=160] {x^40};
+  \node[font=\small, omDef] at (axis cs:0.62,0.5) {$x^2$};
+  \node[font=\small, omDef] at (axis cs:0.83,0.48) {$x^5$};
+  \node[font=\small, omThm] at (axis cs:0.987,0.5) {$x^{40}$};
+\end{axis}
+\end{tikzpicture}
+
+{\small De rij $x^n$ op $\intcc{0}{1}$: de grafieken zakken naar
+$0$ maar moeten allen naar $1$ klimmen in $x = 1$ --- de
+sup-afstand tot de discontinue puntsgewijze limiet krimpt nooit
+onder een constante.}
+\end{omfigure}
+
+\begin{example}[Twee limieten die weigeren te commuteren]\label{ex:b2:funcseq:doublelimit}
+Het hele hoofdstuk gaat over het verwisselen van limieten, dus
+hier is de kleinst mogelijke mislukking. Zij $a_{n,m} =
+\dfrac{n}{n+m}$ voor $n, m \geq 1$. Dan
+\[
+\lim_{m\to\infty}\Bigl(\lim_{n\to\infty}a_{n,m}\Bigr)
+= \lim_{m\to\infty} 1 = 1,
+\qquad
+\lim_{n\to\infty}\Bigl(\lim_{m\to\infty}a_{n,m}\Bigr)
+= \lim_{n\to\infty} 0 = 0 :
+\]
+beide geitereerde limieten bestaan en ze verschillen. Elke
+overdrachtsstelling van dit hoofdstuk is een vergunning om twee
+limieten te verwisselen --- $\lim_n$ met $\lim_{x\to a}$
+(continuïteit), met $\int$ (integratie), met $\frac{\dd}{\dd x}$
+(differentiatie) --- en \omterm{def:b2:funcseq:def}{uniforme convergentie} is precies de
+prijs die de verwisseling legaal maakt. Slotinzicht: telkens
+wanneer een ``bewijs'' stilzwijgend twee limietoperaties
+verwisselt, is dit twee-regels-schema het tegenvoorbeeld dat men
+eraan moet houden; de glijdende bulten van
+\cref{exo:b2:funcseq:2} zijn hetzelfde fenomeen met een
+integraalteken.
+\end{example}
+
+\section{De drie overdrachtsstellingen}
+
+\begin{theorem}[Continuïteit]\label{thm:b2:funcseq:continuity}
+Als elke $f_n$ continu is in $a$ en $f_n \to f$ \omterm{def:b2:funcseq:def}{uniform} op een
+omgeving van $a$, dan is $f$ continu in $a$. Een uniforme limiet
+van continue functies is continu.
+\end{theorem}
+
+\begin{proof}
+Het $3\varepsilon$-argument reeds gebruikt in
+\cref{thm:b2:metric:rncomplete}: kies $n$ met $\norm{f_n -
+f}_\infty \leq \varepsilon$, dan $\delta$ uit de continuïteit
+van $f_n$ in $a$; voor $\abs{x - a} \leq \delta$,
+\[
+\abs{f(x) - f(a)} \leq \abs{f(x) - f_n(x)} + \abs{f_n(x) - f_n(a)}
++ \abs{f_n(a) - f(a)} \leq 3\varepsilon . \qedhere
+\]
+\end{proof}
+
+\begin{example}[Uniformiteit faalt precies waar de limiet breekt]\label{ex:b2:funcseq:threshold}
+Op $\intcc{0}{2}$, zij $f_n(x) = \dfrac{x^n}{1 + x^n}$. De
+puntsgewijze limiet is een functie in drie stukken:
+\[
+f(x) = \begin{cases} 0 & 0 \leq x < 1,\\[2pt]
+\tfrac12 & x = 1,\\[2pt]
+1 & 1 < x \leq 2, \end{cases}
+\]
+discontinu in $1$, dus door \cref{thm:b2:funcseq:continuity}
+kan de convergentie niet \omterm{def:b2:funcseq:def}{uniform} zijn op $\intcc{0}{2}$. Op de
+gesloten stukken die de drempel vermijden is zij dat wel: voor
+$0 \leq x \leq a < 1$,
+\[
+\sup_{\intcc{0}{a}}\abs{f_n - 0}
+= \frac{a^n}{1 + a^n} \leq a^n \to 0 ,
+\]
+en voor $1 < b \leq x \leq 2$,
+\[
+\sup_{\intcc{b}{2}}\abs{f_n - 1}
+= \frac{1}{1 + b^n} \leq b^{-n} \to 0 ,
+\]
+beide suprema berekend via de monotonie van $u \mapsto
+\frac{u}{1+u}$ en van $x \mapsto x^n$. Slotinzicht: het falen
+van de uniformiteit is gelokaliseerd bij de discontinuïteit van
+de limiet --- dezelfde geometrie als \cref{ex:b2:funcseq:xn}, en
+de reden waarom de discipline ``\omterm{def:b2:funcseq:def}{uniform} op elk segment
+daarbinnen'' het hele hoofdstuk lang terugkeert.
+\end{example}
+
+\begin{theorem}[Integratie op een segment]\label{thm:b2:funcseq:integration}
+Als $f_n \to f$ \omterm{def:b2:funcseq:def}{uniform} op $\intcc{a}{b}$, met $f_n$ stuksgewijs
+continu ($f$ evenzo), dan
+\[
+\int_a^b f_n \longrightarrow \int_a^b f .
+\]
+\end{theorem}
+
+\begin{proof}
+Lineariteit en de driehoeksongelijkheid voor integralen geven
+\[
+\Bigl|\int_a^b f_n - \int_a^b f\Bigr|
+= \Bigl|\int_a^b (f_n - f)\Bigr|
+\leq \int_a^b\abs{f_n - f}
+\leq (b - a)\,\norm{f_n - f}_\infty \longrightarrow 0 .
+\]
+De lengtefactor $(b - a)$ is waar de compactheid van het segment
+binnenkomt: op niet-compacte intervallen produceert dezelfde
+schatting de nutteloze grens $\infty\cdot0$, en de conclusie
+faalt werkelijk zonder overheersing --- de platte bulten $f_n =
+\frac1n\mathbf 1_{\intcc{0}{n}}$ convergeren \omterm{def:b2:funcseq:def}{uniform} naar $0$
+op $\intco{0}{\infty}$ en houden toch $\int f_n = 1$ (zie de
+valkuilen-opmerking hieronder), en de glijdende bulten uit de
+opmerking van \cref{ch:b2:integration} doen hetzelfde met
+\omterm{def:b2:funcseq:def}{puntsgewijze convergentie}; \omterm{def:b2:funcseq:def}{uniforme convergentie} beheerst
+hoogten, nooit breedten.
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=8.6cm, height=5.4cm,
+    xmin=0, xmax=1.05, ymin=0, ymax=1.9,
+    xtick={0,1}, ytick={1}]
+  \addplot[omDef!45, thick, domain=0:1.05, samples=120]
+    {2*x*exp(-2*x^2)};
+  \addplot[omDef!70, thick, domain=0:1.05, samples=120]
+    {5*x*exp(-5*x^2)};
+  \addplot[omDef, thick, domain=0:1.05, samples=160]
+    {15*x*exp(-15*x^2)};
+  \node[font=\small, omDef] at (axis cs:0.62,0.42) {$n=2$};
+  \node[font=\small, omDef] at (axis cs:0.40,0.80) {$n=5$};
+  \node[font=\small, omDef] at (axis cs:0.24,1.55) {$n=15$};
+\end{axis}
+\end{tikzpicture}
+
+{\small De bulten $g_n(x) = nx\,\eu^{-nx^2}$ van
+\cref{exo:b2:funcseq:1}: zij convergeren naar $0$ in elk punt,
+maar de pieken (hoogte $\sim\sqrt{n/(2\eu)}$, drijvend naar
+$0$) groeien onbegrensd --- \omterm{def:b2:funcseq:def}{puntsgewijze convergentie} met
+$\norm{g_n}_\infty \to \infty$, en $\int_0^1 g_n \to \frac12
+\neq 0$: de massa verbergt zich onder de bewegende piek.}
+\end{omfigure}
+
+\begin{theorem}[Differentiatie]\label{thm:b2:funcseq:differentiation}
+Zij $f_n$ van klasse $C^1$ op een interval $I$, met: $(f_n')$
+\emph{\omterm{def:b2:funcseq:def}{uniform}} convergerend op $I$ (of op elk segment van $I$)
+naar enige $g$, en $(f_n(x_0))$ convergerend in één punt $x_0$.
+Dan convergeert $(f_n)$ (\omterm{def:b2:funcseq:def}{uniform} op segmenten) naar een $C^1$-functie
+$f$, en $f' = g$: men mag de limiet differentiëren.
+\end{theorem}
+
+\begin{proof}
+Definieer $f(x) = \lim f_n(x_0) + \int_{x_0}^x g$: legitiem,
+want $g$ is continu --- immers $g$ is de \emph{uniforme} limiet
+op segmenten van de continue $f_n'$, dus
+\cref{thm:b2:funcseq:continuity} is van toepassing, en de
+integraal van een continue functie is welgedefinieerd met, door
+de hoofdstelling van de integraalrekening,
+\[
+f'(x) = g(x) \qquad (x \in I) :
+\]
+de kandidaat-limiet is $C^1$ met de juiste afgeleide
+\emph{per constructie}, vóórdat enige convergentie bewezen is.
+Opnieuw via de hoofdstelling, $f_n(x) = f_n(x_0) + \int_{x_0}^x
+f_n'$; aftrekken geeft
+\[
+\abs{f_n(x) - f(x)} \leq \abs{f_n(x_0) - \lim f_n(x_0)}
++ \abs{x - x_0}\,\norm{f_n' - g}_{\infty} ,
+\]
+wat \omterm{def:b2:funcseq:def}{uniform} naar $0$ gaat op elk segment. En $f$ is $C^1$ met
+$f' = g$ per constructie.
+\end{proof}
+
+\begin{example}[Waarom de hypothese op de afgeleiden zit]\label{ex:b2:funcseq:sqrtabs}
+Zij $F_n(x) = \sqrt{x^2 + \frac1n}$ op $\R$. Elke $F_n$ is
+$C^1$ (zelfs $C^\infty$), en de convergentie naar $\abs x$ is
+\omterm{def:b2:funcseq:def}{uniform} op heel $\R$:
+\[
+0 \leq F_n(x) - \abs x
+= \frac{(x^2 + \frac1n) - x^2}{\sqrt{x^2+\frac1n} + \abs x}
+= \frac{1/n}{\sqrt{x^2 + \frac1n} + \abs x}
+\leq \frac{1/n}{1/\sqrt n} = \frac{1}{\sqrt n} .
+\]
+Toch is de limiet $\abs x$ niet differentieerbaar in $0$:
+\omterm{def:b2:funcseq:def}{uniforme convergentie} van de \emph{functies}, hoe snel ook,
+draagt geen differentieerbaarheid over. Het falen is zichtbaar
+op de afgeleiden:
+\[
+F_n'(x) = \frac{x}{\sqrt{x^2 + \frac1n}}
+\longrightarrow \begin{cases} 1 & x > 0,\\ 0 & x = 0,\\
+-1 & x < 0, \end{cases}
+\]
+een discontinue puntsgewijze limiet, dus $(F_n')$ kan niet
+\omterm{def:b2:funcseq:def}{uniform} convergeren bij $0$ (\cref{thm:b2:funcseq:continuity}
+opnieuw). Slotinzicht:
+\cref{thm:b2:funcseq:differentiation} neemt opzettelijk
+\omterm{def:b2:funcseq:def}{uniforme convergentie} van de $f_n'$ aan, niet van de $f_n$ ---
+dit voorbeeld is de reden.
+\end{example}
+
+\section{Reeksen van functies}
+
+\begin{definition}\label{def:b2:funcseq:series}
+Een reeks van functies $\sum u_n$ convergeert puntsgewijs/\omterm{def:b2:funcseq:def}{uniform}
+wanneer haar partiële sommen dat doen. Zij convergeert
+\emph{normaal}\index{normale convergentie} (op $X$) wanneer
+$\sum \norm{u_n}_\infty < \infty$. Normale convergentie
+impliceert \omterm{def:b2:funcseq:def}{uniforme convergentie} (in de \omterm{def:b2:nvs:banach}{Banachruimte} van
+begrensde functies:
+\cref{thm:b2:nvs:absoluteconvergence}), die puntsgewijze
+impliceert; beide implicaties zijn strikt.
+\end{definition}
+
+\begin{example}[Eén reeks, drie oordelen]\label{ex:b2:funcseq:threemodes}
+Neem $u_n(x) = \frac{x^n}{n}$ op $\intco{0}{1}$.
+\emph{Puntsgewijs:} convergeert voor elke $x \in \intco01$
+(vergelijking met de meetkundige reeks). \emph{\omterm{def:b2:funcseq:series}{Normaal} op
+$\intcc{0}{a}$, $a < 1$:} $\norm{u_n}_{\infty,\intcc0a} =
+\frac{a^n}{n}$, \omterm{def:b2:series:summable}{sommeerbaar}. \emph{Niet \omterm{def:b2:funcseq:series}{normaal} op
+$\intco{0}{1}$:} $\norm{u_n}_{\infty,\intco01} = \frac1n$, en
+$\sum\frac1n$ divergeert. \emph{Niet eens \omterm{def:b2:funcseq:def}{uniform} op
+$\intco{0}{1}$:} de restterm verzet zich bij $1$,
+\[
+R_N(x) = \sum_{n>N}\frac{x^n}{n}
+\geq \sum_{n=N+1}^{2N}\frac{x^n}{n}
+\geq \frac{N\,x^{2N}}{2N} = \frac{x^{2N}}{2}
+\xrightarrow[x\to1^-]{} \frac12 ,
+\]
+dus $\sup_{\intco01}\abs{R_N} \geq \frac12$ voor elke $N$.
+Slotinzicht: alle vier oordelen bestaan vreedzaam naast
+elkaar --- de som $-\ln(1-x)$ is continu op $\intco{0}{1}$
+omdat continuïteit alleen uniformiteit \emph{bij elk punt}
+nodig heeft, d.w.z.\ op de segmenten $\intcc0a$; exploderen
+aan de rand is het recht van de som.
+\end{example}
+
+\begin{theorem}[Overdracht voor reeksen]\label{thm:b2:funcseq:seriestransfer}
+Als $\sum u_n$ \omterm{def:b2:funcseq:def}{uniform} convergeert (bijv.\ \omterm{def:b2:funcseq:series}{normaal}) op de
+relevante verzameling: continuïteit van alle $u_n$ in $a$ gaat
+over op de som; integratie op een segment mag term voor term;
+en als $\sum u_n(x_0)$ convergeert terwijl $\sum u_n'$ \omterm{def:b2:funcseq:def}{uniform}
+convergeert op segmenten, is de som $C^1$ met afgeleide $\sum
+u_n'$.
+\end{theorem}
+
+\begin{proof}
+Alles is de overeenkomstige stelling toegepast op de partiële
+sommen $S_N = \sum_{n\leq N}u_n$, die eindige sommen zijn van
+functies met de relevante regulariteit. Continuïteit: elke
+$S_N$ is continu in $a$ en $S_N \to \sum u_n$ \omterm{def:b2:funcseq:def}{uniform}:
+\cref{thm:b2:funcseq:continuity}. Integratie: op het segment,
+\[
+\int_a^b \sum_{n\geq0} u_n
+= \lim_N \int_a^b S_N
+= \lim_N \sum_{n=0}^{N}\int_a^b u_n
+= \sum_{n\geq0}\int_a^b u_n
+\]
+door \cref{thm:b2:funcseq:integration} (eerste gelijkheid) en
+lineariteit van de integraal (tweede). Differentiatie: de $S_N$
+zijn $C^1$, $S_N(x_0)$ convergeert, en $S_N' =
+\sum_{n\leq N}u_n'$ convergeert \omterm{def:b2:funcseq:def}{uniform} op segmenten:
+\cref{thm:b2:funcseq:differentiation} geeft dat de som $C^1$ is
+met afgeleide $\lim S_N' = \sum u_n'$.
+\end{proof}
+
+\begin{remark}[Veelgemaakte valkuilen]
+Vier vallen, alle gezien in tentamenstukken. \emph{(i)
+Half-gecontroleerde suprema:} $f_n$ evalueren langs een
+goedgekozen rij $x_n$ boundeert $\norm{f_n - f}_\infty$ alleen
+van \emph{onderen} --- genoeg om uniformiteit te weerleggen (als
+in \cref{ex:b2:funcseq:xn}), nooit om haar te bewijzen; om te
+bewijzen, boundeer het sup door een berekening geldig voor
+\emph{alle} $x$. \emph{(ii) Uniformiteit op de verkeerde
+verzameling:} normale of \omterm{def:b2:funcseq:def}{uniforme convergentie} geldt vaak op
+elk $\intcc{-a}{a}$ of $\intco\delta\infty$ maar faalt op de
+open vereniging; dat is geen obstakel --- continuïteit en
+differentieerbaarheid zijn lokaal, dus de
+segment-voor-segment-discipline van \cref{ex:b2:funcseq:zeta}
+geeft ze op de hele open verzameling. \emph{(iii) Integreren
+over niet-segmenten:} \cref{thm:b2:funcseq:integration} is een
+uitspraak over segmenten; op $\intco0\infty$ verhindert
+\omterm{def:b2:funcseq:def}{uniforme convergentie} niet dat massa naar oneindig ontsnapt
+($f_n = \frac1n\mathbf 1_{\intcc{0}{n}}$ convergeert \omterm{def:b2:funcseq:def}{uniform}
+naar $0$, met $\int f_n = 1$) --- gebruik daar gedomineerde
+convergentie. \emph{(iv) De limiet differentiëren:}
+\cref{ex:b2:funcseq:sqrtabs}; de afgeleide-hypothese zit op
+$(f_n')$, en geen enkele convergentiesnelheid van $(f_n)$ kan
+haar vervangen.
+\end{remark}
+
+\begin{example}[De Riemann $\zeta$-functie]\label{ex:b2:funcseq:zeta}
+$\zeta(s) = \sum_{n\geq1} n^{-s}$ convergeert \omterm{def:b2:funcseq:series}{normaal} op elke
+halfrechte $\intco{a}{+\infty}$, $a > 1$ ($\norm{n^{-s}}_\infty =
+n^{-a}$, \omterm{def:b2:series:summable}{sommeerbaar}): $\zeta$ is continu op $\intoo{1}{+\infty}$;
+termgewijs differentiëren (de afgeleide reeks $\sum -\ln n\; n^{-s}$
+convergeert eveneens \omterm{def:b2:funcseq:series}{normaal} op $\intco{a}{\infty}$), $\zeta$ is
+$C^1$ --- en, itererend, $C^\infty$ --- met $\zeta'(s) = -\sum
+\frac{\ln n}{n^s}$. Let op de discipline: \omterm{def:b2:funcseq:series}{normale convergentie}
+wordt gecontroleerd op \emph{sub}-halfrechten, nooit op de open
+$\intoo{1}{\infty}$ zelf, waar zij faalt.
+\end{example}
+
+\begin{example}[Een logaritmische reeks, tot het eind uitgewerkt]\label{ex:b2:funcseq:logseries}
+Zij $F(x) = \sum_{n\geq1} \frac{\eu^{-nx}}{n}$ op
+$\intoo{0}{\infty}$. Elke term is begrensd op $\intco{\delta}
+\infty$ door $\frac{\eu^{-n\delta}}{n} \leq \eu^{-n\delta}$, een
+convergente meetkundige reeks: \omterm{def:b2:funcseq:series}{normale convergentie} op elke
+$\intco\delta\infty$, dus $F$ is continu op
+$\intoo{0}{\infty}$. De afgeleide reeks $\sum -\eu^{-nx}$ is
+eveneens \omterm{def:b2:funcseq:series}{normaal} convergent op $\intco\delta\infty$
+($\norm{\eu^{-nx}}_{\infty,\intco\delta\infty} =
+\eu^{-n\delta}$), dus $F$ is $C^1$ met een meetkundige
+afgeleide:
+\[
+F'(x) = -\sum_{n\geq1}\eu^{-nx}
+= \frac{-\eu^{-x}}{1 - \eu^{-x}}
+= \frac{-1}{\eu^{x} - 1} .
+\]
+Itererend is $F$ van klasse $C^\infty$. Integreren van $F'$
+(zowel $F$ als $x \mapsto -\ln(1 - \eu^{-x})$ verdwijnen in
+$+\infty$ en hebben dezelfde afgeleide op $\intoo0\infty$):
+\[
+F(x) = -\ln\bigl(1 - \eu^{-x}\bigr),
+\]
+de logaritmische reeks in $t = \eu^{-x}$. Slotinzicht: als $x
+\to 0^+$, $F(x) = -\ln(x + O(x^2)) = \ln\frac1x + O(x)$ --- de
+reeks divergeert logaritmisch aan de rand, precies zoals de
+harmonische reeks die zij wordt in $x = 0$; \omterm{def:b2:funcseq:series}{normale
+convergentie} op $\intco\delta\infty$ maar niet op
+$\intoo0\infty$ is het symptoom.
+\end{example}
+
+\begin{method}[Uniforme convergentie bewijzen of weerleggen]\label{met:b2:funcseq:uniform}
+Voor $f_n \to f$ puntsgewijs op $X$:
+\begin{enumerate}
+  \item Bereken of boundeer $\norm{f_n - f}_\infty$: bestudeer de
+        functie $x \mapsto \abs{f_n(x) - f(x)}$ (afgeleide,
+        monotonie) om haar maximum te lokaliseren; een grens
+        geldig voor alle $x$ die naar $0$ gaat, bewijst
+        uniformiteit.
+  \item Om te \emph{weerleggen}: vertoon punten $x_n$ met
+        $\abs{f_n(x_n) - f(x_n)} \not\to 0$ (vaak volgt $x_n$ de
+        bewegende bult, als in \cref{exo:b2:funcseq:1}); of
+        roep een overdrachtsstelling in contrappositie aan ---
+        een discontinue limiet van continue functies
+        (\cref{ex:b2:funcseq:threshold}), of $\int f_n
+        \not\to \int f$ op een segment.
+  \item Voor reeksen, probeer eerst \omterm{def:b2:funcseq:series}{normale convergentie}
+        ($\sum\sup\abs{u_n} < \infty$); als zij globaal faalt,
+        test haar op de subsegmenten die ertoe doen
+        (\cref{ex:b2:funcseq:threemodes}); als zij overal faalt,
+        kan \omterm{def:b2:funcseq:def}{uniforme convergentie} nog gelden via de
+        resttermgrens van de alternerende reeks
+        (\cref{exo:b2:funcseq:4}) of partiële sommatie.
+\end{enumerate}
+\end{method}
+
+\section{De benaderingsstelling van Weierstrass}
+
+\begin{theorem}[Weierstrass, via Bernstein]\label{thm:b2:funcseq:weierstrass}
+Elke continue $f \colon \intcc{0}{1} \to \R$ is een uniforme limiet
+van veeltermen --- expliciet, van haar \emph{Bernsteinveeltermen}\index{Bernsteinveeltermen}\index{benaderingsstelling van Weierstrass}
+\[
+B_n(f)(x) = \sum_{k=0}^{n} f\Bigl(\frac kn\Bigr)\binom nk x^k
+(1-x)^{n-k} .
+\]
+\end{theorem}
+
+\begin{proof}
+Fixeer $x \in \intcc{0}{1}$ en zet $p_k(x) = \binom nk x^k(1 -
+x)^{n-k}$. Drie binomiale identiteiten, verkregen door $(x + y)^n$
+en haar twee $x$-afgeleiden te evalueren in $y = 1 - x$:
+\[
+\sum_k p_k = 1,
+\qquad
+\sum_k k\,p_k = nx,
+\qquad
+\sum_k k(k-1) p_k = n(n-1)x^2 .
+\]
+In detail: $(x+y)^n = \sum_k\binom nk x^ky^{n-k}$ in $y = 1-x$
+is de eerste; differentiëren naar $x$,
+\[
+n(x+y)^{n-1} = \sum_k k\binom nk x^{k-1}y^{n-k} ,
+\]
+dan vermenigvuldigen met $x$ en $y = 1 - x$ zetten geeft de
+tweede; tweemaal differentiëren en vermenigvuldigen met $x^2$
+geeft de derde. Ontwikkelen van $(k - nx)^2 = k(k-1) + k(1 - 2nx) +
+n^2x^2$ en combineren van de drie:
+\[
+\sum_k (k - nx)^2 p_k
+= n(n-1)x^2 + nx(1 - 2nx) + n^2x^2
+= nx(1 - x) \leq \frac n4 ,
+\]
+de \emph{variantie-identiteit}.
+
+Nu schatten, met $\sum p_k = 1$:
+\[
+\abs{B_n(f)(x) - f(x)}
+\leq \sum_{k} \Bigl| f\Bigl(\frac kn\Bigr) - f(x)\Bigr|\, p_k(x)
+= \Sigma_{\text{dichtbij}} + \Sigma_{\text{ver}},
+\]
+gesplitst volgens $\abs{\frac kn - x} \leq \delta$ of niet.
+Gegeven $\varepsilon > 0$, uniforme continuïteit van $f$ (Heine)
+levert $\delta$ met $\Sigma_{\text{dichtbij}} \leq \varepsilon$.
+Voor de verre som, met $M = \norm f_\infty$: via de
+variantie-identiteit en de teltruc van Chebyshev,
+\[
+\Sigma_{\text{ver}} \leq 2M \sum_{\abs{k - nx} > n\delta} p_k
+\leq 2M\,\frac{\sum_k (k - nx)^2 p_k}{n^2\delta^2}
+\leq \frac{2M}{4 n \delta^2} \cdot 1
+= \frac{M}{2n\delta^2}
+\xrightarrow[n\to\infty]{} 0 ,
+\]
+\omterm{def:b2:funcseq:def}{uniform} in $x$. Dus $\norm{B_n(f) - f}_\infty \leq \varepsilon +
+\frac{M}{2n\delta^2} \leq 2\varepsilon$ voor grote $n$.
+\end{proof}
+
+\begin{remark}
+Door affiene substitutie geldt de stelling op elk segment
+$\intcc{a}{b}$. Zij faalt op $\R$ (een uniforme limiet van
+veeltermen op $\R$ is een veelterm: \cref{exo:b2:funcseq:8}).
+De probabilistische lezing --- $B_n(f)(x)$ is de verwachte
+waarde van $f$ in een binomiaal gemiddelde, en de
+variantiegrens is de ongelijkheid van Chebyshev --- wordt
+eerlijk gemaakt in \cref{ch:b2:genfun}.
+\end{remark}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=8.6cm, height=6.0cm,
+    xmin=0, xmax=1.05, ymin=0, ymax=1.08,
+    xtick={0,1}, ytick={1}]
+  \addplot[omThm, very thick, domain=0:1, samples=80] {x^2};
+  \addplot[omDef!45, thick, domain=0:1, samples=2] {x};
+  \addplot[omDef!70, thick, domain=0:1, samples=80]
+    {x^2 + x*(1-x)/2};
+  \addplot[omDef, thick, domain=0:1, samples=80]
+    {x^2 + x*(1-x)/6};
+  \node[font=\small, omDef] at (axis cs:0.30,0.37) {$B_1f$};
+  \node[font=\small, omDef] at (axis cs:0.52,0.46) {$B_2f$};
+  \node[font=\small, omDef] at (axis cs:0.76,0.56) {$B_6f$};
+  \node[font=\small, omThm] at (axis cs:0.88,0.68) {$f$};
+\end{axis}
+\end{tikzpicture}
+
+{\small Bernsteinbenadering van $f(x) = x^2$ (rood), via de
+exacte formule $B_nf = x^2 + \frac{x(1-x)}{n}$ van
+\cref{exo:b2:funcseq:7}: $B_1f$ is de koorde, en elke verdubbeling
+van $n$ halveert de kloof. Betrouwbaar maar traag --- de
+$\frac1n$-verzadiging die de stelling van Voronovskaya
+(weekendprobleem) exact maakt.}
+\end{omfigure}
+
+\begin{remark}[Waar dit gebruikt wordt]
+De Weierstrassbenadering is de dichtheidsstelling van de
+klassieke analyse: zij maakt $C(\intcc ab)$ separabel, laat
+integraalidentiteiten alleen op veeltermen controleren
+(momentproblemen), en ligt ten grondslag aan de trigonometrische
+versie bewezen in het Fourierhoofdstuk via de kern van Fejér.
+Het weekendprobleem van dit hoofdstuk haalt de kwantitatieve
+inhoud van Bernsteins bewijs naar boven ---
+convergentiesnelheden beheerst door de modulus van continuïteit
+--- en isoleert vervolgens wat het echt liet werken, in de
+stelling van Korovkin: positiviteit plus drie testfuncties. Het
+boekdeel van Jaar~3 generaliseert de dichtheidsuitspraak naar
+willekeurige subalgebra's (Stone--Weierstrass) en naar compacte
+ruimten.
+\end{remark}
+
+\begin{example}[Polygonale benadering, met een snelheid]\label{ex:b2:funcseq:polygonal}
+Voor $L$-Lipschitz $f$ op $\intcc{0}{1}$, zij $I_nf$ de
+stuksgewijs-affiene interpolant in de knopen $\frac kn$. Op een
+cel $\intcc{\frac kn}{\frac{k+1}n}$ liggen zowel $f(x)$ als
+$I_nf(x)$ tussen de extreme waarden die een $L$-Lipschitz
+functie kan aannemen gegeven de twee knoopwaarden, dus voor $x$
+in de cel, met $x_k = \frac kn$:
+\[
+\abs{I_nf(x) - f(x)}
+\leq \abs{I_nf(x) - f(x_k)} + \abs{f(x_k) - f(x)}
+\leq L\,\abs{x - x_k} + L\,\abs{x - x_k}
+\leq \frac{2L}{n}
+\]
+(de interpolant is zelf $L$-Lipschitz op de cel: haar helling is
+een differentiequotiënt van $f$). Dus $\norm{I_nf -
+f}_\infty \leq \frac{2L}{n}$: polygonale benadering van
+Lipschitzfuncties convergeert met snelheid $\frac1n$ ---
+\emph{sneller} dan Bernsteins $\frac{1}{\sqrt n}$ voor dezelfde
+klasse (weekendprobleem, Deel~II). Slotinzicht: de polygoon
+interpoleert maar is niet glad, Bernstein is glad maar traag;
+er is geen gratis lunch tussen regulariteit van de benaderende
+en snelheid --- een afweging die de verzadigingsresultaten van
+het weekendprobleem precies maken.
+\end{example}
+
+\begin{remark}[Perspectieven binnen dit boekdeel]
+\omterm{def:b2:funcseq:def}{Uniforme convergentie} is vanaf hier het werkpaard van dit boek.
+Het machtreeksenhoofdstuk loopt \omterm{def:b2:metric:complete}{volledig} op \omterm{def:b2:funcseq:series}{normale
+convergentie} op compacte subschijven --- elke term-voor-term
+stelling daar is een speciaal geval van de
+overdrachtsstellingen van dit hoofdstuk. Het Fourierhoofdstuk
+leeft één verdieping hoger: zijn partiële sommen $S_N$ falen
+precies waar dit hoofdstuk waarschuwt dat zij kunnen (puntsgewijs
+maar niet \omterm{def:b2:funcseq:def}{uniform} bij sprongen), en zijn Fejérgemiddelden slagen
+door dezelfde $3\varepsilon$-mechanica die
+\cref{thm:b2:funcseq:continuity} bewees. Het
+differentiaalvergelijkingenhoofdstuk definieert $\eu^{tA}$ door
+een \omterm{def:b2:funcseq:series}{normaal} convergente reeks en differentieert haar termgewijs
+--- letterlijk \cref{thm:b2:funcseq:seriestransfer} toegepast op
+matrixcoëfficiënten. Wanneer later in het boek twijfel rijst
+over ``waarom mogen we dit doen'', is het antwoord meestal een
+stelling van dit hoofdstuk.
+\end{remark}
+
+\section{Oefeningen}
+
+\begin{exercise}[$\star$]\label{exo:b2:funcseq:1}
+Bestudeer de puntsgewijze en \omterm{def:b2:funcseq:def}{uniforme convergentie} op
+$\intcc{0}{1}$, daarna op $\intcc{0}{a}$ ($a < 1$) of
+$\intco{\delta}{1}$ al naargelang relevant, van:
+\[
+f_n(x) = \frac{x}{1 + nx},
+\qquad
+g_n(x) = n x\,\eu^{-n x^2},
+\qquad
+h_n(x) = x^n(1 - x^n).
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:funcseq:2}
+Bewijs dat $\displaystyle\int_0^1 g_n \not\to \int_0^1 \lim g_n$
+voor de $g_n$ van \cref{exo:b2:funcseq:1}, en verzoen dit met
+\cref{thm:b2:funcseq:integration}.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:funcseq:3}
+Bewijs dat $S(x) = \sum_{n\geq1} \dfrac{x^n}{n^2}$ continu is op
+$\intcc{-1}{1}$, en dat $S$ van klasse $C^1$ is op
+$\intoo{-1}{1}$ met $S'(x) = -\frac{\ln(1-x)}{x}$ voor $0 <
+\abs x < 1$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:4}
+Zij $F(x) = \sum_{n \geq 0} \dfrac{(-1)^n}{n + x}$ op
+$\intoo{0}{+\infty}$. Bewijs uniforme (niet normale)
+convergentie op $\intco{\delta}{\infty}$ via de resttermgrens
+van de alternerende reeks, continuïteit, en de functionaalvergelijking
+$F(x) + F(x + 1) = \frac1x$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:5}
+(Dini) Zij $f_n \colon K \to \R$ continu op een \emph{compacte}
+\omterm{def:b2:metric:def}{metrische ruimte}, met $f_n \to f$ \emph{puntsgewijs}, $f$
+continu, en $(f_n(x))$ \emph{dalend} in $n$ voor elke $x$.
+Bewijs dat de convergentie \omterm{def:b2:funcseq:def}{uniform} is. \emph{(Gegeven
+$\varepsilon$, de open verzamelingen $U_n = \{x : f_n(x) - f(x)
+< \varepsilon\}$ groeien en overdekken $K$; extraheer een
+eindige suboverdekking ---
+\cref{thm:b2:metric:borellebesgue}.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:6}
+Bewijs dat $\displaystyle\lim_{n\to\infty} \int_0^1
+\frac{n\,f(x)}{1 + n^2x^2}\,\dd x = \frac{\pi}{2} f(0)$ voor
+elke continue $f$ op $\intcc{0}{1}$. \emph{(Substitueer $u =
+nx$; splits $f(0)$ af; overheers.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:7}
+Bereken de \omterm{thm:b2:funcseq:weierstrass}{Bernsteinveeltermen} van $f(x) = x^2$ expliciet en
+verifieer de uniforme fout $\norm{B_n f - f}_\infty =
+O\bigl(\frac1n\bigr)$ voorspeld door het bewijs van
+\cref{thm:b2:funcseq:weierstrass} --- hier exact $\frac{x(1 -
+x)}{n}$ in elk punt.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:8}
+Bewijs dat als veeltermen $P_n$ \omterm{def:b2:funcseq:def}{uniform} convergeren \emph{op heel
+$\R$} naar $f$, dan is $f$ een veelterm. \emph{(Voor grote $m,
+n$ is $P_n - P_m$ een begrensde veelterm op $\R$, dus constant;
+de rij stabiliseert dus modulo constanten.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:funcseq:9}
+(Een continue, nergens differentieerbare functie --- geleid) Zij
+$\varphi$ de afstand tot het dichtstbijzijnde gehele getal
+($1$-periodiek, $\norm{\varphi}_\infty = \frac12$,
+$1$-Lipschitz) en
+\[
+W(x) = \sum_{n=0}^{\infty} \Bigl(\frac{3}{4}\Bigr)^{\!n}
+\varphi(4^n x) .
+\]
+Bewijs: (a) $W$ is continu op $\R$ (\omterm{def:b2:funcseq:series}{normale convergentie}); (b)
+voor elke $x$ en elke $m$, kiezend $h_m = \pm\frac12\cdot 4^{-m}$
+met het teken dat $\varphi$ affien maakt op het segment van
+$4^m x$ tot $4^m(x + h_m)$, voldoet het differentiequotiënt
+aan
+\[
+\Bigl|\frac{W(x + h_m) - W(x)}{h_m}\Bigr| \geq 3^m -
+\sum_{n<m} 3^n \geq \frac{3^m + 1}{2} \xrightarrow[m\to\infty]{}
+\infty
+\]
+(termen $n > m$ verdwijnen door periodiciteit; term $n = m$
+draagt precies $3^m$ bij; termen $n < m$ worden begrensd door de
+Lipschitz-eigenschap). Concludeer dat $W$ nergens
+differentieerbaar is.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:funcseq:10}
+Zij $u_n(x) = (-1)^n x^n(1 - x)$ op $\intcc{0}{1}$. Toon dat
+$\sum u_n$ puntsgewijs convergeert op $\intcc{0}{1}$ en bereken
+haar som; toon dat de convergentie \omterm{def:b2:funcseq:def}{uniform} is op $\intcc{0}{1}$
+\emph{(boundeer de restterm $R_N(x) = \sum_{n > N} u_n(x)$, een
+meetkundige staart, door haar eerste term en maximaliseer
+$x^{N+1}(1-x)$)} maar \emph{niet} \omterm{def:b2:funcseq:series}{normaal} \emph{(bereken
+$\norm{u_n}_\infty$)}: \omterm{def:b2:funcseq:def}{uniforme convergentie} is strikt zwakker
+dan \omterm{def:b2:funcseq:series}{normale convergentie}. Contrasteer met $\sum x^n(1-x)$,
+waarvan de som discontinu is in $1$: daar faalt zelfs de
+uniformiteit.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:11}
+Zij $f_n \to f$ \omterm{def:b2:funcseq:def}{uniform} op een \omterm{def:b2:metric:def}{metrische ruimte} $X$, elke $f_n$
+continu, en zij $x_n \to x$ in $X$. Bewijs $f_n(x_n) \to f(x)$.
+Toon met een voorbeeld op $X = \intcc{0}{1}$ dat \omterm{def:b2:funcseq:def}{puntsgewijze
+convergentie} niet volstaat, zelfs met $f$ continu
+\emph{(gebruik de bulten $g_n$ van \cref{exo:b2:funcseq:1} en
+$x_n = \frac{1}{\sqrt{2n}}$)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:funcseq:12}
+(Een Volterra-integraalvergelijking via reeksen) Voor $f \in
+C(\intcc{0}{1})$ definieer $Tf(x) = \int_0^x f(t)\,\dd t$.
+\begin{enumerate}
+  \item Toon door inductie dat voor $n \geq 1$:
+        \[
+        T^n f(x) = \int_0^x \frac{(x -
+        t)^{n-1}}{(n-1)!}\,f(t)\,\dd t,
+        \qquad
+        \norm{T^n f}_\infty \leq \frac{\norm f_\infty}{n!} .
+        \]
+  \item Leid af dat $S = \sum_{n\geq0} T^n f$ \omterm{def:b2:funcseq:series}{normaal} convergeert
+        op $\intcc{0}{1}$ en de integraalvergelijking $S = f +
+        TS$ oplost.
+  \item Verifieer dat $S(x) = f(x) + \int_0^x \eu^{x-t}f(t)\,\dd
+        t$ dezelfde vergelijking oplost, en bewijs uniciteit van
+        continue oplossingen \emph{(als $S = TS$ dan
+        $\norm{S}_\infty \leq \norm{T^nS}_\infty \to 0$)}:
+        concludeer de gesloten vorm van de som.
+\end{enumerate}
+\end{exercise}
+
+\section{Probleem: Benaderingssnelheden en de stelling van Korovkin}
+
+\begin{problem}\label{pb:b2:funcseq:1}
+Het Bernsteinbewijs van \cref{thm:b2:funcseq:weierstrass} verbergt
+twee schatten. Ten eerste is het \emph{kwantitatief}: hoe snel
+$B_nf \to f$ wordt beheerst door de modulus van continuïteit van
+$f$, met de scherpe snelheid bereikt door $\abs{x - \frac12}$.
+Ten tweede is het \emph{structureel}: al wat ertoe deed was dat
+$B_n$ een positieve lineaire operator is die zich goed gedraagt
+op $1$, $x$, $x^2$ --- die observatie, geïsoleerd, is de
+\emph{stelling van Korovkin}\index{stelling van Korovkin}. Dit
+probleem bewijst beide, en sluit af met de exacte asymptotiek van
+Voronovskaya. Doorheen, $f \in C(\intcc{0}{1})$, $M = \norm
+f_\infty$, $p_k(x) = \binom nk x^k(1-x)^{n-k}$, en $e_j$ duidt
+$x \mapsto x^j$ aan.
+
+\medskip
+\noindent\textbf{Deel I --- De Bernsteinoperator.}
+\begin{enumerate}
+  \item Toon dat $B_n$ lineair is, \emph{positief} ($f \geq 0
+        \Rightarrow B_nf \geq 0$), dus monotoon ($f \leq g
+        \Rightarrow B_nf \leq B_ng$), met
+        $\norm{B_nf}_\infty \leq \norm f_\infty$, en dat $B_nf$
+        $f$ interpoleert in beide eindpunten.
+  \item Herleid de identiteiten $B_n e_0 = e_0$, $B_n e_1 =
+        e_1$ en $B_n e_2 = e_2 + \frac{e_1 - e_2}{n}$
+        \emph{(differentieer $(x + y)^n$ tweemaal en zet $y = 1
+        - x$)}.
+  \item Leid de variantie-identiteit $\sum_k \bigl(\frac kn -
+        x\bigr)^2 p_k(x) = \frac{x(1-x)}{n}$ af en, via
+        Cauchy--Schwarz, de eerste-moment-grens
+        \[
+        \sum_{k=0}^{n}\Bigl|\frac kn - x\Bigr|\,p_k(x)
+        \leq \sqrt{\frac{x(1-x)}{n}} \leq \frac{1}{2\sqrt n} .
+        \]
+  \item Toon dat als $f$ convex is, dan $B_nf \geq f$ op
+        $\intcc{0}{1}$ \emph{(eindige ongelijkheid van Jensen
+        voor de gewichten $p_k(x)$)}.
+  \item (De telgrens van Chebyshev, herformuleerd) Voor $\delta
+        > 0$ toon
+        \[
+        \sum_{\abs{k/n - x} > \delta} p_k(x)
+        \leq \frac{x(1-x)}{n\delta^2}
+        \leq \frac{1}{4n\delta^2} ,
+        \]
+        en geef de probabilistische lezing: $B_nf(x)$ middeleert
+        $f$ over een binomiaal steekproefgemiddelde dat in $x$
+        concentreert.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel II --- Snelheden: de modulus van
+continuïteit.}
+Voor $\delta > 0$ zet $\omega(\delta) = \sup\{\abs{f(s) - f(t)}
+: s, t \in \intcc{0}{1},\ \abs{s - t} \leq \delta\}$.
+\begin{enumerate}[resume]
+  \item Toon: $\omega$ is eindig, niet-dalend, $\omega(\delta)
+        \to 0$ als $\delta \to 0^+$ (Heine), subadditief
+        ($\omega(\delta_1 + \delta_2) \leq \omega(\delta_1) +
+        \omega(\delta_2)$), en $\omega(\lambda\delta) \leq (1 +
+        \lambda)\,\omega(\delta)$ voor alle $\lambda > 0$.
+  \item Bewijs de meesterschatting, voor elke $\delta > 0$:
+        \[
+        \abs{B_nf(x) - f(x)}
+        \leq \sum_k \omega\Bigl(\Bigl|\frac kn -
+        x\Bigr|\Bigr)p_k(x)
+        \leq \Bigl(1 + \frac1\delta\sum_k\Bigl|\frac kn -
+        x\Bigr|p_k(x)\Bigr)\,\omega(\delta) .
+        \]
+  \item Kies $\delta = n^{-1/2}$ en concludeer de
+        \emph{kwantitatieve Weierstrassstelling}:
+        \[
+        \norm{B_nf - f}_\infty \leq
+        \frac32\,\omega\Bigl(\frac{1}{\sqrt n}\Bigr)
+        \xrightarrow[n\to\infty]{} 0 .
+        \]
+  \item Leid de snelheden af: $\norm{B_nf - f}_\infty \leq
+        \frac{3L}{2\sqrt n}$ voor $L$-Lipschitz $f$, en $\leq
+        \frac32 C n^{-\alpha/2}$ voor $\alpha$-Hölder $f$
+        ($\abs{f(s) - f(t)} \leq C\abs{s-t}^\alpha$).
+  \item (Het scherpe voorbeeld --- een binomiale identiteit) Voor
+        $m \geq 1$ bewijs
+        \[
+        \sum_{k=m+1}^{2m} (k - m)\binom{2m}{k}
+        = \frac{m}{2}\binom{2m}{m},
+        \qquad\text{dus}\qquad
+        \sum_{k=0}^{2m}\abs{k - m}\binom{2m}{k}
+        = m\binom{2m}{m}
+        \]
+        \emph{(gebruik $k\binom{2m}k = 2m\binom{2m-1}{k-1}$ en de
+        symmetrie van de binomiale lijn, die
+        $\sum_{j=m}^{2m-1}\binom{2m-1}{j} = 2^{2m-2}$
+        geeft)}.
+  \item Voor $f(t) = \abs{t - \frac12}$ leid de exacte waarde
+        en haar asymptotiek af (centraal binomiaal,
+        \cref{ex:b2:comparison:centralbinomial}):
+        \[
+        B_{2m}f\Bigl(\frac12\Bigr) - f\Bigl(\frac12\Bigr)
+        = \frac{\binom{2m}{m}}{2\cdot4^{m}}
+        \;\sim\; \frac{1}{2\sqrt{\pi m}} :
+        \]
+        de snelheid $\omega(n^{-1/2})$ van vraag~8 wordt bereikt
+        (tot op een constante) --- voor slechts continue $f$ is
+        Bernsteins $n^{-1/2}$ eerlijk.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel III --- De stelling van Korovkin.} Zij
+$(L_n)$ een rij van \emph{positieve lineaire} operatoren van
+$C(\intcc{0}{1})$ naar zichzelf zodanig dat $L_ne_j \to e_j$
+\omterm{def:b2:funcseq:def}{uniform} voor $j = 0, 1, 2$.
+\begin{enumerate}[resume]
+  \item Toon dat een positieve lineaire $L$ monotoon is en
+        $\abs{Lf} \leq L\abs f$ puntsgewijs vervult.
+  \item Toon: voor elke $\varepsilon > 0$ is er $\delta > 0$
+        zodanig dat voor \emph{alle} $s, x \in \intcc{0}{1}$:
+        \[
+        \abs{f(s) - f(x)} \leq \varepsilon +
+        \frac{2M}{\delta^2}(s - x)^2
+        \]
+        \emph{(behandel $\abs{s - x} \leq \delta$ via Heine en
+        $\abs{s-x} > \delta$ via de ruwe grens $2M$)}.
+  \item Fixeer $x$, pas $L_n$ toe op de ongelijkheid van vraag~13
+        in de variabele $s$, en leid af
+        \[
+        \abs{L_nf(x) - f(x)\,L_ne_0(x)}
+        \leq \varepsilon\,L_ne_0(x) + \frac{2M}{\delta^2}
+        \bigl(L_ne_2(x) - 2x\,L_ne_1(x) + x^2 L_ne_0(x)\bigr).
+        \]
+  \item Toon dat $\sup_x \bigl(L_ne_2(x) - 2x\,L_ne_1(x) + x^2
+        L_ne_0(x)\bigr) \to 0$, en assembleer dan de
+        \emph{stelling van Korovkin}: $L_nf \to f$ \omterm{def:b2:funcseq:def}{uniform} voor
+        \emph{elke} $f \in C(\intcc{0}{1})$.
+  \item Controleer dat $(B_n)$ aan de hypothesen van Korovkin
+        voldoet: Weierstrass een derde maal, vanuit drie
+        monomen.
+  \item Zij $I_n$ de stuksgewijs-affiene interpolatie-operator
+        in de knopen $\frac kn$. Toon dat $I_n$ positief lineair
+        is, $I_ne_0 = e_0$, $I_ne_1 = e_1$, en
+        $\norm{I_ne_2 - e_2}_\infty = \frac{1}{4n^2}$
+        \emph{(op elke cel is de fout van affiene interpolatie
+        van $t^2$ gelijk aan $(t - a)(b - t)$)}. Concludeer via
+        Korovkin: polygonale interpolanten convergeren \omterm{def:b2:funcseq:def}{uniform}
+        voor elke continue $f$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel IV --- Dividenden: dichtheid, momenten,
+afgeleiden.}
+\begin{enumerate}[resume]
+  \item Toon dat veeltermen met \emph{rationale} coëfficiënten
+        dicht liggen in $\bigl(C(\intcc{0}{1}),
+        \norm\cdot_\infty\bigr)$: deze \omterm{def:b2:nvs:banach}{Banachruimte} is
+        separabel.
+  \item (Momenten bepalen de functie) Zij $f \in
+        C(\intcc{0}{1})$ met $\int_0^1 f(t)\,t^n \dd t = 0$
+        voor elke $n \in \N$. Toon $\int_0^1 f P = 0$ voor
+        elke veelterm, dan $\int_0^1 f^2 = 0$, dan $f = 0$.
+  \item Bewijs de afgeleide-identiteit
+        \[
+        (B_nf)'(x) = n\sum_{k=0}^{n-1}\Bigl(
+        f\Bigl(\frac{k+1}{n}\Bigr) -
+        f\Bigl(\frac kn\Bigr)\Bigr)\,
+        \binom{n-1}{k}x^k(1-x)^{n-1-k}
+        \]
+        \emph{(differentieer $p_k$ en herindexeer --- een
+        Abelsommatie)}.
+  \item Stel $f$ is $C^1$. Via de middelwaardestelling in elke
+        toename en vergelijking met $B_{n-1}(f')$, toon
+        $(B_nf)' \to f'$ \omterm{def:b2:funcseq:def}{uniform} op $\intcc{0}{1}$. Leid af:
+        voor $f \in C^1$ bestaan veeltermen die naar $f$
+        convergeren \emph{samen met} hun afgeleiden.
+  \item Stel $f$ is $C^2$. Via Taylor--Lagrange in $x$ toon
+        \[
+        \abs{B_nf(x) - f(x)} \leq
+        \frac{\norm{f''}_\infty}{2}\cdot\frac{x(1-x)}{n}
+        \leq \frac{\norm{f''}_\infty}{8n} :
+        \]
+        gladheid verbetert de snelheid van $n^{-1/2}$ naar
+        $n^{-1}$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel V --- Verzadiging: de stelling van
+Voronovskaya.}
+\begin{enumerate}[resume]
+  \item Bewijs de vierde-moment-identiteit
+        \[
+        \sum_k (k - nx)^4 p_k(x)
+        = nx(1-x)\bigl(1 + 3(n-2)x(1-x)\bigr) \leq n^2
+        \quad (n \geq 1)
+        \]
+        \emph{(ontwikkel $k^4$ in dalende factorialen
+        $k(k-1)\cdots$ en gebruik de differentiatietruc van
+        vraag~2 nog tweemaal)}.
+  \item (Voronovskaya) Zij $f$ van klasse $C^2$ en $x \in
+        \intcc{0}{1}$. Schrijvend $f(t) = f(x) + f'(x)(t-x) +
+        \frac{f''(x)}2(t-x)^2 + \eta(t)(t-x)^2$ met $\eta$
+        begrensd en $\eta(t) \to 0$ als $t \to x$, bewijs
+        \[
+        n\bigl(B_nf(x) - f(x)\bigr)
+        \xrightarrow[n\to\infty]{}
+        \frac{x(1-x)}{2}\,f''(x)
+        \]
+        \emph{(splits de $\eta$-som bij $\abs{t - x} \leq
+        \delta$; beheer het verre deel met vraag~23)}. Dus de
+        fout van vraag~22 is exact in orde \emph{en} constante:
+        $B_n$ \emph{verzadigt} bij $\frac1n$, hoe glad $f$ ook
+        is --- vergelijk \cref{exo:b2:funcseq:7}.
+  \item Synthese. In één zin elk: (i) wat positiviteit alleen
+        kocht (Delen~I en~III); (ii) waar compactheid van
+        $\intcc{0}{1}$ in elk deel binnenkwam; (iii) waarom drie
+        testfuncties volstaan in de stelling van Korovkin; (iv)
+        de afweging die Bernstein maakt (robuuste $n^{-1/2}$
+        voor ruwe $f$, maar een $\frac1n$-plafond voor gladde
+        $f$), en welk hoofdstuk van dit boek hetzelfde spel
+        speelt met trigonometrische veeltermen.
+\end{enumerate}
+\end{problem}

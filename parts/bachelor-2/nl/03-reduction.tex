@@ -1,0 +1,993 @@
+\chapter{Reductie van endomorfismen}\label{ch:b2:reduction}
+
+Om een endomorfisme te begrijpen, vind de richtingen die het
+slechts rekt. Dit hoofdstuk bouwt de machinerie --- \omterm{def:b2:reduction:eigen}{eigenwaarden},
+karakteristieke en \omterm{def:b2:reduction:polyu}{minimale veeltermen}, het
+kernontbindingslemma --- en haar beloningen: diagonaliseerbaarheids-
+en trigonaliseerbaarheidscriteria, Cayley--Hamilton, de
+\omterm{thm:b2:reduction:dunford}{Dunford-ontbinding}, en de berekening van machten en
+exponentialen die \cref{ch:b2:diffeq} zal voeden. Overal is $E$
+een eindigdimensionale $K$-vectorruimte ($K = \R$ of $\C$) en $u
+\in \mathcal{L}(E)$, $n = \dim E$.
+
+\section{Eigenwaarden en eigenvectoren}
+
+\begin{definition}\label{def:b2:reduction:eigen}
+$\lambda \in K$ is een \emph{eigenwaarde}\index{eigenwaarde} van
+$u$ wanneer $u(x) = \lambda x$ voor zekere $x \neq 0$ (een
+\emph{eigenvector}); de \emph{eigenruimte} is $E_\lambda(u) =
+\ker(u - \lambda\,\mathrm{id})$. De verzameling van eigenwaarden
+is het \emph{spectrum}\index{spectrum} $\operatorname{Sp}(u)$.
+Een deelruimte $F$ is \emph{stabiel} wanneer $u(F) \subseteq F$;
+eigenruimten zijn stabiel, en stabiele deelruimten laten
+geïnduceerde endomorfismen $u|_F$ toe.
+\end{definition}
+
+\begin{theorem}[Onafhankelijkheid van eigenruimten]\label{thm:b2:reduction:independence}
+\omterm{def:b2:reduction:eigen}{Eigenvectoren} behorend bij paarsgewijs verschillende
+\omterm{def:b2:reduction:eigen}{eigenwaarden} vormen een vrije familie; equivalent, is de som
+van de \omterm{def:b2:reduction:eigen}{eigenruimten} $E_{\lambda_1} + \dots + E_{\lambda_r}$
+(verschillende $\lambda_i$) direct. In het bijzonder heeft $u$
+hoogstens $n$ \omterm{def:b2:reduction:eigen}{eigenwaarden}.
+\end{theorem}
+
+\begin{proof}
+Door inductie op $r$. Stel $x_1 + \dots + x_r = 0$ met $x_i \in
+E_{\lambda_i}$, de uitspraak bekend voor $r - 1$. Pas $u$ toe en
+trek $\lambda_r$ maal de relatie af:
+\[
+\sum_{i=1}^{r-1} (\lambda_i - \lambda_r)\, x_i = 0 ,
+\]
+dus door inductie elke $(\lambda_i - \lambda_r)x_i = 0$, d.w.z.\
+$x_i = 0$ voor $i < r$, dan $x_r = 0$. Directe sommen van
+niet-nulle ruimten in een ruimte van dimensie $n$ hebben
+hoogstens $n$ sommanden.
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=0.9, >={Stealth}]
+  \draw[gray!40] (-2.6,-2.2) grid (2.6,2.2);
+  \draw[->] (-2.6,0) -- (2.7,0) node[below, font=\small] {$x$};
+  \draw[->] (0,-2.2) -- (0,2.3) node[left, font=\small] {$y$};
+  \draw[omDef, very thick, ->] (0,0) -- (0.7,0.7)
+    node[above, font=\small] {$v_1$};
+  \draw[omDef, thick, ->, dashed] (0,0) -- (2.1,2.1)
+    node[above right, font=\small] {$Av_1 = 3v_1$};
+  \draw[omThm, very thick, ->] (0,0) -- (0.9,-0.9)
+    node[below, font=\small] {$v_2$};
+  \draw[omThm, thick, ->, dashed] (0,0) -- (0.9,-0.9);
+  \draw[omProp, very thick, ->] (0,0) -- (1,0)
+    node[below right, font=\small] {$e_1$};
+  \draw[omProp, thick, ->, dashed] (0,0) -- (2,1)
+    node[right, font=\small] {$Ae_1$};
+\end{tikzpicture}
+
+{\small De matrix $A = \begin{psmallmatrix}2 & 1\\ 1 &
+2\end{psmallmatrix}$ werkend op het vlak: de generieke vector
+$e_1$ wordt van haar lijn gestoten, maar de eigenrichtingen $v_1
+= (1,1)$ en $v_2 = (1,-1)$ worden slechts gerekt --- met $3$ en
+met $1$ (dus $Av_2 = v_2$: het gestippelde beeld valt samen met
+$v_2$). Diagonaliseren is de overgang naar de basis $(v_1,
+v_2)$, waar $A$ $\operatorname{diag}(3, 1)$ wordt.}
+\end{omfigure}
+
+\begin{definition}[Karakteristieke veelterm]\label{def:b2:reduction:charpoly}
+$\chi_u(X) = \det(X\,\mathrm{id} - u)$\index{karakteristieke
+veelterm} --- berekend in elke basis als $\det(XI_n - A)$, een
+monische veelterm van graad $n$, invariant onder
+gelijkvormigheid (\cref{thm:b2:linalg:detrules}). Haar wortels
+in $K$ zijn precies de \omterm{def:b2:reduction:eigen}{eigenwaarden} ($\lambda$ \omterm{def:b2:reduction:eigen}{eigenwaarde}
+$\iff u - \lambda\,\mathrm{id}$ niet injectief $\iff
+\chi_u(\lambda) = 0$), en
+\[
+\chi_u(X) = X^n - (\operatorname{tr} u)\, X^{n-1} + \dots +
+(-1)^n \det u .
+\]
+De \emph{algebraïsche multipliciteit}\index{algebraïsche
+multipliciteit} $m_\lambda$ van een \omterm{def:b2:reduction:eigen}{eigenwaarde} is haar
+multipliciteit als wortel van $\chi_u$; de \emph{meetkundige
+multipliciteit}\index{meetkundige multipliciteit} is $\dim
+E_\lambda$, en $1 \leq \dim E_\lambda \leq m_\lambda$.
+\end{definition}
+
+\begin{proof}[Bewijs van de gestelde feiten]
+De coëfficiëntclaims: ontwikkel $\det(XI - A)$ door de
+permutatieformule; de identiteitspermutatie draagt $\prod_i (X -
+a_{ii}) = X^n - (\sum a_{ii})X^{n-1} + \dots$ bij, en elke
+andere permutatie fixeert hoogstens $n - 2$ diagonaalposities,
+bijdragend graad $\leq n - 2$: de top twee coëfficiënten zijn
+zoals gesteld; $X = 0$ geeft de constante term $\det(-A) =
+(-1)^n\det A$.
+
+Meetkundig $\leq$ algebraïsch: zij $d = \dim E_\lambda$ en vul
+een basis van $E_\lambda$ aan tot een basis van $E$; de matrix
+van $u$ is blokbovendriehoekig met linksboven blok $\lambda
+I_d$, dus $\chi_u(X) = (X - \lambda)^d\,
+\chi_{\text{(onderblok)}}(X)$: de multipliciteit van $\lambda$
+is minstens $d$.
+\end{proof}
+
+\begin{example}[Zelfde $\chi$, verschillende meetkunde]\label{ex:b2:reduction:samechi}
+De matrices
+\[
+\begin{pmatrix}2 & 0\\ 0 & 2\end{pmatrix}
+\qquad\text{en}\qquad
+\begin{pmatrix}2 & 1\\ 0 & 2\end{pmatrix}
+\]
+delen de \omterm{def:b2:reduction:charpoly}{karakteristieke veelterm} $(X - 2)^2$, het spoor, de
+\omterm{def:b2:linalg:det}{determinant}, het \omterm{def:b2:reduction:eigen}{spectrum} --- maar zijn niet gelijkvormig: de
+eerste heeft $E_2$ van dimensie $2$ (\omterm{def:b2:reduction:charpoly}{meetkundige multipliciteit}
+$2$), de tweede van dimensie $1$. De \omterm{def:b2:reduction:charpoly}{karakteristieke veelterm}
+ziet alleen \omterm{def:b2:reduction:charpoly}{algebraïsche multipliciteiten}; de
+eigenruimtedimensies zijn de fijnere invariant, en de \omterm{def:b2:reduction:polyu}{minimale
+veelterm} beslecht ($X - 2$ versus $(X - 2)^2$). Moraal voor alle
+diagonaliseerbaarheidsdiscussies: $\chi$ shortlist de
+kandidaten, maar kernen brengen de stemmen uit.
+\end{example}
+
+\begin{definition}[Diagonaliseerbaar, trigonaliseerbaar]\label{def:b2:reduction:diag}
+$u$ is \emph{diagonaliseerbaar}\index{diagonaliseerbaar} wanneer
+$E$ een basis van \omterm{def:b2:reduction:eigen}{eigenvectoren} heeft (matrix: gelijkvormig met
+een diagonaalmatrix); \emph{trigonaliseerbaar}\index{trigonaliseerbaar}
+wanneer haar matrix in zekere basis bovendriehoekig is.
+\end{definition}
+
+\begin{theorem}[Diagonaliseerbaarheidscriteria]\label{thm:b2:reduction:diagcrit}
+De volgende zijn equivalent:
+\begin{enumerate}
+  \item $u$ is \omterm{def:b2:reduction:diag}{diagonaliseerbaar};
+  \item $E = \bigoplus_{\lambda \in \operatorname{Sp} u} E_\lambda$;
+  \item $\chi_u$ splitst over $K$ en $\dim E_\lambda = m_\lambda$
+        voor elke \omterm{def:b2:reduction:eigen}{eigenwaarde};
+  \item (voldoende, niet noodzakelijk) $\chi_u$ heeft $n$
+        verschillende wortels in $K$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1 $\iff$ 2): een basis van \omterm{def:b2:reduction:eigen}{eigenvectoren} sorteert in bases van
+de $E_\lambda$'s, en omgekeerd geeft concatenatie van bases van
+de directe sommanden een basis van $E$
+(\cref{thm:b2:reduction:independence} maakt de som direct;
+dimensiegelijkheid maakt haar alles).
+
+(2 $\iff$ 3): in de diagonale basis splitst $\chi_u = \prod (X -
+\lambda)^{\dim E_\lambda}$ met matchende multipliciteiten.
+Omgekeerd, stel $\chi_u$ splitst met $\dim E_\lambda =
+m_\lambda$ overal; dan heeft de directe som van de \omterm{def:b2:reduction:eigen}{eigenruimten}
+(direct door \cref{thm:b2:reduction:independence}) dimensie
+\[
+\sum_{\lambda}\dim E_\lambda = \sum_{\lambda} m_\lambda =
+\deg\chi_u = n ,
+\]
+de middelste gelijkheid omdat de graad van een gesplitste
+veelterm de som van haar wortelmultipliciteiten is: de som is
+heel $E$. Merk waar elke hypothese werkte: splijting vulde de
+graad, multipliciteitsgelijkheid vulde de dimensies.
+
+(4 $\Rightarrow$ 1): $n$ verschillende \omterm{def:b2:reduction:eigen}{eigenwaarden} geven $n$
+onafhankelijke \omterm{def:b2:reduction:eigen}{eigenvectoren}
+(\cref{thm:b2:reduction:independence}): een basis.
+\end{proof}
+
+\begin{method}[Diagonaliseerbaarheid beslissen]\label{met:b2:reduction:decide}
+In de praktijk, test in deze volgorde --- elke stap kan de
+klus klaren. (1) Presenteert zich een annulerende veelterm met
+eenvoudige gesplitste wortels ($u^2 = \mathrm{id}$, $u^2 = u$,
+$u^k = \mathrm{id}$)? Zo ja: \omterm{def:b2:reduction:diag}{diagonaliseerbaar}, geen berekening
+(\cref{cor:b2:reduction:minpolycrit} hieronder). (2) Bereken
+$\chi_u$; als ze $n$ verschillende wortels in $K$ heeft:
+\omterm{def:b2:reduction:diag}{diagonaliseerbaar} (\cref{thm:b2:reduction:diagcrit}~(4)). (3)
+Anders, voor elke meervoudige wortel $\lambda$ alleen, vergelijk
+$\dim\ker(u - \lambda\,\mathrm{id})$ met de multipliciteit
+$m_\lambda$: elk tekort doodt diagonaliseerbaarheid; gelijkheid
+overal bewijst ze. Bereken nooit \omterm{def:b2:reduction:eigen}{eigenruimten} van enkelvoudige
+wortels (hun dimensie is gedwongen $1$), en trigonaliseer nooit
+alleen om te beslissen.
+\end{method}
+
+\begin{example}[Diagonaliseren aan het werk]\label{ex:b2:reduction:diagwork}
+$A = I + J = \begin{psmallmatrix}2 & 1 & 1\\ 1 & 2 & 1\\ 1 & 1 &
+2\end{psmallmatrix}$, met $J$ de all-eens-matrix: uit
+$\operatorname{Sp}(J) = \{3, 0\}$
+(\cref{ex:b2:linalg:onesmatrix}), $\operatorname{Sp}(A) = \{4,
+1\}$, met \omterm{def:b2:reduction:eigen}{eigenruimten} $\R(1,1,1)$ en het vlak $\{x + y + z =
+0\}$: dimensies $1 + 2 = 3$, \omterm{def:b2:reduction:diag}{diagonaliseerbaar}
+(\cref{thm:b2:reduction:diagcrit}~(2)). Machten zonder enige
+basisveranderingsmatrix: met $\Pi = J/3$ de projector op
+$\R(1,1,1)$,
+\[
+A = 4\,\Pi + 1\cdot(I - \Pi)
+\quad\Longrightarrow\quad
+A^k = 4^k\,\Pi + (I - \Pi)
+= \frac{4^k - 1}{3}\,J + I .
+\]
+(Controle $k = 1$: $\frac{4-1}3 J + I = A$.) Het sluitende
+inzicht: wanneer de \omterm{def:b2:reduction:eigen}{eigenruimten} zichtbaar zijn, berekenen
+spectrale \emph{projectoren} machten sneller dan $PDP^{-1}$ ooit
+zal --- en de formule toont de dynamica: $A^k$ groeit als $4^k$
+langs $(1,1,1)$ en blijft staan op het orthogonale vlak.
+\end{example}
+
+\begin{theorem}[Trigonalisatie]\label{thm:b2:reduction:trigonalization}
+$u$ is \omterm{def:b2:reduction:diag}{trigonaliseerbaar} over $K$ desda $\chi_u$ over $K$
+splitst. In het bijzonder is elk endomorfisme van een
+$\C$-vectorruimte \omterm{def:b2:reduction:diag}{trigonaliseerbaar}.\index{trigonalisatie}
+\end{theorem}
+
+\begin{proof}
+($\Rightarrow$) De \omterm{def:b2:reduction:charpoly}{karakteristieke veelterm} van een driehoekige
+matrix is $\prod(X - t_{ii})$: gesplitst.
+
+($\Leftarrow$) Inductie op $n$. Omdat $\chi_u$ splitst, heeft ze
+een wortel $\lambda$: kies een \omterm{def:b2:reduction:eigen}{eigenvector} $e_1$. In een basis
+beginnend met $e_1$ is de matrix $\begin{pmatrix} \lambda &
+\ast\\ 0 & B\end{pmatrix}$, en $\chi_u = (X - \lambda)\chi_B$:
+$\chi_B$ splitst ook. Door de inductiehypothese toegepast op de
+$(n-1) \times (n-1)$-matrix $B$ is er een inverteerbare $Q$ met
+$Q^{-1}BQ$ bovendriehoekig; conjugatie van de hele matrix door
+$\begin{pmatrix}1 & 0\\ 0 & Q\end{pmatrix}$ driehoekigt haar.
+\end{proof}
+
+\begin{example}[Met de hand trigonaliseren]\label{ex:b2:reduction:trigwork}
+$B = \begin{pmatrix}3 & -1\\ 1 & 1\end{pmatrix}$: $\chi_B = X^2
+- 4X + 4 = (X - 2)^2$, en $\ker(B - 2I) =
+\ker\begin{psmallmatrix}1 & -1\\ 1 & -1\end{psmallmatrix}$ is
+de lijn opgespannen door $e_1' = (1, 1)$: één \omterm{def:b2:reduction:eigen}{eigenwaarde}, een
+eendimensionale \omterm{def:b2:reduction:eigen}{eigenruimte} --- niet \omterm{def:b2:reduction:diag}{diagonaliseerbaar}, maar
+\omterm{def:b2:reduction:diag}{trigonaliseerbaar} (\cref{thm:b2:reduction:trigonalization}).
+Vul de basis aan met $e_2' = (1, 0)$ en bereken:
+\[
+u(e_1') = (2, 2) = 2e_1',
+\qquad
+u(e_2') = (3, 1) = 1\cdot e_1' + 2\, e_2' ,
+\]
+dus in de basis $(e_1', e_2')$ is de matrix $T =
+\begin{psmallmatrix}2 & 1\\ 0 & 2\end{psmallmatrix}$. Het
+sluitende inzicht: de diagonaal van $T$ was gedwongen (beide
+entries moeten de dubbele \omterm{def:b2:reduction:eigen}{eigenwaarde} $2$ zijn); alleen de
+hoekentry hing af van de keuze van $e_2'$, en herschalen van
+$e_2'$ kan er elke niet-nulle waarde van maken --- de
+weerstandige ``$1$'' is de schaduw van het nilpotente deel dat
+Dunford zal isoleren.
+\end{example}
+
+\section{Veeltermen van een endomorfisme}
+
+\begin{definition}\label{def:b2:reduction:polyu}
+Voor $P = \sum a_k X^k \in K[X]$, stel $P(u) = \sum a_k u^k \in
+\mathcal{L}(E)$. De afbeelding $P \mapsto P(u)$ is een morfisme
+van algebras $K[X] \to \mathcal{L}(E)$
+(\cref{def:b2:structures:algebra}); haar kern $\{P : P(u) =
+0\}$ is een \omterm{def:b2:structures:ideal}{ideaal} van $K[X]$, niet-nul (de familie
+$(\mathrm{id}, u, \dots, u^{n^2})$ is afhankelijk in de
+$n^2$-dimensionale $\mathcal{L}(E)$), dus voortgebracht door een
+unieke monische veelterm $\mu_u$: de \emph{minimale
+veelterm}\index{minimale veelterm}
+(\cref{thm:b2:structures:principal}).
+\end{definition}
+
+\begin{proposition}\label{prop:b2:reduction:minpoly}
+\begin{enumerate}
+  \item $P(u) = 0 \iff \mu_u \mid P$; \omterm{def:b2:reduction:eigen}{eigenwaarden} van $u$ zijn
+        wortels van elke annulerende veelterm, en de wortels van
+        $\mu_u$ zijn \emph{precies} de \omterm{def:b2:reduction:eigen}{eigenwaarden}.
+  \item Als $F$ stabiel is, $\mu_{u|_F} \mid \mu_u$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(1) De deelbaarheid is de definitie van een voortbrenger. Als
+$u(x) = \lambda x$, $x \neq 0$, dan $0 = P(u)(x) = P(\lambda)x$,
+dus $P(\lambda) = 0$: \omterm{def:b2:reduction:eigen}{eigenwaarden} zijn wortels van
+\omterm{def:b2:linalg:annihilator}{annihilatoren}, in het bijzonder van $\mu_u$. Omgekeerd, als
+$\lambda$ een wortel is, $\mu_u = (X - \lambda)Q$ met $Q(u)
+\neq 0$ (graad van $\mu_u$ minimaal): kies $y$ met $Q(u)(y)
+\neq 0$; dan $(u - \lambda)(Q(u)(y)) = \mu_u(u)(y) = 0$
+vertoont de \omterm{def:b2:reduction:eigen}{eigenvector} $Q(u)(y)$.
+
+(2) $\mu_u(u|_F) = \mu_u(u)|_F = 0$, en pas (1) toe op $u|_F$.
+\end{proof}
+
+\begin{example}[Minimale veeltermen met de hand gevonden]\label{ex:b2:reduction:minpolyhand}
+De \omterm{def:b2:reduction:polyu}{minimale veelterm} wordt berekend door opeenvolgende graden te
+testen. Voor de all-eens-matrix $J \in \mathcal{M}_3(\R)$: $J
+\neq \lambda I$ (graad $1$ is uit), en $J^2 = 3J$, dus
+\[
+\mu_J = X^2 - 3X = X(X - 3) :
+\]
+graad $2$, gesplitst, enkelvoudige wortels --- $J$ is
+\omterm{def:b2:reduction:diag}{diagonaliseerbaar} met \omterm{def:b2:reduction:eigen}{spectrum} $\{0, 3\}$
+(\cref{cor:b2:reduction:minpolycrit} hieronder), bevestigend
+\cref{ex:b2:linalg:onesmatrix} zonder één enkele \omterm{def:b2:linalg:det}{determinant}.
+Voor de swapmatrix $A$ van
+\cref{ex:b2:reduction:projectorswork}: $A \neq \pm I$ en $A^2
+= I$ geven $\mu_A = X^2 - 1$. In beide gevallen is het patroon
+hetzelfde: raad een lage-graad-identiteit uit de structuur (rang
+één dwingt $J^2 = (\operatorname{tr}J)\,J$; een involutie dwingt
+$A^2 = I$), controleer dan dat geen echte deler annuleert.
+\omterm{def:b2:reduction:polyu}{Minimale veeltermen} worden meestal \emph{gevonden}, niet
+berekend uit $\chi$.
+\end{example}
+
+\begin{theorem}[Kernontbindingslemma]\label{thm:b2:reduction:kernels}
+Als $P = P_1 P_2 \cdots P_r$ met de $P_i$ paarsgewijs relatief
+priem, dan\index{kernontbindingslemma}
+\[
+\ker P(u) = \ker P_1(u) \oplus \dots \oplus \ker P_r(u),
+\]
+en de projecties op de sommanden zijn veeltermen in $u$.
+\end{theorem}
+
+\begin{proof}
+Het volstaat $r = 2$ te behandelen en te induceren. Bézout in
+$K[X]$ (\cref{thm:b2:structures:principal}): $U P_1 + V P_2 =
+1$, dus voor elke $x$,
+\[
+x = \underbrace{U(u)P_1(u)(x)}_{=:\,x_2}
++ \underbrace{V(u)P_2(u)(x)}_{=:\,x_1}.
+\]
+Als $x \in \ker P(u)$: $P_2(u)(x_2) = U(u)\,P(u)(x) = 0$
+(veeltermen in $u$ commuten), dus $x_2 \in \ker P_2(u)$, en
+symmetrisch $x_1 \in \ker P_1(u)$: de som vult $\ker P(u)$;
+beide sommanden zitten in $\ker P(u)$ ($P_i \mid P$). Directheid:
+$x \in \ker P_1(u) \cap \ker P_2(u)$ geeft $x =
+U(u)P_1(u)x + V(u)P_2(u)x = 0$. De formules voor $x_1, x_2$
+vertonen de projecties als $V(u)P_2(u)$ en $U(u)P_1(u)$.
+\end{proof}
+
+\begin{example}[Het kernlemma met expliciete projectoren]\label{ex:b2:reduction:projectorswork}
+Zij $A = \begin{psmallmatrix}0 & 1 & 0\\ 1 & 0 & 0\\ 0 & 0 &
+1\end{psmallmatrix}$ (verwissel de eerste twee coördinaten).
+Dan $A^2 = I$: de veelterm $X^2 - 1 = (X - 1)(X + 1)$
+annuleert $A$, haar factoren zijn relatief priem, en Bézout is
+expliciet:
+\[
+\frac{1}{2}(X + 1) - \frac12(X - 1) = 1 .
+\]
+Het bewijs van \cref{thm:b2:reduction:kernels} volgend, zijn de
+projecties op $\ker(A - I)$ en $\ker(A + I)$ de veeltermen in
+$A$
+\[
+\pi_+ = \frac{A + I}{2} = \frac12\begin{pmatrix}
+1 & 1 & 0\\ 1 & 1 & 0\\ 0 & 0 & 2\end{pmatrix},
+\qquad
+\pi_- = \frac{I - A}{2} = \frac12\begin{pmatrix}
+1 & -1 & 0\\ -1 & 1 & 0\\ 0 & 0 & 0\end{pmatrix}.
+\]
+Controle: $\pi_+ + \pi_- = I$, $\pi_+\pi_- = 0$, $\pi_\pm^2 =
+\pi_\pm$, en de beelden zijn het vlak $\{x = y\}$
+(symmetrische vectoren, \omterm{def:b2:reduction:eigen}{eigenwaarde} $1$) en de lijn $\R(1, -1,
+0)$ (antisymmetrisch, \omterm{def:b2:reduction:eigen}{eigenwaarde} $-1$). Het kernlemma is geen
+bestaanuitspraak: Bézout-coëfficiënten \emph{zijn} de
+projectorformules.
+\end{example}
+
+\begin{example}[Projectoren berekenen ook de exponentiaal]\label{ex:b2:reduction:expprojectors}
+Dezelfde swapmatrix, één dividend verder. Omdat $A = \pi_+ -
+\pi_-$ met algebraïsch-orthogonale projectoren ($\pi_+\pi_- =
+0$), gehoorzaamt elke macht $A^k = \pi_+ + (-1)^k\pi_-$, en de
+exponentiaalreeks hergroepeert per projector:
+\[
+\eu^{tA} = \sum_k \frac{t^k}{k!}\bigl(\pi_+ +
+(-1)^k\pi_-\bigr)
+= \eu^{t}\,\pi_+ + \eu^{-t}\,\pi_- =
+\begin{pmatrix}
+\cosh t & \sinh t & 0\\
+\sinh t & \cosh t & 0\\
+0 & 0 & \eu^{t}
+\end{pmatrix}.
+\]
+(Controle $t = 0$: de identiteit; afgeleide in $0$: $A$.) De
+eigenontbinding zet een matrixreeks om in twee scalaire reeksen
+--- precies het mechanisme dat \cref{ch:b2:diffeq} op elk
+\omterm{def:b2:reduction:diag}{diagonaliseerbaar} stelsel zal draaien, en de reden dat
+hyperbolische functies symmetrische koppelingen regeren.
+\end{example}
+
+\begin{corollary}[Diagonaliseerbaarheid via de minimale veelterm]\label{cor:b2:reduction:minpolycrit}
+$u$ is \omterm{def:b2:reduction:diag}{diagonaliseerbaar} $\iff$ $\mu_u$ splitst over $K$ met
+\emph{enkelvoudige} wortels $\iff$ zekere annulerende veelterm
+van $u$ splitst met enkelvoudige wortels.
+\end{corollary}
+
+\begin{proof}
+Als $P(u) = 0$ met $P = \prod_{i}(X - \lambda_i)$ (verschillende
+$\lambda_i$), geeft het lemma $E = \ker P(u) = \bigoplus_i
+\ker(u - \lambda_i)$: een directe som van \omterm{def:b2:reduction:eigen}{eigenruimten}, dus is
+$u$ \omterm{def:b2:reduction:diag}{diagonaliseerbaar} (\cref{thm:b2:reduction:diagcrit}).
+Omgekeerd wordt een diagonaliseerbare $u$ gedood door
+$\prod_{\lambda \in \operatorname{Sp}u}(X - \lambda)$ (ze doodt
+elke \omterm{def:b2:reduction:eigen}{eigenruimte}), die splitst met enkelvoudige wortels; en
+$\mu_u$ deelt haar terwijl ze dezelfde wortels heeft
+(\cref{prop:b2:reduction:minpoly}): $\mu_u$ is precies dat
+product.
+\end{proof}
+
+\begin{example}\label{ex:b2:reduction:projections}
+Projecties voldoen aan $p^2 = p$: geannuleerd door $X(X-1)$,
+gesplitst enkelvoudige wortels --- \omterm{def:b2:reduction:diag}{diagonaliseerbaar} met
+\omterm{def:b2:reduction:eigen}{spectrum} $\subseteq \{0, 1\}$, en $E = \ker p \oplus \ker(p -
+\mathrm{id})$: de meetkundige analyse van Jaar~1, opnieuw
+bewezen in één regel. Symmetrieën ($s^2 = \mathrm{id}$,
+\omterm{def:b2:linalg:annihilator}{annihilator} $X^2 - 1$): \omterm{def:b2:reduction:diag}{diagonaliseerbaar} wanneer
+$\operatorname{char} K \neq 2$, \omterm{def:b2:reduction:eigen}{spectrum} $\subseteq \{\pm 1\}$.
+Een endomorfisme met $u^3 = u^2$ en $u^2 \neq u$: geannuleerd
+door $X^2(X - 1)$, \emph{niet} noodzakelijk \omterm{def:b2:reduction:diag}{diagonaliseerbaar}
+--- het criterium detecteert het (dubbele wortel $0$ moet worden
+getest: \omterm{def:b2:reduction:diag}{diagonaliseerbaar} desda bovendien $\ker u^2 = \ker u$).
+\end{example}
+
+\begin{example}[Het lichaam beslist: een rotatie in $\R^3$]\label{ex:b2:reduction:rotation3d}
+Zij $R$ de kwartslag om de $z$-as:
+\[
+R = \begin{pmatrix}
+0 & -1 & 0\\
+1 & 0 & 0\\
+0 & 0 & 1
+\end{pmatrix},
+\qquad
+\chi_R = (X - 1)(X^2 + 1).
+\]
+Over $\R$: de enige \omterm{def:b2:reduction:eigen}{eigenwaarde} is $1$, met \omterm{def:b2:reduction:eigen}{eigenruimte} de as
+$\R e_3$ --- één lijn vaste vectoren, en geen verdere reductie:
+$R$ is noch \omterm{def:b2:reduction:diag}{diagonaliseerbaar} noch \omterm{def:b2:reduction:diag}{trigonaliseerbaar} in
+$\mathcal{M}_3(\R)$ ($\chi_R$ splitst niet). Over $\C$: drie
+verschillende \omterm{def:b2:reduction:eigen}{eigenwaarden} $1, \iu, -\iu$, dus is $R$
+\omterm{def:b2:reduction:diag}{diagonaliseerbaar}, met \omterm{def:b2:reduction:eigen}{eigenvectoren} $e_3$ en $e_1 \mp \iu
+e_2$. De meetkunde was hoorbaar in de algebra: rotaties in het
+vlak hebben geen reële invariante richtingen, en de complexe
+\omterm{def:b2:reduction:eigen}{eigenwaarden} $\pm\iu$ van modulus $1$ bewaren de hoek
+($\pm\frac\pi2$) die de reële matrix alleen kan uitdrukken door
+coördinaten te mengen.
+\end{example}
+
+\begin{example}[Minimaal versus karakteristiek]\label{ex:b2:reduction:minvschar}
+Voor $D = \operatorname{diag}(2, 2, 3)$: $\chi_D = (X - 2)^2(X -
+3)$ maar $\mu_D = (X - 2)(X - 3)$, omdat $(D - 2I)(D - 3I) = 0$
+(controleer op de canonieke basis) terwijl geen van beide
+factoren alleen $D$ doodt. Voor het shiftblok $N =
+\begin{psmallmatrix}0 & 1\\ 0 & 0\end{psmallmatrix} \oplus
+(3)$, d.w.z.\ $N' = \begin{psmallmatrix}0 & 1 & 0\\ 0 & 0 & 0\\
+0 & 0 & 3\end{psmallmatrix}$: $\chi_{N'} = X^2(X - 3)$
+\emph{en} $\mu_{N'} = X^2(X - 3)$ --- de dubbele wortel is echt
+nodig omdat $N'$ niet \omterm{def:b2:reduction:diag}{diagonaliseerbaar} is aan de kern-kant
+($N'e_2 = e_1 \neq 0$). Vuistregel: $\mu$ en $\chi$ delen hun
+wortels (\cref{prop:b2:reduction:minpoly}); de multipliciteit in
+$\mu$ meet de grootte van het grootste nilpotente blok, die in
+$\chi$ de totale dimensie van de karakteristieke deelruimte.
+\end{example}
+
+\begin{theorem}[Cayley--Hamilton]\label{thm:b2:reduction:cayleyhamilton}
+$\chi_u(u) = 0$; bijgevolg $\mu_u \mid \chi_u$, en $\deg \mu_u
+\leq n$.\index{stelling van Cayley--Hamilton}
+\end{theorem}
+
+\begin{proof}
+Fixeer $x \neq 0$ en zij $d$ maximaal met $(x, u(x), \dots,
+u^{d-1}(x))$ vrij; schrijf
+\[
+u^d(x) = -a_0 x - a_1 u(x) - \dots - a_{d-1}u^{d-1}(x),
+\]
+en stel $P_x = X^d + a_{d-1}X^{d-1} + \dots + a_0$, dus
+$P_x(u)(x) = 0$. Vul de vrije familie aan tot een basis van $E$:
+daarop heeft $u$ blokvorm $\begin{pmatrix} C & \ast\\ 0 &
+D\end{pmatrix}$ waarbij $C$ de begeleidende matrix van $P_x$ is,
+waarvan de \omterm{def:b2:reduction:charpoly}{karakteristieke veelterm} $P_x$ is (ontwikkel
+$\det(XI - C)$ langs de eerste kolom, door inductie op $d$).
+Dus $\chi_u = P_x \cdot \chi_D$, en
+\[
+\chi_u(u)(x) = \chi_D(u)\bigl(P_x(u)(x)\bigr) = 0 .
+\]
+Het argument geldt voor elke $x$: $\chi_u(u) = 0$.
+\end{proof}
+
+\begin{example}[Cayley--Hamilton aan het werk]\label{ex:b2:reduction:chwork}
+$A = \begin{pmatrix} 1 & 2\\ 3 & 4\end{pmatrix}$: $\chi_A = X^2
+- 5X - 2$, dus $A^2 = 5A + 2I$. Elke macht van $A$ stort in tot
+een combinatie van $I$ en $A$:
+\[
+A^4 = (5A + 2I)^2 = 25A^2 + 20A + 4I = 145A + 54I =
+\begin{pmatrix} 199 & 290\\ 435 & 634\end{pmatrix},
+\]
+en de inverse komt gratis: $A(A - 5I) = 2I$ geeft
+\[
+A^{-1} = \tfrac12(A - 5I)
+= \begin{pmatrix} -2 & 1\\ 3/2 & -1/2\end{pmatrix}.
+\]
+Het sluitende inzicht: Cayley--Hamilton comprimeert heel de
+algebra $K[A]$ tot $\operatorname{Vect}(I, A, \dots, A^{n-1})$
+--- $\dim K[A] = \deg\mu_A \leq n$, hoe groot de machten die u
+nodig heeft ook zijn.
+\end{example}
+
+\begin{remark}[Veelvoorkomende valkuilen]\label{rem:b2:reduction:pitfalls}
+(i) \omterm{def:b2:reduction:eigen}{Eigenwaarden} tellen niet op: $\operatorname{Sp}(A + B)$ is
+niet $\operatorname{Sp}A + \operatorname{Sp}B$, en een som van
+diagonaliseerbare matrices hoeft niet \omterm{def:b2:reduction:diag}{diagonaliseerbaar} te zijn
+--- $\begin{psmallmatrix}1 & 1\\ 0 & 0\end{psmallmatrix} +
+\begin{psmallmatrix}0 & 0\\ 0 & 1\end{psmallmatrix} =
+\begin{psmallmatrix}1 & 1\\ 0 & 1\end{psmallmatrix}$ is een som
+van twee diagonaliseerbare matrices (elk heeft verschillende
+\omterm{def:b2:reduction:eigen}{eigenwaarden}) en is niet \omterm{def:b2:reduction:diag}{diagonaliseerbaar}; alleen
+\emph{commuterende} families gedragen zich
+(\cref{exo:b2:reduction:9}). (ii) ``$\chi_u$ splitst'' is een
+hypothese over het \emph{lichaam}: een vlakrotatie heeft $\chi
+= X^2 - 2\cos\theta\,X + 1$, gesplitst over $\C$, niet over $\R$
+--- \omterm{def:b2:reduction:diag}{diagonaliseerbaar} in $\mathcal{M}_2(\C)$, niet
+\omterm{def:b2:reduction:diag}{trigonaliseerbaar} in $\mathcal{M}_2(\R)$. (iii) De
+ongelijkheid loopt meetkundig $\leq$ algebraïsch, nooit
+omgekeerd; alleen $\dim E_\lambda \geq 1$ testen bewijst niets
+over diagonaliseerbaarheid. (iv) $\mu_u$ is niet $\chi_u$:
+gelijkheid geldt precies wanneer elke \omterm{def:b2:reduction:eigen}{eigenwaarde} een enkele
+blokketen heeft (bijv.\ begeleidende matrices, het
+weekendprobleem van dit hoofdstuk); $\chi$ gebruiken waar $\mu$
+nodig is blaast elke machtsberekening op. (v) Dunfords $d$ en
+$\nu$ zijn veeltermen in $u$ --- een ontbinding $u = d' + \nu'$
+met de juiste eigenschappen maar $d'\nu' \neq \nu'd'$ is
+\emph{niet} Dunford en is nooit uniek.
+\end{remark}
+
+\begin{remark}[Waar dit hoofdstuk wordt gebruikt]
+Reductie is het werkpaard van de rest van het boek: machten en
+exponentialen van matrices drijven de lineaire
+differentiaalstelsels van \cref{ch:b2:diffeq}; de
+spectraalstelling van \cref{ch:b2:quadratic} is
+diagonaliseren orthogonaal gemaakt; genererende functies
+(\cref{ch:b2:genfun}) herleiden de recurrentie-asymptotiek van
+het weekendprobleem van dit hoofdstuk analytisch. In het
+Bachelor jaar~3-volume loopt hetzelfde programma in oneindige
+dimensie: de spectraaltheorie van compacte zelfgeadjungeerde
+operatoren, waar eigenwaardenvolgordes eindige spectra
+vervangen, en de Perron--Frobenius-theorie van positieve
+matrices, die verklaart \emph{waarom} dominante \omterm{def:b2:reduction:eigen}{eigenwaarden}
+van telproblemen positief en enkelvoudig zijn.
+\end{remark}
+
+\section{Nilpotenten en de Dunford-ontbinding}
+
+\begin{proposition}[Nilpotente endomorfismen]\label{prop:b2:reduction:nilpotent}
+Voor $u$ met $\chi_u$ gesplitst zijn de volgende equivalent:
+$u^n = 0$; $u^k = 0$ voor zekere $k$; $\operatorname{Sp}(u) =
+\{0\}$; $\chi_u = X^n$; $u$ is \omterm{def:b2:reduction:diag}{trigonaliseerbaar} met nulle
+diagonaal. Een \omterm{prop:b2:reduction:nilpotent}{nilpotent endomorfisme} heeft $\mu_u =
+X^{\text{(nilpotentie-index)}}$, en index $\leq
+n$.\index{nilpotent endomorfisme}
+\end{proposition}
+
+\begin{proof}
+$u^k = 0$ maakt elke \omterm{def:b2:reduction:eigen}{eigenwaarde} een wortel van $X^k$: \omterm{def:b2:reduction:eigen}{spectrum}
+$\{0\}$ (niet-leeg wanneer $\chi$ splitst --- over $\C$ altijd).
+Dan $\chi_u = X^n$ (alle wortels nul) en Cayley--Hamilton geeft
+$u^n = 0$; trigonalisatie
+(\cref{thm:b2:reduction:trigonalization}) zet nullen op de
+diagonaal (de diagonaal draagt de \omterm{def:b2:reduction:eigen}{eigenwaarden}). Omgekeerd, zij
+$A$ strikt bovendriehoekig: $a_{ij} = 0$ voor $j \leq i$. We
+tonen door inductie dat
+\[
+(A^k)_{ij} = 0 \qquad \text{wanneer } j \leq i + k - 1,
+\]
+d.w.z.\ elke macht duwt de nulle regio één diagonaal hoger. Voor
+$k = 1$ is dit de hypothese. Voor de stap,
+\[
+(A^{k+1})_{ij} = \sum_{\ell} (A^k)_{i\ell}\,a_{\ell j} ,
+\]
+en elke term verdwijnt: ofwel $\ell \leq i + k - 1$ (de eerste
+factor is $0$ door inductie) of $\ell \geq i + k$, in welk
+geval $j \leq i + k \leq \ell$ de tweede factor doodt. Bij $k =
+n$ geldt de voorwaarde $j \leq i + n - 1$ voor alle $i, j \leq
+n$: $A^n = 0$. De \omterm{def:b2:reduction:polyu}{minimale veelterm} deelt $X^n$ en annihilatie
+definieert de index.
+\end{proof}
+
+\begin{theorem}[Dunford-ontbinding]\label{thm:b2:reduction:dunford}
+Stel $\chi_u$ splitst over $K$ (automatisch voor $K = \C$). Dan
+bestaat er een \emph{uniek} paar $(d, \nu)$ met
+\[
+u = d + \nu, \qquad d \text{ diagonaliseerbaar}, \quad \nu
+\text{ nilpotent}, \quad d\nu = \nu d ,
+\]
+en bovendien zijn $d$ en $\nu$ veeltermen in
+$u$.\index{Dunford-ontbinding}
+\end{theorem}
+
+\begin{proof}
+\emph{Bestaan.} Schrijf $\chi_u = \prod_{i=1}^{r} (X -
+\lambda_i)^{m_i}$ (verschillende $\lambda_i$) en stel $N_i =
+\ker(u - \lambda_i)^{m_i}$, de \emph{karakteristieke
+deelruimten}. Door Cayley--Hamilton en het kernlemma
+(\cref{thm:b2:reduction:kernels}),
+\[
+E = N_1 \oplus \dots \oplus N_r ,
+\]
+met projecties $\pi_i$ veelterm in $u$; elke $N_i$ is stabiel
+(veeltermen in $u$ commuten met $u$). Definieer $d = \sum_i
+\lambda_i \pi_i$: een veelterm in $u$, \omterm{def:b2:reduction:diag}{diagonaliseerbaar} (ze
+werkt als $\lambda_i$ op $N_i$, dus ontbindt $E$ in haar
+\omterm{def:b2:reduction:eigen}{eigenruimten}). Dan is $\nu = u - d$ een veelterm in $u$ (dus
+commuteert met $d$), en op elke $N_i$ werkt ze als $u -
+\lambda_i$, met $(u - \lambda_i)^{m_i} = 0$ daar:
+$\nu^{\max m_i} = 0$ op elke sommand, dus is $\nu$ nilpotent.
+
+\emph{Uniciteit.} Zij $u = d' + \nu'$ een ander zulk paar.
+Omdat $d'$ en $\nu'$ met elkaar commuten, commuten ze met $u =
+d' + \nu'$, dus met elke veelterm in $u$ --- in het bijzonder
+met $d$ en $\nu$. Dan is $d - d'$ \omterm{def:b2:reduction:diag}{diagonaliseerbaar} (twee
+commuterende diagonaliseerbare afbeeldingen zijn
+gelijktijdig \omterm{def:b2:reduction:diag}{diagonaliseerbaar}: \cref{exo:b2:reduction:9}) en
+gelijk aan $\nu' - \nu$, die nilpotent is: als $\nu^k = 0$ en
+$\nu'^{k'} = 0$, laat commutatie de binomiaalontwikkeling toe
+\[
+(\nu' - \nu)^{k + k' - 1}
+= \sum_{j=0}^{k+k'-1}\binom{k + k' - 1}{j}
+\,\nu'^{\,j}\,(-\nu)^{k + k' - 1 - j} ,
+\]
+waarin elke term sterft: ofwel $j \geq k'$ (eerste factor nul)
+of $k + k' - 1 - j \geq k$ (tweede factor nul), en één van de
+twee geldt altijd. Een diagonaliseerbare nilpotente is nul
+(haar \omterm{def:b2:reduction:eigen}{spectrum} is $\{0\}$ en ze is diagonaal in zekere basis):
+$d = d'$, $\nu = \nu'$.
+\end{proof}
+
+\begin{example}[Machten en exponentialen]\label{ex:b2:reduction:powers}
+$A = \begin{pmatrix} 3 & 1\\ -1 & 1\end{pmatrix}$: $\chi_A = X^2
+- 4X + 4 = (X-2)^2$, enkele \omterm{def:b2:reduction:eigen}{eigenwaarde} $2$, \omterm{def:b2:reduction:eigen}{eigenruimte} van
+dimensie $1$: niet \omterm{def:b2:reduction:diag}{diagonaliseerbaar}. Dunford: $D = 2I$, $N = A
+- 2I = \begin{pmatrix} 1 & 1\\ -1 & -1\end{pmatrix}$, $N^2 =
+0$. Dan
+\[
+A^k = (2I + N)^k = 2^k I + k\,2^{k-1} N ,
+\qquad
+\eu^{tA} = \eu^{2t}(I + tN),
+\]
+door de commuterende binomiaalstelling, resp.\ de
+exponentiaalreeks (\cref{ch:b2:diffeq}) gesplitst op
+commuterende sommanden. Reductie zet matrixdynamica om in
+scalaire dynamica.
+\end{example}
+
+\begin{remark}[Perspectieven binnen dit volume]\label{rem:b2:reduction:perspectives}
+Reductie is een knooppunt; hier zijn de vier spaken om te
+volgen. In \cref{ch:b2:nvs} zetten aangepaste normen ``alle
+\omterm{def:b2:reduction:eigen}{eigenwaarden} van modulus $< 1$'' om in ``zekere operatornorm $<
+1$'', waardoor spectra convergentie van machten en reeksen
+regeren. In \cref{ch:b2:diffeq} wordt het recept van
+\cref{ex:b2:reduction:powers} de algemene oplossing van $X' =
+AX$: Dunford splijt $\eu^{tA}$ in
+veelterm-maal-exponentiaal-blokken, en stabiliteit leest de
+reële delen van \omterm{def:b2:reduction:eigen}{eigenwaarden} af. In \cref{ch:b2:quadratic}
+dwingt een scalair product wat loutere lineaire algebra niet
+kan: symmetrische matrices worden \emph{orthogonaal}
+\omterm{def:b2:reduction:diag}{diagonaliseerbaar}, zonder nilpotent deel. En in
+\cref{ch:b2:genfun} keren de
+dominante-eigenwaarde-asymptotiek van het weekendprobleem van
+dit hoofdstuk analytisch terug, als de kleinste singulariteit
+van een genererende functie --- twee talen voor één groeisnelheid.
+\end{remark}
+
+\section{Oefeningen}
+
+\begin{exercise}[$\star$]\label{exo:b2:reduction:1}
+Diagonaliseer (\omterm{def:b2:reduction:eigen}{eigenwaarden}, bases van \omterm{def:b2:reduction:eigen}{eigenruimten},
+inverteerbare $P$):
+\[
+A = \begin{pmatrix} 1 & 2\\ 2 & 1 \end{pmatrix},
+\qquad
+B = \begin{pmatrix} 0 & 1 & 1\\ 1 & 0 & 1\\ 1 & 1 & 0
+\end{pmatrix}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:reduction:2}
+Toon dat $C = \begin{pmatrix} 1 & 1\\ 0 & 1\end{pmatrix}$ niet
+\omterm{def:b2:reduction:diag}{diagonaliseerbaar} is, tweemaal: via \omterm{def:b2:reduction:eigen}{eigenruimten}, en via de
+\omterm{def:b2:reduction:polyu}{minimale veelterm}.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:reduction:3}
+Zij $u$ voldoen aan $u^2 - 5u + 6\,\mathrm{id} = 0$. Bewijs dat
+$u$ \omterm{def:b2:reduction:diag}{diagonaliseerbaar} is, bepaal de mogelijke spectra, en
+bereken $u^k$ als combinatie van $\mathrm{id}$ en $u$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:4}
+Zij $u$ \omterm{def:b2:reduction:diag}{diagonaliseerbaar} en $F$ een stabiele deelruimte. Bewijs
+dat $u|_F$ \omterm{def:b2:reduction:diag}{diagonaliseerbaar} is \emph{(beperk een annulerende
+veelterm met enkelvoudige gesplitste wortels)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:5}
+(Fibonacci) Zij $A = \begin{pmatrix} 1 & 1\\ 1 & 0\end{pmatrix}$.
+Diagonaliseer $A$ over $\R$, en leid de formule van Binet af voor
+de Fibonacci-rij ($F_0 = 0$, $F_1 = 1$, $F_{n+1} = F_n +
+F_{n-1}$):
+\[
+F_n = \frac{\varphi^n - \psi^n}{\sqrt 5},
+\qquad \varphi = \frac{1 + \sqrt5}{2},\ \psi = \frac{1 -
+\sqrt5}{2}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:6}
+Zij $u \in \mathcal{L}(E)$ met $u^2$ \omterm{def:b2:reduction:diag}{diagonaliseerbaar} en $u$
+inverteerbaar ($K = \C$). Bewijs dat $u$ \omterm{def:b2:reduction:diag}{diagonaliseerbaar} is.
+Geef een tegenvoorbeeld wanneer $u$ niet inverteerbaar is.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:7}
+Bereken de \omterm{thm:b2:reduction:dunford}{Dunford-ontbinding}, $A^k$, en $\eu^{tA}$ voor
+\[
+A = \begin{pmatrix} 2 & 1 & 0\\ 0 & 2 & 1\\ 0 & 0 & 2
+\end{pmatrix}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:8}
+Zij $A \in \mathcal{M}_n(\C)$ met $A^k = I$ voor zekere $k \geq
+1$. Bewijs dat $A$ \omterm{def:b2:reduction:diag}{diagonaliseerbaar} is en haar \omterm{def:b2:reduction:eigen}{eigenwaarden}
+$k$-de eenheidswortels zijn. Leid af dat een eindige-orde
+inverteerbare complexe matrix gelijkvormig met een driehoekige
+matrix met eenheidsdiagonaal de identiteit is.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:reduction:9}
+(Gelijktijdige diagonaliseerbaarheid) Zij $u, v$
+\omterm{def:b2:reduction:diag}{diagonaliseerbaar} en commuterend. Bewijs dat ze
+\emph{gelijktijdig} \omterm{def:b2:reduction:diag}{diagonaliseerbaar} zijn: zekere basis
+diagonaliseert beide. \emph{(Elke \omterm{def:b2:reduction:eigen}{eigenruimte} van $u$ is
+$v$-stabiel; diagonaliseer de restricties van $v$ daar, met
+\cref{exo:b2:reduction:4}.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:reduction:10}
+Zij $u \in \mathcal{L}(\C^n)$. Bewijs dat $u$
+\omterm{def:b2:reduction:diag}{diagonaliseerbaar} is desda elke $u$-stabiele deelruimte een
+$u$-stabiele complementaire deelruimte heeft. \emph{(Voor
+$\Leftarrow$: pas de eigenschap toe op $F = \sum_\lambda
+E_\lambda(u)$, de som van alle \omterm{def:b2:reduction:eigen}{eigenruimten}; als een stabiel
+complement $G$ niet-nul was, zou trigonaliseren van $u|_G$ een
+\omterm{def:b2:reduction:eigen}{eigenvector} van $u$ in $G$ produceren --- in strijd met $G \cap
+F = \{0\}$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:reduction:11}
+(Spectrale straal à la Gelfand-lite, $2\times2$-smaak van de
+analyse die komt) Zij $A \in \mathcal{M}_2(\C)$ met beide
+\omterm{def:b2:reduction:eigen}{eigenwaarden} van modulus $< 1$. Bewijs dat $A^k \to 0$ entrygewijs
+als $k \to \infty$. \emph{(Trigonaliseer: $A = P(T)P^{-1}$ met
+$T$ bovendriehoekig; bereken $T^k$ expliciet --- onderscheid
+gelijke en verschillende \omterm{def:b2:reduction:eigen}{eigenwaarden} --- en begrens.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:12}
+Zij $u \in \mathcal{L}(\C^n)$ met $\operatorname{rk} u = 1$ ($n
+\geq 2$). Toon dat $\chi_u = X^{n-1}(X - \operatorname{tr} u)$,
+en dat $u$ \omterm{def:b2:reduction:diag}{diagonaliseerbaar} is desda $\operatorname{tr} u \neq
+0$. \emph{(Herinner uit \cref{exo:b2:linalg:5} dat $u^2 =
+(\operatorname{tr} u)\,u$.)}
+\end{exercise}
+
+\section{Probleem: Lineaire recurrenties en begeleidende matrices}
+
+Een lineaire recurrentie $u_{n+k} = a_{k-1}u_{n+k-1} + \dots +
+a_0 u_n$ is een matrixmacht in vermomming, en reductie zet ze om
+in gesloten formules, groeisnelheden, en foutschattingen. Dit
+weekendprobleem ontwikkelt het woordenboek --- begeleidende
+matrices aan de ene kant, de shiftoperator op de rijruimte aan
+de andere --- bewijst de \emph{fundamentele stelling van
+lineaire recurrenties} (de algemene oplossing is $\sum_i
+Q_i(n)\lambda_i^n$ over de wortels van de \omterm{def:b2:reduction:charpoly}{karakteristieke
+veelterm}), en besteedt de dividenden aan Diophantische
+benadering van $\sqrt2$, aan het tellen van wandelingen en
+woorden, en aan een ring van gekoppelde rijen die alleen
+gelijktijdige diagonaliseerbaarheid kan ontwarren.
+
+\begin{problem}[{Weekendprobleem --- de fundamentele stelling van
+lineaire recurrenties}]
+\label{pb:b2:reduction:1}
+Fixeer $k \geq 1$, scalaren $a_0, \dots, a_{k-1} \in \C$ met
+$a_0 \neq 0$, de monische veelterm $P = X^k - a_{k-1}X^{k-1} -
+\dots - a_1 X - a_0$, en de recurrentie
+\[
+(\mathcal R)\colon\quad u_{n+k} = a_{k-1}u_{n+k-1} + \dots +
+a_1 u_{n+1} + a_0 u_n \qquad (n \geq 0).
+\]
+De \emph{begeleidende matrix} van $P$ is
+\[
+C =
+\begin{pmatrix}
+0 & 1 & & \\
+ & \ddots & \ddots & \\
+ & & 0 & 1\\
+a_0 & a_1 & \cdots & a_{k-1}
+\end{pmatrix}
+\in \mathcal{M}_k(\C).
+\]
+
+\medskip
+\noindent\textbf{Deel I --- Het begeleidende woordenboek.}
+\begin{enumerate}
+  \item Toon dat een rij $(u_n)$ aan $(\mathcal R)$ voldoet desda
+        de vectoren $v_n = (u_n, u_{n+1}, \dots,
+        u_{n+k-1})^{\mathsf T}$ voldoen aan $v_{n+1} = Cv_n$,
+        dus $v_n = C^n v_0$.
+  \item Bewijs dat $\chi_C = P$ (ontwikkel $\det(XI - C)$ langs
+        de eerste kolom en induceer op $k$), dan dat $\mu_C = P$
+        eveneens \emph{(ga over op $C^{\mathsf T}$, waarvoor
+        $e_1$ cyclisch is, en merk op dat een matrix en haar
+        \omterm{def:b2:linalg:transpose}{getransponeerde} dezelfde \omterm{def:b2:reduction:polyu}{minimale veelterm} hebben)}.
+  \item Toon dat voor elke wortel $\lambda$ van $P$ de vector
+        $(1, \lambda, \dots, \lambda^{k-1})^{\mathsf T}$ de
+        \omterm{def:b2:reduction:eigen}{eigenruimte} van $C$ voor $\lambda$ opspant; leid af dat
+        \emph{elke} \omterm{def:b2:reduction:eigen}{eigenruimte} van $C$ dimensie $1$ heeft, en
+        dat $C$ \omterm{def:b2:reduction:diag}{diagonaliseerbaar} is desda $P$ $k$
+        verschillende wortels heeft.
+  \item Stel $P$ heeft verschillende wortels $\lambda_1, \dots,
+        \lambda_k$. Toon dat de meetkundige rijen
+        $(\lambda_i^n)_n$ een basis vormen van de
+        oplossingsruimte van $(\mathcal R)$, dus is elke
+        oplossing $u_n = \sum_i c_i\lambda_i^n$ voor unieke
+        constanten $c_i$.
+  \item Los volledig op: $u_{n+2} = u_{n+1} + 6u_n$, $u_0 = 1$,
+        $u_1 = 8$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel II --- De shiftoperator en de fundamentele
+stelling.} Zij $\mathcal{S}$ de $\C$-vectorruimte van alle
+complexe rijen en $S \in \mathcal{L}(\mathcal{S})$ de shift,
+$S\bigl((u_n)_n\bigr) = (u_{n+1})_n$.
+\begin{enumerate}[resume]
+  \item Toon dat de oplossingsverzameling van $(\mathcal R)$
+        $\ker P(S)$ is, en dat ze precies dimensie $k$ heeft
+        \emph{(beeld een oplossing af op haar beginwaarden)}.
+  \item Leg uit waarom het kernontbindingslemma
+        (\cref{thm:b2:reduction:kernels}) van toepassing is op
+        $S$ op de oneindigdimensionale $\mathcal{S}$ zonder
+        enige verandering, en schrijf de resulterende
+        ontbinding van $\ker P(S)$ voor $P =
+        \prod_{i=1}^{r}(X - \lambda_i)^{m_i}$ (verschillende
+        $\lambda_i$, alle niet-nul omdat $a_0 \neq 0$).
+  \item Voor $\lambda \neq 0$ en $m \geq 1$, toon
+        \[
+        \ker\,(S - \lambda\,\mathrm{id})^m
+        = \bigl\{\,\bigl(Q(n)\,\lambda^n\bigr)_n : Q \in
+        \C_{m-1}[X]\,\bigr\},
+        \]
+        van dimensie $m$. \emph{(Bereken $(S -
+        \lambda)\bigl(Q(n)\lambda^n\bigr) =
+        \lambda^{n+1}(\Delta Q)(n)$ met $\Delta Q = Q(X + 1) -
+        Q(X)$, en gebruik dat $\Delta$ de graad verlaagt; voor
+        de dimensie, begrens ze met $m$ via beginwaarden.)}
+  \item (De fundamentele stelling van lineaire recurrenties)
+        Concludeer: als $P = \prod_{i=1}^{r}(X -
+        \lambda_i)^{m_i}$ met de $\lambda_i$ verschillend en
+        niet-nul, zijn de oplossingen van $(\mathcal R)$ precies
+        de rijen
+        \[
+        u_n = \sum_{i=1}^{r} Q_i(n)\,\lambda_i^n,
+        \qquad Q_i \in \C_{m_i - 1}[X],
+        \]
+        met uniek bepaalde veeltermen $Q_i$.
+  \item Los volledig op: $u_{n+2} = 4u_{n+1} - 4u_n$, $u_0 =
+        1$, $u_1 = 0$, en controleer het antwoord op $u_2$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel III --- Dominante wortels en Diophantische
+dividenden.}
+\begin{enumerate}[resume]
+  \item Stel de wortels zijn enkelvoudig met $\abs{\lambda_1} >
+        \abs{\lambda_i}$ voor $i \geq 2$, en $u_n = \sum_i c_i
+        \lambda_i^n$ met $c_1 \neq 0$. Toon $u_n \sim
+        c_1\lambda_1^n$ en $u_{n+1}/u_n \to \lambda_1$.
+  \item (Pell) Definieer $a_{n+1} = a_n + 2b_n$, $b_{n+1} = a_n
+        + b_n$, $a_0 = b_0 = 1$. Toon dat $q(a, b) = a^2 -
+        2b^2$ voldoet aan $q(a_{n+1}, b_{n+1}) = -q(a_n, b_n)$,
+        dus $a_n^2 - 2b_n^2 = (-1)^{n+1}$; relateer dit aan de
+        \omterm{def:b2:linalg:det}{determinant} van $M = \begin{psmallmatrix}1 & 2\\ 1 &
+        1\end{psmallmatrix}$.
+  \item Leid de foutschatting af
+        \[
+        \Bigl|\frac{a_n}{b_n} - \sqrt2\Bigr|
+        = \frac{1}{b_n\,(a_n + \sqrt2\,b_n)}
+        \leq \frac{1}{2b_n^2},
+        \]
+        en toon dat ze geometrisch vervalt met ratio $3 -
+        2\sqrt2$ \emph{(vind de \omterm{def:b2:reduction:eigen}{eigenwaarden} van $M$ en de
+        groei van $b_n$)}.
+  \item (Algemene groei) Uit vraag 9, bewijs: (a) als elke
+        wortel $\abs{\lambda_i} \leq \rho$ voldoet, dan
+        $\abs{u_n} \leq C\,n^{m-1}\rho^n$ met $m = \max_i m_i$;
+        (b) als er een unieke wortel $\lambda_1$ van maximale
+        modulus is en $Q_1 \neq 0$, dan $u_{n+1}/u_n \to
+        \lambda_1$ --- controleer op de oplossing van vraag 10.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel IV --- Wandelen en woorden tellen.} Voor
+een eindige graaf met knopenverzameling $\{1, \dots, N\}$ heeft
+de \emph{adjacentiematrix} $A$ $A_{ij} = 1$ als $ij$ een rand is,
+anders $0$.
+\begin{enumerate}[resume]
+  \item Bewijs dat $(A^n)_{ij}$ het aantal wandelingen van lengte
+        $n$ van $i$ naar $j$ is (rijen van $n$ randen, elke stap
+        langs een rand).
+  \item (De driehoek) Voor de complete graaf op $3$ knopen, $A
+        = J - I$: met het \omterm{def:b2:reduction:eigen}{spectrum} van $J$
+        (\cref{ex:b2:linalg:onesmatrix}), toon
+        \[
+        (A^n)_{ii} = \frac{2^n + 2(-1)^n}{3},
+        \qquad
+        (A^n)_{ij} = \frac{2^n - (-1)^n}{3} \quad (i \neq j),
+        \]
+        en controleer beide bij $n = 2$ door wandelingen op te
+        sommen.
+  \item (Woorden zonder $11$) Zij $w_n$ het aantal binaire
+        woorden van lengte $n$ zonder twee opeenvolgende
+        $1$'en. Codeer woorden door hun laatste letter om een
+        transfermatrix te krijgen, toon $w_{n+2} = w_{n+1} +
+        w_n$, leid af $w_n = F_{n+2}$ (Fibonacci,
+        \cref{exo:b2:reduction:5}), en geef de groeisnelheid
+        $\lim w_{n+1}/w_n$.
+  \item (Het pad) Voor de padgraaf $1 - 2 - 3$, toon dat de
+        \omterm{def:b2:reduction:eigen}{eigenwaarden} van $A$ $\sqrt2, 0, -\sqrt2$ zijn met
+        \omterm{def:b2:reduction:eigen}{eigenvectoren} $(1, \pm\sqrt2, 1)$ en $(1, 0, -1)$, en
+        leid af dat het aantal wandelingen van lengte $n$ van
+        eind tot eind $\bigl((\sqrt2)^n +
+        (-\sqrt2)^n\bigr)/4$ is: nul voor oneven $n$, en
+        $2^{\,n/2 - 1}$ voor even $n$. Controleer bij $n = 4$.
+  \item (Spoorformule) Toon dat het totale aantal gesloten
+        wandelingen van lengte $n$ (alle startpunten)
+        $\operatorname{tr}(A^n) = \sum_i \lambda_i^n$ is, en
+        verifieer op de driehoek.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel V --- Een ring van rijen: gelijktijdige
+diagonaliseerbaarheid.} Fixeer $k \geq 3$, zij $\omega =
+\eu^{2\iu\pi/k}$, en zij $W \in \mathcal{M}_k(\C)$ de cyclische
+shift: $W e_i = e_{i+1}$ (indices mod $k$, kolommen geïndexeerd
+$0, \dots, k-1$).
+\begin{enumerate}[resume]
+  \item Toon dat $W^{\mathsf T}$ de begeleidende matrix van $X^k
+        - 1$ is, leid af $\chi_W = \mu_W = X^k - 1$, en dat $W$
+        \omterm{def:b2:reduction:diag}{diagonaliseerbaar} is met de $k$ enkelvoudige
+        \omterm{def:b2:reduction:eigen}{eigenwaarden} $\omega^j$ en \omterm{def:b2:reduction:eigen}{eigenvectoren} $f_j = (1,
+        \omega^{-j}, \omega^{-2j}, \dots,
+        \omega^{-(k-1)j})^{\mathsf T}$.
+  \item Een \emph{circulante} matrix is $C = c_0 I + c_1 W +
+        \dots + c_{k-1}W^{k-1}$. Toon dat alle circulanten
+        commuten, dat de basis $(f_0, \dots, f_{k-1})$
+        \emph{alle} ervan gelijktijdig diagonaliseert, en dat
+        de \omterm{def:b2:reduction:eigen}{eigenwaarden} van $C$ $\widehat c(\omega^j) = \sum_m
+        c_m \omega^{jm}$ zijn, $j = 0, \dots, k-1$.
+  \item Leid af $\det C = \prod_{j=0}^{k-1} \widehat
+        c(\omega^j)$, en controleer dat $k = 3$ de
+        factorisatie van \cref{exo:b2:linalg:8} herwint.
+  \item (Het kettinggemiddelde) Zij $x^{(n+1)} = Mx^{(n)}$ met
+        $M = \frac12(W + W^{-1})$: elk van $k$ getallen in een
+        ring gerangschikt wordt vervangen door het gemiddelde
+        van zijn twee buren. Toon dat de \omterm{def:b2:reduction:eigen}{eigenwaarden} van $M$
+        $\cos(2\pi j/k)$ zijn, en dat de coëfficiënt van
+        $x^{(0)}$ op $f_0$ het gemiddelde
+        $\frac1k\sum_m x^{(0)}_m$ is \emph{(sommeer de
+        coördinaten van de $f_j$)}.
+  \item Concludeer: voor oneven $k$ convergeert $x^{(n)}$ naar
+        de constante vector waarvan de waarde het gemiddelde van
+        de beginwaarden is; voor $k = 4$, vertoon de
+        \omterm{def:b2:reduction:eigen}{eigenwaarde} verantwoordelijk voor niet-convergentie en
+        de exacte obstructie (een alternerend-gemiddelde-
+        coëfficiënt die moet verdwijnen).
+  \item (Synthese) In één zin elk: hoe de begeleidende matrix
+        analyse van $(\mathcal R)$ omzet in reductie; waar het
+        kernontbindingslemma geen eindige dimensie nodig had;
+        waarom dominante \omterm{def:b2:reduction:eigen}{eigenwaarden} groeisnelheden en
+        Diophantische fout regeren; waarom machten van de
+        adjacentiematrix wandelingen tellen; en wat
+        commuterende matrices kopen. Noem de twee toppen: de
+        fundamentele stelling van lineaire recurrenties, en ---
+        voor de positieve matrices van Deel IV, in het Bachelor
+        jaar~3-volume --- de stelling van Perron--Frobenius.
+\end{enumerate}
+\end{problem}

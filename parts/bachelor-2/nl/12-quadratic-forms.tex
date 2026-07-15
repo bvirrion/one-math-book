@@ -1,0 +1,900 @@
+\chapter{Kwadratische vormen}\label{ch:b2:quadratic}
+
+Een \omterm{def:b2:quadratic:def}{kwadratische vorm} is de algebraïsche schaduw van een meetkunde: de
+delen van signatuur nul vlakken af, de positieve delen krommen de ene
+kant op, de negatieve de andere. Dit hoofdstuk herleidt elke reële
+\omterm{def:b2:quadratic:def}{kwadratische vorm} tot een som van $\pm$ kwadraten (Gauss), bewijst dat
+de aantallen tekens intrinsiek zijn (Sylvester), en bekroont daarna de
+euclidische meetkunde met de \emph{spectraalstelling}: symmetrische
+endomorfismen diagonaliseren in orthonormale basissen --- de
+meestgebruikte stelling van de toegepaste lineaire algebra.
+
+\section{Bilineaire en kwadratische vormen}
+
+\begin{definition}\label{def:b2:quadratic:def}
+Een \emph{symmetrische bilineaire vorm} op een reële vectorruimte $E$ is een
+bilineaire $\varphi \colon E \times E \to \R$ met $\varphi(x, y) =
+\varphi(y, x)$; de geassocieerde \emph{kwadratische
+vorm}\index{kwadratische vorm} is $q(x) = \varphi(x, x)$. De vorm
+$\varphi$ wordt uit $q$ teruggewonnen via
+\emph{polarisatie}\index{polarisatie-identiteit}:
+\[
+\varphi(x, y) = \tfrac12\bigl(q(x + y) - q(x) - q(y)\bigr).
+\]
+In een basis $(e_i)$ is de \emph{matrix} van $\varphi$ de symmetrische
+$B = (\varphi(e_i, e_j))$, met $q(x) = X^{\mathsf T} B X$; een
+basisverandering met matrix $P$ vervangt $B$ door $P^{\mathsf T} B P$
+(\emph{congruentie}\index{congruente matrices} --- geen similariteit!).
+De \emph{rang} van $q$ is $\operatorname{rk} B$ (invariant:
+congruentie vermenigvuldigt met inverteerbare matrices).
+\end{definition}
+
+\begin{example}
+Op $\R^2$: $q(x, y) = x^2 + 4xy + y^2$ heeft matrix $\begin{pmatrix}
+1 & 2\\ 2 & 1\end{pmatrix}$. Een inwendig product is precies een
+\omterm{def:b2:quadratic:def}{symmetrische bilineaire vorm} waarvan de \omterm{def:b2:quadratic:def}{kwadratische vorm} positief
+definiet is; dit hoofdstuk bestudeert het algemene, teken-indefinitie
+geval.
+\end{example}
+
+\begin{example}[Congruentie in actie]\label{ex:b2:quadratic:congruence}
+Neem $q(x, y) = x^2 + 4xy + y^2$ (matrix $B = \begin{pmatrix} 1
+& 2\\ 2 & 1\end{pmatrix}$) en de nieuwe basis $e_1' = (1, 1)$,
+$e_2' = (1, -1)$, d.w.z.\ $P = \begin{pmatrix} 1 & 1\\ 1 &
+-1\end{pmatrix}$. Dan
+\[
+P^{\mathsf T}BP
+= \begin{pmatrix} 1 & 1\\ 1 & -1\end{pmatrix}
+\begin{pmatrix} 1 & 2\\ 2 & 1\end{pmatrix}
+\begin{pmatrix} 1 & 1\\ 1 & -1\end{pmatrix}
+= \begin{pmatrix} 6 & 0\\ 0 & -2\end{pmatrix} :
+\]
+in de coördinaten $(u, v)$ langs de nieuwe basis is $q = 6u^2 -
+2v^2$ --- controle: $x = u + v$, $y = u - v$ geeft $x^2 + 4xy +
+y^2 = 6u^2 - 2v^2$ direct. Merk op dat de nieuwe diagonale
+ingangen $6, -2$ \emph{niet} de \omterm{def:b2:reduction:eigen}{eigenwaarden} $3, -1$ van $B$
+zijn: \omterm{def:b2:quadratic:def}{congruentie} herschaalt, alleen similariteit behoudt spectra
+--- maar de tekens kloppen, zoals de stelling van Sylvester eist.
+(De basis hier is orthogonaal maar niet orthonormaal; normaliseren
+met $\frac{1}{\sqrt2}$ zou de diagonaal door $2$ delen en de
+\omterm{def:b2:reduction:eigen}{eigenwaarden} teruggeven.)
+\end{example}
+
+\begin{example}[Gram-determinanten meten oppervlakte]\label{ex:b2:quadratic:gramarea}
+Voor $v_1, v_2$ in een euclidische ruimte verpakt de Gram-matrix $G =
+\bigl(\langle v_i, v_j\rangle\bigr)$ lengtes en
+hoek; haar \omterm{def:b2:linalg:det}{determinant} verpakt \emph{oppervlakte}:
+\[
+\det G = \norm{v_1}^2\norm{v_2}^2 - \langle v_1, v_2\rangle^2
+= \norm{v_1}^2\norm{v_2}^2\bigl(1 - \cos^2\theta\bigr)
+= \bigl(\norm{v_1}\,\norm{v_2}\sin\theta\bigr)^2 ,
+\]
+de gekwadrateerde oppervlakte van het parallellogram op $v_1, v_2$ ---
+en Cauchy--Schwarz is precies de uitspraak $\det G \geq 0$.
+Uitgewerkt voorbeeld: $v_1 = (1, 2, 2)$, $v_2 = (2, 1, -2)$ in
+$\R^3$:
+\[
+G = \begin{pmatrix} 9 & 0\\ 0 & 9 \end{pmatrix},
+\qquad
+\det G = 81 :
+\]
+de vectoren zijn orthogonaal van lengte $3$, en spannen een
+parallellogram (hier een vierkant) op van oppervlakte $\sqrt{81} = 9$.
+Slotinzicht: er is geen uitwendig product en geen driedimensionale
+magie gebruikt --- $\sqrt{\det G}$ meet $k$-dimensionaal volume
+in \emph{elke} dimensie, het startpunt van deel I van het
+weekeindprobleem en van de oppervlakte-integralen later in
+dit volume.
+\end{example}
+
+\section{Gauss-reductie en de inertie van Sylvester}
+
+\begin{theorem}[Gauss-reductie]\label{thm:b2:quadratic:gauss}
+Elke \omterm{def:b2:quadratic:def}{kwadratische vorm} $q$ op een eindigdimensionale reële ruimte kan
+geschreven worden als\index{Gauss-reductie}
+\[
+q = \sum_{i=1}^{s} \ell_i^2 - \sum_{j=1}^{t} m_j^2 ,
+\]
+waar $\ell_1, \dots, \ell_s, m_1, \dots, m_t$ lineair
+onafhankelijke lineaire vormen zijn; equivalent: er is een basis
+waarin de matrix van $q$ diagonaal is met ingangen $+1$ ($s$ keer),
+$-1$ ($t$ keer), $0$.
+\end{theorem}
+
+\begin{proof}
+Inductie naar het aantal variabelen, in coördinaten: $q(x_1,
+\dots, x_n)$.
+
+\emph{Geval 1: er verschijnt een kwadraat}, zeg de coëfficiënt $a$ van
+$x_1^2$ is niet nul. Groepeer alle $x_1$-termen en maak het
+kwadraat af:
+\[
+q = a\Bigl(x_1 + \frac{1}{a}\,\lambda(x_2, \dots,
+x_n)\Bigr)^{\!2} + q_1(x_2, \dots, x_n),
+\]
+waar $\lambda$ lineair is en $q_1$ kwadratisch in de overige
+variabelen: één onafhankelijke vorm is afgesplitst (die bevat $x_1$,
+de anderen niet), inductie past op $q_1$, en de $\pm$-tekens komen
+van het teken van $a$ na herschaling met $\sqrt{\abs a}$.
+
+\emph{Geval 2: geen kwadraat, wel een kruisterm}, zeg $b\,x_1x_2$ met
+$b \neq 0$. Gebruik de identiteit
+\[
+x_1x_2 = \tfrac14\bigl((x_1 + x_2)^2 - (x_1 - x_2)^2\bigr)
+\]
+na groepering: schrijf $q = b\,x_1x_2 + x_1\alpha + x_2\beta +
+q_2$ (met $\alpha, \beta, q_2$ in de overige variabelen), men
+controleert
+\[
+q = \frac{b}{4}\Bigl[\Bigl(x_1 + x_2 + \frac{\alpha +
+\beta}{b}\Bigr)^{2} - \Bigl(x_1 - x_2 + \frac{\beta -
+\alpha}{b}\Bigr)^{2}\Bigr] + \widetilde q ,
+\]
+met $\widetilde q$ vrij van $x_1, x_2$: twee onafhankelijke vormen
+zijn afgesplitst, en inductie maakt het af.
+
+Onafhankelijkheid van de verzamelde vormen: orden de batches zoals
+ze geproduceerd zijn. De vormen van de eerste batch bevatten $x_1$
+(geval 1) of $x_1, x_2$ (geval 2); alle latere vormen zijn vrij van
+die variabelen. Stel dat een lineaire combinatie van alle verzamelde
+vormen verdwijnt. Lees de coëfficiënt van $x_1$ (en $x_2$): alleen
+de eerste batch draagt bij, en binnen die batch zijn de één of
+twee vormen zichtbaar onafhankelijk ($\ell$ alleen; of $\ell \pm
+m$ met onafhankelijke $\ell, m$): de coëfficiënten van de eerste
+batch verdwijnen. Strip de batch en herhaal: inductief langs de
+batches verdwijnen alle coëfficiënten --- de hele familie is vrij,
+triangulariteit expliciet gemaakt.
+\end{proof}
+
+\begin{theorem}[Inertiewet van Sylvester]\label{thm:b2:quadratic:sylvester}
+Het paar $(s, t)$ in \cref{thm:b2:quadratic:gauss} hangt alleen af van
+$q$, niet van de reductie: het is de
+\emph{signatuur}\index{signatuur van een kwadratische vorm} van $q$.
+Bovendien
+\[
+s = \max\{\dim F : q|_F \text{ positief definiet}\},
+\]
+en \omterm{def:b2:quadratic:adjoint}{symmetrisch} voor $t$.
+\end{theorem}
+
+\begin{proof}
+Laat $q = \sum_{i \leq s}\ell_i^2 - \sum_{j\leq t} m_j^2$ en laat
+$F_+$ de opspanning zijn van de (pre-)duale vectoren waarop $(\ell_i)$
+tot coördinaten beperken --- concreet: completeer de
+onafhankelijke familie $(\ell_1, \dots, \ell_s, m_1, \dots, m_t)$
+tot een basis van de duale $E^*$, en laat $(u_1, \dots, u_n)$ de
+basis van $E$ zijn waarvan deze de coördinaatvormen zijn (de
+pre-duale basis: $\ell_i(u_k) = \delta_{ik}$ voor $k \leq s$,
+en de latere vormen verdwijnen op de eerdere vectoren). Stel $F_+ =
+\operatorname{Vect}(u_1, \dots, u_s)$: voor $x = \sum_{i\leq
+s}x_iu_i \in F_+$ is
+\[
+\ell_i(x) = x_i,
+\qquad m_j(x) = 0,
+\qquad\text{dus}\qquad
+q(x) = \sum_{i\leq s}x_i^2 > 0 \quad (x \neq 0) :
+\]
+$q|_{F_+}$ is positief definiet en het maximum in de display
+is $\geq s$. Omgekeerd, laat $F$ een deelruimte zijn met $q|_F$
+positief definiet, en $G = \{x : \ell_1(x) = \dots = \ell_s(x) =
+0\}$, van codimensie $\leq s$; op $G$ is $q(x) = -\sum m_j^2 \leq 0$.
+Dan $F \cap G = \{0\}$ (een niet-nulvector daar zou $q > 0$
+en $q \leq 0$ hebben), dus $\dim F \leq \dim E - \dim G \leq s$. Dus is
+het maximum gelijk aan $s$ voor \emph{elke} reductie: $s$ is intrinsiek,
+en $t = \operatorname{rk} q - s$ evenzo.
+\end{proof}
+
+\begin{example}\label{ex:b2:quadratic:gaussexample}
+$q(x, y, z) = xy + yz + zx$ (geen kwadraten). Met $x_1 = x$, $x_2 =
+y$: $q = xy + z(x + y)$, en de twee-kwadraten-identiteit geeft
+\[
+q = \tfrac14(x + y + 2z)^2 - \tfrac14(x - y)^2 - z^2 ,
+\]
+(uitwerken ter controle). Drie onafhankelijke vormen: signatuur $(1, 2)$,
+rang $3$. Eén positieve richting, twee negatieve: de ``lichtkegel''-
+meetkunde van deze vorm.
+\end{example}
+
+\begin{example}[Een ontaarde vorm, volledig gereduceerd]\label{ex:b2:quadratic:degenerate}
+$q(x, y, z) = xy + yz$ op $\R^3$: geen kwadraten, dus geval 2 met de
+groepering $q = y(x + z)$. De twee-kwadraten-identiteit op het product
+van de onafhankelijke vormen $y$ en $x + z$:
+\[
+q = \frac14\bigl(y + x + z\bigr)^2 -
+\frac14\bigl(y - x - z\bigr)^2 .
+\]
+De twee lineaire vormen $y + x + z$ en $y - x - z$ zijn
+onafhankelijk (hun verschil is $2(x+z)$, hun som $2y$), dus
+leest Sylvester af: signatuur $(1, 1)$, rang $2$ ---
+\emph{ontaard}. De kern van de polaire vorm vindt men door
+$\varphi(v, \cdot) = 0$ op te lossen: met matrix
+$\frac12\begin{pmatrix} 0&1&0\\ 1&0&1\\ 0&1&0\end{pmatrix}$ is
+de kern $\{y = 0,\ x + z = 0\} = \R\,(1, 0, -1)$, de
+richting waarin $q$ niets ziet. Slotinzicht: rangtekort
+verschijnt bij Gauss als ``geen variabelen meer''
+--- de reductie produceerde slechts twee kwadraten uit drie
+dimensies, en de ontbrekende dimensie is precies de kern.
+\end{example}
+
+\begin{example}[Eén vorm, twee wegen naar de signatuur]\label{ex:b2:quadratic:tworoads}
+$q(x, y, z) = 2x^2 + 2y^2 + 2z^2 + 2xy + 2yz$, matrix
+$\begin{pmatrix} 2 & 1 & 0\\ 1 & 2 & 1\\ 0 & 1 & 2
+\end{pmatrix}$. \emph{Weg 1, Gauss:} maak kwadraten af in
+volgorde,
+\[
+q = 2\Bigl(x + \frac y2\Bigr)^{\!2} + \frac32 y^2 + 2yz + 2z^2
+= 2\Bigl(x + \frac y2\Bigr)^{\!2}
++ \frac32\Bigl(y + \frac{2z}{3}\Bigr)^{\!2} + \frac43 z^2 :
+\]
+drie positieve kwadraten op onafhankelijke vormen, signatuur $(3,
+0)$: positief definiet. \emph{Weg 2, \omterm{def:b2:reduction:eigen}{eigenwaarden}:} de matrix
+is de tridiagonaal $2I + N$ met $N$ de buurmatrix; haar
+\omterm{def:b2:reduction:eigen}{eigenwaarden} zijn $2 + \sqrt2$, $2$, $2 - \sqrt2$ (controleer de
+\omterm{def:b2:reduction:eigen}{eigenvectoren} $(1, \pm\sqrt2, 1)$ en $(1, 0, -1)$), alle
+positief: zelfde oordeel, via
+\cref{cor:b2:quadratic:principalaxes}. Gauss is sneller;
+\omterm{def:b2:reduction:eigen}{eigenwaarden} zeggen meer (ze geven de hoofdassen en de
+extreme waarden van $q$ op de bol). Slotinzicht: de
+positieve pivots $2, \frac32, \frac43$ van Gauss zijn precies de
+verhoudingen $\frac{\Delta_k}{\Delta_{k-1}}$ van leidende principale
+minoren ($\Delta_1 = 2$, $\Delta_2 = 3$, $\Delta_3 = 4$) --- het
+weekeindprobleem bewijst dit in het algemeen.
+\end{example}
+
+\begin{method}[Een signatuur berekenen: drie routes]\label{met:b2:quadratic:signature}
+\begin{enumerate}
+  \item \emph{Gauss} (werkt altijd, snelst met de hand): maak
+        kwadraten af in volgorde, geval 2 wanneer geen kwadraat
+        beschikbaar is; tel de tekens. Controleer dat de verzamelde
+        lineaire vormen onafhankelijk zijn --- minder vormen dan
+        variabelen betekent een kern (\cref{ex:b2:quadratic:degenerate}).
+  \item \emph{Leidende minoren} (voor definietheidstests): alle
+        $\Delta_k > 0$ d.e.s.d.a.\ positief definiet
+        (\cref{exo:b2:quadratic:8}); de pivots
+        $\Delta_k/\Delta_{k-1}$ geven zelfs de Gauss-
+        coëfficiënten (weekeindprobleem). Faalt stilzwijgend als
+        enige $\Delta_k = 0$: val terug op route 1.
+  \item \emph{\omterm{def:b2:reduction:eigen}{Eigenwaarden}} (meest informatief, duurst):
+        tekens van het spectrum
+        (\cref{cor:b2:quadratic:principalaxes}); levert ook
+        de hoofdassen en de extreme waarden van $q$ op
+        de eenheidsbol. Verkies dit wanneer de eigenstructuur
+        sowieso nodig is.
+\end{enumerate}
+\end{method}
+
+\section{De spectraalstelling}
+
+Laat nu $E$ euclidisch zijn (inwendig product $\langle\cdot,\cdot\rangle$,
+jaar-1-volume).
+
+\begin{definition}[Adjunct; symmetrische endomorfismen]\label{def:b2:quadratic:adjoint}
+Voor $u \in \mathcal{L}(E)$ is de \emph{adjunct}\index{adjunct}
+$u^*$ het unieke endomorfisme met
+\[
+\langle u(x), y\rangle = \langle x, u^*(y)\rangle
+\qquad (x, y \in E);
+\]
+in een orthonormale basis is $\operatorname{Mat}(u^*) =
+\operatorname{Mat}(u)^{\mathsf T}$. $u$ is
+\emph{symmetrisch}\index{symmetrisch endomorfisme} (zelftoegevoegd) wanneer
+$u^* = u$ --- equivalent is haar matrix in een orthonormale basis
+symmetrisch.
+\end{definition}
+
+\begin{proof}[Bestaan en uniciteit van de adjunct]
+Voor vaste $y$ is de vorm $x \mapsto \langle u(x), y\rangle$
+lineair, dus (eindige dimensie) van de gedaante $\langle x,
+z_y\rangle$ voor een unieke $z_y$ --- de afbeelding $y \mapsto z_y =:
+u^*(y)$ is lineair door uniciteit. De matrixidentificatie:
+$\langle u(e_i), e_j\rangle$ beide kanten op gelezen.
+\end{proof}
+
+\begin{example}[De adjunct hangt af van het inwendig product]\label{ex:b2:quadratic:weightedadjoint}
+Op $\R^2$ neem het \emph{gewogen} inwendig product $\langle x,
+y\rangle_D = x_1y_1 + 2x_2y_2$ (matrix $D =
+\operatorname{diag}(1,2)$) en $u$ van matrix $A =
+\begin{pmatrix} 0 & 1\\ 0 & 0\end{pmatrix}$ in de canonieke
+basis. Uit $\langle u(x), y\rangle_D = (Ax)^{\mathsf T}Dy =
+x^{\mathsf T}(A^{\mathsf T}D)y$ en $\langle x, u^*(y)\rangle_D
+= x^{\mathsf T}(DA^*)y$ is de matrix van de \omterm{def:b2:quadratic:adjoint}{adjunct}
+\[
+A^* = D^{-1}A^{\mathsf T}D
+= \begin{pmatrix} 1 & 0\\ 0 & \tfrac12\end{pmatrix}
+\begin{pmatrix} 0 & 0\\ 1 & 0\end{pmatrix}
+\begin{pmatrix} 1 & 0\\ 0 & 2\end{pmatrix}
+= \begin{pmatrix} 0 & 0\\ \tfrac12 & 0\end{pmatrix}
+\neq A^{\mathsf T} .
+\]
+Saniteitscontrole op $x = (1,0)$, $y = (0,1)$:
+\[
+\langle u(x), y\rangle_D = \langle (0,0), y\rangle_D = 0,
+\quad
+\langle x, u^*(y)\rangle_D
+= \langle(1,0), (0,\tfrac12)\rangle_D = 0 ;
+\]
+op $x = (0,1)$, $y = (1,0)$:
+\[
+\langle u(x), y\rangle_D = \langle(1,0),(1,0)\rangle_D = 1,
+\quad
+\langle x, u^*(y)\rangle_D =
+\langle(0,1),(0,\tfrac12)\rangle_D = 1 .
+\] Slotinzicht: ``$\operatorname{Mat}(u^*)
+= \operatorname{Mat}(u)^{\mathsf T}$'' is een uitspraak over
+\emph{orthonormale} basissen alleen; in het algemeen mengt de metriek
+$D$ zich, precies zoals bij de simultane reductie van het
+weekeindprobleem.
+\end{example}
+
+\begin{theorem}[Spectraalstelling]\label{thm:b2:quadratic:spectral}
+Laat $u$ een \omterm{def:b2:quadratic:adjoint}{symmetrisch endomorfisme} van een euclidische ruimte $E$
+zijn. Dan heeft $E$ een \emph{orthonormale basis van \omterm{def:b2:reduction:eigen}{eigenvectoren}}
+van $u$; alle \omterm{def:b2:reduction:eigen}{eigenwaarden} zijn reëel, en \omterm{def:b2:reduction:eigen}{eigenruimten} bij
+verschillende \omterm{def:b2:reduction:eigen}{eigenwaarden} zijn orthogonaal. Matrixvorm: elke reële
+symmetrische matrix $A$ schrijft
+\[
+A = P\,D\,P^{\mathsf T},
+\qquad P \text{ orthogonaal } (P^{\mathsf T} P = I),\ D
+\text{ diagonaal}.\index{spectraalstelling}
+\]
+\end{theorem}
+
+\begin{proof}
+\emph{Er bestaat een \omterm{def:b2:reduction:eigen}{eigenvector}.} De functie $x \mapsto \langle u(x),
+x\rangle$ is continu op de eenheidsbol $S$ van $E$, die
+\omterm{def:b2:metric:compact}{compact} is (eindige dimensie, \cref{thm:b2:nvs:finitedim}): zij
+bereikt haar maximum $\lambda$ in enig $a \in S$. We claimen $u(a) =
+\lambda a$. Voor elke $y \perp a$ met $\norm y = 1$ en $t \in \R$ ligt
+de vector $x_t = \frac{a + ty}{\sqrt{1 + t^2}}$ op $S$
+($\norm{a + ty}^2 = 1 + t^2$ door Pythagoras); de gemaximaliseerde
+functie uitwerkend,
+\[
+g(t) = \langle u(x_t), x_t\rangle
+= \frac{\langle u(a), a\rangle + 2t\langle u(a), y\rangle +
+t^2\langle u(y), y\rangle}{1 + t^2}
+\]
+(symmetrie van $u$ voegde de twee kruistermen samen: $\langle u(a),
+y\rangle = \langle a, u(y)\rangle = \langle u(y), a\rangle$).
+$g$ is een differentieerbare functie van $t$ met een maximum in $t =
+0$; de quotiëntregel in $0$ geeft
+\[
+g'(0) = \frac{2\langle u(a), y\rangle\cdot 1 - \langle u(a),
+a\rangle\cdot 0}{1} = 2\langle u(a), y\rangle = 0 .
+\]
+Dus is $u(a)$ orthogonaal op het hele hypervlak $a^\perp$: $u(a)
+\in (a^{\perp})^{\perp} = \R a$, d.w.z.\ $u(a) = \mu a$; en $\mu =
+\langle u(a), a\rangle = \lambda$.
+
+\emph{Inductie.} Het orthogonaal complement $F = a^\perp$ is
+$u$-stabiel: voor $x \perp a$ is $\langle u(x), a\rangle = \langle x,
+u(a)\rangle = \lambda\langle x, a\rangle = 0$. De restrictie
+$u|_F$ is \omterm{def:b2:quadratic:adjoint}{symmetrisch} voor het geïnduceerde inwendig product; inductief
+naar de dimensie heeft $F$ een orthonormale eigenbasis; plak $a$ ervoor.
+
+\emph{Aanvullingen.} \omterm{def:b2:reduction:eigen}{Eigenwaarden} zijn de reële getallen $\langle u(e),
+e\rangle$ op de eigenbasis. Orthogonaliteit van \omterm{def:b2:reduction:eigen}{eigenruimten}: $u(x) =
+\lambda x$, $u(y) = \mu y$ geven $\lambda\langle x, y\rangle =
+\langle u(x), y\rangle = \langle x, u(y)\rangle = \mu\langle x,
+y\rangle$, dus $\langle x, y\rangle = 0$ wanneer $\lambda \neq \mu$.
+Matrixvorm: kolommen van $P$ = de orthonormale eigenbasis.
+\end{proof}
+
+\begin{example}[Een volledige spectraalrun]\label{ex:b2:quadratic:fullrun}
+Diagonaliseer orthogonaal $A = \begin{pmatrix} 1 & 2\\ 2 &
+1\end{pmatrix}$. \omterm{def:b2:reduction:charpoly}{Karakteristieke veelterm} $(1 - \lambda)^2 -
+4$: \omterm{def:b2:reduction:eigen}{eigenwaarden} $3$ en $-1$. \omterm{def:b2:reduction:eigen}{Eigenvectoren}: $(A - 3I)v = 0$
+geeft $v_1 = \frac{1}{\sqrt2}(1,1)$; $(A + I)v = 0$ geeft $v_2
+= \frac{1}{\sqrt2}(1,-1)$ --- orthogonaal, zoals
+\cref{thm:b2:quadratic:spectral} garandeert zonder
+berekening. Met $P = (v_1\ v_2)$ (een rotatie over
+$\frac\pi4$):
+\[
+P^{\mathsf T}AP = \begin{pmatrix} 3 & 0\\ 0 & -1
+\end{pmatrix},
+\qquad
+x^2 + 4xy + y^2 = 3u^2 - v^2
+\quad\text{in het geroteerde stelsel} .
+\]
+Dus is de vorm van \cref{exo:b2:quadratic:1} een hyperboolachtige
+vorm: signatuur $(1,1)$, consistent met haar \omterm{thm:b2:quadratic:gauss}{Gauss-reductie}
+$(x + 2y)^2 - 3y^2$ --- verschillende kwadraten, zelfde
+signatuur, zoals Sylvester eist. Slotinzicht: Gauss gaf het
+antwoord sneller, maar de spectraalroute rapporteert ook dat op
+de eenheidscirkel $q$ precies $\intcc{-1}{3}$ doorloopt, bereikt
+langs $v_2$ en $v_1$: het extra werk koopt meetkunde.
+\end{example}
+
+\begin{corollary}[Hoofdassen; positiviteitstests]\label{cor:b2:quadratic:principalaxes}
+\begin{enumerate}
+  \item Elke \omterm{def:b2:quadratic:def}{kwadratische vorm} $q$ op een euclidische ruimte diagonaliseert
+        in enige \emph{orthonormale} basis: $q(x) = \sum_i \lambda_i
+        x_i^2$ met $\lambda_i$ de \omterm{def:b2:reduction:eigen}{eigenwaarden} van de symmetrische
+        matrix van $q$; de signatuur telt positieve en negatieve
+        \omterm{def:b2:reduction:eigen}{eigenwaarden}.
+  \item Een symmetrische matrix is positief semi-definiet (resp.\
+        definiet) d.e.s.d.a.\ al haar \omterm{def:b2:reduction:eigen}{eigenwaarden} $\geq 0$ (resp.\ $>
+        0$) zijn; en dan zijn de extreme waarden van het Rayleigh-quotiënt
+        \[
+        \min_{\norm x = 1} \langle Ax, x\rangle = \lambda_{\min},
+        \qquad
+        \max_{\norm x = 1} \langle Ax, x\rangle = \lambda_{\max} .
+        \]
+\end{enumerate}
+\end{corollary}
+
+\begin{proof}
+(1) Schrijf $q(x) = \langle A x, x\rangle$ met $A$ \omterm{def:b2:quadratic:adjoint}{symmetrisch} (de
+matrix van $q$ in een orthonormale basis); diagonaliseer $A$ met de
+spectraalstelling: voor $x = \sum x_ie_i$ in de orthonormale
+eigenbasis is
+\[
+q(x) = \Bigl\langle \sum_i \lambda_ix_ie_i,\ \sum_j
+x_je_j\Bigr\rangle = \sum_i \lambda_i x_i^2
+\]
+(orthonormaliteit doodt de kruistermen). De $\pm$-tekens van de
+$\lambda_i$ tellen de signatuur via Sylvester: herschalen van elke
+coördinaat met $\sqrt{\abs{\lambda_i}}$ levert een Gauss-
+reductie met onafhankelijke vormen.
+
+(2) In de eigenbasis is $\langle Ax, x\rangle = \sum \lambda_i
+x_i^2$, gevangen tussen $\lambda_{\min}\norm x^2$ en
+$\lambda_{\max}\norm x^2$, met gelijkheid in de bijbehorende
+\omterm{def:b2:reduction:eigen}{eigenvectoren}; positiviteit van alle \omterm{def:b2:reduction:eigen}{eigenwaarden} is dus equivalent
+met positiviteit van de vorm.
+\end{proof}
+
+\begin{example}\label{ex:b2:quadratic:spectralexample}
+$A = \begin{pmatrix} 2 & 1\\ 1 & 2 \end{pmatrix}$: \omterm{def:b2:reduction:eigen}{eigenwaarden} $3$
+(\omterm{def:b2:reduction:eigen}{eigenvector} $\frac{1}{\sqrt2}(1,1)$) en $1$
+($\frac{1}{\sqrt2}(1,-1)$). De \omterm{def:b2:quadratic:def}{kwadratische vorm} $2x^2 + 2xy + 2y^2$
+wordt $3X^2 + Y^2$ in het geroteerde orthonormale stelsel: de
+hoofdassen van een ellips, berekend. De \omterm{thm:b2:quadratic:gauss}{Gauss-reductie} bereikt ook
+een diagonaalvorm, maar alleen de spectraalstelling bereikt haar
+\emph{zonder lengtes te vervormen}.
+\end{example}
+
+\begin{example}[Een ellips volledig geïdentificeerd]\label{ex:b2:quadratic:ellipserun}
+Welke kromme is $5x^2 + 4xy + 2y^2 = 6$? De matrix
+$\begin{pmatrix} 5 & 2\\ 2 & 2\end{pmatrix}$ heeft \omterm{def:b2:reduction:charpoly}{karakteristieke
+veelterm} $\lambda^2 - 7\lambda + 6 = (\lambda - 1)(\lambda -
+6)$: \omterm{def:b2:reduction:eigen}{eigenwaarden} $1$ en $6$, beide positief --- een ellips.
+Orthonormale \omterm{def:b2:reduction:eigen}{eigenvectoren}: voor $\lambda = 1$, los
+$\begin{pmatrix} 4 & 2\\ 2 & 1\end{pmatrix}v = 0$ op: $v_1 =
+\frac{1}{\sqrt5}(1, -2)$; voor $\lambda = 6$: $v_2 =
+\frac{1}{\sqrt5}(2, 1)$. In de geroteerde coördinaten $(X, Y)$
+langs $(v_2, v_1)$ wordt de vergelijking
+\[
+6X^2 + Y^2 = 6,
+\qquad\text{d.w.z.}\qquad
+X^2 + \frac{Y^2}{6} = 1 :
+\]
+halve assen $1$ (langs $v_2$) en $\sqrt6$ (langs $v_1$).
+Slotinzicht: de grove vorm was gratis --- $\det
+= 6 > 0$ en positief spoor kondigen een ellips aan vóór enige
+\omterm{def:b2:reduction:eigen}{eigenvector} berekend is --- maar alleen de spectraalstelling
+levert de richtingen en lengtes van de assen, d.w.z.\ de echte
+meetkunde.
+\end{example}
+
+\begin{example}[Extrema op de bol, afgelezen van het spectrum]\label{ex:b2:quadratic:sphereextremes}
+Wat zijn de extreme waarden van $q(x,y,z) = 2xy + 2yz + 2zx$ op
+de eenheidsbol? Haar matrix (de all-ones-off-diagonaal van
+\cref{exo:b2:quadratic:2}) heeft \omterm{def:b2:reduction:eigen}{eigenwaarden} $2$ en $-1$
+(dubbel), dus via \cref{cor:b2:quadratic:principalaxes}~(2):
+\[
+\max_{\norm v = 1} q(v) = 2
+\ \text{ in } v = \tfrac{1}{\sqrt3}(1,1,1),
+\qquad
+\min_{\norm v = 1} q(v) = -1
+\ \text{ op de cirkel } x + y + z = 0 .
+\]
+Geen calculus, geen Lagrange-multiplicatoren: de spectraalstelling
+lost deze begrensde optimalisatie meteen op --- en toont de
+maximizer. Slotinzicht: vergelijk met de multiplicatormethode
+van het differentiaalrekeninghoofdstuk, die dezelfde kritieke
+punten vindt met meer werk; voor \emph{kwadratische}
+doelfuncties op bollen zijn spectra de koninklijke weg (het
+weekeindprobleem van het hermitische hoofdstuk bouwt de hele
+Courant--Fischer-theorie op deze waarneming).
+\end{example}
+
+\begin{remark}[Veelgemaakte valkuilen]
+\emph{(i) \omterm{def:b2:quadratic:def}{Congruentie} is geen similariteit:} een basisverandering voor
+een vorm werkt via $P^{\mathsf T}BP$, niet $P^{-1}BP$; \omterm{def:b2:reduction:eigen}{eigenwaarden}
+zijn \emph{geen} invarianten van een \omterm{def:b2:quadratic:def}{kwadratische vorm} ($I$ en $4I$
+zijn congruent via $P = 2I$) --- alleen hun tekens zijn
+(Sylvester). Spreek van de \omterm{def:b2:reduction:eigen}{eigenwaarden} van een vorm pas wanneer een
+inwendig product vastligt. \emph{(ii) Positieve ingangen bewijzen
+niets:} $\begin{pmatrix} 1 & 2\\ 2 & 1\end{pmatrix}$ heeft alle
+ingangen positief, maar signatuur $(1,1)$ ($\det = -3$);
+omgekeerd kan een positief definiete matrix negatieve
+off-diagonale ingangen hebben (\cref{ex:b2:quadratic:tworoads} verschoven:
+$2I - N$ werkt evenzeer). Gebruik
+\cref{met:b2:quadratic:signature}. \emph{(iii) Afhankelijke
+kwadraten:} $q = \ell_1^2 - \ell_2^2$ schrijven zegt niets als
+$\ell_1, \ell_2$ evenredig zijn --- $x^2 + 2xy + y^2 =
+(x+y)^2$ heeft rang $1$, niet $2$; controleer altijd onafhankelijkheid
+vóór het aflezen van de signatuur. \emph{(iv) Bol-extrema
+zonder compactheid:} de Rayleigh-grenzen van
+\cref{cor:b2:quadratic:principalaxes} worden bereikt omdat de
+bol \omterm{def:b2:metric:compact}{compact} is; op de open bal of de hele ruimte heeft een
+indefinitie vorm noch maximum noch minimum.
+\end{remark}
+
+\begin{remark}[Waar dit gebruikt wordt]
+De spectraalstelling is het meest geëxporteerde resultaat van dit
+boek: statistiek diagonaliseert covariantiematrices ermee
+(hoofdcomponentenanalyse), mechanica haalt normale trillingswijzen
+van oscillatie eruit (de simultane reductie van het
+weekeindprobleem), numerieke analyse bouwt Cholesky en
+singuliere-waardeontbindingen erop (zelfde probleem), en het
+volgende hoofdstuk transporteert haar naar complexe hermitische
+ruimten. Het jaar-3-volume bewijst haar oneindigdimensionale
+avatar voor compacte zelftoegevoegde operatoren, waar het
+compactheidsargument van het eindigdimensionale bewijs het hele
+verhaal wordt.
+\end{remark}
+
+\begin{remark}[Perspectieven binnen dit volume]
+\omterm{def:b2:quadratic:def}{Kwadratische vormen} lopen door de rest van boek 4 in drie
+gedaanten. Als \emph{Hessiaanse vormen}: het differentiaalrekening-
+hoofdstuk classificeert kritieke punten via de signatuur van de
+tweede-orde-vorm, dus de invariantie van Sylvester maakt
+``zadel'' tot een welgedefinieerd woord. Als \emph{energieën}: de
+oscillatoren van het differentiaalvergelijkingenhoofdstuk dragen de
+kwadratische energie $\frac12x'^2 + \frac12\omega^2x^2$, en de
+simultane reductie van het weekeindprobleem van dit hoofdstuk is
+precies de extractie van normale trillingswijzen. Als \emph{meetkunde}:
+de kegelsneden van dit hoofdstuk groeien uit tot de kwadratische
+oppervlakken van de meetkundehoofdstukken, waar de tweede
+grondvorm van een oppervlak --- een \omterm{def:b2:quadratic:def}{kwadratische vorm} op elk
+raakvlak --- met haar signatuur beslist of het oppervlak kromt als
+een kom of als een zadel. Het hermitische hoofdstuk, hierna,
+speelt de hele partituur opnieuw over $\C$.
+\end{remark}
+
+\section{Oefeningen}
+
+\begin{exercise}[$\star$]\label{exo:b2:quadratic:1}
+Gauss-reduceer en geef rang en signatuur:
+\[
+q_1(x,y) = x^2 + 4xy + y^2,
+\qquad
+q_2(x,y,z) = x^2 + 2y^2 + 3z^2 + 2xy + 2yz .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:quadratic:2}
+Diagonaliseer orthogonaal $A = \begin{pmatrix} 0 & 1 & 1\\ 1 & 0 &
+1\\ 1 & 1 & 0\end{pmatrix}$ (\omterm{def:b2:reduction:eigen}{eigenwaarden} uit de berekening van
+\cref{ch:b2:reduction}; maak nu de basis
+orthonormaal) en herleid de vorm $q(x,y,z) = 2xy + 2yz + 2zx$ tot
+hoofdassen.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:quadratic:3}
+Bewijs dat $u^{**} = u$, $(u \circ v)^* = v^* \circ u^*$, en dat
+$\ker u^* = (\operatorname{im} u)^{\perp}$. Leid hieruit af
+$\operatorname{rk} u^* = \operatorname{rk} u$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:quadratic:4}
+Laat $A$ reëel \omterm{def:b2:quadratic:adjoint}{symmetrisch} zijn met $A^3 = A$. Bewijs dat $A^2$ de
+matrix is van een orthogonale projectie. Relateer algemener de
+spectrale ontbindingen van $A$ en $P(A)$ voor een veelterm $P$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:quadratic:5}
+Bewijs dat $O(n) = \{P : P^{\mathsf T}P = I\}$ een compacte deelverzameling
+is van $\mathcal{M}_n(\R)$ \emph{(gesloten: inverse beeld van $\{I\}$ onder een
+continue afbeelding; begrensd: kolommen zijn eenheidsvectoren)}. Is zij
+\omterm{def:b2:metric:connected}{samenhangend}?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:quadratic:6}
+(Vierkantswortel) Laat $A$ \omterm{def:b2:quadratic:adjoint}{symmetrisch} positief semi-definiet zijn. Construeer
+een symmetrische positief semi-definiete $B$ met $B^2 = A$, en bewijs
+dat zij \emph{uniek} is \emph{(bestaan: neem vierkantswortels van de
+\omterm{def:b2:reduction:eigen}{eigenwaarden} in een spectraalbasis; uniciteit: een kandidaat $B$
+commuteert met $A = B^2$, dus behoudt haar \omterm{def:b2:reduction:eigen}{eigenruimten} --- herleid tot
+het scalaire geval op elk)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:quadratic:7}
+Voor reëel symmetrische $A$, bewijs dat $\vertiii{A}_2 :=
+\sup_{\norm x_2 = 1}\norm{Ax}_2 = \max_i \abs{\lambda_i}$
+(spectraalstraal), en bereken $\vertiii{A}_2$ voor $A =
+\begin{pmatrix} 1 & 2\\ 2 & 1\end{pmatrix}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:quadratic:8}
+(Criterium van Sylvester) Laat $A$ reëel \omterm{def:b2:quadratic:adjoint}{symmetrisch} zijn met leidende
+principale minoren $\Delta_1, \dots, \Delta_n$ (\omterm{def:b2:linalg:det}{determinanten} van de
+linksboven-blokken). Bewijs dat $A$ positief definiet is d.e.s.d.a.\
+alle $\Delta_k > 0$. \emph{(Voor $\Rightarrow$: restricties van een
+definiete vorm zijn definiet, en de \omterm{def:b2:linalg:det}{determinant} van een positief
+definiete matrix --- het product van haar \omterm{def:b2:reduction:eigen}{eigenwaarden} --- is positief.
+Voor $\Leftarrow$: inductie naar $n$; het linksboven-$(n-1)$-blok is
+positief definiet, diagonaliseer de vorm op die deelruimte en
+maak het kwadraat af in de laatste variabele; het teken van de laatste
+diagonale ingang wordt bestuurd door $\det A = \Delta_n > 0$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:quadratic:9}
+(Courant--Fischer, tweede \omterm{def:b2:reduction:eigen}{eigenwaarde}) Laat $u$ \omterm{def:b2:quadratic:adjoint}{symmetrisch} zijn met
+\omterm{def:b2:reduction:eigen}{eigenwaarden} $\lambda_1 \geq \lambda_2 \geq \dots \geq \lambda_n$.
+Bewijs
+\[
+\lambda_2 = \min_{\substack{H \text{ hypervlak}}}\;
+\max_{\substack{x \in H,\ \norm x = 1}} \langle u(x), x\rangle .
+\]
+\emph{(Voor $\leq$: elk hypervlak snijdt het $2$-vlak opgespannen door
+de top-twee \omterm{def:b2:reduction:eigen}{eigenvectoren}. Voor $\geq$: kies $H =
+(e_1)^{\perp}$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:quadratic:10}
+Bepaal rang en signatuur van $q(x_1, \dots, x_n) = \sum_{i <
+j} x_ix_j$ op $\R^n$ ($n \geq 2$), op twee manieren: via de algebraïsche
+identiteit $2q = \bigl(\sum x_i\bigr)^2 - \sum x_i^2$ samen
+met de restrictie van $q$ tot het hypervlak $\sum x_i = 0$;
+en via berekening van de \omterm{def:b2:reduction:eigen}{eigenwaarden} van haar matrix $\frac12(J - I)$,
+waar $J$ de all-ones-matrix is.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:quadratic:11}
+Laat $A$, $B$ reëel \omterm{def:b2:quadratic:adjoint}{symmetrisch} zijn met $B$ positief semi-definiet.
+Bewijs
+\[
+\lambda_{\min}(A)\operatorname{tr} B
+\;\leq\;
+\operatorname{tr}(AB)
+\;\leq\;
+\lambda_{\max}(A)\operatorname{tr} B .
+\]
+\emph{(Schrijf $B = C^{\mathsf T}C$ en $\operatorname{tr}(AB) =
+\sum_i \langle A c_i, c_i\rangle$ over de kolommen $c_i$ van
+$C^{\mathsf T}$.)} In het bijzonder $\operatorname{tr}(AB) \geq 0$
+wanneer beide positief semi-definiet zijn.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:quadratic:12}
+Op $E = \mathcal{M}_n(\R)$, beschouw $q(M) =
+\operatorname{tr}(M^2)$.
+\begin{enumerate}
+  \item Toon dat $q$ een \omterm{def:b2:quadratic:def}{kwadratische vorm} is met polaire vorm
+        $\varphi(M, N) = \operatorname{tr}(MN)$.
+  \item Toon dat de symmetrische en antisymmetrische matrices
+        $\varphi$-orthogonale deelruimten vormen waarop $q$
+        respectievelijk positief definiet en negatief definiet is
+        \emph{(bereken $\operatorname{tr}(M^2)$ entriesgewijs in
+        elk geval)}.
+  \item Concludeer: $q$ heeft signatuur $\bigl(\frac{n(n+1)}{2},
+        \frac{n(n-1)}{2}\bigr)$ en rang $n^2$.
+\end{enumerate}
+\end{exercise}
+
+\section{Probleem: Cholesky, Hadamard en de polaire
+ontbinding}
+
+\begin{problem}\label{pb:b2:quadratic:1}
+De spectraalstelling is een microscoop; dit probleem gebruikt haar als
+fabriek. Uit Gram-matrices fabriceren we de \emph{Cholesky-
+factorisatie}\index{Cholesky-factorisatie} (en identificeren we de
+Gauss-pivots als verhoudingen van minoren), bewijzen we de \emph{ongelijkheid
+van Hadamard}\index{ongelijkheid van Hadamard} over \omterm{def:b2:linalg:det}{determinanten}, bouwen we
+de \emph{polaire ontbinding}\index{polaire ontbinding} $A =
+QS$ en de \emph{singuliere-waardeontbinding}, classificeren we vlakke
+kegelsneden, en eindigen we met de simultane reductie van twee vormen ---
+de stelling achter normale trillingswijzen van oscillatie. Doorheen het
+probleem is $E = \R^n$ met haar standaard inwendig product.
+
+\medskip
+\noindent\textbf{Deel I --- Gram-matrices en Cholesky.} Voor
+vectoren $v_1, \dots, v_n \in E$ is hun \emph{Gram-matrix}
+$G = \bigl(\langle v_i, v_j\rangle\bigr)_{i,j}$.
+\begin{enumerate}
+  \item Toon dat $G$ \omterm{def:b2:quadratic:adjoint}{symmetrisch} positief semi-definiet is, en
+        positief definiet d.e.s.d.a.\ $(v_1, \dots, v_n)$
+        lineair onafhankelijk is \emph{(bereken $X^{\mathsf T}GX$)}.
+  \item Omgekeerd, toon dat elke symmetrische positief
+        semi-definiete $A$ een Gram-matrix is: $A = C^{\mathsf T}C$
+        voor enige $C$ (gebruik de vierkantswortel van
+        \cref{exo:b2:quadratic:6}), met $C$ inverteerbaar d.e.s.d.a.\ $A$
+        definiet is.
+  \item Leid af dat een positief semi-definiete $A$ voldoet aan
+        $\abs{a_{ij}} \leq \sqrt{a_{ii}\,a_{jj}}$ voor alle $i,
+        j$ \emph{(beperk tot twee coördinaten)} --- de
+        Cauchy--Schwarz-ongelijkheid, matricieel herlezen.
+  \item (Cholesky) Laat $A$ positief definiet zijn. Bewijs dat
+        er een \emph{unieke} bovendriehoeksmatrix $T$ is met
+        positieve diagonale ingangen zodat
+        \[
+        A = T^{\mathsf T}\,T
+        \]
+        \emph{(bestaan: pas Gram--Schmidt toe op vectoren
+        die $A$ realiseren als Gram-matrix; uniciteit: als
+        $T_1^{\mathsf T}T_1 = T_2^{\mathsf T}T_2$, toon dat
+        $T_1T_2^{-1}$ orthogonaal en driehoekig is met
+        positieve diagonaal, dus $I$)}.
+  \item Toon dat de leidende principale minoren voldoen aan
+        $\Delta_k = (t_{11}\cdots t_{kk})^2$, en leid af dat
+        de pivots die de \omterm{thm:b2:quadratic:gauss}{Gauss-reductie} van een
+        positief definiete vorm produceert, genomen in de natuurlijke
+        variabelenvolgorde, zijn
+        \[
+        d_k = \frac{\Delta_k}{\Delta_{k-1}}
+        \qquad (\Delta_0 = 1) :
+        \]
+        de minoren van het criterium van Sylvester
+        (\cref{exo:b2:quadratic:8}) en de pivots van Gauss zijn
+        dezelfde data. Controleer op
+        \cref{ex:b2:quadratic:tworoads}.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel II --- De ongelijkheid van Hadamard.}
+\begin{enumerate}[resume]
+  \item Laat $A$ positief definiet zijn. Bewijs
+        \[
+        \det A \leq a_{11}\,a_{22}\cdots a_{nn}
+        \]
+        \emph{(normaliseer: $B = DAD$ met $D =
+        \operatorname{diag}(a_{ii}^{-1/2})$ heeft eenheidsdiagonaal;
+        begrens $\det B = \prod \mu_i$ via AM--GM tegen
+        $\operatorname{tr} B = n$)}.
+  \item Toon dat gelijkheid geldt d.e.s.d.a.\ $A$ diagonaal is.
+  \item Leid de \emph{ongelijkheid van Hadamard} af: voor elke reële
+        vierkante matrix $M$ met kolommen $c_1, \dots, c_n$,
+        \[
+        \abs{\det M} \leq \prod_{i=1}^{n}\norm{c_i}_2 ,
+        \]
+        met gelijkheid (voor inverteerbare $M$) d.e.s.d.a.\ de kolommen
+        paarsgewijs orthogonaal zijn \emph{(pas vragen 6--7 toe op
+        $M^{\mathsf T}M$)}.
+  \item Meetkundige en combinatorische dividenden: interpreteer
+        vraag 8 als ``het volume van een parallellepipedum is ten
+        hoogste het product van zijn riblengtes''; en toon dat een
+        matrix met alle ingangen in $\intcc{-1}{1}$ voldoet aan
+        $\abs{\det M} \leq n^{n/2}$. (Matrices die deze
+        grens bereiken --- Hadamard-matrices --- bestaan voor $n = 1, 2$
+        en vele veelvouden van $4$; of voor \emph{alle}
+        veelvouden van $4$ is een beroemd open probleem.)
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel III --- \omterm{pb:b2:quadratic:1}{Polaire ontbinding} en singuliere
+waarden.}
+\begin{enumerate}[resume]
+  \item Laat $A$ inverteerbaar zijn. Toon dat $A^{\mathsf T}A$
+        positief definiet is, en dat
+        \[
+        S = \sqrt{A^{\mathsf T}A}
+        \quad\text{(de vierkantswortel van
+        \cref{exo:b2:quadratic:6})},
+        \qquad Q = AS^{-1}
+        \]
+        een factorisatie $A = QS$ geven met $Q$ orthogonaal en
+        $S$ positief definiet.
+  \item Bewijs dat deze factorisatie van een inverteerbare $A$
+        uniek is.
+  \item Breid bestaan uit tot willekeurige $A$: kies
+        $\varepsilon_k \to 0$ met $A + \varepsilon_k I$
+        inverteerbaar, schrijf $A + \varepsilon_kI = Q_kS_k$, en
+        gebruik de compactheid van $O(n)$
+        (\cref{exo:b2:quadratic:5}) om $Q_k \to Q$ te extraheren;
+        toon dat $S_k = Q_k^{\mathsf T}(A + \varepsilon_kI)$
+        convergeert naar enige positief semi-definiete $S$ met $A =
+        QS$ en $S = \sqrt{A^{\mathsf T}A}$. Waar faalt
+        uniciteit voor singuliere $A$?
+  \item (Singuliere-waardeontbinding) Leid af dat elke reële
+        vierkante $A$ schrijft
+        \[
+        A = U\,\Sigma\,V^{\mathsf T},
+        \qquad U, V \in O(n),\quad
+        \Sigma = \operatorname{diag}(\sigma_1, \dots,
+        \sigma_n),\ \sigma_i \geq 0 ,
+        \]
+        waar de $\sigma_i$ (de \emph{singuliere waarden}) de
+        \omterm{def:b2:reduction:eigen}{eigenwaarden} zijn van $\sqrt{A^{\mathsf T}A}$.
+  \item Drie gevolgen: $\vertiii{A}_2 = \sigma_{\max}$ voor
+        \emph{elke} reële $A$ (veralgemening van
+        \cref{exo:b2:quadratic:7}); $\abs{\det A} =
+        \sigma_1\cdots\sigma_n$; en het beeld van de eenheidsbol
+        onder een inverteerbare $A$ is een ellipsoïde met
+        halve assen $\sigma_1, \dots, \sigma_n$ langs de kolommen
+        van $U$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel IV --- Kegelsneden, via de spectraalstelling.}
+Een vlakke kegelsnede is de nulverzameling van $f(x) = q(x) + \langle b,
+x\rangle + c$, met $q \neq 0$ een \omterm{def:b2:quadratic:def}{kwadratische vorm} van matrix $A$,
+$b \in \R^2$, $c \in \R$.
+\begin{enumerate}[resume]
+  \item Herleid $f$ door een rotatie (hoofdassen,
+        \cref{cor:b2:quadratic:principalaxes}) gevolgd door een
+        translatie, en classificeer de mogelijke niet-lege,
+        niet-ontaarde vormen via de signatuur van $q$: ellips
+        ($\det A > 0$), hyperbool ($\det A < 0$), parabool
+        ($\det A = 0$, rang $1$, met de lineaire term niet
+        geabsorbeerd).
+  \item Voer de reductie \omterm{def:b2:metric:complete}{volledig} uit voor
+        \[
+        x^2 + 4xy + y^2 + 2x - 2y = 4 :
+        \]
+        geroteerde coördinaten, gereduceerde vergelijking, aard en
+        middelpunt van de kegelsnede.
+  \item (Centrale kegelsneden) Stel $\det A \neq 0$. Toon dat het
+        \emph{middelpunt} $x_0 = -\frac12 A^{-1}b$ is, en dat de
+        \omterm{def:b2:quadratic:def}{congruentie} via $\begin{pmatrix} I & x_0\\ 0 &
+        1\end{pmatrix}$ van de $3\times3$-matrix $\widetilde Q
+        = \begin{pmatrix} A & b/2 \\ b^{\mathsf T}/2 &
+        c\end{pmatrix}$ oplevert
+        \[
+        \det\widetilde Q = f(x_0)\,\det A :
+        \]
+        de centrale kegelsnede is ontaard (een punt of twee rechten)
+        precies wanneer $\det\widetilde Q = 0$.
+  \item Verifieer vraag 17 op het voorbeeld van vraag 16:
+        bereken $x_0$, $f(x_0)$ en $\det\widetilde Q$, en
+        concludeer opnieuw dat de kegelsnede een niet-ontaarde
+        hyperbool is.
+  \item (Een kwadratische potlood) Voor $\lambda \in \R$, classificeer
+        het oppervlak
+        \[
+        x^2 + y^2 + z^2 + 2\lambda(xy + yz + zx) = 1
+        \]
+        via de \omterm{def:b2:reduction:eigen}{eigenwaarden} van haar matrix \emph{(all-ones-
+        structuur: \omterm{def:b2:reduction:eigen}{eigenwaarden} $1 + 2\lambda$ en $1 -
+        \lambda$ dubbel)}: bol/ellipsoïde, cilinder, paar
+        vlakken, hyperboloïden van één en twee bladen, naar
+        gelang $\lambda$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel V --- Twee vormen tegelijk: simultane
+reductie.}
+\begin{enumerate}[resume]
+  \item Laat $q$ positief definiet zijn en $q'$ een willekeurige
+        \omterm{def:b2:quadratic:def}{kwadratische vorm} op $E$. Bewijs dat er een basis van
+        $E$ is die orthonormaal is voor $q$ en orthogonaal voor
+        $q'$: daarin is $q = \sum x_i^2$ en $q' = \sum \mu_i
+        x_i^2$ \emph{(gebruik $q$ als inwendig product en pas
+        de spectraalstelling toe op het endomorfisme dat
+        $q'$ voorstelt)}.
+  \item Matrixvorm: voor $A$ positief definiet en $B$
+        \omterm{def:b2:quadratic:adjoint}{symmetrisch} is er een inverteerbare $P$ met
+        $P^{\mathsf T}AP = I$ en $P^{\mathsf T}BP =
+        \operatorname{diag}(\mu_1, \dots, \mu_n)$, waar de
+        $\mu_i$ de wortels zijn van $\det(B - \mu A) = 0$.
+  \item Voer het \omterm{def:b2:metric:complete}{volledig} uit voor
+        \[
+        A = \begin{pmatrix} 2 & 1\\ 1 & 1 \end{pmatrix},
+        \qquad
+        B = \begin{pmatrix} 0 & 1\\ 1 & 0 \end{pmatrix} :
+        \]
+        de gegeneraliseerde \omterm{def:b2:reduction:eigen}{eigenwaarden} $\mu_\pm$, en vectoren
+        die beide vormen diagonaliseren.
+  \item Toon dat positieve definietheid niet kan worden weggelaten: voor
+        \[
+        A = \begin{pmatrix} 1 & 0\\ 0 & -1 \end{pmatrix},
+        \qquad
+        B = \begin{pmatrix} 0 & 1\\ 1 & 0 \end{pmatrix},
+        \]
+        diagonaliseert geen basis beide vormen \emph{(als $P$
+        beide diagonaliseerde, zou $\det(B - \mu A)$ splitsen met
+        reële wortels; bereken hem)}.
+  \item Toon dat de $\mu_i$ van vraag 21 de
+        \omterm{def:b2:reduction:eigen}{eigenwaarden} zijn van $A^{-1}B$, en dat $A^{-1}B$, hoewel niet
+        \omterm{def:b2:quadratic:adjoint}{symmetrisch} in het algemeen, altijd \omterm{def:b2:reduction:diag}{diagonaliseerbaar} is met
+        reële \omterm{def:b2:reduction:eigen}{eigenwaarden} \emph{(conjugeren met $\sqrt A$)}.
+  \item Synthese. In één zin elk: (i) de ene stelling
+        waarop elk deel steunde; (ii) welke resultaten van delen
+        I--III overleven voor positief \emph{semi}definiete
+        matrices, en welke definietheid nodig hebben; (iii) het
+        fysische systeem waarvan de kleine oscillaties vragen
+        20--22 diagonaliseren (kinetische en potentiële energie als
+        de twee vormen), en wat de $\mu_i$ daar betekenen.
+\end{enumerate}
+\end{problem}

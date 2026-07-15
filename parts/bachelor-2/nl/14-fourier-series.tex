@@ -1,0 +1,909 @@
+\chapter{Fourierreeksen}\label{ch:b2:fourier}
+
+Kan elk periodiek signaal heropgebouwd worden uit pure sinussen en cosinussen?
+Fouriers stoutmoedige ``ja'' creëerde een eeuw analyse. Dit
+hoofdstuk bewijst de twee pijlers binnen MP*-bereik: de \emph{stelling van
+Dirichlet} (puntsgewijze reconstructie voor stuksgewijs $C^1$-functies,
+via de \omterm{lem:b2:fourier:kernel}{Dirichlet-kern}) en de \emph{identiteit van Parseval} (de energie
+van een signaal is de som van de energieën van zijn harmonischen), en
+oogst de klassieke numerieke reeksen --- Basels $\sum 1/n^2 =
+\pi^2/6$ voorop.
+
+Doorheen zijn functies $2\pi$-periodiek, stuksgewijs continu,
+complexwaardig; $\mathcal{C}$ duidt de continue aan.
+
+\section{Fouriercoëfficiënten}
+
+\begin{definition}\label{def:b2:fourier:coefficients}
+De \emph{Fouriercoëfficiënten}\index{Fouriercoëfficiënten} van $f$
+zijn
+\[
+c_n(f) = \frac{1}{2\pi}\int_{-\pi}^{\pi} f(t)\,\eu^{-\iu n t}\,\dd
+t \qquad (n \in \Z),
+\]
+en de reële-vormcoëfficiënten $a_n = c_n + c_{-n}$, $b_n = \iu(c_n
+- c_{-n})$, zodat de \emph{Fourier-deelsommen}\index{Fourier-deelsommen} zijn
+\[
+S_N(f)(t) = \sum_{n=-N}^{N} c_n(f)\,\eu^{\iu nt}
+= \frac{a_0}{2} + \sum_{n=1}^{N}\bigl(a_n\cos nt + b_n \sin
+nt\bigr).
+\]
+Op $\mathcal{C}$ definieer het hermitische inwendig product $\langle f,
+g\rangle = \frac{1}{2\pi}\int_{-\pi}^{\pi}\conj f\,g$: de
+exponentialen $e_n(t) = \eu^{\iu nt}$ zijn \emph{orthonormaal}
+($\langle e_m, e_n\rangle = \delta_{mn}$, directe berekening), en
+$c_n(f) = \langle e_n, f\rangle$: Fourier-analyse is hermitische
+meetkunde (\cref{ch:b2:hermitian}) in oneindige dimensie.
+\end{definition}
+
+\begin{proposition}[Ongelijkheid van Bessel]\label{prop:b2:fourier:bessel}
+$S_N(f)$ is de orthogonale projectie van $f$ op de ruimte
+$\mathcal{T}_N$ van trigonometrische veeltermen van graad $\leq N$,
+en\index{ongelijkheid van Bessel}
+\[
+\sum_{n=-N}^{N} \abs{c_n(f)}^2 \leq \norm f_2^2 =
+\frac{1}{2\pi}\int_{-\pi}^{\pi} \abs f^2 :
+\]
+de reeks $\sum \abs{c_n}^2$ convergeert, en $c_n(f) \to 0$ als
+$\abs n \to \infty$ (Riemann--Lebesgue voor coëfficiënten).
+\end{proposition}
+
+\begin{proof}
+$f - S_N(f)$ is orthogonaal op elke $e_k$, $\abs k \leq N$ ($\langle
+e_k, f - S_N f\rangle = c_k - c_k = 0$): $S_Nf$ is de orthogonale
+projectie op $\mathcal{T}_N = \operatorname{Vect}(e_{-N}, \dots,
+e_N)$ (projectiestelling van het jaar-1-volume, letterlijk in de
+hermitische setting). Pythagoras: $\norm f_2^2 = \norm{S_Nf}_2^2 +
+\norm{f - S_Nf}_2^2 \geq \norm{S_Nf}_2^2 = \sum_{\abs n \leq N}
+\abs{c_n}^2$; laat $N \to \infty$.
+\end{proof}
+
+\begin{example}[Beste benadering, gemeten]\label{ex:b2:fourier:bestapprox}
+Hoe goed benaderen lagere-graads trigonometrische veeltermen
+de zaagtand $f(t) = t$ (op $\intoo{-\pi}{\pi}$) in het
+kwadratisch gemiddelde? Via \cref{prop:b2:fourier:bessel} is de beste
+graad-$N$-benadering \emph{precies} $S_N(f)$, met gekwadrateerde fout
+\[
+\norm{f - S_Nf}_2^2 = \norm f_2^2 -
+\sum_{\abs n\leq N}\abs{c_n}^2 .
+\]
+Hier is $\norm f_2^2 = \frac{1}{2\pi}\int_{-\pi}^\pi t^2\dd t =
+\frac{\pi^2}{3}$, en uit $b_n = \frac{2(-1)^{n+1}}{n}$
+(\cref{ex:b2:fourier:basel}): $\abs{c_n}^2 + \abs{c_{-n}}^2 =
+\frac{b_n^2}{2} = \frac{2}{n^2}$. Dus
+\[
+\norm{f - S_Nf}_2^2
+= \frac{\pi^2}{3} - \sum_{n=1}^{N}\frac{2}{n^2}
+\qquad\text{: numeriek } 1.29,\ 0.79,\ 0.57,\ 0.44
+\]
+voor $N = 1, 2, 3, 4$ --- dalend, maar langzaam: de staart
+$\sum_{n>N}\frac2{n^2} \sim \frac2N$ wordt bestuurd door het trage
+$\frac1n$-verval van de coëfficiënten, zelf de handtekening van
+de sprong (\cref{exo:b2:fourier:6} achterwaarts gelezen). Slot-
+inzicht: Parseval verandert benaderingskwaliteit in een staart van een
+numerieke reeks --- en voorspelt, vóór enig plaatje, dat
+sprongen \omterm{def:b2:fourier:coefficients}{Fourierreeksen} terughoudend laten convergeren.
+\end{example}
+
+\begin{method}[Fouriercoëfficiënten efficiënt berekenen]\label{met:b2:fourier:coefficients}
+Vóór iets te integreren:
+\begin{enumerate}
+  \item \emph{Pariteit:} even $f$ heeft $b_n = 0$, oneven $f$ heeft $a_n
+        = 0$, en de overlevende integralen herleiden tot $\frac2\pi
+        \int_0^\pi$ --- half het werk, tweemaal de betrouwbaarheid.
+  \item \emph{Trigonometrische veeltermen zijn al klaar:}
+        lineariseer producten ($\cos^3$, $\sin^2\cos$, \dots) en
+        lees de coëfficiënten af
+        (\cref{exo:b2:fourier:9}); orthonormaliteit maakt elke
+        verdere integratie overbodig.
+  \item \emph{Complexe exponentialen voor exponentialen:} voor
+        factoren $\eu^{at}$ of gedempte oscillaties, bereken
+        $c_n$ direct --- één integraal van $\eu^{(a - \iu
+        n)t}$ wint van twee partiële integraties
+        (\cref{exo:b2:fourier:10}).
+  \item \emph{Differentieer een bekende ontwikkeling:} als $f'$
+        bekende coëfficiënten heeft en $f$ continu is, herstelt $c_n(f) =
+        \frac{c_n(f')}{\iu n}$ ($n \neq 0$) alles behalve
+        $c_0$, wat het gemiddelde is --- vaak de snelste route,
+        en legitiem precies onder de hypothesen van
+        \cref{thm:b2:fourier:parseval}~(1).
+\end{enumerate}
+\end{method}
+
+\section{Stelling van Dirichlet}
+
+\begin{lemma}[Dirichlet-kern]\label{lem:b2:fourier:kernel}
+$S_N(f)(x) = \frac{1}{2\pi}\int_{-\pi}^{\pi} f(x + u)\,D_N(u)\,\dd
+u$, waar\index{Dirichlet-kern}
+\[
+D_N(u) = \sum_{n=-N}^{N} \eu^{\iu nu}
+= \frac{\sin\bigl((N + \frac12)u\bigr)}{\sin\frac u2}
+\quad (u \notin 2\pi\Z),
+\qquad
+\frac{1}{2\pi}\int_{-\pi}^{\pi} D_N = 1 .
+\]
+\end{lemma}
+
+\begin{proof}
+Steek de definitie van $c_n$ in $S_N$ en verwissel som en integraal
+(legitiem: de som is eindig):
+\[
+S_N(f)(x)
+= \sum_{n=-N}^{N}\Bigl(\frac{1}{2\pi}\int_{-\pi}^{\pi}
+f(t)\,\eu^{-\iu nt}\dd t\Bigr)\eu^{\iu nx}
+= \frac{1}{2\pi}\int_{-\pi}^{\pi} f(t)
+\sum_{n=-N}^{N}\eu^{\iu n(x-t)}\,\dd t ;
+\]
+substitueer $u = t - x$ en schuif het integratiesegment terug
+naar $\intcc{-\pi}{\pi}$ via $2\pi$-periodiciteit van de integrand;
+het symmetrische indexbereik maakt $\sum_n\eu^{-\iu nu} = D_N(u)$.
+De gesloten vorm: geometrische som met verhouding $\eu^{\iu u}$,
+\[
+D_N(u) = \eu^{-\iu Nu}\,\frac{\eu^{\iu(2N+1)u} - 1}{\eu^{\iu u} -
+1}
+= \frac{\eu^{\iu(N + \frac12)u} - \eu^{-\iu(N+\frac12)u}}
+{\eu^{\iu u/2} - \eu^{-\iu u/2}} ,
+\]
+wat het sinusuotiënt is. Haar gemiddelde is $1$: alleen $n = 0$
+draagt bij.
+\end{proof}
+
+\begin{theorem}[Lemma van Riemann--Lebesgue]\label{thm:b2:fourier:riemannlebesgue}
+Voor $g$ stuksgewijs continu op een segment,
+$\int_a^b g(t)\sin(\lambda t + \varphi)\,\dd t \to 0$ als $\lambda
+\to +\infty$.\index{lemma van Riemann--Lebesgue}
+\end{theorem}
+
+\begin{proof}
+Benader $g$ uniform door stapfuncties
+(\cref{thm:b2:funcseq:weierstrass} is niet nodig --- de elementaire
+stapfunctiebenadering van stuksgewijs continue functies
+voldoet) en integreer elke stap expliciet: elk stuk
+draagt $O\bigl(\frac1\lambda\bigr)$ bij, en de benaderings-
+fout draagt $\varepsilon(b - a)$ bij. Dit argument is \omterm{def:b2:metric:complete}{volledig}
+uitgevoerd als de laatste oefening van het integratiehoofdstuk van
+het jaar-1-volume; voor $C^1$-stukken kan men in plaats daarvan partieel
+integreren en begrenzen met $\frac C\lambda$.
+\end{proof}
+
+\begin{example}[Hoe snel sterven coëfficiënten?]\label{ex:b2:fourier:decaytable}
+Riemann--Lebesgue zegt dat de coëfficiënten naar $0$ neigen; hun
+\emph{snelheid} is een gladheidsmeter. Drie specimens uit dit
+hoofdstuk en zijn oefeningen:
+\[
+\text{blokgolf: } b_n = \frac{4}{\pi n}\ (n\ \text{oneven}),
+\qquad
+\abs t : a_n = \frac{-4}{\pi n^2}\ (n\ \text{oneven}),
+\qquad
+\abs{\sin t} : a_{2k} = \frac{-4}{\pi(4k^2-1)} .
+\]
+Een sprong in $f$ (blokgolf, zaagtand) laat coëfficiënten van
+orde $\frac1n$ over: geen \omterm{def:b2:funcseq:series}{normale convergentie}, Gibbs-overschoot bij de
+sprongen. Continuïteit met een knik --- een sprong alleen in $f'$ ---
+verbetert de orde tot $\frac{1}{n^2}$: \omterm{def:b2:funcseq:series}{normale convergentie},
+uniforme reconstructie. In het algemeen kopen $k$ afgeleiden $c_n =
+O(n^{-k})$ (\cref{exo:b2:fourier:6}), en omgekeerd dwingt een spectrum
+dat sneller vervalt dan elke macht $f$ tot $C^\infty$
+(term voor term differentiëren, nu legitiem). Slot-
+inzicht: regulariteit van het signaal en verval van het spectrum
+zijn dezelfde informatie --- een ingenieur leest de ene af van de
+helling van de andere zonder ooit de functie te tekenen.
+\end{example}
+
+\begin{theorem}[Dirichlet]\label{thm:b2:fourier:dirichlet}
+Laat $f$ $2\pi$-periodiek en stuksgewijs $C^1$ zijn. Dan voor elke $x$,
+\[
+S_N(f)(x) \xrightarrow[N \to \infty]{}
+\frac{f(x^+) + f(x^-)}{2}
+\]
+(het gemiddelde van de eenzijdige limieten) --- in het bijzonder $S_N(f)(x) \to
+f(x)$ in elk continuïteitspunt.\index{stelling van Dirichlet}
+\end{theorem}
+
+
+\begin{proof}
+Via het kernlemma en haar eenheidsgemiddelde, de integraal splitsend in
+$u > 0$ en $u < 0$ helften (elk van gemiddelde $\frac12$):
+\begin{align*}
+S_N(f)(x) - \frac{f(x^+) + f(x^-)}{2}
+&= \frac{1}{2\pi}\int_{0}^{\pi} \bigl(f(x+u) -
+f(x^+)\bigr)D_N(u)\,\dd u\\
+&\quad+ \frac{1}{2\pi}\int_{-\pi}^{0}\bigl(f(x+u) -
+f(x^-)\bigr)D_N(u)\,\dd u .
+\end{align*}
+Behandel de eerste (de tweede is \omterm{def:b2:quadratic:adjoint}{symmetrisch}). Schrijf
+\[
+\bigl(f(x + u) - f(x^+)\bigr)\,D_N(u)
+= \underbrace{\frac{f(x+u) - f(x^+)}{\sin\frac u2}}_{g(u)}\,
+\sin\Bigl(\Bigl(N + \frac12\Bigr)u\Bigr) .
+\]
+De functie $g$ is stuksgewijs continu op $\intoc{0}{\pi}$ en
+heeft een \emph{eindige limiet in $0^+$}: schrijvend
+\[
+g(u) = \frac{f(x+u) - f(x^+)}{u}\cdot\frac{u}{\sin\frac u2} ,
+\]
+neigt de eerste factor naar $f'(x^+)$ (eenzijdige
+differentieerbaarheid, uit stuksgewijs $C^1$) en de tweede naar $2$
+(de standaardlimiet $\frac{\sin v}{v} \to 1$ in $v = \frac
+u2$): $g(0^+) = 2f'(x^+)$ bestaat. Dus strekt $g$ zich stuksgewijs
+continu uit tot $\intcc{0}{\pi}$, en Riemann--Lebesgue
+(\cref{thm:b2:fourier:riemannlebesgue}) stuurt de integraal naar
+$0$. Dit is het hele punt van de hypothese: zonder
+eenzijdige afgeleiden waait de factor $\frac{1}{\sin(u/2)}$
+in $0$ sneller op dan Riemann--Lebesgue kan compenseren, en
+kan \omterm{def:b2:funcseq:def}{puntsgewijze convergentie} oprecht falen voor louter continue
+$f$ --- de kloof die de stelling van Fejér (weekeindprobleem)
+sluit door middeling.
+\end{proof}
+
+\begin{example}[Dirichlet bij een sprong]\label{ex:b2:fourier:jumpvalue}
+Voor de zaagtand $f(t) = t$ op $\intoo{-\pi}{\pi}$
+(\cref{ex:b2:fourier:basel} hieronder) springt de periodieke uitbreiding
+in $t = \pi$ van $f(\pi^-) = \pi$ naar $f(\pi^+) = -\pi$.
+Dirichlet belooft de waarde $\frac{\pi + (-\pi)}{2} = 0$
+daar, en inderdaad verdwijnt elke term van $\sum
+\frac{2(-1)^{n+1}}{n}\sin nt$ in $t = \pi$: de
+reeks convergeert beleefd naar het middelpunt, beide
+eenzijdige waarden negerend. Het evaluatiepunt naar $t =
+\frac\pi2$ verplaatsen (een continuïteitspunt) verandert dezelfde reeks
+in Leibniz' $\frac\pi4$. Eén reeks, twee gedragingen ---
+precies de twee clausules van de stelling.
+\end{example}
+
+\begin{theorem}[Normale convergentie voor $C^1$; Parseval]\label{thm:b2:fourier:parseval}
+\begin{enumerate}
+  \item Als $f$ continu is, $2\pi$-periodiek en stuksgewijs $C^1$,
+        dan is $c_n(f') = \iu n\,c_n(f)$, convergeert de \omterm{def:b2:fourier:coefficients}{Fourierreeks} van $f$
+        \emph{normaal} op $\R$, en is haar som $f$.
+  \item (Parseval) Voor elke stuksgewijs continue $2\pi$-periodieke
+        $f$:\index{identiteit van Parseval}
+        \[
+        \frac{1}{2\pi}\int_{-\pi}^{\pi}\abs{f}^2
+        = \sum_{n=-\infty}^{\infty} \abs{c_n(f)}^2
+        = \frac{\abs{a_0}^2}{4} + \frac12\sum_{n\geq1}
+        \bigl(\abs{a_n}^2 + \abs{b_n}^2\bigr).
+        \]
+        \emph{(Hier bewezen voor $f$ continu stuksgewijs $C^1$;
+        in het algemeen toegegeven.)}
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) Partiële integratie op elk $C^1$-stuk (randtermen cancelen
+door continuïteit en periodiciteit): $c_n(f') = \iu n c_n(f)$. Dan, via
+Cauchy--Schwarz op de twee kwadratisch-sommeerbare families
+(\cref{prop:b2:fourier:bessel} voor $f'$):
+\[
+\sum_{n \neq 0} \abs{c_n(f)} = \sum_{n\neq0}
+\frac{\abs{c_n(f')}}{\abs n}
+\leq \Bigl(\sum \abs{c_n(f')}^2\Bigr)^{1/2}
+\Bigl(\sum_{n\neq0}\frac{1}{n^2}\Bigr)^{1/2} < \infty :
+\]
+\omterm{def:b2:funcseq:series}{normale convergentie} van de \omterm{def:b2:fourier:coefficients}{Fourierreeks}. Haar som is continu en
+valt samen met $f$ in elk punt via Dirichlet
+(\cref{thm:b2:fourier:dirichlet}: $f$ is continu): de reeks
+convergeert naar $f$, uniform.
+
+(2) Voor zulke $f$: $S_N f \to f$ uniform, dus $\norm{f - S_Nf}_2
+\leq \norm{f - S_Nf}_\infty \to 0$, en Pythagoras
+($\norm f_2^2 = \sum_{\abs n \leq N}\abs{c_n}^2 + \norm{f -
+S_Nf}_2^2$) gaat over naar de limiet. De reële vorm is boekhouding met
+$a_n, b_n$.
+\end{proof}
+
+\begin{example}[De $C^1$-staartgrens, kwantitatief gemaakt]\label{ex:b2:fourier:tailbound}
+Het bewijs van \cref{thm:b2:fourier:parseval}~(1) verbergt een bruikbare
+schatting. Voor continue stuksgewijs-$C^1$ $f$ geeft dezelfde
+Cauchy--Schwarz toegepast op alleen de staart
+\[
+\sum_{\abs n > N}\abs{c_n(f)}
+= \sum_{\abs n > N}\frac{\abs{c_n(f')}}{\abs n}
+\leq \Bigl(\sum_{\abs n > N}\abs{c_n(f')}^2\Bigr)^{\!1/2}
+\Bigl(\sum_{\abs n>N}\frac{1}{n^2}\Bigr)^{\!1/2}
+\leq \norm{f'}_2\,\sqrt{\frac{2}{N}} ,
+\]
+via Bessel voor $f'$ en $\sum_{n>N}n^{-2} \leq \frac1N$. Dus
+gehoorzaamt de uniforme fout van de deelsommen
+\[
+\norm{f - S_Nf}_\infty
+\leq \sum_{\abs n>N}\abs{c_n(f)}
+\leq \norm{f'}_2\,\sqrt{\frac2N} .
+\]
+Voor $f(t) = \abs t$: $\norm{f'}_2 = 1$ (de afgeleide is
+$\pm1$), dus tien termen reconstrueren $\abs t$ al uniform
+binnen $\sqrt{0.2} \approx 0.45$, en $N = 10^4$ binnen
+$0.015$. Slotinzicht: één afgeleide koopt de
+uniforme $\frac{1}{\sqrt N}$-snelheid; vergeleken met de
+$\frac1n$-coëfficiëntenwereld van de blokgolf (helemaal geen \omterm{def:b2:funcseq:def}{uniforme
+convergentie}) krijgt het woordenboek van
+\cref{ex:b2:fourier:decaytable} getallen.
+\end{example}
+
+\begin{example}[Basel en vrienden]\label{ex:b2:fourier:basel}
+Laat $f(t) = t$ op $\intoo{-\pi}{\pi}$, $2\pi$-periodiek uitgebreid
+(een zaagtand, stuksgewijs $C^1$). Berekenend, $a_n = 0$ (onevenheid) en
+\[
+b_n = \frac{1}{\pi}\int_{-\pi}^{\pi} t\sin nt\,\dd t
+= \frac{2(-1)^{n+1}}{n} .
+\]
+Dirichlet in $t = \frac\pi2$ herstelt Leibniz' $\frac\pi4 = 1 -
+\frac13 + \frac15 - \dots$; Parseval geeft
+\[
+\frac{1}{2\pi}\int_{-\pi}^{\pi} t^2\,\dd t = \frac{\pi^2}{3}
+= \frac12\sum_{n\geq1}\frac{4}{n^2}
+\quad\Longrightarrow\quad
+\boxed{\;\sum_{n\geq1}\frac{1}{n^2} = \frac{\pi^2}{6}\;}
+\]
+--- Eulers Basel-som, in twee regels. De functie $f(t) = t^2$
+levert evenzo $\sum \frac1{n^4} = \frac{\pi^4}{90}$
+(\cref{exo:b2:fourier:3}).
+\end{example}
+
+\begin{example}[Een volledige ontwikkeling met ingebouwde controle: $\abs{\sin t}$]\label{ex:b2:fourier:abssin}
+De functie $f(t) = \abs{\sin t}$ is continu, even,
+$\pi$-periodiek (dus $2\pi$-periodiek), stuksgewijs $C^1$.
+Evenheid doodt de $b_n$; $a_0 = \frac1\pi\int_{-\pi}^{\pi}
+\abs{\sin t}\dd t = \frac4\pi$; en voor $n \geq 1$ geeft
+product-tot-som
+\[
+a_n = \frac2\pi\int_0^\pi \sin t\cos nt\,\dd t
+= \frac{1}{\pi}\int_0^\pi\bigl(\sin(1+n)t +
+\sin(1-n)t\bigr)\dd t
+= \frac2\pi\cdot\frac{1 + \cos n\pi}{1 - n^2}
+\]
+voor $n \neq 1$ (en $a_1 = 0$ direct): nul voor oneven $n$, en
+$a_{2k} = \frac{-4}{\pi(4k^2-1)}$. Via
+\cref{thm:b2:fourier:parseval}~(1) is de convergentie normaal,
+en
+\[
+\abs{\sin t} = \frac{2}{\pi} - \frac{4}{\pi}
+\sum_{k\geq1}\frac{\cos(2kt)}{4k^2 - 1}
+\qquad (t \in \R) .
+\]
+Ingebouwde controle in $t = 0$: de identiteit eist
+$\sum_{k\geq1}\frac{1}{4k^2-1} = \frac12$, wat telescoperen
+bevestigt:
+\[
+\sum_{k\geq1}\frac{1}{4k^2-1}
+= \frac12\sum_{k\geq1}\Bigl(\frac{1}{2k-1} -
+\frac{1}{2k+1}\Bigr) = \frac12 . \checkmark
+\]
+Slotinzicht: het spectrum van $\abs{\sin}$ leeft alleen op de
+\emph{even} frequenties --- een sinus gelijkrichten verdubbelt haar
+frequentie-inhoud, wat is waarom volgolf-gelijkrichters brommen op
+$100$ of $120$ hertz, tweemaal de netfrequentie.
+\end{example}
+
+\begin{example}[Parseval als rekenmachine]\label{ex:b2:fourier:zetafourodd}
+Parseval verandert ontwikkelingen en masse in numerieke reeksen.
+Pas hem toe op $f(t) = \abs t$ (\cref{exo:b2:fourier:2}: $a_0 =
+\pi$, $a_n = \frac{-4}{\pi n^2}$ voor oneven $n$, de rest nul):
+\[
+\frac{1}{2\pi}\int_{-\pi}^{\pi}t^2\,\dd t = \frac{\pi^2}{3}
+= \frac{a_0^2}{4} + \frac12\sum_{n \text{ oneven}} a_n^2
+= \frac{\pi^2}{4} +
+\frac{8}{\pi^2}\sum_{n\text{ oneven}}\frac{1}{n^4} ,
+\]
+vandaar
+\[
+\sum_{n\text{ oneven}}\frac{1}{n^4}
+= \frac{\pi^2}{8}\Bigl(\frac{\pi^2}{3} -
+\frac{\pi^2}{4}\Bigr) = \frac{\pi^4}{96} .
+\]
+Kruiscontrole tegen \cref{exo:b2:fourier:3}: $\sum\frac1{n^4}$ splitsen
+in oneven en even delen geeft $\zeta$-stijl
+boekhouding $S = S_{\mathrm{oneven}} + \frac{S}{16}$, dus $S =
+\frac{16}{15}\cdot\frac{\pi^4}{96} = \frac{\pi^4}{90}$ ---
+precies de waarde daar gevonden via een andere functie. Twee
+ontwikkelingen, één getal: de consistentie is de isometrie van Parseval
+aan het werk. Slotinzicht: elke nieuwe Fourier-ontwikkeling is een
+genererende machine voor reeksidentiteiten; deel II van het
+weekeindprobleem legt uit waarom de machine zichzelf nooit
+kan tegenspreken.
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=9.2cm, height=5.6cm,
+    xmin=-3.6, xmax=3.6, ymin=-1.5, ymax=1.5,
+    xtick={-3.1416, 0, 3.1416},
+    xticklabels={$-\pi$, $0$, $\pi$}, ytick={-1,1}]
+  \addplot[omExo, thick] coordinates {(-3.1416,-1) (0,-1)};
+  \addplot[omExo, thick] coordinates {(0,1) (3.1416,1)};
+  \addplot[omDef, thick, domain=-3.3:3.3, samples=200]
+    {4/pi*sin(deg(x))};
+  \addplot[omThm, very thick, domain=-3.3:3.3, samples=400]
+    {4/pi*(sin(deg(x)) + sin(deg(3*x))/3 + sin(deg(5*x))/5 +
+     sin(deg(7*x))/7 + sin(deg(9*x))/9)};
+\end{axis}
+\end{tikzpicture}
+
+{\small De blokgolf (grijs) en de \omterm{def:b2:fourier:coefficients}{Fourier-deelsommen} $S_1$
+(blauw) en $S_9$ (rood): convergentie in elk continuïteitspunt, maar
+een hardnekkige $\sim 9\%$-overschoot bij de sprongen --- het
+\emph{Gibbs-fenomeen}\index{Gibbs-fenomeen}. \omterm{def:b2:funcseq:def}{Uniforme
+convergentie} faalt precies omdat de limiet discontinu is.}
+\end{omfigure}
+
+\begin{example}[Translatie en modulatie]\label{ex:b2:fourier:shiftrules}
+Twee éénregelsregels genereren vele ontwikkelingen uit één. Voor $a
+\in \R$, met substitutie $s = t - a$:
+\[
+c_n\bigl(f(\cdot - a)\bigr)
+= \frac{1}{2\pi}\int_{-\pi}^{\pi}f(t - a)\eu^{-\iu nt}\dd t
+= \eu^{-\iu na}\,c_n(f)
+\qquad\text{(translatie moduleert het spectrum)},
+\]
+en direct uit de definitie,
+\[
+c_n\bigl(\eu^{\iu kt}f\bigr) = c_{n-k}(f)
+\qquad\text{(modulatie translateert het spectrum)}.
+\]
+Uitgewerkt voorbeeld: de zaagtand verschoven over $\pi$, $g(t) = f(t -
+\pi)$ met $f(t) = t$, heeft $b_n$-coëfficiënten
+$(-1)^n\cdot\frac{2(-1)^{n+1}}{n} = -\frac2n$: de ontwikkeling
+$g \sim -2\sum\frac{\sin nt}{n}$ van de zaagtand die springt in
+$0$ in plaats van in $\pi$ --- geen integraal herberekend. Slot-
+inzicht: tijdverschuivingen draaien alleen fasen, nooit amplitudes
+($\abs{c_n}$ is verschuivingsinvariant), wat is waarom energie
+(Parseval) en convergentieklasse eigenschappen zijn van de
+\emph{vorm} van het signaal, niet van waar de klok start.
+\end{example}
+
+\begin{remark}[Veelgemaakte valkuilen]
+\emph{(i) Drie convergenties, drie munteenheden:} puntsgewijs
+(Dirichlet: heeft stuksgewijs $C^1$ nodig, betaalt het \emph{middelpunt} bij
+elke sprong --- nooit de eenzijdige waarde), uniform (heeft een
+continue limiet nodig; onmogelijk over een sprong, Gibbs is het
+zichtbare symptoom), en kwadratisch gemiddelde (Parseval: het meest
+robuust, blind voor individuele punten). Noem altijd welke je
+claimt. \emph{(ii) Geen termgewijze differentiatie bij
+default:} de zaagtandreeks van
+\cref{ex:b2:fourier:basel} term voor term differentiëren levert $\sum
+2(-1)^{n+1}\cos nt$, waarvan de termen niet eens naar $0$ neigen ---
+de overdrachtsstellingen van het functierijenhoofdstuk hebben
+\omterm{def:b2:funcseq:def}{uniforme convergentie} van de \emph{afgeleide} reeks nodig, die de
+sprong vernietigt. Eerst gladheid, dan differentiatie
+(\cref{exo:b2:fourier:6} is het woordenboek). \emph{(iii)
+Symmetrische deelsommen:} de stelling van Dirichlet betreft $S_N =
+\sum_{-N}^{N}$; herschikken of één kant eerst sommeren kan
+divergentie in convergentie veranderen en terug. \emph{(iv)
+Normalisatiedrift:} conventies verschillen tussen boeken
+($\frac{1}{2\pi}$ of $\frac1\pi$ vooraan, periode $2\pi$ of
+$1$); de betrouwbare invarianten zijn de orthonormaliteitsrelaties
+--- herbereken $\langle e_m, e_n\rangle$ in de conventie ter
+plaatse vóór een formule te vertrouwen.
+\end{remark}
+
+\begin{remark}[Waar dit gebruikt wordt]
+Parseval is de kiem van de $L^2$-theorie van \omterm{def:b2:fourier:coefficients}{Fourierreeksen}: het
+jaar-3-volume voltooit het plaatje (de exponentialen zijn een
+Hilbert-basis van $L^2$, en de afbeelding $f \mapsto (c_n)$ is een
+bijectieve isometrie). Binnen dit volume bewijst het weekeindprobleem
+de \emph{stelling van Fejér} --- de Cesàro-middelen van de
+\omterm{def:b2:fourier:coefficients}{Fourierreeks} convergeren uniform voor elke continue periodieke
+$f$ --- die de toegegeven algemene Parseval tot stelling promoveert,
+de trigonometrische stelling van Weierstrass oplevert, en twee
+spectaculaire dividenden betaalt: de equidistributiestelling van Weyl en
+de isoperimetrische ongelijkheid. Toegepaste wiskunde leest dit
+hoofdstuk dagelijks: spectra van signalen, harmonischen van trillende
+systemen, en de snelle Fourier-transformatie (de eindige avatar was
+\cref{exo:b2:hermitian:10}).
+\end{remark}
+
+\begin{remark}[Perspectieven binnen dit volume]
+Drie hoofdstukken conversen met dit. Achterwaarts: het hermitische
+hoofdstuk leverde de meetkunde (orthonormale families,
+projecties, Bessel), en het functierijenhoofdstuk de
+analyse (\omterm{def:b2:funcseq:def}{uniforme convergentie}, overdrachtsstellingen, benaderde
+identiteiten --- de Fejér-kern is voor \omterm{def:b2:fourier:coefficients}{Fourierreeksen} wat
+Bernsteins veeltermen waren voor Weierstrass). Zijwaarts: de
+randtheorie van het machtreeksenhoofdstuk keert terug via Abel-
+sommatie, hier gerealiseerd door de Poisson-kern
+(\cref{exo:b2:fourier:12}) --- de straal $r$ van de schijf speelt
+de rol van de sommatieparameter. Voorwaarts: het
+differentiaalvergelijkingenhoofdstuk ontleedt periodieke forcering
+in harmonischen en voert elk aan de frequentierespons van de oscillator;
+resonantie gebeurt wanneer een Fourier-modus van de input
+een eigenfrequentie matcht, wat is waarom zijn weekeindprobleem
+en dat van dit hoofdstuk twee helften van één verhaal zijn.
+\end{remark}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=9.2cm, height=5.6cm,
+    xmin=-3.6, xmax=3.6, ymin=-2.5, ymax=9.5,
+    xtick={-3.1416, 0, 3.1416},
+    xticklabels={$-\pi$, $0$, $\pi$}, ytick={8}]
+  \addplot[omDef, thick, domain=0.02:3.3, samples=300]
+    {sin(deg(8.5*x))/sin(deg(0.5*x))};
+  \addplot[omDef, thick, domain=-3.3:-0.02, samples=300]
+    {sin(deg(8.5*x))/sin(deg(0.5*x))};
+  \addplot[omThm, very thick, domain=0.02:3.3, samples=300]
+    {sin(deg(4*x))^2/(8*sin(deg(0.5*x))^2)};
+  \addplot[omThm, very thick, domain=-3.3:-0.02, samples=300]
+    {sin(deg(4*x))^2/(8*sin(deg(0.5*x))^2)};
+  \node[font=\small, omDef] at (axis cs:1.05,5.2) {$D_8$};
+  \node[font=\small, omThm] at (axis cs:-0.75,6.2) {$F_8$};
+\end{axis}
+\end{tikzpicture}
+
+{\small De \omterm{lem:b2:fourier:kernel}{Dirichlet-kern} $D_8$ (blauw) oscilleert en neemt
+negatieve waarden aan; de Fejér-kern $F_8$ (rood) is niet-negatief,
+concentreert zich in $0$, en heeft gemiddelde $1$: een \emph{benaderde
+identiteit}. Positiviteit is precies wat de \omterm{lem:b2:fourier:kernel}{Dirichlet-kern}
+mist, en wat de stelling van Fejér in het weekeindprobleem
+onvoorwaardelijk maakt.}
+\end{omfigure}
+
+\section{Oefeningen}
+
+\begin{exercise}[$\star$]\label{exo:b2:fourier:1}
+Bereken de \omterm{def:b2:fourier:coefficients}{Fouriercoëfficiënten} van de blokgolf ($f = -1$ op
+$\intoo{-\pi}{0}$, $+1$ op $\intoo{0}{\pi}$), formuleer de conclusie van Dirichlet
+in $t = \frac\pi2$ en bij de sprong $t = 0$, en herstel
+Leibniz' reeks.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:fourier:2}
+Ontwikkel $f(t) = \abs t$ ($\abs t \leq \pi$, $2\pi$-periodiek) in
+\omterm{def:b2:fourier:coefficients}{Fourierreeks}; rechtvaardig \emph{normale} convergentie; evalueer in $t =
+0$ om $\sum_{k\geq0}\frac{1}{(2k+1)^2} = \frac{\pi^2}{8}$ te krijgen,
+en herleid Basel daaruit.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:fourier:3}
+Ontwikkel $f(t) = t^2$ ($\abs t \leq \pi$) en leid af
+\[
+\sum_{n\geq1}\frac{(-1)^{n+1}}{n^2} = \frac{\pi^2}{12},
+\qquad
+\sum_{n\geq1}\frac{1}{n^4} = \frac{\pi^4}{90}
+\quad\text{(Parseval)}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:fourier:4}
+Laat $f$ continu $2\pi$-periodiek zijn met $c_n(f) = 0$ voor alle
+$n$. Bewijs $f = 0$ \emph{(Parseval --- voor welke klasse is hij hier bewezen?
+rechtvaardig dat continuïteit plus stuksgewijs $C^1$ kan worden weggelaten
+door de algemene Parseval toe te geven, of geef het dichtheidsargument in
+hoofdlijnen)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:fourier:5}
+Voor $\alpha \notin \Z$, ontwikkel $f(t) = \cos(\alpha t)$ ($\abs t
+\leq \pi$) en leid de partiele-breukontwikkeling van de
+cotangens af:
+\[
+\pi\cot(\pi\alpha) = \frac{1}{\alpha} + \sum_{n\geq1}
+\frac{2\alpha}{\alpha^2 - n^2} .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:fourier:6}
+Bewijs dat als $f$ $2\pi$-periodiek en $C^k$ is met $f^{(k)}$
+stuksgewijs continu, dan $c_n(f) = O\bigl(\abs n^{-k}\bigr)$:
+gladheid van het signaal $=$ verval van zijn spectrum.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:fourier:7}
+(Ongelijkheid van Wirtinger) Laat $f$ $C^1$, $2\pi$-periodiek zijn, met
+$\int_{-\pi}^{\pi} f = 0$. Bewijs
+\[
+\int_{-\pi}^{\pi} \abs{f}^2 \leq \int_{-\pi}^{\pi} \abs{f'}^2 ,
+\]
+met gelijkheid d.e.s.d.a.\ $f(t) = a\cos t + b\sin t$. \emph{(Parseval op
+beide kanten; vergelijk $\abs{c_n}^2$ en $n^2\abs{c_n}^2$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:fourier:8}
+(De Gibbs-constante) Voor de blokgolf van
+\cref{exo:b2:fourier:1}, evalueer de deelsom in $x_N =
+\frac{\pi}{2N}$: schrijvend $u_k = \frac{(2k+1)\pi}{2N}$ en $\Delta u
+= \frac{\pi}{N}$, toon dat
+\[
+S_{2N-1}\Bigl(\frac{\pi}{2N}\Bigr)
+= \frac{4}{\pi}\sum_{k=0}^{N-1} \frac{\sin u_k}{2k+1}
+= \frac{2}{\pi}\sum_{k=0}^{N-1} \frac{\sin u_k}{u_k}\,\Delta u
+\xrightarrow[N\to\infty]{}
+\frac{2}{\pi}\int_0^{\pi}\frac{\sin u}{u}\,\dd u \approx 1.179 :
+\]
+een Riemann-som van $\frac{2}{\pi}\cdot\frac{\sin u}{u}$ op
+$\intcc{0}{\pi}$ in middelpunten. Concludeer dat de overschoot voorbij
+de sprongwaarde $1$ niet verdwijnt als $N \to \infty$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:fourier:9}
+Ontwikkel $\cos^3 t$ en $\sin^2 t\,\cos t$ in \omterm{def:b2:fourier:coefficients}{Fourierreeks}
+\emph{(lineariseer; een trigonometrische veelterm is zijn eigen Fourier-
+reeks, door uniciteit van coëfficiënten)}. Wat zijn $c_n$,
+$a_n$, $b_n$ voor elk?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:fourier:10}
+Laat $a > 0$ en $f(t) = \eu^{at}$ op $\intoc{-\pi}{\pi}$,
+$2\pi$-periodiek uitgebreid. Bereken
+\[
+c_n(f) = \frac{(-1)^n\sinh(a\pi)}{\pi(a - \iu n)} ,
+\]
+pas de stelling van Dirichlet toe bij de sprong $t = \pi$, en leid de
+partiele-breukontwikkeling van de hyperbolische cotangens af:
+\[
+\coth(\pi a) = \frac{1}{\pi a} + \sum_{n\geq1}
+\frac{2a}{\pi(a^2 + n^2)} .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:fourier:11}
+(Convolutie) Voor $f, g$ continu en $2\pi$-periodiek definieer
+\[
+(f * g)(x) = \frac{1}{2\pi}\int_{-\pi}^{\pi} f(x - t)\,g(t)\,
+\dd t .
+\]
+Toon dat $f * g = g * f$, dat $c_n(f*g) = c_n(f)\,c_n(g)$
+\emph{(om de twee integralen van een continue integrand te verwisselen,
+vergelijk de twee functies van de bovengrens: beide verdwijnen in het
+linker eindpunt en hebben dezelfde afgeleide, via continuïteit en
+differentiatie onder het integraalteken)}, en dat $S_N(f) =
+f * D_N$ voor de \omterm{lem:b2:fourier:kernel}{Dirichlet-kern}. (De Fejér-middelen van het
+weekeindprobleem zijn evenzo convoluties, $\sigma_N(f) = f *
+F_N$.)
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:fourier:12}
+(Poisson-kern: Abel-middelen van \omterm{def:b2:fourier:coefficients}{Fourierreeksen}) Voor $0 \leq r <
+1$ stel $P_r(t) = \sum_{n\in\Z} r^{\abs n}\eu^{\iu nt}$.
+\begin{enumerate}
+  \item Som de twee geometrische reeksen en toon
+        \[
+        P_r(t) = \frac{1 - r^2}{1 - 2r\cos t + r^2} > 0,
+        \qquad
+        \frac{1}{2\pi}\int_{-\pi}^{\pi}P_r = 1 .
+        \]
+  \item Toon dat voor $\delta \leq \abs t \leq \pi$: $P_r(t)
+        \leq \frac{1 - r^2}{1 - 2r\cos\delta + r^2} \to 0$ als
+        $r \to 1^-$, uniform.
+  \item Leid af dat voor elke continue $2\pi$-periodieke $f$,
+        de \emph{Abel-middelen} $(f * P_r)(x) = \sum_n
+        r^{\abs n}c_n(f)\,\eu^{\iu nx}$ uniform naar $f$
+        convergeren als $r \to 1^-$ --- de continu-parameter-
+        broer van de stelling van Fejér, en de Fourier-
+        incarnatie van Abel-sommatie uit het machtreeksen-
+        hoofdstuk.
+\end{enumerate}
+\end{exercise}
+
+\section{Probleem: de stelling van Fejér en haar dividenden}
+
+\begin{problem}\label{pb:b2:fourier:1}
+De stelling van Dirichlet heeft $f$ stuksgewijs $C^1$ nodig; voor louter
+continue $f$ kunnen de deelsommen $S_N(f)$ zich misdragen. Fejérs
+ontdekking: hun \emph{Cesàro-middelen} doen dat nooit. De motor is
+de positiviteit van de Fejér-kern, en de oogst is
+immens: uniforme trigonometrische benadering (Weierstrass),
+uniciteit van \omterm{def:b2:fourier:coefficients}{Fouriercoëfficiënten}, Parseval voor elke functie
+van dit hoofdstuk (het ``toegegeven'' in
+\cref{thm:b2:fourier:parseval} verwijderend), de equidistributiestelling van Weyl,
+en --- een eeuw meetkunde bekronend --- de
+isoperimetrische ongelijkheid.\index{stelling van Fejer@stelling van Fejér}\index{equidistributie}\index{isoperimetrische ongelijkheid}
+Doorheen is $f$ $2\pi$-periodiek en stuksgewijs continu,
+en
+\[
+\sigma_N(f) = \frac{S_0(f) + S_1(f) + \dots +
+S_{N-1}(f)}{N} .
+\]
+
+\medskip
+\noindent\textbf{Deel I --- De Fejér-kern.}
+\begin{enumerate}
+  \item Toon dat $\sigma_N(f)(x) =
+        \frac{1}{2\pi}\int_{-\pi}^{\pi}f(x+u)\,F_N(u)\,\dd u$
+        met $F_N = \frac{D_0 + \dots + D_{N-1}}{N}$, en
+        dat $\frac{1}{2\pi}\int_{-\pi}^{\pi}F_N = 1$.
+  \item Bewijs de gesloten vorm, voor $u \notin 2\pi\Z$:
+        \[
+        F_N(u) = \frac{1}{N}\,
+        \frac{\sin^2\bigl(\frac{Nu}{2}\bigr)}
+        {\sin^2\bigl(\frac u2\bigr)} \;\geq\; 0
+        \]
+        \emph{(som $\sin\bigl((n+\frac12)u\bigr)$ als het
+        imaginaire deel van een geometrische reeks)}.
+  \item Toon de concentratieschatting: voor $0 < \delta \leq
+        \abs u \leq \pi$,
+        \[
+        F_N(u) \leq \frac{1}{N\sin^2\frac\delta2}
+        \xrightarrow[N\to\infty]{} 0
+        \quad\text{uniform} :
+        \]
+        $(F_N)$ is een positieve benaderde identiteit.
+  \item (Stelling van Fejér) Bewijs: als $f$ continu en
+        $2\pi$-periodiek is, dan $\sigma_N(f) \to f$
+        \emph{uniform} op $\R$ \emph{(splits de integraal van
+        $\bigl(f(x+u) - f(x)\bigr)F_N(u)$ bij $\abs u =
+        \delta$; gebruik Heine en vragen 1--3)}.
+  \item Voor stuksgewijs continue $f$, toon de puntsgewijze
+        versie $\sigma_N(f)(x) \to \frac{f(x^+) +
+        f(x^-)}{2}$ in elke $x$, en de uniforme grens
+        $\norm{\sigma_N(f)}_\infty \leq \norm f_\infty$
+        \emph{(positiviteit!)}.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel II --- Weierstrass, uniciteit,
+Parseval.}
+\begin{enumerate}[resume]
+  \item (Trigonometrische Weierstrass) Leid af: elke continue
+        $2\pi$-periodieke functie is een uniforme limiet van
+        trigonometrische veeltermen.
+  \item (Uniciteit) Leid af: een continue $f$ met $c_n(f) = 0$
+        voor alle $n$ is identiek nul --- twee continue
+        periodieke functies met dezelfde \omterm{def:b2:fourier:coefficients}{Fouriercoëfficiënten}
+        vallen samen (\cref{exo:b2:fourier:4}, nu zonder
+        toelating).
+  \item (Parseval, continu geval) Via de projectie-
+        eigenschap van $S_N$ (\cref{prop:b2:fourier:bessel}) en
+        $\sigma_Nf \in \mathcal T_{N-1} \subseteq \mathcal
+        T_N$, bewijs
+        \[
+        \norm{f - S_Nf}_2 \leq \norm{f - \sigma_Nf}_2
+        \leq \norm{f - \sigma_Nf}_\infty
+        \xrightarrow[N\to\infty]{} 0 ,
+        \]
+        en concludeer de identiteit van Parseval voor elke
+        \emph{continue} $2\pi$-periodieke $f$.
+  \item (Parseval, stuksgewijs continu geval) Gegeven $f$
+        stuksgewijs continu en $\varepsilon > 0$, construeer een
+        continue periodieke $g$ met $\norm{f - g}_2 \leq
+        \varepsilon$ \emph{(vervang $f$ door een affine
+        interpolatie op kleine intervallen rond de sprongen)},
+        en leid $\norm{f - S_Nf}_2 \to 0$ af
+        \emph{(gebruik Bessel: $\norm{S_Nh}_2 \leq \norm h_2$)}:
+        Parseval geldt in de volle algemeenheid gesteld in
+        \cref{thm:b2:fourier:parseval} --- het ``toegegeven''
+        is weg.
+  \item (Geen Gibbs voor Fejér) Contrasteer met
+        \cref{exo:b2:fourier:8}: toon dat voor de blokgolf
+        $f$, $\abs{\sigma_N(f)} \leq 1$ overal, voor elke
+        $N$ --- Cesàro-middeling wist de overschoot die
+        $S_N$ achtervolgt. Leg in één zin uit welke eigenschap
+        van $F_N$ verantwoordelijk is.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel III --- Snelheden.}
+\begin{enumerate}[resume]
+  \item Bewijs de twee kerngrenzen, voor $0 < \abs u \leq
+        \pi$:
+        \[
+        F_N(u) \leq N,
+        \qquad
+        F_N(u) \leq \frac{\pi^2}{N u^2}
+        \]
+        \emph{(voor de eerste, $\abs{\sin N\theta} \leq
+        N\abs{\sin\theta}$ via inductie; voor de tweede,
+        $\sin\frac u2 \geq \frac{u}{\pi}$ op
+        $\intcc{0}{\pi}$)}.
+  \item Leid de eerste-momentschatting af
+        \[
+        \frac{1}{2\pi}\int_{-\pi}^{\pi}\abs u\,F_N(u)\,\dd u
+        \;\leq\; \frac{C\,\ln N}{N}
+        \qquad (N \geq 2)
+        \]
+        voor een expliciete constante \emph{(splits bij $\abs u =
+        \frac1N$)}.
+  \item Concludeer: als $f$ $L$-Lipschitz en $2\pi$-periodiek is,
+        dan
+        \[
+        \norm{\sigma_N f - f}_\infty \leq \frac{C\,L\ln N}{N} .
+        \]
+  \item (Saturatie) Bereken $\sigma_N(e_1)$ voor $e_1(t) =
+        \eu^{\iu t}$ en toon $\norm{\sigma_Ne_1 - e_1}_\infty
+        = \frac1N$: zelfs voor de gladste functies convergeert Fejér
+        niet sneller dan $\frac1N$ --- de exacte
+        analoog van de Bernstein-saturatie in het
+        weekeindprobleem van het functierijenhoofdstuk.
+  \item (Localisatie) Toon: als $f$ (stuksgewijs continu)
+        verdwijnt op $\intoo{x - \delta}{x + \delta}$, dan
+        $\sigma_N(f)(x) \to 0$, hoe wild $f$ elders ook is
+        --- convergentie van de middelen in $x$ ziet alleen $f$ bij
+        $x$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel IV --- De equidistributiestelling van Weyl.}
+Een rij $(x_n)_{n\geq1}$ in $\intco{0}{1}$ is
+\emph{equidistribueerd} wanneer, voor elk interval
+$\intcc{a}{b} \subseteq \intcc{0}{1}$,
+\[
+\frac{\#\{n \leq N : x_n \in \intcc ab\}}{N}
+\xrightarrow[N\to\infty]{} b - a .
+\]
+\begin{enumerate}[resume]
+  \item Toon dat $(x_n)$ equidistribueerd is zodra
+        $\frac1N\sum_{n\leq N}f(x_n) \to \int_0^1 f$ voor elke
+        \emph{continue} $1$-periodieke $f$ \emph{(knijp de
+        indicator van $\intcc ab$ tussen twee continue
+        stuksgewijs-affine functies waarvan de integralen $\varepsilon$
+        verschillen)}.
+  \item (Criterium van Weyl, voldoende) Stel
+        \[
+        \frac{1}{N}\sum_{n=1}^{N}\eu^{2\iu\pi kx_n}
+        \xrightarrow[N\to\infty]{} 0
+        \qquad\text{voor elke } k \in \Z\setminus\{0\} .
+        \]
+        Toon $\frac1N\sum f(x_n) \to \int_0^1f$ eerst voor
+        trigonometrische veeltermen, dan voor alle continue
+        $1$-periodieke $f$ via vraag 6 (getransporteerd naar periode
+        $1$): met vraag 16 is $(x_n)$ equidistribueerd.
+  \item Laat $\alpha$ irrationaal zijn en $x_n = \{n\alpha\}$
+        (breukdeel). Begrens de geometrische som
+        \[
+        \Bigl|\sum_{n=1}^{N}\eu^{2\iu\pi kn\alpha}\Bigr|
+        \leq \frac{2}{\abs{1 - \eu^{2\iu\pi k\alpha}}}
+        \qquad (k \neq 0),
+        \]
+        en concludeer de \emph{stelling van Weyl}: $(\{n\alpha\})$ is
+        equidistribueerd in $\intco{0}{1}$.
+  \item Leid af dat $(\{n\alpha\})$ dicht is in
+        $\intcc{0}{1}$ voor irrationaal $\alpha$, en leg in
+        één zin uit waarom equidistributie strikt sterker is
+        dan dichtheid.
+  \item (Leidende cijfers) Bewijs dat de proportie van gehele getallen
+        $n \leq N$ zodat $2^n$ leidend (decimaal) cijfer
+        $1$ heeft neigt naar $\log_{10}2 \approx 0.301$ \emph{(leidend
+        cijfer $1$ betekent $\{n\log_{10}2\} \in
+        \intco{0}{\log_{10}2}$; toon dat $\log_{10}2$
+        irrationaal is)}.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel V --- De isoperimetrische ongelijkheid.} Laat
+$\Gamma$ een gesloten eenvoudige $C^1$-kromme van lengte $L$ zijn die
+een georiënteerde oppervlakte $A$ insluit, geparametriseerd door geschaalde
+booglengte: $z(t) =
+x(t) + \iu y(t)$, $2\pi$-periodiek, met $\abs{z'(t)} =
+\frac{L}{2\pi}$ constant; de ingesloten oppervlakte is
+\[
+A = \frac12\int_0^{2\pi}\bigl(x\,y' - y\,x'\bigr)\dd t
+= \frac{1}{2}\,\Im\int_0^{2\pi}\conj{z}\,z'\,\dd t
+\]
+(hier genomen als definitie van de georiënteerde oppervlakte; het
+hoofdstuk over meervoudige integralen bewijst dat zij overeenkomt met de
+intuïtieve, via de formule van Green).
+\begin{enumerate}[resume]
+  \item Ontwikkel $z(t) = \sum_{n\in\Z}c_n\eu^{\iu nt}$ (de
+        reeks van een $C^1$-functie, normaal convergent) en
+        bewijs, via Parseval toegepast op $z'$:
+        \[
+        \frac{L^2}{2\pi} = \int_0^{2\pi}\abs{z'}^2\dd t
+        = 2\pi\sum_{n\in\Z}n^2\abs{c_n}^2 .
+        \]
+  \item Bewijs evenzo $A = \pi\sum_{n\in\Z}
+        n\,\abs{c_n}^2$ \emph{(Parseval in gepolariseerde vorm:
+        $\frac{1}{2\pi}\int\conj f g = \sum
+        \conj{c_n(f)}c_n(g)$, toegepast op $f = z$, $g = z'$)}.
+  \item (Hurwitz) Concludeer:
+        \[
+        L^2 - 4\pi A = 4\pi^2\sum_{n\in\Z}
+        (n^2 - n)\abs{c_n}^2 \;\geq\; 0 ,
+        \]
+        met gelijkheid d.e.s.d.a.\ $z(t) = c_0 +
+        c_1\eu^{\iu t}$ --- een cirkel. De isoperimetrische
+        ongelijkheid: onder gesloten krommen van lengte $L$ sluit alleen
+        de cirkel oppervlakte $\frac{L^2}{4\pi}$ in.
+  \item Saniteitscontroles: verifieer gelijkheid voor de cirkel van
+        straal $R$ en de strikte ongelijkheid voor het vierkant van
+        zijde $a$; leg uit waarom $n^2 - n \geq 0$ voor elk
+        geheel getal $n$, inclusief de negatieve, en waar
+        de constante snelheid van de parametrisering gebruikt werd.
+  \item Synthese. In één zin elk: (i) de enkele
+        eigenschap van $F_N$ waaruit delen I--III voortvloeien, en
+        die $D_N$ mist; (ii) hoe Cesàro-sommatie hier
+        relateert aan het weekeindprobleem van het machtreeksenhoofdstuk
+        (Frobenius); (iii) welk dividend alleen
+        Weierstrass gebruikte (vraag 6) en welk volle
+        Parseval nodig had; (iv) één zin over wat het jaar-3-volume
+        toevoegt ($L^2$-volledigheid: \omterm{def:b2:fourier:coefficients}{Fourierreeksen} als Hilbert-
+        basis).
+\end{enumerate}
+\end{problem}

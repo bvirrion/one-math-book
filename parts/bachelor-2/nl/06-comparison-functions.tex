@@ -1,0 +1,789 @@
+\chapter{Vergelijking van functies}\label{ch:b2:comparison}
+
+Asymptotische analyse --- de kunst een gecompliceerde grootheid te
+vervangen door een eenvoudige plus een gecontroleerde fout --- begon
+in het volume van Jaar~1 met Taylorontwikkelingen. Dit hoofdstuk
+maakt er een discipline op zich van: ontwikkelingen langs algemene
+schalen, de reeks--integraalvergelijking met haar volle asymptotische
+kracht, de formule van Stirling (\omterm{def:b2:metric:complete}{volledig} bewezen), en de
+systematische studie van impliciet gedefinieerde rijen. Deze
+technieken zijn het dagelijks brood van asymptotische analyse, en elk
+later hoofdstuk dat iets schat --- reeksen, integralen, kansen --- eet
+van deze tafel.
+
+\section{Vergelijkingsrelaties en schalen}
+
+\begin{definition}\label{def:b2:comparison:landau}
+Nabij een punt $a$ ($a \in \R$ of $\pm\infty$), voor functies (of
+rijen, met $n \to \infty$): $f = o(g)$, $f = O(g)$, $f \sim g$ zoals
+in het volume van Jaar~1. Een \emph{vergelijkingsschaal}\index{vergelijkingsschaal}
+in $a$ is een familie van positieve functies, paarsgewijs
+vergelijkbaar, totaal geordend door $o(\cdot)$ --- de standaardschaal
+in $+\infty$ is
+\[
+x^{\alpha} (\ln x)^{\beta}
+\qquad (\alpha, \beta \in \R),
+\]
+lexicografisch geordend in $(\alpha, \beta)$, verfijnd wanneer nodig
+door exponentialen $\eu^{\gamma x}$.
+\end{definition}
+
+\begin{definition}[Asymptotische ontwikkeling]\label{def:b2:comparison:expansion}
+$f$ laat de \emph{asymptotische ontwikkeling}\index{asymptotische
+ontwikkeling}
+\[
+f = c_1 \varphi_1 + c_2\varphi_2 + \dots + c_k \varphi_k +
+o(\varphi_k)
+\qquad (\varphi_{i+1} = o(\varphi_i) \text{ in de schaal})
+\]
+toe wanneer de opeenvolgende resten aan de weergegeven schattingen
+voldoen. De coëfficiënten zijn dan uniek: $c_1 = \lim f/\varphi_1$,
+en inductief $c_{i+1} = \lim\,(f - \sum_{j \leq i}
+c_j\varphi_j)/\varphi_{i+1}$.
+\end{definition}
+
+\begin{example}
+Taylorontwikkelingen zijn \omterm{def:b2:comparison:expansion}{asymptotische ontwikkelingen} langs de
+schaal $(x - a)^k$ in $a$. Maar het begrip is strikt ruimer: in
+$+\infty$,
+\[
+\frac{1}{x - \ln x}
+= \frac1x \cdot \frac{1}{1 - \frac{\ln x}{x}}
+= \frac1x + \frac{\ln x}{x^2} + o\Bigl(\frac{\ln x}{x^2}\Bigr),
+\]
+een ontwikkeling langs de gemengde schaal --- geen Taylorstelling is
+van toepassing, alleen de meetkundige ontwikkeling en de calculus van
+$o$'s.
+\end{example}
+
+\begin{example}[De standaardschaal is echt geordend]\label{ex:b2:comparison:scaleorder}
+De lexicografische claim van \cref{def:b2:comparison:landau} heeft
+één regel bewijs per geval nodig. Vergelijk $x^{\alpha}(\ln
+x)^{\beta}$ en $x^{\alpha'}(\ln x)^{\beta'}$ in $+\infty$. Als
+$\alpha < \alpha'$: de ratio is $x^{\alpha - \alpha'}(\ln
+x)^{\beta - \beta'} \to 0$, omdat een negatieve macht van $x$ elke
+macht van $\ln x$ verplettert (stel $x = \eu^t$: $\eu^{(\alpha -
+\alpha')t}\,t^{\beta - \beta'} \to 0$ door de
+exponentieel-verslaat-polynoom-limiet van het volume van Jaar~1). Als
+$\alpha = \alpha'$ en $\beta < \beta'$: de ratio is $(\ln
+x)^{\beta - \beta'} \to 0$ direct. Dus ordenen de paren $(\alpha,
+\beta)$, lexicografisch geordend, de schaal door $o(\cdot)$ --- en
+de substitutie $x = \eu^t$ is de universele truc voor gemengde
+macht-log-vergelijkingen.
+\end{example}
+
+\begin{example}[Een menagerie rangschikken]\label{ex:b2:comparison:ranking}
+Schalen moeten \emph{geordend} zijn; hier is de standaardoefening. In
+$+\infty$, vergelijk $n^{10}$, $\eu^{\sqrt{\ln n}\,\cdot\,\sqrt n}$,
+$2^n$ en $n^{\ln n}$ door logaritmen te nemen:
+\[
+10\ln n
+\;\ll\; (\ln n)^2
+\;\ll\; \sqrt{n\ln n}
+\;\ll\; n\ln 2 ,
+\]
+waar $a_n \ll b_n$ betekent $a_n = o(b_n)$; de tweede entry is
+$\ln(n^{\ln n})$. Exponentialen bewaren deze strikte kloven (als
+$\ln u_n - \ln v_n \to -\infty$ dan $u_n/v_n \to 0$), dus
+\[
+n^{10} = o\bigl(n^{\ln n}\bigr),
+\qquad
+n^{\ln n} = o\bigl(\eu^{\sqrt{n\ln n}}\bigr),
+\qquad
+\eu^{\sqrt{n\ln n}} = o(2^n) .
+\]
+De moraal, tweemaal: vergelijk altijd via logaritmen (verschillen van
+logs, niet ratio's van logs), en concludeer nooit $u_n \sim v_n$ uit
+$\ln u_n \sim \ln v_n$ --- het paar $n^{10}$ en $n^{\ln n}$ heeft
+$\ln$-ratio naar $\infty$, maar $2^n$ en $4^n$ hebben $\ln$-ratio
+precies $2$ en zijn wild inequivalent.
+\end{example}
+
+\section{Reeks--integraalvergelijking, asymptotisch}
+
+\begin{theorem}\label{thm:b2:comparison:seriesintegral}
+Zij $f$ continu, positief, \emph{dalend} op $\intco{1}{+\infty}$.
+\begin{enumerate}
+  \item Als $\int_1^{\infty} f$ convergeert, voldoen de resten aan
+        \[
+        \int_{n+1}^{\infty} f \;\leq\; \sum_{k > n} f(k) \;\leq\;
+        \int_{n}^{\infty} f .
+        \]
+  \item Als $\int_1^\infty f$ divergeert, voldoen de partiële sommen
+        aan $\sum_{k=1}^{n} f(k) = \int_1^n f + C + o(1)$ voor
+        zekere constante $C$: het verschil $\sum_{k \leq n} f(k) -
+        \int_1^n f$ \emph{convergeert}.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+De inkleming $f(k+1) \leq \int_k^{k+1} f \leq f(k)$ (daling) was het
+apparaat van Jaar~1; sommeren over $k \geq n+1$, resp.\ $k \geq n$,
+geeft (1). Voor (2), stel $u_k = f(k) - \int_k^{k+1} f$: door de
+inkleming, $0 \leq u_k \leq f(k) - f(k+1)$, dus zijn de partiële
+sommen van $\sum u_k$ begrensd door de telescoperende $f(1) -
+f(n+1) \leq f(1)$: de reeks convergeert. Bovendien is de rij
+$\bigl(\int_n^{n+1} f\bigr)_n$ niet-stijgend ($f$ daalt) en
+niet-negatief, dus convergent. Schrijvend
+\[
+\sum_{k=1}^{n} f(k) - \int_1^n f
+= \sum_{k=1}^{n} u_k + \int_n^{n+1} f ,
+\]
+convergeert de rechterkant als $n \to \infty$: het verschil
+convergeert naar een constante $C$, wat uitspraak (2) is.
+\end{proof}
+
+\begin{example}[De harmonische ontwikkeling]\label{ex:b2:comparison:harmonic}
+Voor $f(t) = \frac1t$: $H_n = \ln n + \gamma + o(1)$, herwint de
+constante van Euler (volume van Jaar~1) met een schoner bewijs. Eén
+orde verder duwen (\cref{exo:b2:comparison:3}):
+\[
+H_n = \ln n + \gamma + \frac{1}{2n} + o\Bigl(\frac1n\Bigr).
+\]
+Getallen maken de winst zichtbaar bij $n = 10$: $H_{10} =
+2.928968\dots$ en $\ln 10 = 2.302585\dots$, dus de ruwe schatting
+van $\gamma$ is $H_{10} - \ln 10 = 0.626383$, $0.049$ ernaast;
+aftrekken van de correctie $\frac1{20}$ geeft $0.576383$, naast
+$\gamma = 0.577216$ met slechts $8.3\cdot10^{-4}$ --- wat zelf de
+volgende term $\frac{1}{12\cdot100}$ van de ontwikkeling is, zoals
+het weekendvraagstuk bewijst (vraag 8).
+\end{example}
+
+\begin{example}[Een ruwe $\ln(n!)$ zonder Stirling]\label{ex:b2:comparison:lnfactorial}
+Het inklemingsapparaat alleen al lokaliseert $\ln(n!)$. Aangezien
+$\ln$ stijgt,
+\[
+\int_{k-1}^{k}\ln t\,\dd t \;\leq\; \ln k \;\leq\;
+\int_{k}^{k+1}\ln t\,\dd t ,
+\]
+en sommeren over $k = 2, \dots, n$ (met $\int_1^n\ln = n\ln n - n +
+1$):
+\[
+n\ln n - n + 1 \;\leq\; \ln(n!) \;\leq\; (n+1)\ln(n+1) - n .
+\]
+Beide hekken zijn $n\ln n - n + O(\ln n)$: dus $\ln(n!) = n\ln n - n
++ O(\ln n)$, en in het bijzonder $\ln(n!) \sim n\ln n$. Wat Stirling
+toevoegt zijn de volgende twee treden --- de $\frac12\ln n$ en de
+constante $\ln\sqrt{2\pi}$ --- die de fijnere telescopatie van
+\cref{thm:b2:comparison:stirling} kosten. Weten welke precisie elk
+instrument koopt is de helft van asymptotisch vakmanschap.
+\end{example}
+
+\begin{example}[Cancellatie eist ontwikkelingen]\label{ex:b2:comparison:cancellation}
+Bereken de limiet van $\sqrt{n^2 + n} - n$. Beide termen zijn $\sim
+n$, en ``$\sim n - n$'' is zinloos: equivalenten kunnen niet worden
+afgetrokken. Ontwikkel in plaats daarvan:
+\[
+\sqrt{n^2 + n} - n
+= n\Bigl(\sqrt{1 + \tfrac1n} - 1\Bigr)
+= n\Bigl(\frac{1}{2n} - \frac{1}{8n^2} +
+O\Bigl(\frac1{n^3}\Bigr)\Bigr)
+= \frac12 - \frac{1}{8n} + O\Bigl(\frac1{n^2}\Bigr) :
+\]
+limiet $\frac12$, met de naderingssnelheid $\frac1{8n}$ als bonus.
+Het mechanisme verdient een naam: een verschil van twee grote
+equivalente grootheden leeft \omterm{def:b2:metric:complete}{volledig} in hun \emph{volgende}
+termen, dus moet men ontwikkelen tot de eerste orde waarop de twee
+kanten verschillen --- en de rest meedragen om te certificeren dat
+niets anders op die orde overleeft.
+\end{example}
+
+\begin{example}[Een divergente vergelijking, uitgewerkt]\label{ex:b2:comparison:loglog}
+Voor $f(t) = \frac{1}{t\ln t}$ op $\intco{2}{+\infty}$ (continu,
+positief, dalend): $\int_2^x f = \ln\ln x - \ln\ln 2 \to \infty$,
+dus door \cref{thm:b2:comparison:seriesintegral}~(2),
+\[
+\sum_{k=2}^{n}\frac{1}{k\ln k} = \ln\ln n + C + o(1)
+\]
+voor zekere constante $C$. Twee lessen. Eerst, de divergentie is
+echt maar gletsjerachtig: de partiële som overschrijdt $4$ eerst
+rond $n \approx \eu^{\eu^{4 - C}}$, astronomisch groot. Ten tweede
+werd de \emph{vorm} $\ln\ln n$ geleverd door een antiderivaat, niet
+geraden: voor monotone termen is de integraal het canonieke
+sommeerapparaat, en de constante $C$ --- zoals Eulers $\gamma$ ---
+is het geheugen van de begintermen.
+\end{example}
+
+\section{De formule van Stirling}
+
+\begin{lemma}[Wallisintegralen, herzien]\label{lem:b2:comparison:wallis}
+Zij $W_n = \int_0^{\pi/2} \sin^n t\,\dd t$. Dan $nW_nW_{n-1} =
+\frac\pi2$ voor $n \geq 1$, $(W_n)$ daalt, en $W_n \sim
+\sqrt{\dfrac{\pi}{2n}}$.
+\end{lemma}
+
+\begin{proof}
+Partiële integratie geeft $nW_n = (n-1)W_{n-2}$ ($n \geq 2$), dus is
+$nW_nW_{n-1}$ constant in $n$, gelijk aan $1 \cdot W_1 W_0 =
+\frac\pi2$. Daling: $\sin^{n+1} \leq \sin^n$ op
+$\intcc{0}{\frac\pi2}$. De squeeze, in detail: monotoniciteit geeft
+$W_{n+1} \leq W_n \leq W_{n-1}$, en delen door $W_{n-1} > 0$,
+\[
+\frac{n}{n+1} = \frac{W_{n+1}}{W_{n-1}} \leq
+\frac{W_n}{W_{n-1}} \leq 1 ,
+\]
+de linkeridentiteit uit de recurrentie op index $n + 1$. Beide
+grenzen gaan naar $1$: $W_n \sim W_{n-1}$, vandaar
+\[
+nW_n^2 \sim nW_nW_{n-1} = \frac\pi2
+\qquad\Longrightarrow\qquad
+W_n \sim \sqrt{\frac{\pi}{2n}} .
+\]
+\end{proof}
+
+\begin{example}[De eerste Wallisintegralen]\label{ex:b2:comparison:wallisvalues}
+Uit $W_0 = \frac\pi2$, $W_1 = 1$ en de recurrentie $nW_n =
+(n-1)W_{n-2}$:
+\[
+W_2 = \frac\pi4, \qquad
+W_3 = \frac23, \qquad
+W_4 = \frac{3\pi}{16}, \qquad
+W_5 = \frac{8}{15}, \qquad
+W_6 = \frac{5\pi}{32}.
+\]
+Even indices dragen een $\pi$, oneven zijn rationaal --- de twee
+verweven producten van de gesloten vormen. Numeriek $W_6 \approx
+0.4909$ tegen de asymptotiek $\sqrt{\pi/12} \approx 0.5116$: bij $n
+= 6$ is het equivalent al binnen $5\%$, en de productidentiteit is
+exact bij elke $n$: $6\,W_6W_5 = 6\cdot\frac{5\pi}{32}\cdot\frac8{15}
+= \frac\pi2$. Kleine tabellen als deze zijn de goedkoopste manier om
+een algebrafout te vangen voordat zij een asymptotisch argument
+infecteert.
+\end{example}
+
+\begin{theorem}[Stirling]\label{thm:b2:comparison:stirling}
+\[
+n! \;\sim\; \sqrt{2\pi n}\, \Bigl(\frac{n}{\eu}\Bigr)^{\!n}
+.\index{formule van Stirling}
+\]
+\end{theorem}
+
+\begin{proof}
+\emph{Stap 1: $n! \sim C \sqrt n\, (n/\eu)^n$ voor zekere constante
+$C > 0$.} Stel
+\[
+d_n = \ln(n!) - \Bigl(n + \frac12\Bigr)\ln n + n .
+\]
+Dan
+\[
+d_n - d_{n+1}
+= \Bigl(n + \frac12\Bigr) \ln\frac{n+1}{n} - 1
+= \Bigl(n + \frac12\Bigr)\Bigl(\frac1n - \frac{1}{2n^2} +
+\frac{1}{3n^3} + o\bigl(n^{-3}\bigr)\Bigr) - 1
+= \frac{1}{12n^2} + o\Bigl(\frac{1}{n^2}\Bigr),
+\]
+door de Taylorontwikkeling van $\ln(1 + \frac1n)$. De reeks $\sum
+(d_n - d_{n+1})$ convergeert dus absoluut (vergelijking met $\sum
+n^{-2}$), dus convergeert $(d_n)$, zeg naar $d$; exponentiëren, $n!
+\sim C\sqrt n\,(n/\eu)^n$ met $C = \eu^{d}$.
+
+\emph{Stap 2: $C = \sqrt{2\pi}$ via Wallis.} De gesloten vorm
+$W_{2p} = \frac{(2p)!}{4^p (p!)^2}\cdot\frac\pi2$ (uit de
+recurrentie, berekening van Jaar~1 herdaan in de setting van
+\cref{lem:b2:comparison:wallis}) combineert met Stap 1:
+\[
+W_{2p} \sim \frac{C\sqrt{2p}\,(2p/\eu)^{2p}}
+{4^p\,\bigl(C\sqrt p\,(p/\eu)^p\bigr)^2}\cdot\frac{\pi}{2}
+= \frac{\sqrt{2p}}{C\,p}\cdot\frac{\pi}{2}
+= \frac{\pi}{C}\cdot\frac{1}{\sqrt{2p}} .
+\]
+Vergelijken met $W_{2p} \sim \sqrt{\frac{\pi}{4p}}$
+(\cref{lem:b2:comparison:wallis}): $\frac{\pi}{C\sqrt{2p}} =
+\sqrt{\frac{\pi}{4p}}\,(1 + o(1))$ forceert $C = \pi
+\sqrt{\frac{4p}{2p\,\pi}} = \sqrt{2\pi}$.
+\end{proof}
+
+\begin{example}[Centraal binomiaalcoëfficiënt]\label{ex:b2:comparison:centralbinomial}
+\[
+\binom{2n}{n} = \frac{(2n)!}{(n!)^2}
+\sim \frac{\sqrt{4\pi n}\,(2n/\eu)^{2n}}{2\pi n\,(n/\eu)^{2n}}
+= \frac{4^n}{\sqrt{\pi n}} :
+\]
+de kans dat een symmetrische random walk op tijd $2n$ naar $0$
+terugkeert is $\sim \frac{1}{\sqrt{\pi n}}$ --- een aankondiging van
+\cref{ch:b2:randomvar}.
+\end{example}
+
+\begin{remark}[Perspectieven binnen dit volume]\label{rem:b2:comparison:perspectives}
+Elk kwantitatief hoofdstuk vooruit spreekt de taal van dit
+hoofdstuk. \cref{ch:b2:series} classificeert reeksen door termen te
+vergelijken met de schaal $n^{-\alpha}(\ln n)^{-\beta}$ --- haar
+weekendvraagstuk brengt die grens \omterm{def:b2:metric:complete}{volledig} in kaart.
+\cref{ch:b2:integration} doet hetzelfde voor oneigenlijke
+integralen, met de identieke schaal in de continue variabele.
+\cref{ch:b2:powerseries} berekent convergentiestralen uit
+$\limsup\abs{a_n}^{1/n}$, een equivalent-van-$n$-de-wortels-oefening
+waar Stirling de standaardsleutel is ($\sqrt[n]{n!} \sim \frac
+n\eu$, \cref{exo:b2:comparison:4}). En de kanshoofdstukken cashen
+Stirling direct: de lokale schattingen van \cref{ch:b2:randomvar}
+voor binomiaalcoëfficiënten zijn \cref{ex:b2:comparison:centralbinomial}
+en \cref{ex:b2:comparison:lopsided} letterlijk. Asymptotiek is hier
+geen hoofdstuk; het is het accent van het volume.
+\end{remark}
+
+\begin{method}[De bootstrapchecklist]\label{met:b2:comparison:checklist}
+Voor je een gebootstrapte ontwikkeling vertrouwt, audit vier punten.
+(1) \emph{Eerst bestaan:} de wortel of rij moet vastgepind worden
+(monotoniciteit, tussenwaarden) vóór enige ontwikkeling ---
+symbolen zonder referenten ontwikkelen prachtig en betekenen niets.
+(2) \emph{Eén orde per doorgang:} elke substitutie mag alleen
+vertrouwd worden tot de orde van de ingevoerde schatting; twee
+nieuwe termen uit één doorgang extraheren is de klassieke bron van
+foute coëfficiënten. (3) \emph{Resten rijden mee:} draag de
+$o(\cdot)$ door elke algebraïsche stap en laat absorptie (kleinere
+termen opgeslokt door grotere resten) aan het eind expliciet
+gebeuren. (4) \emph{Numerieke audit:} evalueer bij één eerlijke
+waarde van $n$; een coëfficiëntfout overleeft algebraïsche
+herleiding verrassend vaak, en bijna nooit rekenkunde.
+\end{method}
+
+\begin{remark}[Veelgemaakte valkuilen]\label{rem:b2:comparison:pitfalls}
+(i) Equivalenten \emph{optellen} slecht: uit $u_n \sim n + \ln n$ en
+$v_n \sim -n$ mag men \emph{niet} concluderen $u_n + v_n \sim \ln
+n$; cancellaties eisen ontwikkelingen met expliciete resten, nooit
+kale equivalenten. (ii) Exponentieer nooit een equivalentie: $n + 1
+\sim n$ maar $\eu^{n+1} \not\sim \eu^n$; de veilige richting is
+logaritmen nemen van equivalenten die naar $+\infty$ gaan
+(weekendvraagstuk van dit hoofdstuk, vraag 24). (iii) Een
+\omterm{def:b2:comparison:expansion}{asymptotische ontwikkeling} is gehecht aan een \emph{schaal}:
+schrijven $f = \frac1x + o\bigl(\frac1{x^2}\bigr)$ claimt meer dan
+$f = \frac1x + o\bigl(\frac1x\bigr)$, en de twee mengen
+invalideert latere algebra. (iv) In bootstraps, substitueer de
+\emph{hele} huidige ontwikkeling, rest inbegrepen --- een
+$o(\cdot)$ mid-pass droppen produceert aannemelijke maar foute
+coëfficiënten. (v) De reeks--integraalvergelijking eist
+monotoniciteit: voor oscillerende termen faalt zij botweg
+(vergelijk $\sum\frac{\sin k}k$, \cref{ch:b2:series}).
+\end{remark}
+
+\begin{example}[Stirling in getallen]\label{ex:b2:comparison:stirlingnum}
+Bij $n = 10$: de formule geeft $\sqrt{20\pi}\,(10/\eu)^{10}
+\approx 3\,598\,696$ tegen $10! = 3\,628\,800$: relatieve fout
+$8.3\cdot10^{-3}$, opmerkelijk voor een ``asymptotische'' uitspraak
+bij $n = 10$. De fout heeft structuur --- de exacte verfijning $n!
+= \sqrt{2\pi n}\,(n/\eu)^n\bigl(1 + \frac1{12n} +
+O(n^{-2})\bigr)$ --- waarvan de eerste correctie $\frac1{120}
+\approx 8.3\cdot10^{-3}$ de waargenomen kloof bijna exact verklaart.
+De Euler--Maclaurin-machinerie van het weekendvraagstuk is precies de
+systematische bron van zulke correctietermen.
+\end{example}
+
+\begin{remark}[Waar dit hoofdstuk gebruikt wordt]
+Asymptotische vergelijking is de grammatica van alles kwantitatiefs
+stroomafwaarts: de convergentietests en het Bertrandpanorama van
+\cref{ch:b2:series}, de integreerbaarheidscriteria van
+\cref{ch:b2:integration}, de convergentiestraalberekeningen van
+\cref{ch:b2:powerseries}, en de limietstellingen van
+\cref{ch:b2:randomvar} (waar Stirling de de Moivre--Laplace-schattingen
+draait). Het volume van Jaar~3 industrialiseert het ene idee dat we
+hier met de hand bewijzen --- extraheer de hoofdterm, begrens de
+rest --- tot de Laplace-methode en gedomineerde convergentie.
+\end{remark}
+
+\begin{example}[Een integraal vergeleken met zichzelf: $\int_2^x \frac{\dd t}{\ln t}$]\label{ex:b2:comparison:liworked}
+De vergelijkingsgereedschapskist loopt ook op integralen. Zij $F(x)
+= \int_2^x\frac{\dd t}{\ln t}$ (het integrandum is continu op
+$\intco2\infty$). Partiële integratie:
+\[
+F(x) = \Bigl[\frac{t}{\ln t}\Bigr]_2^x +
+\int_2^x\frac{\dd t}{(\ln t)^2}
+= \frac{x}{\ln x} + O\Bigl(\int_2^x\frac{\dd t}{(\ln
+t)^2}\Bigr) + O(1),
+\]
+en de restintegraal is $o\bigl(\frac{x}{\ln x}\bigr)$: splits haar
+in $\sqrt x$, begrensend door
+\[
+\int_2^{\sqrt x}\frac{\dd t}{(\ln t)^2} \leq \sqrt x
+\qquad\text{en}\qquad
+\int_{\sqrt x}^{x}\frac{\dd t}{(\ln t)^2} \leq
+\frac{x}{(\ln\sqrt x)^2} = \frac{4x}{(\ln x)^2} .
+\]
+Dus $F(x) \sim \frac{x}{\ln x}$. Lezers die de priemgetalstelling
+in het weekendvraagstuk van dit hoofdstuk ontmoetten herkennen $F$:
+zij is de logaritmische integraal, de betere schatter van $\pi(x)$,
+en de berekening toont dat zij tot op eerste orde met
+$\frac{x}{\ln x}$ overeenkomt.
+\end{example}
+
+\begin{example}[Stirling op een scheve binomiaal]\label{ex:b2:comparison:lopsided}
+Dezelfde drie-faculteitsroutine als voor
+\cref{ex:b2:comparison:centralbinomial} geeft, voor $\binom{3n}{n}
+= \frac{(3n)!}{n!\,(2n)!}$:
+\[
+\binom{3n}{n} \sim
+\frac{\sqrt{6\pi n}\,(3n/\eu)^{3n}}
+{\sqrt{2\pi n}\,(n/\eu)^{n}\cdot\sqrt{4\pi n}\,(2n/\eu)^{2n}}
+= \sqrt{\frac{3}{4\pi n}}\,
+\Bigl(\frac{27}{4}\Bigr)^{\!n} .
+\]
+De exponentiële rate $\frac{27}4 = \frac{3^3}{2^2}$ is
+$\eu^{3n\,H(1/3)}$ in de entropienotatie van informatietheorie:
+scheve binomialen groeien strikt trager dan de centrale $4^n$ per
+twee stappen --- hier $(27/4)^{1/3} \approx 1.89 < 2$ per stap. Elke
+binomiale asymptotiek in combinatoriek en kansrekening
+(\cref{ch:b2:randomvar}) is deze ene berekening met andere
+gewichten.
+\end{example}
+
+\section{Impliciet gedefinieerde rijen}
+
+\begin{method}\label{met:b2:comparison:implicit}
+Om de asymptotiek van oplossingen $x_n$ van een vergelijking $F(x,
+n) = 0$ te vinden:\index{impliciete rij}
+\begin{enumerate}
+  \item \emph{Lokaliseer}: bewijs bestaan en uniciteit van $x_n$ in
+        een bepaald interval (monotoniciteit, tussenwaardestelling),
+        en vind haar ruwe gedrag (limiet, groeiorde).
+  \item \emph{Bootstrap}: substitueer de ruwe vorm $x_n =
+        (\text{hoofdterm})(1 + \varepsilon_n)$ in de vergelijking en
+        los de volgende orde van $\varepsilon_n$ op; herhaal, elke
+        doorgang verfijnt één orde.
+\end{enumerate}
+\end{method}
+
+\begin{example}\label{ex:b2:comparison:tan}
+Voor $n \geq 1$ heeft de vergelijking $\tan x = x$ precies één
+oplossing $x_n$ in $\intoo{n\pi - \frac\pi2}{n\pi + \frac\pi2}$ (de
+functie $\tan x - x$ stijgt daar van $-\infty$ naar $+\infty$, haar
+afgeleide is $\tan^2 x \geq 0$). \emph{Ruw:} $x_n = n\pi +
+\frac\pi2 - y_n$ met $y_n \in \intoo{0}{\pi}$; aangezien $x_n \to
+\infty$ en $\tan x_n = x_n \to +\infty$, nadert $x_n$ de asymptoot
+van links: $y_n \to 0$. \emph{Bootstrap:} $\tan x_n = \cot y_n =
+\frac{1}{\tan y_n} \sim \frac{1}{y_n}$, en de vergelijking $\cot y_n
+= x_n \sim n\pi$ geeft $y_n \sim \frac{1}{n\pi}$. Dus
+\[
+x_n = n\pi + \frac\pi2 - \frac{1}{n\pi} +
+o\Bigl(\frac1n\Bigr),
+\]
+en het proces gaat door tot elke orde
+(\cref{exo:b2:comparison:6}).
+\end{example}
+
+\begin{example}[Een tweede run van de methode]\label{ex:b2:comparison:xplusln}
+Los $x + \ln x = n$ asymptotisch op. \emph{Lokaliseer:} $x \mapsto
+x + \ln x$ stijgt van $-\infty$ naar $+\infty$ op
+$\intoo{0}{+\infty}$: een unieke wortel $x_n$, en $x_n \to \infty$.
+\emph{Ruw:} $\ln x_n = o(x_n)$ geeft $x_n \sim n$.
+\emph{Bootstrap:} uit $x_n = n - \ln x_n$ en $\ln x_n = \ln n +
+o(1)$ (logaritmen van equivalenten, beide kanten $\to \infty$):
+\[
+x_n = n - \ln n + o(1) ;
+\]
+nog een doorgang, met $\ln x_n = \ln\bigl(n - \ln n + o(1)\bigr) =
+\ln n - \frac{\ln n}{n} + o\bigl(\frac{\ln n}n\bigr)$:
+\[
+x_n = n - \ln n + \frac{\ln n}{n} +
+o\Bigl(\frac{\ln n}{n}\Bigr).
+\]
+(Controle bij $n = 100$: de wortel is $x \approx 95.4415$; de
+drietermformule geeft $100 - 4.6052 + 0.0461 = 95.4409$, de
+tweeterm $95.3948$ --- elke doorgang wint de voorspelde orde.)
+Zelfde lus, derde landschap: de methode van
+\cref{met:b2:comparison:implicit} geeft niet om hoe de
+vergelijking eruitziet, alleen dat elke doorgang de dominante
+onbekende isoleert.
+\end{example}
+
+\section{Oefeningen}
+
+\begin{exercise}[$\star$]\label{exo:b2:comparison:1}
+Ontwikkel in $+\infty$, twee termen voorbij de leidende:
+\[
+\sqrt{x^2 + x + 1} ,
+\qquad
+\ln(x^2 + x) - 2\ln x,
+\qquad
+\frac{x + \sin x}{x - \ln x} .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:comparison:2}
+Geef de aard (convergentie/divergentie) en, wanneer divergent, de
+leidende asymptotiek van $\sum_{k \leq n} k^\alpha$ voor $\alpha >
+-1$, $\alpha = -1$, $\alpha < -1$, via
+\cref{thm:b2:comparison:seriesintegral}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:comparison:3}
+Bewijs $H_n = \ln n + \gamma + \frac{1}{2n} + o\bigl(\frac1n\bigr)$.
+\emph{(Bestudeer $v_n = H_n - \ln n - \gamma$: toon $v_n - v_{n+1} =
+\frac{1}{2n^2} + O(n^{-3})$ en sommeer de staart, vergelijkend met
+$\sum_{k \geq n} \frac{1}{2k^2} \sim \frac{1}{2n}$ ---
+\cref{thm:b2:comparison:seriesintegral}~(1).)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:comparison:4}
+Vind met Stirling equivalenten van: $\dfrac{(3n)!}{(n!)^3}$;
+$\;\dfrac{n!}{n^n}$; $\;\sqrt[n]{n!}$ (als $\frac n\eu(1 + o(1))$,
+precies gemaakt tot twee termen).
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:comparison:5}
+Bewijs voor $n \geq 2$ dat $x^n + x = 1$ een unieke oplossing $x_n
+\in \intoo{0}{1}$ heeft, dat $x_n \to 1$, en vestig
+\[
+x_n = 1 - \frac{\ln n}{n} + o\Bigl(\frac{\ln n}{n}\Bigr).
+\]
+\emph{(Uit $x_n^n = 1 - x_n$: neem logaritmen en bootstrap met $x_n
+= 1 - \varepsilon_n$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:comparison:6}
+Duw \cref{ex:b2:comparison:tan} één orde verder:
+\[
+x_n = n\pi + \frac\pi2 - \frac{1}{n\pi} + \frac{1}{2n^2\pi} +
+o\Bigl(\frac{1}{n^2}\Bigr).
+\]
+\emph{(Schrijf $\cot y_n = x_n$ exact, ontwikkel $\cot y = \frac1y
+- \frac y3 + o(y)$ en $x_n = n\pi(1 + \frac{1}{2n} - \dots)$, en
+identificeer.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:comparison:7}
+Bepaal $\lim_{n\to\infty} \dfrac{1}{n!}\sum_{k=0}^{n} k!$
+\emph{(begrens de som van alle termen behalve de laatste twee)}, en
+leid de \omterm{def:b2:comparison:expansion}{asymptotische ontwikkeling} $\sum_{k \leq n} k! =
+n!\bigl(1 + \frac1n + O(n^{-2})\bigr)$ af.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:comparison:8}
+Zij $u_0 > 0$ en $u_{n+1} = u_n + \dfrac{1}{u_n}$. Bewijs dat $u_n
+\to \infty$, dan dat $u_n \sim \sqrt{2n}$ \emph{(bestudeer $u_n^2$:
+haar incrementen zijn $2 + u_n^{-2}$; sommeer)}, en verfijn:
+\[
+u_n = \sqrt{2n}\Bigl(1 + \frac{\ln n}{8n} +
+o\Bigl(\frac{\ln n}{n}\Bigr)\Bigr).
+\]
+\emph{(Uit $u_n^2 = 2n + \sum_{k<n} u_k^{-2} + u_0^2$ en $u_k^2
+\sim 2k$: de som is $\sim \frac12\ln n$ door
+\cref{thm:b2:comparison:seriesintegral}.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:comparison:9}
+(Een Riemannsom met een twist) Bepaal het asymptotische gedrag van
+\[
+S_n = \sum_{k=1}^{n} \frac{1}{n + k\ln n} .
+\]
+\emph{(Factoriseer $n$: $S_n = \frac1n\sum_k \bigl(1 +
+\frac{k\ln n}{n}\bigr)^{-1}$; herken een Riemann-achtige som met een
+langzaam variërende parameter $t = \ln n$, bereken $\int_0^1
+\frac{\dd u}{1 + tu} = \frac{\ln(1+t)}{t}$, en besluit $S_n \sim
+\frac{\ln\ln n}{\ln n}$.)}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:comparison:10}
+Bewijs de identiteit $(\ln n)^{\ln n} = n^{\ln\ln n}$, en
+rangschik dan de volgende in toenemende $o(\cdot)$-orde in oneindig,
+met bewijzen: $n^2$, $(\ln n)^{\ln n}$, $2^n$, $n!$, $n^n$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:comparison:11}
+(Staart van $\sum 1/k^2$, twee termen) Met de exacte telescopatie
+$\sum_{k > n} \frac{1}{k(k+1)} = \frac{1}{n+1}$ en de ontbinding
+$\frac1{k^2} = \frac{1}{k(k+1)} + \frac{1}{k^2(k+1)}$, bewijs
+\[
+\sum_{k > n} \frac{1}{k^2}
+= \frac1n - \frac{1}{2n^2} + O\Bigl(\frac{1}{n^3}\Bigr).
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:comparison:12}
+Zij $u_0 = \frac12$ en $u_{n+1} = u_n + \eu^{-u_n}$. Bewijs dat
+$u_n \to \infty$, dan --- $v_n = \eu^{u_n}$ stellend en tonend
+$v_{n+1} = v_n + 1 + \frac{1}{2v_n} + O\bigl(v_n^{-2}\bigr)$ ---
+vestig
+\[
+u_n = \ln n + \frac{\ln n}{2n} + O\Bigl(\frac1n\Bigr).
+\]
+\end{exercise}
+
+\section{Vraagstuk: Bootstrappen, van Euler--Maclaurin tot de priemen}
+
+Een impliciete of geaccumuleerde grootheid levert haar asymptotiek
+zelden in één keer; men extraheert ze in doorgangen, elke doorgang
+voedt de vorige schatting terug in de definiërende relatie. Dit
+weekendvraagstuk traint die lus op verse vergelijkingen, bewijst de
+eerste-orde \emph{formule van Euler--Maclaurin} (de
+trapeziumopwaardering van de reeks--integraalvergelijking, met
+rigoureuze foutenbalken), inverteert $x\ln x = n$, en cash de
+beroemdste cheque van de methode: uit de toegegeven
+priemgetalstelling, de asymptotische wet $p_n \sim n\ln n$ van het
+$n$-de priemgetal.
+
+\begin{problem}[{Weekendvraagstuk --- de Euler--Maclaurin-correctie
+en de asymptotiek van het $n$-de priemgetal}]
+\label{pb:b2:comparison:1}
+
+\medskip
+\noindent\textbf{Deel I --- De bootstrap-lus op een verse
+vergelijking.}
+\begin{enumerate}
+  \item Bewijs de uniciteitsclaim van
+        \cref{def:b2:comparison:expansion}: als $f = \sum_{i\leq
+        k} c_i\varphi_i + o(\varphi_k) = \sum_{i \leq k}
+        c_i'\varphi_i + o(\varphi_k)$ langs dezelfde schaal, dan
+        $c_i = c_i'$ voor alle $i$. Duw dan het gemengde
+        voorbeeld van de cursus één tree verder:
+        \[
+        \frac{1}{x - \ln x} = \frac1x + \frac{\ln x}{x^2} +
+        \frac{(\ln x)^2}{x^3} + o\Bigl(\frac{(\ln
+        x)^2}{x^3}\Bigr) \qquad (x \to +\infty),
+        \]
+        en leg uit waarom geen term $\frac{c}{x^2}$ verschijnt.
+  \item Toon dat voor elke $n \geq 1$ de vergelijking $\eu^x + x =
+        n$ precies één reële oplossing $x_n$ heeft, en dat $x_n
+        \to +\infty$ met $x_n \sim \ln n$.
+  \item Bootstrap tweemaal:
+        \[
+        x_n = \ln n - \frac{\ln n}{n} - \frac{(\ln n)^2}{2n^2} +
+        o\Bigl(\frac{(\ln n)^2}{n^2}\Bigr).
+        \]
+  \item Controleer numeriek bij $n = 1000$: vergelijk $x_{1000}
+        \approx 6.90083$ met de één-, twee- en drietermwaarden van
+        vraag 3, tot vijf decimalen.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel II --- Euler--Maclaurin, orde één.}
+\begin{enumerate}[resume]
+  \item Bewijs de trapeziumkernidentiteit: voor $g$ van klasse
+        $C^2$ op $\intcc{0}{1}$,
+        \[
+        \int_0^1 g(t)\,\dd t = \frac{g(0) + g(1)}{2}
+        - \frac12\int_0^1 t(1 - t)\,g''(t)\,\dd t
+        \]
+        \emph{(integreer $\frac12 t(1-t)g''$ tweemaal partieel)}.
+  \item Zij $f$ $C^2$ op $\intco{1}{+\infty}$ met $\int_1^\infty
+        \abs{f''} < \infty$. Toon dat
+        \[
+        E_n = \sum_{k=1}^{n} f(k) - \int_1^n f -
+        \frac{f(1) + f(n)}{2}
+        \]
+        convergeert naar een constante $E$, met de staartgrens
+        $\abs{E - E_n} \leq \frac18\int_n^\infty\abs{f''}$: de
+        \emph{formule van Euler--Maclaurin} tot eerste orde.
+  \item Pas dit toe op $f(t) = \frac1t$: bewijs
+        \[
+        H_n = \ln n + \gamma + \frac{1}{2n} + \varepsilon_n,
+        \qquad \abs{\varepsilon_n} \leq \frac{1}{8n^2},
+        \]
+        versterkend \cref{exo:b2:comparison:3} (identificeer de
+        constante met $\gamma$ door te vergelijken met
+        \cref{ex:b2:comparison:harmonic}).
+  \item Extraheer de volgende coëfficiënt: toon $\varepsilon_n =
+        -\frac{1}{12n^2} + o\bigl(\frac1{n^2}\bigr)$
+        \emph{(de incrementen van $E_n$ zijn
+        $\frac12\int_0^1t(1-t)f''(n+t)\dd t =
+        \frac1{12}f''(n) + o(f''(n))$; sommeer de staart met
+        \cref{thm:b2:comparison:seriesintegral})}.
+  \item Pas vraag 6 toe op $f = \ln$: herleid in drie regels de
+        convergentie van $d_n = \ln n! - (n + \frac12)\ln n + n$
+        (Stap 1 van \cref{thm:b2:comparison:stirling}), met de
+        bonusfoutsnelheid $d_n = d + O\bigl(\frac1n\bigr)$.
+  \item Pas vraag 6 toe op $f(t) = \frac{1}{\sqrt t}$: toon
+        \[
+        \sum_{k=1}^{n}\frac1{\sqrt k} = 2\sqrt n + c +
+        \frac{1}{2\sqrt n} + O\Bigl(\frac{1}{n^{3/2}}\Bigr)
+        \]
+        voor zekere constante $c$, en evalueer alle termen bij $n =
+        10^4$ (de constante is $c \approx -1.4604$).
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel III --- Inversie: de vergelijking $x\ln x =
+n$.}
+\begin{enumerate}[resume]
+  \item Toon dat $x\ln x = n$ precies één oplossing $x_n \in
+        \intco{1}{+\infty}$ heeft voor $n \geq 1$, dat $x_n \to
+        \infty$, en dat $\ln x_n \sim \ln n$.
+  \item Leid de eenterminversie $x_n \sim \dfrac{n}{\ln n}$ af, dan
+        bootstrap nog eens:
+        \[
+        \ln x_n = \ln n - \ln\ln n + o(1),
+        \qquad
+        x_n = \frac{n}{\ln n}\Bigl(1 + \frac{\ln\ln n}{\ln n}
+        + o\Bigl(\frac{\ln\ln n}{\ln n}\Bigr)\Bigr).
+        \]
+  \item Test bij $n = 10^6$: de ware wortel is $x \approx
+        87\,848$; vergelijk met de eenterm ($\approx 72\,382$) en
+        tweeterm ($\approx 86\,140$) waarden, en leg de trage
+        winst uit (de ontwikkelingsparameter is $\frac{\ln\ln
+        n}{\ln n}$, slechts $\approx 0.19$ bij $n = 10^6$).
+  \item We \emph{geven toe} de priemgetalstelling: het aantal
+        $\pi(x)$ van priemen $\leq x$ voldoet aan $\pi(x) \sim
+        \frac{x}{\ln x}$ als $x \to \infty$ (eerlijk bewezen in
+        het volume van Jaar~3). Schrijvend $p_n$ voor het $n$-de
+        priemgetal, rechtvaardig $\pi(p_n) = n$, en voer de
+        inversie van vragen 11--12 uit om
+        \[
+        p_n \sim n \ln n .
+        \]
+        te bewijzen.
+  \item Dividenden: (a) toon $\sum_{k \leq n} p_k \sim
+        \frac{n^2\ln n}{2}$ \emph{(vergelijk $\sum k\ln k$ met
+        $\int t\ln t\,\dd t$)}; (b) bereken de benaderde kans dat
+        een uniform willekeurig geheel getal met $100$ cijfers
+        priem is ($\ln 10^{100} \approx 230.26$: ongeveer één op
+        $230$).
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel IV --- De methode geëxporteerd: $x\tan x =
+1$.}
+\begin{enumerate}[resume]
+  \item Toon dat voor elke $n \geq 1$ de vergelijking $\tan x =
+        \frac1x$ precies één oplossing $x_n$ heeft in
+        $\intoo{n\pi}{\,n\pi + \frac\pi2}$, en dat $z_n = x_n -
+        n\pi \to 0^+$.
+  \item Eén term: $z_n \sim \dfrac{1}{n\pi}$.
+  \item Toon dat de ontwikkeling van $z_n$ \emph{geen}
+        $\frac{c}{n^2}$-term heeft: $z_n = \frac1{n\pi} +
+        O\bigl(\frac{1}{n^3}\bigr)$.
+  \item Drie termen: met $\arctan u = u - \frac{u^3}3 + O(u^5)$ en
+        $\frac1{x_n} = \frac{1}{n\pi} - \frac{z_n}{(n\pi)^2} +
+        O(n^{-3}\cdot z_n^2)$, bewijs
+        \[
+        x_n = n\pi + \frac{1}{n\pi} -
+        \frac{4}{3\pi^3 n^3} + o\Bigl(\frac{1}{n^3}\Bigr).
+        \]
+  \item Controleer bij $n = 3$: ware wortel $x_3 \approx
+        9.5293344$; vergelijk de één- en drietermwaarden, en
+        contrasteer in één zin met de $\tan x = x$ van de cursus
+        (\cref{ex:b2:comparison:tan}): waar elke rij in haar
+        venster zit, en waarom.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Deel V --- Een dynamische bootstrap, spelregels,
+synthese.}
+\begin{enumerate}[resume]
+  \item Zij $u_0 \in \intoo{0}{\pi}$ en $u_{n+1} = \sin u_n$. Toon
+        $u_n \to 0$ dalend, en bereken de limiet van
+        $\dfrac{1}{u_{n+1}^2} - \dfrac{1}{u_n^2}$ \emph{(ontwikkel
+        $\sin^{-2}$ via $\sin u = u - \frac{u^3}6 + o(u^3)$)}.
+  \item Leid via Cesàro-middelen (volume van Jaar~1) de klassieker
+        \[
+        u_n \sim \sqrt{\frac{3}{n}} .
+        \]
+        af.
+  \item (Gecertificeerde numeriek) Toon met de rigoureuze grens van
+        vraag 7 dat evalueren van $\ln n + \gamma + \frac1{2n}$ bij
+        $n = 10^6$ $H_{10^6}$ levert met fout ten hoogste
+        $1.25\cdot10^{-13}$ --- een miljoen-termen-som berekend tot
+        dertien cijfers door drie termen.
+  \item (Spelregels) Bewijs of weerleg, met bewijzen of
+        tegenvoorbeelden: (a) als $u_n \sim v_n \to +\infty$ dan
+        $\ln u_n \sim \ln v_n$; (b) als $u_n \sim v_n$ dan
+        $\eu^{u_n} \sim \eu^{v_n}$; (c) als $f \sim g$ in
+        $+\infty$ ($f, g$ differentieerbaar) dan $f' \sim g'$.
+  \item (Synthese) In één zin elk: de bootstrap-lus van
+        \cref{met:b2:comparison:implicit} zoals gebruikt in Delen
+        I, III, IV; wat de trapeziumcorrectie toevoegt aan
+        \cref{thm:b2:comparison:seriesintegral}; waarom inversie
+        van $x\ln x$ precies de brug van $\pi(x)$ naar $p_n$ is; en
+        welke van de regels van vraag 24 welke stap beschermde.
+        Noem de twee toppen: de formule van Euler--Maclaurin
+        (eerste orde), en de asymptotische wet van het $n$-de
+        priemgetal.
+\end{enumerate}
+\end{problem}
