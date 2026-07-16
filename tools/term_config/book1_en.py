@@ -102,6 +102,7 @@ EXTRA_PROTECT = [
     r'[Hh]alf\s+past',
     # "round": the adjective, and a round of sharing
     r'perfectly\s+round', r'round\s+table', r'th\s+round',
+    r'[Rr]ound(?:\s+|-)trip',             # out-and-back journeys
     # "sum": the verb ("the three angles sum to $180^\circ$")
     r'[Ss]ums?\s+to\s',
     # "scale": the verb, and the pair of pans -- not the scale of a map
