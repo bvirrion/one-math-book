@@ -247,10 +247,17 @@ use and **hard-errors on anything unknown** — if a new chapter adds a
 LaTeX construct, extend the converter, never let it skip content. Math is
 pre-rendered with KaTeX (macro map mirrors `onemath.sty`; keep the katex
 version pinned identically here and in the saas `package.json`). Figures
-compile standalone via pdflatex + dvisvgm. A translation that lags the
-English chapter is accepted only as a strict structural prefix (warning);
-any other structural divergence between languages aborts the build.
-Generated output is committed in the saas repo only, never here.
+compile standalone via pdflatex + dvisvgm (the preamble includes the
+`omaxis` pgfplots style). A translation that lags the English chapter is
+accepted only as a strict structural prefix (warning); any other
+structural divergence between languages aborts the build.
+
+Cross-chapter `\cref`/`\omterm`: the manifest stores each chapter's label
+map, and references to an already-published chapter resolve to links into
+its page. **Build chapters in order** — a chapter referencing another
+needs that one in the manifest first (rebuild the referenced chapter
+before the referencing one after label changes). Generated output is
+committed in the saas repo only, never here.
 
 ## Style-file specifics worth knowing
 

@@ -26,6 +26,16 @@ PREAMBLE = r"""
 \pgfplotsset{compat=1.18}
 \usepgfplotslibrary{fillbetween}
 \usetikzlibrary{arrows.meta,calc,angles,quotes,patterns}
+\pgfplotsset{
+  omaxis/.style={
+    axis lines=middle,
+    tick label style={font=\small},
+    label style={font=\small},
+    xlabel={$x$}, ylabel={$y$},
+    xlabel style={below right}, ylabel style={above left},
+    samples=100,
+  },
+}
 \definecolor{omDef}{RGB}{0,84,147}
 \definecolor{omThm}{RGB}{150,20,30}
 \definecolor{omProp}{RGB}{190,90,20}

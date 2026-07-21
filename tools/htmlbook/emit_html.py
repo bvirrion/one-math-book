@@ -66,19 +66,24 @@ def slugify(text):
 
 
 class Emitter:
-    def __init__(self, lang, labels, solutions, figures, chapter_number):
+    def __init__(self, lang, labels, solutions, figures, chapter_number,
+                 externals=None):
         """
         lang       -- LangStrings
         labels     -- label map from model.number_chapter
         solutions  -- sol_key -> blocks (already numbered? no: solutions are
                       bodies only; their exercise numbers come from labels)
         figures    -- tikz source -> {"file","width","height","url"}
+        externals  -- labels of OTHER already-published chapters:
+                      {label: {"kind","number","href"}} where href is the
+                      target chapter page URL + #anchor (this language)
         """
         self.lang = lang
         self.labels = labels
         self.solutions = solutions
         self.figures = figures
         self.chapter_number = chapter_number
+        self.externals = externals or {}
         self.math = []          # [(tex, display)]
 
     # ------------------------------------------------------------- helpers
@@ -88,11 +93,16 @@ class Emitter:
         return f"\x00M{len(self.math) - 1}\x00"
 
     def resolve(self, label, where):
-        if label not in self.labels:
-            raise ParseError(
-                f"unresolvable reference {label!r} in {where}: the MVP "
-                "publishes one chapter, and this label is not in it")
-        return self.labels[label]
+        """A reference target: in this chapter (anchor) or in another
+        published chapter (page URL + anchor)."""
+        if label in self.labels:
+            info = self.labels[label]
+            return {**info, "href": f"#{info['anchor']}"}
+        if label in self.externals:
+            return self.externals[label]
+        raise ParseError(
+            f"unresolvable reference {label!r} in {where}: this label is "
+            "neither in the current chapter nor in a published one")
 
     # ------------------------------------------------------------- inlines
 
@@ -114,20 +124,23 @@ class Emitter:
             elif t == "sup":
                 out.append(f"<sup>{self.inlines(node['inl'])}</sup>")
             elif t == "term":
-                info = self.labels.get(node["label"])
+                label = node["label"]
                 text = self.inlines(node["inl"])
-                if info:
-                    out.append(f'<a class="om-term" '
-                               f'href="#{info["anchor"]}">{text}</a>')
+                if label in self.labels:
+                    out.append(f'<a class="om-term" href='
+                               f'"#{self.labels[label]["anchor"]}">{text}</a>')
+                elif label in self.externals:
+                    out.append(f'<a class="om-term" href='
+                               f'"{self.externals[label]["href"]}">{text}</a>')
                 else:
                     # target lives in a chapter not yet published: keep the
                     # link intent in the DOM, resolvable by a later run
                     out.append(f'<span class="om-term-future" data-omterm='
-                               f'"{html.escape(node["label"])}">{text}</span>')
+                               f'"{html.escape(label)}">{text}</span>')
             elif t == "cref":
                 info = self.resolve(node["label"], "\\cref")
                 text = self.lang.cref_text(info["kind"], info["number"])
-                out.append(f'<a class="om-cref" href="#{info["anchor"]}">'
+                out.append(f'<a class="om-cref" href="{info["href"]}">'
                            f"{text}</a>")
             else:
                 raise ParseError(f"emitter: unknown inline {t!r}")
@@ -289,8 +302,10 @@ class Emitter:
             rows.append(f"<thead><tr>{cells}</tr></thead>")
         body_rows = []
         for row in node["rows"]:
-            cells = "".join(f"<td>{self.inlines(c)}</td>" for c in row)
-            body_rows.append(f"<tr>{cells}</tr>")
+            cells = "".join(f"<td>{self.inlines(c)}</td>"
+                            for c in row["cells"])
+            attr = ' class="om-rule"' if row["rule"] else ""
+            body_rows.append(f"<tr{attr}>{cells}</tr>")
         rows.append("<tbody>" + "".join(body_rows) + "</tbody>")
         return ('<div class="om-table-wrap"><table class="om-table">'
                 + "".join(rows) + "</table></div>")

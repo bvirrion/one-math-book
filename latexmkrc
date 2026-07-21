@@ -7,6 +7,7 @@ $out_dir = 'build';
     'one_math_book_1_primary_middle_school.tex',
     'one_math_book_1_primary_middle_school_fr.tex',
     'one_math_book_1_primary_middle_school_nl.tex',
+    'one_math_book_1_primary_middle_school_es.tex',
     'one_math_book_2_high_school.tex',
     'one_math_book_2_high_school_fr.tex',
     'one_math_book_2_high_school_nl.tex',

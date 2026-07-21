@@ -334,6 +334,12 @@ class Parser:
         cur.i += len("\\begin")
         name = read_group(cur)
 
+        if name == "align*":
+            # display-math block; KaTeX renders align* natively in
+            # display mode, so keep the whole environment verbatim
+            body = find_env_end(cur, "align*")
+            return {"t": "dmath",
+                    "tex": "\\begin{align*}" + body + "\\end{align*}"}
         if name == "omfigure":
             body = find_env_end(cur, "omfigure")
             return self.parse_figure(body)
@@ -401,6 +407,9 @@ class Parser:
 
     def parse_center(self, body):
         body = body.strip()
+        # row-height tweak for print (sign tables); CSS handles it in HTML
+        body = re.sub(r"^\\renewcommand\{\\arraystretch\}\{[\d.]+\}\s*",
+                      "", body)
         if not body.startswith("\\begin{tabular}"):
             raise ParseError(
                 f"{self.filename}: only tabular is supported inside center")
@@ -415,17 +424,25 @@ class Parser:
         return self.parse_tabular(colspec, tab_body)
 
     def parse_tabular(self, colspec, body):
+        """Rows are dicts {"cells": [...], "rule": bool} — `rule` marks a
+        row preceded by a mid-table \\hline (sign tables draw one above
+        the final sign row)."""
         rows_raw = split_top_level(body, "\\", self.filename)
         header, rows = None, []
+        pending_rule = False
         for raw in rows_raw:
             had_hline = "\\hline" in raw
             raw = raw.replace("\\hline", "").strip()
             if had_hline and len(rows) == 1 and header is None:
                 # an \hline right after the first row marks it as the header
-                header = rows.pop()
+                header = rows.pop()["cells"]
+                had_hline = False
             if not raw:
+                pending_rule = pending_rule or had_hline
                 continue
-            rows.append(self.split_cells(raw))
+            rows.append({"cells": self.split_cells(raw),
+                         "rule": had_hline or pending_rule})
+            pending_rule = False
         return {"t": "table", "colspec": colspec, "header": header,
                 "rows": rows}
 
