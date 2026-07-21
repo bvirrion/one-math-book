@@ -246,6 +246,19 @@ class Parser:
                     parbuf.append(" ")
                     cur.i += 1
                 continue
+            if c == "$":
+                # consume the whole inline-math segment: a \begin{cases}
+                # inside $...$ must not be mistaken for a block environment
+                end = cur.i
+                while True:
+                    end = s.find("$", end + 1)
+                    if end < 0:
+                        cur.err("unbalanced $")
+                    if s[end - 1] != "\\":
+                        break
+                parbuf.append(s[cur.i:end + 1])
+                cur.i = end + 1
+                continue
             if c == "\\":
                 if s.startswith("\\begin{", cur.i):
                     flush()
@@ -265,14 +278,22 @@ class Parser:
                     cur.i += len("\\chapter")
                     self.chapter_title = self.parse_inlines(read_group(cur))
                     continue
-                m = re.match(r"\\section(\*?)\{", s[cur.i:])
+                m = re.match(r"\\(sub)?section(\*?)\{", s[cur.i:])
                 if m:
                     flush()
-                    cur.i += len("\\section") + len(m.group(1))
+                    cur.i += len("\\section") + len(m.group(1) or "") \
+                        + len(m.group(2))
                     title = read_group(cur)
-                    blocks.append({"t": "section",
+                    blocks.append({"t": "subsection" if m.group(1) else "section",
                                    "inl": self.parse_inlines(title),
-                                   "star": bool(m.group(1))})
+                                   "star": bool(m.group(2))})
+                    continue
+                m = re.match(r"\\admitted\b", s[cur.i:])
+                if m:
+                    # zero-arg macro: a whole "Admitted at this level" proof
+                    flush()
+                    blocks.append({"t": "admitted"})
+                    cur.i += m.end()
                     continue
                 m = re.match(r"\\(medskip|smallskip|bigskip|noindent|par)\b",
                              s[cur.i:])
@@ -313,9 +334,11 @@ class Parser:
             cur.i = m.end()
             # commands with brace groups: consume their groups too so a
             # nested \begin inside an argument can't fool the block scanner
-            n_groups = {"omterm": 2, "cref": 1, "ref": 1, "emph": 1,
-                        "textbf": 1, "index": 1, "label": 1,
-                        "textsuperscript": 1}.get(name, 0)
+            n_groups = {"omterm": 2, "cref": 1, "Cref": 1, "ref": 1,
+                        "emph": 1, "textbf": 1, "index": 1, "label": 1,
+                        "textsuperscript": 1, "footnote": 1,
+                        "texorpdfstring": 2, "hspace": 1, "rule": 2,
+                        "H": 1}.get(name, 0)
             out = [s[start:cur.i]]
             for _ in range(n_groups):
                 while cur.i < len(s) and s[cur.i] in " \n":
@@ -334,12 +357,12 @@ class Parser:
         cur.i += len("\\begin")
         name = read_group(cur)
 
-        if name == "align*":
-            # display-math block; KaTeX renders align* natively in
-            # display mode, so keep the whole environment verbatim
-            body = find_env_end(cur, "align*")
+        if name in ("align*", "gather*"):
+            # display-math blocks; KaTeX renders them natively in display
+            # mode, so keep the whole environment verbatim
+            body = find_env_end(cur, name)
             return {"t": "dmath",
-                    "tex": "\\begin{align*}" + body + "\\end{align*}"}
+                    "tex": f"\\begin{{{name}}}" + body + f"\\end{{{name}}}"}
         if name == "omfigure":
             body = find_env_end(cur, "omfigure")
             return self.parse_figure(body)
@@ -390,19 +413,29 @@ class Parser:
         cur.err(f"unknown environment {name!r}")
 
     def parse_figure(self, body):
-        m = re.search(r"\\begin\{tikzpicture\}", body)
-        if not m:
+        """An omfigure holds one or more tikzpictures (side-by-side plots
+        are two pictures separated by \\qquad) plus a {\\small ...} caption."""
+        tikzs = []
+        end_pat = "\\end{tikzpicture}"
+        rest = body
+        while True:
+            m = re.search(r"\\begin\{tikzpicture\}", rest)
+            if not m:
+                break
+            e = rest.find(end_pat, m.start())
+            if e < 0:
+                raise ParseError(
+                    f"{self.filename}: missing \\end{{tikzpicture}}")
+            tikzs.append(rest[m.start():e + len(end_pat)])
+            rest = rest[:m.start()] + rest[e + len(end_pat):]
+        if not tikzs:
             raise ParseError(f"{self.filename}: omfigure without tikzpicture")
-        e = body.find("\\end{tikzpicture}")
-        if e < 0:
-            raise ParseError(f"{self.filename}: missing \\end{{tikzpicture}}")
-        tikz = body[m.start():e + len("\\end{tikzpicture}")]
-        caption = (body[:m.start()] + body[e + len("\\end{tikzpicture}"):])
-        caption = caption.strip()
+        # what remains is the caption (plus separators like \qquad)
+        caption = re.sub(r"\\qquad|\\quad|\\hfill", " ", rest).strip()
         m2 = re.fullmatch(r"\{\\small\s+(.*)\}", caption, re.S)
         if m2:
             caption = m2.group(1)
-        return {"t": "figure", "tikz": tikz,
+        return {"t": "figure", "tikzs": tikzs,
                 "caption": self.parse_inlines(caption)}
 
     def parse_center(self, body):
@@ -506,6 +539,17 @@ class Parser:
                 m = CMD_RE.match(s, cur.i)
                 if not m:
                     nxt = s[cur.i + 1:cur.i + 2]
+                    if nxt in ("'", "`", "^", '"', "~") \
+                            and s[cur.i + 2:cur.i + 3].isalpha():
+                        # accents in prose: \'e -> e-acute, \"O -> O-uml
+                        import unicodedata
+                        combining = {"'": "\u0301", "`": "\u0300",
+                                     "^": "\u0302", '"': "\u0308",
+                                     "~": "\u0303"}[nxt]
+                        text.append(unicodedata.normalize(
+                            "NFC", s[cur.i + 2] + combining))
+                        cur.i += 3
+                        continue
                     if nxt in (" ", "\n"):        # "\ " explicit space
                         text.append(" ")
                     elif nxt == ",":               # thin space
@@ -524,7 +568,8 @@ class Parser:
                     inner = read_group(cur)
                     out.append({"t": "term", "label": label,
                                 "inl": self.parse_inlines(inner)})
-                elif name == "cref":
+                elif name in ("cref", "Cref"):
+                    # cleveref runs with [capitalize]: identical output
                     emit_text()
                     out.append({"t": "cref", "label": read_group(cur)})
                 elif name == "emph":
@@ -555,6 +600,37 @@ class Parser:
                     emit_text()
                     inner = read_group(cur)
                     out.append({"t": "sup", "inl": self.parse_inlines(inner)})
+                elif name == "footnote":
+                    emit_text()
+                    inner = read_group(cur)
+                    out.append({"t": "footnote",
+                                "inl": self.parse_inlines(inner)})
+                elif name == "texorpdfstring":
+                    # the TeX branch is what the book renders
+                    emit_text()
+                    tex_arg = read_group(cur)
+                    read_group(cur)  # pdf-string branch, unused
+                    out.extend(self.parse_inlines(tex_arg))
+                elif name == "checkmark":
+                    text.append("✓")
+                elif name == "hfill":
+                    pass  # horizontal fill: no HTML equivalent needed
+                elif name == "hspace":
+                    read_group(cur)
+                    text.append(" ")
+                elif name == "rule":
+                    # struts like \rule{0pt}{11pt} (table row spacing)
+                    read_group(cur)
+                    read_group(cur)
+                elif name == "small":
+                    pass  # size switch inside a group; CSS owns sizing
+                elif name == "H":
+                    # Hungarian umlaut accent (Erd\H{o}s)
+                    inner = read_group(cur)
+                    mapped = {"o": "ő", "O": "Ő", "u": "ű", "U": "Ű"}
+                    if inner not in mapped:
+                        cur.err(f"unsupported \\H{{{inner}}}")
+                    text.append(mapped[inner])
                 else:
                     cur.err(f"unsupported command \\{name}")
                 continue

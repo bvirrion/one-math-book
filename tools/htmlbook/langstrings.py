@@ -52,6 +52,16 @@ class LangStrings:
             self.names[kind] = cmds[key]
         self.proof = cmds["omnameProof"]
         self.solution_of = cmds["omsolutionof"]
+        self.admitted = cmds["omadmittedtext"]
+        # plural cref names (\omname<Kind>s) for multi-label \cref
+        self.plurals = {}
+        for kind, macro in KIND_TO_NAME_MACRO.items():
+            plural = cmds.get(f"omname{macro}s")
+            if plural:
+                self.plurals[kind] = plural
+        # list conjunction — not in the lang files (cleveref supplies it
+        # in LaTeX); extend here when a new language is added
+        self.and_word = {"en": "and", "fr": "et", "nl": "en"}[lang]
         # \st -> its \text{...} body, fed to KaTeX as a macro
         m = re.search(r"\\newcommand\{\\st\}\{(.*)\}", text)
         if not m:

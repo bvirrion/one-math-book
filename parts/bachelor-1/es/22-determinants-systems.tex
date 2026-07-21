@@ -1,0 +1,799 @@
+\chapter{Determinantes y sistemas lineales}\label{ch:b1:det}
+
+El determinante condensa en un escalar la respuesta a "¿son estos?"
+$n$ vectoriza un \omterm{def:b1:vspaces:free}{base}?'' --- y, geométricamente, mide el volumen
+ellos \omterm{def:b1:vspaces:span}{engendrado}. Lo caracterizamos por sus propiedades (multilineal,
+alternante, normalizado), calcularlo en las dimensiones $2$ y $3$ y por
+\omterm{thm:b1:det:cofactor}{expansión de cofactor} en general, y ponerlo a funcionar en \omterm{def:b1:det:system}{sistemas lineales},
+junto con el algoritmo multiuso: \omterm{met:b1:det:gauss}{eliminación gaussiana}.
+
+\section{el determinante}
+
+\begin{theorem}[Caracterización]\label{thm:b1:det:def}
+Hay exactamente una \omterm{def:b1:logic:map}{aplicación} $\det \colon \mathcal{M}_n(K) \to K$,
+visto como una función de las columnas $n$, es decir:
+\begin{enumerate}
+ \item \emph{\omterm{def:b1:linmaps:def}{lineal} in each column} (los demás arreglados);
+ \item \emph{alterno}: intercambiar dos columnas cambia el signo
+ (por lo tanto, dos columnas iguales dan $0$);
+ \item \emph{normalizado}: $\det I_n = 1$.
+\end{enumerate}
+Para $n = 2$ y $3$:\index{determinante}
+\[
+\begin{vmatrix} a & b\\ c & d\end{vmatrix} = ad - bc,
+\qquad
+\begin{vmatrix} a & b & c\\ d & e & f\\ g & h & i\end{vmatrix}
+= aei + bfg + cdh - ceg - bdi - afh
+\]
+(la regla $3 \times 3$ de Sarrus: productos de diagonales descendentes
+menos los ascendentes).
+\end{theorem}
+\admitted
+
+\begin{remark}
+Para $n = 2$: expandir por bilinealidad en las columnas canónicas da
+la fórmula, que a la inversa satisface los axiomas --- una completa
+prueba; $n = 3$ es idéntico a más términos. El caso general
+(existencia por la suma sobre \omterm{def:b1:counting:objects}{permutaciones}, unicidad por el mismo
+expansión) exige la firma de un \omterm{def:b1:counting:objects}{permutación} y se difiere a
+el segundo año; Usamos libremente los axiomas y las consecuencias.
+abajo.
+
+La expansión $n = 2$ al completo, ya que es la plantilla: con
+columnas $C_1 = a\,e_1 + c\,e_2$ y $C_2 = b\,e_1 + d\,e_2$,
+la bilinealidad da
+\[
+\det(C_1, C_2) = ab\det(e_1, e_1) + ad\det(e_1, e_2)
++ cb\det(e_2, e_1) + cd\det(e_2, e_2),
+\]
+y la alternancia mata los pares repetidos mientras se voltea
+$\det(e_2, e_1) = -\det(e_1, e_2)$: todo la \omterm{def:b1:logic:map}{aplicación} colapsa para
+$(ad - bc)\det(e_1, e_2) = ad - bc$ por normalización. Unicidad
+es visible en el cálculo mismo --- los axiomas no dejaron
+elección en cualquier paso --- y esta es exactamente la singularidad escalada
+hecho utilizado en la prueba de la regla del producto a continuación.
+\end{remark}
+
+\begin{theorem}[Propiedades]\label{thm:b1:det:props}
+Para $A, B \in \mathcal{M}_n(K)$:
+\begin{enumerate}
+ \item agregar a una columna un múltiplo de otra no cambia la
+ determinante; multiplicar una columna por $\lambda$ la multiplica
+ por $\lambda $(entonces $\det(\lambda A) = \lambda^n \det A$);
+ \item $\det(AB) = \det A\, \det B$;
+ \item $A$ es invertible $\iff$ $\det A \neq 0$ $\iff$ las columnas
+ formar un \omterm{def:b1:vspaces:free}{base} de $K^n$; y luego $\det(A^{-1}) = (\det
+ A)^{-1}$;
+ \item $\det(A^{\mathsf T}) = \det A$ --- entonces cada regla de columna es
+ también una regla de fila;
+ \item el determinante de una matriz triangular es el producto de su
+ entradas diagonales.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) Por linealidad, $\det(\dots, C_i + \lambda C_j, \dots) = \det A +
+\lambda\det(\dots, C_j, \dots)$ donde el segundo determinante tiene dos
+columnas iguales: cero.
+
+(2) Repare $A$ y considere $\varphi(B) = \det(AB)$ como una función de
+las columnas de $B$: como $AB$ tiene columnas $AB_j$,$\varphi$ es
+multilineal y alterno en el $B_j$. Admitimos, con
+\cref{thm:b1:det:def}, su singularidad \omterm{def:b1:logic:statement}{enunciado} en forma escalada:
+\emph{cada} multilineal alternante \omterm{def:b1:logic:map}{aplicación} $\varphi$ de las columnas
+es igual a $\varphi(I_n) \cdot \det$. Aquí $\varphi(I_n) = \det A$, entonces
+$\det(AB) = \det A \cdot \det B$.
+
+(3) Si $A$ es invertible:$\det A\,\det A^{-1} = \det I = 1$, entonces
+$\det A \neq 0$ y se cumple la fórmula inversa. Si$A$ no es
+invertible, sus columnas están vinculadas (\cref{cor:b1:linmaps:samedim}
+y \cref{prop:b1:linmaps:basis}); expresando una columna a través
+los demás y expandir por linealidad deja a los determinantes con dos
+columnas iguales: $\det A = 0$. El \omterm{def:b1:vspaces:free}{base} \omterm{def:b1:logic:statement}{enunciado} es
+\cref{prop:b1:findim:twoofthree}.
+
+(4) Admitido con la construcción general (es inmediato al
+fórmula \omterm{def:b1:counting:objects}{permutación}); lo grabamos para usar \omterm{met:b1:matrices:gauss}{operaciones de fila}.
+
+(5) Si alguna entrada diagonal desaparece, las primeras columnas $k$ son
+vinculado para algunos productos $k $(consideraciones de clasificación) y $\det = 0 =$.
+De lo contrario, borre cada columna debajo y a la izquierda por operaciones de tipo
+(1) --- posible en forma triangular --- llegando a la diagonal
+matriz, cuyo determinante es el producto de las entradas por
+multilinealidad de $I_n$.
+\end{proof}
+
+\begin{example}[Las reglas, comprobadas en números.]
+\label{ex:b1:det:rulescheck}
+Tome $A = \begin{pmatrix} 1 & 2\\ 3 & 4\end{pmatrix}$($\det A =
+-2$) y $B = \begin{pmatrix} 0 & 1\\ 1 & 1\end{pmatrix}$($\det
+B = -1$). entonces
+\[
+AB = \begin{pmatrix} 2 & 3\\ 4 & 7\end{pmatrix},
+\quad \det(AB) = 14 - 12 = 2 = (-2)(-1) ;
+\qquad
+\det(A^{\mathsf T}) = \begin{vmatrix} 1 & 3\\ 2 & 4
+\end{vmatrix} = -2 = \det A .
+\]
+Multiplicatividad e invariancia de transposición confirmadas --- mientras
+la aditividad \emph{FALSO} falla en el mismo par:
+\[
+\det(A + B) = \begin{vmatrix} 1 & 3\\ 4 & 5\end{vmatrix} = -7
+\neq \det A + \det B = -3 .
+\]
+Treinta segundos de aritmética de este tipo, después de cualquier determinante
+Se invoca la identidad, es el seguro contra errores más barato disponible.
+\end{example}
+
+\begin{example}[Determinantes como áreas]
+\label{ex:b1:det:area}
+El paralelogramo abarcado por $u = (2, 0)$ y $v = (1, 3)$ tiene
+base $2$ y altura $3$: área $6$. y
+\[
+\begin{vmatrix} 2 & 1\\ 0 & 3\end{vmatrix} = 6 :
+\]
+el determinante $2\times2$\emph{is} el área firmada del
+paralelogramo de sus columnas. Los axiomas vuelven a contar la geometría:
+agregar un múltiplo de una columna a la otra es \emph{cortar},
+deslizar el paralelogramo paralelo a un lado sin cambiar
+base o altura (operación~(1) de \cref{thm:b1:det:props});
+escalar una columna escala el área; intercambiando las columnas volteadas
+la orientación, de donde el signo, $\det(v, u) = -6$. En$\R^3$
+la misma lectura da volúmenes firmados, y $\abs{\det}$ se convierte en
+el factor de escala de volumen universal de \omterm{def:b1:linmaps:def}{aplicaciones lineales} --- el hecho
+detrás de la fórmula de cambio de variables para múltiples \omterm{thm:b1:integration:def}{integrales}
+en el volumen Año ~ 2.
+\end{example}
+
+\begin{theorem}[Expansión de cofactor]\label{thm:b1:det:cofactor}
+Sean $A \in \mathcal{M}_n(K)$ y $\Delta_{ij}$ el determinante de
+$A$ con la fila $i$ y la columna $j$ eliminadas. Entonces, para cualquier columna fija
+$j $(o fila, por transposición):\index{expansión de cofactor}
+\[
+\det A = \sum_{i=1}^{n} (-1)^{i+j}\, a_{ij}\, \Delta_{ij} .
+\]
+\end{theorem}
+\admitted
+
+\begin{example}\label{ex:b1:det:cofactor}
+Expandiendo a lo largo de la primera columna:
+\[
+\begin{vmatrix}
+2 & 1 & 0\\
+1 & 2 & 1\\
+0 & 1 & 2
+\end{vmatrix}
+= 2\begin{vmatrix} 2 & 1\\ 1 & 2\end{vmatrix}
+- 1\begin{vmatrix} 1 & 0\\ 1 & 2\end{vmatrix}
+= 2 \times 3 - 2 = 4 .
+\]
+Estrategia: crear ceros primero (operaciones de fila/columna), luego expandir
+a lo largo de la línea más vacía.
+\end{example}
+
+\begin{example}[El cofactor inverso, una vez a mano]
+\label{ex:b1:det:cofactorinverse}
+Para $A = \begin{pmatrix} 1 & 1 & 0\\ 0 & 1 & 1\\ 1 & 0 &
+1\end{pmatrix}$:$\det A = 1(1) - 1(-1) + 0 = 2$. los nueve
+cofactores $(-1)^{i+j}\Delta_{ij}$ se ensamblan en
+\[
+\operatorname{Com}(A) = \begin{pmatrix}
+1 & 1 & -1\\
+-1 & 1 & 1\\
+1 & -1 & 1
+\end{pmatrix},
+\qquad
+A^{-1} = \frac{1}{\det A}\operatorname{Com}(A)^{\mathsf T}
+= \frac12\begin{pmatrix}
+1 & -1 & 1\\
+1 & 1 & -1\\
+-1 & 1 & 1
+\end{pmatrix},
+\]
+la fórmula citada en \cref{exo:b1:det:8}. Marque una fila-columna
+par: (fila $1$ de $A$)(columna $1$ de $A^{-1}$)$= \frac12(1 + 1
++ 0) = 1$, y contra la columna $2$:$\frac12(-1 + 1 + 0) = 0$.
+Nueve determinantes $2\times2$ para una inversa $3\times3$: ya
+en este tamaño, la reducción de filas (\cref{exo:b1:det:3}) es más barata ---
+El valor de la fórmula del cofactor es teórico (integralidad en
+\cref{exo:b1:det:8}, diferenciabilidad de la inversa en posteriores
+volúmenes), no computacionales.
+\end{example}
+
+\begin{example}[La regla del bloque triangular, en tamaño $4$]
+\label{ex:b1:det:blocktriangular}
+Reclamación: $\det\begin{pmatrix} M & N\\ 0 & P\end{pmatrix} = \det
+M\,\det P $ para bloques $2\times2$. Borre el bloque $N $ por columna
+operaciones: agregar a las columnas $3, 4$ combinaciones adecuadas de
+columnas $1, 2$ elimina $N$\emph{cuando $M$ es invertible} (resolver
+$M\Lambda = -N$ para los coeficientes de combinación $\Lambda$),
+dejando $\det\begin{pmatrix} M & 0\\ 0 & P\end{pmatrix}$; entonces
+\omterm{thm:b1:det:cofactor}{expansión de cofactor} a lo largo de la primera columna, dos veces, da $\det
+M\det P $ para esta forma de bloque diagonal. Si$M $ no es
+invertible, sus columnas están vinculadas, por lo que las dos primeras columnas de
+la matriz grande están vinculadas (sus mitades inferiores son cero): ambas
+los lados desaparecen. La regla se extiende a cualquier tamaño de bloque por el mismo
+argumento de dos casos --- y es el motor de
+\cref{exo:b1:det:10}.
+\end{example}
+
+\begin{example}[Un determinante $4 \times 4$, estratégicamente]
+\label{ex:b1:det:fourbyfour}
+\[
+\Delta = \begin{vmatrix}
+1 & 2 & 3 & 4\\
+2 & 3 & 4 & 1\\
+3 & 4 & 1 & 2\\
+4 & 1 & 2 & 3
+\end{vmatrix}.
+\]
+Cada fila suma $10$: la operación $C_1 \leftarrow C_1 + C_2 +
+C_3 + C_4$ hace que la primera columna sea constante y la factorización $10$
+deja unos. Entonces $L_i \leftarrow L_i - L_1$($i \geq 2$) se borra
+la primera columna:
+\[
+\Delta = 10\begin{vmatrix}
+1 & 2 & 3 & 4\\
+0 & 1 & 1 & -3\\
+0 & 2 & -2 & -2\\
+0 & -1 & -1 & -1
+\end{vmatrix}
+= 10\begin{vmatrix}
+1 & 1 & -3\\
+2 & -2 & -2\\
+-1 & -1 & -1
+\end{vmatrix}
+= 10 \times 16 = 160,
+\]
+el último determinante $3\times3$ se expande a lo largo de su primera fila:
+$1(2 - 2) - 1(-2 - 2) + (-3)(-2 - 2) = 0 + 4 + 12 = 16$. Moraleja:
+una operación bien elegida (detectar la suma constante de filas) supera
+dieciséis cofactores.
+\end{example}
+
+\begin{method}[Elegir una estrategia determinante]
+\label{met:b1:det:strategy}
+Escanee la matriz antes de calcular nada.
+\begin{enumerate}
+ \item \emph{Sumas constantes de filas o columnas}: agrega todo en
+ una línea, factoriza el valor común
+ (\cref{ex:b1:det:fourbyfour}, \cref{exo:b1:det:7}).
+ \item \emph{Estructura repetitiva}: restar filas vecinas o
+ columnas para crear ceros; Los patrones de escaleras colapsan
+ hacia la forma triangular, cuyo determinante se lee en la
+ diagonal.
+ \item \emph{Ceros aislados}: expandir a lo largo de la línea más vacía
+ (\cref{ex:b1:det:cofactor}); familias recursivas
+ (tridiagonal, \cref{exo:b1:det:6}) produce recurrencias este
+ manera.
+ \item \emph{un parametro}: el determinante es un \omterm{def:b1:poly:def}{polinomio} en
+ eso; encontrar sus raíces detectando los valores degenerados
+ (filas iguales, columnas proporcionales), luego fije el
+ \omterm{def:b1:poly:def}{polinomio} descendido por grado y coeficiente principal. Para
+ la matriz de \cref{exo:b1:det:7}: $m = 1$ da tres
+ filas iguales (rango $1$, una raíz doble),$m = -2$ hace que
+ las filas suman cero (una raíz más); el determinante tiene
+ grado $3$ en $m$ con término principal$-m^3$(el
+ producto anti-diagonal $m\cdot m\cdot m$, cuyo Sarrus
+ el signo es $-1$), por lo que debe ser $-(m+2)(m-1)^2$ --- no
+ Se necesita expansión y los dos métodos se controlan entre sí.
+\end{enumerate}
+\end{method}
+
+\begin{example}[determinante de Vandermonde]\label{ex:b1:det:vandermonde}
+Para escalares $x_1, \dots, x_n$:\index{Determinante de Vandermonde}
+\[
+V(x_1, \dots, x_n) =
+\begin{vmatrix}
+1 & x_1 & x_1^2 & \cdots & x_1^{n-1}\\
+1 & x_2 & x_2^2 & \cdots & x_2^{n-1}\\
+\vdots & & & & \vdots\\
+1 & x_n & x_n^2 & \cdots & x_n^{n-1}
+\end{vmatrix}
+= \prod_{1 \leq i < j \leq n} (x_j - x_i) .
+\]
+Bosquejo de prueba (detallado en \cref{exo:b1:det:5}): operaciones de columna
+$C_k \leftarrow C_k - x_1 C_{k-1}$ desde la derecha despeja el primero
+fila, y factorizar cada fila restante se reduce a
+$V(x_2, \dots, x_n)$. Distinto de cero si el $x_i$ son distintos por pares
+--- el determinante detrás de \omterm{thm:b1:poly:lagrange}{interpolación de Lagrange}
+(\cref{ex:b1:linmaps:interpolation}).
+\end{example}
+
+\section{Sistemas lineales}
+
+\begin{definition}\label{def:b1:det:system}
+Un sistema \omterm{def:b1:linmaps:def}{lineal}\index{sistema lineal} de ecuaciones $n$ en $p$
+las incógnitas son $AX = B$ con $A \in \mathcal{M}_{n,p}(K)$,$B \in
+K^n $; es \emph{homogéneo} cuando $B = 0$. Su solución \omterm{def:b1:logic:sets}{conjunto}, cuando
+no vacío, es $X_0 + \ker A$: una solución particular más la general
+solución homogénea --- un afín \omterm{def:b1:vspaces:subspace}{subespacio} de dimensión $p -
+\operatorname{rk} A $(rango - nulidad).
+\end{definition}
+
+\begin{example}[La estructura afín, hecha visible]
+\label{ex:b1:det:affinestructure}
+resolver
+\[
+\begin{cases}
+x + y + z = 3\\
+x - y + 2z = 2 .
+\end{cases}
+\]
+Restando las ecuaciones: $2y - z = 1$, entonces $z = 2y - 1$ y $x =
+3 - y - z = 4 - 3y $. Las soluciones forman la línea.
+\[
+(x, y, z) = (4,\ 0,\ -1) + y\,(-3,\ 1,\ 2)
+\qquad (y \in \R):
+\]
+la solución particular $X_0 = (4, 0, -1)$(la elección$ y = 0$)
+más la línea del kernel $\ker A = \operatorname{Vect}(-3, 1, 2)$ de
+el sistema homogéneo asociado --- comprobar: $(-3) + 1 + 2 = 0$
+y $(-3) - 1 + 4 = 0$. Geométricamente, dos planos no paralelos de
+$\R^3$ se cruza a lo largo de una línea, y el recuento de dimensiones $p -
+\operatorname{rk} A = 3 - 2 = 1$ lo sabía antes de que resolviéramos
+cualquier cosa. Cambiar la solución particular (digamos $ y = 1$:$X_0' =
+(1, 1, 1)$) cambia la descripción, no la línea: un afín
+\omterm{def:b1:vspaces:subspace}{subespacio} tiene muchos orígenes y una dirección.
+\end{example}
+
+\begin{theorem}[Sistemas Cramer cuadrados]\label{thm:b1:det:cramer}
+Si $A \in GL_n(K)$, el sistema $AX = B$ tiene la solución única $X =
+A^{-1}B $, cuyos \omterm{prop:b1:vspaces:coordinates}{coordenadas} son\index{regla de cramer}
+\[
+x_j = \frac{\det A_j}{\det A},
+\qquad A_j = A \text{ with column } j \text{ replaced by } B .
+\]
+\end{theorem}
+
+\begin{proof}
+La unicidad y la existencia son la invertibilidad. Para la fórmula:
+escriba $B = \sum_k x_k C_k $(columnas de $A$); entonces, por
+multilinealidad y alternancia,
+\[
+\det A_j = \det\Bigl(C_1, \dots, \sum_k x_k C_k, \dots, C_n\Bigr)
+= \sum_k x_k \det(C_1, \dots, C_k, \dots, C_n)
+= x_j \det A ,
+\]
+todos los términos excepto $k = j$ tienen una columna repetida.
+\end{proof}
+
+\begin{example}[Cramer con un parámetro, completo]
+\label{ex:b1:det:cramerparameter}
+Para $m \in \R$, resuelva
+\[
+\begin{cases}
+x + m y = 1\\
+m x + y = 2 .
+\end{cases}
+\]
+El determinante es $1 - m^2$. \emph{Caso genérico}$m \neq \pm1$:
+Cramer da
+\[
+x = \frac{\begin{vmatrix} 1 & m\\ 2 & 1\end{vmatrix}}{1 - m^2}
+= \frac{1 - 2m}{1 - m^2},
+\qquad
+y = \frac{\begin{vmatrix} 1 & 1\\ m & 2\end{vmatrix}}{1 - m^2}
+= \frac{2 - m}{1 - m^2},
+\]
+una solución limpia para cada $m$ admisible (verificar en $m = 0$:
+$(1, 2)$, obviamente cierto). \emph{Casos degenerados}: en $m = 1$
+las ecuaciones dicen $x + y = 1$ y $x + y = 2$: incompatibles; en
+$m = -1$ leen $x - y = 1$ y $-x + y = 2$, es decir $x - y =
+1$ y $ x - y = -2$: incompatibles nuevamente. La desaparición del
+determinante anuncia que \emph{algo} degenera, pero
+nunca dice qué --- vacío o infinito debe decidirse mirando
+en el lado derecho. Observe también cómo las fórmulas señalan su
+límites propios: como $m \to 1^{-}$,$x = \frac{1 - 2m}{1 - m^2} \to
+-\infty $; el punto de solución se escapa cuando las dos líneas se vuelven
+paralelo.
+\end{example}
+
+\begin{method}[Eliminación gaussiana en sistemas]\label{met:b1:det:gauss}
+Reducir por filas la matriz aumentada $(A \mid B)$ a escalón
+formulario.\index{eliminación gaussiana}
+\begin{enumerate}
+ \item Si aparece un pivote en la última columna (línea $0 = 1$): no
+ solución.
+ \item De lo contrario, las incógnitas se dividen en \emph{incógnitas de pivote} y
+ \emph{\omterm{def:b1:vspaces:free}{libre} unknowns} (parámetros); sustitución hacia atrás
+ expresa lo primero en lo segundo: la solución \omterm{def:b1:logic:sets}{conjunto} es una
+ afín \omterm{def:b1:vspaces:subspace}{subespacio} de dimensión $=$ número de \omterm{def:b1:vspaces:free}{libre} incógnitas.
+\end{enumerate}
+Las fórmulas de Cramer son para teoría y sistemas pequeños; la eliminación es
+El algoritmo práctico.
+\end{method}
+
+\begin{example}[Una discusión con el parámetro]\label{ex:b1:det:parameter}
+Para $m \in \R$, considere
+\[
+\begin{cases}
+x + y + mz = 1\\
+x + my + z = 1\\
+mx + y + z = 1 .
+\end{cases}
+\]
+La matriz tiene el determinante $-(m+2)(m-1)^2$(calculado en
+\cref{exo:b1:det:7} sumando todas las columnas a la primera). Para $m
+\neq 1, -2$:
+solución única $x = y = z = \frac{1}{m+2}$(por simetría). Para $m =
+1$: una ecuación repetida tres veces, un plano de soluciones. Para $m =
+-2$: la suma de las tres ecuaciones da $0 = 3$, sin solución.
+\end{example}
+
+\begin{remark}[Errores comunes]
+\label{rem:b1:det:pitfalls}
+\emph{The determinant is not \omterm{def:b1:linmaps:def}{lineal} in the matrix}: $\det(A + B)
+\neq \det A + \det B $(ya $\det(I_2 + I_2) = 4 \neq 2$); eso
+es \omterm{def:b1:linmaps:def}{lineal} en cada \emph{columna} por separado, que es un diferente
+cosa por completo.
+\emph{Escalada}: $\det(\lambda A) = \lambda^n\det A$, no
+$\lambda\det A$--- cada una de las columnas $n$ está escalada.
+\emph{\omterm{met:b1:matrices:gauss}{Operaciones de fila} are not all \omterm{def:b1:vspaces:free}{libre}}: $L_i \leftarrow L_i +
+\lambda L_j $ preserva el determinante, pero un intercambio cambia el
+firmar y $L_i \leftarrow \lambda L_i$ lo multiplica por $\lambda$
+--- Los errores contables aquí son la fuente clásica de errores.
+signos en cálculos basados en eliminación.
+\emph{Un determinante cero es el comienzo, no el final.}: dice
+``rango $< n$'' pero no qué rango; sólo trabajo adicional (escalón
+formulario, o los menores de \cref{exo:b1:det:12}) lo localiza --- cf.\
+el caso $m = 1$ vs $m = -2$ en \cref{ex:b1:det:parameter}.
+\emph{Cramer necesita invertibilidad}: cuando $\det A = 0$ el
+Las fórmulas $x_j = \det A_j/\det A$ no tienen sentido y el sistema
+perfectamente puede tener (infinitas) soluciones.
+\emph{Sólo las matrices cuadradas tienen determinantes}: para un rectangular
+sistema, la eliminación es la única herramienta.
+\end{remark}
+
+\begin{remark}[Adónde van los determinantes]
+\label{rem:b1:det:whereused}
+Tres vidas aguardan a este escalar. \emph{Geométrico}: $\abs{\det}$ es
+el factor de escala de área o volumen del \omterm{def:b1:logic:map}{aplicación} asociado --- hecho
+preciso para el plano en \cref{ch:b1:euclid} y, como el jacobiano
+de un cambio de variables, en el múltiplo \omterm{thm:b1:integration:def}{integrales} del Año~2
+volumen. \emph{Algebraico}: $\det(A - \lambda I)$, el
+característica \omterm{def:b1:poly:def}{polinomio}, \omterm{def:b1:topology:open}{abre} teoría de valores propios en el año ~2 ---
+la identidad $A^2 - (\operatorname{tr} A)A + (\det A)I = 0$ de
+el problema del fin de semana \cref{ch:b1:matrices} es su primera sombra.
+\emph{Analítico}: determinantes de matrices especiales (Vandermonde,
+Cauchy, Gram) deciden cuando la interpolación, la descomposición y
+\omterm{def:b1:linmaps:projection}{proyección} los problemas están bien planteados; el problema del fin de semana a continuación
+evalúa las dos primeras familias por completo.
+\end{remark}
+
+\begin{remark}[Perspectivas dentro del Libro 3]
+\label{rem:b1:det:perspectives}
+Este capítulo cierra la columna vertebral de álgebra lineal del volumen y
+sus dos capítulos restantes cobran los dividendos. en
+\cref{ch:b1:euclid}: la matriz de Gram
+$\bigl(\langle v_i, v_j\rangle\bigr)$ prueba la libertad mediante un
+determinante (\cref{exo:b1:euclid:11}), y las isometrías planas
+dividirse en rotaciones y reflexiones a lo largo del signo de su
+determinante --- la clasificación del problema del fin de semana allí
+corre sobre él. En \cref{ch:b1:multivar}: la cantidad de Monge $rt -
+s^2$ es el determinante de la matriz simétrica de segunda
+\omterm{def:b1:derivative:def}{derivados}, y las ecuaciones normales de mínimos cuadrados son una
+Sistema Cramer cuya matriz es una matriz de Gram (por lo tanto, momento) ---
+invertible precisamente según los criterios con sabor a Vandermonde
+establecido aquí. Cuando esos capítulos afirman "invertible" o
+``positivo'', los recibos están en este.
+\end{remark}
+
+\section{Ceremonias}
+
+\begin{exercise}[$\star$]\label{exo:b1:det:1}
+Calcular:
+\[
+\begin{vmatrix} 3 & 1\\ 5 & 2 \end{vmatrix},
+\qquad
+\begin{vmatrix} 1 & 2 & 3\\ 4 & 5 & 6\\ 7 & 8 & 9\end{vmatrix},
+\qquad
+\begin{vmatrix} 1 & 1 & 1\\ 1 & 2 & 4\\ 1 & 3 & 9\end{vmatrix}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:det:2}
+¿Para qué $\lambda \in \R$ es la familia $\bigl((1, 1, \lambda),
+(1, \lambda, 1), (\lambda, 1, 1)\bigr)$ una \omterm{def:b1:vspaces:free}{base} de $\R^3$?
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:det:3}
+Resuelva por la regla de Cramer:
+\[
+\begin{cases}
+2x + y = 5\\
+3x - 2y = 4 ,
+\end{cases}
+\qquad\text{then}\qquad
+\begin{cases}
+x + y + z = 6\\
+x - y + z = 2\\
+2x + y - z = 1 .
+\end{cases}
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:det:4}
+Resuelva por \omterm{met:b1:det:gauss}{eliminación gaussiana}, describiendo la solución \omterm{def:b1:logic:sets}{conjunto}:
+\[
+\begin{cases}
+x + 2y - z + t = 1\\
+2x + 4y + z - t = 5\\
+x + 2y + 2z - 2t = 4 .
+\end{cases}
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:det:5}
+Demuestre la fórmula de Vandermonde de \cref{ex:b1:det:vandermonde} mediante
+inducción en $n$, con las operaciones de columna $C_k \leftarrow C_k -
+x_1 C_{k-1}$ realizadas desde $k = n $ hasta $k = 2$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:det:6}
+(Tridiagonal) Sea $D_n$ el determinante $n \times n$ con $2$ en
+la diagonal, $1$ en las dos diagonales adyacentes,$0$ en el resto.
+Expandiendo a lo largo de la primera fila, demuestre $D_n = 2D_{n-1} - D_{n-2}$ y
+calcular $D_n $($D_1 = 2$,$D_2 = 3$).
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:det:7}
+Completar \cref{ex:b1:det:parameter}: calcular el determinante
+$\begin{vmatrix} 1 & 1 & m\\ 1 & m & 1\\ m & 1 & 1\end{vmatrix}$
+por la operación $C_1 \leftarrow C_1 + C_2 + C_3$, y realizar la
+discusión completa del sistema.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:det:8}
+Sea $A \in \mathcal{M}_n(\R)$ con entradas \emph{entero}. probar
+que $A$ tiene una inversa con entradas enteras si y sólo si $\det A
+= \pm 1$. \emph{(For the direct sense, take determinants; for the
+converse, admit --- or prove for $n \leq 3$ via cofactors --- that
+$A^{-1} = \frac{1}{\det A}\,\operatorname{Com}(A)^{\mathsf T}$ with
+integer cofactor matrix.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:det:9}
+Calcular el determinante $n \times n$ de la matriz $aI + bJ$
+(\cref{exo:b1:matrices:9}), es decir con $a + b$ en la diagonal y
+$b$ en otro lugar. \emph{(Suma todas las columnas a la primera, factoriza, luego
+claro.)} Recuperar la condición de invertibilidad $a \neq 0$,$a + nb
+\neq 0$.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:det:10}
+Sea $A, B \in \mathcal{M}_n(\R)$. demostrar que
+\[
+\det\begin{pmatrix} A & B\\ B & A \end{pmatrix}
+= \det(A + B)\,\det(A - B),
+\]
+por columna de bloque y \omterm{met:b1:matrices:gauss}{operaciones de fila} ($C_1 \leftarrow C_1 + C_2$, luego
+$L_2 \leftarrow L_2 - L_1$, en forma de bloque), suponiendo el natural
+regla triangular de bloque $\det\begin{pmatrix} M & N\\ 0 &
+P\end{pmatrix} = \det M \det P $--- probada para $2 \times 2$
+bloques en \cref{ex:b1:det:blocktriangular}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:det:11}
+(Circulante de orden $3$) Sea $a, b, c \in \C$ y
+\[
+\Delta = \begin{vmatrix}
+a & b & c\\
+c & a & b\\
+b & c & a
+\end{vmatrix}.
+\]
+Demuestre que $\Delta = (a + b + c)(a^2 + b^2 + c^2 - ab - bc -
+ca)$ y factorice completamente $\C$ usando $ j =
+\eu^{2\iu\pi/3}$:
+\[
+\Delta = (a + b + c)(a + jb + j^2c)(a + j^2b + jc) .
+\]
+\emph{(Start with $C_1 \leftarrow C_1 + C_2 + C_3$; for the
+complex form, note that the column $(1, j, j^2)^{\mathsf T}$
+almost behaves like an eigenvector.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:det:12}
+(Rango y menores) Let $A \in \mathcal{M}_{n,p}(K)$. demostrar que
+$\operatorname{rk} A$ equivale al tamaño más grande $r$ de un
+submatriz $r \times r$ invertible de $A$(una submatriz mantiene la
+entradas en los cruces de $r$ filas elegidas y $r$ elegidas
+columnas). \emph{(If $\operatorname{rk} A = r$, select $r$\omterm{def:b1:vspaces:free}{libre}
+columns, then $r$\omterm{def:b1:vspaces:free}{libre} rows of the resulting $n \times r$ block;
+conversely, an invertible submatrix forces the corresponding
+columns of $A$ to be \omterm{def:b1:vspaces:free}{libre}.)}
+\end{exercise}
+
+\section{Problema: la doble alternante de Cauchy}
+
+\begin{problem}\label{pb:b1:det:1}
+Dos determinantes rigen las aplicaciones de este capítulo: la
+\omterm{ex:b1:det:vandermonde}{Determinante de Vandermonde}, evaluado en \cref{exo:b1:det:5}, y
+el \emph{\omterm{pb:b1:det:1}{determinante de cauchy}} $\det\bigl(\frac{1}{a_i +
+b_j}\bigr)$, evaluado aquí. A su alrededor se acumula este problema.
+la caja de herramientas alternativa: \omterm{def:b1:poly:def}{polinomio} trucos de columna, interpolación
+por Cramer, el \omterm{pb:b1:det:1}{matriz de hilabert}, el discriminante de una cúbica, y
+el método de alternancia \omterm{def:b1:poly:def}{polinomios}. En todo momento, $V(x_1,
+\dots, x_n) = \prod_{i < j}(x_j - x_i)$ denota Vandermonde.
+valor.\index{determinante de cauchy}\index{matriz de hilabert}
+\index{discriminante}
+
+\medskip
+\noindent\textbf{Parte I --- The Vandermonde toolbox.}
+\begin{enumerate}
+ \item Calcule $V(1, 2, 3, 4)$ y recuerde por qué la interpolación en
+ $n$ nodos distintos por pares es un sistema Cramer.
+ \item (\omterm{def:b1:poly:def}{Polinomio} alternante) Sea $P_0, \dots, P_{n-1}$\emph{\omterm{def:b1:poly:def}{mónico}} con $\deg P_k = k$. probar
+ \[
+ \det\bigl(P_{j-1}(x_i)\bigr)_{1 \leq i, j \leq n}
+ = V(x_1, \dots, x_n) :
+ \]
+ Las operaciones de columna reemplazan cada columna de potencia por cualquier \omterm{def:b1:poly:def}{mónico}.
+ escalera, libre.
+ \item Aplicar la pregunta 2 al binomio \omterm{def:b1:poly:def}{polinomios} $B_k =
+ \frac{X(X-1)\cdots(X-k+1)}{k!}$: demostrar que para
+ \emph{números enteros}$m_1 < m_2 < \dots < m_n$,
+ \[
+ \frac{V(m_1, \dots, m_n)}{0!\,1!\,2!\cdots(n-1)!}
+ \in \N :
+ \]
+ el producto de todas las diferencias por pares de números enteros $n$
+ es divisible por el superfactorial $0!\,1!\cdots(n-1)!$.
+ \item Probar $\det\bigl(x_i^{\,j}\bigr)_{1 \leq i, j \leq n} =
+ x_1 x_2 \cdots x_n\, V(x_1, \dots, x_n)$(poderes ahora
+ a partir de $1$).
+ \item (Matriz de momentos) Sea $S = \bigl(p_{i+j-2}\bigr)_{1 \leq
+ i, j \leq n}$ donde $ p_k = x_1^k + \dots + x_n^k $. probar
+ que $S = W^{\mathsf T} W$ para la matriz $W =
+ (x_i^{\,j-1})_{ij}$, deduzca
+ \[
+ \det S = V(x_1, \dots, x_n)^2 ,
+ \]
+ y concluya: $n$\emph{real} los números están en pares
+ distintos si y sólo si su matriz de momentos es
+ invertible y $\det S \geq 0$ siempre.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte II --- Interpolation revisited.} Nodos
+$x_1 < \dots < x_n$, valores $y_1, \dots, y_n$.
+\begin{enumerate}[resume]
+ \item Escriba las condiciones ``$P = c_0 + c_1X + \dots +
+ c_{n-1}X^{n-1}$ interpola'' como \omterm{def:b1:det:system}{sistema lineal} en el
+ $c_k$ con la matriz $W$, y recuperar de $\det W = V \neq
+ 0$ la existencia y unicidad del interpolante
+ (compare las dos pruebas anteriores,
+ \cref{thm:b1:poly:lagrange} y
+ \cref{ex:b1:linmaps:interpolation}).
+ \item Por la regla de Cramer y \omterm{thm:b1:det:cofactor}{expansión de cofactor} de la pertinente
+ determinante a lo largo de su última columna, demuestre que el
+ El coeficiente principal del interpolante es
+ \[
+ c_{n-1} = \sum_{i=1}^{n}
+ \frac{y_i}{\prod_{j \neq i}(x_i - x_j)} .
+ \]
+ \item (Confluente Vandermonde) Computación
+ \[
+ \begin{vmatrix}
+ 1 & x_1 & x_1^2\\
+ 0 & 1 & 2x_1\\
+ 1 & x_2 & x_2^2
+ \end{vmatrix}
+ = (x_2 - x_1)^2 ,
+ \]
+ e interpretar: los datos $\bigl(P(x_1), P'(x_1),
+ P(x_2)\bigr)$ determinan un $P \in \R_2[X]$ único cuando
+ $x_1 \neq x_2$(interpolación de Hermite).
+ \item Encuentre el $P \in \R_2[X]$único con $P(0) = 1$,$P'(0)
+ = 0$,$P(1) = 2$ y compare su respuesta con
+ pregunta 8.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte III --- The \omterm{pb:b1:det:1}{determinante de cauchy}.} Sean $a_1,
+\dots, a_n $ y $b_1, \dots, b_n$ escalares con $a_i + b_j
+\neq 0$ para todos $i, j $, y
+\[
+C_n = \det\Bigl(\frac{1}{a_i + b_j}\Bigr)_{1 \leq i, j \leq n} .
+\]
+\begin{enumerate}[resume]
+ \item Calcule $C_2$ a mano y póngalo en la forma
+ ``productos de diferencias sobre productos de sumas''.
+ \item Para $n \geq 2$, realice $L_i \leftarrow L_i - L_n $($i <
+ n $) y factorice filas y columnas para demostrar
+ \[
+ C_n = \frac{\prod_{i<n}(a_n - a_i)}{\prod_{j}(a_n +
+ b_j)}\;\det M,
+ \]
+ donde $M$ concuerda con la matriz de Cauchy en las filas $i < n$
+ y tiene la última fila $(1, 1, \dots, 1)$.
+ \item Realice $C_j \leftarrow C_j - C_n $($j < n$) en $M$,
+ factorizar nuevamente y concluir por inducción
+ \emph{La doble alternante de Cauchy}:
+ \[
+ C_n = \frac{\prod_{1 \leq i < j \leq n}(a_j - a_i)(b_j -
+ b_i)}{\prod_{i, j}(a_i + b_j)} .
+ \]
+ \item Deducir el criterio de invertibilidad (el $a_i$ por pares
+ distinto y el $b_j$ distinto por pares). Para el
+ \emph{\omterm{pb:b1:det:1}{matriz de hilabert}} $H_n = \bigl(\frac{1}{i + j -
+ 1}\bigr)$: calcula $\det H_2$ y $\det H_3$ a partir del
+ fórmula y verifique que $H_2^{-1}$ tenga entradas enteras.
+ \item Demuestre que para $b_j$ distintos por pares y cualquier mano derecha
+ lado, el sistema $\sum_j \frac{c_j}{a_i + b_j} = y_i$
+ ($i = 1, \dots, n$) tiene una solución única y se relaciona
+ esto a la existencia y unicidad de la fracción parcial
+ descomposiciones con \omterm{def:b1:fractions:field}{polos} simples
+ (\cref{thm:b1:fractions:complex}).
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte IV --- The discriminant of a cubic.} Deja
+$\lambda_1, \lambda_2, \lambda_3$ sean las raíces (en $\C$) de $X^3
++ pX + q $ y $p_k = \lambda_1^k + \lambda_2^k + \lambda_3^k$.
+\begin{enumerate}[resume]
+ \item Usando $\lambda^3 = -p\lambda - q$ en cada raíz y
+ Vieta ($p_1 = 0$), calcule $p_2 = -2p$,$p_3 = -3q$ y
+ $p_4 = 2p^2$.
+ \item Con la pregunta 5 (sobre $\C$, manteniendo $\det S = V^2$),
+ calcular
+ \[
+ \operatorname{disc} = V(\lambda_1, \lambda_2,
+ \lambda_3)^2 = \begin{vmatrix}
+ 3 & 0 & -2p\\
+ 0 & -2p & -3q\\
+ -2p & -3q & 2p^2
+ \end{vmatrix}
+ = -4p^3 - 27q^2 .
+ \]
+ \item Deducir: $X^3 + pX + q$ tiene una raíz repetida si y sólo
+ si $4p^3 + 27q^2 = 0$; consulte $X^3 - 3X + 2 = (X -
+ 1)^2(X + 2)$.
+ \item Supongamos que $p, q$ es real. Demostrar que la cúbica tiene tres.
+ raíces reales distintas si y sólo si $\operatorname{disc}
+ > 0$, y una raíz conjugada real más dos no reales si
+ y sólo si $\operatorname{disc} < 0$. \emph{(If
+ $\lambda_3 = \conj{\lambda_2} \neq \lambda_2$ and
+ $\lambda_1 \in \R$, show $V$ is purely imaginary.)}
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part V --- Dividends, and the alternating
+method.}
+\begin{enumerate}[resume]
+ \item Para $0 < a_1 < a_2 < \dots < a_n$, mostrar
+ $\det\bigl(\frac{1}{a_i + a_j}\bigr) > 0$.
+ \item Calcular $\det\bigl(\binom{m_i}{j-1}\bigr)_{1 \leq i, j
+ \leq 3}$ para $(m_1, m_2, m_3) = (2, 4, 7)$, primero por
+ preguntas 2--3, luego por expansión directa.
+ \item Sea $\lambda_1, \dots, \lambda_n$ distinto por pares
+ y distinto de cero. Usando una matriz de Vandermonde invertible,
+ demostrar nuevamente que las sucesiones geométricas
+ $\bigl((\lambda_i^{\,k})_{k \geq 0}\bigr)_{1 \leq i \leq
+ n}$ forma un \omterm{def:b1:vspaces:free}{familia libre} del espacio de secuencias.
+ \item Calcular $\det\bigl(\frac{1}{i + j}\bigr)_{1 \leq i, j
+ \leq 3}$ a partir de la doble alternante.
+ \item (Alternando \omterm{def:b1:poly:def}{polinomios}) Llame a \omterm{def:b1:poly:def}{polinomio} $F$ en $x_1,
+ \dots, x_n $\emph{alterno} al intercambiar dos
+ variable cambia de signo. Demuestre que un $F$ alterno
+ desaparece cada vez que $x_i = x_j $($i \neq j$), y deduce
+ --- una variable a la vez, según el teorema del factor ---
+ que $F$ es divisible por $\prod_{i<j}(x_j - x_i)$.
+ \item Utilice la pregunta 23 para refutar la fórmula de Vandermonde con
+ sin inducción: el determinante $\det(x_i^{\,j-1})$ es un
+ alternando \omterm{def:b1:poly:def}{polinomio} de grado total $\binom n2$,
+ por tanto, un múltiplo \emph{constante} de $\prod_{i<j}(x_j -
+ x_i)$; Identifica la constante comparando un monomio.
+ \item Síntesis, en cuatro frases: ¿qué propiedad única de
+ el determinante (qué axioma) genera todos los
+ factorizaciones de este problema; ¿Por qué la matriz de momentos?
+ La identidad de la pregunta 5 genera un \omterm{def:b1:logic:statement}{enunciado} sobre
+ \emph{complejo} distinción en un computable
+ \emph{real} prueba de signos; cuales dos matrices clásicas eran
+ evaluados completamente aquí y qué problemas \omterm{def:b1:linmaps:def}{lineal}
+ gobernar; y cómo el método alterno de preguntas
+ 23--24 explica, de un plumazo, por qué sigue apareciendo $\prod_{i<j}(x_j -
+ x_i)$. Nombra el teorema de la Parte III.
+\end{enumerate}
+\end{problem}

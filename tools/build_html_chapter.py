@@ -29,7 +29,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from htmlbook import lexer, model  # noqa: E402
-from htmlbook.emit_html import Emitter, plaintext, slugify, substitute_math  # noqa: E402
+from htmlbook.emit_html import Emitter, footnotes_html, plaintext, slugify, substitute_math  # noqa: E402
 from htmlbook.model import anchor_for  # noqa: E402
 from htmlbook.langstrings import LangStrings  # noqa: E402
 from htmlbook.tikz2svg import FigureBuilder  # noqa: E402
@@ -128,7 +128,7 @@ def first_paragraph_text(blocks, limit=160):
 def collect_figures(blocks, out):
     for b in blocks:
         if b["t"] == "figure":
-            out.append(b["tikz"])
+            out.extend(b["tikzs"])
         elif b["t"] == "env":
             collect_figures(b["body"], out)
         elif b["t"] == "list":
@@ -179,6 +179,14 @@ def main():
                         for lang, e in editions.items()})
     ch_key = editions[langs[0]]["label"].split(":", 1)[1].replace(":", "-")
 
+    # the chapter's own label is referenceable too (\cref{ch:...})
+    for e in editions.values():
+        e["labels"][e["label"]] = {
+            "kind": "chapter",
+            "number": str(args.chapter_number),
+            "anchor": f"ch-{ch_key}",
+        }
+
     # ---- cross-chapter references --------------------------------------
     # Labels of OTHER already-published chapters (from the existing
     # manifest) resolve to links into their pages; the URL scheme mirrors
@@ -206,6 +214,12 @@ def main():
                 externals[label] = {"kind": info["kind"],
                                     "number": info["number"],
                                     "href": f"{page}#{anchor_for(label)}"}
+            if "label" in other:
+                externals[other["label"]] = {
+                    "kind": "chapter",
+                    "number": str(other["number"]),
+                    "href": f"{page}#ch-{other['key']}",
+                }
         return externals
 
     # ---- figures (deduped by content hash across languages) ------------
@@ -229,6 +243,7 @@ def main():
                           figures, args.chapter_number,
                           externals=externals_for(lang))
         html_body = emitter.blocks(e["blocks"])
+        html_body += footnotes_html(emitter)
         macros = dict(KATEX_MACROS, **{"\\st": e["strings"].st_macro})
         rendered = render_math(emitter.math, macros)
         html_body = substitute_math(html_body, rendered)
@@ -258,6 +273,7 @@ def main():
     entry = {
         "key": ch_key,
         "number": args.chapter_number,
+        "label": editions[langs[0]]["label"],
         "languages": manifest_langs,
         "exercise_count": kinds.count("exercise"),
         "problem_count": kinds.count("problem"),

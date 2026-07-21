@@ -1,0 +1,998 @@
+\chapter{Lógica, conjuntos y aplicaciones}\label{ch:b1:logic}
+
+Hasta ahora las pruebas se han realizado con una idea informal pero honesta.
+de lo que significa "probar". Este primer capítulo de pregrado.
+Las matemáticas hacen explícitas las reglas del juego: ¡qué matemática!
+\omterm{def:b1:logic:statement}{enunciado} es, cómo se combinan los conectivos y cuantificadores \omterm{def:b1:logic:statement}{enunciados},
+qué movimientos son legales en una prueba --- y luego construye, sobre esta base,
+los dos lenguajes universales de las matemáticas: \omterm{def:b1:logic:sets}{conjuntos} y \omterm{def:b1:logic:map}{aplicaciones}.
+
+\section{Enunciados y conectivos}
+
+\begin{definition}[Enunciado, conectivos]\label{def:b1:logic:statement}
+Un \emph{enunciado}\index{enunciado} (o \emph{proposición}) es un
+oración que es verdadera (V) o falsa (F) --- exactamente una de las
+dos. De las enunciados $P$ y $Q$ se forma:
+\begin{itemize}
+ \item o \emph{negación} $\lnot P$("no $P$"), verdadero exactamente cuando
+ $P$ es falso;
+ \item o \emph{conjunción} $P \land Q$(``$P$ y $Q$''), verdadero
+ exactamente cuando ambas son ciertas;
+ \item o \emph{disyunción} $P \lor Q$(``$P$ o $Q$''), verdadero
+ exactamente cuando al menos uno es verdadero (este "o" es inclusivo);
+ \item el \emph{implicación} $P \implies Q$, falso exactamente cuando $P$
+ es verdadero y $Q$ es falso;
+ \item el \emph{equivalencia} $P \iff Q$, verdadero exactamente cuando $P$ y
+ $Q$ tienen el mismo valor de verdad.
+\end{itemize}
+\end{definition}
+
+\begin{remark}
+La tabla de verdad de $P \implies Q$ merece una pausa: cuando $P$ es falsa,
+$P \implies Q$ es \emph{verdadero}, sea lo que sea $Q$. ``Si$2 < 1$ entonces
+$0 = 5$'' es una implicación verdadera. Una implicación no afirma nada sobre
+¿Qué sucede cuando su hipótesis falla?
+\end{remark}
+
+\begin{proposition}[Reglas de cómputo de enunciados]\label{prop:b1:logic:rules}
+Para todos los \omterm{def:b1:logic:statement}{enunciados} $P$,$Q$,$R$:
+\begin{enumerate}
+ \item $\lnot(\lnot P) \iff P$;
+ \item Leyes de De Morgan\index{Las leyes de De Morgan}:
+ $\lnot(P \land Q) \iff (\lnot P) \lor (\lnot Q)$ y
+ $\lnot(P \lor Q) \iff (\lnot P) \land (\lnot Q)$;
+ \item $(P \implies Q) \iff \bigl((\lnot P) \lor Q\bigr)$, por lo tanto
+ $\lnot(P \implies Q) \iff P \land (\lnot Q)$;
+ \item contraposición\index{contraposición}:
+ $(P \implies Q) \iff \bigl((\lnot Q) \implies (\lnot P)\bigr)$;
+ \item $(P \iff Q) \iff \bigl((P \implies Q) \land (Q \implies
+ P)\bigr)$;
+ \item Distributividad : $P \land (Q \lor R) \iff (P \land Q) \lor
+ (P \land R)$ y $ P \lor (Q \land R) \iff (P \lor Q) \land
+ (P \lor R)$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+Cada equivalencia se verifica comparando tablas de verdad: dos compuestos
+\omterm{def:b1:logic:statement}{enunciados} construido a partir de $P$,$Q$,$R$ son exactamente equivalentes cuando
+tome el mismo valor de verdad en cada uno de los (cuatro u ocho) casos. vamos
+Muestre una tabla completa para la primera ley de De Morgan:
+\begin{center}
+\begin{tabular}{cc|c|c|cc|c}
+$P$&$Q$&$P \land Q$&$\lnot(P \land Q)$&$\lnot P$&$\lnot Q$ &
+$(\lnot P) \lor (\lnot Q)$\\
+\hline
+T & T & T & F & F & F & F \\
+T & F & F & T & F & T & T \\
+F & T & F & T & T & F & T \\
+F & F & F & T & T & T & T \\
+\end{tabular}
+\end{center}
+Las columnas $4$ y $7$ coinciden, lo que confirma la ley. Para contraposición
+un atajo verbal es más rápido: $P \implies Q$ es falso exactamente en el
+caso ($P$ verdadero,$Q$ falso) y $(\lnot Q) \implies (\lnot P)$ es falso
+exactamente en el caso ($\lnot Q$ verdadero,$\lnot P$ falso), es decir ($Q$
+falso, $P$ verdadero) --- el mismo caso único, por lo que las dos implicaciones tienen
+tablas idénticas. Las reglas restantes se verifican de la misma manera; nota
+que (3) reduce cada implicación a una disyunción, de modo que (2)
+produce mecánicamente la regla de negación $\lnot(P \implies Q) \iff P
+\land (\lnot Q)$: para contradecir una implicación se debe exhibir un caso
+donde la hipótesis se cumple y la conclusión falla.
+\end{proof}
+
+\section{Cuantificadores}
+
+\begin{definition}[Cuantificadores]\label{def:b1:logic:quantifiers}
+Sea $P(x)$ una propiedad de un elemento $x$ de un \omterm{def:b1:logic:sets}{conjunto}$E$.
+\begin{itemize}
+ \item $\forall x \in E,\ P(x)$("para todos $x$ en $E$,$P(x)$") es
+ verdadero cuando cada elemento de $E$ satisface $P$;
+ \item $\exists x \in E,\ P(x)$("existe $x$ en $E$ tal que
+ $P(x)$'') es verdadera cuando al menos un elemento de $E$ satisface
+ $P$.
+\end{itemize}
+Se escribe $\exists!$ para decir "existe un único".
+\end{definition}
+
+\begin{proposition}[Negación de cuantificadores]\label{prop:b1:logic:negquant}
+\[
+\lnot\bigl(\forall x \in E,\ P(x)\bigr) \iff
+\exists x \in E,\ \lnot P(x),
+\qquad
+\lnot\bigl(\exists x \in E,\ P(x)\bigr) \iff
+\forall x \in E,\ \lnot P(x).
+\]
+\end{proposition}
+
+\begin{proof}
+Argumentemos la primera equivalencia en ambas direcciones; el segundo
+es simétrico. Si $\forall x \in E,\ P(x)$ es falso, entonces no todos
+elemento satisface $P$: el \omterm{def:b1:logic:sets}{conjunto}$A = \{x \in E : \lnot P(x)\}$
+no puede estar vacío y cualquiera de sus elementos es testigo de $\exists x \in
+E,\ \lnot P(x)$. Por el contrario, si algún $x_0 \in E $ satisface $\lnot
+P(x_0)$, entonces $x_0$ es un contraejemplo y el universal \omterm{def:b1:logic:statement}{enunciado}
+falla. Para la segunda regla: ``no $x$ satisface $P$'' significa \omterm{def:b1:logic:sets}{conjunto}
+$\{x : P(x)\}$ está vacío, es decir, cada $x$ se encuentra en su complemento
+$A$. Aplicados en cascada a un prefijo anidado de cuantificadores, los dos
+Las reglas dan el procedimiento mecánico de \cref{ex:b1:logic:limit}:
+la negación camina de izquierda a derecha, volteando cada $\forall$ en
+$\exists$ y cada $\exists$ en $\forall$, y finalmente niega
+el predicado más interno.
+\end{proof}
+
+\begin{example}[Negando oraciones matemáticas cotidianas]\label{ex:b1:logic:negpractice}
+Sea $f \colon \R \to \R$. La frase ``$f$ está aumentando'' dice
+\[
+\forall x \in \R,\ \forall y \in \R,\quad
+x \leq y \implies f(x) \leq f(y) ,
+\]
+y su negación, por \cref{prop:b1:logic:negquant} más la regla
+$\lnot(P \implies Q) \iff P \land \lnot Q$:
+\[
+\exists x \in \R,\ \exists y \in \R,\quad
+x \leq y \ \text{ and }\ f(x) > f(y) :
+\]
+una sola pareja de testigos es suficiente. Del mismo modo, ``$f$ está acotado'' es
+$\exists M \in \R,\ \forall x \in \R,\ \abs{f(x)} \leq M$, con
+negación
+\[
+\forall M \in \R,\ \exists x \in \R,\quad \abs{f(x)} > M :
+\]
+Se propone el límite \emph{lo que}, algún punto lo supera. el
+Idea: una negación correcta nunca contiene "no" aplicado a un
+bloque cuantificado --- es un nuevo positivo \omterm{def:b1:logic:statement}{enunciado}, en el cual el
+Se intercambian roles: ahora uno presenta a los testigos que antes
+recibido.
+\end{example}
+
+\begin{example}[Orden de cuantificadores]\label{ex:b1:logic:order}
+El \omterm{def:b1:logic:order}{orden} de diferentes cuantificadores importa:
+\[
+\forall x \in \R,\ \exists y \in \R,\ y > x
+\quad\text{is true (take } y = x+1\text{),}
+\]
+\[
+\exists y \in \R,\ \forall x \in \R,\ y > x
+\quad\text{is false (no real number exceeds all reals).}
+\]
+En el primero \omterm{def:b1:logic:statement}{enunciado} $ y $ puede depender de $x$; en el segundo, uno solo
+$ y $ debe funcionar para todos los $x$. Dos cuantificadores idénticos, por otro lado
+mano, siempre conmutar.
+\end{example}
+
+\begin{example}[Lectura de una definición con tres cuantificadores]\label{ex:b1:logic:limit}
+La frase ``la secuencia $(u_n)$ converge a$\ell$'' será
+escrito en \cref{ch:b1:seq} como
+\[
+\forall \varepsilon > 0,\ \exists N \in \N,\ \forall n \geq N,\quad
+\abs{u_n - \ell} \leq \varepsilon .
+\]
+Su negación, por \cref{prop:b1:logic:negquant} aplicada tres veces, es
+\[
+\exists \varepsilon > 0,\ \forall N \in \N,\ \exists n \geq N,\quad
+\abs{u_n - \ell} > \varepsilon .
+\]
+Ser capaz de negar tales oraciones mecánicamente, sin pensar.
+sobre lo que quieren decir, es una habilidad genuina: separa el trabajo lógico
+del trabajo matemático.
+\end{example}
+
+\section{Técnicas de prueba}
+
+\begin{method}[Los patrones de prueba estándar]\label{met:b1:logic:proofs}
+Para probar\dots
+\begin{enumerate}
+ \item \emph{an implication $P \implies Q$ directly}: asume $P$,
+ deducir $Q$;
+ \item \emph{por contraposición}: asume $\lnot Q$, deduce $\lnot P$
+ --- válido por \cref{prop:b1:logic:rules}~(4);
+ \item \emph{por contradicción}: asume que \omterm{def:b1:logic:statement}{enunciado} es falso, deriva
+ una contradicción;
+ \item \emph{una equivalencia}: prove both implications separately (or
+ cadena de equivalencias conocidas);
+ \item \emph{a ``for all'' \omterm{def:b1:logic:statement}{enunciado}}: elige un \emph{arbitrario} $x$
+ en $E$("let $x \in E$") y probar $P(x)$;
+ \item \emph{a ``there exists'' \omterm{def:b1:logic:statement}{enunciado}}: presentar un testigo, o
+ probar la existencia indirectamente;
+ \item \emph{por inducción}: ver \cref{thm:b1:logic:induction}.
+\end{enumerate}
+Al probar un \omterm{def:b1:logic:statement}{enunciado} sobre un elemento bien elegido pero arbitrario,
+never give the element extra properties: ``let $x \in \R$'' followed by
+``desde $x > 0$\dots'' no prueba nada sobre $x$ negativo.
+\end{method}
+
+\begin{remark}[Errores comunes en las pruebas.]\label{rem:b1:logic:pitfalls}
+Cuatro trampas clásicas, todas dignas de mencionar una vez.
+\begin{enumerate}
+ \item \emph{Inverso en lugar de contrapositivo.} $Q \implies P$
+ es \emph{no} equivalente a $P \implies Q$; sólo $\lnot Q
+ \implies \lnot P $ lo es. ``Si llueve, la calle está mojada''
+ no da derecho a concluir que llueve en una calle mojada.
+ \item \emph{Demostrar una equivalencia por una implicación.} Un
+ La afirmación ``iff'' son dos teoremas; anunciar en qué dirección está
+ siendo probado, y probar ambos. Las cadenas de $\iff$ son legales.
+ sólo si el enlace \emph{cada} es realmente reversible ---
+ elevar al cuadrado una ecuación, por ejemplo, no lo es.
+ \item \emph{Pruebas al revés.} Comenzando desde el deseado
+ Concluir y deducir un verdadero \omterm{def:b1:logic:statement}{enunciado} no prueba nada.
+ (de $-1 = 1$ se deriva el verdadero $1 = 1$ elevando al cuadrado).
+ Un cálculo puede ser \emph{descubierto} al revés, pero
+ debe ser \emph{escrito} hacia adelante, o con explícito
+ equivalencias.
+ \item \emph{Testigo fijo versus elemento arbitrario.} Para demostrar
+ $\exists x,\ P(x)$, uno puede exhibir uno ingeniosamente
+ elegido $x$; para probar $\forall x,\ P(x)$, el elegido $x$
+ debe seguir siendo arbitrario. Mezclando los dos --- comprobando un
+ afirmación universal sobre un ejemplo --- es la más común
+ error en las copias para principiantes.
+\end{enumerate}
+\end{remark}
+
+\begin{example}[Contraposición y contradicción en el trabajo.]\label{ex:b1:logic:sqrt2}
+\emph{For $n \in \N$: if $n^2$ is even then $n$ is even.} Por
+contraposición: si $n$ es impar,$n = 2k+1$, entonces
+$n^2 = 4k^2 + 4k + 1$ es extraño.
+
+\emph{$\sqrt 2$ is irrational.} Por contradicción: supongamos
+$\sqrt 2 = p/q$ con $p, q \in \N^*$ y la fracción en términos más bajos.
+Entonces $p^2 = 2q^2$ es par, entonces $p$ es par (punto anterior),$p = 2r$;
+entonces $q^2 = 2r^2$ es par, por lo que $q$ es par --- contradice el más bajo
+términos.
+\end{example}
+
+\begin{theorem}[induccion]\label{thm:b1:logic:induction}
+Sea $P(n)$ una propiedad del número entero $n$. si
+\begin{enumerate}
+ \item $P(0)$ es cierto, y
+ \item para todos $n \in \N$,$P(n) \implies P(n+1)$,
+\end{enumerate}
+entonces $P(n)$ es cierto para todos los $n \in \N$.
+
+\emph{Fuerte inducción:} conclusión sin cambios si (2) se reemplaza por:
+para todos $n$,$\bigl(P(0) \land \dots \land P(n)\bigr) \implies
+P(n+1)$.
+\end{theorem}
+
+\begin{proof}
+Esta es una propiedad del propio $\N$, equivalente a: \emph{every nonempty
+subset of $\N$ has a least element} (que tomamos como conocida). De hecho,
+supongamos que (1) y (2) mantienen y dejan $A = \{n \in \N : P(n)
+\text{ false}\}$. Si$A \neq \emptyset $, tiene un elemento mínimo $m $;
+$m \neq 0$ por (1); luego $m - 1 \notin A$, por lo que se cumple $P(m-1)$, y (2)
+da $P(m)$--- contradicción. Entonces $A = \emptyset $. Para fuerte
+inducción, aplique el mismo argumento: $P(0), \dots, P(m-1)$ todos se mantienen
+ya que $m$ es menor en $A$.
+\end{proof}
+
+\begin{example}[Probando existencia única]\label{ex:b1:logic:uniqueexistence}
+A \omterm{def:b1:logic:statement}{enunciado} $\exists!\,x,\ P(x)$ es \emph{dos} \omterm{def:b1:logic:statement}{enunciados}, probado
+por separado: existencia (exhibir o construir algún $x_0$ con
+$P(x_0)$) y unicidad (supongamos $P(x)$ y $P(x')$, deduzca $x =
+x'$). Muestra: \emph{hay un $x $real único con $x^3 + x =
+2$.} Existencia:$x_0 = 1$ funciona, desde $1 + 1 = 2$. Unicidad:
+si $x^3 + x = x'^3 + x'$, entonces
+\[
+0 = (x^3 - x'^3) + (x - x')
+= (x - x')\,\bigl(x^2 + xx' + x'^2 + 1\bigr),
+\]
+y el segundo factor es positivo (es igual a $\bigl(x +
+\tfrac{x'}2\bigr)^2 + \tfrac34 x'^2 + 1 \geq 1$), por lo que $x = x'$.
+Tenga en cuenta la división del trabajo: la existencia utilizó una suposición afortunada,
+álgebra utilizada de unicidad válida para soluciones \emph{arbitrario} ---
+Ninguno de los argumentos hace el trabajo del otro, y olvidar el segundo
+La mitad es una tentación permanente una vez que se ha encontrado una solución.
+\end{example}
+
+\begin{example}\label{ex:b1:logic:induction}
+Para todos los $n \in \N^*$:$\;\sum_{k=1}^n k = \frac{n(n+1)}{2}$. Caso base
+$n = 1$: ambos lados son iguales a$1$. Paso: asumiendo la fórmula para $n$,
+\[
+\sum_{k=1}^{n+1} k = \frac{n(n+1)}{2} + (n+1)
+= (n+1)\Bigl(\frac n2 + 1\Bigr) = \frac{(n+1)(n+2)}{2}. \qedhere
+\]
+\end{example}
+
+\begin{example}[Fuerte inducción en el trabajo.]\label{ex:b1:logic:strongind}
+\emph{Every integer $n \geq 2$ is a product of prime numbers} (un primo
+siendo un número entero $\geq 2$ cuyos únicos divisores $\geq 1$ son $1$ y
+mismo; los primos se estudian por sí mismos en \cref{ch:b1:arith}).
+La inducción ordinaria es inútil aquí: sabiendo que $95 = 5 \times 19$
+factores no dice nada sobre $96$. La inducción fuerte encaja exactamente. bases
+caso: $2$ es primo, por lo tanto, un producto (de un factor) de primos. Paso: dejar
+$n \geq 2$ y supongamos que cada número entero $m$ con $2 \leq m \leq n$ es un
+producto de números primos. Si $n + 1$ es primo, listo. De lo contrario $n + 1 = ab $
+con $2 \leq a, b \leq n$; por la hipótesis fuerte tanto $a$ como $b$
+son productos de números primos, por lo tanto, $n + 1$ también lo es. La idea: fuerte
+La inducción es la herramienta adecuada siempre que viva la "razón" de $P(n+1)$.
+en algún rango anterior impredecible, no en el rango $n$.
+\end{example}
+
+\section{Conjuntos}
+
+\begin{definition}[Establecer operaciones]\label{def:b1:logic:sets}
+Tomamos la noción de \emph{conjunto}\index{conjunto} y la relación de membresía.
+$x \in E$ como primitivo. Para conjuntos $A, B$ dentro de un conjunto ambiental $E$:
+\begin{itemize}
+ \item \emph{inclusión}: $A \subseteq B$ cuando $\forall x,\ x \in A
+ \implies x \in B $; igualdad $A = B $ cuando $A \subseteq B $ y
+ $B \subseteq A$;
+ \item \emph{unión} $A \cup B$, \emph{intersección}$A \cap B$,
+ \emph{diferencia}$A \setminus B = \{x \in A : x \notin B\}$,
+ \emph{complementar}$\overline{A} = E \setminus A$;
+ \item o \emph{conjunto vacío} $\emptyset$, contenidos en cada conjunto;
+ \item el \emph{conjunto de potencia}\index{conjunto de potencia} $\mathcal{P}(E)$: el conjunto
+ de todos los subconjuntos de $E$;
+ \item o \emph{producto} $E \times F$: el conjunto de pares ordenados
+ $(x, y)$ con $x \in E$,$ y \in F$.
+\end{itemize}
+\end{definition}
+
+\begin{example}[Acostumbrándose al conjunto de potencia]\label{ex:b1:logic:powerset}
+Para $E = \{a, b\}$:
+\[
+\mathcal P(E) = \bigl\{\, \emptyset,\ \{a\},\ \{b\},\ \{a, b\}
+\,\bigr\},
+\]
+cuatro elementos --- y tenga en cuenta la disciplina de tipo: $a \in E$ pero
+$\{a\} \in \mathcal P(E)$; el \omterm{def:b1:logic:statement}{enunciados}$a \in \mathcal P(E)$
+y $\{a\} \subseteq \mathcal P(E)$ son ambos falsos tal como están escritos
+(el segundo requeriría que $a$ sea \emph{subconjunto} de $E$).
+Iterando desde la nada: $\mathcal P(\emptyset) = \{\emptyset\}$
+tiene un elemento, $\mathcal P(\mathcal P(\emptyset)) = \{\emptyset,
+\{\emptyset\}\}$ tiene dos, el siguiente tiene cuatro --- \omterm{def:b1:logic:sets}{conjuntos} de \omterm{def:b1:logic:sets}{conjuntos} son
+\omterm{def:b1:logic:sets}{conjuntos} ordinario y \cref{ch:b1:counting} confirmarán la duplicación.
+patrón: $\abs{\mathcal P(E)} = 2^{\abs E}$. manteniendo los niveles
+($x$,$\{x\}$,$\{\{x\}\}$) en fila es la mitad de la batalla en
+ejercicios como \cref{exo:b1:logic:11,exo:b1:logic:12}.
+\end{example}
+
+\begin{proposition}[Álgebra de conjuntos]\label{prop:b1:logic:setalgebra}
+Para los subconjuntos $A, B, C$ de $E$:
+\begin{enumerate}
+ \item $A \cap (B \cup C) = (A \cap B) \cup (A \cap C)$ y
+ $A \cup (B \cap C) = (A \cup B) \cap (A \cup C)$;
+ \item De Morgan: $\overline{A \cup B} = \overline{A} \cap
+ \overline{B}$ y $\overline{A \cap B} = \overline{A} \cup
+ \overline{B}$;
+ \item $A \subseteq B \iff \overline{B} \subseteq \overline{A}$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+Cada identidad traduce una regla de \cref{prop:b1:logic:rules} mediante
+el diccionario ($\in A$ o no)$\leftrightarrow $(\omterm{def:b1:logic:statement}{enunciado} verdadero o
+falso): por ejemplo\ $x \in \overline{A \cup B} \iff \lnot(x \in A \lor x \in
+B) \iff (x \notin A) \land (x \notin B) \iff x \in \overline{A} \cap
+\overline{B}$. El punto (3) es la contraposición. Como segunda muestra, la
+primera ley de distributividad en su totalidad:
+\[
+x \in A \cap (B \cup C)
+\iff (x \in A) \land \bigl(x \in B \lor x \in C\bigr)
+\iff \bigl(x \in A \land x \in B\bigr) \lor
+\bigl(x \in A \land x \in C\bigr),
+\]
+por la distributividad de \cref{prop:b1:logic:rules}~(6), y la
+El último \omterm{def:b1:logic:statement}{enunciado} lee $x \in (A \cap B) \cup (A \cap C)$. Cada \omterm{def:b1:logic:sets}{conjunto}
+La identidad de este tipo se puede demostrar mediante este mecanismo
+traducción --- razón por la cual ninguno de ellos necesita ser memorizado.
+\end{proof}
+
+\begin{method}[Demostración de igualdades de conjuntos]\label{met:b1:logic:doubleinc}
+Para probar $A = B$, pruebe las dos inclusiones: let $x \in A$, show $x \in
+B $; luego deje que $x \in B $muestre $x \in A $. Alternativamente, cadena
+equivalencias $x \in A \iff \dots \iff x \in B$ cuando cada paso es realmente
+una equivalencia.
+\end{method}
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=0.9]
+ \draw[thick] (-2.6,-1.9) rectangle (2.6,1.9);
+ \node[below right] at (-2.6,1.9) {$E$};
+ \begin{scope}
+ \clip (-2.6,-1.9) rectangle (2.6,1.9);
+ \fill[omDef!20] (-2.6,-1.9) rectangle (2.6,1.9);
+ \fill[white] (-0.7,0) circle (1.1);
+ \fill[white] (0.7,0) circle (1.1);
+ \end{scope}
+ \draw[omDef, thick] (-0.7,0) circle (1.1);
+ \draw[omDef, thick] (0.7,0) circle (1.1);
+ \node[omDef] at (-1.35,0.5) {$A$};
+ \node[omDef] at (1.35,0.5) {$B$};
+ \begin{scope}[xshift=6.6cm]
+ \draw[thick] (-2.6,-1.9) rectangle (2.6,1.9);
+ \node[below right] at (-2.6,1.9) {$E$};
+ \begin{scope}
+ \clip (-2.6,-1.9) rectangle (2.6,1.9);
+ \fill[omThm!20] (-2.6,-1.9) rectangle (2.6,1.9);
+ \begin{scope}
+ \clip (-0.7,0) circle (1.1);
+ \fill[white] (0.7,0) circle (1.1);
+ \end{scope}
+ \end{scope}
+ \draw[omThm, thick] (-0.7,0) circle (1.1);
+ \draw[omThm, thick] (0.7,0) circle (1.1);
+ \node[omThm] at (-1.35,0.5) {$A$};
+ \node[omThm] at (1.35,0.5) {$B$};
+ \end{scope}
+\end{tikzpicture}
+
+{\small Leyes de De Morgan en imágenes: la región sombreada de la izquierda
+es $\overline{A \cup B} = \overline A \cap \overline B$(todo
+fuera de ambos discos); a la derecha, $\overline{A \cap B} = \overline
+A \cup \overline B$(todo excepto la superposición en forma de lente). un
+El diagrama no es una prueba, pero hace que la búsqueda de elementos sea una prueba de
+\cref{prop:b1:logic:setalgebra} imposible de recordar mal.}
+\end{omfigure}
+
+\section{Aplicaciones}
+
+\begin{definition}[Aplicación, imagen, imagen inversa]\label{def:b1:logic:map}
+Una \emph{aplicación}\index{aplicación} (o \emph{función}) $f \colon E \to F$
+asigna a cada elemento $x$ del \omterm{def:b1:logic:sets}{conjunto}$E$(el \emph{dominio}) exactamente
+un elemento $f(x)$ del \omterm{def:b1:logic:sets}{conjunto}$F$(el \emph{codominio}). Para $A
+\subseteq E $ y $B \subseteq F$:
+\[
+f(A) = \{f(x) : x \in A\} \subseteq F,
+\qquad
+f^{-1}(B) = \{x \in E : f(x) \in B\} \subseteq E
+\]
+son el \emph{imagen directa} de $A$ y el \emph{preimagen}
+\index{preimagen} de $B$. El \emph{composición} de $f \colon E \to F$
+y $g \colon F \to G$ es $g \circ f \colon E \to G$,$x \mapsto
+g(f(x))$.
+\end{definition}
+
+\begin{remark}
+La notación $f^{-1}(B)$\emph{no} presupone una \omterm{def:b1:logic:map}{aplicación} inversa:
+$f^{-1}(B)$ se define para cada $f$. \omterm{def:b1:logic:map}{Imágenes inversas} se porta mejor que
+imágenes: $f^{-1}$ conserva uniones, intersecciones y complementos,
+mientras que $f(A \cap A') \subseteq f(A) \cap f(A')$ puede ser estricto
+(\cref{exo:b1:logic:8}).
+\end{remark}
+
+\begin{example}[Computación de imágenes y preimágenes]\label{ex:b1:logic:images}
+Sea $f \colon \R \to \R$,$x \mapsto x^2$. Entonces:
+\[
+f\bigl(\intcc{-1}{2}\bigr) = \intcc04, \qquad
+f^{-1}\bigl(\intcc14\bigr) = \intcc{-2}{-1} \cup \intcc12, \qquad
+f^{-1}(\{-1\}) = \emptyset .
+\]
+Para el primero: cada $x \in \intcc{-1}2$ tiene $x^2 \in \intcc04$, y
+cada $ y \in \intcc04$ se obtiene como $ y = (\sqrt y)^2$ con $\sqrt y
+\in \intcc02 \subseteq \intcc{-1}2$ --- tenga en cuenta que la imagen es
+\emph{no} $\intcc14 = \{(-1)^2, 2^2\}$: las imágenes de intervalos no son
+calculado únicamente a partir de puntos finales. Para el segundo: $1 \leq x^2 \leq 4 \iff
+1 \leq \abs x \leq 2$, que se parte en dos pedazos. el tercero
+ilustra que un \omterm{def:b1:logic:map}{imagen inversa} puede estar vacío --- $f^{-1}(B)$ siempre hace
+sentido, por pequeña que sea la intersección de $B$ con la imagen. Finalmente
+observe en este ejemplo el fenómeno de rigor de la observación anterior:
+con $A = \intcc{-1}0$ y $A' = \intcc01$, uno tiene $f(A \cap A') =
+f(\{0\}) = \{0\}$, mientras que $f(A) \cap f(A') = \intcc01$.
+\end{example}
+
+\begin{definition}[Inyectivo, sobreyectivo, biyectivo]\label{def:b1:logic:inj}
+A \omterm{def:b1:logic:map}{aplicación} $f \colon E \to F$ es:
+\begin{itemize}
+ \item \emph{inyectivo}\index{inyectivo} cuando distintos elementos tienen
+ imágenes distintas: $\forall x, x' \in E,\ f(x) = f(x') \implies
+ x = x'$;
+ \item \emph{sobreyectivo}\index{sobreyectivo} cuando cada elemento de $F$
+ se alcanza: $\forall y \in F,\ \exists x \in E,\ f(x) = y $;
+ \item \emph{biyectivo}\index{biyectivo} cuando es ambos, es decir cada
+ $ y \in F$ tiene exactamente un \omterm{def:b1:logic:map}{imagen inversa}.
+\end{itemize}
+\end{definition}
+
+\begin{theorem}[Aplicación inversa]\label{thm:b1:logic:inverse}
+Una \omterm{def:b1:logic:map}{aplicación} $f \colon E \to F$ es \omterm{def:b1:logic:inj}{biyectivo} si y sólo si hay una \omterm{def:b1:logic:map}{aplicación}
+$g \colon F \to E$ con $g \circ f = \mathrm{id}_E$ y $f \circ g =
+\mathrm{id}_F $. En ese caso $g $ es único; está escrito $f^{-1}$ y
+llamado \emph{inverso} de $f$, y $f^{-1}$ es en sí mismo \omterm{def:b1:logic:inj}{biyectivo} con
+$(f^{-1})^{-1} = f$.
+\end{theorem}
+
+\begin{proof}
+($\Rightarrow$) Si$f$ es \omterm{def:b1:logic:inj}{biyectivo}, cada $ y \in F$ tiene un
+\omterm{def:b1:logic:map}{imagen inversa}; defina $g(y)$ como \omterm{def:b1:logic:map}{imagen inversa}. Entonces $f(g(y)) = y $ por
+construcción, y $g(f(x)) = x$ porque $x$ es \emph{el} \omterm{def:b1:logic:map}{imagen inversa} de
+$f(x)$.
+
+($\Leftarrow$) Supongamos que existe tal $g$. Si$f(x) = f(x')$, aplicando
+$g$ da $x = x'$:$f$ es \omterm{def:b1:logic:inj}{inyectivo}. Para$ y \in F$,$x = g(y)$
+satisface $f(x) = y $:$f$ es \omterm{def:b1:logic:inj}{sobreyectivo}.
+
+Unicidad: si $g$ y $h$ funcionan, entonces $g = g \circ \mathrm{id}_F
+= g \circ (f \circ h) = (g \circ f) \circ h = h $. Finalmente la pareja de
+Las identidades son simétricas en $f$ y $g$, por lo que $g = f^{-1}$ es \omterm{def:b1:logic:inj}{biyectivo}.
+con inverso $f$.
+\end{proof}
+
+\begin{example}[Calcular una inversa en la práctica]\label{ex:b1:logic:inversecomp}
+Sea $f \colon \R \to \intoo0{+\infty}$,$f(x) = \eu^{2x+1}$. a
+invertir, resolver $ y = f(x)$ para un $ y > 0$ dado:
+\[
+y = \eu^{2x+1} \iff \ln y = 2x + 1 \iff x = \frac{\ln y - 1}2 ,
+\]
+cada paso es reversible en los dominios anunciados. el
+El cálculo entrega todo a la vez: para cada $ y $ en el
+codominio hay exactamente una solución $x$, por lo que $f$ es \omterm{def:b1:logic:inj}{biyectivo},
+y
+\[
+f^{-1} \colon \intoo0{+\infty} \to \R,
+\qquad
+f^{-1}(y) = \frac{\ln y - 1}2 .
+\]
+Una comprobación rápida de ambas composiciones ($f^{-1}(f(x)) = \frac{(2x+1) -
+1}2 = x $ y $f(f^{-1}(y)) = \eu^{\ln y} = y $) confirma
+Criterio de \cref{thm:b1:logic:inverse}. La idea: "resolver
+$x$ y observar las equivalencias'' es simultáneamente la existencia
+prueba, la prueba de unicidad y la fórmula --- pero solo funciona
+si el codominio se anunció correctamente ($f$ es \emph{no}
+\omterm{def:b1:logic:inj}{sobreyectivo} sobre $\R$).
+\end{example}
+
+\begin{proposition}[Composición y tres propiedades]\label{prop:b1:logic:comp}
+Sean $f \colon E \to F$ y $g \colon F \to G$.
+\begin{enumerate}
+ \item Si $f$ y $g$ son \omterm{def:b1:logic:inj}{inyectivo} (resp.\ \omterm{def:b1:logic:inj}{sobreyectivo}, \omterm{def:b1:logic:inj}{biyectivo}), entonces
+ es $g \circ f$; y luego $(g \circ f)^{-1} = f^{-1} \circ
+ g^{-1}$ en el caso \omterm{def:b1:logic:inj}{biyectivo}.
+ \item Si $g \circ f$ es \omterm{def:b1:logic:inj}{inyectivo}, entonces $f$ es \omterm{def:b1:logic:inj}{inyectivo}. si
+ $g \circ f$ es \omterm{def:b1:logic:inj}{sobreyectivo}, luego $g$ es \omterm{def:b1:logic:inj}{sobreyectivo}.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(1) Si $g(f(x)) = g(f(x'))$, la inyectividad de $g$ da $f(x) = f(x')$,
+entonces la inyectividad de $f$ da $x = x'$. Si$z \in G$, sobreyectividad de
+$g$ da $ y $ con $g(y) = z$, luego la sobreyectividad de $f$ da $x$ con
+$f(x) = y $, entonces $g(f(x)) = z$. En el caso \omterm{def:b1:logic:inj}{biyectivo} se comprueba directamente
+que $f^{-1} \circ g^{-1}$ es un inverso de dos caras de $g \circ f$, y
+concluye la unicidad en \cref{thm:b1:logic:inverse}.
+
+(2) Si $f(x) = f(x')$ entonces $g(f(x)) = g(f(x'))$, y la inyectividad de
+$g \circ f$ da $x = x'$. Si$z \in G$, sobreyectividad de $g \circ f$
+da $x$ con $g(f(x)) = z$: luego $ y = f(x)$ satisface $g(y) = z$.
+\end{proof}
+
+\begin{example}[El punto (2) es nítido]\label{ex:b1:logic:compsharp}
+En \cref{prop:b1:logic:comp}~(2), no se puede actualizar el
+conclusiones: $g \circ f$\omterm{def:b1:logic:inj}{biyectivo} ¿\emph{no} fuerza a$f$?
+\omterm{def:b1:logic:inj}{sobreyectivo} o $g$\omterm{def:b1:logic:inj}{inyectivo}. Tome $E = G = \{1\}$,$F = \{1,
+2\}$, con $f(1) = 1$ y $ g(1) = g(2) = 1$: entonces $g \circ f =
+\mathrm{id}_E $ es \omterm{def:b1:logic:inj}{biyectivo}, pero $f $omite el elemento $2$ y
+$g$ colapsa ambos elementos. La moraleja es una contabilidad precisa.
+regla: la información de composición fluye al \emph{interno} \omterm{def:b1:logic:map}{aplicación} para
+inyectividad y al \emph{exterior} \omterm{def:b1:logic:map}{aplicación} para sobreyectividad, nunca
+al revés. (\cref{exo:b1:logic:9} construye el mismo fenómeno
+con infinito \omterm{def:b1:logic:sets}{conjuntos}, donde está el motor detrás unilateral
+inversas.)
+\end{example}
+
+\begin{example}\label{ex:b1:logic:injexamples}
+$f \colon \R \to \R$,$x \mapsto x^2$ no es \omterm{def:b1:logic:inj}{inyectivo} ($f(-1) =
+f(1)$) ni \omterm{def:b1:logic:inj}{sobreyectivo} ($-1$ no tiene \omterm{def:b1:logic:map}{imagen inversa}). Restringir el dominio
+y el codominio, $f \colon \R_+ \to \R_+$,$x \mapsto x^2$ es \omterm{def:b1:logic:inj}{biyectivo},
+con inverso $ y \mapsto \sqrt y $. Inyectividad o sobreyectividad de A \omterm{def:b1:logic:map}{aplicación}
+Depende del dominio y codominio anunciado, no sólo de la fórmula.
+\end{example}
+
+\section{Relaciones}
+
+\begin{definition}[Relación de equivalencia]\label{def:b1:logic:equiv}
+Un \emph{relación binaria} $\mathcal{R}$ en un \omterm{def:b1:logic:sets}{conjunto}$E$ es un
+\emph{relación de equivalencia}\index{relación de equivalencia} cuando es:
+\emph{reflexivo} ($x \mathbin{\mathcal{R}} x$ para todos los $x$),
+\emph{simétrico} ($x \mathbin{\mathcal{R}} y \implies y
+\mathbin{\mathcal{R}} x $) y \emph{transitivo} ($x
+\mathbin{\mathcal{R}} y $ y $ y \mathbin{\mathcal{R}} z$ implican $ x
+\mathbin{\mathcal{R}} z $). El \emph{clase de equivalencia} de $x $ es
+$\mathrm{cl}(x) = \{y \in E : x \mathbin{\mathcal{R}} y\}$.
+\end{definition}
+
+\begin{example}[Comprobando los tres axiomas]\label{ex:b1:logic:fracpart}
+En $\R$, declare $x \mathbin{\mathcal{R}} y $ cuando $x - y \in \Z$.
+\emph{Reflexivo:} $x - x = 0 \in \Z$. \emph{Simétrico:} si $x - y
+\in \Z $ entonces $ y - x = -(x - y) \in \Z $. \emph{Transitivo:} si $x -
+y \in \Z $ y $ y - z \in \Z$, entonces $x - z = (x - y) + (y - z) \in
+\Z $(una suma de números enteros). Entonces $\mathcal R $ es \omterm{def:b1:logic:equiv}{equivalencia
+relación} y $\mathrm{cl}(x) = x + \Z = \{x + k : k \in \Z\}$:
+cada clase contiene exactamente un representante en $\intco01$, su
+\emph{parte fraccionaria}. Por el contrario, la relación ``$\abs{x - y}
+\leq 1$'' en $\R$ es reflexiva y simétrica, pero \emph{no}
+transitivo ($0 \mathbin{\mathcal R} 1$ y $1 \mathbin{\mathcal R}
+2$, aún $\abs{0 - 2} > 1$): la cercanía no se propaga y no
+\omterm{thm:b1:logic:partition}{dividir} en clases existe --- un contraejemplo útil para mantener
+tener en cuenta al verificar los axiomas parece una rutina.
+\end{example}
+
+\begin{theorem}[Las clases forman una partición.]\label{thm:b1:logic:partition}
+Sea $\mathcal{R}$ un \omterm{def:b1:logic:equiv}{relación de equivalencia} en $E$. Entonces el
+las clases de equivalencia no están vacías, son disjuntas por pares o iguales, y sus
+unión es $E$: forman un \emph{dividir}\index{dividir} de $E$.
+Por el contrario, cada \omterm{thm:b1:logic:partition}{dividir} de $E$ surge de esta manera exactamente de un
+\omterm{def:b1:logic:equiv}{relación de equivalencia} (``estar en la misma pieza'').
+\end{theorem}
+
+\begin{proof}
+$x \in \mathrm{cl}(x)$ por reflexividad, por lo que las clases no están vacías con
+unión $E$. Supongamos $\mathrm{cl}(x) \cap \mathrm{cl}(y) \neq \emptyset$,
+digamos $z$ se encuentra en ambos. Luego $x \mathbin{\mathcal{R}} z$ y $ y
+\mathbin{\mathcal{R}} z $, por simetría y transitividad $x
+\mathbin{\mathcal{R}} y $. Ahora para cualquier $t \in \mathrm{cl}(y)$,
+transitividad da $t \in \mathrm{cl}(x)$, y simétricamente: los dos
+las clases son iguales. Por el contrario, sea $(E_i)_{i \in I}$ un
+\omterm{thm:b1:logic:partition}{dividir} de $E$ y define $x \mathbin{\mathcal S} y $ como significado
+``alguna pieza contiene $x$ y $ y $''. \emph{Reflexivo:}$x$
+se encuentra en alguna pieza, que luego contiene $x$ dos veces.
+\emph{Simétrico:} la condición definitoria es simétrica en $x$ y
+$ y $. \emph{Transitivo:} si $x, y \in E_i$ y $ y, z \in E_j$, entonces
+$ y \in E_i \cap E_j$, por lo que $E_i = E_j $(las piezas distintas son
+disjunto) y $x, z$ comparten una pieza. La clase $\mathcal S$ de $x$
+es exactamente la pieza que contiene $x$, por lo que las clases son las dadas
+piezas. Finalmente la relación está determinada por sus clases: dos
+\omterm{def:b1:logic:equiv}{relaciones de equivalencia} con las mismas clases relacionan los mismos pares,
+ya que cada uno relaciona $x$ y $ y $exactamente cuando $ y $ pertenece al
+clase de $x$ --- de ahí la afirmación de unicidad.
+\end{proof}
+
+\begin{example}\label{ex:b1:logic:congruence}
+En $\Z$, módulo de congruencia $n $($x \equiv y \pmod n$ cuando $n$ divide
+$x - y $) es un \omterm{def:b1:logic:equiv}{relación de equivalencia}; sus clases son las $n$\omterm{def:b1:logic:sets}{conjuntos} de
+números enteros con un resto dado al dividir por $n$. este ejemplo
+se convierte en el anillo $\Z/n\Z$ en \cref{ch:b1:structures}.
+\end{example}
+
+\begin{definition}[Relación de pedido]\label{def:b1:logic:order}
+Una relación $\preceq$ en $E$ es una \emph{orden}\index{relación de orden}
+cuando es reflexivo, \emph{antisimétrico} ($x \preceq y $ y $ y
+\preceq x $ implican $x = y $) y transitivo. El pedido es \emph{total}
+cuando dos elementos cualesquiera sean comparables, \emph{parcial} en caso contrario. un
+el elemento $M \in A \subseteq E$ es un \emph{mayor elemento} de $A$ cuando
+$a \preceq M$ para todos los $a \in A$; los elementos mayores (y menores) son
+únicos cuando existen.
+\end{definition}
+
+\begin{example}\label{ex:b1:logic:orders}
+$(\R, \leq)$ está totalmente ordenado.$(\mathcal{P}(E), \subseteq)$ es
+pedido parcialmente tan pronto como $E$ tenga dos elementos:$\{a\}$ y
+$\{b\}$ no son comparables. El subconjunto $A = \{\{a\}, \{b\}\}$ de
+$\mathcal{P}(\{a,b\})$ no tiene elemento mayor, pero tiene un límite superior
+$\{a, b\}$: la distinción entre elementos mayores y límites superiores
+devuelve, para $\R$, en \cref{ch:b1:reals}.
+\end{example}
+
+\begin{example}[Dos órdenes en la parrilla $\N^2$]\label{ex:b1:logic:lexorder}
+En pares de naturales, compare por componentes: $(a, b) \preceq (a',
+b')$ cuando $ a \leq a'$\emph{y}$b \leq b'$(el \emph{product
+\omterm{def:b1:logic:order}{orden}}). Este es un \omterm{def:b1:logic:order}{orden} --- cada axioma es una coordenada heredada
+por coordenada --- pero parcial: $(1, 3)$ y $(2, 0)$ son
+incomparable. Ahora compare como un diccionario: $(a, b)
+\preceq_{\mathrm{lex}} (a', b')$ cuando $ a < a'$, o $a = a'$ y $ b
+\leq b'$(el \emph{lexicographic \omterm{def:b1:logic:order}{orden}}). La transitividad requiere
+una verificación de dos casos pero se cumple, y dos pares cualesquiera ahora son comparables:
+el \omterm{def:b1:logic:order}{orden} es total. Los dos \omterm{def:b1:logic:order}{pedidos} clasifican al mismo \omterm{def:b1:logic:sets}{conjunto} de manera diferente
+--- $(0, 100) \preceq_{\mathrm{lex}} (1, 0)$ a través del producto
+\omterm{def:b1:logic:order}{orden} no dice nada --- un recordatorio de que \omterm{def:b1:logic:order}{orden} es una estructura
+uno \emph{elige}, no es propiedad de \omterm{def:b1:logic:sets}{conjunto}. Lexicográfico
+La comparación es también el truco estándar para convertir varios sistemas de clasificación.
+criterios en uno solo.
+\end{example}
+
+\begin{remark}[Interludio: tamaño como biyección]\label{rem:b1:logic:interlude}
+Un tema tranquilo de este capítulo merece atención: las biyecciones son
+la noción matemática de "mismo tamaño". Para \omterm{def:b1:logic:sets}{conjuntos} finito esto
+se convierte en el cálculo de conteo de \cref{ch:b1:counting}, donde
+toda fórmula es secretamente una biyección; para infinito \omterm{def:b1:logic:sets}{conjuntos}
+se convierte en el problema del fin de semana a continuación, donde $\N$,$\Q$ y $\R$ se vuelven
+resulta que tienen tamaños realmente diferentes. el mismo diccionario
+reaparece dos veces más en este volumen en formas refinadas: secuencias
+(\cref{ch:b1:seq}) no son más que \omterm{def:b1:logic:map}{aplicaciones} $\N \to \R$, entonces \omterm{def:b1:logic:statement}{enunciados}
+las secuencias de aproximadamente son \omterm{def:b1:logic:statement}{enunciados} de \omterm{def:b1:logic:sets}{conjunto} de \omterm{def:b1:logic:map}{aplicaciones}; y lineal
+El álgebra medirá espacios vectoriales no por biyecciones sino por
+\emph{lineal} biyecciones, cuya existencia se rige por una única
+número, la dimensión (\cref{ch:b1:findim}). Cada vez que un nuevo
+Aparece "igualdad" --- equipotencia, isomorfismo de grupos
+(\cref{ch:b1:structures}), isomorfismo lineal --- el patrón de
+\cref{thm:b1:logic:inverse} repite: la igualdad es invertible,
+\omterm{def:b1:logic:map}{aplicación} que respeta la estructura.
+\end{remark}
+
+\begin{remark}[Dónde se utiliza este capítulo]\label{rem:b1:logic:whereused}
+En todas partes, pero unos pocos lugares merecen ser señalados. El tres cuantificador
+gimnasia de \cref{ex:b1:logic:limit} es el pan de cada día de
+\cref{ch:b1:seq,ch:b1:continuity}: cada prueba de límite es un juego
+contra un $\varepsilon$ arbitrario. Las clases de equivalencia reaparecen como
+clases de congruencia de $\Z/n\Z$ en \cref{ch:b1:structures}, donde el
+\omterm{thm:b1:logic:partition}{dividir} de \cref{thm:b1:logic:partition} adquiere un valor algebraico
+estructura propia. \omterm{def:b1:logic:order}{Relaciones de orden}, límites superiores y mínimo superior
+Los límites se convierten en el corazón axiomático de $\R$ en \cref{ch:b1:reals}.
+Las inyecciones, sobreyecciones y biyecciones regresan como el \omterm{def:b1:logic:map}{aplicaciones} lineal de
+\cref{ch:b1:linmaps}, donde se puede probar la inyectividad en un solo
+vector (el núcleo); y el problema del fin de semana a continuación deja al desnudo
+noción de biyección en una teoría del \emph{sizes of infinite
+\omterm{def:b1:logic:sets}{conjuntos}}, cuyas conclusiones (contabilidad de $\Q$, incontabilidad de
+$\R$) resurgen en \cref{ch:b1:reals,ch:b1:topology}.
+\end{remark}
+
+\section{Ceremonias}
+
+\begin{exercise}[$\star$]\label{exo:b1:logic:1}
+Escribe la negación de cada \omterm{def:b1:logic:statement}{enunciado}, sin utilizar la palabra ``not'':
+\begin{enumerate}
+ \item $\forall x \in \R,\ \exists y \in \R,\ x + y > 0$;
+ \item $\exists x \in \R,\ \forall y \in \R,\ xy = 0$;
+ \item $\forall \varepsilon > 0,\ \exists \delta > 0,\ \forall x \in
+ \R,\ \abs{x} \leq \delta \implies \abs{f(x)} \leq \varepsilon $
+ (para un fijo \omterm{def:b1:logic:map}{aplicación} $f \colon \R \to \R$).
+\end{enumerate}
+Luego decida si \omterm{def:b1:logic:statement}{enunciados} (1) y (2) son verdaderos.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:logic:2}
+Sea $P, Q$\omterm{def:b1:logic:statement}{enunciados}. Usando tablas de verdad, demuestre que
+$\lnot(P \implies Q) \iff P \land (\lnot Q)$, y deducir la negación.
+de: ``si una función es derivable entonces es continua''.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:logic:3}
+Demostrar por contraposición: para $x \in \R$, si $x^3 + x \geq 2$ entonces
+$x \geq 1$. Luego demuestre por contradicción: no existe un mínimo estrictamente
+número real positivo.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:logic:4}
+Demuestre por inducción que para todo $n \in \N$:
+\begin{enumerate}
+ \item $\sum_{k=0}^{n} 2^k = 2^{n+1} - 1$;
+ \item $4^n + 5$ es divisible por $3$.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:logic:5}
+Encuentre el defecto en la siguiente "prueba" de que todos los lápices tienen iguales
+color. \emph{Let $P(n)$: ``in every \omterm{def:b1:logic:sets}{conjunto} of $n$ pencils, all pencils
+have the same color''. $P(1)$ is clear. Assume $P(n)$ and take $n+1$
+pencils; removing the last one, the first $n$ share their color;
+removing the first one, the last $n$ share their color; hence all
+$n+1$ share their color.}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:logic:6}
+Sean $A, B, C$ subconjuntos de $E$. Demostrar:
+\begin{enumerate}
+ \item $A \setminus B = A \cap \overline{B}$;
+ \item $(A \cup B) \setminus C = (A \setminus C) \cup (B \setminus
+ C)$;
+ \item $A \subseteq B \iff A \cup B = B \iff A \cap B = A$.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:logic:7}
+Para cada \omterm{def:b1:logic:map}{aplicación}, decida (con prueba) si es \omterm{def:b1:logic:inj}{inyectivo}, \omterm{def:b1:logic:inj}{sobreyectivo},
+\omterm{def:b1:logic:inj}{biyectivo}:
+\begin{enumerate}
+ \item $f \colon \N \to \N$,$n \mapsto n + 1$;
+ \item $g \colon \Z \to \Z$,$n \mapsto n + 1$;
+ \item $h \colon \R \setminus \{1\} \to \R$,$x \mapsto
+ \frac{x+1}{x-1}$.
+\end{enumerate}
+Para $h$, ajuste el codominio para que sea \omterm{def:b1:logic:inj}{biyectivo} y calcule el
+inversa.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:logic:8}
+Dejemos $f \colon E \to F$, dejemos $A, A' \subseteq E$ y $B, B' \subseteq
+F $.
+\begin{enumerate}
+ \item Demuestre $f^{-1}(B \cap B') = f^{-1}(B) \cap f^{-1}(B')$ y
+ $f(A \cup A') = f(A) \cup f(A')$.
+ \item Demuestre $f(A \cap A') \subseteq f(A) \cap f(A')$ y dé una
+ Ejemplo donde la inclusión es estricta.
+ \item Demuestre: $f$ es \omterm{def:b1:logic:inj}{inyectivo} si y sólo si $f(A \cap A') = f(A)
+ \cap f(A')$ para todos los $A, A'$.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:logic:9}
+Sea $f \colon E \to F$ y $g \colon F \to E$ satisfagan a$g \circ f =
+\mathrm{id}_E $. Demuestre que $f $ es \omterm{def:b1:logic:inj}{inyectivo} y $g $ es \omterm{def:b1:logic:inj}{sobreyectivo}.
+Dé un ejemplo en el que ni $f$ ni $g$ sean \omterm{def:b1:logic:inj}{biyectivo}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:logic:10}
+En $\R$, defina $x \mathbin{\mathcal{R}} y \iff x^2 - y^2 = x - y $.
+Demuestre que $\mathcal{R}$ es un \omterm{def:b1:logic:equiv}{relación de equivalencia} y describa el
+\omterm{def:b1:logic:equiv}{clase de equivalencia} de cada $x$ real. ¿Qué clases tienen exactamente una?
+elemento?
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:logic:11}
+(Cantor) Sea $E$ un \omterm{def:b1:logic:sets}{conjunto}. Demostrar que no existe sobreyección de $E$
+hacia $\mathcal{P}(E)$. \emph{Hint: given $f \colon E \to
+\mathcal{P}(E)$, consider $D = \{x \in E : x \notin f(x)\}$.}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:logic:12}
+Sea $f \colon E \to F$ una \omterm{def:b1:logic:map}{aplicación}. Defina $\Phi \colon \mathcal{P}(F)
+\to \mathcal{P}(E)$ por $\Phi(B) = f^{-1}(B)$.
+\begin{enumerate}
+ \item Demuestre que $f$ es \omterm{def:b1:logic:inj}{sobreyectivo} si y sólo si $\Phi$ es
+ \omterm{def:b1:logic:inj}{inyectivo}.
+ \item Demuestre que $f$ es \omterm{def:b1:logic:inj}{inyectivo} si y sólo si $\Phi$ es
+ \omterm{def:b1:logic:inj}{sobreyectivo}.
+\end{enumerate}
+\end{exercise}
+
+\section{Problema: comparar infinitos}
+
+\begin{problem}\label{pb:b1:logic:1}
+¿Cuándo dos \omterm{def:b1:logic:sets}{conjuntos} tienen "el mismo número de elementos"? Cantor
+respuesta --- cuando hay una biyección entre ellos --- resulta ser
+utilizable incluso para infinito \omterm{def:b1:logic:sets}{conjuntos}, y divide el infinito en genuinamente
+diferentes tamaños. Este problema construye toda la caja de herramientas desde cero.
+definiciones de este capítulo: el teorema de Cantor--Schröder--Bernstein
+(dos inyecciones producen una biyección), la contabilización de $\Q$,
+la incontabilidad de $\R$ por el argumento diagonal, y la de Cantor
+sorprendente conclusión de 1874: \emph{\omterm{pb:b1:logic:1}{números trascendentales} exist, and
+massively so}, sin exhibir ni uno solo.
+\index{conjunto contable}\index{Teorema de Cantor-Schroder-Bernstein}
+En todo momento, para \omterm{def:b1:logic:sets}{conjuntos} $E$ y $F$, escriba $E \preceq F$ cuando haya
+existe una inyección de $E$ en $F$ y $E \approx F$(``$E$ y
+$F$ son \emph{equipotente}'') cuando existe una biyección de $E$
+hacia $F$.
+
+\medskip
+\noindent\textbf{Parte I --- The vocabulary of comparison.}
+\begin{enumerate}
+ \item Demuestre que $\approx$ se comporta como un \omterm{def:b1:logic:equiv}{relación de equivalencia}:
+ $E \approx E$; si $E \approx F$ entonces $F \approx E$; si
+ $E \approx F$ y $F \approx G$ y luego $E \approx G$. (Cita
+ precisamente \cref{thm:b1:logic:inverse} y
+ \cref{prop:b1:logic:comp}.)
+ \item Demuestre que $\preceq$ es transitivo y que una inyección
+ $f \colon E \to F$ siempre induce a$E \approx f(E)$.
+ \item Vamos $E \neq \emptyset$. Demuestre que $E \preceq F$ si y sólo
+ si existe una sobreyección de $F$a$E$.
+ \item Verifique que $n \mapsto n + 1$ sea una biyección de $\N$ a
+ $\N^* = \N \setminus \{0\}$, y que
+ \[
+ \sigma(n) = \frac n2 \ \ (n \text{ even}), \qquad
+ \sigma(n) = -\frac{n+1}2 \ \ (n \text{ odd})
+ \]
+ es una biyección de $\N$a$\Z$. Por lo tanto, eliminando un punto,
+ o duplicar a negativos, no cambia el tamaño de
+ $\N$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte II --- The Cantor--Schröder--Bernstein
+theorem.} Sean $f \colon E \to F$ y $g \colon F \to E$ dos
+inyecciones. Definir
+\[
+C_0 = E \setminus g(F), \qquad C_{n+1} = g\bigl(f(C_n)\bigr)
+\ \ (n \in \N), \qquad C = \bigcup_{n \in \N} C_n,
+\]
+y dejar que $h \colon E \to F$ envíe $x \in C$a$f(x)$ y $x \notin C$
+al único $ y \in F$ con $g(y) = x$.
+\begin{enumerate}[resume]
+ \item Comprobar que $h$ esté bien definido: si $x \notin C$ entonces $x \in
+ g(F)$, y el elemento$ y $ con $g(y) = x $ es único.
+ \item Demuestra que $g\bigl(f(C)\bigr) = \bigcup_{n \geq 1} C_n
+ \subseteq C $. (Las imágenes directas conmutan con los sindicatos:
+ \cref{exo:b1:logic:8}.)
+ \item Demuestre que $h$ es \omterm{def:b1:logic:inj}{inyectivo}. (Tres casos; en el caso mixto
+ $x \in C$,$x' \notin C$, muestran que $h(x) = h(x')$
+ fuerza $x' \in g(f(C)) \subseteq C$.)
+ \item Demuestre que $h$ es \omterm{def:b1:logic:inj}{sobreyectivo}: dado $ y \in F$, distinga
+ los casos $g(y) \notin C$ y $g(y) \in C_n$ para algunos $n
+ \geq 1$(¿por qué es imposible $g(y) \in C_0$?), y exhiben un
+ \omterm{def:b1:logic:map}{imagen inversa} de $ y $ en cada caso.
+ \item Concluye con \emph{Cantor--Schröder--Bernstein
+ theorem}: si $E \preceq F$ y $F \preceq E$, entonces $E
+ \approx F $. Comenta en una frase lo que hace que esto
+ \omterm{def:b1:logic:statement}{enunciado} no trivial.
+ \item Dos aplicaciones. (a) Mostrar $\intcc01 \approx \intoo01$.
+ (b) Demuestre que $\varphi(p, q) = 2^p(2q + 1) - 1$ define un
+ biyección de $\N \times \N$a$\N$ --- inyectividad por un
+ argumento de paridad, sobreyectividad por inducción fuerte
+ (\cref{thm:b1:logic:induction}). Por lo tanto $\N \times \N \approx
+ \N $: el plano de puntos enteros no es mayor que el
+ línea.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte III --- \omterm{pb:b1:logic:1}{Conjuntos contables}.} Llamar a \omterm{def:b1:logic:sets}{conjunto} $E$\emph{como máximo contable} cuando $E \preceq \N$ y \emph{contable}
+cuando $E \approx \N$.
+\begin{enumerate}[resume]
+ \item Demuestre que todo subconjunto infinito $A \subseteq \N$ es
+ contable. (Defina $\varphi(n)$ recursivamente como el mínimo
+ elemento de $A \setminus \{\varphi(0), \dots,
+ \varphi(n-1)\}$; mostrar $\varphi$ es estrictamente creciente,
+ satisface $\varphi(n) \geq n$ y alcanza todos los elementos de
+ $A$.)
+ \item Deduzca que un \omterm{def:b1:logic:sets}{conjunto} es como máximo contable si y sólo si es
+ finito o contable, y observe que la pregunta 9 da la
+ atajo: si $E \preceq \N$ y $\N \preceq E$, entonces $E$ es
+ contable.
+ \item Demuestre que si $E$ y $F$ son como máximo contables, también lo es $E
+ \times F $. Deduzca que $\Z \times \N^*$ es contable.
+ \item Demuestre que $\Q$ es contable. (Inyecte $\Q$ en $\Z \times
+ \N^*$ escribiendo cada racional en sus términos más bajos con positivo
+ denominador --- la unicidad de esa representación es
+ probado en \cref{ch:b1:arith}; luego aplique la pregunta 12.)
+ \item Demuestre que una unión contable de como máximo \omterm{pb:b1:logic:1}{conjuntos contables} está en
+ más contable: si cada $E_n $($n \in \N$) es como máximo
+ contable, también lo es $\bigcup_{n \in \N} E_n$. (Envíe $x$ al
+ par $(n, f_n(x))$ donde $n$ es el índice \emph{el menos} con
+ $x \in E_n$.)
+ \item Demuestre que el \omterm{def:b1:logic:sets}{conjunto} de los subconjuntos \emph{finito} de $\N$ es
+ contable. (Asigne un subconjunto finito $F$a$\sum_{i \in F} 2^i$;
+ probar la inyectividad comparando el elemento más grande donde dos
+ finito \omterm{def:b1:logic:sets}{conjuntos} difieren, usando $\sum_{k=0}^{m-1} 2^k = 2^m - 1$
+ de \cref{exo:b1:logic:4}.)
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte IV --- Diagonalization.} Deja $\{0,1\}^{\N}$
+denota el \omterm{def:b1:logic:sets}{conjunto} de todos los \omterm{def:b1:logic:map}{aplicaciones} $u \colon \N \to \{0, 1\}$, es decir,\ el \omterm{def:b1:logic:sets}{conjunto}
+de secuencias binarias.
+\begin{enumerate}[resume]
+ \item Construya una biyección entre $\mathcal{P}(\N)$ y
+ $\{0,1\}^{\N}$(funciones del indicador).
+ \item (El argumento diagonal) Sea $\Phi \colon \N \to
+ \{0,1\}^{\N}$ cualquier \omterm{def:b1:logic:map}{aplicación}. Considere la secuencia $d $ definida
+ por $d(n) = 1 - \Phi(n)(n)$. Mostrar que $d$ no está en el
+ imagen de $\Phi$ y concluir que $\{0,1\}^{\N}$ es
+ \emph{no} como máximo contable. Explica en una frase por qué,
+ hasta la pregunta 17, este es exactamente el teorema de Cantor
+ (\cref{exo:b1:logic:11}) para $E = \N$.
+ \item Admitir --- como familiar de la escuela y establecido
+ rigurosamente en \cref{ch:b1:reals} --- que cada $x \in
+ \intco01$ tiene una expansión decimal \emph{adecuado} única $x =
+ 0.d_1 d_2 d_3\dots $(una que no termina en una cadena infinita de
+ $9$s). Dada cualquier secuencia $(x_n)_{n \geq 1}$ de elementos de
+ $\intco01$, construya $x \in \intco01$ con $x \neq x_n$ para
+ todos $n$: elija su dígito $n$ para que sea $5$ si el $n$-ésimo
+ El dígito de $x_n$ difiere de $5$ y de $6$ en caso contrario. justificar
+ cuidadosamente que $x$ sea adecuado y evite cada $x_n$, y
+ concluir que $\intco01$ no es, como mucho, contable.
+ \item Deduzca que $\R$ es incontable y que el \omterm{def:b1:logic:sets}{conjunto}$\R
+ \setminus \Q $ de números irracionales también es incontable.
+ ¿En qué sentido preciso son irracionales "la mayoría" de los números reales?
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part V --- Cantor's 1874 theorem: \omterm{pb:b1:logic:1}{trascendental
+numeros} exist.} Un número real $x$ es \emph{algebraico}
+\index{número algebraico} cuando $P(x) = 0$ para algún polinomio distinto de cero
+$P$ con coeficientes enteros y \emph{trascendental}
+\index{numero trascendental} en caso contrario. Admítelo para esta parte ---
+se demuestra en \cref{ch:b1:poly} --- que un polinomio distinto de cero de
+El grado $n$ tiene como máximo $n$ raíces reales.
+\begin{enumerate}[resume]
+ \item Demuestre que todo número racional es algebraico y encuentre
+ polinomios explícitos con coeficientes enteros aniquiladores
+ $\sqrt 2$ y $\sqrt 2 + \sqrt 3$.
+ \item Para $n \in \N$ fijo, demuestre que el \omterm{def:b1:logic:sets}{conjunto} de polinomios de
+ El grado como máximo $n$ con coeficientes enteros es contable.
+ (Inyéctelo en $\Z^{n+1}$e induzca en $n$ con
+ pregunta 13.)
+ \item Deduce que el \omterm{def:b1:logic:sets}{conjunto} de \emph{todo} polinomios con número entero
+ los coeficientes son contables.
+ \item Prueba \emph{Cantor's theorem on \omterm{pb:b1:logic:1}{números algebraicos}}: el \omterm{def:b1:logic:sets}{conjunto}
+ $\mathcal{A}$ de números reales algebraicos es contable.
+ \item Concluye: los números reales trascendentales existen, y el \omterm{def:b1:logic:sets}{conjunto} de
+ \omterm{pb:b1:logic:1}{números trascendentales} es incontable. Luego haga un balance de
+ Todo el problema en unas pocas frases: la cadena $\N \approx
+ \Z \approx \Q \approx \mathcal{A}$, el salto estricto a$\R
+ \approx $(esencialmente)$\mathcal{P}(\N)$, donde cada herramienta
+ (Cantor--Schröder--Bernstein, uniones contables, el
+ diagonal) fue decisivo --- y el golpe filosófico de
+ demostrando que existen incontables \omterm{pb:b1:logic:1}{números trascendentales}
+ sin nombrar ni uno solo. (Acreditando un número \emph{específico}
+ como $\pi$ trascendental es mucho más difícil y más allá de esto
+ volumen.)
+\end{enumerate}
+\end{problem}

@@ -259,6 +259,20 @@ needs that one in the manifest first (rebuild the referenced chapter
 before the referencing one after label changes). Generated output is
 committed in the saas repo only, never here.
 
+`tools/build_html_toc.py` writes the book's FULL table of contents (every
+chapter, published or not, from the entry file's part inputs and each
+chapter's `\chapter{...}\label{ch:...}` line, per language) into the same
+manifest — the website's sidebar and book landing pages render it with
+unpublished chapters grayed out. Run it AFTER chapter builds (it
+validates keys/numbers/titles against the published entries), and re-run
+it after any from-scratch manifest rebuild or chapter retitling:
+
+```sh
+python3 tools/build_html_toc.py --entry one_math_book_2_high_school.tex \
+    --book math-2 --languages en,fr,nl \
+    --out ../../saas/resources/onecourse/chapters
+```
+
 ## Style-file specifics worth knowing
 
 - `\P` = ℙ, `\E` = 𝔼, `\V` = 𝕍 (redefined); `\pcond{B}{A}`;

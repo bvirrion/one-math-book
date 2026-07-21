@@ -1,0 +1,806 @@
+\chapter{Serie numérica}\label{ch:b1:series}
+
+Sumar infinitos números significa tomar el límite del parcial
+sumas --- nada más y nada menos. Este capítulo \omterm{def:b1:logic:sets}{conjuntos} hasta el
+definiciones y pruebas de convergencia utilizables en el primer año:
+comparación y equivalentes para términos positivos, el \omterm{thm:b1:series:ratio}{prueba de relación}, el
+Comparación \omterm{thm:b1:integration:def}{integral} que proporciona \omterm{thm:b1:series:riemann}{serie de riemann}, \omterm{thm:b1:series:absolute}{convergencia absoluta},
+y el teorema \omterm{thm:b1:series:alternating}{series alternas}. La teoría más fina (productos de
+\omterm{def:b1:series:def}{serie}, sumatoria por paquetes, \omterm{def:b1:series:def}{serie} de funciones) pertenece al
+segundo año.
+
+\section{Generalidades}
+
+\begin{definition}\label{def:b1:series:def}
+Dada una secuencia $(u_n)$, la \emph{serie}\index{serie}$\sum u_n$
+es la secuencia de \emph{sumas parciales} $S_N = \sum_{n=0}^{N} u_n$.
+La serie \emph{converge} cuando $(S_N)$ converge; el límite es el
+\emph{suma} $\sum_{n=0}^{\infty} u_n$ y $R_N = \sum_{n > N} u_n =
+S - S_N $ es \emph{resto}, que tiende a$0$.
+\end{definition}
+
+\begin{example}[Serie geométrica]\label{ex:b1:series:geometric}
+Para $q \in \C$:$\;S_N = \sum_{n=0}^{N} q^n = \frac{1 -
+q^{N+1}}{1-q}$($q \neq 1$). El \omterm{def:b1:series:def}{serie} converge si $\abs q < 1$
+(\cref{exo:b1:seq:3}), con\index{serie geométrica}
+\[
+\sum_{n=0}^{\infty} q^n = \frac{1}{1 - q} .
+\]
+\end{example}
+
+\begin{example}[Los decimales periódicos son series geométricas]\label{ex:b1:series:periodicdecimal}
+¿Qué número es $0.363636\dots$? Su escritura misma es un \omterm{def:b1:series:def}{serie}:
+\[
+0.\overline{36} = \sum_{k=1}^{\infty} \frac{36}{100^k}
+= 36\cdot\frac{1/100}{1 - 1/100} = \frac{36}{99} =
+\frac{4}{11} ,
+\]
+por la suma geométrica con $q = \frac{1}{100}$. En general un
+vale la pena bloquear $B$ de dígitos $p$ que se repiten para siempre
+$\frac{B}{10^p - 1}$ --- el mecanismo detrás de la periodicidad
+criterio de \cref{pb:b1:reals:1}, que el lenguaje de este capítulo
+finalmente dice en una línea: a \omterm{pb:b1:reals:1}{expansión decimal} es un convergente
+\omterm{def:b1:series:def}{serie}, eventualmente periódica exactamente cuando su suma es racional.
+La maquinaria digital del Capítulo 10, construida allí con desnudos
+suprema, era la teoría \omterm{def:b1:series:def}{serie} viajando de incógnito.
+\end{example}
+
+\begin{proposition}[primeros hechos]\label{prop:b1:series:first}
+\begin{enumerate}
+ \item Si $\sum u_n$ converge, entonces $u_n \to 0$. (Lo contrario es
+ \emph{FALSO}: el armónico \omterm{def:b1:series:def}{serie}.)
+ \item Linealidad: convergente \omterm{def:b1:series:def}{serie} suma y escala, con el esperado
+ sumas.
+ \item (Telescopia\index{serie telescópica}) $\sum (v_{n+1} -
+ v_n)$ converge si $(v_n)$ converge, con la suma $\lim v_n -
+ v_0$.
+ \item Cambiar un número finito de términos no afecta la convergencia
+ (solo la suma).
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(1) $u_N = S_N - S_{N-1} \to S - S = 0$. El armónico \omterm{def:b1:series:def}{serie} tiene
+$u_n = \frac1n \to 0$ aún diverge (\cref{exo:b1:seq:5}). (2)
+Operaciones sobre límites. (3) $S_N = v_{N+1} - v_0$. (4) El parcial
+las sumas cambian en una cantidad finalmente constante.
+\end{proof}
+
+\begin{example}[Dígitos de planificación con resto geométrico]\label{ex:b1:series:georemainder}
+Para $\abs q < 1$ el resto del \omterm{ex:b1:series:geometric}{serie geométrica} es
+explícito:
+\[
+R_N = \sum_{n = N+1}^{\infty} q^n = \frac{q^{N+1}}{1 - q} .
+\]
+Esto convierte los objetivos de precisión en recuentos de términos antes de cualquier
+cálculo. Para evaluar $\sum_{n\geq0} \bigl(\frac13\bigr)^n =
+\frac32$ dentro de $10^{-10}$: necesita $\frac{(1/3)^{N+1}}{2/3} \leq
+10^{-10}$, es decir $3^{N} \geq \frac{3}{2}\cdot 10^{10}$, es decir $N
+\geq 22$(como $3^{22} \approx 3.1\cdot10^{10}$): veintitrés
+términos, conocidos de antemano. Cada estimación de tasa geométrica de la
+problemas de fin de semana (la serie $\frac13$ para $\ln 2$, Machin's
+\omterm{def:b1:functions:arc}{arctangentes} en \cref{pb:b1:taylor:1}) es este presupuesto de dos líneas
+en vestimenta profesional.
+\end{example}
+
+\begin{example}[Un telescopio más largo]\label{ex:b1:series:telescope3}
+Calcule $\sum_{n\geq1} \frac{1}{n(n+1)(n+2)}$. Parcial
+fracciones (\cref{ch:b1:fractions}):
+\[
+\frac{1}{n(n+1)(n+2)}
+= \frac{1/2}{n} - \frac{1}{n+1} + \frac{1/2}{n+2}
+= \frac12\Bigl(\frac{1}{n(n+1)} - \frac{1}{(n+1)(n+2)}\Bigr),
+\]
+donde la segunda forma --- una diferencia de valores consecutivos de
+$w_n = \frac{1}{n(n+1)}$ --- es el telescópico. Por lo tanto
+\[
+\sum_{n=1}^{N} \frac{1}{n(n+1)(n+2)}
+= \frac12\Bigl(w_1 - w_{N+1}\Bigr)
+= \frac12\Bigl(\frac12 - \frac{1}{(N+1)(N+2)}\Bigr)
+\longrightarrow \frac14 .
+\]
+La idea final: las fracciones parciales de tres términos rara vez
+telescopio tal como está escrito; primero reagruparlos en una diferencia $w_n -
+w_{n+1}$ --- la recompensa no es solo la convergencia sino la
+suma exacta, que ninguna prueba de comparación ofrece jamás.
+\end{example}
+
+\section{Series con términos no negativos}
+
+\begin{theorem}[Sumas parciales acotadas]\label{thm:b1:series:positive}
+Si $u_n \geq 0$ para todo $n$, las sumas parciales aumentan, entonces:$\sum
+u_n $converge $\iff$ sus sumas parciales están acotadas arriba. De ahí el
+\emph{prueba de comparación}: si $0 \leq u_n \leq v_n$ para todos (grande)
+$n$,
+\[
+\sum v_n \text{ converges} \implies \sum u_n \text{ converges},
+\qquad
+\sum u_n \text{ diverges} \implies \sum v_n \text{ diverges}.
+\]
+Y el \emph{prueba de equivalentes}: si $u_n \sim v_n$ con $v_n \geq
+0$, los dos \omterm{def:b1:series:def}{serie} tienen la misma naturaleza.
+\end{theorem}
+
+\begin{proof}
+Teorema del límite monótono (\cref{thm:b1:seq:monotone}) para el primero
+punto; comparación de sumas parciales para el segundo. Equivalentes: para
+grande $n$,$\frac12 v_n \leq u_n \leq 2 v_n $(definición de $\sim$
+con $\varepsilon = \frac12$), y la comparación se aplica en ambos sentidos.
+\end{proof}
+
+\begin{example}[Un equivalente que demuestra divergencia]\label{ex:b1:series:equivdiverge}
+¿Naturaleza de $\sum_{n\geq1} n\sin\dfrac{1}{n^2}$? desde
+$\frac{1}{n^2} \to 0$ y $\sin h \sim h$ en $0$:
+\[
+n\sin\frac{1}{n^2} \;\sim\; n\cdot\frac{1}{n^2} = \frac1n ,
+\]
+y la prueba de equivalentes transfiere la divergencia de la
+armónico \omterm{def:b1:series:def}{serie}: divergente --- aunque los términos tienden a
+$0$. Una ampliación, una escala, un veredicto; los mismos dos pasos
+patrón (equivalente, luego Riemann o búsqueda geométrica) decide
+los cuatro \omterm{def:b1:series:def}{serie} de \cref{exo:b1:series:3}.
+\end{example}
+
+\begin{example}[La prueba de equivalentes en una línea]\label{ex:b1:series:equivtest}
+¿Naturaleza de $\sum_{n \geq 1} \frac{\sqrt{n+1} - \sqrt n}{n}$?
+Conjuga el numerador:
+\[
+\frac{\sqrt{n+1} - \sqrt n}{n}
+= \frac{1}{n\,(\sqrt{n+1} + \sqrt n)}
+\sim \frac{1}{2\,n^{3/2}} ,
+\]
+una escala de Riemann convergente ($\alpha = \frac32 > 1$): la \omterm{def:b1:series:def}{serie}
+converge. Toda la decisión requirió un equivalente y una búsqueda.
+--- siempre que los términos no sean negativos, que lo son. el
+Información final: para \omterm{def:b1:series:def}{serie} positivo, toda la convergencia
+La teoría es un \emph{diccionario de escalas} ($n^{-\alpha}$,$q^n$,
+$\frac{1}{n(\ln n)^\alpha}$) más la licencia para reemplazar un término
+por un equivalente; el trabajo analítico está en las asintóticas
+(\cref{ch:b1:taylor}), nunca en la sumatoria.
+\end{example}
+
+\begin{theorem}[Comparación integral; Serie Riemann]\label{thm:b1:series:riemann}
+Sea $f$\omterm{def:b1:continuity:continuous}{continuo}, no negativo y \emph{decreciente} en
+$\intco{1}{+\infty}$. entonces
+\[
+\int_1^{N+1} f(t)\,\dd t \;\leq\; \sum_{n=1}^{N} f(n) \;\leq\; f(1)
++ \int_1^{N} f(t)\,\dd t ,
+\]
+entonces $\sum f(n)$ converge si $\bigl(\int_1^x f\bigr)$ está acotado. en
+en particular, para $\alpha \in \R$:\index{serie de riemann}
+\[
+\sum_{n \geq 1} \frac{1}{n^\alpha} \text{ converges}
+\iff \alpha > 1,
+\]
+y $\sum_{n=1}^{N} \frac1n = \ln N + O(1)$.
+\end{theorem}
+
+\begin{proof}
+Para $n \leq t \leq n+1$, la monotonicidad da $f(n+1) \leq f(t)
+\leq f(n)$; integrando sobre $\intcc{n}{n+1}$(un segmento de
+longitud $1$):
+\[
+f(n+1) \;\leq\; \int_n^{n+1} f(t)\,\dd t \;\leq\; f(n) .
+\]
+Sumar las desigualdades correctas para $n = 1, \dots, N-1$ da
+$\int_1^{N} f \leq \sum_{n=1}^{N-1} f(n)$, de ahí la parte superior
+encuadre después de agregar $f(N) \leq f(1)$; sumando los de la izquierda para
+$n = 1, \dots, N$ da $\sum_{n=2}^{N+1} f(n) \leq
+\int_1^{N+1} f$, que después de la reindexación es el marco inferior.
+Convergencia: las sumas parciales y el \omterm{thm:b1:integration:def}{integrales} $\int_1^x f$
+unidos entre sí dentro de la constante $f(1)$, y ambos están
+no decreciente, por lo que uno está acotado si el otro es
+(\cref{thm:b1:series:positive}). Para $f(t)
+= t^{-\alpha}$($\alpha \neq 1$):$\int_1^x t^{-\alpha}\dd t =
+\frac{x^{1-\alpha} - 1}{1 - \alpha}$, acotado si $\alpha > 1$; para
+$\alpha = 1$ el \omterm{thm:b1:integration:def}{integral} es $\ln x \to \infty $, y el encuadre
+da $\ln(N+1) \leq H_N \leq 1 + \ln N$. Para $\alpha \leq 0$ el
+Los términos no tienden a $0$.
+\end{proof}
+
+\begin{example}[La pila armónica]\label{ex:b1:series:harmonicstack}
+¿Cuántos términos debe acumular el armónico \omterm{def:b1:series:def}{serie} para pasar $20$?
+El encuadre $\ln(N+1) \leq H_N \leq 1 + \ln N$ responde sin
+suma total: $H_N \geq 20$ requiere $1 + \ln N \geq 20$,
+es decir,\ $N \geq \eu^{19} \approx 1.8\cdot10^{8}$, y está garantizado
+una vez $\ln(N + 1) \geq 20$, es decir $N \approx \eu^{20} \approx
+4.9\cdot10^{8}$. (El problema del fin de semana agudiza esto a$N \approx
+\eu^{20 - \gamma} \approx 2.7\cdot10^{8}$ vía \omterm{pb:b1:series:1}{constante de euler}).
+La conclusión final: la comparación \omterm{thm:b1:integration:def}{integral} no se limita simplemente
+decidir convergencia --- es \emph{localiza} sumas parciales con
+precisión logarítmica, convirtiendo un cálculo desesperado
+(cientos de millones de términos) en una estimación de dos líneas.
+\end{example}
+
+\begin{theorem}[Prueba de relación (d'Alembert)]\label{thm:b1:series:ratio}
+Vamos $u_n > 0$ con $\frac{u_{n+1}}{u_n} \to \ell$.\index{prueba de relación}
+\begin{itemize}
+ \item Si $\ell < 1$:$\sum u_n$ converge;
+ \item si $\ell > 1$:$u_n \to +\infty $, divergencia;
+ \item si $\ell = 1$: sin conclusión ($\sum \frac1n$ diverge,$\sum
+ \frac{1}{n^2}$ converge).
+\end{itemize}
+\end{theorem}
+
+\begin{proof}
+Si $\ell < 1$, corrija $q \in \intoo{\ell}{1}$: más allá de algunos $N$,
+$u_{n+1} \leq q\,u_n$, entonces $u_n \leq u_N q^{\,n-N}$ por inducción:
+comparación con un \omterm{ex:b1:series:geometric}{serie geométrica}. Si $\ell > 1$: más allá de algunos $N$
+la secuencia $(u_n)$ es creciente, por lo que no puede tender a$0$
+(su límite, en caso de existir, es $\geq u_N > 0$); por
+\cref{prop:b1:series:first}~(1), divergencia --- y de hecho $u_n
+\geq u_N q^{n-N}$ con $ q > 1$ da $u_n \to \infty $.
+\end{proof}
+
+\begin{example}\label{ex:b1:series:ratio}
+$\sum \frac{x^n}{n!}$ converge para cada $x > 0$: relación
+$\frac{x}{n+1} \to 0$. Su suma es $\eu^x$: por Taylor--Lagrange
+(\cref{thm:b1:taylor:lagrange}) en $\intcc{0}{x}$,
+\[
+\Bigl| \eu^x - \sum_{k=0}^{n} \frac{x^k}{k!} \Bigr|
+\leq \eu^{x}\, \frac{x^{n+1}}{(n+1)!} \xrightarrow[n\to\infty]{} 0 ,
+\]
+el límite tiende a $0$ porque domina el factorial
+(\cref{exo:b1:integration:9}~(1) utilizó el mismo hecho). lo mismo
+El argumento suma $\sin $,$\cos$,$\sinh$,$\cosh$\omterm{def:b1:series:def}{serie} en todos
+$\R$.
+\end{example}
+
+\begin{example}[La prueba de relación es suficiente, no necesaria]\label{ex:b1:series:rationotnecessary}
+Sea $u_n = 2^{-n}$ para $n$ par y $u_n = 2^{-n-2}$ para impar
+$n$. Los ratios consecutivos oscilan entre $\frac{1}{8}$ y
+$\frac12\cdot4 = 2$, por lo que $\frac{u_{n+1}}{u_n}$ no tiene límite y
+d'Alembert es mudo --- sin embargo $u_n \leq 2^{-n}$ y la comparación
+La prueba resuelve la convergencia al instante. La hipótesis de la prueba (la
+ratio \emph{converge}) es una restricción real: se adapta a los términos
+con una estructura multiplicativa dominante (factoriales, potencias),
+y falla en todo lo que respira. Cuando las proporciones se comportan mal,
+retrocedamos a la comparación con una envolvente geométrica --- que
+es todo lo que alguna vez fue el \omterm{thm:b1:series:ratio}{prueba de relación}, como lo demuestra su prueba.
+\end{example}
+
+\begin{example}[Prueba de ratio en batallas factoriales]\label{ex:b1:series:ratiobinom}
+Naturaleza de $\sum_{n\geq0} \dfrac{(n!)^2}{(2n)!}$(recíprocos de
+la central \omterm{def:b1:counting:objects}{coeficientes binomiales}, hasta el factor $n + 1$)?
+La relación colapsa los factoriales:
+\[
+\frac{u_{n+1}}{u_n}
+= \frac{((n+1)!)^2}{(n!)^2}\cdot\frac{(2n)!}{(2n+2)!}
+= \frac{(n+1)^2}{(2n+1)(2n+2)}
+\longrightarrow \frac14 < 1 :
+\]
+convergente, con espacio de sobra --- los términos decaen esencialmente
+como $4^{-n}$, consistente con $\binom{2n}{n} \geq
+\frac{4^n}{2n+1}$ de \cref{pb:b1:integration:1}. el cierre
+Insight: los cocientes de factoriales son exactamente lo que \omterm{thm:b1:series:ratio}{prueba de relación}
+digiere --- cada factorial se cancela en una función racional de
+$n$, cuyo límite se lee en los términos principales.
+\end{example}
+
+\section{Convergencia absoluta; series alternas}
+
+\begin{theorem}[Convergencia absoluta]\label{thm:b1:series:absolute}
+Si $\sum \abs{u_n}$ converge (\emph{absoluto
+convergencia}\index{convergencia absoluta}), entonces $\sum u_n$ converge,
+y $\bigl|\sum u_n\bigr| \leq \sum \abs{u_n}$. Esto es cierto
+o términos complejos.
+\end{theorem}
+
+\begin{proof}
+Las sumas parciales satisfacen, para $M > N$(criterio de Cauchy,
+\cref{thm:b1:seq:complete}):
+\[
+\abs{S_M - S_N} = \Bigl| \sum_{n=N+1}^{M} u_n \Bigr|
+\leq \sum_{n=N+1}^{M} \abs{u_n},
+\]
+que es pequeño para grande $N$ ya que las sumas parciales de $\sum\abs{u_n}$
+formar un \omterm{def:b1:seq:cauchy}{secuencia de cauchy}. Entonces $(S_N)$ es Cauchy, por lo tanto convergente. el
+la desigualdad pasa al límite de la desigualdad del triángulo finito.
+\end{proof}
+
+\begin{example}[Convergencia absoluta, real y compleja]\label{ex:b1:series:absexamples}
+$\sum_{n\geq1} \frac{\sin n}{n^2}$: los términos cambian de signo
+erráticamente (de hecho $(\sin n)$ es \omterm{def:b1:topology:dense}{denso} en $\intcc{-1}{1}$,
+\cref{exo:b1:seq:12}), y no hay ninguna estructura alterna en
+vista. \omterm{thm:b1:series:absolute}{Convergencia absoluta} rescata todo de una vez:
+$\bigl|\frac{\sin n}{n^2}\bigr| \leq \frac{1}{n^2}$, un
+escala convergente, por lo que el \omterm{def:b1:series:def}{serie} converge. El mismo escudo funciona.
+sobre $\C$:$\sum_{n\geq1}\frac{\eu^{\iu n}}{n^2}$ converge
+porque $\bigl|\frac{\eu^{\iu n}}{n^2}\bigr| = \frac{1}{n^2}$
+--- los patrones de signos, incluso los bidimensionales, son irrelevantes
+una vez que los módulos son sumables. La idea final: \omterm{thm:b1:series:absolute}{absoluto
+convergencia} es la única herramienta de este capítulo que nunca pregunta cómo
+los carteles están organizados; pruébalo primero
+(\cref{met:b1:series:decide}), y reservar las pruebas delicadas
+para el \omterm{def:b1:series:def}{serie} que lo falla.
+\end{example}
+
+\begin{theorem}[Prueba de series alternativas]\label{thm:b1:series:alternating}
+Sea $(a_n)$ decreciente con $a_n \to 0$. Entonces \omterm{thm:b1:series:alternating}{alternando
+serie} $\sum (-1)^n a_n$ converge; su suma se encuentra entre dos cualesquiera
+sumas parciales consecutivas, y\index{series alternas}
+\[
+\abs{R_N} = \Bigl| \sum_{n > N} (-1)^n a_n \Bigr| \leq a_{N+1} .
+\]
+\end{theorem}
+
+\begin{proof}
+Las sumas parciales pares e impares son adyacentes: $S_{2p+2} - S_{2p} =
+a_{2p+2} - a_{2p+1} \leq 0$(decreciente),$S_{2p+1} - S_{2p-1} =
+a_{2p} - a_{2p+1} \geq 0$(creciente) y $S_{2p} - S_{2p+1} =
+a_{2p+1} \to 0$. Por \cref{thm:b1:seq:adjacent} comparten un límite
+$S$, que los dos criterios \omterm{def:b1:seq:subsequence}{subsecuencias}
+(\cref{prop:b1:seq:subsequences}) hace el límite de $(S_N)$;
+además $S$ está atrapado entre sumas parciales consecutivas, y
+$\abs{S - S_N}$ es como máximo la brecha con el siguiente,$a_{N+1}$.
+\end{proof}
+
+\begin{example}[Serie armónica alterna]\label{ex:b1:series:ln2}
+$\sum_{n \geq 1} \frac{(-1)^{n-1}}{n}$ converge (prueba alternante)
+pero no del todo (armónico \omterm{def:b1:series:def}{serie}). Su suma es $\ln 2$: del
+identidad geométrica finita $\frac{1}{1+t} = \sum_{k=0}^{n-1} (-t)^k +
+\frac{(-t)^n}{1+t}$, integrar sobre $\intcc{0}{1}$:
+\[
+\ln 2 = \sum_{k=1}^{n} \frac{(-1)^{k-1}}{k}
++ (-1)^n \int_0^1 \frac{t^n}{1+t}\,\dd t ,
+\qquad
+0 \leq \int_0^1 \frac{t^n}{1+t}\,\dd t \leq \frac{1}{n+1} \to 0 .
+\]
+La convergencia es dolorosamente lenta ($R_N \approx \frac{1}{N}$) ---
+\omterm{thm:b1:series:alternating}{series alternas} convergen por cancelación, no por pequeñez.
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}[x=0.78cm, y=7.2cm]
+ \draw[-Stealth] (0.3,0.42) -- (11,0.42)
+ node[below, font=\small] {$N$};
+ \draw (1,0.415) -- (1,0.425) node[below=1pt, font=\small]
+ {$1$};
+ \draw (5,0.415) -- (5,0.425) node[below=1pt, font=\small]
+ {$5$};
+ \draw (10,0.415) -- (10,0.425) node[below=1pt, font=\small]
+ {$10$};
+ \draw[gray, dashed] (0.3,0.6931) -- (10.7,0.6931)
+ node[right, font=\small, text=black] {$\ln 2$};
+ \node[left, font=\small] at (0.3,1) {$1$};
+ \node[left, font=\small] at (0.3,0.5) {$0.5$};
+ \draw[omDef, thick]
+ plot coordinates {(1,1) (2,0.5) (3,0.8333) (4,0.5833)
+ (5,0.7833) (6,0.6167) (7,0.7595) (8,0.6345)
+ (9,0.7456) (10,0.6456)};
+ \fill[omDef] (1,1) circle (1.5pt);
+ \fill[omDef] (2,0.5) circle (1.5pt);
+ \fill[omDef] (3,0.8333) circle (1.5pt);
+ \fill[omDef] (4,0.5833) circle (1.5pt);
+ \fill[omDef] (5,0.7833) circle (1.5pt);
+ \fill[omDef] (6,0.6167) circle (1.5pt);
+ \fill[omDef] (7,0.7595) circle (1.5pt);
+ \fill[omDef] (8,0.6345) circle (1.5pt);
+ \fill[omDef] (9,0.7456) circle (1.5pt);
+ \fill[omDef] (10,0.6456) circle (1.5pt);
+\end{tikzpicture}
+
+{\small Las sumas parciales $S_N$ del armónico alterno
+\omterm{def:b1:series:def}{serie} $1 - \frac12 + \frac13 - \cdots$ salta por encima de su límite
+$\ln 2$ en cada paso: sumas impares desde arriba, sumas pares desde
+a continuación, cada salto de tamaño $\frac{1}{N+1}$. El paréntesis es el
+prueba de \cref{thm:b1:series:alternating} hecha visible --- y
+el lento cierre de las tenazas ($\abs{S_N - \ln 2} \approx
+\frac{1}{2N}$, problema de fin de semana \cref{pb:b1:series:1}) es el motivo
+nadie calcula $\ln 2$ de esta manera.}
+\end{omfigure}
+
+\begin{remark}[Errores comunes de las series.]
+(i) \emph{La prueba de equivalentes necesita un signo.}: sean $v_n =
+\frac{(-1)^n}{\sqrt n}$ y $ u_n = v_n + \frac1n$. entonces
+$\frac{u_n}{v_n} = 1 + \frac{(-1)^n}{\sqrt n} \to 1$, entonces $u_n
+\sim v_n $; sin embargo,$\sum v_n $ converge (prueba alterna) mientras
+$\sum u_n = \sum v_n + \sum \frac1n$ diverge. Equivalencia
+controla el \emph{tamaño} de términos y el tamaño \omterm{def:b1:series:def}{serie} firmado
+no es el destino --- la prueba es declarada y verdadera, porque
+(eventualmente) solo términos no negativos. (ii) \emph{$u_n \to 0$
+proves nothing}: el armónico \omterm{def:b1:series:def}{serie} es el eterno
+contraejemplo; la dirección inversa
+(\cref{prop:b1:series:first}~(1)) es sólo una divergencia rápida
+prueba. (iii) \emph{El límite de relación $1$ es silencio, no
+convergencia}: tanto $\sum\frac1n$ como $\sum\frac{1}{n^2}$ tienen
+relación $\to 1$; cambiar a escalas Riemann o comparación \omterm{thm:b1:integration:def}{integral}.
+(iv) \emph{Necesidades alternas decrecientes}: $\sum
+\frac{(-1)^n}{n + (-1)^n}$ parece alternar y se maneja
+sólo por ampliación (\cref{exo:b1:series:5}); el problema del fin de semana
+de \cref{ch:b1:taylor} (pregunta 23 allí) muestra que la prueba puede
+fracasar rotundamente sin monotonicidad. (v) \emph{Agrupación y
+reordenar no es libre}: insertar paréntesis es inofensivo para
+convergente \omterm{def:b1:series:def}{serie} pero puede crear convergencia a partir de divergencia
+($1 - 1 + 1 - \cdots$ agrupados en pares), y se puede reordenar
+cambiar la suma misma --- el drama escenificado en este capítulo
+problema de fin de semana (\cref{pb:b1:series:1}).
+\end{remark}
+
+\begin{method}[Decidir la naturaleza de una serie.]\label{met:b1:series:decide}
+\begin{enumerate}
+ \item ¿$u_n \to 0$? Si no, divergencia, basta.
+ \item Términos no negativos: busque un equivalente de $u_n $(expansiones,
+ \cref{ch:b1:taylor}!), comparar con Riemann o geométrico
+ escalas; factoriales y potencias requieren el \omterm{thm:b1:series:ratio}{prueba de relación};
+ la disminución de $f(n)$ requiere una comparación de \omterm{thm:b1:integration:def}{integral}.
+ \item Los signos varían: pruebe primero con \omterm{thm:b1:series:absolute}{convergencia absoluta}; si falla, el
+ prueba alterna (verifique cuidadosamente \emph{decreciente}); más allá
+ eso, herramientas de segundo año.
+\end{enumerate}
+\end{method}
+
+\begin{example}[Denominadores impares, la mitad del telescopio]\label{ex:b1:series:oddtelescope}
+Calcule $\sum_{n \geq 1} \dfrac{1}{4n^2 - 1}$. Parcial
+fracciones: $\frac{1}{(2n-1)(2n+1)} =
+\frac12\bigl(\frac{1}{2n-1} - \frac{1}{2n+1}\bigr)$, entonces
+\[
+\sum_{n=1}^{N} \frac{1}{4n^2 - 1}
+= \frac12\Bigl(1 - \frac{1}{2N+1}\Bigr)
+\longrightarrow \frac12 .
+\]
+Comparar con $\sum \frac{1}{n(n+1)} = 1$
+(\cref{exo:b1:series:1}): mismo esqueleto telescópico, pero el
+Los términos consecutivos aquí están separados por dos en los números impares, y
+el factor $\frac12$ registra el paso. La idea final:
+telescopar es un cambio de punto de vista, no un truco --- siempre que
+el término general es una diferencia $w_n - w_{n+1}$ de una secuencia
+con un límite, la suma es $w_1 - \lim w$, exactamente
+\cref{prop:b1:series:first}~(3).
+\end{example}
+
+\begin{remark}[El proceso de análisis, en retrospectiva.]
+Este capítulo es donde converge el análisis del volumen, y cada
+la prueba nombra a su antepasado. Sumas parciales acotadas es lo monótono
+teorema del límite (\cref{ch:b1:seq}), en sí mismo el axioma de completitud
+de \cref{ch:b1:reals}; \omterm{thm:b1:series:absolute}{convergencia absoluta} es el Cauchy
+criterio; la prueba \omterm{thm:b1:integration:def}{integral} es la de \cref{ch:b1:integration}
+encuadre de áreas; equivalentes de términos generales son
+Expansiones de \cref{ch:b1:taylor}; y el teorema de la alternancia es
+el lema de secuencias adyacentes con su ropa dominical. leer
+Al revés, el canal explica en qué consistió cada capítulo.
+\emph{para} --- y los problemas del fin de semana lo atravesaron
+($b$-dígitos ádicos, Cesàro--Stolz, las máquinas de irracionalidad,
+\omterm{pb:b1:series:1}{constante de euler}) son las mismas pocas ideas que se encuentran en niveles superiores y
+mayor altitud. El álgebra lineal que sigue cambia
+tema, no estándares: el hábito de exacto \omterm{def:b1:logic:statement}{enunciados} con
+El error certificado sobrevive al paso de los límites a las dimensiones.
+\end{remark}
+
+\begin{remark}[Adónde irá la serie a continuación]
+Este capítulo cierra el análisis del volumen \omterm{def:b1:topology:open}{abre} y tres
+puertas. En el volumen del Año 2, \omterm{def:b1:series:def}{serie} adquiere una variable ($\sum
+a_n x^n $: potencia \omterm{def:b1:series:def}{serie}, con su radio de convergencia) y
+luego una teoría valorada en funciones (Fourier \omterm{def:b1:series:def}{serie}); la dicotomía
+convergencia absoluta versus condicional, dramatizada en el
+El problema del fin de semana que aparece a continuación se convierte en la piedra angular de ambos. en
+probabilidad (volumen del año 3), expectativas de azar discreto
+variables \emph{son} \omterm{def:b1:series:def}{serie}, y \omterm{thm:b1:series:absolute}{convergencia absoluta} es lo que
+los hace bien definidos. Y el \omterm{thm:b1:series:riemann}{serie de riemann} $\sum n^{-s}$,
+empujado al complejo $s$, se convierte en la función zeta --- el único
+la mayoría estudió \omterm{def:b1:series:def}{serie} en matemáticas.
+\end{remark}
+
+\section{Ceremonias}
+
+\begin{exercise}[$\star$]\label{exo:b1:series:1}
+Naturaleza (y suma, al observar) de:
+\[
+\sum_{n\geq1} \frac{1}{n(n+1)},
+\qquad
+\sum_{n\geq2} \ln\Bigl(1 - \frac{1}{n^2}\Bigr),
+\qquad
+\sum_{n\geq0} \frac{3^n + 4^n}{5^n} .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:series:2}
+Naturaleza de: $\;\sum \dfrac{n^2}{2^n}$;$\;\sum \dfrac{n!}{n^n}$;
+$\;\sum \dfrac{2^n\,n!}{n^n}$;$\;\sum \dfrac{3^n\,n!}{n^n}$.
+\emph{(\omterm{thm:b1:series:ratio}{prueba de relación}; recall $\bigl(1 + \frac1n\bigr)^n \to \eu$.)}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:series:3}
+Naturaleza de: $\;\sum \sin\dfrac{1}{n^2}$;$\;\sum
+\Bigl(1 - \cos\dfrac1n\Bigr)$;$\;\sum \dfrac{1}{\sqrt{n(n+1)}}$;
+$\;\sum \dfrac{\ln n}{n^2}$\emph{(compare with $n^{-3/2}$)}.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:series:4}
+Demuestre que $\sum_{n\geq1} \frac{1}{n^2}$ converge con la suma $\leq 2$,
+usando $\frac{1}{n^2} \leq \frac{1}{n(n-1)}$ para $n \geq 2$ y un
+cota telescópica.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:series:5}
+Naturaleza de $\;\sum \dfrac{(-1)^n}{\sqrt n}$, de $\;\sum
+\dfrac{(-1)^n}{n + (-1)^n}$, \emph{(ampliar: la prueba alterna no
+no se aplica directamente --- ¿por qué?)} y de $\;\sum
+\sin\bigl(\pi\sqrt{n^2+1}\,\bigr)$, \emph{(reduce modulo $\pi$:
+$\sqrt{n^2+1} = n + \frac{1}{2n} + O(n^{-3})$)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:series:6}
+¿Para qué $\alpha > 0$ converge $\sum_{n \geq 2}
+\dfrac{1}{n (\ln n)^{\alpha}}$? \emph{(\omterm{thm:b1:integration:def}{Integral} comparison;
+substitute $u = \ln t$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:series:7}
+Sea $u_n = \dfrac{1}{n} - \ln\Bigl(1 + \dfrac1n\Bigr)$. demostrar que
+$0 \leq u_n \leq \dfrac{1}{2n^2}$, que $\sum u_n$ converge, y
+deducir la existencia de \omterm{pb:b1:series:1}{constante de euler}\index{constante de euler}:
+\[
+\gamma = \lim_{N \to \infty} \Bigl( \sum_{n=1}^{N} \frac 1n - \ln N
+\Bigr) .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:series:8}
+Calcular las sumas
+\[
+\sum_{n=1}^{\infty} \frac{1}{n(n+2)}
+\qquad\text{and}\qquad
+\sum_{n=0}^{\infty} \frac{n}{2^n} .
+\]
+\emph{(For the first: partial fractions. For the second: compute
+$\sum_{n=1}^{N} n x^{n-1}$ in closed form and let $N \to \infty $ at
+$x = \frac12$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:series:9}
+(Condensación de Cauchy) Sea $(u_n)$ no negativo y decreciente.
+demostrar que
+\[
+\sum_{n \geq 1} u_n \text{ converges}
+\iff
+\sum_{k \geq 0} 2^k\, u_{2^k} \text{ converges},
+\]
+comparando paquetes de términos entre potencias consecutivas de $2$.
+Recuperar de él el criterio de Riemann y
+\cref{exo:b1:series:6}.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:series:10}
+Utilizando la identidad \omterm{thm:b1:integration:def}{integral} de \cref{ex:b1:series:ln2} adaptada a
+$\frac{1}{1+t^2}$, demuestra la fórmula de Leibniz
+\[
+\frac{\pi}{4} = \sum_{n=0}^{\infty} \frac{(-1)^n}{2n+1}
+= 1 - \frac13 + \frac15 - \frac17 + \cdots
+\]
+con el error vinculado $\abs{R_N} \leq \frac{1}{2N+3}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:series:11}
+Naturaleza de $\displaystyle\sum_{n \geq 1} \frac{1}{n^{1 + 1/n}}$.
+\emph{(Calcule el límite de $n^{1/n}$ y encuentre un equivalente de
+el término general: la prueba de Riemann necesita un \emph{fijado}
+exponente.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:series:12}
+Sea $(u_n)$ no negativo y \emph{decreciente} con $\sum u_n$
+convergente. Demuestre que $n\,u_n \to 0$\emph{(bound $n\,u_{2n}$
+by a slice $\sum_{k=n+1}^{2n} u_k$ and use the Cauchy
+criterion)}. Demuestre que lo contrario falla y que el
+La hipótesis de la monotonicidad no se puede eliminar.
+\end{exercise}
+
+\section{Problema: la constante de Euler y la serie que cambia
+su suma}
+
+\begin{problem}[{Problema de fin de semana --- $H_n = \ln n + \gamma +
+\frac{1}{2n} + O(n^{-2})$ y reorganización de $1 - \frac12 +
+\frac13 - \dots $a$\frac{\ln 2}{2}$}]
+\label{pb:b1:series:1}
+Dos pisos comparten el armónico \omterm{def:b1:series:def}{serie}. Primero, el exacto
+contabilidad de su divergencia: $H_n - \ln n$ converge a \omterm{pb:b1:series:1}{Euler
+constante} $\gamma $(\cref{exo:b1:series:7}), y este problema
+afila el \omterm{def:b1:logic:statement}{enunciado} en una ley de dos caras $\frac{1}{2(n+1)}
+\leq H_n - \ln n - \gamma \leq \frac{1}{2n}$, certificando $\gamma
+= 0.5772\dots $ a mano. En segundo lugar, el escándalo del condicional.
+convergencia: el armónico alterno \omterm{def:b1:series:def}{serie} suma $\ln 2$
+(\cref{ex:b1:series:ln2}), aún \emph{los mismos términos, en un
+orden diferente}, suma a $\frac{\ln 2}{2}$--- o a$\ln 2 +
+\frac12\ln\frac pq $ para cualquier $p, q $, o a cualquier real
+(Riemann). Las dos historias son una: las sumas reordenadas son
+calculó \emph{con} la ley $\gamma$.\index{Euler
+constante}\index{reordenamiento de series}
+
+\medskip
+\noindent\textbf{Parte I --- $\gamma$, bracketed.} Configure $a_n = H_n
+- \ln n $ y $b_n = H_n - \ln(n+1)$.
+\begin{enumerate}
+ \item Usando $\frac{t}{1+t} \leq \ln(1 + t) \leq t$, muestre que
+ $(a_n)$ disminuye,$(b_n)$ aumenta, y que son
+ adyacente; su límite común es $\gamma$, con $b_n \leq
+ \gamma \leq a_n $ por cada $n $.
+ \item Primer disparo numérico: de $H_{10} = 2.928968\dots$,
+ soporte $\gamma$ entre $b_{10} = 0.5311$ y $a_{10} =
+ 0.6264$. ¿Qué tamaño necesitaría un $n $ para este tosco soporte?
+ por cuatro decimales?
+ \item Muestra la representación exacta de la cola $a_n - \gamma =
+ \sum_{k \geq n} w_k $(límite de sumas parciales), donde
+ \[
+ w_k = a_k - a_{k+1}
+ = \ln\Bigl(1 + \frac1k\Bigr) - \frac{1}{k+1}
+ = \int_k^{k+1} \frac{(k + 1 - t)}{t\,(k+1)}\,\dd t ,
+ \]
+ y deducir de la forma \omterm{thm:b1:integration:def}{integral} el límite de dos caras
+ $\dfrac{1}{2(k+1)^2} \leq w_k \leq \dfrac{1}{2k(k+1)}$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte II --- The $\frac{1}{2n}$ law.}
+\begin{enumerate}[resume]
+ \item Sume los límites de la pregunta 3 (ambos lados telescopio o
+ comparar con telescopios) y concluir la ley:
+ \[
+ \frac{1}{2(n+1)} \;\leq\; H_n - \ln n - \gamma \;\leq\;
+ \frac{1}{2n} \qquad (n \geq 1).
+ \]
+ \item Deducir $H_n = \ln n + \gamma + \frac{1}{2n} +
+ O\bigl(\frac{1}{n^2}\bigr)$; precisamente, demostrar que
+ $\gamma_n = H_n - \ln n - \frac{1}{2n}$ satisface
+ $-\frac{1}{2n(n+1)} \leq \gamma_n - \gamma \leq 0$.
+ \item Certificar cuatro decimales con $n = 100$: dado $H_{100} =
+ 5.1873775\dots $, calcular $\gamma_{100} = 0.577207\dots$
+ y concluir $\gamma = 0.5772 \pm 5\cdot10^{-5}$(verdadero
+ valor $0.5772156\dots$).
+ \item Dos dividendos de la ley, ambos necesarios después: como $m \to
+ \infty $,
+ \[
+ H_{2m} - H_m = \ln 2 - \frac{1}{4m} +
+ O\Bigl(\frac{1}{m^2}\Bigr),
+ \qquad
+ \sum_{j=1}^{m} \frac{1}{2j-1} = \frac{\ln m}{2} + \ln 2
+ + \frac\gamma2 + o(1) ,
+ \]
+ el segundo vía $\sum_{j \leq m} \frac{1}{2j-1} = H_{2m}
+ - \frac12 H_m$, y también $\sum_{j=1}^{m}
+ \frac{1}{2j} = \frac{\ln m}{2} + \frac\gamma2 + o(1)$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte III --- The alternating harmonic \omterm{def:b1:series:def}{serie},
+to second order.}
+\begin{enumerate}[resume]
+ \item Mostrar (inducción o agrupación) la identidad
+ $\sum_{k=1}^{2m} \frac{(-1)^{k-1}}{k} = H_{2m} - H_m$,
+ y deducir tanto la suma $\ln 2$(nuevamente) como la suma exacta
+ velocidad:
+ \[
+ \sum_{k=1}^{2m} \frac{(-1)^{k-1}}{k}
+ = \ln 2 - \frac{1}{4m} + O\Bigl(\frac{1}{m^2}\Bigr) .
+ \]
+ \item Deducir el error asintótico del armónico alterno
+ \omterm{def:b1:series:def}{serie} en el índice \emph{cualquier}: $S - S_N \sim
+ \frac{(-1)^N}{2N}$ --- dos veces más pequeño que el peor de los casos
+ obligado $a_{N+1} \approx \frac1N$ de
+ \cref{thm:b1:series:alternating}.
+ \item (Aceleración gratuita) Demuestre que las sumas promediadas
+ $\tilde S_N = \frac{S_N + S_{N+1}}{2}$ satisface $\tilde
+ S_N = \ln 2 + O\bigl(\frac{1}{N^2}\bigr)$. Verifique:$S_{10}
+ = 0.64563$,$S_{11} = 0.73654$,$\tilde S_{10} =
+ 0.69109$, contra $\ln 2 = 0.69315$: una compra promedio
+ dos decimales.
+ \item Explique en dos frases por qué ningún truco de este tipo puede ayudar a un
+ \emph{positivo} pregunta tipo fenómeno de cola divergente
+ Corchete de 2: el error alterno oscila (signo
+ $(-1)^N$), por lo que el promedio cancela su término principal, mientras que
+ el error $\gamma$-bracket $\frac{1}{2n}$ tiene constante
+ firmar. (Promediando $a_n$ y $b_n$\emph{hace} ayuda:
+ relacionar $\frac{a_n + b_n}{2}$ con la estimación del punto medio
+ $H_n - \ln\bigl(n + \frac12\bigr)$ y muestra que su error es
+ $O\bigl(\frac{1}{n^2}\bigr)$.)
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte IV --- Rigidity and its failure.}
+\begin{enumerate}[resume]
+ \item Demuestre que la parte positiva $\sum \frac{1}{2j-1}$ y
+ la parte negativa $\sum \frac{1}{2j}$ del alternador
+ armónico \omterm{def:b1:series:def}{serie} ambos divergen --- la firma de
+ \emph{condicional} convergencia.
+ \item Demuestre el \omterm{def:b1:logic:statement}{enunciado} general detrás de la pregunta 12: si
+ $\sum u_n$ converge pero $\sum \abs{u_n}$ diverge, entonces
+ el \omterm{def:b1:series:def}{serie} de partes positivas $\sum u_n^+$ y de
+ las partes negativas $\sum u_n^-$ ambas divergen \emph{(from
+ $u_n^\pm = \frac{\abs{u_n} \pm u_n}{2}$: if one
+ converged, so would the other, hence $\sum\abs{u_n}$)}.
+ Esta reserva inagotable de cosas positivas y negativas
+ masa es lo que gastará la receta de Riemann.
+ \item (Rigidez) Demuestre: si $\sum u_n$ converge
+ \emph{absolutamente} y $\sigma \colon \N \to \N$ es un
+ biyección, entonces $\sum u_{\sigma(n)}$ converge a la
+ misma suma \emph{(for $N$ large the first $M$ rearranged
+ terms contain $u_0, \dots, u_N$; compare partial sums
+ through the tail $\sum_{n > N}\abs{u_n}$)}.
+ \item (receta de Riemann) Vamos $t \in \R$. Describe los codiciosos
+ reordenamiento del armónico alterno \omterm{def:b1:series:def}{serie}: tomar
+ términos positivos $1, \frac13, \frac15, \dots$ hasta el
+ la suma parcial primero excede $t$, luego los términos negativos
+ $-\frac12, -\frac14, \dots$ hasta que caiga por primera vez
+ $t$ y repita. Demuestre que cada término se usa exactamente
+ una vez, que después del primer cruce las sumas parciales
+ permanecer dentro del último término utilizado de $t$ y concluir que
+ el \omterm{def:b1:series:def}{serie} reordenado converge a $t$: \emph{cualquier}
+ la suma prescrita es alcanzable.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part V --- The $(p, q)$ formula.} Arreglar números enteros
+$p, q \geq 1$. Reorganice el armónico alterno \omterm{def:b1:series:def}{serie} en
+bloques: $p$ términos positivos (los siguientes recíprocos impares), luego $q$
+términos negativos (los siguientes recíprocos pares) y repetir.
+\begin{enumerate}[resume]
+ \item Compruebe que se trata de un reordenamiento genuino (cada término
+ exactamente una vez), y que para $(p, q) = (1, 2)$ se lee
+ \[
+ 1 - \frac12 - \frac14 + \frac13 - \frac16 - \frac18 +
+ \frac15 - \frac1{10} - \frac1{12} + \dots
+ \]
+ \item (La reducción exacta a la mitad) Para $(p, q) = (1, 2)$, demuestre la
+ bloquear identidad
+ \[
+ \frac{1}{2k-1} - \frac{1}{4k-2} - \frac{1}{4k}
+ = \frac12\Bigl(\frac{1}{2k-1} - \frac{1}{2k}\Bigr),
+ \]
+ y deducir la relación \emph{exacto} $T_{3K} = \frac12
+ S_{2K}$ entre las sumas parciales reordenadas y las
+ originales: la reducción a la mitad de la suma es visible en
+ cada etapa finita, no sólo en el límite.
+ \item Muestra que la suma parcial después de $K$ bloquea completamente
+ es igual a $\sum_{j=1}^{pK} \frac{1}{2j-1} -
+ \sum_{j=1}^{qK} \frac{1}{2j}$ y calcula su límite
+ con la pregunta 7:
+ \[
+ \ln 2 + \frac12 \ln\frac pq .
+ \]
+ \item Controlar las sumas parciales \emph{adentro} de un bloque (el
+ Los términos tienden a $0$) y concluyen que el $(p,
+ q)$ reorganizado \omterm{def:b1:series:def}{serie} converge a$\ln 2 + \frac12\ln
+ \frac pq $. En particular,$(1, 2)$ da $\frac{\ln
+ 2}{2}$: verificar con los primeros nueve términos,$T_9 =
+ 0.3083$, avanzando lentamente hacia $0.3466$.
+ \item Comprobaciones de cordura y rango: $(1,1)$ recupera $\ln 2$;
+ $(2,1)$ da $\frac32\ln 2$; qué sumas son alcanzables
+ por $(p, q)$-blocks, y ¿cómo funciona este menú contable?
+ comparar con la carta completa de Riemann (pregunta 14)?
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part VI --- Epilogue: $\gamma$ at work, and
+synthesis.}
+\begin{enumerate}[resume]
+ \item Identificar la suma del \omterm{def:b1:series:def}{serie} convergente
+ $\sum_{k\geq1} \bigl(\frac1k - \ln\frac{k+1}{k}\bigr)$
+ (\cref{exo:b1:series:7}): muestra que es igual a $\gamma$.
+ \item Ejecute la receta de Riemann (pregunta 14) para el objetivo $t =
+ 1$ y enumere los primeros doce términos producidos ($1, \frac13,
+ -\frac12, \frac15, -\frac14, \frac17, \frac19, -\frac16,
+ \frac1{11}, \frac1{13}, -\frac18, \frac1{15}$).
+ calculando la suma parcial ($\approx 0.980$) --- ver
+ el algoritmo respira alrededor de su objetivo.
+ \item Demuestre que algún reordenamiento del armónico alterno
+ \omterm{def:b1:series:def}{serie} diverge a $+\infty$\emph{(bloques de positivo
+ términos lo suficientemente largos como para ganar $1$ cada vez, usando la pregunta
+ 12, separados por términos negativos únicos)}.
+ \item Afile \cref{ex:b1:series:harmonicstack} con el
+ Ley $\gamma$: muestra que el primer índice con $H_N \geq
+ 20$ satisface $ N = \eu^{\,20 - \gamma}\,(1 + o(1))
+ \approx 2.7\cdot10^{8}$ --- \omterm{pb:b1:series:1}{constante de euler} es exactamente
+ En la corrección faltaba el encuadre crudo.
+ \item Síntesis, una frase cada una: (i) la ley $\gamma$ y
+ lo que cada una de sus tres piezas ($\ln n$,$\gamma$,
+ $\frac{1}{2n}$) contribuye; (ii) por qué condicional
+ la convergencia hace que la suma dependa del orden, mientras que \omterm{thm:b1:series:absolute}{absoluto
+ convergencia} lo prohíbe; (iii) cómo funciona la fórmula $(p,q)$
+ era un \emph{cálculo} con la ley $\gamma$ en lugar
+ que una afirmación de existencia abstracta; (iv) donde estos
+ Los hilos continúan --- power \omterm{def:b1:series:def}{serie} y productos de \omterm{def:b1:series:def}{serie}.
+ en el volumen del año 2 y el fin de semana del volumen del año 3
+ problema en la fórmula de Stirling, donde lo mismo
+ La contabilidad de suma versus integral funciona a máxima potencia.
+\end{enumerate}
+\end{problem}

@@ -85,6 +85,7 @@ class Emitter:
         self.chapter_number = chapter_number
         self.externals = externals or {}
         self.math = []          # [(tex, display)]
+        self.footnotes = []     # collected footnote bodies (HTML)
 
     # ------------------------------------------------------------- helpers
 
@@ -123,6 +124,11 @@ class Emitter:
                 out.append(f"<strong>{self.inlines(node['inl'])}</strong>")
             elif t == "sup":
                 out.append(f"<sup>{self.inlines(node['inl'])}</sup>")
+            elif t == "footnote":
+                self.footnotes.append(self.inlines(node["inl"]))
+                n = len(self.footnotes)
+                out.append(f'<sup class="om-fnref" id="fnref-{n}">'
+                           f'<a href="#fn-{n}">{n}</a></sup>')
             elif t == "term":
                 label = node["label"]
                 text = self.inlines(node["inl"])
@@ -138,10 +144,30 @@ class Emitter:
                     out.append(f'<span class="om-term-future" data-omterm='
                                f'"{html.escape(label)}">{text}</span>')
             elif t == "cref":
-                info = self.resolve(node["label"], "\\cref")
-                text = self.lang.cref_text(info["kind"], info["number"])
-                out.append(f'<a class="om-cref" href="{info["href"]}">'
-                           f"{text}</a>")
+                labels = [part.strip() for part in node["label"].split(",")]
+                infos = [self.resolve(lbl, "\\cref") for lbl in labels]
+                if len(infos) == 1:
+                    info = infos[0]
+                    text = self.lang.cref_text(info["kind"], info["number"])
+                    out.append(f'<a class="om-cref" href="{info["href"]}">'
+                               f"{text}</a>")
+                else:
+                    # \cref{a,b}: "Chapters 9 and 10" — same-kind lists only
+                    kinds = {info["kind"] for info in infos}
+                    if len(kinds) != 1:
+                        raise ParseError(
+                            f"multi-label \\cref mixes kinds: {labels}")
+                    name = self.lang.plurals.get(infos[0]["kind"])
+                    if not name:
+                        raise ParseError(
+                            f"no plural name for {infos[0]['kind']!r}")
+                    links = [f'<a class="om-cref" href="{info["href"]}">'
+                             f'{info["number"]}</a>' for info in infos]
+                    joined = (f" {self.lang.and_word} ".join(links)
+                              if len(links) == 2
+                              else ", ".join(links[:-1])
+                              + f" {self.lang.and_word} " + links[-1])
+                    out.append(f"{name} {joined}")
             else:
                 raise ParseError(f"emitter: unknown inline {t!r}")
         return "".join(out)
@@ -167,6 +193,23 @@ class Emitter:
                     out.append(
                         f'<h2 id="{sid}"><span class="om-secnum">{num}'
                         f"</span> {title}</h2>")
+            elif t == "subsection":
+                title = self.inlines(node["inl"])
+                if node["star"]:
+                    out.append(f"<h3>{title}</h3>")
+                else:
+                    num = node["number"]
+                    sid = f"sec-{num.replace('.', '-')}"
+                    out.append(
+                        f'<h3 id="{sid}"><span class="om-secnum">{num}'
+                        f"</span> {title}</h3>")
+            elif t == "admitted":
+                # \admitted: a whole proof reading "Admitted at this level."
+                out.append(
+                    f'<div class="om-proof"><p>'
+                    f'<span class="om-proof-lead">{self.lang.proof}.</span> '
+                    f"<em>{self.lang.admitted}</em> "
+                    f'<span class="om-qed">∎</span></p></div>')
             elif t == "env":
                 out.append(self.env(node))
             elif t == "list":
@@ -285,13 +328,14 @@ class Emitter:
         return tag_open + "\n" + "\n".join(items) + "\n" + tag_close
 
     def figure(self, node):
-        fig = self.figures[node["tikz"]]
         caption = self.inlines(node["caption"])
         alt = html.escape(plaintext(node["caption"]).strip(), quote=True)
-        return (f'<figure class="om-figure">\n'
-                f'<img src="{fig["url"]}" alt="{alt}" '
-                f'width="{fig["width"]}" height="{fig["height"]}" '
-                f'loading="lazy">\n'
+        imgs = "\n".join(
+            f'<img src="{fig["url"]}" alt="{alt}" '
+            f'width="{fig["width"]}" height="{fig["height"]}" loading="lazy">'
+            for fig in (self.figures[tikz] for tikz in node["tikzs"]))
+        return (f'<figure class="om-figure">\n<div class="om-figure-row">\n'
+                f"{imgs}\n</div>\n"
                 f"<figcaption>{caption}</figcaption>\n</figure>")
 
     def table(self, node):
@@ -309,6 +353,19 @@ class Emitter:
         rows.append("<tbody>" + "".join(body_rows) + "</tbody>")
         return ('<div class="om-table-wrap"><table class="om-table">'
                 + "".join(rows) + "</table></div>")
+
+
+def footnotes_html(emitter):
+    """End-of-chapter footnote list with backlinks (empty string if none)."""
+    if not emitter.footnotes:
+        return ""
+    items = "\n".join(
+        f'<li id="fn-{i + 1}">{body} '
+        f'<a href="#fnref-{i + 1}" class="om-fnback" '
+        f'aria-label="Back to text">↩</a></li>'
+        for i, body in enumerate(emitter.footnotes))
+    return (f'\n<section class="om-footnotes">\n<ol>\n{items}\n</ol>\n'
+            f"</section>")
 
 
 def substitute_math(html_text, rendered):

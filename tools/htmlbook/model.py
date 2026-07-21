@@ -26,6 +26,7 @@ def number_chapter(blocks, chapter_number):
     exercise = 0
     problem = 0
     section = 0
+    subsection = 0
 
     def record(label, kind, number):
         if label is None:
@@ -36,13 +37,19 @@ def number_chapter(blocks, chapter_number):
                          "anchor": anchor_for(label)}
 
     def walk(nodes):
-        nonlocal shared, exercise, problem, section
+        nonlocal shared, exercise, problem, section, subsection
         for node in nodes:
             t = node["t"]
             if t == "section":
                 if not node["star"]:
                     section += 1
+                    subsection = 0
                     node["number"] = f"{chapter_number}.{section}"
+                continue
+            if t == "subsection":
+                if not node["star"]:
+                    subsection += 1
+                    node["number"] = f"{chapter_number}.{section}.{subsection}"
                 continue
             if t == "env":
                 kind = node["kind"]
