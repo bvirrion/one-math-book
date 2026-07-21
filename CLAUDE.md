@@ -301,3 +301,10 @@ python3 tools/build_html_toc.py --entry one_math_book_2_high_school.tex \
 - Translated editions: install `texlive-lang-french` / Dutch babel
   packages when possible so babel loads the language `.ldf`. Without
   them the books still build; UI strings come from `styles/lang/<lang>.tex`.
+- babel-spanish redefines `\%` to auto-insert a thin space, and its
+  `\lastskip` probe is a fatal "Incompatible glue units" on the
+  sources' `$t\,\%$` convention — only where `spanish.ldf` is
+  installed (CI's full TeX Live, not a minimal local install).
+  `onemath.sty` calls `\spanishplainpercent` after loading babel to
+  disable it; keep the explicit `\,\%` in es sources. Generic version
+  of this gotcha: the umbrella repo's `translation_instruction.md`.
