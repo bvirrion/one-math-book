@@ -122,7 +122,8 @@ class Emitter:
             if t == "text":
                 out.append(html.escape(node["s"], quote=False))
             elif t == "math":
-                out.append(self.math_ph(node["tex"], display=False))
+                out.append(self.math_ph(node["tex"],
+                                        display=node.get("display", False)))
             elif t == "emph":
                 attr = ""
                 if node.get("index"):
@@ -154,8 +155,14 @@ class Emitter:
                     # link intent in the DOM, resolvable by a later run
                     out.append(f'<span class="om-term-future" data-omterm='
                                f'"{html.escape(label)}">{text}</span>')
+            elif t == "eqref":
+                info = self.resolve(node["label"], "\\eqref")
+                out.append(f'<a class="om-cref" href="{info["href"]}">'
+                           f"({info['number']})</a>")
             elif t == "cref":
-                labels = [part.strip() for part in node["label"].split(",")]
+                # labels may be line-wrapped in the source
+                labels = [re.sub(r"\s+", "", part)
+                          for part in node["label"].split(",")]
                 infos = [self.resolve(lbl, "\\cref") for lbl in labels]
                 if len(infos) == 1:
                     info = infos[0]
@@ -163,22 +170,32 @@ class Emitter:
                     out.append(f'<a class="om-cref" href="{info["href"]}">'
                                f"{text}</a>")
                 else:
-                    # \cref{a,b}: "Chapters 9 and 10" — same-kind lists only
                     kinds = {info["kind"] for info in infos}
-                    if len(kinds) != 1:
-                        raise ParseError(
-                            f"multi-label \\cref mixes kinds: {labels}")
-                    name = self.lang.plurals.get(infos[0]["kind"])
-                    if not name:
-                        raise ParseError(
-                            f"no plural name for {infos[0]['kind']!r}")
-                    links = [f'<a class="om-cref" href="{info["href"]}">'
-                             f'{info["number"]}</a>' for info in infos]
-                    joined = (f" {self.lang.and_word} ".join(links)
-                              if len(links) == 2
-                              else ", ".join(links[:-1])
-                              + f" {self.lang.and_word} " + links[-1])
-                    out.append(f"{name} {joined}")
+                    if len(kinds) == 1:
+                        # \cref{a,b} same kind: "Chapters 9 and 10"
+                        name = self.lang.plurals.get(infos[0]["kind"])
+                        if not name:
+                            raise ParseError(
+                                f"no plural name for {infos[0]['kind']!r}")
+                        links = [f'<a class="om-cref" href="{info["href"]}">'
+                                 f'{info["number"]}</a>' for info in infos]
+                        joined = (f" {self.lang.and_word} ".join(links)
+                                  if len(links) == 2
+                                  else ", ".join(links[:-1])
+                                  + f" {self.lang.and_word} " + links[-1])
+                        out.append(f"{name} {joined}")
+                    else:
+                        # mixed kinds: each reference spelled out in full
+                        links = [
+                            f'<a class="om-cref" href="{info["href"]}">'
+                            + self.lang.cref_text(info["kind"],
+                                                  info["number"])
+                            + "</a>" for info in infos]
+                        joined = (f" {self.lang.and_word} ".join(links)
+                                  if len(links) == 2
+                                  else ", ".join(links[:-1])
+                                  + f" {self.lang.and_word} " + links[-1])
+                        out.append(joined)
             else:
                 raise ParseError(f"emitter: unknown inline {t!r}")
         return "".join(out)
@@ -192,8 +209,13 @@ class Emitter:
             if t == "para":
                 out.append(f"<p>{self.inlines(node['inl'])}</p>")
             elif t == "dmath":
-                out.append(f'<div class="om-display">'
-                           f"{self.math_ph(node['tex'], display=True)}</div>")
+                tex = node["tex"]
+                anchor = ""
+                if node.get("label"):
+                    anchor = f' id="{anchor_for(node["label"])}"'
+                    tex += f"\\tag{{{node['number']}}}"
+                out.append(f'<div class="om-display"{anchor}>'
+                           f"{self.math_ph(tex, display=True)}</div>")
             elif t == "section":
                 title = self.inlines(node["inl"])
                 if node["star"]:

@@ -31,10 +31,37 @@ import re
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from htmlbook.emit_html import tex_to_alt  # noqa: E402
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
-CHAPTER_RE = re.compile(
-    r"\\chapter\{([^{}]*)\}\s*\\label\{(ch:[a-z0-9:]+)\}")
+def read_chapter_line(text, where):
+    """(raw_title, label) from \\chapter{...}\\label{ch:...} — balanced
+    braces, so titles like \\texorpdfstring{$L^p$}{Lp} work; the label may
+    sit on the following line."""
+    i = text.find("\\chapter{")
+    if i < 0:
+        fail(f"{where}: no \\chapter{{...}} found")
+    depth, start = 0, i + len("\\chapter")
+    j = start
+    while j < len(text):
+        if text[j] == "\\":
+            j += 2
+            continue
+        if text[j] == "{":
+            depth += 1
+        elif text[j] == "}":
+            depth -= 1
+            if depth == 0:
+                break
+        j += 1
+    title = text[start + 1:j]
+    m = re.match(r"\s*\\label\{(ch:[a-z0-9:]+)\}", text[j + 1:])
+    if not m:
+        fail(f"{where}: no \\label{{ch:...}} after \\chapter")
+    return title, m.group(1)
 
 
 def fail(msg):
@@ -47,6 +74,14 @@ ACCENTS = {"'": "́", "`": "̀", "^": "̂",
 
 def detex(text, where):
     import unicodedata
+
+    # \texorpdfstring{$tex$}{plain}: the TEX branch through the same
+    # alt-text conversion the chapter converter applies to titles, so the
+    # toc title matches the published one exactly
+    text = re.sub(r"\\texorpdfstring\{\$([^$]*)\$\}\{[^{}]*\}",
+                  lambda m: tex_to_alt(m.group(1)), text)
+    text = re.sub(r"\$([^$]*)\$",
+                  lambda m: tex_to_alt(m.group(1)), text)
 
     # accents first (\'e, \`{a}, \c{c}, ...) — before quote curling,
     # which would otherwise eat the accent characters
@@ -128,10 +163,9 @@ def chapter_title_and_label(grade_dir, slug, lang):
         path = REPO_ROOT / "parts" / grade_dir / f"{slug}.tex"
     if not path.exists():
         fail(f"missing chapter file {path}")
-    m = CHAPTER_RE.search(path.read_text(encoding="utf-8"))
-    if not m:
-        fail(f"{path}: no \\chapter{{...}}\\label{{ch:...}} line matched")
-    return detex(m.group(1), str(path)), m.group(2)
+    title, label = read_chapter_line(path.read_text(encoding="utf-8"),
+                                     str(path))
+    return detex(title, str(path)), label
 
 
 def main():

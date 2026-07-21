@@ -67,6 +67,14 @@ class LangStrings:
                                 "nl": "Figuur"}[lang]
         self.plurals["figure"] = {"en": "Figures", "fr": "Figures",
                                   "nl": "Figuren"}[lang]
+        self.names["equation"] = {"en": "Equation", "fr": "Équation",
+                                  "nl": "Vergelijking"}[lang]
+        self.names["section"] = {"en": "Section", "fr": "Section",
+                                 "nl": "Sectie"}[lang]
+        self.plurals["section"] = {"en": "Sections", "fr": "Sections",
+                                   "nl": "Secties"}[lang]
+        self.plurals["equation"] = {"en": "Equations", "fr": "Équations",
+                                    "nl": "Vergelijkingen"}[lang]
         # \st -> its \text{...} body, fed to KaTeX as a macro
         m = re.search(r"\\newcommand\{\\st\}\{(.*)\}", text)
         if not m:

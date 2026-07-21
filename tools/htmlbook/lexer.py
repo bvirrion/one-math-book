@@ -78,9 +78,12 @@ def strip_comments(text):
 
 
 def read_group(cur):
-    """Read a balanced {...} group; cursor must be on '{'. Returns content."""
+    """Read a balanced {...} group; skips leading whitespace (an argument
+    may start on the next source line). Returns the group content."""
     s = cur.s
-    if s[cur.i] != "{":
+    while cur.i < len(s) and s[cur.i] in " \n\t":
+        cur.i += 1
+    if cur.i >= len(s) or s[cur.i] != "{":
         cur.err("expected '{'")
     depth, start = 0, cur.i + 1
     i = cur.i
@@ -129,6 +132,27 @@ def read_optional(cur):
 
 
 CMD_RE = re.compile(r"\\([a-zA-Z]+)\s*")
+
+
+def find_inline_math_end(s, start):
+    """Index of the `$` closing the inline math opened at s[start] — the
+    first unescaped `$` at brace depth 0 (LaTeX re-enters math inside
+    \\text{...}, e.g. $\\sum_{\\text{$k$ even}}$). Returns -1 if none."""
+    depth = 0
+    i = start + 1
+    while i < len(s):
+        c = s[i]
+        if c == "\\":
+            i += 2
+            continue
+        if c == "{":
+            depth += 1
+        elif c == "}":
+            depth -= 1
+        elif c == "$" and depth == 0:
+            return i
+        i += 1
+    return -1
 
 
 def find_env_end(cur, name):
@@ -249,13 +273,9 @@ class Parser:
             if c == "$":
                 # consume the whole inline-math segment: a \begin{cases}
                 # inside $...$ must not be mistaken for a block environment
-                end = cur.i
-                while True:
-                    end = s.find("$", end + 1)
-                    if end < 0:
-                        cur.err("unbalanced $")
-                    if s[end - 1] != "\\":
-                        break
+                end = find_inline_math_end(s, cur.i)
+                if end < 0:
+                    cur.err("unbalanced $")
                 parbuf.append(s[cur.i:end + 1])
                 cur.i = end + 1
                 continue
@@ -306,8 +326,14 @@ class Parser:
                 if s.startswith("\\label{", cur.i):
                     cur.i += len("\\label")
                     label = read_group(cur)
-                    if self.chapter_label is None and not blocks and not parbuf:
+                    if self.chapter_label is None and not blocks \
+                            and not "".join(parbuf).strip():
                         self.chapter_label = label
+                    elif blocks and not "".join(parbuf).strip() \
+                            and blocks[-1]["t"] in ("section", "subsection") \
+                            and "label" not in blocks[-1]:
+                        # \section{...}\label{sec:...}
+                        blocks[-1]["label"] = label
                     else:
                         # a label placed late in an environment body (the
                         # style file's page-break workaround): surface it
@@ -338,10 +364,13 @@ class Parser:
             # commands with brace groups: consume their groups too so a
             # nested \begin inside an argument can't fool the block scanner
             n_groups = {"omterm": 2, "cref": 1, "Cref": 1, "ref": 1,
-                        "emph": 1, "textbf": 1, "index": 1, "label": 1,
-                        "textsuperscript": 1, "footnote": 1,
+                        "eqref": 1, "emph": 1, "textbf": 1, "index": 1,
+                        "label": 1, "textsuperscript": 1, "footnote": 1,
                         "texorpdfstring": 2, "hspace": 1, "rule": 2,
-                        "H": 1, "c": 1, "textsc": 1}.get(name, 0)
+                        "H": 1, "c": 1, "v": 1, "textsc": 1}.get(name, 0)
+            if name in ("H", "c", "v") \
+                    and (cur.i >= len(s) or s[cur.i] != "{"):
+                n_groups = 0  # bare-letter accent form (\v S)
             out = [s[start:cur.i]]
             for _ in range(n_groups):
                 while cur.i < len(s) and s[cur.i] in " \n":
@@ -360,6 +389,16 @@ class Parser:
         cur.i += len("\\begin")
         name = read_group(cur)
 
+        if name == "equation":
+            # numbered display equation; the label (if any) becomes an
+            # anchored \tag'd formula
+            body = find_env_end(cur, "equation")
+            label = None
+            m = re.search(r"\\label\{([^{}]*)\}", body)
+            if m:
+                label = m.group(1)
+                body = body[:m.start()] + body[m.end():]
+            return {"t": "dmath", "tex": body.strip(), "label": label}
         if name in ("align*", "gather*"):
             # display-math blocks; KaTeX renders them natively in display
             # mode, so keep the whole environment verbatim
@@ -407,7 +446,10 @@ class Parser:
                         o = opt.strip()
                         if o.startswith("{") and o.endswith("}"):
                             o = o[1:-1]
-                        title = self.parse_inlines(o)
+                        if o == "\\omnameProof":
+                            title = None  # explicit default title
+                        else:
+                            title = self.parse_inlines(o)
             label = None
             m = re.match(r"\s*\\label\{", s[cur.i:])
             if m:
@@ -555,6 +597,21 @@ class Parser:
         cells.append(self.parse_inlines("".join(buf).strip()))
         return cells
 
+    def accented_letter(self, cur, combining):
+        """Accent argument: a {X} group or a bare next letter (\\v S)."""
+        import unicodedata
+        src = cur.s
+        if cur.i < len(src) and src[cur.i] == "{":
+            inner = read_group(cur)
+        elif cur.i < len(src) and src[cur.i].isalpha():
+            inner = src[cur.i]
+            cur.i += 1
+        else:
+            cur.err("accent command needs a letter")
+        if len(inner) != 1 or not inner.isalpha():
+            cur.err(f"unsupported accent argument {inner!r}")
+        return unicodedata.normalize("NFC", inner + combining)
+
     # --------------------------------------------------------------- inlines
 
     def parse_inlines(self, raw):
@@ -578,12 +635,22 @@ class Parser:
             if until and s.startswith(until, cur.i):
                 break
             if c == "$":
-                end = s.find("$", cur.i + 1)
+                end = find_inline_math_end(s, cur.i)
                 if end < 0:
                     cur.err("unbalanced $")
                 emit_text()
                 out.append({"t": "math", "tex": s[cur.i + 1:end].strip()})
                 cur.i = end + 1
+                continue
+            if s.startswith("\\[", cur.i):
+                # display math nested in an inline context (e.g. \emph)
+                end = s.find("\\]", cur.i + 2)
+                if end < 0:
+                    cur.err("missing \\]")
+                emit_text()
+                out.append({"t": "math", "tex": s[cur.i + 2:end].strip(),
+                            "display": True})
+                cur.i = end + 2
                 continue
             if c == "\\":
                 m = CMD_RE.match(s, cur.i)
@@ -615,7 +682,7 @@ class Parser:
                         text.append(" ")
                     elif nxt == ",":               # thin space
                         text.append(" ")
-                    elif nxt in ("%", "&", "_", "#", "$"):
+                    elif nxt in ("%", "&", "_", "#", "$", "{", "}"):
                         text.append(nxt)
                     elif nxt == "-":
                         pass  # discretionary hyphen: hyphenation hint only
@@ -635,6 +702,10 @@ class Parser:
                     # cleveref runs with [capitalize]: identical output
                     emit_text()
                     out.append({"t": "cref", "label": read_group(cur)})
+                elif name == "eqref":
+                    # amsmath: "(N.M)" linked, no kind name
+                    emit_text()
+                    out.append({"t": "eqref", "label": read_group(cur)})
                 elif name == "emph":
                     emit_text()
                     inner = read_group(cur)
@@ -701,20 +772,14 @@ class Parser:
                 elif name in ("oe", "OE"):
                     text.append("\u0153" if name == "oe" else "\u0152")
                 elif name == "c":
-                    # cedilla accent: \c{c} -> c-cedilla
-                    import unicodedata
-                    inner = read_group(cur)
-                    if len(inner) != 1 or not inner.isalpha():
-                        cur.err(f"unsupported \\c{{{inner}}}")
-                    text.append(unicodedata.normalize(
-                        "NFC", inner + "\u0327"))
+                    # cedilla accent, braced or bare letter
+                    text.append(self.accented_letter(cur, "\u0327"))
+                elif name == "v":
+                    # caron accent (\v{S}mulian, \v Smulian)
+                    text.append(self.accented_letter(cur, "\u030c"))
                 elif name == "H":
                     # Hungarian umlaut accent (Erd\H{o}s)
-                    inner = read_group(cur)
-                    mapped = {"o": "ő", "O": "Ő", "u": "ű", "U": "Ű"}
-                    if inner not in mapped:
-                        cur.err(f"unsupported \\H{{{inner}}}")
-                    text.append(mapped[inner])
+                    text.append(self.accented_letter(cur, "̋"))
                 else:
                     cur.err(f"unsupported command \\{name}")
                 continue
