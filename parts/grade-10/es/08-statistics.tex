@@ -1,0 +1,385 @@
+\chapter{Estadísticas descriptivas}\label{ch:g10:stats}
+
+Las estadísticas resumen una gran colección de números: grados, salarios,
+temperaturas --- según unos pocos indicadores bien elegidos. Este capítulo presenta
+las dos familias de indicadores: los que localizan el \emph{centro} del
+datos (\omterm{def:g10:stats:mean}{significar}, \omterm{def:g10:stats:median}{mediana}) y aquellos que miden su \emph{desparramar} (\omterm{def:g10:stats:quartiles}{rango},
+\omterm{def:g10:stats:quartiles}{cuartiles}). Entra un tratamiento más profundo, que incluye la desviación estándar.
+\cref{ch:g11:stat}.
+
+\section{Datos y frecuencias}
+
+\begin{definition}[serie estadistica]\label{def:g10:stats:series}
+A \emph{serie estadística}\index{serie estadística} es una lista de valores
+$x_1, x_2, \dots, x_N$ observado en una población de tamaño $N$. cuando un valor
+$x$ aparece $n$ veces, $n$ es su \emph{contar} y el cociente
+\[
+f = \frac{n}{N}
+\]
+es su \emph{frecuencia}\index{frecuencia} (a menudo expresado como
+porcentaje). Las frecuencias de todos los valores suman $1$.
+\end{definition}
+
+\begin{example}\label{ex:g10:stats:frequencies}
+Las calificaciones de los estudiantes $20$ en una prueba de puntos $5$:
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{c|cccccc}
+grade $x$ & $0$ & $1$ & $2$ & $3$ & $4$ & $5$ \\
+\hline
+count $n$ & $1$ & $2$ & $4$ & $6$ & $5$ & $2$ \\
+\omterm{def:g10:stats:series}{frecuencia} $f$ & $0.05$ & $0.10$ & $0.20$ & $0.30$ & $0.25$ & $0.10$ \\
+\end{tabular}
+\end{center}
+Verifique: $1 + 2 + 4 + 6 + 5 + 2 = 20$ y las frecuencias suman $1$.
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[
+  width=8.4cm, height=5.2cm,
+  ybar, bar width=14pt,
+  xmin=-0.7, xmax=5.7, ymin=0, ymax=7.4,
+  xtick={0,1,2,3,4,5},
+  ytick={1,2,3,4,5,6},
+  xlabel={grade}, ylabel={count},
+  tick label style={font=\small},
+  label style={font=\small}]
+  \addplot[fill=omDef!30, draw=omDef] coordinates
+    {(0,1) (1,2) (2,4) (3,6) (4,5) (5,2)};
+\end{axis}
+\end{tikzpicture}
+
+{\small El gráfico de barras de las calificaciones del cuestionario: una barra por valor, con altura
+igual al conteo.}
+\end{omfigure}
+
+\section{medidas de centro}
+
+\begin{definition}[Medio]\label{def:g10:stats:mean}
+El \emph{significar}\index{significar} de la serie es
+\[
+\bar x = \frac{x_1 + x_2 + \dots + x_N}{N}.
+\]
+Si los valores $v_1, \dots, v_k$ aparecen con recuentos $n_1, \dots, n_k$, el
+Se calcula el mismo número que \emph{media ponderada}.
+\[
+\bar x = \frac{n_1 v_1 + n_2 v_2 + \dots + n_k v_k}{n_1 + n_2 + \dots + n_k}.
+\]
+\end{definition}
+
+\begin{example}\label{ex:g10:stats:mean}
+Para el cuestionario de \cref{ex:g10:stats:frequencies}:
+\[
+\bar x = \frac{1 \times 0 + 2 \times 1 + 4 \times 2 + 6 \times 3
++ 5 \times 4 + 2 \times 5}{20}
+= \frac{0 + 2 + 8 + 18 + 20 + 10}{20}
+= \frac{58}{20} = 2.9 .
+\]
+\end{example}
+
+\begin{definition}[mediana]\label{def:g10:stats:median}
+El \emph{mediana}\index{mediana} es un valor que divide el \emph{ordenado}
+serie en dos mitades: al menos la mitad de los valores son $\leq$ la mediana, y
+al menos la mitad son $\geq$. En la práctica, ordene los valores $N$;
+\begin{itemize}
+  \item si $N$ es impar, la mediana es el valor medio, en posición
+        $\frac{N+1}{2}$;
+  \item si $N$ es par, tome el \omterm{prop:g10:coordgeom:midpoint}{punto medio} de los dos valores medios, en
+        posiciones $\frac N2$ y $\frac N2 + 1$.
+\end{itemize}
+\end{definition}
+
+\begin{example}\label{ex:g10:stats:median}
+Serie ordenada de precios de viviendas $7$ (en miles): $120$, $150$, $160$,
+$180$, $210$, $240$, $900$. El \omterm{def:g10:stats:median}{mediana} es el valor $4$, $180$. El \omterm{def:g10:stats:mean}{significar}
+es $\frac{1960}{7} = 280$ --- ¡mayor que $6$ de los precios $7$!
+Un valor extremo ($900$) tira del \omterm{def:g10:stats:mean}{significar} mucho más que del \omterm{def:g10:stats:median}{mediana}: el
+\omterm{def:g10:stats:median}{mediana} es \emph{robusto}, \omterm{def:g10:stats:mean}{significar} no lo es.
+\end{example}
+
+\section{Medidas de propagación}
+
+\begin{definition}[rango, cuartiles]\label{def:g10:stats:quartiles}
+Para una serie ordenada:
+\begin{itemize}
+  \item el \emph{rango}\index{rango} es la diferencia entre el
+        valores más grandes y más pequeños;
+  \item el \emph{primer cuartil}\index{cuartilla} $Q_1$ es el más pequeño
+        valor tal que al menos una cuarta parte ($25\%$) de los valores sean
+        $\leq Q_1$; el \emph{tercer cuartil} $Q_3$ es el valor más pequeño
+        tal que al menos tres cuartas partes ($75\%$) de los valores sean
+        $\leq Q_3$;
+  \item el \emph{rango intercuartil}\index{rango intercuartil} $Q_3 - Q_1$ mide la propagación de
+        la mitad central de los datos.
+\end{itemize}
+\end{definition}
+
+\begin{method}[Encontrar los cuartiles]\label{met:g10:stats:quartiles}
+Para una serie de valores ordenados $N$:
+\begin{enumerate}
+  \item calcula $\frac N4$; si no es \omterm{def:g10:numbers:sets}{entero}, redondee \emph{up} a
+        el siguiente \omterm{def:g10:numbers:sets}{entero}; $Q_1$ es el valor en esa posición;
+  \item calcula $\frac{3N}{4}$; redondear si es necesario; $Q_3$ es el valor en
+        esa posición.
+\end{enumerate}
+\end{method}
+
+\begin{example}\label{ex:g10:stats:quartiles}
+Tome los valores ordenados $11$
+\[
+2,\ 3,\ 5,\ 5,\ 6,\ 7,\ 8,\ 9,\ 9,\ 10,\ 12 .
+\]
+\omterm{def:g10:stats:median}{Mediana}: posición $\frac{11+1}{2} = 6$, por lo que \omterm{def:g10:stats:median}{mediana} es $7$.
+$Q_1$: $\frac{11}{4} = 2.75$, redondear hacia arriba a $3$; el valor $3$ es $5$.
+$Q_3$: $\frac{33}{4} = 8.25$, redondear hacia arriba a $9$; el valor $9$ es $9$.
+\omterm{def:g10:stats:quartiles}{Rango}: $12 - 2 = 10$; \omterm{def:g10:stats:quartiles}{rango intercuartil}: $9 - 5 = 4$.
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=0.85]
+  \draw[-Stealth] (1,0) -- (13.4,0) node[below, font=\small] {values};
+  \foreach \x in {2,4,6,8,10,12}
+    { \draw (\x,-0.07) -- (\x,0.07);
+      \node[below, font=\footnotesize] at (\x,-0.1) {\x}; }
+  \draw[omDef, thick, fill=omDef!12] (5,0.5) rectangle (9,1.3);
+  \draw[omDef, very thick] (7,0.5) -- (7,1.3);
+  \draw[omDef, thick] (2,0.9) -- (5,0.9);
+  \draw[omDef, thick] (9,0.9) -- (12,0.9);
+  \draw[omDef, thick] (2,0.7) -- (2,1.1);
+  \draw[omDef, thick] (12,0.7) -- (12,1.1);
+  \node[above, font=\small] at (5,1.32) {$Q_1$};
+  \node[above, font=\small] at (7,1.32) {median};
+  \node[above, font=\small] at (9,1.32) {$Q_3$};
+  \node[above, font=\small] at (2,1.12) {min};
+  \node[above, font=\small] at (12,1.12) {max};
+\end{tikzpicture}
+
+{\small El diagrama de caja de \cref{ex:g10:stats:quartiles}: el cuadro abarca el
+intercuartil \omterm{def:g10:numbers:interval}{intervalo} $\intcc{Q_1}{Q_3}$ y contiene la mitad central de
+los datos; los bigotes alcanzan los valores extremos.}
+\end{omfigure}
+
+\begin{example}[Comparando dos grupos]\label{ex:g10:stats:comparison}
+Dos clases toman el mismo examen (puntuaciones de $20$):
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{c|ccc}
+ & \omterm{def:g10:stats:median}{mediana} & $Q_1$ & $Q_3$ \\
+\hline
+class A & $12$ & $10$ & $14$ \\
+class B & $12$ & $6$ & $17$ \\
+\end{tabular}
+\end{center}
+Mismo \omterm{def:g10:stats:median}{mediana}, spreads muy diferentes: la clase A es homogénea (la mitad de su
+puntuaciones en $\intcc{10}{14}$), la clase B es heterogénea (su mitad central
+abarca $\intcc{6}{17}$). Los indicadores del centro por sí solos nunca dicen el todo
+historia.
+\end{example}
+
+\begin{remark}
+Ni el \omterm{def:g10:stats:mean}{significar} ni el \omterm{def:g10:stats:median}{mediana} son "mejores": el \omterm{def:g10:stats:mean}{significar} usa todos los valores
+(y es necesario para calcular totales), el \omterm{def:g10:stats:median}{mediana} resiste valores extremos. un
+Un resumen serio de una serie proporciona al menos un indicador de centro.
+\emph{y} uno de propagación.
+\end{remark}
+
+\section{Ceremonias}
+
+\begin{exercise}[$\star$]\label{exo:g10:stats:1}
+Aquí está la cantidad de libros leídos en un año por los estudiantes de $15$:
+\[
+0,\ 1,\ 1,\ 2,\ 2,\ 2,\ 3,\ 3,\ 4,\ 4,\ 5,\ 6,\ 7,\ 8,\ 12 .
+\]
+Calcule el \omterm{def:g10:stats:mean}{significar}, el \omterm{def:g10:stats:median}{mediana} y el \omterm{def:g10:stats:quartiles}{rango} de esta serie.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g10:stats:2}
+Se lanzó un dado $50$ veces:
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{c|cccccc}
+outcome & $1$ & $2$ & $3$ & $4$ & $5$ & $6$ \\
+\hline
+count & $7$ & $9$ & $8$ & $10$ & $6$ & $10$ \\
+\end{tabular}
+\end{center}
+Calcule el \omterm{def:g10:stats:series}{frecuencia} de cada resultado y el resultado \omterm{def:g10:stats:mean}{significar}.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g10:stats:3}
+Encuentre \omterm{def:g10:stats:median}{mediana}, $Q_1$ y $Q_3$ de la serie ordenada
+\[
+1,\ 2,\ 4,\ 4,\ 5,\ 6,\ 6,\ 7,\ 8,\ 9,\ 9,\ 11 \qquad (N = 12),
+\]
+y dibuja el diagrama de caja correspondiente.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g10:stats:4}
+El \omterm{def:g10:stats:mean}{significar} de los resultados de las pruebas $24$ es $11.5$. Un estudiante $25$º realiza la prueba
+y puntuaciones $19$. ¿Cuál es el nuevo \omterm{def:g10:stats:mean}{significar} de la clase?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g10:stats:5}
+Un estudiante tiene un \omterm{def:g10:stats:mean}{significar} de $12$ después de las pruebas $5$, todos con el mismo peso.
+¿Qué puntuación en la prueba $6$ elevaría el \omterm{def:g10:stats:mean}{significar} a $13$? Es un \omterm{def:g10:stats:mean}{significar} de
+¿$14$ accesible (las puntuaciones están fuera de $20$)?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g10:stats:6}
+Inventar una serie de valores no negativos $7$ cuyo \omterm{def:g10:stats:median}{mediana} sea $10$ y cuyo
+\omterm{def:g10:stats:mean}{significar} es mayor que $20$; entonces uno cuyo \omterm{def:g10:stats:median}{mediana} es $10$ y cuyo \omterm{def:g10:stats:mean}{significar} es
+menor que $6$. ¿Por qué el \omterm{def:g10:stats:mean}{significar} de una serie de este tipo nunca puede ser menor que
+$\frac{40}{7}$? ¿Qué muestran estos ejemplos?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g10:stats:7}
+En una empresa, los empleados $9$ ganan $1800$ cada uno por mes y el
+director gana $12000$.
+\begin{enumerate}
+  \item Calcular el salario \omterm{def:g10:stats:mean}{significar} y \omterm{def:g10:stats:median}{mediana}.
+  \item ¿Qué indicador describe mejor un salario "típico" aquí? ¿Por qué?
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g10:stats:8}
+Una clase de chicos $12$ tiene una altura \omterm{def:g10:stats:mean}{significar} de $168$ cm; las chicas $18$ de la
+misma clase tienen una altura \omterm{def:g10:stats:mean}{significar} de $163$ cm. Calcule la altura \omterm{def:g10:stats:mean}{significar} del
+toda la clase. (Ojo: es \emph{no} el \omterm{prop:g10:coordgeom:midpoint}{punto medio} de $168$ y $163$
+--- ponderar las medias según el tamaño del grupo.)
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g10:stats:9}
+Una serie de valores $N$ $x_1, \dots, x_N$ tiene \omterm{def:g10:stats:mean}{significar} $\bar x$. Cada valor es
+transformado a $y_i = a x_i + b$ para números fijos $a$ y $b$.
+\begin{enumerate}
+  \item Muestra que el \omterm{def:g10:stats:mean}{significar} de la nueva serie es $a \bar x + b$.
+  \item Las temperaturas de una semana, en grados centígrados, tienen \omterm{def:g10:stats:mean}{significar} $20$.
+        ¿Cuál es su \omterm{def:g10:stats:mean}{significar} en grados Fahrenheit?
+        ($F = 1.8\,C + 32$)?
+\end{enumerate}
+\end{exercise}
+
+\section{Problema: la persona promedio no existe}
+
+\begin{problem}[{Problema de fin de semana --- media contra mediana: valores atípicos,
+curvas niveladoras, el almacén en la carretera y la cabina diseñada
+para nadie}]
+\label{pb:g10:stats:1}
+En 1950, la Fuerza Aérea de EE. UU. midió a $4\,000$ pilotos en diez cuerpos.
+dimensiones y construyó la cabina para el \emph{hombre promedio}. eso
+equipado --- como descubrió un teniente al contar --- esencialmente
+nadie. Las estadísticas resumen las multitudes con números únicos, y cada
+resumen dice la verdad sobre algo y miente sobre algo
+más. Este problema toma el \omterm{def:g10:stats:mean}{significar} y el \omterm{def:g10:stats:median}{mediana}.
+(\cref{def:g10:stats:mean}, \cref{def:g10:stats:median}) a los tribunales,
+deja que cada uno muestre lo que hace mejor y cierra la cabina.
+
+\medskip
+\noindent\textbf{Parte I --- Two summaries on trial.}
+\begin{enumerate}
+  \item Una calle vende siete casas, en miles de euros:
+        $200$, $210$, $220$, $230$, $240$, $250$ --- y uno
+        mansión en $1\,200$. Calcular el \omterm{def:g10:stats:mean}{significar} y el \omterm{def:g10:stats:median}{mediana}
+        precio. ¿Qué número describe "una casa en esta calle"?
+  \item Retire la mansión y vuelva a calcular ambas. ¿Por cuánto hizo
+        cada movimiento resumido? Establezca la moraleja sobre los valores atípicos.
+  \item Una tabla censal: de $100$ familias, $20$ no tienen
+        niño, $25$ tiene uno, $30$ tiene dos, $15$ tiene tres,
+        $10$ tiene cuatro. Calcule el número de niños \omterm{def:g10:stats:mean}{significar}. No
+        la familia ``tiene $1.7$ hijos'' --- entonces, ¿cuál es la cantidad real?
+        ¿Codifica el \omterm{def:g10:stats:mean}{significar}? (Multiplíquelo por $100$).
+  \item Por los quince marcos
+        $4, 6, 7, 8, 9, 10, 10, 11, 12, 12, 13, 14, 15, 17, 19$:
+        encuentre el \omterm{def:g10:stats:median}{mediana} y el \omterm{def:g10:stats:quartiles}{cuartiles} $Q_1$, $Q_3$
+        (\cref{met:g10:stats:quartiles}).
+  \item Para la misma serie, proporcione el \omterm{def:g10:stats:quartiles}{rango} y el
+        \omterm{def:g10:stats:quartiles}{rango intercuartil}. ¿Qué mide cada uno?
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte II --- Grading curves and merged classes.}
+\begin{enumerate}[resume]
+  \item De \cref{exo:g10:stats:9}: cambiando cada valor por
+        $+b$ desplaza \omterm{def:g10:stats:mean}{significar}, \omterm{def:g10:stats:median}{mediana} y \omterm{def:g10:stats:quartiles}{cuartiles} por $+b$; escalando
+        por $a$ los escala por $a$. ¿Qué sucede con el \omterm{def:g10:stats:quartiles}{rango} y
+        el \omterm{def:g10:stats:quartiles}{rango intercuartil} bajo un turno? ¿Bajo una escala?
+        Justificar.
+  \item Un examen tiene \omterm{def:g10:stats:mean}{significar} $9$ (de $20$) y el profesor quiere
+        \omterm{def:g10:stats:mean}{significar}$12$. Se proponen dos curvas: agregar puntos $3$ a
+        todos, o multiplique cada marca por $\frac43$. calcular
+        el destino de un estudiante en $6$ y uno en $18$ debajo de cada
+        curva. ¿Qué curva favorece a quién y cuál tiene una
+        ¿Problema del techo?
+  \item Clase A (estudiantes $20$) tiene \omterm{def:g10:stats:mean}{significar} $12$; clase B ($30$
+        estudiantes) tiene \omterm{def:g10:stats:mean}{significar} $10$. Calcular el \omterm{def:g10:stats:mean}{significar} del $50$
+        estudiantes juntos y expliquen por qué no es $11$
+        (la lección de promedio ponderado del problema de fin de semana \omterm{def:g10:stats:mean}{media armónica} del volumen de Escuela Secundaria, en
+        el aula).
+  \item Demuestre que \omterm{def:g10:stats:median}{medianas} rechaza este juego: calcule el \omterm{def:g10:stats:median}{medianas}
+        de $A = \{1, 2, 3\}$ y $B = \{0, 10\}$, entonces el
+        \omterm{def:g10:stats:median}{mediana} de la lista fusionada y compárelo con el
+        promedio ponderado por tamaño de los dos \omterm{def:g10:stats:median}{medianas}.
+  \item Patinaje artístico: cinco jueces puntúan $5.2$, $5.3$, $5.4$,
+        $5.5$, $9.9$. Calcule el \omterm{def:g10:stats:mean}{significar}, el \omterm{def:g10:stats:median}{mediana} y el
+        \emph{trimmed \omterm{def:g10:stats:mean}{significar}} (eliminar el promedio más bajo y más alto
+        el resto). ¿Por qué la mayoría de los deportes juzgados recortan?
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte III --- Reading distributions.}
+\begin{enumerate}[resume]
+  \item Dos fábricas producen pernos de longitud \omterm{def:g10:stats:mean}{significar}
+        $50$ mm. Fábrica A: $Q_1 = 49.9$, $Q_3 = 50.1$; fábrica
+        B: $Q_1 = 48$, $Q_3 = 52$. Necesitas intercambiables
+        Pernos: ¿qué fábrica y qué estadística decidieron?
+  \item En una clínica, la espera \omterm{def:g10:stats:median}{mediana} es de $10$ minutos pero el
+        \omterm{def:g10:stats:mean}{significar} espera es $25$. ¿Qué forma de datos tiene este par?
+        ¿traicionar? Construya un conjunto de datos de cinco valores exactamente con esto
+        \omterm{def:g10:stats:median}{mediana} y \omterm{def:g10:stats:mean}{significar}.
+  \item ``Su bebé está en el percentil 75 de altura'' ---
+        ¿Qué significa esa frase \omterm{def:g10:stats:mean}{significar}? ¿Y puede cada hijo de una
+        ciudad esté "por encima del promedio"? ¿Por encima del \omterm{def:g10:stats:median}{mediana}? Explicar el
+        diferencia.
+  \item Clase A: mín. $4$, $Q_1\,8$, \omterm{def:g10:stats:median}{mediana} $11$, $Q_3\,13$, máx.
+        $17$. Clase B: mín $2$, $Q_1\,9$, \omterm{def:g10:stats:median}{mediana} $11$, $Q_3\,12$,
+        máximo $19$. Compárese: marca típica, homogeneidad de la
+        mitad media, desenfreno de los extremos.
+  \item La lista de verificación del periodista: un titular dice ``promedio
+        salario en TechCorp: $5\,000$ euros''. enumera los tres
+        preguntas que este problema te ha enseñado a hacer antes
+        creer que el titular dice algo sobre un típico
+        empleado.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte IV --- The cockpit case.}
+\begin{enumerate}[resume]
+  \item Construya su propia evidencia: construya cinco precios de viviendas
+        con \omterm{def:g10:stats:mean}{significar} $300$ y \omterm{def:g10:stats:median}{mediana} $200$ (miles de euros).
+  \item El \omterm{def:g10:stats:mean}{significar} es el punto de equilibrio: demostrarlo a partir de la definición
+        que las desviaciones del \omterm{def:g10:stats:mean}{significar} siempre se cancelan,
+        $\sum (x_i - \bar x) = 0$ y verifíquelo en su conjunto de datos
+        de la pregunta 16.
+  \item El \omterm{def:g10:stats:median}{mediana} es el minimizador de recados: las tiendas se encuentran en
+        kilómetros $1$, $3$, $4$, $9$, $13$ de un camino, y un
+        El almacén debe minimizar el \emph{distancia total} al
+        cinco tiendas. Calcule ese total para un almacén en el
+        \omterm{def:g10:stats:median}{mediana} ($4$), en \omterm{def:g10:stats:mean}{significar} ($6$) y en $5$. ¿Quién gana?
+        (Esto es general: el \omterm{def:g10:stats:median}{mediana} minimiza el total absoluto
+        distancia --- pruebe cualquier otro lugar.)
+  \item La cabina, resuelta: supongamos que un piloto tiene un $30\,\%$
+        probabilidad de estar "cerca del promedio" en un cuerpo
+        dimensión, independientemente entre las dimensiones $10$.
+        Estime la probabilidad de estar cerca del promedio en
+        \emph{los diez} --- y conciliar el resultado con lo que
+        teniente encontrado en $4\,000$ pilotos. ¿Qué hizo el aire?
+        ¿Forzar construcción en lugar de la cabina promedio?
+  \item Finale --- la guía del usuario, una línea cada una: cuando totalizan
+        son lo que importa (un presupuesto, una cosecha), utilice el \dots;
+        cuando el individuo típico importa (salarios, espera
+        veces), utilice el \dots; cuando la equidad en la distribución importa,
+        reportar el \dots; cuando la contaminación amenace, utilice el
+        \dots. Cierra el caso con el título del problema.
+\end{enumerate}
+\end{problem}

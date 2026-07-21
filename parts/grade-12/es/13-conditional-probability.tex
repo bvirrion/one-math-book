@@ -1,0 +1,387 @@
+\chapter{Probabilidad condicional e independencia}\label{ch:g12:condprob}
+
+\omterm{def:g10:proba:distribution}{Probabilidad} cuantifica la incertidumbre; \omterm{def:g12:condprob:cond}{probabilidad condicional} cuantifica cómo
+la información lo cambia. Saber que ocurrió un \omterm{def:g11:prob:model}{evento} $B$ remodela el
+probabilidades de todos los demás \omterm{def:g11:prob:model}{eventos} --- un mecanismo formalizado por Bayes y
+mal utilizado a diario en los tribunales y en los periódicos. Este capítulo establece las reglas.
+del condicionamiento y el significado exacto de \omterm{def:g12:condprob:indep}{independencia}.
+
+\section{Espacios de probabilidad (recordatorio)}
+
+Un experimento con un número finito de resultados se modela mediante un \emph{\omterm{def:g11:prob:model}{muestra
+espacio}} $\Omega$ (el conjunto de resultados) y un \omterm{def:g10:proba:distribution}{probabilidad} $\P$ asignando a
+cada \omterm{def:g11:prob:model}{evento} $A \subseteq \Omega$ un número $\P(A) \in \intcc{0}{1}$, aditivo
+sobre \omterm{def:g10:numbers:interunion}{sindicatos} disjunto y con $\P(\Omega) = 1$. Recuerde las reglas básicas:
+\[
+\P(\bar A) = 1 - \P(A),
+\qquad
+\P(A \cup B) = \P(A) + \P(B) - \P(A \cap B).
+\]
+Cuando todos los resultados son igualmente probables,
+$\P(A) = \frac{\abs A}{\abs\Omega}$ --- y las probabilidades de cálculo reducen
+a las técnicas de conteo de \cref{ch:g12:comb}.
+
+\section{Probabilidad condicional}
+
+\begin{definition}[Probabilidad condicional]\label{def:g12:condprob:cond}
+Sea $B$ un \omterm{def:g11:prob:model}{evento} con $\P(B) > 0$. El \emph{probabilidad de $A$ dada
+$B$}\index{probabilidad condicional} es
+\[
+\pcond{B}{A} = \frac{\P(A \cap B)}{\P(B)} .
+\]
+\end{definition}
+
+El mapa $A \mapsto \pcond BA$ es en sí mismo un \omterm{def:g10:proba:distribution}{probabilidad} (se aplican todas las reglas); eso
+representa el nuevo estado de conocimiento de alguien que ha aprendido que $B$
+ocurrió.
+
+\begin{proposition}[regla de multiplicacion]\label{prop:g12:condprob:product}
+Para \omterm{def:g11:prob:model}{eventos} con probabilidades distintas de cero:
+\[
+\P(A \cap B) = \P(B)\,\pcond{B}{A} = \P(A)\,\pcond{A}{B},
+\]
+y más en general
+$\P(A_1 \cap A_2 \cap A_3) = \P(A_1)\,\pcond{A_1}{A_2}\,
+\pcond{A_1 \cap A_2}{A_3}$, etc.
+\end{proposition}
+
+\begin{proof}
+Reorganizar la definición; la fórmula de la cadena sigue iterando.
+\end{proof}
+
+\begin{theorem}[Ley de probabilidad total]\label{thm:g12:condprob:total}
+\index{ley de probabilidad total}
+Sea $B_1, \dots, B_n$ una partición de $\Omega$ en \omterm{def:g11:prob:model}{eventos} de distinto de cero
+\omterm{def:g10:proba:distribution}{probabilidad}. Por cada \omterm{def:g11:prob:model}{evento} $A$:
+\[
+\P(A) = \sum_{i=1}^{n} \P(B_i)\,\pcond{B_i}{A}.
+\]
+\end{theorem}
+
+\begin{proof}
+Los conjuntos $A \cap B_i$ son separados por pares de \omterm{def:g10:numbers:interunion}{unión} $A$, por lo que
+$\P(A) = \sum_i \P(A \cap B_i) = \sum_i \P(B_i)\pcond{B_i}{A}$ por el
+regla de multiplicación.
+\end{proof}
+
+\begin{method}[Árboles de probabilidad]\label{met:g12:condprob:tree}
+A \omterm{met:g10:proba:tree}{diagrama de arbol} organiza probabilidades condicionales: cada rama lleva el
+\omterm{def:g10:proba:distribution}{probabilidad} del siguiente \omterm{def:g11:prob:model}{evento} \emph{dado} la ruta hasta el momento.
+\begin{itemize}
+  \item El \omterm{def:g10:proba:distribution}{probabilidad} de una hoja (una ruta completa) es el \emph{producto} de
+        las probabilidades a lo largo de sus ramas (regla de multiplicación).
+  \item El \omterm{def:g10:proba:distribution}{probabilidad} de un \omterm{def:g11:prob:model}{evento} es el \emph{suma} de las probabilidades
+        de las hojas al darse cuenta (total \omterm{def:g10:proba:distribution}{probabilidad}).
+  \item Las probabilidades en las ramas que salen de un nodo suman $1$.
+\end{itemize}
+\end{method}
+
+\begin{omfigure}
+\begin{tikzpicture}[font=\small]
+  \coordinate (root) at (0,0);
+  \node (B)  at (2.6,1.2)  {$B$};
+  \node (Bc) at (2.6,-1.2) {$\bar B$};
+  \node (BA)  at (5.4,1.8)  {$A$};
+  \node (BAc) at (5.4,0.6)  {$\bar A$};
+  \node (BcA)  at (5.4,-0.6) {$A$};
+  \node (BcAc) at (5.4,-1.8) {$\bar A$};
+  \draw (root) -- (B)  node[midway, above] {$\P(B)$};
+  \draw (root) -- (Bc) node[midway, below] {$\P(\bar B)$};
+  \draw (B) -- (BA)   node[midway, above] {$\pcond{B}{A}$};
+  \draw (B) -- (BAc)  node[midway, below] {$\pcond{B}{\bar A}$};
+  \draw (Bc) -- (BcA)  node[midway, above] {$\pcond{\bar B}{A}$};
+  \draw (Bc) -- (BcAc) node[midway, below] {$\pcond{\bar B}{\bar A}$};
+  \node[anchor=west] at (6.0,1.8)  {$\P(A \cap B) = \P(B)\,\pcond{B}{A}$};
+  \node[anchor=west] at (6.0,0.6)  {$\P(\bar A \cap B)$};
+  \node[anchor=west] at (6.0,-0.6) {$\P(A \cap \bar B)$};
+  \node[anchor=west] at (6.0,-1.8) {$\P(\bar A \cap \bar B)$};
+\end{tikzpicture}
+
+{\small Un \omterm{met:g10:proba:tree}{árbol} de dos niveles: multiplica a lo largo de un camino, suma sobre las hojas.
+Por ejemplo $\P(A)$ es la suma de la primera y tercera hoja.
+probabilidades.}
+\end{omfigure}
+
+\begin{theorem}[fórmula de bayes]\label{thm:g12:condprob:bayes}
+\index{fórmula de bayes}
+Sea $B_1, \dots, B_n$ una partición de $\Omega$ como arriba y $A$ una \omterm{def:g11:prob:model}{evento}
+con $\P(A) > 0$. entonces
+\[
+\pcond{A}{B_j} =
+\frac{\P(B_j)\,\pcond{B_j}{A}}{\sum_{i=1}^{n} \P(B_i)\,\pcond{B_i}{A}} .
+\]
+\end{theorem}
+
+\begin{proof}
+$\pcond{A}{B_j} = \frac{\P(A \cap B_j)}{\P(A)}$; ampliar el numerador en
+la regla de multiplicación y el denominador por el total \omterm{def:g10:proba:distribution}{probabilidad}.
+\end{proof}
+
+\begin{example}[Prueba de detección]\label{ex:g12:condprob:test}
+Una enfermedad afecta a $1\%$ de una población. Un test lo detecta con \omterm{def:g10:proba:distribution}{probabilidad}
+$0.99$ (sensibilidad) y da un falso positivo con \omterm{def:g10:proba:distribution}{probabilidad} $0.05$.
+Dada una prueba positiva, el \omterm{def:g10:proba:distribution}{probabilidad} de tener realmente la enfermedad es
+\[
+\frac{0.01 \times 0.99}{0.01\times0.99 + 0.99\times0.05}
+= \frac{0.0099}{0.0099 + 0.0495} = \frac{1}{6} \approx 0.17 .
+\]
+A pesar de la precisión de la prueba, cinco de seis positivos son falsos --- porque
+la enfermedad es rara. Confundir $\pcond{A}{B}$ con $\pcond{B}{A}$ es el
+\emph{falacia del fiscal}.
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}[font=\small]
+  \coordinate (root) at (0,0);
+  \node (D)  at (2.6,1.2)  {$D$};
+  \node (Dc) at (2.6,-1.2) {$\bar D$};
+  \node (DT)  at (5.2,1.8)  {$T$};
+  \node (DTc) at (5.2,0.6)  {$\bar T$};
+  \node (DcT)  at (5.2,-0.6) {$T$};
+  \node (DcTc) at (5.2,-1.8) {$\bar T$};
+  \draw (root) -- (D)  node[midway, above] {$0.01$};
+  \draw (root) -- (Dc) node[midway, below] {$0.99$};
+  \draw (D) -- (DT)   node[midway, above] {$0.99$};
+  \draw (D) -- (DTc)  node[midway, below] {$0.01$};
+  \draw (Dc) -- (DcT)  node[midway, above] {$0.05$};
+  \draw (Dc) -- (DcTc) node[midway, below] {$0.95$};
+  \node[omThm, anchor=west] at (5.8,1.8)  {$0.0099$ \ (true positives)};
+  \node[anchor=west] at (5.8,0.6)  {$0.0001$};
+  \node[omThm, anchor=west] at (5.8,-0.6) {$0.0495$ \ (false positives)};
+  \node[anchor=west] at (5.8,-1.8) {$0.9405$};
+\end{tikzpicture}
+
+{\small La prueba de detección como \omterm{met:g10:proba:tree}{árbol} ($D$: enfermo, $T$: positivo
+prueba). Las dos hojas positivas (rojas) tienen peso total $0.0594$, de
+donde los falsos positivos aportan cinco sextos.}
+\end{omfigure}
+
+\section{Independencia}
+
+\begin{definition}[Eventos independientes]\label{def:g12:condprob:indep}
+Dos \omterm{def:g11:prob:model}{eventos} $A$ y $B$ son \emph{independiente}\index{independencia} si
+\[
+\P(A \cap B) = \P(A)\,\P(B) .
+\]
+Cuando $\P(B) > 0$, esto equivale a $\pcond{B}{A} = \P(A)$: conociendo $B$
+no cambia el \omterm{def:g10:proba:distribution}{probabilidad} de $A$.
+\end{definition}
+
+\begin{proposition}\label{prop:g12:condprob:indepcompl}
+Si $A$ y $B$ son \omterm{def:g12:condprob:indep}{independiente}, también lo son $A$ y $\bar B$ (y $\bar A$ y
+$\bar B$).
+\end{proposition}
+
+\begin{proof}
+$\P(A \cap \bar B) = \P(A) - \P(A \cap B) = \P(A) - \P(A)\P(B)
+= \P(A)\bigl(1 - \P(B)\bigr) = \P(A)\,\P(\bar B)$.
+\end{proof}
+
+\begin{remark}
+No confunda \emph{\omterm{def:g12:condprob:indep}{independiente}} ($\P(A\cap B) = \P(A)\P(B)$) con
+\emph{\omterm{def:g10:proba:operations}{incompatible}} ($A \cap B = \varnothing$). Dos \omterm{def:g10:proba:operations}{incompatible} \omterm{def:g11:prob:model}{eventos} de
+\omterm{def:g10:proba:distribution}{probabilidad} distintos de cero nunca son \omterm{def:g12:condprob:indep}{independiente}: saber que ocurrió uno garantiza
+el otro no.
+\end{remark}
+
+\begin{definition}[repeticiones independientes]\label{def:g12:condprob:repet}
+Cuando un experimento se repite $n$ veces para que el resultado de cada prueba
+no influye en los demás, el \omterm{def:g10:proba:distribution}{probabilidad} de un \omterm{def:g12:seq:sequence}{secuencia} especificado de
+Los resultados son el producto de las probabilidades individuales. este es el modelo
+subyacente al binomio \omterm{def:g11:prob:rv}{distribución} (\cref{ch:g12:randvar}).
+\end{definition}
+
+\section{Ceremonias}
+
+\begin{exercise}[$\star$]\label{exo:g12:condprob:1}
+Se extrae una carta de una baraja estándar de 52 cartas. Calcule el \omterm{def:g10:proba:distribution}{probabilidad} que
+es un rey, dado que es una figura (sota, reina o rey). son los
+\omterm{def:g11:prob:model}{eventos} ``rey'' y ``corazón'' \omterm{def:g12:condprob:indep}{independiente}?
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:condprob:2}
+Una urna contiene 5 bolas rojas y 3 azules. Se extraen dos bolas seguidas
+Reemplazo \emph{sin}.
+\begin{enumerate}
+  \item Dibuja el \omterm{def:g10:proba:distribution}{probabilidad} \omterm{met:g10:proba:tree}{árbol}.
+  \item Calcule el \omterm{def:g10:proba:distribution}{probabilidad} que ambos son rojos y el \omterm{def:g10:proba:distribution}{probabilidad} que
+        el segundo es rojo.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:condprob:3}
+Se lanzan dos dados justos. Sea $A$ = ``la suma es $7$'', $B$ = ``la primera
+El dado muestra $3$'', $C$ = ``la suma es $6$''. Determine si $A$ y $B$
+son \omterm{def:g12:condprob:indep}{independiente}, entonces si lo son $B$ y $C$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:condprob:4}
+Una fábrica tiene tres máquinas que producen respectivamente $50\%$, $30\%$ y
+$20\%$ de la producción total, con tasas de defectos $1\%$, $2\%$ y $4\%$.
+\begin{enumerate}
+  \item ¿Qué proporción de la producción es defectuosa?
+  \item Un artículo elegido al azar está defectuoso. ¿Qué es el \omterm{def:g10:proba:distribution}{probabilidad}?
+        vino de la tercera máquina?
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:condprob:5}
+En \cref{ex:g12:condprob:test}, ¿a qué prevalencia de la enfermedad $p$ (en lugar de
+$1\%$) ¿Una prueba positiva \omterm{def:g11:stat:mean}{significar} tendría al menos una $90\%$ probabilidad de enfermedad? resolver
+la desigualdad y comentar.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:condprob:6}
+Una moneda sesgada sale cara con \omterm{def:g10:proba:distribution}{probabilidad} $p \in \intoo{0}{1}$. es
+lanzado tres veces, siendo los lanzamientos \omterm{def:g12:condprob:indep}{independiente}.
+\begin{enumerate}
+  \item Calcular el \omterm{def:g10:proba:distribution}{probabilidad} del \omterm{def:g11:prob:model}{evento} $E$ = ``exactamente dos cabezas''.
+  \item ¿Para qué $p$ es $\P(E)$ máximo?
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:condprob:7}
+\emph{(Monty Hall.)} Un premio se esconde detrás de una de las tres puertas. tu eliges un
+puerta; el anfitrión, que sabe dónde está el premio, abre uno de los dos
+puertas restantes, siempre revelando una vacía (eligiendo al azar si ambas
+están vacías) y le ofrece pasar a la otra puerta cerrada. Usando
+Fórmula de Bayes, calcula el \omterm{def:g10:proba:distribution}{probabilidad} de ganar si cambias, y si
+no lo haces.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:condprob:8}
+Un canal de información transmite bits. Cada bit es invertido por el ruido con
+\omterm{def:g10:proba:distribution}{probabilidad} $\varepsilon = 0.1$, de forma independiente. Para proteger un poco, se envía.
+tres veces y decodificado por mayoría.
+\begin{enumerate}
+  \item Calcule \omterm{def:g10:proba:distribution}{probabilidad} que el bit decodificado es incorrecto.
+  \item La palabra recibida es $101$. ¿Cuál es el \omterm{def:g10:proba:distribution}{probabilidad} que envió?
+        bit era $1$? (Supongamos que $0$ y $1$ se envían con \omterm{def:g10:proba:distribution}{probabilidad} igual).
+\end{enumerate}
+\end{exercise}
+
+\section{Problema: El médico, el juez y el filtro de spam}
+
+\begin{problem}[{Problema del fin de semana --- Fórmula de Bayes contra el
+Falacia de la tasa base: por qué una prueba $99\,\%$ puede significar $2\,\%$, por qué una
+Una coincidencia entre un millón no condena a nadie, y cómo su buzón
+piensa}]
+\label{pb:g12:condprob:1}
+Una prueba que detecta $99\,\%$ de casos da positivo ---
+y el verdadero \omterm{def:g10:proba:distribution}{probabilidad} de la enfermedad está por debajo de $2\,\%$. un ADN
+Se encuentra un perfil que coincide con una persona entre un millón --- y el
+El sospechoso es probablemente inocente. Ambas afirmaciones son correctas, ambas
+han sido juzgados erróneamente por médicos y tribunales, y ambos se resuelven
+por una línea de este capítulo: la fórmula de Bayes
+(\cref{thm:g12:condprob:bayes}). Este problema lo entrena en urnas,
+luego en la clínica, la sala del tribunal y la bandeja de entrada.
+
+\medskip
+\noindent\textbf{Parte I --- Fluency.}
+\begin{enumerate}
+  \item Una moneda justa elige la urna I ($2$ roja, $1$ azul) o la urna II
+        ($1$ rojo, $3$ azul), luego se extrae una bola. calcular
+        $\P(\text{red})$ con la ley del total \omterm{def:g10:proba:distribution}{probabilidad}
+        (\cref{thm:g12:condprob:total}).
+  \item La bola es roja: calcular $\P(\text{urn I} \mid
+        \text{red})$.
+  \item Una tirada de dado: ¿los \omterm{def:g11:prob:model}{eventos} son ``pares'' y
+        ``$\leq 4$'' \omterm{def:g12:condprob:indep}{independiente}
+        (\cref{def:g12:condprob:indep})? Y "par" y
+        ¿``$\leq 3$''?
+  \item Dos alarmas de humo \omterm{def:g12:condprob:indep}{independiente}, cada una de las cuales se activa con
+        \omterm{def:g10:proba:distribution}{probabilidad} $0.9$ en un incendio. Usando
+        \cref{prop:g12:condprob:indepcompl}, calcule el
+        \omterm{def:g10:proba:distribution}{probabilidad} que al menos uno desencadena.
+  \item Dos tarjetas sin reposición: cómputo
+        $\P(\text{two kings})$ con la regla de la multiplicación
+        (\cref{prop:g12:condprob:product}).
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte II --- The doctor.}
+Una enfermedad afecta a la persona $1$ en $1\,000$. La prueba detecta
+$99\,\%$ de los enfermos (sensibilidad) pero también dispara sobre $5\,\%$ de
+los sanos (falsos positivos).
+\begin{enumerate}[resume]
+  \item Frecuencias naturales: imagina $100\,000$ personas. como
+        ¿Cuántos están enfermos, cuántos sanos? cuantos aspectos positivos
+        produce cada grupo, y cuantos positivos hay en
+        todos?
+  \item A partir de los conteos, calcule
+        $\P(\text{sick} \mid \text{positive})$. Absorber el
+        shock.
+  \item Vuelva a calcularlo con la fórmula de Bayes y verifique el
+        acuerdo.
+  \item En las encuestas, la mayoría de los médicos responden ``sobre
+        $99\,\%$''. Nombra las dos probabilidades condicionales.
+        estar confundido y explicar por qué la pequeña tasa base
+        impulsa la verdadera respuesta.
+  \item Una segunda prueba, \omterm{def:g12:condprob:indep}{independiente}, también resulta positiva.
+        Actualización: tomando $1.9\,\%$ como nuevo anterior, calcule
+        $\P(\text{sick} \mid \text{two positives})$. que es
+        evidencia \emph{acumulación} haciendo?
+  \item Calcular $\P(\text{sick} \mid \text{positive})$ si el
+        La misma prueba se utiliza sólo en un grupo de alto riesgo con
+        prevalencia $5\,\%$. Deducir la moraleja de la salud pública
+        sobre la detección masiva de enfermedades raras.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte III --- The judge.}
+\begin{enumerate}[resume]
+  \item Un perfil de ADN de la escena del crimen coincide con una persona en un
+        millones. El sospechoso, encontrado buscando en una base de datos de
+        los $10$ millones de habitantes de la ciudad, coinciden. esperado
+        ¿Número de partidos inocentes en la ciudad? Dado sólo el
+        coincidencia, ¿qué es $\P(\text{innocent} \mid
+        \text{match})$, aproximadamente?
+  \item Nombre la falacia --- que \omterm{def:g10:proba:distribution}{probabilidad} hizo el
+        cita del fiscal, ¿cuál necesitaba el tribunal? ---
+        y su paralelo exacto con la pregunta 9.
+  \item La trampa \omterm{def:g12:condprob:indep}{independencia}: dos raras tragedias en una familia
+        alguna vez fueron cuadrados en "uno en $73$ millones" por
+        tratándolos como \omterm{def:g12:condprob:indep}{independiente}, condenando a un inocente
+        madre (el caso de Sally Clark). Si el recurso compartido \omterm{def:g11:prob:model}{eventos}
+        factores de riesgo familiares por lo que el segundo, dada la
+        primero, es $5$ veces más probable que la tasa base,
+        recalcular el orden de magnitud --- y establecer el
+        Lección sobre multiplicación de probabilidades.
+  \item La defensa también puede hacer trampa: ``diez inocentes coinciden, así que
+        El partido no prueba nada'', ignora todo lo demás.
+        ¿Qué hace la fórmula de Bayes con las piezas \emph{varios}?
+        de evidencia, y ¿qué oración debería cada
+        ¿Sabe el jurado?
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte IV --- The spam filter.}
+\begin{enumerate}[resume]
+  \item Tu correo es $40\,\%$ spam. La palabra "lotería"
+        aparece en $15\,\%$ de spam y $0.5\,\%$ de honesto
+        correo. Un mensaje lo contiene: calcular
+        $\P(\text{spam} \mid \text{lottery})$.
+  \item Repetición de corrección de errores
+        (\cref{exo:g12:condprob:8} continuación): con flip
+        \omterm{def:g10:proba:distribution}{probabilidad} $\varepsilon = 0.1$, decodificación mayoritaria de
+        \emph{cinco} falla la copia ¿con qué \omterm{def:g10:proba:distribution}{probabilidad}?
+        Compárese con el código de tres copias.
+  \item Un bit cruza $4$ \omterm{def:g12:condprob:indep}{independiente} relés ruidosos, cada uno
+        volteándolo con \omterm{def:g10:proba:distribution}{probabilidad} $0.1$: llega correcto
+        exactamente cuando el número de lanzamientos es par. Calcula eso
+        \omterm{def:g10:proba:distribution}{probabilidad} dos veces: sumando los términos binomiales, y
+        por la elegante fórmula
+        $\frac{1 + (1 - 2\varepsilon)^4}{2}$.
+  \item Los filtros de spam reales multiplican la evidencia de muchas palabras
+        como si fuera \omterm{def:g12:condprob:indep}{independiente} ("ingenuo" Bayes). ¿Por qué es eso?
+        suposición falsa para palabras como "ganar" y
+        ``lotería'' --- y por qué funciona bien el filtro
+        de todos modos? (Una o dos frases.)
+  \item Finale --- Bayes como la aritmética de la creencia: anterior
+        $\times$ probabilidad, renormalizar, posterior. Reproducir el
+        tres veredictos (clínica, sala de audiencias, bandeja de entrada) en uno
+        Enumere cada una de ellas y luego enumere las tres trampas de este problema.
+        expuesto: tarifas base olvidadas, \omterm{def:g12:condprob:indep}{independencia} falso y
+        La evidencia se lee una pieza a la vez.
+\end{enumerate}
+\end{problem}

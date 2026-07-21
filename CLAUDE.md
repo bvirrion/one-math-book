@@ -20,6 +20,11 @@ translate that content, keeping identical labels, order, and structure.
 `THEME.md` documents the One Course cover brand. Read both before writing
 chapters.
 
+## Git
+
+**Never create git commits yourself.** Make the changes and leave the
+working tree for the user to review and commit.
+
 ## Build
 
 ```sh
@@ -221,6 +226,31 @@ Content rules (from CONTRIBUTING.md, enforced in review):
   (no optional argument), and should be followed by a `remark` saying
   where the result is honestly proved (usually "Year 3").
 - New terms: `\emph{...}` + `\index{...}` in a `definition`.
+
+## HTML export (the one-course.com online reader)
+
+`tools/build_html_chapter.py` converts a chapter (all language editions)
+to HTML fragments + figure SVGs + a manifest for the website's online
+reader (the `saas` repo serves them as Blade pages):
+
+```sh
+cd tools/htmlbook && npm install   # once (KaTeX, version-pinned)
+python3 tools/build_html_chapter.py \
+    --chapter parts/grade-10/01-numbers-and-sets.tex \
+    --chapter-number 1 --book math-2 --languages en,fr,nl \
+    --out ../../saas/resources/onecourse/chapters \
+    --svg-out ../../saas/public/images/onecourse/chapters
+```
+
+The parser in `tools/htmlbook/` covers exactly the constructs the books
+use and **hard-errors on anything unknown** — if a new chapter adds a
+LaTeX construct, extend the converter, never let it skip content. Math is
+pre-rendered with KaTeX (macro map mirrors `onemath.sty`; keep the katex
+version pinned identically here and in the saas `package.json`). Figures
+compile standalone via pdflatex + dvisvgm. A translation that lags the
+English chapter is accepted only as a strict structural prefix (warning);
+any other structural divergence between languages aborts the build.
+Generated output is committed in the saas repo only, never here.
 
 ## Style-file specifics worth knowing
 

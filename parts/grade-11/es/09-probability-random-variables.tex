@@ -1,0 +1,439 @@
+\chapter{Probabilidad y variables aleatorias}\label{ch:g11:prob}
+
+\omterm{def:g10:proba:distribution}{Probabilidad} modela experimentos cuyo resultado es incierto: una tirada de dado, una
+carta extraída, un juego jugado. Este capítulo establece el vocabulario sobre finitos.
+conjuntos, luego presenta el carácter central de toda la teoría \omterm{def:g10:proba:distribution}{probabilidad}:
+el \emph{\omterm{def:g11:prob:rv}{variable aleatoria}} y su \emph{\omterm{def:g11:prob:expectation}{expectativa}}. Estas nociones son
+revisado y profundizado en \cref{ch:g12:randvar}, y condicional
+las probabilidades siguen en \cref{ch:g12:condprob}.
+
+\section{Probabilidad en un conjunto finito}
+
+\begin{definition}[Modelo de probabilidad]\label{def:g11:prob:model}
+Un experimento con un número finito de resultados está modelado por su \emph{muestra
+espacio}\index{espacio muestral} $\Omega = \{\omega_1, \dots, \omega_n\}$ (el
+conjunto de resultados) junto con una asignación \emph{\omterm{def:g10:proba:distribution}{probabilidad}} $\P$ a cada
+resultado $\omega_i$ un número $p_i \geq 0$, con $p_1 + \dots + p_n = 1$. un
+\emph{evento}\index{evento} es un subconjunto $A \subseteq \Omega$, y
+\[
+\P(A) = \sum_{\omega_i \in A} p_i .
+\]
+Cuando todos los resultados son igualmente probables ($p_i = \frac1n$: el \emph{uniforme
+modelo}\index{modelo uniforme}),
+\[
+\P(A) = \frac{\text{number of outcomes in } A}
+{\text{number of outcomes in } \Omega}.
+\]
+\end{definition}
+
+\begin{example}\label{ex:g11:prob:twodice}
+Tira dos dados distinguibles: $\Omega$ es el conjunto de los pares ordenados $36$
+$(i, j)$ con $1 \leq i, j \leq 6$, todos igualmente probables. El \omterm{def:g11:prob:model}{evento}
+$S$ = ``la suma es $7$'' contiene los pares $6$
+$(1,6)$, $(2,5)$, $(3,4)$, $(4,3)$, $(5,2)$, $(6,1)$, entonces
+$\P(S) = \frac{6}{36} = \frac16$. El \omterm{def:g11:prob:model}{evento} ``la suma es $12$'' contiene
+sólo $(6,6)$: \omterm{def:g10:proba:distribution}{probabilidad} $\frac{1}{36}$. Eligiendo el \emph{bien}
+\omterm{def:g11:prob:model}{espacio muestral} --- pares ordenados, no desordenados --- es lo que hace que el
+\omterm{def:g11:prob:model}{modelo uniforme} aplicable.
+\end{example}
+
+\begin{proposition}[Reglas de probabilidad]\label{prop:g11:prob:rules}
+Para \omterm{def:g11:prob:model}{eventos} $A, B \subseteq \Omega$:
+\[
+\P(\emptyset) = 0, \qquad \P(\Omega) = 1, \qquad
+\P(\bar A) = 1 - \P(A),
+\]
+\[
+\P(A \cup B) = \P(A) + \P(B) - \P(A \cap B),
+\]
+donde $\bar A$ es \emph{\omterm{def:g10:proba:operations}{complementar}} de $A$ (todos los resultados no están en $A$).
+En particular, $\P(A \cup B) = \P(A) + \P(B)$ cuando $A$ y $B$ son
+\emph{\omterm{def:g10:proba:operations}{incompatible}} ($A \cap B = \emptyset$).
+\end{proposition}
+
+\begin{proof}
+El \omterm{def:g11:prob:model}{evento} vacío no contiene ningún resultado (suma vacía) y el $\Omega$ contiene
+todos ellos (suma total $1$). Cada resultado está exactamente en uno de $A$,
+$\bar A$, entonces $\P(A) + \P(\bar A) = 1$. Para el \omterm{def:g10:numbers:interunion}{unión}: sumando el $p_i$
+sobre $A$ y luego sobre $B$ cuenta los resultados de $A \cap B$ dos veces;
+restar $\P(A \cap B)$ corrige el conteo doble.
+\end{proof}
+
+\begin{example}
+En una clase, $60\%$ estudia música ($M$), $45\%$ practica un deporte ($S$) y
+$25\%$ haz ambas cosas. La proporción que hace al menos uno es
+$\P(M \cup S) = 0.60 + 0.45 - 0.25 = 0.80$, entonces $20\%$ no hace ninguna de las dos cosas
+(\omterm{def:g10:proba:operations}{complementar}).
+\end{example}
+
+\section{variables aleatorias}
+
+\begin{definition}[Variable aleatoria, distribución.]\label{def:g11:prob:rv}
+Un \emph{variable aleatoria}\index{variable aleatoria} en $\Omega$ es un \omterm{def:g11:func:function}{función}
+$X$ asignando un número a cada resultado. su
+\emph{distribución}\index{distribución} es la tabla de sus posibles
+valores $x_1, \dots, x_k$ junto con sus probabilidades
+\[
+\P(X = x_i) = \P\bigl(\{\omega : X(\omega) = x_i\}\bigr),
+\qquad
+\sum_{i=1}^k \P(X = x_i) = 1 .
+\]
+\end{definition}
+
+\begin{example}\label{ex:g11:prob:game}
+Un juego: paga $2$ euros, tira un dado justo, recibe el valor mostrado si
+es al menos $5$, nada más. Sea $G$ el \emph{ganar} (recibido
+menos pagado). Los resultados $1, 2, 3, 4$ dan $G = -2$; el resultado $5$
+da $G = 3$; el resultado $6$ da $G = 4$. El \omterm{def:g11:prob:rv}{distribución} de $G$:
+\begin{center}
+\begin{tabular}{c|ccc}
+$g$ & $-2$ & $3$ & $4$\\
+\hline\rule{0pt}{11pt}%
+$\P(G = g)$ & $\dfrac46$ & $\dfrac16$ & $\dfrac16$
+\end{tabular}
+\end{center}
+\end{example}
+
+\begin{method}[Construyendo una tabla de distribución]\label{met:g11:prob:table}
+Enumere los posibles valores de $X$; Para cada valor, recopile los resultados.
+producirlo y sumar sus probabilidades; comprobar que la fila de
+Las probabilidades suman $1$.
+\end{method}
+
+\section{Expectativa}
+
+\begin{definition}[expectativa]\label{def:g11:prob:expectation}
+El \emph{expectativa}\index{expectativa} (o \omterm{def:g11:stat:mean}{significar}) de $X$ es el promedio
+de sus valores ponderados por sus probabilidades:
+\[
+\E(X) = \sum_{i=1}^{k} \P(X = x_i)\; x_i .
+\]
+\end{definition}
+
+\begin{remark}
+$\E(X)$ es lo que el \omterm{def:g11:stat:mean}{significar} de una enorme cantidad de repeticiones independientes de
+el experimento sería --- la versión precisa de esta afirmación es la
+ley de los grandes números, demostrada en \cref{ch:g12:sums}. Tenga en cuenta lo formal
+analogía con el \omterm{def:g11:stat:mean}{significar} de un conjunto de datos con frecuencias
+(\cref{def:g11:stat:mean}): las probabilidades juegan el papel de relativo
+frecuencias $\frac{n_i}{n}$.
+\end{remark}
+
+\begin{example}\label{ex:g11:prob:gameexp}
+Para el juego de \cref{ex:g11:prob:game}:
+\[
+\E(G) = \frac46 \times (-2) + \frac16 \times 3 + \frac16 \times 4
+= \frac{-8 + 3 + 4}{6} = -\frac16 \approx -0.17 .
+\]
+En promedio, el jugador pierde aproximadamente $17$ centavos por juego: el juego es
+desfavorable. Un juego se llama \emph{justo} cuando la ganancia esperada es $0$.
+\end{example}
+
+\begin{proposition}[Linealidad]\label{prop:g11:prob:linearity}
+Para todos los reales $a, b$:
+\[
+\E(aX + b) = a\,\E(X) + b .
+\]
+\end{proposition}
+
+\begin{proof}
+La variable $aX + b$ toma el valor $a x_i + b$ con \omterm{def:g10:proba:distribution}{probabilidad}
+$\P(X = x_i)$, entonces
+\[
+\E(aX + b) = \sum_i \P(X = x_i)(a x_i + b)
+= a \sum_i \P(X = x_i)\,x_i + b \underbrace{\sum_i \P(X =
+x_i)}_{=\,1} = a\,\E(X) + b .
+\]
+\end{proof}
+
+\section{Varianza y desviación estándar}
+
+\begin{definition}[variación]\label{def:g11:prob:variance}
+El \emph{diferencia}\index{diferencia} de $X$ mide la propagación de su
+valores alrededor de \omterm{def:g11:prob:expectation}{expectativa} $m = \E(X)$:
+\[
+\V(X) = \E\bigl((X - m)^2\bigr)
+= \sum_{i=1}^{k} \P(X = x_i)\,(x_i - m)^2,
+\qquad
+\sigma(X) = \sqrt{\V(X)} .
+\]
+\end{definition}
+
+\begin{proposition}[Fórmula de acceso directo]\label{prop:g11:prob:konig}
+\[
+\V(X) = \E(X^2) - \E(X)^2 .
+\]
+\end{proposition}
+
+\begin{proof}
+Expande $(x_i - m)^2 = x_i^2 - 2m\,x_i + m^2$ dentro de la suma:
+\[
+\V(X) = \sum_i \P(X = x_i)\,x_i^2
+- 2m \sum_i \P(X = x_i)\,x_i + m^2\sum_i \P(X = x_i)
+= \E(X^2) - 2m^2 + m^2 ,
+\]
+que es $\E(X^2) - m^2$. Esta es la versión de variable aleatoria del
+Identidad probada para conjuntos de datos en \cref{prop:g11:stat:shortcut}.
+\end{proof}
+
+\begin{proposition}[Transformación afín]\label{prop:g11:prob:affine}
+$\V(aX + b) = a^2\,\V(X)$ y $\sigma(aX + b) = \abs a\,\sigma(X)$.
+\end{proposition}
+
+\begin{proof}
+Por linealidad, $aX + b$ se desvía de su \omterm{def:g11:prob:expectation}{expectativa} $a m + b$ en
+$(aX + b) - (am + b) = a(X - m)$: cada desviación se escala en $a$, por lo tanto
+cada desviación al cuadrado por $a^2$, y también lo es su \omterm{def:g11:stat:mean}{significar} ponderado. el
+shift $b$ ha desaparecido --- cambiar una variable no cambia su
+difundir.
+\end{proof}
+
+\begin{example}\label{ex:g11:prob:variance}
+Para el juego de \cref{ex:g11:prob:game}:
+$\E(G^2) = \frac46 \times 4 + \frac16 \times 9 + \frac16 \times 16
+= \frac{16 + 9 + 16}{6} = \frac{41}{6}$, entonces
+\[
+\V(G) = \frac{41}{6} - \left(-\frac16\right)^2
+= \frac{41}{6} - \frac{1}{36} = \frac{245}{36} \approx 6.8,
+\qquad
+\sigma(G) \approx 2.6 .
+\]
+La pérdida de $0.17$ por juego en promedio viene con cambios de tamaño típicos.
+$2.6$ euros --- \omterm{def:g11:prob:expectation}{expectativa} sin \omterm{def:g11:stat:variance}{desviación estándar} dice solo la mitad
+la historia.
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[
+  width=8.6cm, height=5.2cm,
+  ybar, bar width=14pt,
+  xlabel={$g$}, ylabel={$\P(G = g)$},
+  xmin=-3.5, xmax=5.5, ymin=0, ymax=0.8,
+  xtick={-2,3,4}, ytick={1/6, 4/6},
+  yticklabels={$\tfrac16$,$\tfrac46$},
+  tick label style={font=\small},
+  label style={font=\small}]
+  \addplot[fill=omDef!40, draw=omDef] coordinates {
+    (-2,0.6667) (3,0.1667) (4,0.1667)};
+  \draw[omThm, dashed, thick] (axis cs:-0.1667,0) --
+    (axis cs:-0.1667,0.75);
+  \node[omThm, font=\small, anchor=south west] at (axis cs:-0.05,0.62)
+    {$\E(G)$};
+\end{axis}
+\end{tikzpicture}
+
+{\small El \omterm{def:g11:prob:rv}{distribución} de la ganancia $G$ de
+\cref{ex:g11:prob:game} y su \omterm{def:g11:prob:expectation}{expectativa} $\E(G) = -\frac16$ (discontinuo):
+el punto de equilibrio de las masas \omterm{def:g10:proba:distribution}{probabilidad}.}
+\end{omfigure}
+
+\section{Ceremonias}
+
+\begin{exercise}[$\star$]\label{exo:g11:prob:1}
+Se extrae una carta de una baraja de cartas estándar $52$. Calcular el \omterm{def:g10:proba:distribution}{probabilidad}
+del dibujo: un corazón; un rey; un corazón o un rey; ni un corazón ni un
+rey.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g11:prob:2}
+Se lanzan dos dados justos y se registra su suma $S$. Usando el
+$36$: modelo de resultado de \cref{ex:g11:prob:twodice}, cálculo $\P(S = 6)$,
+$\P(S \geq 10)$ y $\P(S \text{ is even})$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g11:prob:3}
+Un \omterm{def:g11:prob:rv}{variable aleatoria} tiene \omterm{def:g11:prob:rv}{distribución}
+\begin{center}
+\begin{tabular}{c|cccc}
+$x$ & $-1$ & $0$ & $2$ & $5$\\
+\hline
+$\P(X=x)$ & $0.3$ & $0.2$ & $0.4$ & $p$
+\end{tabular}
+\end{center}
+Encuentre $p$ y luego calcule $\E(X)$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g11:prob:4}
+$X$ satisface $\E(X) = 3$ y $\V(X) = 4$. Dar el \omterm{def:g11:prob:expectation}{expectativa}, \omterm{def:g11:prob:variance}{diferencia}
+y \omterm{def:g11:stat:variance}{desviación estándar} de $Y = 2X - 5$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:prob:5}
+Una rueda de la fortuna tiene $10$ sectores iguales: $5$ muestra $0$ euros, $3$ muestra
+$2$ euros, $2$ muestra $5$ euros. Jugar cuesta $2$ euros. Dale el
+\omterm{def:g11:prob:rv}{distribución} de la ganancia $G$ (ganancias menos apuesta), calcule $\E(G)$, y
+decidir si el juego es favorable.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:prob:6}
+Una urna contiene bolas rojas $3$ y bolas azules $2$; se extraen dos bolas
+Reemplazo \emph{sin}. Sea $X$ el número de bolas rojas extraídas.
+Construya el \omterm{def:g11:prob:rv}{distribución} de $X$ (enumere los sorteos ordenados $20$ o use un
+\omterm{met:g10:proba:tree}{árbol}) y calcular $\E(X)$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:prob:7}
+Para la rueda de \cref{exo:g11:prob:5}, calcule $\V(G)$ y $\sigma(G)$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:prob:8}
+Una compañía de seguros vende una póliza por $80$ euros. Con \omterm{def:g10:proba:distribution}{probabilidad}
+$0.05$ el cliente reclama $1000$ euros, con \omterm{def:g10:proba:distribution}{probabilidad} $0.01$ el cliente
+reclama $5000$ euros, de lo contrario nada. Sea $B$ el beneficio de la empresa.
+en una sola política. Proporcione \omterm{def:g11:prob:rv}{distribución} de $B$, calcule $\E(B)$ y
+interpretar.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:prob:9}
+Una pregunta de opción múltiple tiene respuestas $4$, una correcta. una respuesta correcta
+puntuaciones $+1$; Para desalentar las adivinanzas, una respuesta incorrecta puntúa $x < 0$.
+Un estudiante responde al azar. ¿Para qué valor de $x$ es el del estudiante?
+puntuación esperada cero?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:prob:10}
+Se lanzan dos monedas justas. Ann propone: ``si ambas monedas coinciden, te pago
+$1$ euros; si difieren, me pagas $1$ euro.'' Calcule el valor esperado
+ganancia de cada jugador. ¿Es el juego justo? Misma pregunta con tres monedas,
+donde Ann paga $2$ euros si los tres coinciden.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g11:prob:11}
+Una lotería vende billetes $1000$ a $5$ euros cada uno. Un boleto gana
+$2000$ euros, ganan cinco entradas $200$ euros, ganan veinte entradas $25$
+euros.
+\begin{enumerate}
+  \item Da el \omterm{def:g11:prob:rv}{distribución} de los ingresos totales del organizador menos
+        premios, y de la ganancia de un solo jugador $G$.
+  \item Calcule $\E(G)$ y el beneficio total esperado del organizador.
+        Comprueba que las dos respuestas sean consistentes.
+\end{enumerate}
+\end{exercise}
+
+\section{Problema: el juego inacabado}
+
+\begin{problem}[{Problema del fin de semana --- Pascal, Fermat y la feria
+Escisión de una apuesta interrumpida: el nacimiento de la expectativa, la magia
+de linealidad, y lo que la expectativa no puede ver}]
+\label{pb:g11:prob:1}
+En 1654, el Chevalier de Méré --- el mismo jugador cuyos dados
+las apuestas abrieron el problema \omterm{def:g10:proba:distribution}{probabilidad} del volumen de la escuela secundaria ---
+le hizo a Blaise Pascal una pregunta más profunda: dos personas igualmente hábiles
+los jugadores deben detener su serie con el puntaje de $5$ a $3$, seis
+gana llevándose el bote de pistola $64$. \emph{¿Cómo debe ser la olla?
+dividir de manera justa?} Las cartas entre Pascal y Fermat contestándola
+fundó el concepto central de este capítulo: \omterm{def:g11:prob:expectation}{expectativa}
+(\cref{def:g11:prob:expectation}). Volverás a derivar su
+Responde en ambos sentidos, luego conoce el truco de fiesta de la linealidad y
+El único punto ciego de \omterm{def:g11:prob:expectation}{expectativa}.
+
+\medskip
+\noindent\textbf{Parte I --- \omterm{def:g11:prob:expectation}{Expectativa} fluency.}
+\begin{enumerate}
+  \item Tira un dado justo; tu ganancia es (cara $- 3$) euros. construir
+        la tabla \omterm{def:g11:prob:rv}{distribución} de la ganancia $G$
+        (\cref{met:g11:prob:table}) y calcular $\E(G)$.
+  \item Calcular $V(G)$ con la fórmula de acceso directo
+        (\cref{prop:g11:prob:konig}) y $\sigma(G)$ (dos
+        decimales).
+  \item Sin ninguna tabla nueva, proporcione $\E(2G - 1)$ y
+        $V(2G - 1)$ (\cref{prop:g11:prob:affine}).
+  \item Un puesto cobra $m$ euros por tirar dos dados y casillas
+        te la suma en euros. ¿Cuál es el precio \emph{justo}?
+        $m$? El puesto cobra $8$: ¿cuál es su pérdida esperada?
+        por juego?
+  \item Un portátil que vale $800$ euros tiene una $5\,\%$ posibilidades de
+        destrucción cada año. Calcular el seguro justo
+        prima y el beneficio esperado del asegurador por póliza
+        si cobra $60$ euros.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte II --- Splitting the pot.}
+Puntuación $5$--$3$, el primero en llegar a $6$ gana las pistolas $64$, las rondas son
+lanzamientos de moneda justos.
+\begin{enumerate}[resume]
+  \item Dos tentadoras respuestas incorrectas: dividir $5 : 3$
+        (proporcionalmente a las rondas ganadas), o dar todo a
+        el líder. Di en una frase cada uno lo que es injusto.
+        sobre ellos.
+  \item Método de Fermat: el jugador A necesita $1$ más victorias, B necesita
+        $3$; Imagínese jugar exactamente $3$ más rondas independientemente.
+        Enumere los resultados $8$ igualmente probables, marque quién gana el
+        serie en cada uno, y deducir la división justa del $64$
+        pistolas.
+  \item El punto sutil que Fermat tuvo que defender: el verdadero juego
+        podría detenerse después de una ronda --- ¿por qué sigue siendo así?
+        ¿Es legítimo razonar en todas las rondas imaginarias $3$?
+  \item Método de Pascal, hacia atrás desde el final: calcular A
+        participación justa en las puntuaciones (hipotéticas) $5$--$5$, luego
+        $5$--$4$, luego $5$--$3$, cada vez promediando los dos
+        futuros igualmente probables. Compárese con la pregunta 7.
+  \item Misma pregunta en la partitura $4$--$3$: ¿cuántos imaginarios
+        rondas, qué resultados le dan a B la serie y cuál es
+        la división justa?
+  \item Indique el principio que comparten los dos métodos --- la feria
+        El valor de un futuro incierto es su \emph{\omterm{def:g11:prob:expectation}{expectativa}}.
+        --- y nombre dos industrias modernas que funcionan enteramente con
+        (la pregunta 5 muestra uno).
+  \item Un control de cordura para cada puntuación: explica, con el
+        linealidad de \omterm{def:g11:prob:expectation}{expectativa}
+        (\cref{prop:g11:prob:linearity}), ¿por qué los dos jugadores
+        las partes justas siempre deben sumar exactamente el
+        $64$ - Olla de pistola.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte III --- Linearity's party trick.}
+\begin{enumerate}[resume]
+  \item Recuperar $\E(\text{sum of two dice}) = 7$ en una línea
+        con linealidad (\cref{prop:g11:prob:linearity}), no
+        XXXP0206Tabla de celdas XXX. Para el \emph{\omterm{def:g11:prob:variance}{diferencia}} de la suma,
+        la regla $V(X + Y) = V(X) + V(Y)$ necesita que los dados sean
+        independiente (admitido): computarlo.
+  \item La fiesta del check-check: $n$ los invitados tiran sus sombreros en una
+        apila y cada uno toma uno al azar. Deja que $X$ cuente
+        los invitados que recuperan su propio sombrero. por uno fijo
+        invitado, ¿cuál es el \omterm{def:g10:proba:distribution}{probabilidad} de recuperar lo suyo?
+        sombrero? Sumando estas probabilidades $n$ (¡linealidad!), calcule
+        $\E(X)$. La respuesta debería sorprenderte: no
+        Depende de $n$.
+  \item Verificar $\E(X) = 1$ por fuerza bruta para $n = 2$ y
+        $n = 3$ (enumere $2$ y $6$ con la misma probabilidad
+        asignaciones de sombreros y promediar los conteos).
+  \item Las recuperaciones de los invitados están lejos de ser independientes (si
+        $n - 1$ los invitados recuperaron sus propios sombreros, el último
+        también debe hacerlo). ¿Dónde exactamente se realizó el cálculo de la pregunta 14?
+        \emph{no} ¿requiere independencia? Linealidad del estado
+        superpotencia.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte IV --- What \omterm{def:g11:prob:expectation}{expectativa} cannot see.}
+\begin{enumerate}[resume]
+  \item Dos tarjetas rasca y gana de $5$ euros: la tarjeta A gana $10$ euros con
+        \omterm{def:g10:proba:distribution}{probabilidad}$\frac12$; la tarjeta B gana $1\,000$ euros con
+        \omterm{def:g10:proba:distribution}{probabilidad}$0.005$. Compruebe que ambas ganancias tengan la
+        mismo \omterm{def:g11:prob:expectation}{expectativa}, luego calcule ambos \omterm{def:g11:prob:variance}{variaciones}. cual
+        ¿Qué compran las personas reales y qué compran?
+  \item El juego de San Petersburgo: voltear hasta la primera cruz;
+        si la primera cruz aparece en el giro $n$, recibirás
+        $2^n$ euros. Calcule la contribución de cada $n$ a
+        el \omterm{def:g11:prob:expectation}{expectativa} y el propio \omterm{def:g11:prob:expectation}{expectativa}. ¿Quieres
+        pagar $1\,000$ euros para jugar una vez? ¿Qué significa el choque?
+        enseñar sobre \omterm{def:g11:prob:expectation}{expectativa}?
+  \item Seguro por parte del cliente: pagar $20$ euros, o
+        ¿Enfrenta un riesgo $1\,\%$ de perder $1\,000$? comparar los dos
+        \omterm{def:g11:prob:expectation}{esperanzas de heredar} y explique por qué comprar el seguro puede
+        seguir siendo racional (¿qué no puede hacer una sola familia?)
+        ``promedio superior''?).
+  \item Finale --- biografía de \omterm{def:g11:prob:expectation}{expectativa}, una frase por
+        capítulo: nacido en 1654 para dividir una olla; su superpotencia,
+        linealidad, que agrega \omterm{def:g11:prob:expectation}{esperanzas de heredar} sin preguntar
+        independencia (los sombreros); su punto ciego, el riesgo, que
+        medidas \omterm{def:g11:prob:variance}{diferencia} (tarjetas, San Petersburgo, seguros);
+        y su coronación el próximo año, cuando la ley de los grandes
+        Los números explican exactamente por qué la casa siempre gana.
+\end{enumerate}
+\end{problem}

@@ -1,0 +1,453 @@
+\chapter{La distribución binomial}\label{ch:g11:binom}
+
+Repita el mismo experimento de sí/no varias veces, de forma independiente, y cuente
+los éxitos: el \omterm{def:g11:prob:rv}{distribución} resultante --- el \emph{binomio} --- es
+el \omterm{def:g11:prob:rv}{distribución} discreto más importante de todos. Este capítulo lo construye.
+con \omterm{met:g10:proba:tree}{árboles} y conteo de rutas; la fórmula cerrada para el camino cuenta (con
+factoriales) viene con las herramientas de conteo de \cref{ch:g12:comb}, y el
+\omterm{def:g11:prob:rv}{distribución} se revisa en \cref{ch:g12:randvar}.
+
+\section{juicios de Bernoulli}
+
+\begin{definition}[Juicio Bernoulli]\label{def:g11:binom:bernoulli}
+Un \emph{juicio de Bernoulli}\index{juicio de Bernoulli} es un experimento con
+exactamente dos resultados: \emph{éxito}, con \omterm{def:g10:proba:distribution}{probabilidad} $p$, y
+\emph{falla}, con \omterm{def:g10:proba:distribution}{probabilidad} $1 - p$. El \omterm{def:g11:prob:rv}{variable aleatoria} $X$ igual
+a $1$ en caso de éxito y $0$ en caso de error se dice que sigue el
+\emph{Bernoulli \omterm{def:g11:prob:rv}{distribución}}$\mathcal B(p)$; entonces
+\[
+\E(X) = p,
+\qquad
+\V(X) = p(1 - p).
+\]
+\end{definition}
+
+\begin{proof}[Prueba de las dos fórmulas]
+$\E(X) = p \times 1 + (1-p) \times 0 = p$; y desde $X^2 = X$ (ambos $0$
+y $1$ son sus propios cuadrados), $\E(X^2) = p$, por lo que por
+\cref{prop:g11:prob:konig}, $\V(X) = p - p^2 = p(1-p)$.
+\end{proof}
+
+\begin{definition}[Ensayos independientes repetidos]\label{def:g11:binom:repeated}
+Repetir un \omterm{def:g11:binom:bernoulli}{juicio de Bernoulli} $n$ veces \emph{independientemente} significa: el
+El resultado de cada ensayo no tiene influencia sobre los demás, y el \omterm{def:g10:proba:distribution}{probabilidad}
+de cualquier \omterm{def:g11:seq:sequence}{secuencia} completo de resultados es el \emph{producto} del
+probabilidades a lo largo del camino correspondiente de \omterm{met:g10:proba:tree}{árbol} --- $p$ para cada
+éxito, $1 - p$ para cada falla.
+\end{definition}
+
+\begin{example}\label{ex:g11:binom:threetrials}
+Tres ensayos independientes con éxito \omterm{def:g10:proba:distribution}{probabilidad} $p$. El SFS \omterm{def:g11:seq:sequence}{secuencia}
+(éxito, fracaso, éxito) tiene \omterm{def:g10:proba:distribution}{probabilidad} $p(1-p)p = p^2(1-p)$ --- y
+también lo hace \emph{cada} \omterm{def:g11:seq:sequence}{secuencia} con exactamente dos éxitos, independientemente de
+las posiciones: solo importa el \emph{número} de S y F.
+\end{example}
+
+\section{Recuentos de caminos y coeficientes binomiales.}
+
+\begin{definition}[coeficiente binomial]\label{def:g11:binom:coefficient}
+En los ensayos independientes \omterm{met:g10:proba:tree}{árbol} de $n$, el \emph{binomio
+coeficiente}\index{coeficiente binomial} $\binom{n}{k}$ (léase ``$n$
+elija $k$'') es el número de rutas que contienen exactamente éxitos $k$.
+\end{definition}
+
+\begin{example}
+$\binom{3}{2} = 3$: las rutas SSF, SFS, FSS. Asimismo $\binom{3}{0} = 1$
+(la ruta FFF), $\binom{3}{1} = 3$ y $\binom{3}{3} = 1$. Por
+convención y por la \omterm{met:g10:proba:tree}{árbol}, $\binom n0 = \binom nn = 1$ para cada $n$.
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}[font=\small]
+  \coordinate (root) at (0,0);
+  \node (S) at (1.5,1.5) {S};
+  \node (F) at (1.5,-1.5) {F};
+  \node (SS) at (3.0,2.25) {S};
+  \node (SF) at (3.0,0.75) {F};
+  \node (FS) at (3.0,-0.75) {S};
+  \node (FF) at (3.0,-2.25) {F};
+  \node (SSS) at (4.5,2.6) {S};
+  \node (SSF) at (4.5,1.85) {F};
+  \node (SFS) at (4.5,1.1) {S};
+  \node (SFF) at (4.5,0.35) {F};
+  \node (FSS) at (4.5,-0.35) {S};
+  \node (FSF) at (4.5,-1.1) {F};
+  \node (FFS) at (4.5,-1.85) {S};
+  \node (FFF) at (4.5,-2.6) {F};
+  \draw[omThm, thick] (root) -- (S);
+  \draw[omThm, thick] (S) -- (SS);   \draw[omThm, thick] (SS) -- (SSF);
+  \draw[omThm, thick] (S) -- (SF);   \draw[omThm, thick] (SF) -- (SFS);
+  \draw[omThm, thick] (root) -- (F);
+  \draw[omThm, thick] (F) -- (FS);   \draw[omThm, thick] (FS) -- (FSS);
+  \draw[gray] (SS) -- (SSS);
+  \draw[gray] (SF) -- (SFF);
+  \draw[gray] (FS) -- (FSF);
+  \draw[gray] (F) -- (FF);
+  \draw[gray] (FF) -- (FFS);
+  \draw[gray] (FF) -- (FFF);
+  \node[gray, anchor=west] at (5.0,2.6) {$3$ successes};
+  \node[omThm, anchor=west] at (5.0,1.85) {$2$ successes};
+  \node[omThm, anchor=west] at (5.0,1.1) {$2$ successes};
+  \node[gray, anchor=west] at (5.0,0.35) {$1$ success};
+  \node[omThm, anchor=west] at (5.0,-0.35) {$2$ successes};
+  \node[gray, anchor=west] at (5.0,-1.1) {$1$ success};
+  \node[gray, anchor=west] at (5.0,-1.85) {$1$ success};
+  \node[gray, anchor=west] at (5.0,-2.6) {$0$ successes};
+\end{tikzpicture}
+
+{\small El \omterm{met:g10:proba:tree}{árbol} de las pruebas $n = 3$: las rutas $\binom{3}{2} = 3$ (rojas) llevan
+exactamente dos éxitos, cada uno con \omterm{def:g10:proba:distribution}{probabilidad} $p^2(1-p)$.}
+\end{omfigure}
+
+\begin{proposition}[regla de pascal]\label{prop:g11:binom:pascal}
+\index{el triangulo de pascal}
+Para $1 \leq k \leq n - 1$:
+\[
+\binom{n}{k} = \binom{n-1}{k-1} + \binom{n-1}{k}.
+\]
+\end{proposition}
+
+\begin{proof}
+Ordene las rutas de la prueba $n$ \omterm{met:g10:proba:tree}{árbol} con éxitos $k$ según
+su prueba \emph{último}. Los que terminan en éxito se obtienen de una
+camino de las primeras pruebas $n-1$ con éxitos $k - 1$: hay
+$\binom{n-1}{k-1}$ de ellos. Aquellos que terminan en un fracaso extienden un camino con
+$k$ éxitos entre los primeros ensayos $n-1$: $\binom{n-1}{k}$ de ellos.
+Cada camino es exactamente de uno de los dos tipos.
+\end{proof}
+
+La regla de Pascal genera los coeficientes fila por fila --- cada entrada es el
+suma de los dos anteriores:
+\[
+\begin{array}{ccccccccccc}
+&&&&&1&&&&&\\
+&&&&1&&1&&&&\\
+&&&1&&2&&1&&&\\
+&&1&&3&&3&&1&&\\
+&1&&4&&6&&4&&1&\\
+1&&5&&10&&10&&5&&1
+\end{array}
+\]
+
+\begin{remark}
+Una fórmula cerrada, $\binom nk = \frac{n!}{k!(n-k)!}$, junto con una
+teoría sistemática del conteo, está establecida en \cref{ch:g12:comb}. en
+En este nivel, \omterm{prop:g11:binom:pascal}{el triangulo de pascal} calcula todos los coeficientes que necesitamos.
+\end{remark}
+
+\section{La distribución binomial}
+
+\begin{theorem}[Distribución binomial]\label{thm:g11:binom:binomial}
+Dejemos que $X$ cuente los éxitos en $n$ independiente de \omterm{def:g11:binom:bernoulli}{juicios de Bernoulli} de
+parámetro $p$. Luego $X$ sigue a \emph{binomio
+distribución}\index{distribución binomial} $\mathcal B(n, p)$:
+\[
+\P(X = k) = \binom{n}{k}\, p^k (1-p)^{n-k},
+\qquad k = 0, 1, \dots, n .
+\]
+\end{theorem}
+
+\begin{proof}
+\omterm{def:g11:prob:model}{evento} $X = k$ es la colección de todas las rutas con exactamente $k$
+éxitos. Cada una de estas rutas tiene \omterm{def:g10:proba:distribution}{probabilidad} $p^k(1-p)^{n-k}$: el producto
+a lo largo del camino contiene los factores $k$ $p$ y $n - k$ los factores $1-p$, en
+algún pedido (\cref{def:g11:binom:repeated}). Hay $\binom nk$ tales
+caminos (\cref{def:g11:binom:coefficient}), y sus probabilidades se suman.
+\end{proof}
+
+\begin{example}\label{ex:g11:binom:quiz}
+Un cuestionario tiene $5$ preguntas independientes, cada una con $4$ opciones; un estudiante
+respuestas al azar, por lo que cada pregunta es un éxito con $p = \frac14$. el
+el número $X$ de respuestas correctas sigue a $\mathcal B\left(5, \frac14\right)$,
+y, usando la fila $5$ de \omterm{prop:g11:binom:pascal}{el triangulo de pascal}:
+\[
+\P(X = 2) = \binom52 \left(\frac14\right)^2\left(\frac34\right)^3
+= 10 \times \frac{1}{16} \times \frac{27}{64}
+= \frac{270}{1024} \approx 0.26 .
+\]
+El \omterm{def:g10:proba:distribution}{probabilidad} de al menos una respuesta correcta utiliza el \omterm{def:g10:proba:operations}{complementar}:
+$\P(X \geq 1) = 1 - \P(X = 0) = 1 - \left(\frac34\right)^5 \approx
+0.76$.
+\end{example}
+
+\begin{proposition}[Expectativa y variación]\label{prop:g11:binom:expectation}
+Si $X \sim \mathcal B(n, p)$:
+\[
+\E(X) = np,
+\qquad
+\V(X) = np(1-p).
+\]
+\end{proposition}
+
+\begin{proof}[Justificacion]
+Escriba $X = X_1 + X_2 + \dots + X_n$, donde $X_i$ es igual a $1$ si el
+$i$-ésima prueba exitosa: cada $X_i$ es una variable de Bernoulli de \omterm{def:g11:prob:expectation}{expectativa}
+$p$ (\cref{def:g11:binom:bernoulli}). Los promedios suman --- sumando el $n$
+contribuciones da $\E(X) = np$. Que \emph{\omterm{def:g11:prob:variance}{variaciones}} también agregue para
+variables independientes es cierto pero más delicado: la fórmula \omterm{def:g11:prob:variance}{diferencia} es
+\emph{admitido a este nivel} y probado en \cref{ch:g12:sums}.
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[
+  width=10cm, height=5cm,
+  ybar, bar width=9pt,
+  xlabel={$k$}, ylabel={$\P(X = k)$},
+  xmin=-0.8, xmax=10.8, ymin=0, ymax=0.3,
+  xtick={0,1,2,3,4,5,6,7,8,9,10},
+  ytick={0.1, 0.2},
+  tick label style={font=\small},
+  label style={font=\small},
+  title={$\mathcal B(10,\ 0.5)$}]
+  \addplot[fill=omDef!40, draw=omDef] coordinates {
+    (0,0.00098) (1,0.00977) (2,0.04395) (3,0.11719) (4,0.20508)
+    (5,0.24609) (6,0.20508) (7,0.11719) (8,0.04395) (9,0.00977)
+    (10,0.00098)};
+\end{axis}
+\end{tikzpicture}
+
+{\small El \omterm{def:g11:prob:rv}{distribución} $\mathcal B(10, 0.5)$ (diez lanzamientos de moneda justos):
+centrado en $\E(X) = np = 5$, simétrico, con casi todos los \omterm{def:g10:proba:distribution}{probabilidad}
+entre $2$ y $8$.}
+\end{omfigure}
+
+\begin{method}[Reconociendo una situación binomial]\label{met:g11:binom:recognize}
+Antes de escribir $X \sim \mathcal B(n, p)$, verifique tres ingredientes: a
+\emph{numero fijo} $n$ de juicios, decididos de antemano; cada prueba tiene
+\emph{dos resultados} con el éxito \emph{mismo} \omterm{def:g10:proba:distribution}{probabilidad} $p$; el
+Las pruebas son \emph{independiente} (con reemplazo o dispositivos separados).
+El sorteo sin reemplazo de una población pequeña es \emph{no}
+binomio --- el \omterm{def:g10:proba:distribution}{probabilidad} cambia en cada sorteo
+(\cref{exo:g11:prob:6}).
+\end{method}
+
+\section{Muestreo: ¿es sorprendente la observación?}
+
+El binomio \omterm{def:g11:prob:rv}{distribución} responde a una pregunta muy práctica: \emph{if the
+success \omterm{def:g10:proba:distribution}{probabilidad} really is $p$, what counts of successes are
+plausible?}
+
+\begin{example}\label{ex:g11:binom:decision}
+Se supone que una máquina produce como máximo $10\%$ artículos defectuosos. en un
+lote de artículos $10$, $4$ están defectuosos. ¿Mala suerte o máquina rota? si
+la máquina está bien, el número de defectos sigue
+$\mathcal B(10, 0.1)$, y
+\[
+\P(X \geq 4) = 1 - \P(X \leq 3) \approx 1 - 0.987 = 0.013 :
+\]
+aproximadamente una oportunidad en $80$. Observar un \omterm{def:g11:prob:model}{evento} tan improbable es un fuerte
+señal --- uno \emph{rechaza} la hipótesis de que la máquina todavía funciona
+en $10\%$, teniendo en cuenta que la decisión podría ser incorrecta
+\omterm{def:g10:proba:distribution}{probabilidad} sobre $0.013$.
+\end{example}
+
+\begin{method}[Regla de decisión de un modelo binomial]\label{met:g11:binom:decision}
+Juzgar un número observado $k$ de éxitos frente a una hipótesis
+$X \sim \mathcal B(n, p)$: calcula el \omterm{def:g10:proba:distribution}{probabilidad}, bajo la hipótesis,
+de un resultado \emph{al menos tan extremo} como $k$. Si ese \omterm{def:g10:proba:distribution}{probabilidad} es
+muy pequeño (una convención común: debajo de $5\%$), rechace la hipótesis;
+de lo contrario la observación es compatible con ella. El umbral es un
+elección, no un teorema: las estadísticas cuantifican el riesgo y el usuario
+lo acepta.
+\end{method}
+
+\section{Ceremonias}
+
+\begin{exercise}[$\star$]\label{exo:g11:binom:1}
+Extienda \omterm{prop:g11:binom:pascal}{el triangulo de pascal} a la fila $7$ y proporcione los valores de
+$\binom62$, $\binom{7}{3}$ y $\binom74$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g11:binom:2}
+Se lanza un dado justo $4$ veces; $X$ cuenta los seis. justifica eso
+$X \sim \mathcal B\left(4, \frac16\right)$ y calcular $\P(X = 0)$,
+$\P(X = 1)$ y $\P(X \geq 2)$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g11:binom:3}
+¿Cuál de los siguientes es binomial? Justificar.
+\begin{enumerate}
+  \item Número de caras en $20$ lanzamientos de una moneda justa.
+  \item Número de ases en $5$ cartas repartidas en una baraja.
+  \item Número de días de lluvia la próxima semana, si cada día es lluvioso con
+        \omterm{def:g10:proba:distribution}{probabilidad} $0.3$ de forma independiente.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g11:binom:4}
+$X \sim \mathcal B(50, 0.2)$. Introduzca $\E(X)$, $\V(X)$ y $\sigma(X)$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:binom:5}
+Un arquero da en el blanco con \omterm{def:g10:proba:distribution}{probabilidad} $0.7$ en cada tiro,
+de forma independiente. En disparos $6$, calcule el \omterm{def:g10:proba:distribution}{probabilidad} de exactamente $4$ aciertos,
+y de al menos $5$ visitas.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:binom:6}
+Una prueba de verdadero/falso tiene preguntas $8$; un estudiante adivina cada respuesta.
+¿Cuál es el \omterm{def:g10:proba:distribution}{probabilidad} de aprobar (al menos $6$ respuestas correctas)?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:binom:7}
+Cada caja de cereal comprada contiene la figura A o la figura B, con
+\omterm{def:g10:proba:distribution}{probabilidad} $\frac12$ cada uno, de forma independiente. Un coleccionista compra cajas $5$.
+Calcule el \omterm{def:g10:proba:distribution}{probabilidad} de que el coleccionista obtiene al menos una figura de
+cada tipo. (\omterm{def:g10:proba:operations}{Complementar}: todo A o todo B.)
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:binom:8}
+Un jugador de baloncesto anota tiros libres con \omterm{def:g10:proba:distribution}{probabilidad} $p$,
+de forma independiente. Sea $X \sim \mathcal B(3, p)$ el número de puntuaciones en
+tres lanzamientos. Exprese $\P(X = 3)$ y $\P(X \geq 1)$ como \omterm{def:g11:func:function}{funciones} de $p$,
+y encuentre para qué $p$ el \omterm{def:g10:proba:distribution}{probabilidad} de anotar los tres es igual
+$\frac{27}{64}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:binom:9}
+¿Cuántas veces se debe lanzar una moneda justa para obtener el \omterm{def:g10:proba:distribution}{probabilidad} de obtener
+¿Al menos una cabeza debe exceder $0.99$? (\omterm{def:g10:proba:operations}{Complementar}, luego intente sucesivos
+valores de $n$.)
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:binom:10}
+Usando la regla de Pascal (\cref{prop:g11:binom:pascal}) y
+$\binom n0 = \binom nn = 1$, demuestre que las entradas de cada fila de
+\omterm{prop:g11:binom:pascal}{el triangulo de pascal} suma a $2^n$: interprete que ambos lados cuentan todos los
+rutas del \omterm{met:g10:proba:tree}{árbol}.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g11:binom:11}
+Un político reclama la aprobación $60\%$. En un \omterm{def:g10:proba:sample}{muestra} aleatorio de $10$ personas,
+Sólo $3$ lo aprueba.
+\begin{enumerate}
+  \item Según la reclamación, ¿qué significa \omterm{def:g11:prob:rv}{distribución} el número $X$ de
+        ¿Siguen las aprobaciones en el \omterm{def:g10:proba:sample}{muestra}? Calcule $\P(X \leq 3)$.
+  \item Utilizando la regla de decisión de \cref{met:g11:binom:decision} con una
+        Umbral $5\%$, ¿es la observación compatible con la afirmación?
+\end{enumerate}
+\end{exercise}
+
+\section{Problema: el tablero Galton}
+
+\begin{problem}[{Problema de fin de semana --- bolas, clavijas y Pascal
+Triángulo: cómo nace la forma de campana, por qué favorecen las series de playoffs
+el equipo más fuerte, y cuando llorar}]
+\label{pb:g11:binom:1}
+Deja caer mil bolas a través de un entramado de clavijas, cada una rebota un
+Lanzamiento de moneda justo hacia la izquierda o hacia la derecha, y las ranuras de abajo se llenan en un
+campana suave y simétrica --- cada vez. La máquina se llama
+El tablero de Galton y sus matemáticas son exactamente el tema de este capítulo.
+binomio \omterm{def:g11:prob:rv}{distribución} (\cref{thm:g11:binom:binomial}). esto
+problema construye el triángulo, recorre el tablero, arbitra un
+serie al mejor de siete, y termina donde el binomio gana su
+salario: decidir cuando una observación debe hacernos dudar de una
+reclamo.
+
+\medskip
+\noindent\textbf{Parte I --- The triangle.}
+\begin{enumerate}
+  \item Construya \omterm{prop:g11:binom:pascal}{el triangulo de pascal} hasta la fila $6$
+        (\cref{prop:g11:binom:pascal}). Enuncie y explique el
+        simetría $\binom nk = \binom{n}{n-k}$ en una frase
+        (elegir objetos $k$ es lo mismo que \,\dots).
+  \item Verifique en las filas $4$ y $5$ que cada fila sume $2^n$,
+        y pruébalo: ¿qué hacen todos los $\binom nk$ juntos?
+        contar?
+  \item Rederivar la regla de Pascal
+        $\binom{n+1}{k} = \binom nk + \binom{n}{k-1}$ por el
+        argumento del comité: arreglar a una persona distinguida y
+        dividir los comités según el destino de esa persona.
+  \item Calcular $\binom73$ dos veces: desde el triángulo y desde
+        la fórmula factorial.
+  \item Comprobar la identidad de la escalera.
+        $\binom22 + \binom32 + \binom42 + \binom52 =
+        \binom63$, y explíquelo mediante la regla de Pascal en cascada
+        desde $\binom63$ hacia abajo.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte II --- The board.}
+Una bola cae a través de $n$ filas de clavijas; en cada clavija rebota
+izquierda o derecha con \omterm{def:g10:proba:distribution}{probabilidad} $\frac12$, independientemente. Número
+las ranuras $0$ a $n$ por el conteo de rebotes correctos.
+\begin{enumerate}[resume]
+  \item Explique, con la lista de verificación de
+        \cref{met:g11:binom:recognize}, por qué el número de ranura
+        sigue el binomio \omterm{def:g11:prob:rv}{distribución}
+        $\mathcal B\!\left(n, \frac12\right)$.
+  \item Para una placa pequeña ($n = 4$): proporcione las cinco ranuras
+        probabilidades. ¿Qué franja horaria está más concurrida?
+  \item Ahora bolas $n = 10$ y $1\,024$: ¿cuáles son las
+        \emph{esperado} conteo de bolas en la ranura del medio, en la ranura
+        $7$, y en cada ranura de borde? Describe la forma de la pila.
+  \item Para $X \sim \mathcal B\!\left(10, \frac12\right)$:
+        calcular $\E(X)$, $V(X)$ y $\sigma$
+        (\cref{prop:g11:binom:expectation}); luego calcula el
+        proporción de bolas esperadas dentro de $2\sigma$ del
+        centro (ranuras $2$ a $8$) y comparar con Chebyshev
+        Garantía de \cref{pb:g11:stat:1}.
+  \item Una tabla inclinada rebota hacia la derecha con \omterm{def:g10:proba:distribution}{probabilidad} $0.6$:
+        proporcione $\E$, $V$ y $\sigma$ para $n = 10$ y describa
+        ¿Qué pasa con la pila?
+  \item En una o dos frases: ¿qué, en el diseño del tablero,
+        fabrica la forma de campana --- y ¿por qué tantos?
+        cantidades del mundo real (alturas, errores de medición)
+        ¿Se acumulan de la misma manera? (El teorema profundo detrás de ambos es
+        el teorema del límite central, la cumbre de la universidad
+        cursos \omterm{def:g10:proba:distribution}{probabilidad} de los volúmenes.)
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte III --- Best of seven.}
+Dos equipos juegan una serie: el primero en ganar $4$ se lleva el título;
+Los juegos son independientes.
+\begin{enumerate}[resume]
+  \item Equipos iguales ($p = \frac12$): calcular el \omterm{def:g10:proba:distribution}{probabilidad}
+        que la serie termina arrasada (exactamente $4$ juegos).
+  \item Calcular el \omterm{def:g10:proba:distribution}{probabilidad} que la serie va al completo.
+        Juegos $7$ (¿cuál debe ser la puntuación después de $6$?).
+  \item Completa el \omterm{def:g11:prob:rv}{distribución} de la duración de la serie.
+        (juegos $4$, $5$, $6$ o $7$) para equipos iguales, y
+        calcular la longitud esperada. ¿Qué longitudes son más
+        ¿probablemente?
+  \item Ahora un equipo gana cada juego con $p = 0.6$. Calcular su
+        \omterm{def:g10:proba:distribution}{probabilidad} de llevarse la serie (ganar en $4$, $5$, $6$
+        o $7$: en cada caso el equipo gana el último juego y
+        $3$ de los anteriores). ¿Qué le hizo la serie?
+        ¿La ventaja por juego?
+  \item Comparar con una única final ($60\,\%$) y una al mejor de 3
+        (calcularlo). Indique el efecto general de la longitud de la serie.
+        sobre la habilidad contra la suerte --- y por qué las ligas prefieren las largas
+        finales.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte IV --- When to cry foul.}
+\begin{enumerate}[resume]
+  \item Se lanza una moneda $100$ veces y muestra $62$ caras. Para
+        una moneda justa, regale $\E$, $\sigma$ y \omterm{pb:g11:stat:1}{puntuación z}
+        (\cref{pb:g11:stat:1}) de la observación. Veredicto
+        bajo la convención $2\sigma$?
+  \item Un proveedor reclama piezas defectuosas $2\,\%$. en un lote
+        de $50$ encuentra $3$ defectuoso. calcular
+        $\P(X \geq 3)$ bajo el reclamo
+        ($X \sim \mathcal B(50, 0.02)$; pasar por
+        $\P(X = 0), \P(X = 1), \P(X = 2)$). alarmante ante el
+        Umbral $5\,\%$ (\cref{met:g11:binom:decision},
+        \cref{exo:g11:binom:11})?
+  \item Persistencia de lotería: cada billete gana (algo) con
+        \omterm{def:g10:proba:distribution}{probabilidad} $\frac{1}{1000}$. Calcular el \omterm{def:g10:proba:distribution}{probabilidad}
+        de al menos una victoria con boletos $1\,000$. la respuesta
+        ($\approx 63\,\%$, no $100\,\%$!) esconde un famoso
+        constante: calcular $0.999^{1000}$ y mantener el número
+        $0.368$ en mente para el grado 12.
+  \item Finale --- el retrato del binomio: el reconocimiento
+        lista de verificación (fijo $n$, independencia, constante $p$);
+        \omterm{prop:g11:binom:pascal}{el triangulo de pascal} como su tabla; la campana como su forma;
+        $np$ y $np(1-p)$ como brújula; y sus dos herederos
+        esperando en el grado 12 --- la suave curva de campana y el
+        ley de los grandes números. Una frase cada uno.
+\end{enumerate}
+\end{problem}

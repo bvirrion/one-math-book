@@ -1,0 +1,499 @@
+\chapter{Diferenciación y convexidad}\label{ch:g12:deriv}
+
+El \omterm{def:g12:deriv:derivative}{derivado} mide la tasa de cambio instantánea de un \omterm{def:g11:func:function}{función}; es
+el \omterm{def:g10:reffunc:affine}{pendiente} de la línea \omterm{def:g12:deriv:tangent}{tangente} a su \omterm{def:g10:functions:graph}{gráfico}. Este capítulo revisa y amplía
+las reglas de diferenciación, vincula el signo de $f'$ a las variaciones de $f$,
+e introduce \omterm{def:g12:deriv:convex}{convexidad}, que se rige por el segundo \omterm{def:g12:deriv:derivative}{derivado}.
+
+\section{la derivada}
+
+\begin{definition}[Derivada en un punto]\label{def:g12:deriv:derivative}
+Dejemos que $f$ se defina en \omterm{def:g10:numbers:interval}{intervalo}, $I$ y $a \in I$. El \omterm{def:g11:func:function}{función} $f$ es
+\emph{diferenciable en $a$}\index{derivado}\index{diferenciable} si el cociente de diferencias
+\[
+\frac{f(a+h) - f(a)}{h}
+\]
+tiene un límite finito como $h \to 0$. Este límite se llama \emph{derivada de
+$f$ en $a$} y se escribe $f'(a)$. Si $f$ es diferenciable en cada punto de
+$I$, el \omterm{def:g11:func:function}{función} $f' \colon x \mapsto f'(x)$ es el \emph{derivado} de
+$f$.
+\end{definition}
+
+\begin{definition}[recta tangente]\label{def:g12:deriv:tangent}
+Si $f$ es \omterm{def:g12:deriv:derivative}{diferenciable} en $a$, el \emph{tangente}\index{tangente} al
+curva de $f$ en el punto $(a, f(a))$ es la recta de \omterm{def:g10:algebra:equation}{ecuación}
+\[
+y = f(a) + f'(a)(x - a).
+\]
+\end{definition}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, clip=false,
+  width=9.6cm, height=6.8cm,
+  xmin=-0.4, xmax=3.4, ymin=-0.4, ymax=4.3,
+  xtick={1,2.5}, xticklabels={$a$,$a+h$}, ytick=\empty]
+  \addplot[omProp!40, thick, domain=0.2:2.7] {1 + 1.75*(x-1)};
+  \addplot[omProp!70, thick, domain=0.07:2.95] {1 + 1.5*(x-1)};
+  \addplot[omProp, thick, domain=-0.12:3.3] {1 + 1.25*(x-1)};
+  \addplot[omThm, thick, domain=-0.4:3.3] {x};
+  \addplot[omDef, thick, domain=-0.4:2.72] {x^2/2 + 0.5};
+  \draw[black, dashed, thin] (axis cs:1,1) -- (axis cs:2.5,1)
+    node[midway, below, font=\small] {$h$};
+  \draw[black, dashed, thin] (axis cs:2.5,1) -- (axis cs:2.5,3.625)
+    node[midway, right, font=\small] {$f(a+h)-f(a)$};
+  \fill (axis cs:2.5,3.625) circle (1.5pt);
+  \fill (axis cs:2,2.5) circle (1.5pt);
+  \fill (axis cs:1.5,1.625) circle (1.5pt);
+  \fill (axis cs:1,1) circle (1.5pt)
+    node[above left, font=\small] {$A$};
+  \node[omThm, font=\small, anchor=west] at (axis cs:3.38,3.3) {tangent};
+\end{axis}
+\end{tikzpicture}
+
+{\small A medida que $h$ disminuye, la línea \omterm{def:g11:deriv:rate}{secante} hasta $A = (a, f(a))$ y
+$(a+h, f(a+h))$ (naranja) gira hacia \omterm{def:g12:deriv:tangent}{tangente} en $A$ (rojo): su
+\omterm{def:g10:reffunc:affine}{pendiente} $\frac{f(a+h)-f(a)}{h}$ tiende a $f'(a)$.}
+\end{omfigure}
+
+\begin{proposition}\label{prop:g12:deriv:diffcont}
+Un \omterm{def:g11:func:function}{función} \omterm{def:g12:deriv:derivative}{diferenciable} en $a$ es \omterm{def:g12:limcont:continuity}{continuo} en $a$. Lo contrario es falso.
+\end{proposition}
+
+\begin{proof}
+Para $h \neq 0$ pequeño, $f(a+h) - f(a) = h \cdot \frac{f(a+h)-f(a)}{h}$. como
+$h \to 0$, el lado derecho tiende a $0 \times f'(a) = 0$, por lo que
+$f(a+h) \to f(a)$. Por el contrario, $x \mapsto \abs{x}$ es \omterm{def:g12:limcont:continuity}{continuo} en
+$0$, pero su cociente de diferencias en $0$ es igual a $\frac{\abs h}{h} = \pm 1$
+dependiendo del signo de $h$, y no tiene límite.
+\end{proof}
+
+\subsection{Differentiation rules}
+
+\begin{proposition}[Operaciones]\label{prop:g12:deriv:operations}
+Sea $u, v$ \omterm{def:g12:deriv:derivative}{diferenciable} en $I$ y $\lambda \in \R$. Entonces $u + v$,
+$\lambda u$, $uv$ son \omterm{def:g12:deriv:derivative}{diferenciable} en $I$, al igual que $\frac{u}{v}$ donde
+$v \neq 0$, y
+\[
+(u+v)' = u' + v', \quad (\lambda u)' = \lambda u', \quad
+(uv)' = u'v + uv', \quad
+\left(\frac{u}{v}\right)' = \frac{u'v - uv'}{v^2}.
+\]
+\end{proposition}
+
+\begin{proof}[Prueba de la regla del producto]
+Escribe el cociente de diferencias de $uv$ en $a$ como
+\[
+\frac{u(a+h)v(a+h) - u(a)v(a)}{h}
+= \frac{u(a+h) - u(a)}{h}\,v(a+h) + u(a)\,\frac{v(a+h) - v(a)}{h}.
+\]
+Como $h \to 0$, $v(a+h) \to v(a)$ por \omterm{def:g12:limcont:continuity}{continuidad}
+(\cref{prop:g12:deriv:diffcont}), por lo que el lado derecho tiende a
+$u'(a)v(a) + u(a)v'(a)$. Las demás reglas se demuestran de manera similar.
+\end{proof}
+
+\begin{theorem}[regla de cadena]\label{thm:g12:deriv:chain}
+\index{regla de la cadena}
+Sea $u$ \omterm{def:g12:deriv:derivative}{diferenciable} en $I$ con valores en $J$ y $g$ \omterm{def:g12:deriv:derivative}{diferenciable}.
+en $J$. Entonces $g \circ u$ es \omterm{def:g12:deriv:derivative}{diferenciable} en $I$ y
+\[
+(g \circ u)' = (g' \circ u) \cdot u' .
+\]
+En particular, para $u$ \omterm{def:g12:deriv:derivative}{diferenciable}:
+\[
+(u^n)' = n\,u'\,u^{n-1} \ (n \in \Z), \qquad
+\left(\sqrt{u}\right)' = \frac{u'}{2\sqrt{u}} \ (u > 0), \qquad
+\left(\eu^{u}\right)' = u'\,\eu^{u}.
+\]
+\end{theorem}
+
+\begin{proof}[Boceto de prueba]
+Cuando $u(a+h) \neq u(a)$ para $h$ sea pequeño, escriba
+\[
+\frac{g(u(a+h)) - g(u(a))}{h}
+= \frac{g(u(a+h)) - g(u(a))}{u(a+h) - u(a)} \cdot \frac{u(a+h) - u(a)}{h}.
+\]
+Como $h \to 0$, $u(a+h) \to u(a)$, el primer factor tiende a $g'(u(a))$ y
+el segundo a $u'(a)$. (Una prueba completa debe manejar el caso donde
+$u(a+h) = u(a)$ para $h$ arbitrariamente pequeño; Este punto técnico es tratado en
+universidad.)
+\end{proof}
+
+\begin{example}
+El \omterm{def:g12:deriv:derivative}{derivados} habitual, válido sobre el \omterm{def:g11:func:function}{dominios} natural:
+\[
+(x^n)' = nx^{n-1}, \quad
+\left(\frac{1}{x}\right)' = -\frac{1}{x^2}, \quad
+(\sqrt{x})' = \frac{1}{2\sqrt{x}}, \quad
+(\cos x)' = -\sin x, \quad
+(\sin x)' = \cos x .
+\]
+El primero se prueba por inducción a partir de la regla del producto, y los dos últimos en
+\cref{ch:g12:trigo}.
+\end{example}
+
+\section{Variaciones y extremos}
+
+\begin{theorem}[Signo de la derivada y variaciones]\label{thm:g12:deriv:variations}
+Sea $f$ \omterm{def:g12:deriv:derivative}{diferenciable} en un \omterm{def:g10:numbers:interval}{intervalo} $I$.
+\begin{enumerate}
+  \item $f$ es \omterm{def:g12:seq:monotonic}{creciente} en $I$ si y sólo si $f' \geq 0$ en $I$.
+  \item $f$ es \omterm{def:g10:functions:variations}{decreciente} en $I$ si y solo si $f' \leq 0$ en $I$.
+  \item Si $f' > 0$ en $I$ excepto en un número finito de puntos donde
+        desaparece, entonces $f$ es estrictamente \omterm{def:g12:seq:monotonic}{creciente} en $I$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}[prueba parcial]
+Si $f$ es \omterm{def:g12:seq:monotonic}{creciente}, cada cociente de diferencias
+$\frac{f(a+h)-f(a)}{h}$ es $\geq 0$, y pasar al límite da
+$f'(a) \geq 0$. Las implicaciones inversas se basan en el teorema del valor \omterm{def:g11:stat:mean}{significar},
+probado en la universidad; son \emph{admitido a este nivel}.
+\end{proof}
+
+\begin{definition}[extremo local]\label{def:g12:deriv:extremum}
+$f$ tiene un \emph{máximo local}\index{extremo} en $a$ si $f(x) \leq f(a)$ para
+todo $x$ cerca de $a$; los mínimos locales se definen simétricamente.
+\end{definition}
+
+\begin{proposition}[Condición de primer orden]\label{prop:g12:deriv:critical}
+Si $f$ es \omterm{def:g12:deriv:derivative}{diferenciable} en un \emph{abierto} \omterm{def:g10:numbers:interval}{intervalo} $I$ y tiene un local
+\omterm{def:g12:deriv:extremum}{extremo} en $a \in I$, luego $f'(a) = 0$. Lo contrario es falso
+($f(x) = x^3$ en $a = 0$).
+\end{proposition}
+
+\begin{proof}
+Digamos que $a$ es un \omterm{def:g12:deriv:extremum}{máximo local}. Para $h > 0$ pequeño,
+$\frac{f(a+h)-f(a)}{h} \leq 0$, por lo que dejar $h \to 0^+$ da $f'(a) \leq 0$;
+para $h < 0$ el cociente es $\geq 0$, lo que da $f'(a) \geq 0$. Por lo tanto
+$f'(a) = 0$.
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=8.4cm, height=5.6cm,
+  xmin=-2.5, xmax=2.5, ymin=-4.2, ymax=4.2,
+  xtick={-1,1}, ytick={-2,2}]
+  \addplot[omProp, thick, domain=-1.8:-0.2] {2};
+  \addplot[omProp, thick, domain=0.2:1.8] {-2};
+  \addplot[omDef, thick, domain=-2.15:2.15] {x^3 - 3*x};
+  \fill (axis cs:-1,2) circle (1.5pt);
+  \fill (axis cs:1,-2) circle (1.5pt);
+\end{axis}
+\end{tikzpicture}
+
+{\small En un \omterm{def:g12:deriv:extremum}{extremo} local dentro de un \omterm{def:g10:numbers:interval}{intervalo} abierto, el \omterm{def:g12:deriv:tangent}{tangente}
+(naranja) es horizontal: $f'(a) = 0$. Aquí $f(x) = x^3 - 3x$, con un
+\omterm{def:g12:deriv:extremum}{máximo local} en $-1$ y un \omterm{def:g10:functions:extrema}{mínimo} local en $1$.}
+\end{omfigure}
+
+\begin{method}[Tabla de variaciones]\label{met:g12:deriv:table}
+Para estudiar un \omterm{def:g11:func:function}{función} $f$: determine su \omterm{def:g11:func:function}{dominio} y sus límites en el límite;
+calcular $f'$ y factorizarlo; determinar el signo de $f'$ en cada subintervalo;
+registrar todo en un \omterm{def:g10:functions:table}{tabla de variaciones}, marcando extremos; deducir el número de
+soluciones de $f(x) = k$ usando el teorema de biyección
+(\cref{thm:g12:limcont:bijection}).
+\end{method}
+
+\section{Convexidad}
+
+\begin{definition}[Función convexa]\label{def:g12:deriv:convex}
+Un \omterm{def:g11:func:function}{función} $f$ definido en un \omterm{def:g10:numbers:interval}{intervalo} $I$ es \emph{convexo}\index{convexidad}
+en $I$ si cada acorde de su \omterm{def:g10:functions:graph}{gráfico} se encuentra por encima del \omterm{def:g10:functions:graph}{gráfico}: para todos
+$a, b \in I$ y $t \in \intcc{0}{1}$,
+\[
+f\bigl((1-t)a + t b\bigr) \leq (1-t) f(a) + t f(b).
+\]
+Es \emph{cóncavo}\index{cóncavo} si se cumple la desigualdad inversa ($-f$ convexa).
+\end{definition}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=8.8cm, height=6cm,
+  xmin=-1.9, xmax=2.5, ymin=-0.8, ymax=4.3,
+  xtick={-1,1.5}, xticklabels={$a$,$b$}, ytick=\empty]
+  \addplot[omThm, thick, domain=-1.25:1.75] {0.5*x + 1.5};
+  \addplot[omProp, thick, domain=-0.45:2.3] {x - 0.25};
+  \addplot[omDef, thick, domain=-1.6:2.0] {x^2};
+  \draw[black, dashed, thin] (axis cs:0.25,0.0625) -- (axis cs:0.25,1.625);
+  \fill (axis cs:-1,1) circle (1.5pt);
+  \fill (axis cs:1.5,2.25) circle (1.5pt);
+  \fill (axis cs:0.5,0.25) circle (1.5pt);
+  \node[omThm, font=\small, above left] at (axis cs:1.7,2.4) {chord};
+  \node[omProp, font=\small, below right] at (axis cs:1.75,1.5) {tangent};
+\end{axis}
+\end{tikzpicture}
+
+{\small A \omterm{def:g12:deriv:convex}{convexo} \omterm{def:g11:func:function}{función}: cada cuerda (roja) se encuentra por encima del \omterm{def:g10:functions:graph}{gráfico}, y
+el \omterm{def:g10:functions:graph}{gráfico} se encuentra encima de cada uno de sus \omterm{def:g12:deriv:tangent}{tangentes} (naranja). El segmento discontinuo
+muestra la brecha entre $f\bigl((1-t)a+tb\bigr)$ y $(1-t)f(a)+tf(b)$.}
+\end{omfigure}
+
+\begin{theorem}[Convexidad y derivadas]\label{thm:g12:deriv:convexity}
+Sea $f$ \omterm{def:g12:deriv:derivative}{diferenciable} en un \omterm{def:g10:numbers:interval}{intervalo} $I$. Los siguientes son equivalentes:
+\begin{enumerate}
+  \item $f$ es \omterm{def:g12:deriv:convex}{convexo} en $I$;
+  \item $f'$ es \omterm{def:g12:seq:monotonic}{creciente} en $I$;
+  \item el \omterm{def:g10:functions:graph}{gráfico} de $f$ se encuentran encima de cada uno de sus \omterm{def:g12:deriv:tangent}{tangentes}.
+\end{enumerate}
+Si $f$ es el doble de \omterm{def:g12:deriv:derivative}{diferenciable}, estos también equivalen a $f'' \geq 0$ en
+$I$.
+\end{theorem}
+
+\begin{proof}[Prueba de (2) $\Rightarrow$ (3)]
+Reparar $a \in I$ y configurar
+$g(x) = f(x) - f(a) - f'(a)(x-a)$, la brecha entre la curva y el \omterm{def:g12:deriv:tangent}{tangente}
+en $a$. Entonces $g$ es \omterm{def:g12:deriv:derivative}{diferenciable} y $g'(x) = f'(x) - f'(a)$. Si $f'$ es
+\omterm{def:g12:seq:monotonic}{creciente}, $g' \leq 0$ en $I \cap \intoc{-\infty}{a}$ y $g' \geq 0$ en
+$I \cap \intco{a}{+\infty}$: $g$ disminuye antes de $a$ y aumenta después,
+entonces $g$ alcanza su \omterm{def:g10:functions:extrema}{mínimo} $g(a) = 0$, por lo tanto $g \geq 0$.
+Las implicaciones restantes se admiten a este nivel; la equivalencia con
+$f'' \geq 0$ se deriva de \cref{thm:g12:deriv:variations} aplicado a $f'$.
+\end{proof}
+
+\begin{definition}[Punto de inflexión]\label{def:g12:deriv:inflection}
+Un punto donde la curva de $f$ cruza su \omterm{def:g12:deriv:tangent}{tangente} es un \emph{inflexión
+punto}\index{punto de inflexión}. Para $f$ dos veces \omterm{def:g12:deriv:derivative}{diferenciable}, inflexión
+Los puntos son los puntos donde $f''$ cambia de signo.
+\end{definition}
+
+\begin{example}\label{ex:g12:deriv:cube}
+$f(x) = x^3$ tiene $f''(x) = 6x$: $f$ es \omterm{def:g12:deriv:convex}{cóncavo} en $\intoc{-\infty}{0}$,
+\omterm{def:g12:deriv:convex}{convexo} en $\intco{0}{+\infty}$, con un \omterm{def:g12:deriv:inflection}{punto de inflexión} en el origen,
+donde la curva cruza su \omterm{def:g12:deriv:tangent}{tangente} (el eje $x$).
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=7.6cm, height=5.6cm,
+  xmin=-1.7, xmax=1.7, ymin=-2.9, ymax=2.9,
+  xtick={-1,1}, ytick={-1,1}]
+  \addplot[omProp, thick, domain=-1.2:1.2] {0};
+  \addplot[omDef, thick, domain=-1.4:1.4] {x^3};
+  \fill (axis cs:0,0) circle (1.5pt);
+  \node[font=\small, anchor=east] at (axis cs:-0.45,-1.7) {concave};
+  \node[font=\small, anchor=west] at (axis cs:0.45,1.7) {convex};
+\end{axis}
+\end{tikzpicture}
+
+{\small El \omterm{def:g12:deriv:inflection}{punto de inflexión} de $x \mapsto x^3$ en el origen: la curva
+cruza su \omterm{def:g12:deriv:tangent}{tangente} (naranja), \omterm{def:g12:deriv:convex}{cóncavo} a la izquierda, \omterm{def:g12:deriv:convex}{convexo} a la derecha.}
+\end{omfigure}
+
+\begin{example}[Desigualdades de convexidad]\label{ex:g12:deriv:ineq}
+El exponencial es \omterm{def:g12:deriv:convex}{convexo} en $\R$ (su segundo \omterm{def:g12:deriv:derivative}{derivado} es en sí mismo, positivo).
+Su \omterm{def:g12:deriv:tangent}{tangente} en $0$ es $y = 1 + x$, por lo que
+\[
+\eu^x \geq 1 + x \quad \text{for all } x \in \R .
+\]
+Estos \emph{\omterm{def:g12:deriv:tangent}{tangente} line inequalities} son un producto estándar de \omterm{def:g12:deriv:convex}{convexidad}.
+\end{example}
+
+\begin{method}[convexidad]\label{met:g12:deriv:convexity}
+\begin{itemize}
+  \item Para demostrar una desigualdad $f(x) \geq ax + b$: identifica la recta como
+        \omterm{def:g12:deriv:tangent}{tangente} de un \omterm{def:g12:deriv:convex}{convexo} $f$ e invocar
+        \cref{thm:g12:deriv:convexity}(3).
+  \item Para localizar \omterm{def:g12:deriv:inflection}{puntos de inflexión}: resolver $f''(x) = 0$ \emph{y} comprobar
+        que $f''$ cambia de signo allí.
+  \item En un \omterm{def:g10:functions:table}{tabla de variaciones}, \omterm{def:g12:deriv:convex}{convexidad} refina el boceto de la curva.
+        (en qué dirección se dobla).
+\end{itemize}
+\end{method}
+
+\section{Ceremonias}
+
+\begin{exercise}[$\star$]\label{exo:g12:deriv:1}
+Diferenciar los siguientes \omterm{def:g11:func:function}{funciones} en su \omterm{def:g11:func:function}{dominios}:
+\[
+f(x) = x^3 - 5x + 2, \quad
+g(x) = \frac{x}{x^2+1}, \quad
+h(x) = (2x+1)^5, \quad
+k(x) = \sqrt{x^2 + 1}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:deriv:2}
+Dale el \omterm{def:g10:algebra:equation}{ecuación} del \omterm{def:g12:deriv:tangent}{tangente} a la curva de $f(x) = x^2 - 3x + 1$ en
+el punto de \omterm{def:g10:coordgeom:system}{abscisa} $a = 2$, y determine las posiciones de la curva
+en relación con este \omterm{def:g12:deriv:tangent}{tangente}.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:deriv:3}
+Utilizando la definición de \omterm{def:g12:deriv:derivative}{derivado}, calcule
+\[
+\lim_{x \to 0} \frac{(1+x)^{100} - 1}{x}
+\qquad\text{and}\qquad
+\lim_{h \to 0} \frac{\sqrt{4+h} - 2}{h}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:deriv:4}
+Estudie el \omterm{def:g11:func:function}{función} $f(x) = \dfrac{x^2 + 3}{x - 1}$ en su \omterm{def:g11:func:function}{dominio}: límites,
+\omterm{def:g12:deriv:derivative}{derivado}, \omterm{def:g10:functions:table}{tabla de variaciones}, extremos locales.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:deriv:5}
+Una caja sin tapa está hecha de una hoja cuadrada de cartón de lado
+$30\,$cm cortando cuadrados iguales del lado $x$ de las esquinas y doblando hacia arriba
+los lados. Determine $x$ maximizando el volumen de la caja.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:deriv:6}
+Deje $f(x) = x^4 - 4x^3 + 10$.
+\begin{enumerate}
+  \item Calcule $f''$ y determine \omterm{def:g12:deriv:convex}{convexidad} \omterm{def:g10:numbers:interval}{intervalos} y \omterm{def:g12:deriv:inflection}{inflexión
+        puntos} de $f$.
+  \item Mostrar que el \omterm{def:g12:deriv:tangent}{tangente} en el \omterm{def:g12:deriv:inflection}{punto de inflexión} de \omterm{def:g10:coordgeom:system}{abscisa} $2$
+        cruza la curva allí.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:deriv:7}
+Usando una desigualdad de línea \omterm{def:g12:deriv:tangent}{tangente}, demuestre que para todo $x > 0$,
+\[
+\sqrt{x} \leq \frac{x + 1}{2},
+\]
+e identificar cuándo se cumple la igualdad. (Pista: la raíz cuadrada es \omterm{def:g12:deriv:convex}{cóncavo}).
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:deriv:8}
+Sea $f$ \omterm{def:g12:deriv:convex}{convexo} y \omterm{def:g12:deriv:derivative}{diferenciable} en $\R$, y supongamos que $f'$ desaparece
+en algún momento $a$. Demuestre que $f(a)$ es el \emph{global} \omterm{def:g10:functions:extrema}{mínimo} de $f$
+en~$\R$.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:deriv:9}
+Demuestre que entre todos los rectángulos de perímetro fijo $p$, el cuadrado tiene el
+área más grande. Luego demuestre que entre todos los rectángulos de área fija $A$, el
+El cuadrado tiene el perímetro más pequeño y explica cómo se relacionan las dos afirmaciones.
+relacionado.
+\end{exercise}
+
+\section{Problema: el cálculo del socorrista}
+
+\begin{problem}[{Problema del fin de semana --- la ruta de rescate más rápida obedece
+La ley de la luz de Snell, la convexidad certifica cada óptima, y la
+la lata de refresco ideal es exactamente tan alta como ancha}]
+\label{pb:g12:deriv:1}
+Un socorrista ve a un nadador en problemas, en diagonal por la
+playa, en el agua. Correr es más rápido que nadar: el
+La línea recta es \emph{no} la ruta más rápida. La ruta que
+minimiza las curvas de tiempo en la costa, y su ley de flexión es
+Precisamente la ley por la que la luz se refracta al entrar en el agua: la naturaleza,
+también diferencia. Este problema entrena la regla de la cadena.
+(\cref{thm:g12:deriv:chain}), realiza el rescate, cosecha el
+desigualdades de \omterm{def:g12:deriv:convex}{convexidad} (\cref{thm:g12:deriv:convexity}), y
+diseña una lata.
+
+\medskip
+\noindent\textbf{Parte I --- Chain-rule fluency.}
+\begin{enumerate}
+  \item Diferenciar: $\left(3x^2 + 1\right)^5$; \
+        $\sqrt{x^2 + 9}$; $\dfrac{1}{x^2 + 1}$.
+  \item Entregue el \omterm{def:g12:deriv:tangent}{tangente} a $y = \sqrt{x^2 + 9}$ en $x = 4$.
+  \item Construya el \omterm{def:g10:functions:table}{tabla de variaciones} de
+        $f(x) = \dfrac{x}{x^2 + 1}$ en $\R$ (extremos incluidos).
+  \item Para $g(x) = x^3 - 3x^2 + 4$: \omterm{def:g10:functions:table}{tabla de variaciones} \emph{y}
+        tabla \omterm{def:g12:deriv:convex}{convexidad} ($g''$), con el \omterm{def:g12:deriv:inflection}{punto de inflexión}
+        (\cref{def:g12:deriv:inflection}).
+  \item Calcule \omterm{def:g12:deriv:tangent}{tangente} a $g$ en su \omterm{def:g12:deriv:inflection}{punto de inflexión},
+        y mostrar que $g(x) - (\text{tangent}) = (x - 1)^3$:
+        ¿Qué dice el cambio de signo sobre cómo funciona el \omterm{def:g12:deriv:tangent}{tangente}?
+        encuentra la curva en una inflexión?
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte II --- The rescue.}
+Línea costera a lo largo del eje $x$; El salvavidas se encuentra en la arena en
+$A(0, 30)$, el nadador espera en $B(40, -20)$ (metros). el
+El guardia corre a $5$ m/s sobre arena, nada a $2$ m/s y entra al
+agua en un punto $(x, 0)$ de su elección.
+\begin{enumerate}[resume]
+  \item Modelo : expresar el tiempo total de rescate $T(x)$ y decir por qué.
+        sólo $x \in \intcc{0}{40}$ merece consideración.
+  \item Diferenciar $T$ (regla de la cadena en el trabajo --- dos veces).
+  \item Sea $\theta_1$ el ángulo de la pierna que corre con el
+        \emph{perpendicular} a la orilla, $\theta_2$ la de
+        la pierna de natación. mostrar eso
+        $\sin\theta_1 = \frac{x}{\sqrt{x^2 + 900}}$ y que
+        la condición $T'(x) = 0$ dice
+        \[
+        \frac{\sin\theta_1}{5} = \frac{\sin\theta_2}{2}
+        \]
+        --- \emph{ley de snell}, con las dos velocidades en lugar de
+        las velocidades de la luz en el aire y el agua.
+  \item El tramo recto $[AB]$ cruza la orilla en
+        $x = 24$. Calcular $T(24)$, $T(40)$ (ejecutar a lo largo del
+        playa, luego nade recto) y $T(0)$: es el
+        ¿La línea recta geométrica es la más rápida? ¿Es extremo?
+        estrategia?
+  \item Localice el punto de entrada óptimo en \omterm{thm:g12:limcont:ivt}{dicotomía} en
+        $T'$ (es $\approx 33.7$ m): dar $x^*$ al medidor
+        y el tiempo récord $T(x^*)$ a la décima de segundo.
+        ¿Cuánto ahorra la curva óptima sobre la recta?
+        línea?
+  \item ¿Por qué el punto crítico es \emph{global} \omterm{def:g10:functions:extrema}{mínimo}?
+        (Cada término de $T$ es \omterm{def:g12:deriv:convex}{convexo} --- admita que una suma de
+        \omterm{def:g12:deriv:convex}{convexo} \omterm{def:g11:func:function}{funciones} es \omterm{def:g12:deriv:convex}{convexo} --- y aplica
+        \cref{exo:g12:deriv:8}.)
+  \item El principio de Fermat establece que la luz siempre viaja en dirección
+        ruta de al menos \emph{tiempo}. Deducir por qué un rayo de luz se desvía
+        exactamente en la superficie al entrar en el agua
+        (donde la luz es más lenta), y nombrar lo cotidiano
+        observación que esto explica lo de un lápiz en un vaso de
+        agua.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte III --- \omterm{def:g12:deriv:convex}{Convexidad}'s harvest.}
+\begin{enumerate}[resume]
+  \item Demuestre que $x \mapsto x^2$ es \omterm{def:g12:deriv:convex}{convexo} y pruebe la
+        \omterm{prop:g10:coordgeom:midpoint}{punto medio} desigualdad
+        $\left(\frac{a + b}{2}\right)^2 \leq
+        \frac{a^2 + b^2}{2}$ dos veces: una vez de \omterm{def:g12:deriv:convex}{convexidad}, una vez
+        por \omterm{def:g10:algebra:expand}{en expansión} $(a - b)^2 \geq 0$.
+  \item Deduce que el \emph{quadratic \omterm{def:g11:stat:mean}{significar}}
+        $\sqrt{\frac{a^2 + b^2}{2}}$ domina la aritmética
+        \omterm{def:g11:stat:mean}{significar}, y montar la cadena completa de la serie ---
+        armónico $\leq$ geométrico $\leq$ aritmético $\leq$
+        cuadrático --- verificando los cuatro en $a = 2$, $b = 8$.
+  \item Tangente debajo de la curva: $x \mapsto \frac1x$ es \omterm{def:g12:deriv:convex}{convexo}
+        en $\intoo{0}{+\infty}$; escriba su \omterm{def:g12:deriv:tangent}{tangente} en $1$ y
+        deducir la desigualdad
+        $\frac1x \geq 2 - x$ para todos los $x > 0$. ¿Dónde es un
+        igualdad?
+  \item Inflexión en la naturaleza: durante una epidemia, el
+        El recuento acumulado de casos sigue una curva en forma de S. que
+        sucede en su \omterm{def:g12:deriv:inflection}{punto de inflexión}, y ¿por qué es esa fecha?
+        ¿El que vigilan los epidemiólogos? Relacionarse con el signo.
+        del segundo \omterm{def:g12:deriv:derivative}{derivado} en cada lado.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte IV --- The ideal can.}
+Una lata cilíndrica debe contener $V = 330$ cm$^3$ con la menor
+metal: superficie $S = 2\pi r^2 + 2\pi r h$, restricción
+$\pi r^2 h = V$.
+\begin{enumerate}[resume]
+  \item Expreso $S(r) = 2\pi r^2 + \dfrac{2V}{r}$,
+        diferenciar y calcular el radio óptimo y
+        altura para $V = 330$ (precisión milimétrica).
+  \item Demuestre la elegante ley general: en el óptimo,
+        $h = 2r$ --- la lata ideal es exactamente tan alta como es
+        de ancho.
+  \item Marque $S''(r) > 0$ y concluya (vía
+        \cref{exo:g12:deriv:8} nuevamente) que lo óptimo es
+        globales. Las latas de refresco reales son visiblemente más altas que anchas:
+        Nombra una razón no matemática.
+  \item Finale --- el proceso de optimización: modelo, pregunte al
+        \omterm{def:g12:deriv:derivative}{derivado}, resolver puntos críticos, certificar con
+        \omterm{def:g12:deriv:convex}{convexidad} o una tabla, interpretar. Ejecute la lista sobre el
+        salvavidas, la lata y el rayo más fuerte del grado 11
+        (\cref{pb:g11:deriv:1}) --- e indicar cuál es el
+        El principio dice sobre quién más dirige este oleoducto.
+\end{enumerate}
+\end{problem}

@@ -51,7 +51,7 @@ class Config:
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--book", type=int, required=True, choices=sorted(books.ENTRY))
-    ap.add_argument("--lang", default="en", choices=("en", "fr", "nl"))
+    ap.add_argument("--lang", default="en", choices=("en", "fr", "nl", "es"))
     ap.add_argument("--apply", action="store_true", help="rewrite the sources")
     ap.add_argument("--unwrap", action="store_true",
                     help="strip existing links instead of adding them")

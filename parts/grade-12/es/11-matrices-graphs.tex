@@ -1,0 +1,397 @@
+\chapter{Matrices y gráficas}\label{ch:g12:matrix}
+
+Un \omterm{def:g12:matrix:matrix}{matriz} es una matriz rectangular de números, sumados y multiplicados por reglas
+diseñado para que el álgebra \omterm{def:g12:matrix:matrix}{matriz} represente la composición de
+transformaciones. Matrices resuelven \omterm{def:g10:lines:system}{sistemas lineales}, unidad acoplada recurrente
+\omterm{def:g12:seq:sequence}{secuencias} y contar paseos en redes: las matemáticas detrás de la búsqueda
+motores y algoritmos de camino más corto.
+
+\section{Álgebra matricial}
+
+\begin{definition}[Matriz]\label{def:g12:matrix:matrix}
+Un \emph{$m \times n$ matrix}\index{matriz} es una tabla de \omterm{def:g10:numbers:sets}{números reales} con
+$m$ filas y $n$ columnas:
+$A = (a_{ij})$, donde $a_{ij}$ es la entrada en la fila $i$, columna $j$.
+Se suman dos matrices del mismo tamaño entrada por entrada, y
+$\lambda A = (\lambda a_{ij})$.
+\end{definition}
+
+\begin{definition}[Producto matriz]\label{def:g12:matrix:product}
+Sea $A$ $m \times n$ y $B$ sea $n \times p$. El producto $AB$ es el
+$m \times p$ \omterm{def:g12:matrix:matrix}{matriz} cuya entrada $(i,j)$ es
+\[
+(AB)_{ij} = \sum_{k=1}^{n} a_{ik} b_{kj}
+\]
+(la regla ``fila $i$ de $A$ multiplicada por la columna $j$ de $B$'').
+\end{definition}
+
+\begin{example}
+$\begin{pmatrix} 1 & 2\\ 3 & 4\end{pmatrix}
+\begin{pmatrix} 0 & 1\\ 1 & 1\end{pmatrix}
+= \begin{pmatrix} 2 & 3\\ 4 & 7\end{pmatrix}$,
+\quad mientras \quad
+$\begin{pmatrix} 0 & 1\\ 1 & 1\end{pmatrix}
+\begin{pmatrix} 1 & 2\\ 3 & 4\end{pmatrix}
+= \begin{pmatrix} 3 & 4\\ 4 & 6\end{pmatrix}$:
+\emph{\omterm{def:g12:matrix:matrix}{matriz} multiplication is not commutative}.
+\end{example}
+
+\begin{proposition}[Reglas del álgebra matricial]\label{prop:g12:matrix:rules}
+Siempre que los tamaños hagan que los productos tengan significado:
+\[
+(AB)C = A(BC), \qquad A(B + C) = AB + AC, \qquad (A+B)C = AC + BC,
+\]
+y el \emph{identity \omterm{def:g12:matrix:matrix}{matriz}} $I_n$ (unos en la diagonal, ceros en el resto)
+satisface $I_m A = A I_n = A$ para $A$ de tamaño $m \times n$.
+\end{proposition}
+
+\begin{proof}
+Todas son verificaciones entrada por entrada de
+\cref{def:g12:matrix:product}; asociatividad, la única no trivial,
+equivale a intercambiar dos sumas finitas:
+$\bigl((AB)C\bigr)_{ij} = \sum_l \left(\sum_k a_{ik}b_{kl}\right) c_{lj}
+= \sum_k a_{ik} \left(\sum_l b_{kl} c_{lj}\right)
+= \bigl(A(BC)\bigr)_{ij}$.
+\end{proof}
+
+\begin{definition}[inversa]\label{def:g12:matrix:inverse}
+Un cuadrado \omterm{def:g12:matrix:matrix}{matriz} $A$ de tamaño $n$ es \emph{reversible}\index{matriz!inverso}
+si hay un \omterm{def:g12:matrix:matrix}{matriz} $B$ con $AB = BA = I_n$; $B$ es entonces único, escrito
+$A^{-1}$.
+\end{definition}
+
+\begin{proposition}[Inversa de una matriz $2\times2$]\label{prop:g12:matrix:inverse2x2}
+Deje $A = \begin{pmatrix} a & b\\ c & d\end{pmatrix}$ y
+$\det A = ad - bc$ (el \emph{determinante}\index{determinante}). Entonces $A$ es
+\omterm{def:g12:matrix:inverse}{reversible} si y sólo si $\det A \neq 0$, en cuyo caso
+\[
+A^{-1} = \frac{1}{ad - bc}\begin{pmatrix} d & -b\\ -c & a\end{pmatrix}.
+\]
+\end{proposition}
+
+\begin{proof}
+Un cálculo da
+$A \begin{pmatrix} d & -b\\ -c & a\end{pmatrix}
+= \begin{pmatrix} d & -b\\ -c & a\end{pmatrix} A = (ad - bc) I_2$; si
+$ad - bc \neq 0$, dividir. Por el contrario, si $ad - bc = 0$, las columnas de $A$
+son proporcionales, al igual que las columnas de $AB$ para cualquier $B$; pero el
+Las columnas de $I_2$ no son proporcionales, por lo que ninguna $B$ puede satisfacer $AB = I_2$.
+\end{proof}
+
+\begin{method}[sistemas lineales]\label{met:g12:matrix:systems}
+el sistema
+$\begin{cases} ax + by = e\\ cx + dy = f \end{cases}$
+es el \omterm{def:g12:matrix:matrix}{matriz} \omterm{def:g10:algebra:equation}{ecuación} $AX = Y$ con
+$X = \begin{pmatrix} x \\ y\end{pmatrix}$,
+$Y = \begin{pmatrix} e \\ f\end{pmatrix}$. Si $\det A \neq 0$, es único
+la solución es $X = A^{-1}Y$. El mismo formalismo maneja $n$ \omterm{def:g10:algebra:equation}{ecuaciones} en $n$
+incógnitas.
+\end{method}
+
+\section{Poderes matriciales y secuencias recurrentes.}
+
+\begin{definition}\label{def:g12:matrix:power}
+Para un cuadrado \omterm{def:g12:matrix:matrix}{matriz} $A$ y $k \in \N$, $A^k = A \times \dots \times A$
+(factores $k$), con $A^0 = I$.
+\end{definition}
+
+\begin{method}[Casos diagonal más nilpotente y diagonalizable]\label{met:g12:matrix:powers}
+Dos formas estándar de calcular $A^k$:
+\begin{itemize}
+  \item Si $A = \lambda I + N$ donde $N^2 = 0$, el teorema del binomio
+        (válido aquí desde que $I$ y $N$ conmutan) se colapsa en dos términos:
+        $A^k = \lambda^k I + k \lambda^{k-1} N$.
+  \item Si se encuentra un \omterm{def:g12:matrix:inverse}{reversible} $P$ con $A = PDP^{-1}$ y $D$ en diagonal,
+        luego $A^k = P D^k P^{-1}$ y $D^k$ se calcula entrada por entrada.
+        (Encontrar tal $P$ sistemáticamente es la teoría de
+        \emph{diagonalización}, desarrollado en la universidad; en este nivel $P$ es
+        dado.)
+\end{itemize}
+\end{method}
+
+\begin{example}[secuencias acopladas]\label{ex:g12:matrix:coupled}
+Sean $u_{n+1} = 3u_n + v_n$ y $v_{n+1} = u_n + 3v_n$. Configuración
+$X_n = \begin{pmatrix} u_n\\ v_n \end{pmatrix}$ y
+$A = \begin{pmatrix} 3 & 1\\ 1 & 3\end{pmatrix}$, obtenemos
+$X_{n+1} = AX_n$, entonces $X_n = A^n X_0$. El auxiliar \omterm{def:g12:seq:sequence}{secuencias}
+$s_n = u_n + v_n$ y $d_n = u_n - v_n$ satisfacen $s_{n+1} = 4s_n$ y
+$d_{n+1} = 2d_n$, entonces $s_n = 4^n s_0$, $d_n = 2^n d_0$ y
+\[
+u_n = \frac{4^n(u_0+v_0) + 2^n(u_0-v_0)}{2}, \qquad
+v_n = \frac{4^n(u_0+v_0) - 2^n(u_0-v_0)}{2}.
+\]
+(Detrás de escena: $(1,1)$ y $(1,-1)$ son direcciones de vectores propios de $A$).
+\end{example}
+
+\section{Graficas y paseos}
+
+\begin{definition}[Gráfico, matriz de adyacencia]\label{def:g12:matrix:graph}
+Un \emph{gráfico}\index{gráfico} consta de vértices $1, 2, \dots, n$ y aristas
+unir ciertos pares de vértices (pares ordenados para un \emph{dirigido}
+gráfico). Su \emph{matriz de adyacencia}\index{matriz de adyacencia} es el
+$n \times n$ \omterm{def:g12:matrix:matrix}{matriz} $M$ con $m_{ij} = 1$ si hay un borde de $i$ a
+$j$ y $0$ en caso contrario. Un \emph{caminar} de longitud $k$ de $i$ a $j$ es un
+\omterm{def:g12:seq:sequence}{secuencia} de $k$ bordes consecutivos que van desde $i$ a $j$.
+\end{definition}
+
+\begin{omfigure}
+\begin{tikzpicture}[baseline=(current bounding box.center)]
+  \node[circle, draw, inner sep=2.5pt] (v1) at (0,0) {$1$};
+  \node[circle, draw, inner sep=2.5pt] (v2) at (2.6,1.2) {$2$};
+  \node[circle, draw, inner sep=2.5pt] (v3) at (2.6,-1.2) {$3$};
+  \draw[-Stealth, omDef, thick] (v1) -- (v2);
+  \draw[-Stealth, omDef, thick] (v2) -- (v3);
+  \draw[-Stealth, omDef, thick] (v1) to[bend right=18] (v3);
+  \draw[-Stealth, omDef, thick] (v3) to[bend right=18] (v1);
+\end{tikzpicture}
+\qquad\qquad
+$M = \begin{pmatrix} 0 & 1 & 1\\ 0 & 0 & 1\\ 1 & 0 & 0 \end{pmatrix}$
+
+{\small Un \omterm{def:g12:matrix:graph}{gráfico} dirigido y su \omterm{def:g12:matrix:graph}{matriz de adyacencia}
+(\cref{exo:g12:matrix:6}): $m_{ij} = 1$ exactamente cuando hay un borde
+de $i$ a $j$.}
+\end{omfigure}
+
+\begin{theorem}[Contando paseos]\label{thm:g12:matrix:walks}
+El número de recorridos de longitud $k$ desde el vértice $i$ hasta el vértice $j$ es el
+$(i,j)$ entrada de $M^k$.
+\end{theorem}
+
+\begin{proof}
+Inducción en $k$. Para $k = 1$ esta es la definición de $M$. asumir el
+reclamación para $k$. Un paseo de longitud $k+1$ desde $i$ hasta $j$ es un paseo de longitud
+$k$ desde $i$ hasta algún vértice $l$, seguido de una arista desde $l$ hasta $j$; por el
+principios de suma y multiplicación, su número es
+\[
+\sum_{l=1}^{n} \bigl(M^k\bigr)_{il}\, m_{lj} = \bigl(M^{k+1}\bigr)_{ij}.
+\qedhere
+\]
+\end{proof}
+
+\begin{example}
+Para el triángulo \omterm{def:g12:matrix:graph}{gráfico} (vértices $3$, todos los pares unidos),
+$M = \begin{pmatrix} 0&1&1\\ 1&0&1\\ 1&1&0\end{pmatrix}$ y
+$M^2 = \begin{pmatrix} 2&1&1\\ 1&2&1\\ 1&1&2\end{pmatrix}$: de cada vértice
+hay $2$ recorridos de longitud $2$ de regreso a sí mismo (a través de cualquier vecino) y
+$1$ entre sí.
+\end{example}
+
+\section{Ceremonias}
+
+\begin{exercise}[$\star$]\label{exo:g12:matrix:1}
+Deje $A = \begin{pmatrix} 1 & 2\\ 0 & 1 \end{pmatrix}$ y
+$B = \begin{pmatrix} 2 & 0\\ 1 & 1 \end{pmatrix}$. Calcular $A + B$, $AB$,
+$BA$ y $A^2$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:matrix:2}
+Determine si las siguientes matrices son \omterm{def:g12:matrix:inverse}{reversible} y calcule la
+Inversos cuando existen:
+\[
+A = \begin{pmatrix} 2 & 5\\ 1 & 3\end{pmatrix}, \qquad
+B = \begin{pmatrix} 3 & 6\\ 2 & 4\end{pmatrix}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:matrix:3}
+Resolver por inversión \omterm{def:g12:matrix:matrix}{matriz} el sistema.
+$\begin{cases} 2x + 5y = 1\\ x + 3y = 2 . \end{cases}$
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:matrix:4}
+Deje $A = \begin{pmatrix} 2 & 1\\ 0 & 2\end{pmatrix} = 2I + N$ con
+$N = \begin{pmatrix} 0 & 1\\ 0 & 0 \end{pmatrix}$.
+\begin{enumerate}
+  \item Compruebe que $N^2 = 0$ y $I$ y $N$ conmutan.
+  \item Deduzca $A^k$ para todos los $k \in \N$ y verifique la fórmula para $k=2$ por
+        cálculo directo.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:matrix:5}
+Vamos $A = \begin{pmatrix} 0 & 1\\ 1 & 1\end{pmatrix}$ y $F_n$ los Fibonacci
+\omterm{def:g12:seq:sequence}{secuencia} ($F_0 = 0$, $F_1 = 1$, $F_{n+2} = F_{n+1} + F_n$). Mostrar por
+inducción que para $n \geq 1$,
+\[
+A^n = \begin{pmatrix} F_{n-1} & F_n\\ F_n & F_{n+1}\end{pmatrix},
+\]
+y deducir la identidad $F_{n+1}F_{n-1} - F_n^2 = (-1)^n$.
+(Pista: \omterm{def:g11:vect:det}{determinantes} multiplica: $\det(MN) = \det M \det N$, que puedes
+verifique las matrices $2\times2$).
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:matrix:6}
+Un \omterm{def:g12:matrix:graph}{gráfico} dirigido en los vértices $\{1, 2, 3\}$ tiene aristas
+$1\to2$, $2\to3$, $3\to1$ y $1\to3$.
+\begin{enumerate}
+  \item Escriba \omterm{def:g12:matrix:graph}{matriz de adyacencia} $M$ y calcule $M^2$ y $M^3$.
+  \item ¿Cuántas caminatas de longitud $3$ van de $1$ a $1$? Enumérelos.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:matrix:7}
+Una empresa de coches compartidos mueve vehículos entre dos ciudades $A$ y $B$. cada uno
+semana, $80\%$ de los autos en $A$ permanecen en $A$ y $20\%$ pasan a $B$; $30\%$
+de los autos en $B$ pasan a $A$ y $70\%$ permanecen. Sea $a_n, b_n$ el
+proporciones de la flota en cada ciudad.
+\begin{omfigure}
+\begin{tikzpicture}
+  \node[circle, draw, inner sep=3pt] (A) at (0,0) {$A$};
+  \node[circle, draw, inner sep=3pt] (B) at (3.2,0) {$B$};
+  \draw[-Stealth, omDef, thick] (A) to[bend left=25]
+    node[above, font=\small] {$0.2$} (B);
+  \draw[-Stealth, omDef, thick] (B) to[bend left=25]
+    node[below, font=\small] {$0.3$} (A);
+  \draw[-Stealth, omDef, thick] (A) to[loop left]
+    node[left, font=\small] {$0.8$} (A);
+  \draw[-Stealth, omDef, thick] (B) to[loop right]
+    node[right, font=\small] {$0.7$} (B);
+\end{tikzpicture}
+\end{omfigure}
+\begin{enumerate}
+  \item Escribe $X_{n+1} = MX_n$ con
+        $X_n = \begin{pmatrix} a_n\\ b_n\end{pmatrix}$ e identificar $M$.
+  \item Encuentra las proporciones de equilibrio (resuelve $MX = X$ con
+        $a + b = 1$).
+  \item Demuestre que $c_n = a_n - 0.6$ satisface $c_{n+1} = 0.5\,c_n$, y
+        concluir que la flota \omterm{def:g11:prob:rv}{distribución} \omterm{def:g12:seq:limit}{converge} llega al equilibrio.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:matrix:8}
+Vamos $A = \begin{pmatrix} 3 & 1\\ 1 & 3 \end{pmatrix}$,
+$P = \begin{pmatrix} 1 & 1\\ 1 & -1 \end{pmatrix}$.
+\begin{enumerate}
+  \item Calcule $P^{-1}$, luego $D = P^{-1}AP$ y verifique que $D$ sea
+        diagonal.
+  \item Deducir una fórmula cerrada para $A^n$ y comparar con
+        \cref{ex:g12:matrix:coupled}.
+\end{enumerate}
+\end{exercise}
+
+\section{Problema: La matriz que conoce a Fibonacci (y la
+clima)}
+
+\begin{problem}[{Problema de fin de semana --- una matriz $2 \times 2$
+lleva todo Fibonacci, una matriz de Markov pronóstica a largo plazo
+clima, y un vector propio vale mil millones de dólares}]
+\label{pb:g12:matrix:1}
+Un \omterm{def:g12:matrix:matrix}{matriz} es una máquina que come un estado y devuelve el siguiente
+--- y su \emph{potestades} poseen, por tanto, futuros completos. esto
+El problema comienza con el asombroso \omterm{def:g12:matrix:matrix}{matriz} cuyos poderes enumeran los
+Números de Fibonacci (y probar sus identidades en una línea cada uno),
+luego ejecuta el clima como una cadena de Markov hasta su estado estacionario, y
+cierra con el vector propio sobre el que se construyó un motor de búsqueda
+(\cref{thm:g12:matrix:walks},
+\cref{met:g12:matrix:powers}).
+
+\medskip
+\noindent\textbf{Parte I --- Fluency.}
+\begin{enumerate}
+  \item Con $A = \begin{pmatrix} 1 & 2\\ 3 & 4\end{pmatrix}$
+        y $B = \begin{pmatrix} 0 & 1\\ 1 & 0\end{pmatrix}$:
+        calcular $AB$ y $BA$. ¿Veredicto sobre la conmutatividad?
+  \item Invertir $\begin{pmatrix} 2 & 1\\ 5 & 3\end{pmatrix}$
+        (\cref{prop:g12:matrix:inverse2x2}) y utilizar el inverso
+        para resolver $2x + y = 4$, $5x + 3y = 7$.
+  \item Vamos a $N = \begin{pmatrix} 0 & 1\\ 0 & 0\end{pmatrix}$:
+        calcular $N^2$ y deducir
+        $(I + N)^n = I + nN$ por cada $n$.
+  \item El triángulo \omterm{def:g12:matrix:graph}{gráfico} (tres vértices, todos los pares unidos):
+        escriba su \omterm{def:g12:matrix:graph}{matriz de adyacencia} $A$, calcule $A^3$ y
+        interpretar las entradas diagonales
+        (\cref{thm:g12:matrix:walks}).
+  \item Para $D = \begin{pmatrix} 2 & 0\\ 0 & \frac12
+        \end{pmatrix}$: proporcione $D^n$ y su comportamiento como
+        $n \to \infty$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte II --- The Fibonacci \omterm{def:g12:matrix:matrix}{matriz}.}
+Deja $F = \begin{pmatrix} 1 & 1\\ 1 & 0\end{pmatrix}$ y deja
+$F_1 = F_2 = 1, F_3 = 2, \dots$ sean los números de Fibonacci de
+\cref{pb:g11:seq:1}.
+\begin{enumerate}[resume]
+  \item Calcula $F^2$, $F^3$, $F^4$ y conjetura el general
+        forma de $F^n$ en términos de números de Fibonacci.
+  \item Demuestra la conjetura
+        $F^n = \begin{pmatrix} F_{n+1} & F_n\\ F_n & F_{n-1}
+        \end{pmatrix}$ por inducción.
+  \item Tome \omterm{def:g11:vect:det}{determinantes} de ambos lados (el \omterm{def:g11:vect:det}{determinante} de un
+        El producto es el producto del \omterm{def:g11:vect:det}{determinantes} --- compruébalo.
+        en matrices $2 \times 2$ si nunca lo has visto):
+        deducir \emph{La identidad de Cassini}
+        $F_{n+1}F_{n-1} - F_n^2 = (-1)^n$ --- el
+        Motor de cuadrado fugaz, probado en una línea.
+  \item De $F^{m+n} = F^m F^n$, lea la parte superior derecha
+        entradas y derivar el \emph{fórmula de suma}
+        \[
+        F_{m+n} = F_{m+1} F_n + F_m F_{n-1} .
+        \]
+        Compruébelo para $m = n = 3$.
+  \item Deducir de la fórmula de la suma (inducción en $k$)
+        que $F_n$ \omterm{def:g12:arith:divides}{divide} $F_{kn}$, y verifique en
+        $F_3 \mid F_6$ y $F_3 \mid F_9$.
+  \item Para calcular $F_{100}$, no es necesario multiplicar $100$
+        matrices: cuadrado repetidamente ($F^2, F^4, F^8, \dots$)
+        y combinar. ¿Cuántas multiplicaciones \omterm{def:g12:matrix:matrix}{matriz} son suficientes?
+        y qué antiguo truco de multiplicación del Medio
+        ¿El volumen escolar es este, promovido a matrices?
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte III --- The weather machine.}
+En una determinada ciudad: después de un día soleado, el siguiente es soleado con
+\omterm{def:g10:proba:distribution}{probabilidad}$0.8$; despues de un dia lluvioso, soleado con \omterm{def:g10:proba:distribution}{probabilidad}
+$0.4$. Codifique el \omterm{def:g11:prob:rv}{distribución} del día como una columna.
+$\binom{p_{\text{sun}}}{p_{\text{rain}}}$ y la evolución por
+\[
+M = \begin{pmatrix} 0.8 & 0.4\\ 0.2 & 0.6 \end{pmatrix}.
+\]
+\begin{enumerate}[resume]
+  \item Compruebe que cada columna de $M$ sume $1$ y diga por qué.
+        cualquier máquina meteorológica debe tener esta propiedad.
+  \item Hoy está soleado. Calcule el pronóstico para mañana y
+        para el día siguiente.
+  \item Encuentra el \emph{estado estable}: el \omterm{def:g11:prob:rv}{distribución} $v$ con
+        $Mv = v$ (y entradas que suman $1$). ¿Qué fracción de
+        ¿Hay días soleados a largo plazo?
+  \item Comienza desde un día lluvioso, $\binom01$, y aplica $M$ cuatro
+        veces, rastreando la distancia hasta el estado estable en
+        cada paso. ¿En qué factor se reduce la brecha por paso?
+        --- ¿Y qué tipo de convergencia es esta?
+  \item PageRank en miniatura: tres páginas, con enlaces
+        $A \to B$, $A \to C$, $B \to C$, $C \to A$. un azar
+        El navegante sigue un enlace saliente de manera uniforme y aleatoria.
+        Escriba la transición \omterm{def:g12:matrix:matrix}{matriz}, encuentre el estado estacionario y
+        clasificar las páginas.
+  \item Interprete el ranking: ¿por qué $C$ obtiene una puntuación tan alta como
+        $A$ a pesar de recibir enlaces de menos páginas --- ¿qué
+        ¿Cómo mide realmente el estado estacionario? (PageRank real
+        añade un factor de amortiguación para callejones sin salida y saltos; el
+        La idea del vector propio es exactamente ésta.)
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte IV --- Diagonal dividends.}
+\begin{enumerate}[resume]
+  \item Dos cantidades acopladas obedecen
+        $u_{n+1} = 3u_n + v_n$, $v_{n+1} = u_n + 3v_n$, es decir\
+        el \omterm{def:g12:matrix:matrix}{matriz} $A$ de \cref{exo:g12:matrix:8}. Usando eso
+        diagonalización del ejercicio
+        ($D = \operatorname{diag}(4, 2)$), dar el cerrado
+        fórmula para $u_n$ cuando $u_0 = 1$, $v_0 = 0$ y verifique
+        compararlo con el cálculo directo para $n = 1, 2, 3$.
+  \item En una o dos frases: ¿qué significa diagonalización?
+        \emph{do} a un sistema acoplado --- y en qué sentido
+        el estado estacionario de Markov de la pregunta 14 es un vector propio
+        historia también?
+  \item Finale --- las tres caras del \omterm{def:g12:matrix:matrix}{matriz} este fin de semana:
+        contabilidad (sistemas e inversas), combinatoria
+        (paseos y enlaces contados por poderes), y evolución
+        (Fibonacci, el clima, la web --- lectura de futuros
+        direcciones propias). Una frase cada uno, más la
+        puntero hacia adelante: el álgebra lineal de los volúmenes universitarios
+        hace de cada una de estas caras una teoría.
+\end{enumerate}
+\end{problem}

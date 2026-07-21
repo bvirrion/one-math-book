@@ -1,0 +1,420 @@
+\chapter{Aritmética}\label{ch:g12:arith}
+
+La aritmética estudia el \omterm{def:g10:numbers:sets}{números enteros}: \omterm{def:g12:arith:divides}{divisibilidad}, \omterm{def:g12:arith:prime}{numeros primos}, restos.
+Considerada durante mucho tiempo la más pura de las matemáticas puras, ahora protege todas las aplicaciones en línea.
+pago: el criptosistema RSA se basa en los teoremas de Bézout, Gauss y
+Fermat lo demostró en este capítulo.
+
+\section{Divisibilidad y división euclidiana}
+
+\begin{definition}[Divisibilidad]\label{def:g12:arith:divides}
+Deje $a, b \in \Z$. Decimos $b$ \emph{divide} $a$\index{divisibilidad}, escrito
+$b \mid a$, si existe $k \in \Z$ con $a = kb$. También decimos que $a$ es un
+\emph{múltiple} de $b$.
+\end{definition}
+
+\begin{proposition}\label{prop:g12:arith:divprops}
+Si $c \mid a$ y $c \mid b$, entonces $c$ \omterm{def:g12:arith:divides}{divide} cada combinación \omterm{def:g10:numbers:sets}{entero}
+$au + bv$ ($u, v \in \Z$). Si $a \mid b$ y $b \mid a$ con
+$a,b \in \N$, luego $a = b$. Si $a \mid b$ y $b \neq 0$, entonces $\abs a \leq \abs b$.
+\end{proposition}
+
+\begin{proof}
+Escriba $a = kc$, $b = lc$: luego $au + bv = (ku + lv)c$. Los otros puntos
+seguir desde $\abs{a} = \abs{k}\,\abs{b}$ con $\abs k \geq 1$ cuando
+$b = ka \neq 0$.
+\end{proof}
+
+\begin{theorem}[división euclidiana]\label{thm:g12:arith:euclid}
+\index{división euclidiana}
+Sean $a \in \Z$ y $b \in \N^*$. Existe un par único
+$(q, r) \in \Z \times \N$ tal que
+\[
+a = bq + r \qquad\text{and}\qquad 0 \leq r < b .
+\]
+$q$ es el \emph{cociente} y $r$ es el \emph{resto}.
+\end{theorem}
+
+\begin{proof}
+\emph{Existencia.} El conjunto de múltiplos de $b$ que no exceden $a$ tiene un
+elemento más grande $bq$ (no está vacío y es \omterm{def:g12:seq:bounded}{delimitado arriba}); establezca $r = a - bq$.
+Por maximalidad, $b(q+1) > a$, entonces $0 \leq r < b$.
+\emph{Unicidad.} Si $bq + r = bq' + r'$ con $0 \leq r, r' < b$, entonces
+$b(q - q') = r' - r$ y $\abs{r' - r} < b$: un múltiplo de $b$ de \omterm{def:g10:numbers:abs}{absoluto
+valor} menor que $b$ debe ser $0$, por lo tanto $r = r'$ y $q = q'$.
+\end{proof}
+
+\section{Congruencias}
+
+\begin{definition}[congruencia]\label{def:g12:arith:congruence}
+Deje $n \in \N^*$. Dos \omterm{def:g10:numbers:sets}{números enteros} $a, b$ son \emph{módulo congruente
+$n$}\index{congruencia}, escrito $a \equiv b \pmod n$, si $n \mid (a - b)$
+--- de manera equivalente, si $a$ y $b$ tienen el mismo resto en \omterm{thm:g12:arith:euclid}{euclidiano
+división} por $n$.
+\end{definition}
+
+\begin{proposition}[Compatibilidad con operaciones]\label{prop:g12:arith:congops}
+Si $a \equiv b \pmod n$ y $c \equiv d \pmod n$, entonces
+\[
+a + c \equiv b + d, \qquad
+ac \equiv bd, \qquad
+a^k \equiv b^k \ (k \in \N) \pmod n .
+\]
+\end{proposition}
+
+\begin{proof}
+$n$ \omterm{def:g12:arith:divides}{divide} $(a-b) + (c-d) = (a+c) - (b+d)$, y
+$ac - bd = a(c - d) + d(a - b)$ también es un múltiplo de $n$. La regla del poder
+sigue por inducción de la regla del producto.
+\end{proof}
+
+\begin{method}[Módulo de potencias de cálculo $n$]\label{met:g12:arith:powers}
+Para calcular $a^k \bmod n$, reduzca el módulo base $n$, luego busque una pequeña
+potencia de $a$ congruente con $\pm1$ y utilícela para colapsar el exponente. Para
+instancia $2^{100} \bmod 7$: desde $2^3 = 8 \equiv 1 \pmod 7$ y
+$100 = 3\times33 + 1$,
+\[
+2^{100} = \left(2^{3}\right)^{33} \times 2 \equiv 1^{33}\times 2 = 2 \pmod 7 .
+\]
+\end{method}
+
+\section{MCD, Bézout y Gauss}
+
+\begin{definition}[MCD]\label{def:g12:arith:gcd}
+Sea $a, b$ \omterm{def:g10:numbers:sets}{números enteros}, no ambos cero. El \emph{mayor común
+divisor}\index{mcd} $\gcd(a, b)$ es el \omterm{def:g10:numbers:sets}{entero} más grande que divide ambos $a$
+y $b$. Cuando se dice que $\gcd(a,b) = 1$, $a$ y $b$ son
+\emph{coprimo}\index{coprimo}.
+\end{definition}
+
+\begin{proposition}[algoritmo de Euclides]\label{prop:g12:arith:euclidalgo}
+\index{algoritmo de euclides}
+Si $a = bq + r$ ($b \neq 0$), entonces $\gcd(a, b) = \gcd(b, r)$. Iterando el
+\omterm{thm:g12:arith:euclid}{división euclidiana} por lo tanto calcula $\gcd(a,b)$: el \omterm{def:g12:arith:gcd}{mcd} es el último
+resto distinto de cero.
+\end{proposition}
+
+\begin{proof}
+Cualquier divisor común de $a$ y $b$ \omterm{def:g12:arith:divides}{divide} $r = a - bq$
+(\cref{prop:g12:arith:divprops}), por lo tanto es un divisor común de $b$ y $r$;
+y viceversa, desde $a = bq + r$. Los dos pares tienen el mismo común
+divisores, por lo que lo mismo \omterm{def:g12:arith:gcd}{mcd}. El algoritmo termina porque los restos
+forme estrictamente un \omterm{def:g10:functions:variations}{decreciente} \omterm{def:g12:seq:sequence}{secuencia} de \omterm{def:g10:numbers:sets}{números enteros} no negativo.
+\end{proof}
+
+\begin{example}\label{ex:g12:arith:euclidalgo}
+$\gcd(252, 198)$: $252 = 198 + 54$; $198 = 3\times54 + 36$;
+$54 = 36 + 18$; $36 = 2 \times 18 + 0$. Por lo tanto $\gcd(252,198) = 18$.
+\end{example}
+
+\begin{theorem}[Identidad de Bézout]\label{thm:g12:arith:bezout}
+\index{La identidad de Bézout}
+Sea $a, b$ \omterm{def:g10:numbers:sets}{números enteros}, no cero, y $d = \gcd(a,b)$. existen
+$u, v \in \Z$ tal que
+\[
+au + bv = d .
+\]
+En particular, $a$ y $b$ son \omterm{def:g12:arith:gcd}{coprimo} si y sólo si $au + bv = 1$ para algunos
+\omterm{def:g10:numbers:sets}{números enteros} $u, v$.
+\end{theorem}
+
+\begin{proof}
+Ejecute \omterm{prop:g12:arith:euclidalgo}{algoritmo de euclides} al revés: cada resto es una combinación \omterm{def:g10:numbers:sets}{entero}
+de los dos anteriores, y los datos iniciales $a, b$ son combinaciones de
+ellos mismos; mediante sustitución descendente, el último resto distinto de cero $d$ es un
+\omterm{def:g10:numbers:sets}{entero} combinación de $a$ y $b$. (En \cref{ex:g12:arith:euclidalgo}:
+$18 = 54 - 36 = 54 - (198 - 3\times54) = 4\times54 - 198 =
+4(252 - 198) - 198 = 4\times252 - 5\times198$.)
+
+Para la equivalencia: si $\gcd(a,b) = 1$, Bézout proporciona $u, v$; por el contrario,
+cualquier divisor común de $a$ y $b$ \omterm{def:g12:arith:divides}{divide} $au + bv = 1$, forzando
+$\gcd(a,b) = 1$.
+\end{proof}
+
+\begin{theorem}[Lema de Gauss]\label{thm:g12:arith:gauss}
+\index{Lema de Gauss}
+Vamos $a, b, c \in \Z$. Si $a \mid bc$ y $\gcd(a, b) = 1$, entonces $a \mid c$.
+\end{theorem}
+
+\begin{proof}
+Bézout da $au + bv = 1$; multiplicar por $c$: $acu + bcv = c$. Ambos términos de
+el lado izquierdo son múltiplos de $a$ (el segundo porque $a \mid bc$), por lo tanto
+también lo es $c$.
+\end{proof}
+
+\begin{corollary}\label{cor:g12:arith:coprimeprod}
+Si $a \mid c$, $b \mid c$ y $\gcd(a,b) = 1$, entonces $ab \mid c$.
+\end{corollary}
+
+\begin{proof}
+Escribe $c = ak$. De $b \mid ak$ y $\gcd(a,b)=1$, Gauss da
+$b \mid k$, digamos $k = bl$; luego $c = abl$.
+\end{proof}
+
+\section{numeros primos}
+
+\begin{definition}[Principal]\label{def:g12:arith:prime}
+Un \omterm{def:g10:numbers:sets}{entero} $p \geq 2$ es \emph{principal}\index{numero primo} si es solo
+Los divisores positivos son $1$ y $p$.
+\end{definition}
+
+\begin{proposition}\label{prop:g12:arith:primedivides}
+Cada \omterm{def:g10:numbers:sets}{entero} $n \geq 2$ tiene un divisor \omterm{def:g12:arith:prime}{principal}; si $n$ no es \omterm{def:g12:arith:prime}{principal}, tiene un
+\omterm{def:g12:arith:prime}{principal} divisor $\leq \sqrt n$. Si un \omterm{def:g12:arith:prime}{principal} $p$ \omterm{def:g12:arith:divides}{divide} un producto $ab$, entonces
+$p \mid a$ o $p \mid b$ (\emph{Lema de Euclides}).
+\end{proposition}
+
+\begin{proof}
+El divisor más pequeño $d \geq 2$ de $n$ es \omterm{def:g12:arith:prime}{principal} (cualquier divisor propio de $d$
+sería un divisor más pequeño de $n$). Si $n = de$ es compuesto con
+$2 \leq d \leq e$, luego $d^2 \leq de = n$, entonces $d \leq \sqrt n$. Para Euclides
+lema: si $p \nmid a$, entonces $\gcd(p, a) = 1$ (los únicos divisores de $p$ son
+$1$ y $p$), y el lema de Gauss da $p \mid b$.
+\end{proof}
+
+\begin{theorem}[Euclides]\label{thm:g12:arith:infiniteprimes}
+Hay infinitos \omterm{def:g12:arith:prime}{primos}.
+\end{theorem}
+
+\begin{proof}
+Dada cualquier lista finita $p_1, \dots, p_k$ de \omterm{def:g12:arith:prime}{primos}, considere
+$N = p_1 p_2 \cdots p_k + 1$. Algunos \omterm{def:g12:arith:prime}{principal} $p$ \omterm{def:g12:arith:divides}{divide} $N$; pero no $p_i$
+\omterm{def:g12:arith:divides}{divide} $N$ (el resto es $1$), por lo que $p$ es un \omterm{def:g12:arith:prime}{principal} que no está en la lista. No
+La lista finita agota el \omterm{def:g12:arith:prime}{primos}.
+\end{proof}
+
+\begin{theorem}[Teorema fundamental de la aritmética.]\label{thm:g12:arith:fta}
+\index{teorema fundamental de la aritmética}
+Cada \omterm{def:g10:numbers:sets}{entero} $n \geq 2$ es un producto de \omterm{def:g12:arith:prime}{primos}, y esta factorización es
+único hasta el orden de los factores:
+\[
+n = p_1^{\alpha_1} p_2^{\alpha_2} \cdots p_r^{\alpha_r},
+\qquad p_1 < p_2 < \dots < p_r \text{ primes},\ \alpha_i \geq 1 .
+\]
+\end{theorem}
+
+\begin{proof}
+\emph{Existencia}, por inducción fuerte: $n$ \omterm{def:g12:arith:prime}{principal} es su propia factorización;
+de lo contrario $n = de$ con $2 \leq d, e < n$, y ambos factorizan por la inducción
+hipótesis. \emph{Unicidad}: supongamos
+$p_1\cdots p_s = q_1 \cdots q_t$ (\omterm{def:g12:arith:prime}{primos}, con repeticiones permitidas). Por
+lema de Euclides, $p_1$ \omterm{def:g12:arith:divides}{divide} algunos $q_j$, y siendo \omterm{def:g12:arith:prime}{principal}, $p_1 = q_j$;
+cancelar y repetir. Las dos factorizaciones coinciden término por término.
+\end{proof}
+
+\begin{theorem}[Pequeño teorema de Fermat]\label{thm:g12:arith:fermat}
+\index{El pequeño teorema de Fermat}
+Sea $p$ \omterm{def:g12:arith:prime}{principal} y $a \in \Z$ con $p \nmid a$. entonces
+\[
+a^{p-1} \equiv 1 \pmod p .
+\]
+Por cada $a \in \Z$ (no se asume coprimalidad), $a^p \equiv a \pmod p$.
+\end{theorem}
+
+\begin{proof}
+Considere el módulo $p - 1$ \omterm{def:g10:numbers:sets}{números enteros} $a, 2a, 3a, \dots, (p-1)a$ $p$. Ninguno
+es $\equiv 0$ (si $p \mid ka$ con $1 \leq k \leq p-1$, el lema de Euclides fuerza
+$p \mid k$, imposible), y son módulos distintos por pares $p$ (si
+$ka \equiv la$, luego $p \mid (k - l)a$, entonces $p \mid k - l$, entonces $k = l$).
+Por lo tanto, módulo $p$, son los números $1, 2, \dots, p-1$ en algún orden.
+Multiplicando todo \omterm{def:g12:arith:congruence}{congruencias}:
+\[
+a^{p-1}\,(p-1)! \equiv (p-1)! \pmod p .
+\]
+Desde $p$ \omterm{def:g12:arith:divides}{divide} ninguno de $1, \dots, p-1$, uso repetido del lema de Euclides
+permite cancelar $(p-1)!$, dejando $a^{p-1} \equiv 1$. la segunda forma
+sigue multiplicando por $a$ (y es trivial cuando $p \mid a$).
+\end{proof}
+
+\begin{example}[Aplicación a la criptografía]\label{ex:g12:arith:rsa}
+El teorema de Fermat hace que el módulo de exponenciación $n$ sea reversible cuando el
+los exponentes se eligen adecuadamente: el corazón del criptosistema \emph{RSA}.
+Con $p, q$ grande \omterm{def:g12:arith:prime}{primos} y $n = pq$, se publica $n$ y un exponente
+$e$; El cifrado es $x \mapsto x^e \bmod n$. Descifrar requiere un exponente
+$d$ con $ed \equiv 1 \pmod{(p-1)(q-1)}$, que solo alguien conoce $p$
+y $q$ pueden calcular --- y recuperar $p, q$ de $n$ significa \omterm{def:g10:algebra:expand}{factorización} a
+número de cientos de dígitos, algo que ningún algoritmo conocido hace en términos razonables.
+tiempo.
+\end{example}
+
+\section{Ceremonias}
+
+\begin{exercise}[$\star$]\label{exo:g12:arith:1}
+Calcule el cociente y el resto de \omterm{thm:g12:arith:euclid}{división euclidiana} de $2026$ mediante
+$17$, y de $-2026$ por $17$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:arith:2}
+¿Cuál es el resto de $7^{100}$ módulo $10$? (¿Cuál es el último dígito de
+$7^{100}$?)
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:arith:3}
+Usando \omterm{prop:g12:arith:euclidalgo}{algoritmo de euclides}, calcule $\gcd(1071, 462)$ y encuentre \omterm{def:g10:numbers:sets}{números enteros}
+$u, v$ con $1071u + 462v = \gcd(1071, 462)$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:arith:4}
+Demuestre que para cada $n \in \Z$, $n^2$ es congruente con el módulo $0$ o $1$
+$4$. Deducir que un \omterm{def:g10:numbers:sets}{entero} $\equiv 3 \pmod 4$ nunca es suma de dos
+cuadrados.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:arith:5}
+Demuestre que para todo $n \in \N$, $n(n+1)(2n+1)$ es divisible por $6$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:arith:6}
+Resuelva en $\Z$ el \omterm{def:g12:arith:congruence}{congruencia} $5x \equiv 3 \pmod{11}$.
+(Pista: encuentre el inverso de $5$ módulo $11$.)
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:arith:7}
+Resuelve en $\Z \times \Z$ el Diofantino \omterm{def:g10:algebra:equation}{ecuación}
+\[
+17x - 40y = 1,
+\]
+luego describa todas las soluciones de $17x - 40y = 6$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:arith:8}
+Demuestre que $\sqrt2$ es \omterm{ex:g10:numbers:classify}{irracional}, utilizando la unicidad de \omterm{def:g12:arith:prime}{principal}
+factorización (compare el exponente de $2$ en ambos lados de $a^2 = 2b^2$).
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:arith:9}
+Sea $p$ un \omterm{def:g12:arith:prime}{principal}.
+\begin{enumerate}
+  \item Muestre eso para $1 \leq k \leq p - 1$, $p$ \omterm{def:g12:arith:divides}{divide} $\dbinom{p}{k}$.
+        (Sugerencia: utilice $k\binom pk = p\binom{p-1}{k-1}$, \cref{exo:g12:comb:7},
+        y el lema de Gauss.)
+  \item Deduzca, por inducción sobre $a \geq 0$, otra prueba de la pequeña
+        teorema en la forma $a^p \equiv a \pmod p$.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:arith:10}
+\emph{(Problema del resto chino).} Encuentra todos los \omterm{def:g10:numbers:sets}{números enteros} $n$ tales que
+\[
+n \equiv 2 \pmod 3, \qquad n \equiv 3 \pmod 5, \qquad n \equiv 2 \pmod 7 .
+\]
+(Pista: resuelva las dos primeras condiciones, luego incorpore la tercera; Bézout
+los coeficientes ayudan.)
+\end{exercise}
+
+\section{Problema: códigos secretos y dígitos de control}
+
+\begin{problem}[{Problema de fin de semana --- las congruencias protegen cada
+código de barras y tarjeta de crédito, y el pequeño teorema de Fermat ejecuta el
+bloquear los secretos del mundo}]
+\label{pb:g12:arith:1}
+G.\,H.~Hardy se jactaba en 1940 de que la teoría de números era "inmaculada"
+por aplicaciones. Ochenta años después, cada código de barras emite un pitido, cada
+pago con tarjeta de crédito y cada mensaje cifrado lo contradice
+--- exactamente con las herramientas de este capítulo: \omterm{def:g12:arith:congruence}{congruencias}
+(\cref{prop:g12:arith:congops}), Bézout inversas
+(\cref{thm:g12:arith:bezout}) y el pequeño teorema de Fermat
+(\cref{exo:g12:arith:9}). Este problema verifica los códigos, rompe un
+versión de juguete de la cerradura y aprende por qué la cerradura real se mantiene firme.
+
+\medskip
+\noindent\textbf{Parte I --- \omterm{def:g12:arith:congruence}{Congruencia} fluency.}
+\begin{enumerate}
+  \item Calcular $2026 \bmod 7$; luego el último dígito de
+        $7^{100}$ (encontrar el ciclo de potencias del módulo $7$
+        $10$).
+  \item Exponenciación rápida (\cref{met:g12:arith:powers}):
+        calcular $5^{117} \bmod 13$ (comenzar desde
+        $5^2 \equiv -1$).
+  \item Resuelve $3x \equiv 5 \pmod 7$.
+  \item Ejecute \omterm{prop:g12:arith:euclidalgo}{algoritmo de euclides} en $(97, 35)$, sustitución hacia atrás
+        para encontrar \omterm{def:g10:numbers:sets}{números enteros} $u, v$ con $97u + 35v = 1$, y
+        deducir el inverso de $35$ módulo $97$.
+  \item Indique precisamente cuando $a$ es módulo invertible $n$, y
+        cuyo teorema entrega lo inverso.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte II --- Check digits.}
+\begin{enumerate}[resume]
+  \item ISBN-10: los diez dígitos $d_1 \dots d_{10}$ de un libro
+        el código debe satisfacer
+        $10d_1 + 9d_2 + \dots + 2d_9 + 1d_{10} \equiv 0
+        \pmod{11}$. Verificar el ISBN real
+        $0\,306\,40615\,2$.
+  \item Demostrar que el esquema ISBN detecta \emph{cada}
+        Error de un solo dígito: si un dígito cambia por
+        $d \not\equiv 0$, la suma ponderada cambia en $w d$
+        con $1 \leq w \leq 10$ --- ¿por qué esto nunca puede ser?
+        $\equiv 0 \pmod{11}$
+        (\cref{thm:g12:arith:gauss})?
+  \item Demuestre que también detecta cada transposición de dos
+        dígitos adyacentes (distintos). Luego explica el diseño.
+        secreto: qué propiedad de $11$ hizo que ambas pruebas funcionaran,
+        ¿Y qué podría salir mal con \omterm{def:g12:complex:modulus}{módulo} $10$?
+  \item Los códigos de barras EAN-13 pesan los dígitos $1, 3, 1, 3, \dots$
+        módulo $10$. Calcular el dígito de control completando
+        $978\,2940199\,05$. ¿Qué transposiciones adyacentes hacen
+        EAN \emph{fallar} para detectar? (Cuando es
+        $2(a - b) \equiv 0 \pmod{10}$?)
+  \item Las tarjetas de crédito utilizan el esquema de Luhn: desde la derecha, doble
+        cada segundo dígito (restando $9$ cuando el doble
+        excede $9$), suma todo y requiere un múltiplo de
+        $10$. Verificar el número de prueba
+        $4539\,1488\,0343\,6467$.
+  \item En una frase: ¿qué compró el ISBN \omterm{def:g12:arith:prime}{principal} \omterm{def:g12:complex:modulus}{módulo}?
+        que EAN y Luhn, encadenados a $10$, no pueden tener?
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte III --- Fermat's lock.}
+\begin{enumerate}[resume]
+  \item Una trampa ante el tesoro: computar
+        $2^{10} \bmod 341$, deducir $2^{340} \bmod 341$ --- y
+        luego factorice $341$. ¿Qué significa este ejemplo (un
+        \emph{Fermat pseudoprime}) dicen sobre el uso de Fermat
+        ¿Pequeño teorema como prueba de primalidad?
+  \item RSA en miniatura: tome $p = 3$, $q = 11$, entonces
+        $n = 33$ y $(p-1)(q-1) = 20$; el exponente público es
+        $e = 3$. Encuentra el exponente privado $d$ con
+        $3d \equiv 1 \pmod{20}$ (método de la pregunta 4).
+  \item Cifrar el mensaje $m = 4$: calcular
+        $c = m^3 \bmod 33$.
+  \item Descifrar: calcular $c^d \bmod 33$ (usar
+        $c \equiv -2 \pmod{33}$) y recuperar el mensaje.
+  \item Por qué el descifrado siempre funciona: demuestre que
+        $m^{21} \equiv m$ tanto el módulo $3$ como el módulo $11$
+        (El pequeño teorema de Fermat en cada mundo), y concluir
+        módulo $33$ (\cref{thm:g12:arith:gauss} pega los dos
+        \omterm{def:g12:arith:congruence}{congruencias}). ¿De dónde surgió el formulario especial de $21 = ed$?
+        $1 + 20k$ entrar?
+  \item La seguridad de la cerradura: todos conocen $n$ y $e$;
+        recuperar $d$ requiere $(p-1)(q-1)$, de ahí los factores
+        de $n$. Nuestros factores $33$ a la vista --- ¿por qué hace lo mismo?
+        esquema, con $n$ de seiscientos dígitos, protege el
+        los bancos del mundo? (Una frase sobre la asimetría entre
+        multiplicando y \omterm{def:g10:algebra:expand}{factorización}.)
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte IV --- Classics.}
+\begin{enumerate}[resume]
+  \item El viejo conde de soldados chinos (compárese
+        \cref{exo:g12:arith:10}): salen varios soldados
+        resto $2$ cuando se clasifica por $3$ y resto $3$ cuando
+        Clasificado por $5$. Encuentre todos los recuentos posibles y explique
+        por qué la respuesta es módulo único $15$.
+  \item Por fin pruebas de una línea: de $10 \equiv 1 \pmod 9$,
+        demostrar que todo número es congruente con la suma de sus dígitos
+        módulo $9$; de $10 \equiv -1 \pmod{11}$, derivar el
+        regla de suma alterna para $11$. (La escuela secundaria
+        El volumen demostró esto con álgebra explícita --- admirar
+        la compresión.)
+  \item Final --- Hardy contra el código de barras: recapitula el
+        kit de herramientas del capítulo (\omterm{def:g12:arith:congruence}{congruencia} aritmética, Bézout
+        inversas, pequeño teorema de Fermat, pegado \omterm{def:g12:arith:gcd}{coprimo}
+        módulos) y dónde cada uno encajó en su lugar en este
+        problema; luego dé el veredicto moderno sobre
+        ``inmaculado''.
+\end{enumerate}
+\end{problem}
