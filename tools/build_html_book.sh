@@ -11,6 +11,22 @@ OUT="$SAAS/resources/onecourse/chapters"
 SVG_OUT="$SAAS/public/images/onecourse/chapters"
 cd "$(dirname "$0")/.."
 
+# Pass 1: register every chapter's labels so cross-chapter references —
+# including forward ones — resolve during the full pass.
+n=0
+for part in grade-10 grade-11 grade-12; do
+    for slug in $(grep -oP "(?<=\\\\ominput\{$part\}\{)[0-9a-z-]+" "parts/$part/part.tex"); do
+        n=$((n + 1))
+        python3 tools/build_html_chapter.py \
+            --chapter "parts/$part/$slug.tex" \
+            --chapter-number "$n" \
+            --book math-2 --languages en,fr,nl \
+            --out "$OUT" --svg-out "$SVG_OUT" \
+            --labels-only || exit 1
+    done
+done
+
+# Pass 2: full conversion.
 failed=()
 n=0
 for part in grade-10 grade-11 grade-12; do

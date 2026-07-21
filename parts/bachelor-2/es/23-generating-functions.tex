@@ -1,0 +1,1043 @@
+\chapter{Funciones generadoras de probabilidad}\label{ch:b2:genfun}
+
+La serie de potencias de \cref{ch:b2:powerseries} regresa con una
+misión probabilística: a un \omterm{def:b2:randomvar:law}{variable aleatoria} valorado en $\N$ le adjuntamos
+la serie de potencias con coeficientes $\P(X = n)$. esto
+\emph{\omterm{ex:b2:powerseries:fibonacci}{función generadora}} convierte sumas de variables \omterm{def:b2:proba:independence}{independiente}
+en productos, momentos en derivados en $1$ y duro
+identidades combinatorias en multiplicaciones de una línea. el
+El capítulo cierra el libro con dos obras maestras: el Poisson
+aproximación del raro \omterm{def:b2:proba:space}{eventos}, y el criterio de extinción para
+procesos de ramificación --- un proceso probabilístico genuinamente infinito
+cálculo resuelto completamente por la geometría de una curva convexa.
+
+\section{Definición y propiedades básicas.}
+
+\begin{definition}[Función generadora de probabilidad]\label{def:b2:genfun:pgf}
+Sea $X$ un \omterm{def:b2:randomvar:law}{variable aleatoria}, $p_n = \P(X = n)$ con valor $\N$. el
+\emph{función generadora de probabilidad}\index{generación de probabilidad
+función} de $X$ es la suma de los
+serie de potencias
+\[
+G_X(t) = \E\bigl(t^X\bigr) = \sum_{n=0}^{\infty} p_n\,t^n .
+\]
+\end{definition}
+
+\begin{example}[primeros reflejos]\label{ex:b2:genfun:firstreflexes}
+Una variable constante $X = c$ tiene $G_X(t) = t^c$; un turno obedece
+$G_{X+c}(t) = t^c\,G_X(t)$; y evaluar en puntos especiales
+lee información sin ninguna expansión: $G_X(0) = \P(X
+= 0)$, $G_X(1) = 1$y $G_X(-1) = \P(X\text{ even}) -
+\P(X\text{ odd})$, el equilibrio de paridad explotado en
+\cref{exo:b2:genfun:10}. Estas frases ingeniosas se utilizan en silencio.
+en todas partes a continuación --- y la evaluación $G_X(0)$ es exactamente
+cómo se extraerán las probabilidades de extinción de iterados
+\omterm{ex:b2:powerseries:fibonacci}{funciones generadoras} al final del capítulo.
+\end{example}
+
+\begin{proposition}[Radio y primeras propiedades]\label{prop:b2:genfun:radius}
+La serie que define $G_X$ tiene \omterm{def:b2:powerseries:radius}{radio de convergencia} $\geq 1$;
+$G_X$ está definido y \omterm{def:b2:metric:continuity}{continuo} en $\intcc{-1}{1}$,
+$\mathcal{C}^\infty$ en $\intoo{-1}{1}$, con $G_X(1) = 1$ y
+$\abs{G_X(t)} \leq 1$ allí. Además $G_X$ determina el \omterm{def:b2:randomvar:law}{ley} de
+$X$:
+\[
+p_n = \frac{G_X^{(n)}(0)}{n!} .
+\]
+\end{proposition}
+
+\begin{proof}
+Dado que $\sum p_n = 1$ converge, los términos $p_n\,1^n$ están acotados,
+entonces el radio es $\geq 1$ (lema de Abel,
+\cref{ch:b2:powerseries}); en $t = \pm1$ la serie converge
+\omterm{def:b2:series:def}{absolutamente} ($\sum p_n = 1$ domina); mejor, en general
+intervalo $\intcc{-1}1$,
+\[
+\sup_{\abs t\leq1}\,\abs{p_nt^n} = p_n
+\quad\text{with}\quad \sum_np_n < \infty :
+\]
+la serie converge \emph{\omterm{def:b2:funcseq:series}{normalmente}} en $\intcc{-1}1$, por lo que
+su suma es \omterm{def:b2:metric:continuity}{continuo} ahí
+(\cref{thm:b2:funcseq:weierstrass,thm:b2:funcseq:continuity}). Suavidad interior y coeficiente.
+la fórmula es la teoría general de las series de potencias; los coeficientes
+siendo recuperable, dos variables con el mismo \omterm{ex:b2:powerseries:fibonacci}{función generadora}
+tiene el mismo \omterm{def:b2:randomvar:law}{ley}.
+\end{proof}
+
+\begin{example}[Las leyes clásicas]\label{ex:b2:genfun:classical}
+\leavevmode
+\begin{itemize}
+\item Bernoulli $\mathcal{B}(p)$: $G(t) = 1 - p + pt$.
+\item Binomio $\mathcal{B}(n, p)$: $G(t) = \sum_k \binom nk
+(pt)^k(1-p)^{n-k} = (1 - p + pt)^n$ (teorema del binomio).
+\item Geométrico $\mathcal{G}(p)$: $G(t) =
+\sum_{k\geq1}(1-p)^{k-1}p\,t^k = \dfrac{pt}{1 - (1-p)t}$ (radio
+$\frac{1}{1-p} > 1$).
+\item Veneno $\mathcal{P}(\lambda)$: $G(t) =
+\sum_k e^{-\lambda}\frac{(\lambda t)^k}{k!} = e^{\lambda(t - 1)}$
+(radio $\infty$).
+\end{itemize}
+\end{example}
+
+\begin{example}[Integrando el generador
+función]\label{ex:b2:genfun:integraltrick}
+Los derivados de $G_X$ y $1$ dan momentos positivos; el
+\emph{integral} da uno negativo. Desde $\int_0^1t^k\dd t
+= \frac1{k+1}$ e integración término por término (\omterm{def:b2:funcseq:series}{normales
+convergencia} en $\intcc01$):
+\[
+\int_0^1G_X(t)\,\dd t = \sum_{k\geq0}\frac{\P(X =
+k)}{k+1} = \E\Bigl(\frac1{1+X}\Bigr).
+\]
+Para $X \sim \mathcal P(\lambda)$:
+\[
+\E\Bigl(\frac1{1+X}\Bigr) =
+\int_0^1\eu^{\lambda(t-1)}\,\dd t = \frac{1 -
+\eu^{-\lambda}}{\lambda},
+\]
+recuperando en una línea el cálculo de la serie de
+\cref{ex:b2:randomvar:transferex}. El \omterm{ex:b2:powerseries:fibonacci}{función generadora}
+es un instrumento de dos vías: diferenciar en $1$ para el
+momentos $\E(X)$, $\E(X(X-1))$, integrar sobre $\intcc01$
+para $\E\bigl(\frac1{1+X}\bigr)$ --- un objeto \omterm{def:b2:powerseries:analytic}{analítico},
+consultado en cualquier dirección que necesite el problema.
+\end{example}
+
+\begin{example}[Una ley con radio exactamente
+uno]\label{ex:b2:genfun:heavytail}
+Deje $\P(X = k) = \dfrac{6}{\pi^2k^2}$ por $k \geq 1$ --- a
+probabilidad \omterm{def:b2:randomvar:law}{ley} por la identidad de Basilea
+(\cref{ex:b2:fourier:basel}). Es \omterm{ex:b2:powerseries:fibonacci}{función generadora}
+$G(t) = \frac6{\pi^2}\sum_{k\geq1}\frac{t^k}{k^2}$ tiene \omterm{def:b2:powerseries:radius}{radio
+de convergencia} exactamente $1$: el ``radio $\geq
+1$'' limitado general de \cref{prop:b2:genfun:radius} no se puede mejorar. y
+la media es
+\[
+\sum_{k\geq1}k\,\P(X = k) =
+\frac6{\pi^2}\sum_{k\geq1}\frac1k = \infty :
+\]
+$G$ es \omterm{def:b2:metric:continuity}{continuo} en $\intcc{-1}1$, suave por dentro, pero es
+derivada explota en $1^-$ --- el gráfico llega al
+punto $(1, 1)$ con tangente vertical. Las colas pesadas son
+visible \emph{geométricamente} en el \omterm{ex:b2:powerseries:fibonacci}{función generadora}, en
+el punto único $t = 1$; el teorema de momentos siguiente hace
+esta correspondencia es exacta.
+\end{example}
+
+\begin{theorem}[Momentos de la generación
+función]\label{thm:b2:genfun:moments}
+$X$ tiene un \omterm{def:b2:randomvar:expectation}{expectativa} si y sólo si $G_X$ es \omterm{def:b2:diffcalc:differential}{diferenciable} en
+$1^-$ (derivada izquierda, finita) y luego $\E(X) = G_X'(1)$.
+De manera similar, $X$ tiene un segundo momento si $G_X$ es dos veces
+\omterm{def:b2:diffcalc:differential}{diferenciable} en $1^-$, y luego
+\[
+\E\bigl(X(X - 1)\bigr) = G_X''(1),
+\qquad
+V(X) = G_X''(1) + G_X'(1) - G_X'(1)^2 .
+\]
+\end{theorem}
+
+\begin{proof}
+Para $t \in \intoo{0}{1}$, diferenciación término por término dentro del
+disco da $G_X'(t) = \sum_{n\geq1} np_n t^{n-1}$, una serie con
+coeficientes no negativos: $t \mapsto G_X'(t)$ no es decreciente en
+$\intoo{0}{1}$, y por convergencia monótona de sumas parciales (o
+Teorema de Abel para coeficientes no negativos,
+\cref{ch:b2:powerseries}),
+\[
+\lim_{t \to 1^-} G_X'(t)
+= \sum_{n\geq1} n\,p_n \in \intcc{0}{+\infty} ,
+\]
+cada lado es finito exactamente cuando el otro lo es. Cuando es finita, la media
+El teorema del valor comprime los cocientes de diferencia $\frac{G_X(1) -
+G_X(t)}{1 - t}$ entre valores de $G_X'$, por lo que $G_X$ es
+\omterm{def:b2:diffcalc:differential}{diferenciable} en $1^-$ con $G_X'(1) = \sum np_n = \E(X)$ (por
+transferencia). La declaración de segundo orden repite el argumento un nivel.
+arriba: $G''_X(t) = \sum_{n\geq2}n(n-1)p_nt^{n-2}$ es
+no decreciente en $\intoo01$ con límite monótono
+$\sum_nn(n-1)p_n = \E(X(X-1))$, finito exactamente cuando $X$ tiene
+un segundo momento. La fórmula \omterm{def:b2:randomvar:variance}{diferencia} se deriva entonces de
+König--Huygens:
+\[
+V(X) = \E(X^2) - \E(X)^2 = \E\bigl(X(X-1)\bigr) + \E(X) -
+\E(X)^2 = G''_X(1) + G'_X(1) - G'_X(1)^2 .
+\]
+\end{proof}
+
+\begin{example}
+Poisson: $G'(t) = \lambda e^{\lambda(t-1)}$, entonces $\E(X) = \lambda$;
+$G''(1) = \lambda^2$, entonces $V(X) = \lambda^2 + \lambda - \lambda^2 =
+\lambda$ --- los cálculos de \cref{ch:b2:randomvar} en uno
+línea cada uno.
+\end{example}
+
+\begin{example}[El modo de una ley de Poisson]
+\label{ex:b2:genfun:poissonmode}
+¿Dónde es $\P(X = k)$ más grande para $X \sim \mathcal
+P(\lambda)$? Los pesos consecutivos se comparan mediante la relación
+\[
+\frac{\P(X = k+1)}{\P(X = k)} = \frac{\lambda}{k + 1} ,
+\]
+que excede $1$ mientras que $k < \lambda - 1$ y cae por debajo
+$1$ una vez $k > \lambda - 1$: los pesos suben y luego bajan, con
+modo $\floor\lambda$ (y un empate entre $\lambda - 1$ y
+$\lambda$ cuando $\lambda$ es un número entero: para $\lambda = 3$,
+$\P(X = 2) = \P(X = 3) = \frac92\eu^{-3} \approx 0.224$).
+Las pruebas de proporciones sobre los coeficientes suelen ser la ruta más rápida
+a hechos cualitativos sobre un \omterm{def:b2:randomvar:law}{ley} discreto --- no se necesita \omterm{ex:b2:powerseries:fibonacci}{generando
+función}, pero los coeficientes \emph{son}
+\omterm{ex:b2:powerseries:fibonacci}{función generadora}, leer término por término.
+\end{example}
+
+\section{Sumas de variables independientes}
+
+\begin{theorem}[multiplicatividad]\label{thm:b2:genfun:product}
+Si $X$ y $Y$ tienen el valor \omterm{def:b2:proba:independence}{independiente} $\N$ \omterm{def:b2:randomvar:law}{variables aleatorias}, entonces
+\[
+G_{X + Y}(t) = G_X(t)\,G_Y(t)
+\qquad (\abs t \leq 1),
+\]
+y por inducción $G_{X_1 + \dots + X_n} = \prod_i G_{X_i}$ para
+\omterm{def:b2:proba:independence}{independiente}$X_1, \dots, X_n$.
+\end{theorem}
+
+\begin{proof}
+Dos pruebas, ambas instructivas. \emph{Via \omterm{def:b2:randomvar:expectation}{esperanzas de heredar}:} $t^X$ y
+$t^Y$ son variables acotadas \omterm{def:b2:proba:independence}{independiente}, por lo que
+(\cref{thm:b2:randomvar:product})
+\[
+G_{X+Y}(t) = \E\bigl(t^{X+Y}\bigr)
+= \E\bigl(t^X t^Y\bigr)
+= \E\bigl(t^X\bigr)\E\bigl(t^Y\bigr) .
+\]
+\emph{Via \omterm{thm:b2:series:fubini}{productos cauchy}:} el \omterm{def:b2:randomvar:law}{ley} de $X + Y$ es la convolución
+$\P(X + Y = n) = \sum_{k=0}^n \P(X = k)\P(Y = n - k)$, y el
+Teorema \omterm{thm:b2:series:fubini}{producto cauchy} para series convergentes \omterm{def:b2:series:def}{absolutamente}
+(\cref{ch:b2:series}) multiplica exactamente las dos series de potencias
+a lo largo de esta circunvolución.
+\end{proof}
+
+\begin{example}[Estabilidad de las leyes clásicas.]\label{ex:b2:genfun:stability}
+\omterm{def:b2:proba:independence}{Independiente} binomios con el mismo $p$ agregan: $(1 - p + pt)^m(1 -
+p + pt)^n = (1 - p + pt)^{m+n}$, entonces $\mathcal{B}(m, p) +
+\mathcal{B}(n, p) = \mathcal{B}(m + n, p)$ --- en particular una suma
+de $n$ \omterm{def:b2:proba:independence}{independiente} variables de Bernoulli es binomial, volviendo a demostrar la
+\omterm{def:b2:randomvar:law}{ley} del número de éxitos. \omterm{def:b2:proba:independence}{Independiente} Poissons añade:
+$e^{\lambda(t-1)}e^{\mu(t-1)} = e^{(\lambda + \mu)(t-1)}$, entonces
+$\mathcal{P}(\lambda) + \mathcal{P}(\mu) = \mathcal{P}(\lambda +
+\mu)$ --- el cálculo de convolución de
+\cref{exo:b2:randomvar:2}, ahora sin cómputo.
+\end{example}
+
+\begin{example}[Dos dados, un polinomio
+al cuadrado]\label{ex:b2:genfun:twodice}
+Por un dado justo, $G(t) = \frac{t + t^2 + \dots + t^6}{6}$;
+por la suma de dos,
+\[
+G(t)^2 = \frac{1}{36}\bigl(t^2 + 2t^3 + 3t^4 + 4t^5 + 5t^6 +
+6t^7 + 5t^8 + 4t^9 + 3t^{10} + 2t^{11} + t^{12}\bigr) :
+\]
+el triangular \omterm{def:b2:randomvar:law}{ley} de sumas de dados ($7$ es la moda, con
+probabilidad $\frac6{36} = \frac16$), lee un polinomio
+cuadrado que se multiplica una vez en la vida. el
+fórmula de convolución habría requerido once separados
+contar argumentos; el \omterm{ex:b2:powerseries:fibonacci}{función generadora} los hace todos
+simultáneamente, porque multiplicar polinomios \emph{is}
+coeficientes convolutivos. Esta traducción mecánica ---
+\omterm{def:b2:randomvar:law}{leyes} a coeficientes, sumas a productos --- es el total
+modelo de negocio del capítulo, y
+\cref{exo:b2:genfun:11} lo lleva a lo sorprendente
+Dados de Sicherman.
+\end{example}
+
+\begin{example}[Tres dados y un coeficiente
+extracción]\label{ex:b2:genfun:threedice}
+Para la suma $S$ de tres dados justos, $\P(S = 10)$ es el
+coeficiente de $t^{10}$ en $\bigl(\frac{t + \dots +
+t^6}6\bigr)^3$. Factorizar y desarrollar con el binomio y
+serie geométrica:
+\[
+\Bigl(\frac{t(1 - t^6)}{6(1 - t)}\Bigr)^{\!3}
+= \frac{t^3}{216}\,\bigl(1 - 3t^6 + 3t^{12} -
+t^{18}\bigr)\sum_{j\geq0}\binom{j+2}2t^j .
+\]
+El coeficiente de $t^{10}$ requiere $t^7$ del producto:
+$j = 7$ con el término $1$ y $j = 1$ con el término
+$-3t^6$:
+\[
+\P(S = 10) = \frac{1}{216}\Bigl(\binom92 -
+3\binom32\Bigr) = \frac{36 - 9}{216} = \frac{27}{216} =
+\frac18 .
+\]
+La enumeración directa de las tripletas $27$ es propensa a errores; el
+El álgebra es mecánica y se escala a cualquier número de dados.
+la inclusión-exclusión visible en $(1 - t^6)^3$ está funcionando
+el análisis del caso automáticamente.
+\end{example}
+
+\begin{example}[Leyendo una ley a partir de su generador
+función]\label{ex:b2:genfun:identify}
+¿Qué \omterm{def:b2:randomvar:law}{ley} tiene $G(t) = \dfrac1{2 - t}$? Expandirse a un poder
+serie:
+\[
+\frac{1}{2 - t} = \frac12\cdot\frac1{1 - t/2}
+= \sum_{k\geq0}\frac{t^k}{2^{k+1}} :
+\]
+coeficientes no negativos que suman $G(1) = 1$, por lo que este es un
+genuino \omterm{def:b2:randomvar:law}{ley}, $\P(X = k) = 2^{-(k+1)}$ en $\N$ --- a
+geométrico \omterm{def:b2:randomvar:law}{ley} a partir de $0$. Por unicidad
+(\cref{prop:b2:genfun:radius}), ningún otro \omterm{def:b2:randomvar:law}{ley} comparte esto
+$G$. Reconocer \omterm{def:b2:randomvar:law}{leyes} de su \omterm{ex:b2:powerseries:fibonacci}{funciones generadoras} es una
+habilidad que vale la pena explorar: así es como la ramificación crítica
+iterar $G_n(t) = \frac{n - (n-1)t}{n+1 - nt}$ del
+El problema del fin de semana se desenmascara como un \omterm{def:b2:randomvar:law}{ley} geométrico condicionado.
+sobre la supervivencia.
+\end{example}
+
+\begin{remark}
+La estabilidad es sólo en un sentido: las sumas de \omterm{def:b2:proba:independence}{independiente} Poissons son
+Poisson, pero las diferencias no son --- $X - Y$ toma negativo
+valores, por lo que no tiene \omterm{ex:b2:powerseries:fibonacci}{función generadora} en absoluto, y su \omterm{def:b2:randomvar:law}{ley}
+(el Skellam \omterm{def:b2:randomvar:law}{distribución}) se encuentra fuera del alcance de este capítulo.
+kit de herramientas. Asimismo $\mathcal B(m, p) + \mathcal B(n, p')$ con
+$p \neq p'$ es el binomio \emph{no}: el producto $(1 - p +
+pt)^m(1 - p' + p't)^n$ tiene dos ubicaciones de raíz distintas, mientras que
+cada pgf binomial tiene una única raíz repetida. leyendo
+La estabilidad de los patrones de raíz es una pequeña vista previa de cuánto
+estructurar las codificaciones polinómicas.
+\end{remark}
+
+\begin{remark}[El filtro de raíces de la unidad]
+La evaluación en $-1$ separa los pares de los impares; evaluando en absoluto
+$m$-ésima raíz de la unidad separa cada clase de residuo: con
+$\omega = \eu^{2\iu\pi/m}$,
+\[
+\P(X \equiv r \bmod m)
+= \frac1m\sum_{j=0}^{m-1}\omega^{-jr}\,G_X(\omega^j),
+\]
+ya que promediar $\omega^{j(k-r)}$ sobre $j$ produce $1$ si $k
+\equiv r $y$0$ en caso contrario. Ejemplo de dividendo: por la suma $S$
+de dos dados justos, cada uno $G(\omega^j) = \frac16\sum_{k=1}^6
+\omega^{jk} = -\frac16$ para $j \neq 0$ (los siete séptimos
+las raíces de la unidad suman cero), por lo que
+\[
+\P(7 \mid S) = \frac17\Bigl(1 +
+6\cdot\frac1{36}\Bigr) = \frac16 ,
+\]
+confirmando el conteo de \cref{ex:b2:genfun:twodice} ---
+y el método se adapta a preguntas en las que el conteo directo
+no lo hace.
+\end{remark}
+
+\begin{theorem}[Sumas aleatorias: identidad de Wald para generar
+funciones]\label{thm:b2:genfun:compound}
+Sean $(X_k)_{k\geq1}$ variables con valores \omterm{def:b2:proba:independence}{independiente} $\N$ con el
+mismo \omterm{def:b2:randomvar:law}{ley} y \omterm{ex:b2:powerseries:fibonacci}{función generadora} $G_X$, y dejemos que $N$ sea un
+Variable con valor $\N$ \omterm{def:b2:proba:independence}{independiente} del $X_k$, con \omterm{ex:b2:powerseries:fibonacci}{generando
+función} $G_N$. Entonces la suma aleatoria $S = X_1 + \dots + X_N$ (con
+$S = 0$ cuando $N = 0$) tiene \omterm{ex:b2:powerseries:fibonacci}{función generadora}
+\[
+G_S = G_N \circ G_X .
+\]
+En particular, si $N$ y $X_1$ tienen \omterm{def:b2:randomvar:expectation}{esperanzas de heredar}, $\E(S) =
+\E(N)\,\E(X_1)$.
+\end{theorem}
+
+\begin{proof}
+Condición en $N$ (probabilidad total,
+\cref{thm:b2:proba:bayes}): para $\abs t \leq 1$,
+\[
+G_S(t) = \sum_{n=0}^\infty \P(N = n)\,
+\E\bigl(t^{X_1 + \dots + X_n}\bigr)
+= \sum_{n=0}^\infty \P(N = n)\,G_X(t)^n
+= G_N\bigl(G_X(t)\bigr),
+\]
+utilizando la multiplicatividad para cada $n$ fijo y el \omterm{def:b2:series:summable}{sumabilidad} de
+toda la doble familia ($\abs{G_X(t)} \leq 1$). El intercambio de
+resúmenes es Fubini para familias \omterm{def:b2:series:summable}{sumable}
+(\cref{ch:b2:series}). Diferenciando en $1^-$ por la regla de la cadena
+y \cref{thm:b2:genfun:moments}: $\E(S) = G_N'(G_X(1))\,G_X'(1)
+= G_N'(1)G_X'(1) = \E(N)\E(X_1)$.
+\end{proof}
+
+\begin{example}[Poisson compuesto: seguro anual
+perdidas]\label{ex:b2:genfun:compoundpoisson}
+Una aseguradora recibe reclamaciones $N \sim \mathcal P(\lambda)$ en un
+año, cada reclamo cuesta $X_k$ (unidades enteras, i.i.d., pgf
+$G_X$, media $\mu$, independiente de $N$). Por
+\cref{thm:b2:genfun:compound}, la pérdida total que ha tenido $S$
+\[
+G_S(t) = \eu^{\lambda(G_X(t) - 1)},
+\qquad
+\E(S) = \lambda\mu ,
+\]
+y diferenciando dos veces en $1^-$:
+\[
+V(S) = \lambda\,G_X''(1) + \lambda^2\mu^2 + \lambda\mu -
+(\lambda\mu)^2 = \lambda\,\E(X^2) .
+\]
+El \omterm{def:b2:randomvar:variance}{diferencia} involucra el momento \emph{segundo} de un solo
+afirmación, no su \omterm{def:b2:randomvar:variance}{diferencia}: una suma de Poisson compuesta siente el
+reclamo grande ocasional dos veces --- una vez hasta cuántos, una vez
+a través de qué tan grande. Para reclamos $\lambda = 10$ de \omterm{def:b2:randomvar:law}{ley} geométrico
+con media $2$ ($\E X^2 = 6$): $\E S = 20$, $V(S) = 60$ y
+Chebyshev (\cref{ch:b2:randomvar}) ya rinde utilizable
+márgenes de solvencia. Este patrón de "suma detenida aleatoriamente" es el
+el mismo que impulsará la recursividad ramificada de
+\cref{prop:b2:genfun:branching}: la composición de \omterm{ex:b2:powerseries:fibonacci}{generando
+funciones} es el álgebra de poblaciones aleatorias.
+\end{example}
+
+\begin{remark}
+El \omterm{def:b2:proba:independence}{independencia} de $N$ de los sumandos no es decorativo.
+Tome $X_k \in \{0, 2\}$ con probabilidades iguales y sea $N =
+X_1$(flagrantemente dependiente): entonces $S = X_1 + \dots + X_N$ es
+$0$ cuando $X_1 = 0$ y $2 + X_2$ cuando $X_1 = 2$, entonces $\E(S) =
+\frac12(2 + 1) = \frac32$, mientras que $\E(N)\E(X_1) = 1\cdot1 =
+1$: la identidad de Wald falla. Cuando el número de términos es
+permitido a \emph{reaccionar} a los términos mismos, la limpieza
+La estructura del producto colapsa --- la teoría completa de tal
+Las reglas de ``detener'' es el capítulo de martingala del Año 3
+volumen.
+\end{remark}
+
+\section{Aproximación de Poisson}
+
+\begin{theorem}[Ley de eventos raros]\label{thm:b2:genfun:rareevents}
+Deje $X_n \sim \mathcal{B}(n, p_n)$ con $n\,p_n \to \lambda > 0$.
+Luego para cada $k \in \N$:
+\[
+\P(X_n = k)
+\xrightarrow[n\to\infty]{}
+e^{-\lambda}\frac{\lambda^k}{k!} :
+\]
+el binomio \omterm{def:b2:randomvar:law}{ley} de muchos \omterm{def:b2:proba:independence}{eventos independientes} raros converge al
+Poisson \omterm{def:b2:randomvar:law}{ley} del parámetro $\lambda$.
+\end{theorem}
+
+\begin{proof}
+Cálculo directo con $p_n = \frac{\lambda_n}{n}$, $\lambda_n
+\to \lambda$:
+\[
+\P(X_n = k)
+= \binom nk p_n^k(1 - p_n)^{n-k}
+= \frac{n(n-1)\cdots(n-k+1)}{n^k}\cdot
+\frac{\lambda_n^k}{k!}\,
+\bigl(1 - \tfrac{\lambda_n}{n}\bigr)^{n-k} .
+\]
+Como $n \to \infty$ con $k$ arreglado: el primer factor tiende a $1$
+(producto de $k$ factores $\to 1$); $\lambda_n^k \to \lambda^k$;
+y $\bigl(1 - \frac{\lambda_n}{n}\bigr)^{n-k} =
+\exp\bigl((n-k)\ln(1 - \frac{\lambda_n}{n})\bigr) \to
+e^{-\lambda}$ desde $(n - k)\ln\bigl(1 - \frac{\lambda_n}{n}\bigr)
+\sim -\lambda_n \to -\lambda$
+(\cref{ch:b2:comparison}). Alternativamente, a nivel de
+\omterm{ex:b2:powerseries:fibonacci}{funciones generadoras}: $G_{X_n}(t) = \bigl(1 +
+\frac{\lambda_n(t-1)}{n}\bigr)^n \to e^{\lambda(t - 1)} =
+G_{\mathcal{P}(\lambda)}(t)$para cada $t \in [0, 1]$ fijo ---
+convergencia de \omterm{ex:b2:powerseries:fibonacci}{funciones generadoras}, que (para valores $\N$)
+variables) es equivalente a la convergencia de cada $\P(X_n = k)$;
+ver \cref{exo:b2:genfun:9}.
+\end{proof}
+
+\begin{remark}
+Esta es la razón por la que el modelo Poisson \omterm{def:b2:randomvar:law}{leyes} cuenta con raros \omterm{def:b2:proba:space}{eventos} --- errores tipográficos por
+página, desintegraciones radiactivas por segundo, accidentes por día en un
+cruce: cada oportunidad es casi insignificante, las oportunidades son
+muchos, y sólo la tasa media $\lambda$ sobrevive en el límite.
+\end{remark}
+
+\begin{example}[Observando el límite de Poisson
+convergente]\label{ex:b2:genfun:poissonnumerics}
+Arregle $\lambda = 2$ y deje que $X_n \sim \mathcal B(n, 2/n)$. el
+La probabilidad \omterm{def:b2:proba:space}{sin evento} es exactamente $\P(X_n = 0) = (1 - 2/n)^n$:
+\[
+n = 10:\ 0.107, \qquad
+n = 20:\ 0.122, \qquad
+n = 50:\ 0.130, \qquad
+n = 100:\ 0.133,
+\]
+contra el límite $\eu^{-2} \approx 0.135$. la convergencia
+es monótono y de velocidad $O(1/n)$ --- expandiéndose, $(1 -
+2/n)^n = \eu^{-2}\bigl(1 - \tfrac2n + O(n^{-2})\bigr)$ ---
+entonces para $n$ en cientos el modelo Poisson ya está
+precisión hasta el tercer dígito. Este es el contenido práctico.
+de la ley de eventos raros: el modelador nunca sabe $n$ y
+$p$ por separado (¿cuántas microoportunidades por un error tipográfico
+¿una página retenida?), pero solo su producto $\lambda$, y el
+El límite \omterm{def:b2:randomvar:law}{ley} afortunadamente no depende de nada más.
+\end{example}
+
+\section{Procesos de ramificación}
+
+Considere una población a partir de un antepasado; cada individuo,
+de forma independiente, tiene un número aleatorio de niños con \omterm{def:b2:randomvar:law}{ley} $(p_k)_{k
+\in \N}$y \omterm{ex:b2:powerseries:fibonacci}{función generadora}$G$ (el \emph{offspring
+\omterm{def:b2:randomvar:law}{distribución}}). Sea $Z_n$ el tamaño de la generación $n$ ($Z_0 =
+1$) y sea $m = G'(1) = \E(Z_1)$ el número medio de descendientes.
+
+\begin{proposition}\label{prop:b2:genfun:branching}
+El \omterm{ex:b2:powerseries:fibonacci}{función generadora} de $Z_n$ es la iteración $n$.
+$G_{Z_n} = G \circ G \circ \dots \circ G$ ($n$ veces), y el
+probabilidades de extinción $q_n = \P(Z_n = 0)$ satisfacen
+\[
+q_0 = 0, \qquad q_{n+1} = G(q_n),
+\]
+y aumentar a la probabilidad $q$ de una eventual extinción, que
+es un punto fijo de $G$.
+\end{proposition}
+
+\begin{proof}
+La generación $n + 1$ es la suma aleatoria de la descendencia del $Z_n$
+miembros de la generación $n$, con recuentos \omterm{def:b2:proba:independence}{independiente} entre sí
+y de $Z_n$: \cref{thm:b2:genfun:compound} da $G_{Z_{n+1}} =
+G_{Z_n} \circ G$, y la inducción de $G_{Z_0}(t) = t$ produce el
+$n$ iteración veces --- que, por asociatividad de composición, puede
+igualmente debe leerse como $G_{Z_{n+1}} = G \circ G_{Z_n}$. evaluando
+este segundo formulario en $0$: $q_{n+1} = G_{Z_{n+1}}(0) =
+G\bigl(G_{Z_n}(0)\bigr) = G(q_n)$. El aumento de \omterm{def:b2:proba:space}{eventos}$\{Z_n = 0\}$ (las poblaciones extintas permanecen
+extinto), entonces $q_n \uparrow q = \P\bigl(\bigcup_n\{Z_n = 0\}\bigr)$
+por monótono \omterm{def:b2:metric:continuity}{continuidad} (\cref{thm:b2:proba:continuity}), y
+\omterm{def:b2:metric:continuity}{continuidad} de $G$ en $[0, 1]$ convierte $q_{n+1} = G(q_n)$ en $q =
+G(q)$ en el límite.
+\end{proof}
+
+\begin{example}[Observando cómo converge la extinción]
+\label{ex:b2:genfun:cobwebnumerics}
+Para la descendencia \omterm{def:b2:randomvar:law}{ley} $(p_0, p_1, p_2) = (\tfrac14,
+\tfrac14, \tfrac12)$ de \cref{ex:b2:genfun:branchingexample},
+$G(t) = \tfrac14 + \tfrac14t + \tfrac12t^2$ y la iteración
+$q_{n+1} = G(q_n)$ da
+\[
+q_1 = 0.25, \quad q_2 = 0.34375, \quad q_3 \approx 0.39502,
+\quad q_4 \approx 0.42678, \quad q_5 \approx 0.44776,
+\]
+subiendo hacia la probabilidad de extinción $q = \tfrac12$.
+Los espacios $q - q_n$ son $0.25$, $0.156$, $0.105$, $0.073$,
+$0.052$: cada uno es aproximadamente $\tfrac34$ del anterior, y
+de hecho, el teorema del valor medio da $q - q_{n+1} = G'(c_n)(q
+- q_n)$con $G'(q) = \tfrac14 + q = \tfrac34$. Dos moralejas: una
+línea familiar aún viva en la generación $n$ tiene, incorporada en
+el mismo cálculo, probabilidad $q - q_n$ de estar condenado
+más tarde; y la tasa de convergencia de la escalera en el
+La siguiente figura es la derivada en el punto fijo.
+El problema del fin de semana convierte ambas observaciones en teoremas.
+\end{example}
+
+\begin{theorem}[Criterio de extinción]\label{thm:b2:genfun:extinction}
+Supongamos $p_1 \neq 1$. La probabilidad de extinción $q$ es la
+\emph{pequeñísimo} punto fijo de $G$ en $\intcc{0}{1}$, y:
+\begin{itemize}
+\item si $m \leq 1$ (subcrítico o crítico), $q = 1$: extinción
+es seguro;
+\item si $m > 1$ (supercrítico), $q < 1$: la población sobrevive
+para siempre con probabilidad positiva $1 - q$.
+\end{itemize}
+\end{theorem}
+
+\begin{proof}
+$G$ es \omterm{def:b2:affine:convex}{convexo} en $\intcc{0}{1}$ (serie de potencias con valores no negativos)
+coeficientes: $G'' \geq 0$), no decreciente, con $G(1) = 1$.
+
+\emph{Punto fijo más pequeño:} deja que $r \in \intcc{0}{1}$ sea fijo
+punto. Luego $q_0 = 0 \leq r$, e inductivamente $q_{n+1} = G(q_n)
+\leq G(r) = r $(monotonicidad): entonces $q = \lim q_n \leq r$.
+
+\emph{Case $m \leq 1$:} supongamos que $r < 1$ es un punto fijo. por el
+teorema del valor medio en $[r, 1]$, hay $c \in \intoo{r}{1}$ con
+$G'(c) = \frac{G(1) - G(r)}{1 - r} = \frac{1 - r}{1 - r} = 1$. pero
+$G'$ no es decreciente (convexidad) con $\lim_{t\to1^-}G'(t) = m
+\leq 1$, por lo que $G' \leq 1$ en $\intoo{0}{1}$; la igualdad $G'(c) =
+1$ obliga a $G'$a ser constante igual a $1$ en $\intco{c}{1}$,
+por lo tanto $G'' = \sum n(n-1)p_nt^{n-2} \equiv 0$ allí. una serie de potencias
+con coeficientes no negativos que desaparecen en un intervalo tiene todo
+estos coeficientes son cero: $p_n = 0$ para $n \geq 2$, por lo que $G(t) = p_0
++ p_1t $y$1 = G'(c) = p_1$ --- contradicen la hipótesis
+$p_1 \neq 1$. Entonces $1$ es el único punto fijo: $q = 1$.
+
+\emph{Caso $m > 1$:} cerca de $1$, $G(t) - t$ tiene el derivado $G'(t) -
+1 \to m - 1 > 0$ como $t \to 1^-$, por lo que $G(t) - t < G(1) - 1 = 0$ sigue
+algún intervalo $\intoo{1 - \delta}{1}$: la función \omterm{def:b2:metric:continuity}{continuo}
+$G(t) - t$ es $\geq 0$ en $t = 0$ ($G(0) = p_0 \geq 0$) y $< 0$
+justo debajo de $1$, por lo que desaparece en algún $r < 1$ (valor intermedio
+teorema). El punto fijo más pequeño es entonces $q \leq r < 1$.
+\end{proof}
+
+\begin{figure}[ht]
+\centering
+% Subcrítico: G(t) = 0,5 + 0,1 t + 0,4 t^2 => m = 0,9 <= 1
+\begin{tikzpicture}[scale=2.9]
+ \draw[->] (0,0) -- (1.15,0) node[below] {$t$};
+ \draw[->] (0,0) -- (0,1.15);
+ \draw[dashed] (0,0) -- (1,1);
+ \draw[thick, ocBlue, domain=0:1, smooth, samples=40]
+ plot (\x, {0.5 + 0.1*\x + 0.4*\x*\x});
+ \fill (1,1) circle (0.02);
+ \node[below, font=\small] at (0.55,-0.06)
+ {$m \leq 1$: $q = 1$};
+ % cobweb from 0
+ \draw[ocRed, ->] (0,0) -- (0,0.5);
+ \draw[ocRed, ->] (0,0.5) -- (0.5,0.5);
+ \draw[ocRed, ->] (0.5,0.5) -- (0.5,0.65);
+ \draw[ocRed, ->] (0.5,0.65) -- (0.65,0.65);
+ \draw[ocRed, ->] (0.65,0.65) -- (0.65,0.734);
+ \draw[ocRed, ->] (0.65,0.734) -- (0.734,0.734);
+ \node[font=\small, ocBlue] at (0.32,0.75) {$G$};
+\end{tikzpicture}
+\qquad
+% Supercrítico: G(t) = 0,25 + 0,15 t + 0,6 t^2 => m = 1,35 > 1
+\begin{tikzpicture}[scale=2.9]
+ \draw[->] (0,0) -- (1.15,0) node[below] {$t$};
+ \draw[->] (0,0) -- (0,1.15);
+ \draw[dashed] (0,0) -- (1,1);
+ \draw[thick, ocBlue, domain=0:1, smooth, samples=40]
+ plot (\x, {0.25 + 0.15*\x + 0.6*\x*\x});
+ \fill (1,1) circle (0.02);
+ % fixed point q: 0.6q^2 - 0.85q + 0.25 = 0 -> q = 5/12 ~ 0.4167
+ \fill[ocRed] (0.4167,0.4167) circle (0.02)
+ node[below right, font=\small] {$q$};
+ \node[below, font=\small] at (0.55,-0.06)
+ {$m > 1$: $q < 1$};
+ % cobweb from 0
+ \draw[ocRed, ->] (0,0) -- (0,0.25);
+ \draw[ocRed, ->] (0,0.25) -- (0.25,0.25);
+ \draw[ocRed, ->] (0.25,0.25) -- (0.25,0.325);
+ \draw[ocRed, ->] (0.25,0.325) -- (0.325,0.325);
+ \draw[ocRed, ->] (0.325,0.325) -- (0.325,0.3623);
+ \draw[ocRed, ->] (0.325,0.3623) -- (0.3623,0.3623);
+ \node[font=\small, ocBlue] at (0.28,0.72) {$G$};
+\end{tikzpicture}
+\caption{Extinction probabilities as a fixed-point iteration
+$q_{n+1} = G(q_n)$ starting at $q_0 = 0$ (red staircase). Left: a
+subcritical offspring \omterm{def:b2:randomvar:law}{ley} --- the convex curve stays above the
+diagonal, the iteration climbs to the unique fixed point $1$.
+Right: a supercritical \omterm{def:b2:randomvar:law}{ley} --- the curve crosses the diagonal at
+$q < 1$, where the iteration stops: survival has probability $1 -
+q > 0$.}
+\label{fig:b2:genfun:branching}
+\end{figure}
+
+\begin{remark}[Cómo leer la telaraña]
+En la figura, se aplica un movimiento vertical $G$ (de $(q_n, q_n)$
+hasta $(q_n, G(q_n))$), un movimiento horizontal a la diagonal
+convierte salida en entrada: la escalera \emph{is} la
+recursión $q_{n+1} = G(q_n)$. Convexidad de $G$ y $G(1) = 1$
+Deje sólo dos geometrías. O la curva se mantiene por encima del
+diagonal en $\intco01$ (media $m \leq 1$): la escalera tiene
+No hay ningún lugar donde detenerse antes de $1$. O la curva cruza en algún $q <
+1$($m > 1$): la escalera queda atrapada debajo del cruce
+y converge a él, a la razón geométrica $G'(q) < 1$
+cuantificado en \cref{ex:b2:genfun:cobwebnumerics}. todos los
+El análisis del teorema de la extinción es visible en este.
+imagen --- por eso vale la pena dibujar antes
+informática.
+\end{remark}
+
+\begin{example}\label{ex:b2:genfun:branchingexample}
+Descendiente \omterm{def:b2:randomvar:law}{ley}: ningún hijo, un hijo, dos hijos con
+probabilidades $\frac14, \frac14, \frac12$. Luego $m = \frac14 + 1 =
+\frac54 > 1$y $G(t) = \frac14 + \frac14 t + \frac12 t^2$. Fijo
+puntos: $\frac12 t^2 - \frac34 t + \frac14 = 0$, es decir\ $2t^2 - 3t
++ 1 = (2t - 1)(t - 1) = 0$: $q = \frac12$. La línea familiar muere
+sale con probabilidad $\frac12$ --- y con probabilidad $\frac12$
+vive para siempre.
+\end{example}
+
+\begin{remark}[Perspectivas dentro de este volumen]
+El capítulo es la encrucijada del libro, y cada ingrediente
+llegó de un lugar determinado: el álgebra de series de
+\cref{ch:b2:series} y \cref{ch:b2:powerseries}, el
+probabilidad de \cref{ch:b2:proba} (monótono \omterm{def:b2:metric:continuity}{continuidad}
+prueba $q_n \uparrow q$) y \cref{ch:b2:randomvar} ($G_X =
+\E(t^X)$ es un \omterm{def:b2:randomvar:expectation}{expectativa}, la multiplicatividad es el producto
+teorema), la convexidad desde \cref{ch:b2:realfun} hasta
+\cref{ch:b2:affine}. Incluso las patologías de cola pesada se conectan:
+la variable de San Petersburgo del capítulo anterior tiene
+$G(t) = \sum_k2^{-k}t^{2^k}$, una serie perfectamente convergente
+en $\intcc01$ cuya derivada en $1^-$ diverge ---
+media infinita, visible de un vistazo. Un objeto, cada herramienta
+del año: un último capítulo apropiado.
+\end{remark}
+
+\begin{remark}[Errores comunes]
+(i) \omterm{ex:b2:powerseries:fibonacci}{Funciones generadoras} se aplica únicamente a variables con valores $\N$:
+para variables con signo o no enteras, el objeto $\E(t^X)$
+pierde su estructura de series de potencias (el año 3 la reemplaza con
+transformaciones adaptadas a $\R$). (ii) El primer control de cordura de
+cualquier $G$ calculado es $G(1) = 1$; el segundo es que el
+los coeficientes no son negativos --- un coeficiente negativo
+significa un error de álgebra, no un nuevo \omterm{def:b2:randomvar:law}{ley}. (iii) En sumas aleatorias,
+el orden de composición importa: $G_S = G_N \circ G_X$, el
+Función \emph{exterior} contando los términos; componiendo el
+otra manera no tiene sentido ($G_X \circ G_N$ contaría elementos
+de artículos). (iv) La multiplicatividad necesita \omterm{def:b2:proba:independence}{independencia} y
+distintas fuentes de aleatoriedad: $G_{2X}(t) = G_X(t^2)$, no
+$G_X(t)^2$. (v) Diferenciar en $1$ es un límite
+operación: cuando el radio es exactamente $1$, como en
+\cref{ex:b2:genfun:heavytail}, $G'(1^-)$ puede ser infinito,
+y la formulación del límite monótono del teorema de los momentos no es
+una sutileza pedante pero una declaración honesta.
+\end{remark}
+
+\section*{cerrando el volumen}
+
+El \omterm{ex:b2:powerseries:fibonacci}{función generadora} es un objeto final apropiado para este libro:
+es simultáneamente una serie de potencias (\cref{ch:b2:powerseries}), una
+herramienta de familias \omterm{def:b2:series:summable}{sumable} (\cref{ch:b2:series}), una \omterm{def:b2:randomvar:expectation}{expectativa}
+(\cref{ch:b2:randomvar}), una función convexa cuya geometría decide
+extinción (\cref{ch:b2:realfun}) y una iteración de punto fijo
+(\cref{ch:b2:metric}). Las matemáticas del año 2 son una materia.
+El volumen del Año 3 abrirá las puertas que deliberadamente se dejaron cerradas.
+aquí: integración de Lebesgue (descargando la convergencia dominada
+teorema de \cref{ch:b2:integration}), teoría de la medida
+probabilidad en espacios incontables y la función inversa
+demostración completa del teorema (\cref{ch:b2:diffcalc}) en el marco de
+geometría diferencial.
+
+\section{Ceremonias}
+
+\begin{exercise}[$\star$]\label{exo:b2:genfun:1}
+Calcule el \omterm{ex:b2:powerseries:fibonacci}{función generadora} del uniforme \omterm{def:b2:randomvar:law}{ley} en $\{1, 2,
+\dots, 6\}$ (un dado justo). Demuestre que la suma de dos dados justos
+\emph{no puedo} ser uniforme en $\{2, \dots, 12\}$: factor $G_{X+Y}$
+y contar raíces. \emph{(A uniform sum would force $G_X(t)G_Y(t) =
+\frac{t^2}{11}\sum_{k=0}^{10}t^k$, whose nonzero roots are the
+$11$-th roots of unity other than $1$ --- none of them real ---
+while $G_X/t$ and $G_Y/t$ are real polynomials of degree $5$, each
+owning at least one real root.)}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:genfun:2}
+Usando \omterm{ex:b2:powerseries:fibonacci}{funciones generadoras} recupere $\E$ y $V$ para el binomio
+y geométrico \omterm{def:b2:randomvar:law}{leyes} (\cref{thm:b2:genfun:moments}).
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:genfun:3}
+Dos dados cargados: ¿es posible cargar dos dados (de forma independiente,
+idénticamente o no) para que su suma sea uniforme en $\{2, \dots,
+12\}$? \emph{(Same factorization obstruction as in
+\cref{exo:b2:genfun:1}: the answer is no even with different
+loadings, because each factor $G_X(t)/t$ has odd degree $5$,
+hence a real root, while the target has none.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:genfun:4}
+Sea $X_1, X_2, \dots$ \omterm{def:b2:proba:independence}{independiente} Bernoulli $\mathcal{B}(p)$
+y $N \sim \mathcal{P}(\lambda)$ \omterm{def:b2:proba:independence}{independiente} de ellos. mostrar,
+a través de \cref{thm:b2:genfun:compound}, que $S = X_1 + \dots + X_N
+\sim \mathcal{P}(\lambda p)$: un número de Poisson de elementos, cada uno conservado
+con probabilidad $p$, deja un número de Poisson --- \emph{adelgazamiento}.
+Calcula también el \omterm{def:b2:randomvar:law}{ley} del conteo descartado y admira: es
+$\mathcal{P}(\lambda(1-p))$, y se puede demostrar que es independiente.
+de $S$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:genfun:5}
+(Binomio negativo) Sea $T_r$ el número de lanzamientos a obtener
+$r$ cara (probabilidad de cara $p$). Escribe $T_r$ como suma de $r$
+\omterm{def:b2:proba:independence}{independiente} variables geométricas, deducir
+\[
+G_{T_r}(t) = \Bigl(\frac{pt}{1 - (1-p)t}\Bigr)^{r},
+\qquad
+\E(T_r) = \frac rp,
+\qquad
+V(T_r) = \frac{r(1-p)}{p^2},
+\]
+y expanda $G_{T_r}$ para encontrar $\P(T_r = n) = \binom{n-1}{r-1}
+p^r(1-p)^{n-r}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:genfun:6}
+Para la descendencia \omterm{def:b2:randomvar:law}{ley} $p_0 = \frac18$, $p_1 = \frac38$, $p_2 =
+\frac38$, $p_3 = \frac18$: calcule $m$, decida
+supercriticidad y calcular la probabilidad de extinción $q$
+exactamente. \emph{(Factoriza la raíz $t = 1$ de $G(t) - t$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:genfun:7}
+(Progenie total) En un subcrítico \omterm{pb:b2:genfun:1}{proceso de ramificación} ($m < 1$), sea
+$Y = \sum_{n\geq0} Z_n$ sea el número total de individuos alguna vez
+nacido. Mostrar $\E(Y) = \sum_n m^n = \frac{1}{1 - m}$ (justificar el
+intercambio de sumatorias), y probar que el \omterm{ex:b2:powerseries:fibonacci}{función generadora}
+$H = G_Y$ satisface la ecuación funcional $H(t) = t\,G(H(t))$.
+\emph{(The ancestor, plus the total progenies of each of its
+children, which are \omterm{def:b2:proba:independence}{independiente} copies of $Y$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:genfun:8}
+Dejemos que $X$ tenga \omterm{ex:b2:powerseries:fibonacci}{función generadora} $G$ con \omterm{def:b2:powerseries:radius}{radio de convergencia} $>
+1$. Pruebe el \emph{cola exponencial ligada}: hay $C > 0$ y
+$\rho \in \intoo{0}{1}$ con $\P(X \geq n) \leq C\rho^n$.
+\emph{(Markov aplicó a $t^X$ para un $t > 1$ fijo dentro del
+disco.)} Por el contrario, muestre que si $\P(X \geq n) \leq C\rho^n$ con
+$\rho < 1$, el radio de $G$ es $\geq 1/\rho > 1$.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:genfun:9}
+(Teorema \omterm{def:b2:metric:continuity}{Continuidad}, caso elemental) Sea $X, X_1, X_2, \dots$
+$\N$ valorado con $G_{X_n}(t) \to G_X(t)$ por cada $t \in
+\intco{0}{1}$. Muestre que $\P(X_n = k) \to \P(X = k)$ para cada
+$k$. \emph{(Induction on $k$: for $k = 0$ take $t \to 0$ ---
+carefully: fix $t$ small, use $\abs{\P(X_n = 0) - G_{X_n}(t)}
+\leq \frac{t}{1-t}$, valid since the tail $\sum_{j \geq 1}p_jt^j
+\leq \frac{t}{1 - t}$; then diagonalize. For the induction step,
+consider $\frac{G(t) - \P(X = 0)}{t}$, the \omterm{ex:b2:powerseries:fibonacci}{función generadora} of
+a shifted \omterm{def:b2:randomvar:law}{ley}.)}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:genfun:10}
+(Truco de paridad) Muestre que para una variable $X$ con valor $\N$,
+\[
+\P(X \text{ even}) = \frac{1 + G_X(-1)}{2} ,
+\]
+y calcular esta probabilidad para $X \sim \mathcal P(\lambda)$
+y $X \sim \mathcal B(n, p)$. ¿Qué significa $G_X(-1) \to 0$?
+probabilísticamente?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:genfun:11}
+(Dados de Sicherman) Verificar la factorización del dado justo.
+\omterm{ex:b2:powerseries:fibonacci}{función generadora}
+\[
+\frac{t + t^2 + \dots + t^6}{6}
+= \frac{t\,(1 + t)(1 + t + t^2)(1 - t + t^2)}{6},
+\]
+y demostrar que los dos dados con caras $\{1, 2, 2, 3, 3, 4\}$
+y $\{1, 3, 4, 5, 6, 8\}$ tienen \omterm{ex:b2:powerseries:fibonacci}{funciones generadoras}
+$\frac{t(1+t)(1+t+t^2)}6$ y
+$\frac{t(1+t)(1+t+t^2)(1-t+t^2)^2}6$, cuyo producto es el de
+dos dados estándar: estos dados exóticos producen cada total $2,
+\dots, 12$ con exactamente las probabilidades estándar.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:genfun:12}
+(Esperando dos caras seguidas) Una moneda con probabilidad de cara
+Se lanza $p$ hasta que aparecen dos caras consecutivas; sea $T$
+el número de lanzamientos (el juego de \cref{exo:b2:proba:6}).
+Condicionando los primeros lanzamientos, obtenga un sistema lineal para
+el \omterm{ex:b2:powerseries:fibonacci}{funciones generadoras} de los estados ``sin jefe actual''
+y "un jefe actual", y concluir
+\[
+G_T(t) = \frac{p^2t^2}{1 - qt - pqt^2}
+\qquad (q = 1 - p);
+\]
+marque $G_T(1) = 1$ y $\E(T) = \dfrac{1 + p}{p^2}$ ($= 6$
+por una moneda justa).
+\end{exercise}
+
+\section{Problema: el proceso Galton-Watson, resuelto}
+
+\begin{problem}[{Problema de fin de semana --- tasas de crecimiento, exactas
+Soluciones, descendencia total y la crítica de Kolmogorov.
+estimación}]\label{pb:b2:genfun:1}
+El criterio de extinción (\cref{thm:b2:genfun:extinction})
+divide los procesos de ramificación\index{proceso de ramificación} en
+subcrítico, crítico y supercrítico --- pero dice
+nada sobre \emph{tarifas}: qué tan rápido muere una línea condenada, qué tan rápido
+grande crece el superviviente. Este problema los calcula. mantenemos
+la notación del capítulo: descendencia \omterm{def:b2:randomvar:law}{ley} $(p_k)$ con pgf $G$,
+media $m = G'(1)$, tamaños de generación $Z_n$ ($Z_0 = 1$), itera
+$G_n = G_{Z_n}$, probabilidades de extinción $q_n = \P(Z_n = 0)
+\uparrow q$; siempre asumimos $p_1 \neq 1$ y, donde segundo
+Aparecen momentos, $G''(1) < \infty$, y escribimos $\sigma^2 =
+V(Z_1)$.
+
+\medskip
+\noindent\textbf{Parte I --- Moments of the generations.}
+\begin{enumerate}
+ \item Mostrar $\E(Z_n) = m^n$ \emph{(chain rule on $G_n = G
+ \circ G_{n-1}$ at $1^-$, using $G_{n-1}(1) = 1$ and
+ \cref{thm:b2:genfun:moments})}.
+ \item Establece la recursividad $G_n''(1) =
+ G''(1)\,m^{2(n-1)} + m\,G_{n-1}''(1)$ y resuélvela:
+ $G_n''(1) = G''(1)\,m^{n-1}\dfrac{m^n - 1}{m - 1}$
+ para $m \neq 1$ y $G_n''(1) = n\,G''(1)$ para $m =
+ 1$.
+ \item Deducir
+ \[
+ V(Z_n) = \sigma^2m^{n-1}\,\frac{m^n - 1}{m - 1}
+ \quad (m \neq 1),
+ \qquad
+ V(Z_n) = n\,\sigma^2 \quad (m = 1).
+ \]
+ \item (tasa subcrítica, límite superior) Para $m < 1$, mostrar
+ $\P(Z_n > 0) \leq m^n$ \emph{(Markov en el
+ $Z_n$ con valor entero)}: la extinción es segura con un
+ tasa geométrica --- un refinamiento cuantitativo de la
+ criterio del capítulo.
+ \item (tasa subcrítica, límite inferior) Usando
+ Cauchy--Schwarz en $Z_n\mathbf 1_{Z_n > 0}$, mostrar
+ \[
+ \P(Z_n > 0) \geq \frac{\E(Z_n)^2}{\E(Z_n^2)}
+ \geq c\,m^{n}
+ \quad\text{with}\quad
+ c = \Bigl(\frac{\sigma^2}{m(1-m)} + 1\Bigr)^{-1} :
+ \]
+ la tasa geométrica $m^n$ es exacta hasta constantes.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte II --- The geometric family, solved
+exactly.} Sea geométrica la descendencia \omterm{def:b2:randomvar:law}{ley} en $\N$: $p_k =
+qp^k $($k \geq 0$), con $0 < p < 1$, $q = 1 - p$.
+\begin{enumerate}[resume]
+ \item Calcular $G(t) = \dfrac{q}{1 - pt}$ y $m = \dfrac
+ pq$; Ubique los tres regímenes en términos de $p$.
+ \item Resuelva $G(t) = t$: muestra que los puntos fijos son $1$ y
+ $q/p = 1/m$, y recuperar la probabilidad de extinción.
+ $q_{\mathrm{ext}} = \min(1, 1/m)$.
+ \item Demostrar por inducción las formas cerradas.
+ \[
+ q_n = \frac{m^n - 1}{m^{n+1} - 1} \quad (m \neq 1),
+ \qquad
+ q_n = \frac{n}{n+1} \quad (m = 1).
+ \]
+ \item Deduce las tarifas exactas: $1 - q_n \sim (1 - m)\,m^n$
+ en el caso subcrítico, y $q_{\mathrm{ext}} - q_n
+ \sim \dfrac{m - 1}{m^{2}}\cdot m^{-n}$ en el caso
+ caso supercrítico; comprobar que el supercrítico
+ La relación de contracción es $G'(q_{\mathrm{ext}}) = 1/m$.
+ \item Caso crítico ($p = \tfrac12$): calcule $\sigma^2 =
+ 2$y anote $1 - q_n = \frac1{n+1}$: la supervivencia decae
+ como $\frac1n$ --- ni geométrico ni \omterm{def:b2:series:summable}{sumable}.
+ \item Aún crítico: probar por inducción la iteración completa
+ \[
+ G_n(t) = \frac{n - (n-1)t}{n + 1 - nt},
+ \]
+ y deducir que condicionado a la supervivencia, $Z_n$ es
+ geométrico en $\N^*$ con el parámetro $\frac1{n+1}$:
+ \[
+ \P(Z_n = k \mid Z_n > 0) = \frac1{n+1}
+ \Bigl(\frac{n}{n+1}\Bigr)^{k-1},
+ \qquad
+ \E(Z_n \mid Z_n > 0) = n + 1 .
+ \]
+ La línea promedio muere, pero las líneas supervivientes tienen
+ Tamaño del pedido $n$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte III --- Total progeny.} Sea $Y =
+\sum_{n\geq0}Z_n \in \N^* \cup \{\infty\}$ el número total
+de individuos nacidos vivos, y $H(t) =
+\sum_{k\geq1}\P(Y = k)t^k$.
+\begin{enumerate}[resume]
+ \item Justifique $\P(Y < \infty) = q_{\mathrm{ext}}$, y
+ recuperar de \cref{exo:b2:genfun:7} el funcional
+ ecuación $H(t) = t\,G(H(t))$ (cuya derivación no
+ no utilice $m < 1$).
+ \item (ramificación binaria) Para $p_0 = p_2 = \frac12$
+ (crítico), resuelve la ecuación funcional:
+ \[
+ H(t) = \frac{1 - \sqrt{1 - t^2}}{t},
+ \]
+ y expandir con \cref{ex:b2:powerseries:catalan} para
+ conseguir
+ \[
+ \P(Y = 2k + 1) = \frac{C_k}{2^{2k+1}},
+ \qquad C_k = \frac1{k+1}\binom{2k}k ;
+ \]
+ comprobar los valores $\P(Y = 1) = \frac12$ y $\P(Y = 3)
+ = \frac18$ mediante conteo directo.
+ \item Diferenciando la ecuación funcional en $1^-$,
+ mostrar que $\E(Y) = \frac{1}{1-m}$ para $m < 1$, mientras que
+ fuerzas de criticidad $\E(Y) = \infty$: las fuerzas críticas
+ la progenie total es finita casi seguramente con infinitas
+ decir.
+ \item Con las asintóticas binomiales centrales
+ (\cref{ex:b2:comparison:centralbinomial}), mostrar
+ \[
+ \P(Y = 2k+1) \sim \frac{1}{2\sqrt\pi\,k^{3/2}},
+ \]
+ una cola pesada $k^{-3/2}$, y deducir $\P(Y > n)
+ \asymp n^{-1/2}$ (límites superior e inferior de este
+ orden es suficiente).
+ \item Comparar con la feria \omterm{pb:b2:proba:1}{paseo aleatorio} (el fin de semana
+ problema de \cref{ch:b2:proba}): cierto pero
+ tiempos de retorno medios infinitos allí, ciertos pero
+ progenie total de media infinita aquí, ambos con
+ $n^{-3/2}$ leyes locales. Un párrafo sobre por qué
+ La criticidad produce esta firma.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte IV --- Kolmogorov's estimate at
+criticality.} Supongamos $m = 1$, $0 < \sigma^2 = G''(1) <
+\infty$.
+\begin{enumerate}[resume]
+ \item Mostrar que $G''$ extiende \omterm{def:b2:metric:continuity}{continuamente} a $\intcc01$
+ \emph{(creciente no negativo con límite finito)} y
+ deducir la expansión de Taylor en $1$:
+ \[
+ G(t) = t + b\,(1-t)^2 + o\bigl((1-t)^2\bigr),
+ \qquad b = \frac{G''(1)}2 = \frac{\sigma^2}2 .
+ \]
+ \item Para $t \in \intco01$, establezca $h(t) = \dfrac1{1 - G(t)} -
+ \dfrac1{1 - t}$. Mostrar
+ \[
+ h(t) = \frac{G(t) - t}{(1 - G(t))(1 - t)}
+ \xrightarrow[t\to1^-]{} b .
+ \]
+ \item Telescopio a lo largo de la iteración $q_{j+1} = G(q_j)$:
+ \[
+ \frac1{1 - q_n} = 1 + \sum_{j=0}^{n-1}h(q_j),
+ \]
+ y concluir con un argumento de Cesaro que
+ \[
+ \P(Z_n > 0) = 1 - q_n \sim \frac{2}{\sigma^2\,n}
+ \]
+ --- \emph{La estimación de Kolmogorov}: cada crítico
+ \omterm{pb:b2:genfun:1}{proceso de ramificación} muere al ritmo universal $1/n$,
+ con solo el constante recuerdo de la descendencia \omterm{def:b2:randomvar:law}{ley}.
+ \item Verifique la estimación con la geometría crítica.
+ Caso de la pregunta 10.
+ \item Deduce $\E(Z_n \mid Z_n > 0) = \dfrac{1}{1 - q_n}
+ \sim \dfrac{\sigma^2 n}{2}$\emph{(note $\E(Z_n
+ \mathbf 1_{Z_n>0}) = \E(Z_n) = 1$)} y compruébalo.
+ contra la pregunta 11: condicionada a la supervivencia, la
+ la población crece \emph{linealmente} --- el punto crítico
+ la cuerda floja entre la muerte y la explosión.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part V --- Applications and synthesis.}
+\begin{enumerate}[resume]
+ \item (Epidemias, reacciones en cadena) Para una descendencia de Poisson
+ \omterm{def:b2:randomvar:law}{ley} $\mathcal P(\lambda)$ --- cada caso contagia
+ $\mathcal P(\lambda)$ casos nuevos --- escriba el
+ ecuación de extinción $q = \eu^{\lambda(q-1)}$ y
+ resuélvalo numéricamente para $\lambda = 1.5$ ($q \approx
+ 0.417$) y $\lambda = 2$($q \approx 0.203$):
+ A partir de un caso, se produce un brote importante.
+ \emph{no} seguro incluso cuando $\lambda > 1$. explicar
+ ¿Por qué la iteración $q_{n+1} = \eu^{\lambda(q_n - 1)}$?
+ de $q_0 = 0$ converge a la raíz derecha.
+ \item A partir de $k$ ancestros en lugar de uno, demuestre que
+ la probabilidad de extinción es $q^k$. Aplicación:
+ con $\lambda = 1.5$, ¿cuántos casos iniciales forman una
+ ¿Es probable que haya un brote al menos $99\%$?
+ \item (Condicionando un proceso supercrítico a la extinción)
+ Para $m > 1$ con probabilidad de extinción $q \in
+ \intoo01$: primero demuestre por convexidad que $G'(q) < 1$
+ en el punto fijo más pequeño y deducir
+ $q_{\mathrm{ext}} - q_n = O\bigl(G'(q)^n\bigr)$
+ (convergencia geométrica, como se ejemplifica en la pregunta 9).
+ Luego muestra que $\widehat G(t) = G(qt)/q$ es el pgf.
+ de una descendencia genuina \omterm{def:b2:randomvar:law}{ley}, con media $\widehat m =
+ G'(q) < 1$: un proceso acompañante subcrítico. verificar
+ sobre la familia geométrica: condicionando la
+ proceso supercrítico $(p, q)$ en swaps de extinción
+ $p$ y $q$. (La declaración completa --- el condicionado
+ proceso \emph{is} el proceso complementario --- está probado
+ en el volumen del Año 3; aquí lo has verificado
+ sombra de función generadora.)
+ \item Síntesis: elaborar la tabla de tricotomías --- para $m <
+ 1$, $m = 1$, $m > 1$: valor de $q$; tasa de $\P(Z_n >
+ 0)$o de $q - q_n$; $\E(Y)$; tamaño de un sobreviviente
+ generación. Indique en una oración por herramienta cómo
+ composición de pgfs, convexidad, Taylor en $1^-$ y
+ Cesaro promediando se llevó todo el problema, y lo que
+ el volumen del Año 3 agrega (la martingala $Z_n/m^n$ y
+ Límite exponencial de Yaglom \omterm{def:b2:randomvar:law}{ley}).
+\end{enumerate}
+\end{problem}

@@ -550,7 +550,9 @@ class Parser:
                             "NFC", s[cur.i + 2] + combining))
                         cur.i += 3
                         continue
-                    if nxt in (" ", "\n"):        # "\ " explicit space
+                    if nxt in (" ", "\n", ""):    # "\ " explicit space
+                        # ("" = trailing "\<newline>" whose newline was
+                        # stripped at a paragraph boundary)
                         text.append(" ")
                     elif nxt == ",":               # thin space
                         text.append(" ")

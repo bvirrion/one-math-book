@@ -70,6 +70,9 @@ KATEX_MACROS = {
     "\\V": "\\mathbb{V}",
     "\\pcond": "\\P_{#1}\\!\\left(#2\\right)",
     "\\lcm": "\\operatorname{lcm}",
+    # amsthm's in-line QED placement: the HTML proof block draws its own
+    # tombstone, so the marker vanishes from the formula itself
+    "\\qedhere": "",
 }
 
 
@@ -152,6 +155,12 @@ def main():
                          "subdirectories are created inside)")
     ap.add_argument("--svg-url-prefix", default="/images/onecourse/chapters",
                     help="public URL prefix the <img> tags point at")
+    ap.add_argument("--labels-only", action="store_true",
+                    help="fast pre-pass: register the chapter's labels and "
+                         "slugs in the manifest without emitting HTML or "
+                         "figures. Run it for every chapter of a book first "
+                         "so cross-chapter references (including forward "
+                         "ones) resolve during the subsequent full pass.")
     args = ap.parse_args()
 
     langs = [lang.strip() for lang in args.languages.split(",")]
@@ -221,6 +230,44 @@ def main():
                     "href": f"{page}#ch-{other['key']}",
                 }
         return externals
+
+    # ---- labels-only pre-pass ------------------------------------------
+    if args.labels_only:
+        entry = {
+            "key": ch_key,
+            "number": args.chapter_number,
+            "label": editions[langs[0]]["label"],
+            "languages": {
+                lang: {
+                    "slug": f"{args.chapter_number}-"
+                            + slugify(plaintext(e["title"]).strip()),
+                    "title": plaintext(e["title"]).strip(),
+                }
+                for lang, e in editions.items()
+            },
+            "labels": {label: {"kind": info["kind"],
+                               "number": info["number"]}
+                       for label, info in editions[langs[0]]["labels"].items()},
+        }
+        book = manifest["books"].setdefault(args.book, {"chapters": []})
+        existing = next((c for c in book["chapters"]
+                         if c["key"] == ch_key), None)
+        if existing:
+            existing.update(entry | {
+                "languages": {
+                    lang: {**existing["languages"].get(lang, {}), **data}
+                    for lang, data in entry["languages"].items()
+                },
+            })
+        else:
+            book["chapters"].append(entry)
+            book["chapters"].sort(key=lambda c: c["number"])
+        manifest_path.write_text(json.dumps(manifest, indent=2,
+                                            ensure_ascii=False) + "\n",
+                                 encoding="utf-8")
+        print(f"labels-only: registered {ch_key} "
+              f"({len(entry['labels'])} labels)")
+        return
 
     # ---- figures (deduped by content hash across languages) ------------
     svg_dir = Path(args.svg_out) / args.book / ch_key

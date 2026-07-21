@@ -253,11 +253,12 @@ accepted only as a strict structural prefix (warning); any other
 structural divergence between languages aborts the build.
 
 Cross-chapter `\cref`/`\omterm`: the manifest stores each chapter's label
-map, and references to an already-published chapter resolve to links into
-its page. **Build chapters in order** — a chapter referencing another
-needs that one in the manifest first (rebuild the referenced chapter
-before the referencing one after label changes). Generated output is
-committed in the saas repo only, never here.
+map, and references to another chapter resolve to links into its page.
+Forward references are handled by a `--labels-only` pre-pass that
+registers every chapter's labels before the full conversion —
+`tools/build_html_book.sh /path/to/saas` runs both passes for the whole
+book plus the toc tool; use it rather than hand-ordering chapters.
+Generated output is committed in the saas repo only, never here.
 
 `tools/build_html_toc.py` writes the book's FULL table of contents (every
 chapter, published or not, from the entry file's part inputs and each

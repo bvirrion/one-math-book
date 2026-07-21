@@ -60,6 +60,14 @@ PREAMBLE = r"""
 \newcommand{\vect}[1]{\overrightarrow{#1}}
 \newcommand{\scal}[2]{\vect{#1}\cdot\vect{#2}}
 \newcommand{\conj}[1]{\overline{#1}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\V}{\mathbb{V}}
+\newcommand{\pcond}[2]{\P_{#1}\!\left(#2\right)}
+\DeclareMathOperator{\Rea}{Re}
+\DeclareMathOperator{\Ima}{Im}
+\DeclareMathOperator{\Arg}{arg}
+\DeclareMathOperator{\lcm}{lcm}
 \begin{document}
 """
 

@@ -1,0 +1,951 @@
+\chapter{Reducción de endomorfismos}\label{ch:b2:reduction}
+
+Para entender un endomorfismo, encuentre las direcciones que simplemente
+se estira. Este capítulo construye la maquinaria --- \omterm{def:b2:reduction:eigen}{valores propios},
+característica y \omterm{def:b2:reduction:polyu}{polinomios mínimos}, la descomposición del núcleo
+lema --- y sus recompensas: diagonalización y trigonalización
+criterios, Cayley--Hamilton, el \omterm{thm:b2:reduction:dunford}{Descomposición de Dunford} y el
+cálculo de potencias y exponenciales que
+\cref{ch:b2:diffeq} se alimentará. En todo momento, $E$ es un
+espacio vectorial $K$ de dimensión finita ($K = \R$ o $\C$) y $u \in
+\mathcal{L}(E)$, $n = \dim E$.
+
+\section{Valores propios y vectores propios}
+
+\begin{definition}\label{def:b2:reduction:eigen}
+$\lambda \in K$ es un \emph{valor propio}\index{valor propio} de $u$
+cuando $u(x) = \lambda x$ para algunos $x \neq 0$ (un
+\emph{vector propio}); el \emph{espacio propio} es $E_\lambda(u) =
+\ker(u - \lambda\,\mathrm{id})$. El conjunto de valores propios es el
+\emph{espectro}\index{espectro} $\operatorname{Sp}(u)$. Un subespacio $F$ es
+\emph{estable} cuando $u(F) \subseteq F$; los espacios propios son estables y
+los subespacios estables permiten endomorfismos inducidos $u|_F$.
+\end{definition}
+
+\begin{theorem}[Independencia de espacios propios]\label{thm:b2:reduction:independence}
+\omterm{def:b2:reduction:eigen}{Vectores propios} asociado con \omterm{def:b2:reduction:eigen}{valores propios} distintos por pares forman un
+familia libre; equivalentemente, la suma de \omterm{def:b2:reduction:eigen}{espacios propios}
+$E_{\lambda_1} + \dots + E_{\lambda_r}$ ($\lambda_i$ distinto) es
+directo. En particular, $u$ tiene como máximo $n$ \omterm{def:b2:reduction:eigen}{valores propios}.
+\end{theorem}
+
+\begin{proof}
+Por inducción en $r$. Supongamos $x_1 + \dots + x_r = 0$ con $x_i \in
+E_{\lambda_i}$, la declaración conocida por $r - 1$. Aplicar $u$ y
+restar $\lambda_r$ veces la relación:
+\[
+\sum_{i=1}^{r-1} (\lambda_i - \lambda_r)\, x_i = 0 ,
+\]
+entonces, por inducción, cada $(\lambda_i - \lambda_r)x_i = 0$, es decir, \ $x_i =
+0$ para $i < r$, luego $x_r = 0$. Sumas directas de espacios distintos de cero en un
+El espacio de dimensión $n$ tiene como máximo $n$ sumandos.
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=0.9, >={Stealth}]
+ \draw[gray!40] (-2.6,-2.2) grid (2.6,2.2);
+ \draw[->] (-2.6,0) -- (2.7,0) node[below, font=\small] {$x$};
+ \draw[->] (0,-2.2) -- (0,2.3) node[left, font=\small] {$y$};
+ \draw[omDef, very thick, ->] (0,0) -- (0.7,0.7)
+ node[above, font=\small] {$v_1$};
+ \draw[omDef, thick, ->, dashed] (0,0) -- (2.1,2.1)
+ node[above right, font=\small] {$Av_1 = 3v_1$};
+ \draw[omThm, very thick, ->] (0,0) -- (0.9,-0.9)
+ node[below, font=\small] {$v_2$};
+ \draw[omThm, thick, ->, dashed] (0,0) -- (0.9,-0.9);
+ \draw[omProp, very thick, ->] (0,0) -- (1,0)
+ node[below right, font=\small] {$e_1$};
+ \draw[omProp, thick, ->, dashed] (0,0) -- (2,1)
+ node[right, font=\small] {$Ae_1$};
+\end{tikzpicture}
+
+{\small La matriz $A = \begin{psmallmatrix}2 & 1\\ 1 &
+2\end{psmallmatrix}$ que actúa sobre el plano: el vector genérico
+$e_1$ se sale de su línea, pero las direcciones propias $v_1 =
+(1,1)$y $v_2 = (1,-1)$simplemente se estiran --- por $3$ y por
+$1$ (por lo tanto, $Av_2 = v_2$: la imagen discontinua coincide con $v_2$).
+La diagonalización es el cambio a la base $(v_1, v_2)$, donde
+$A$ se convierte en $\operatorname{diag}(3, 1)$.}
+\end{omfigure}
+
+\begin{definition}[Polinomio caracteristico]\label{def:b2:reduction:charpoly}
+$\chi_u(X) = \det(X\,\mathrm{id} - u)$\index{característica
+polinomio} --- calculado en cualquier base como $\det(XI_n - A)$, un mónico
+polinomio de grado $n$, invariante bajo similitud
+(\cref{thm:b2:linalg:detrules}). Sus raíces en $K$ son exactamente las
+\omterm{def:b2:reduction:eigen}{valores propios} ($\lambda$ \omterm{def:b2:reduction:eigen}{valor propio} $\iff u - \lambda\,\mathrm{id}$
+no inyectivo $\iff \chi_u(\lambda) = 0$), y
+\[
+\chi_u(X) = X^n - (\operatorname{tr} u)\, X^{n-1} + \dots +
+(-1)^n \det u .
+\]
+El \emph{multiplicidad algebraica}\index{multiplicidad algebraica}
+$m_\lambda$ de un \omterm{def:b2:reduction:eigen}{valor propio} es
+su multiplicidad como raíz de $\chi_u$; el \emph{geométrico
+multiplicidad}\index{multiplicidad geométrica} es $\dim E_\lambda$ y $1 \leq \dim E_\lambda \leq
+m_\lambda$.
+\end{definition}
+
+\begin{proof}[Prueba de los hechos relacionados]
+El coeficiente afirma: expandir $\det(XI - A)$ por la permutación
+fórmula; la permutación de identidad contribuye $\prod_i (X - a_{ii})
+= X^n - (\sum a_{ii})X^{n-1} + \dots$, y todas las demás permutaciones
+corrige en la mayoría de las posiciones diagonales $n - 2$, contribuyendo al grado $\leq
+n - 2$: los dos coeficientes superiores son como se indican; $X = 0$ da la
+término constante $\det(-A) = (-1)^n\det A$.
+
+Geométrico $\leq$ algebraico: sea $d = \dim E_\lambda$ y complete un
+base de $E_\lambda$ en una base de $E$; la matriz de $u$ es bloque
+triangular superior con el bloque superior izquierdo $\lambda I_d$, entonces $\chi_u(X) =
+(X - \lambda)^d\, \chi_{\text{(bottom block)}}(X)$: la multiplicidad
+de $\lambda$ es al menos $d$.
+\end{proof}
+
+\begin{example}[Igual $\chi$, geometría diferente]\label{ex:b2:reduction:samechi}
+las matrices
+\[
+\begin{pmatrix}2 & 0\\ 0 & 2\end{pmatrix}
+\qquad\text{and}\qquad
+\begin{pmatrix}2 & 1\\ 0 & 2\end{pmatrix}
+\]
+compartir el \omterm{def:b2:reduction:charpoly}{polinomio característico} $(X - 2)^2$, el rastro, el
+\omterm{def:b2:linalg:det}{determinante}, \omterm{def:b2:reduction:eigen}{espectro} --- aún no son similares: el primero tiene
+$E_2$ de dimensión $2$ (\omterm{def:b2:reduction:charpoly}{multiplicidad geométrica} $2$), la segunda
+de dimensión $1$. El \omterm{def:b2:reduction:charpoly}{polinomio característico} sólo ve
+multiplicidades algebraicas; las dimensiones \omterm{def:b2:reduction:eigen}{espacio propio} son las
+invariante más fino, y el \omterm{def:b2:reduction:polyu}{polinomio mínimo} arbitra ($X - 2$
+frente a $(X - 2)^2$). Moraleja para todos \omterm{def:b2:reduction:diag}{diagonalizabilidad}
+discusiones: $\chi$ preselecciona a los candidatos, pero los núcleos se emiten
+los votos.
+\end{example}
+
+\begin{definition}[Diagonalizable, trigonalizable]\label{def:b2:reduction:diag}
+$u$ es \emph{diagonalizable}\index{diagonalizable} cuando $E$ tiene un
+base de \omterm{def:b2:reduction:eigen}{vectores propios} (matriz: similar a una matriz diagonal);
+\emph{trigonalizable}\index{trigonalizable} cuando su matriz en algún
+La base es triangular superior.
+\end{definition}
+
+\begin{theorem}[Criterios de diagonalizabilidad]\label{thm:b2:reduction:diagcrit}
+Los siguientes son equivalentes:
+\begin{enumerate}
+ \item $u$ es \omterm{def:b2:reduction:diag}{diagonalizable};
+ \item $E = \bigoplus_{\lambda \in \operatorname{Sp} u} E_\lambda$;
+ \item $\chi_u$ se divide en $K$ y $\dim E_\lambda = m_\lambda$
+ por cada \omterm{def:b2:reduction:eigen}{valor propio};
+ \item (suficiente, no necesario) $\chi_u$ tiene raíces distintas $n$
+ en $K$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1 $\iff$ 2): una base de \omterm{def:b2:reduction:eigen}{vectores propios} se ordena en bases de la
+$E_\lambda$ y, a la inversa, concatenar bases del directo
+Summands da una base de $E$.
+(\cref{thm:b2:reduction:independence} hace la suma directa; igualdad
+de dimensiones lo hace todo).
+
+(2 $\iff$ 3): en la base diagonal, $\chi_u = \prod (X -
+\lambda)^{\dim E_\lambda}$ se divide con multiplicidades coincidentes.
+Por el contrario, supongamos que $\chi_u$ se divide con $\dim E_\lambda =
+m_\lambda$ en todo momento; luego la suma directa del \omterm{def:b2:reduction:eigen}{espacios propios}
+(directo por \cref{thm:b2:reduction:independence}) tiene dimensión
+\[
+\sum_{\lambda}\dim E_\lambda = \sum_{\lambda} m_\lambda =
+\deg\chi_u = n ,
+\]
+la igualdad media porque el grado de un polinomio dividido es el
+suma de sus multiplicidades de raíces: la suma es todo $E$. Nota
+donde funcionó cada hipótesis: la división llenó el grado,
+la igualdad de multiplicidades llenó las dimensiones.
+
+(4 $\Rightarrow$ 1): $n$ distinto \omterm{def:b2:reduction:eigen}{valores propios} da $n$ independiente
+\omterm{def:b2:reduction:eigen}{vectores propios} (\cref{thm:b2:reduction:independence}): una base.
+\end{proof}
+
+\begin{method}[Decidir la diagonalizabilidad]\label{met:b2:reduction:decide}
+En la práctica, pruebe en este orden: cada paso puede finalizar el
+trabajo. (1) ¿Tiene un polinomio aniquilador con división simple?
+¿Las raíces se presentan ($u^2 = \mathrm{id}$, $u^2 = u$, $u^k =
+\mathrm{id}$)? En caso afirmativo: \omterm{def:b2:reduction:diag}{diagonalizable}, sin cálculo
+(\cref{cor:b2:reduction:minpolycrit} a continuación). (2) Calcular
+$\chi_u$; si tiene $n$ raíces distintas en $K$: \omterm{def:b2:reduction:diag}{diagonalizable}
+(\cref{thm:b2:reduction:diagcrit}~(4)). (3) En caso contrario, para cada
+raíz múltiple $\lambda$ solamente, compare $\dim\ker(u -
+\lambda\,\mathrm{id})$con la multiplicidad $m_\lambda$: cualquiera
+el déficit mata a \omterm{def:b2:reduction:diag}{diagonalizabilidad}; la igualdad en todas partes lo demuestra.
+Nunca calcule \omterm{def:b2:reduction:eigen}{espacios propios} de raíces simples (su dimensión es
+obligado a ser $1$), y nunca trigonalizar sólo para decidir.
+\end{method}
+
+\begin{example}[Diagonalización puesta en marcha]\label{ex:b2:reduction:diagwork}
+$A = I + J = \begin{psmallmatrix}2 & 1 & 1\\ 1 & 2 & 1\\ 1 & 1 &
+2\end{psmallmatrix}$, con $J$ la matriz de todos unos: desde
+$\operatorname{Sp}(J) = \{3, 0\}$
+(\cref{ex:b2:linalg:onesmatrix}), $\operatorname{Sp}(A) = \{4,
+1\}$, con \omterm{def:b2:reduction:eigen}{espacios propios}$\R(1,1,1)$y el plano $\{x + y + z =
+0\}$: dimensiones $1 + 2 = 3$, \omterm{def:b2:reduction:diag}{diagonalizable}
+(\cref{thm:b2:reduction:diagcrit}~(2)). Poderes sin ningún
+matriz de cambio de base: con $\Pi = J/3$ el proyector en
+$\R(1,1,1)$,
+\[
+A = 4\,\Pi + 1\cdot(I - \Pi)
+\quad\Longrightarrow\quad
+A^k = 4^k\,\Pi + (I - \Pi)
+= \frac{4^k - 1}{3}\,J + I .
+\]
+(Consulte $k = 1$: $\frac{4-1}3 J + I = A$). La información final:
+cuando los \omterm{def:b2:reduction:eigen}{espacios propios} son visibles, espectrales \emph{proyectores}
+poderes de cómputo más rápidos de lo que $PDP^{-1}$ alguna vez lo hará, y el
+La fórmula muestra la dinámica: $A^k$ crece como $4^k$ a lo largo
+$(1,1,1)$ y permanece en el plano ortogonal.
+\end{example}
+
+\begin{theorem}[Trigonalización]\label{thm:b2:reduction:trigonalization}
+$u$ es \omterm{def:b2:reduction:diag}{trigonalizable} sobre $K$ si y sólo si $\chi_u$ se divide
+$K$. En particular, cada endomorfismo de un espacio vectorial $\C$ es
+\omterm{def:b2:reduction:diag}{trigonalizable}.\index{trigonalización}
+\end{theorem}
+
+\begin{proof}
+($\Rightarrow$) El \omterm{def:b2:reduction:charpoly}{polinomio característico} de una matriz triangular.
+es $\prod(X - t_{ii})$: dividido.
+
+($\Leftarrow$) Inducción en $n$. Dado que $\chi_u$ se divide, tiene un
+raíz $\lambda$: elija un \omterm{def:b2:reduction:eigen}{vector propio} $e_1$. En una base que comienza con
+$e_1$, la matriz es $\begin{pmatrix} \lambda & \ast\\ 0 &
+B\end{pmatrix}$y $\chi_u = (X - \lambda)\chi_B$: $\chi_B$ se divide
+también. Por la hipótesis de inducción aplicada a la matriz $(n-1) \times
+(n-1)$ $B$, existe una $Q$invertible con $Q^{-1}BQ$ superior
+triangular; conjugar toda la matriz con $\begin{pmatrix}1 & 0\\
+0 & Q\end{pmatrix}$ la triangulariza.
+\end{proof}
+
+\begin{example}[Trigonalizando a mano]\label{ex:b2:reduction:trigwork}
+$B = \begin{pmatrix}3 & -1\\ 1 & 1\end{pmatrix}$: $\chi_B = X^2 -
+4X + 4 = (X - 2)^2$y $\ker(B - 2I) =
+\ker\begin{psmallmatrix}1 & -1\\ 1 & -1\end{psmallmatrix}$ es
+la línea abarcada por $e_1' = (1, 1)$: un \omterm{def:b2:reduction:eigen}{valor propio}, un
+unidimensional \omterm{def:b2:reduction:eigen}{espacio propio} --- no \omterm{def:b2:reduction:diag}{diagonalizable}, pero
+\omterm{def:b2:reduction:diag}{trigonalizable} (\cref{thm:b2:reduction:trigonalization}).
+Complete la base con $e_2' = (1, 0)$ y calcule:
+\[
+u(e_1') = (2, 2) = 2e_1',
+\qquad
+u(e_2') = (3, 1) = 1\cdot e_1' + 2\, e_2' ,
+\]
+entonces en la base $(e_1', e_2')$ la matriz es $T =
+\begin{psmallmatrix}2 & 1\\ 0 & 2\end{psmallmatrix}$. el
+Información final: la diagonal de $T$ fue forzada (ambas entradas
+debe ser el doble \omterm{def:b2:reduction:eigen}{valor propio} $2$); solo la entrada de la esquina
+dependía de la elección de $e_2'$, y reescalar $e_2'$ puede hacer
+cualquier valor distinto de cero --- el resistente ``$1$'' es la sombra de
+la parte nilpotente que Dunford aislará.
+\end{example}
+
+\section{Polinomios de un endomorfismo}
+
+\begin{definition}\label{def:b2:reduction:polyu}
+Para $P = \sum a_k X^k \in K[X]$, configure $P(u) = \sum a_k u^k \in
+\mathcal{L}(E)$. El mapa $P \mapsto P(u)$ es un morfismo de álgebras.
+$K[X] \to \mathcal{L}(E)$ (\cref{def:b2:structures:algebra});
+su núcleo $\{P : P(u) = 0\}$ es un \omterm{def:b2:structures:ideal}{ideal} de $K[X]$, distinto de cero (el
+La familia $(\mathrm{id}, u, \dots, u^{n^2})$ está vinculada en el
+$n^2$-dimensional $\mathcal{L}(E)$), por lo tanto \omterm{def:b2:structures:generated}{generado} por un único
+polinomio mónico $\mu_u$: el \emph{mínimo
+polinomio}\index{polinomio mínimo}
+(\cref{thm:b2:structures:principal}).
+\end{definition}
+
+\begin{proposition}\label{prop:b2:reduction:minpoly}
+\begin{enumerate}
+ \item $P(u) = 0 \iff \mu_u \mid P$; \omterm{def:b2:reduction:eigen}{valores propios} de $u$ son raíces
+ de cada polinomio aniquilador, y las raíces de $\mu_u$
+ son \emph{exactamente} y \omterm{def:b2:reduction:eigen}{valores propios}.
+ \item Si $F$ es estable, $\mu_{u|_F} \mid \mu_u$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(1) La divisibilidad es la definición de generador. Si $u(x) =
+\lambda x$, $x \neq 0$, entonces $0 = P(u)(x) = P(\lambda)x$, entonces
+$P(\lambda) = 0$: \omterm{def:b2:reduction:eigen}{valores propios} son raíces de \omterm{def:b2:linalg:annihilator}{aniquiladores}, en
+particular de $\mu_u$. Por el contrario, si $\lambda$ es una raíz, $\mu_u =
+(X - \lambda)Q$con $Q(u) \neq 0$(grado de $\mu_u$ mínimo): elija
+$y$ con $Q(u)(y) \neq 0$; entonces $(u - \lambda)(Q(u)(y)) = \mu_u(u)(y)
+= 0$ exhibe el \omterm{def:b2:reduction:eigen}{vector propio}$Q(u)(y)$.
+
+(2) $\mu_u(u|_F) = \mu_u(u)|_F = 0$, y aplicar (1) a $u|_F$.
+\end{proof}
+
+\begin{example}[Polinomios mínimos encontrados a mano]\label{ex:b2:reduction:minpolyhand}
+El \omterm{def:b2:reduction:polyu}{polinomio mínimo} se calcula probando sucesivos
+grados. Para la matriz de todos unos $J \in \mathcal{M}_3(\R)$:
+$J \neq \lambda I$ (el grado $1$ está fuera) y $J^2 = 3J$, por lo que
+\[
+\mu_J = X^2 - 3X = X(X - 3) :
+\]
+grado $2$, división, raíces simples --- $J$ es \omterm{def:b2:reduction:diag}{diagonalizable} con
+\omterm{def:b2:reduction:eigen}{espectro} $\{0, 3\}$ (\cref{cor:b2:reduction:minpolycrit} a continuación),
+confirmando \cref{ex:b2:linalg:onesmatrix} sin un solo
+\omterm{def:b2:linalg:det}{determinante}. Para la matriz de intercambio $A$ de
+\cref{ex:b2:reduction:projectorswork}: $A \neq \pm I$ y $A^2
+= I$dan $\mu_A = X^2 - 1$. En ambos casos el patrón es el
+Lo mismo: adivina una identidad de bajo grado a partir de la estructura.
+(el rango uno fuerza a $J^2 = (\operatorname{tr}J)\,J$; una involución
+fuerzas $A^2 = I$), luego verifique que no haya un divisor adecuado
+aniquila. \omterm{def:b2:reduction:polyu}{Polinomios mínimos} suelen ser \emph{encontró}, no
+calculado a partir de $\chi$.
+\end{example}
+
+\begin{theorem}[Lema de análisis del kernel]\label{thm:b2:reduction:kernels}
+Si $P = P_1 P_2 \cdots P_r$ con el coprimo por pares $P_i$,
+entonces\index{Lema de descomposición del núcleo}
+\[
+\ker P(u) = \ker P_1(u) \oplus \dots \oplus \ker P_r(u),
+\]
+y las proyecciones sobre los sumandos son polinomios en $u$.
+\end{theorem}
+
+\begin{proof}
+Basta tratar $r = 2$ e inducir. Bézout en $K[X]$
+(\cref{thm:b2:structures:principal}): $U P_1 + V P_2 = 1$, entonces para
+cada $x$,
+\[
+x = \underbrace{U(u)P_1(u)(x)}_{=:\,x_2}
++ \underbrace{V(u)P_2(u)(x)}_{=:\,x_1}.
+\]
+Si $x \in \ker P(u)$: $P_2(u)(x_2) = U(u)\,P(u)(x) = 0$ (polinomios
+en $u$ conmutar), entonces $x_2 \in \ker P_2(u)$, y simétricamente $x_1
+\in \ker P_1(u)$: la suma llena $\ker P(u)$; ambos mandamientos se sientan
+dentro de $\ker P(u)$ ($P_i \mid P$). Directo: $x \in \ker P_1(u)
+\cap \ker P_2(u)$da $x = U(u)P_1(u)x + V(u)P_2(u)x = 0$. el
+Las fórmulas para $x_1, x_2$ muestran las proyecciones como $V(u)P_2(u)$ y
+$U(u)P_1(u)$.
+\end{proof}
+
+\begin{example}[El lema del núcleo con proyectores explícitos]\label{ex:b2:reduction:projectorswork}
+Dejemos que $A = \begin{psmallmatrix}0 & 1 & 0\\ 1 & 0 & 0\\ 0 & 0 &
+1\end{psmallmatrix}$(intercambie las dos primeras coordenadas). Entonces $A^2
+= I$: el polinomio $X^2 - 1 = (X - 1)(X + 1)$aniquila a $A$,
+sus factores son coprimos y Bézout es explícito:
+\[
+\frac{1}{2}(X + 1) - \frac12(X - 1) = 1 .
+\]
+Siguiendo la prueba de \cref{thm:b2:reduction:kernels}, el
+Las proyecciones sobre $\ker(A - I)$ y $\ker(A + I)$ son las
+polinomios en $A$
+\[
+\pi_+ = \frac{A + I}{2} = \frac12\begin{pmatrix}
+1 & 1 & 0\\ 1 & 1 & 0\\ 0 & 0 & 2\end{pmatrix},
+\qquad
+\pi_- = \frac{I - A}{2} = \frac12\begin{pmatrix}
+1 & -1 & 0\\ -1 & 1 & 0\\ 0 & 0 & 0\end{pmatrix}.
+\]
+Verifique: $\pi_+ + \pi_- = I$, $\pi_+\pi_- = 0$, $\pi_\pm^2 =
+\pi_\pm$, y las imágenes son el plano $\{x = y\}$ (simétrico).
+vectores, \omterm{def:b2:reduction:eigen}{valor propio} $1$) y la línea $\R(1, -1, 0)$
+(antisimétrico, \omterm{def:b2:reduction:eigen}{valor propio} $-1$). El lema del núcleo no es un
+declaración de existencia: Bézout coeficientes \emph{son} el
+Fórmulas del proyector.
+\end{example}
+
+\begin{example}[Los proyectores también calculan el exponencial.]\label{ex:b2:reduction:expprojectors}
+La misma matriz de swap, un dividendo más. Desde $A = \pi_+ -
+\pi_-$ con proyectores ortogonales en sentido algebraico
+($\pi_+\pi_- = 0$), cada potencia obedece a $A^k = \pi_+ +
+(-1)^k\pi_-$, y la serie exponencial se reagrupa por proyector:
+\[
+\eu^{tA} = \sum_k \frac{t^k}{k!}\bigl(\pi_+ +
+(-1)^k\pi_-\bigr)
+= \eu^{t}\,\pi_+ + \eu^{-t}\,\pi_- =
+\begin{pmatrix}
+\cosh t & \sinh t & 0\\
+\sinh t & \cosh t & 0\\
+0 & 0 & \eu^{t}
+\end{pmatrix}.
+\]
+(Marque $t = 0$: la identidad; derivada en $0$: $A$).
+La descomposición propia convierte una serie de matrices en dos escalares.
+serie --- el mecanismo exacto que \cref{ch:b2:diffeq}
+se ejecuta en todos los sistemas \omterm{def:b2:reduction:diag}{diagonalizable}, y la razón es hiperbólica
+Las funciones gobiernan los acoplamientos simétricos.
+\end{example}
+
+\begin{corollary}[Diagonalizabilidad mediante el polinomio mínimo]\label{cor:b2:reduction:minpolycrit}
+$u$ es \omterm{def:b2:reduction:diag}{diagonalizable} $\iff$ $\mu_u$ se divide en $K$ con
+\emph{simple} raíces $\iff$ algún polinomio aniquilador de $u$
+se divide con raíces simples.
+\end{corollary}
+
+\begin{proof}
+Si $P(u) = 0$ con $P = \prod_{i}(X - \lambda_i)$ (distinto
+$\lambda_i$), el lema da $E = \ker P(u) = \bigoplus_i \ker(u -
+\lambda_i)$: una suma directa de \omterm{def:b2:reduction:eigen}{espacios propios}, por lo que $u$ es \omterm{def:b2:reduction:diag}{diagonalizable}
+(\cref{thm:b2:reduction:diagcrit}). Por el contrario, un \omterm{def:b2:reduction:diag}{diagonalizable}
+$u$ es asesinado por $\prod_{\lambda \in \operatorname{Sp}u}(X -
+\lambda)$ (mata a cada \omterm{def:b2:reduction:eigen}{espacio propio}), que se divide con simples
+raíces; y $\mu_u$ lo divide teniendo las mismas raíces
+(\cref{prop:b2:reduction:minpoly}): $\mu_u$ es exactamente ese producto.
+\end{proof}
+
+\begin{example}\label{ex:b2:reduction:projections}
+Proyecciones satisfacen $p^2 = p$: aniquilado por $X(X-1)$, dividido simple
+raíces --- \omterm{def:b2:reduction:diag}{diagonalizable} con \omterm{def:b2:reduction:eigen}{espectro} $\subseteq \{0, 1\}$ y $E =
+\ker p \oplus \ker(p - \mathrm{id})$: análisis geométrico del año 1,
+reprobado en una línea. Simetrías ($s^2 = \mathrm{id}$,
+\omterm{def:b2:linalg:annihilator}{aniquilador} $X^2 - 1$): \omterm{def:b2:reduction:diag}{diagonalizable} cuando $\operatorname{char} K
+\neq 2$, \omterm{def:b2:reduction:eigen}{espectro}$\subseteq \{\pm 1\}$. Un endomorfismo con $u^3 =
+u^2$y $u^2 \neq u$: aniquilado por $X^2(X - 1)$, \emph{no}
+necesariamente \omterm{def:b2:reduction:diag}{diagonalizable} --- el criterio lo detecta (doble raíz
+$0$ debe ser probado: \omterm{def:b2:reduction:diag}{diagonalizable} si además $\ker u^2 = \ker
+u$).
+\end{example}
+
+\begin{example}[El campo decide: una rotación en $\R^3$]\label{ex:b2:reduction:rotation3d}
+Sea $R$ el cuarto de vuelta alrededor del eje $z$:
+\[
+R = \begin{pmatrix}
+0 & -1 & 0\\
+1 & 0 & 0\\
+0 & 0 & 1
+\end{pmatrix},
+\qquad
+\chi_R = (X - 1)(X^2 + 1).
+\]
+Sobre $\R$: el único \omterm{def:b2:reduction:eigen}{valor propio} es $1$, siendo \omterm{def:b2:reduction:eigen}{espacio propio} el eje
+$\R e_3$ --- una línea de vectores fijos y ninguna más
+reducción: $R$ no es ni \omterm{def:b2:reduction:diag}{diagonalizable} ni \omterm{def:b2:reduction:diag}{trigonalizable} en
+$\mathcal{M}_3(\R)$ ($\chi_R$ no se divide). Más de $\C$: tres
+distinto \omterm{def:b2:reduction:eigen}{valores propios} $1, \iu, -\iu$, por lo que $R$ es \omterm{def:b2:reduction:diag}{diagonalizable},
+con \omterm{def:b2:reduction:eigen}{vectores propios} $e_3$ y $e_1 \mp \iu e_2$. La geometría era
+audible en el álgebra: las rotaciones en el plano no tienen real
+direcciones invariantes, y el complejo \omterm{def:b2:reduction:eigen}{valores propios} $\pm\iu$ de
+El módulo $1$ almacena el ángulo ($\pm\frac\pi2$) que forma el real.
+La matriz solo se puede expresar mezclando coordenadas.
+\end{example}
+
+\begin{example}[Mínimo versus característico]\label{ex:b2:reduction:minvschar}
+Para $D = \operatorname{diag}(2, 2, 3)$: $\chi_D = (X - 2)^2(X -
+3)$pero $\mu_D = (X - 2)(X - 3)$, desde $(D - 2I)(D - 3I) = 0$
+(verifique sobre la base canónica) mientras que ningún factor por sí solo mata
+$D$. Para el bloque de cambios $N = \begin{psmallmatrix}0 & 1\\ 0 &
+0\end{psmallmatrix} \oplus (3)$, es decir, $N' =
+\begin{psmallmatrix}0 & 1 & 0\\ 0 & 0 & 0\\ 0 & 0 &
+3\end{psmallmatrix}$: $\chi_{N'} = X^2(X - 3)$ \emph{y}
+$\mu_{N'} = X^2(X - 3)$ --- la doble raíz es realmente necesaria
+porque $N'$ no es \omterm{def:b2:reduction:diag}{diagonalizable} en el lado $\ker$ ($N'e_2 =
+e_1 \neq 0$). Regla general: $\mu $y$\chi$ comparten sus raíces
+(\cref{prop:b2:reduction:minpoly}); la multiplicidad en $\mu$
+mide el tamaño del bloque nilpotente más grande, el que está en
+$\chi$ la dimensión total del subespacio característico.
+\end{example}
+
+\begin{theorem}[Cayley--Hamilton]\label{thm:b2:reduction:cayleyhamilton}
+$\chi_u(u) = 0$; en consecuencia $\mu_u \mid \chi_u$ y $\deg \mu_u
+\leq n$.\index{Teorema de Cayley-Hamilton}
+\end{theorem}
+
+\begin{proof}
+Arregla $x \neq 0$ y deja que $d$ sea máximo con $(x, u(x), \dots,
+u^{d-1}(x))$ gratis; escribir
+\[
+u^d(x) = -a_0 x - a_1 u(x) - \dots - a_{d-1}u^{d-1}(x),
+\]
+y configure $P_x = X^d + a_{d-1}X^{d-1} + \dots + a_0$, por lo que $P_x(u)(x) =
+0$. Complete la familia libre en una base de $E$: en ella, $u$ tiene
+formulario de bloque $\begin{pmatrix} C & \ast\\ 0 & D\end{pmatrix}$ donde $C$
+es la matriz compañera de $P_x$, cuyo \omterm{def:b2:reduction:charpoly}{polinomio característico} es
+$P_x$ (expandir $\det(XI - C)$ a lo largo de la primera columna, por inducción en
+$d$). Por lo tanto $\chi_u = P_x \cdot \chi_D$, y
+\[
+\chi_u(u)(x) = \chi_D(u)\bigl(P_x(u)(x)\bigr) = 0 .
+\]
+El argumento es válido para cada $x$: $\chi_u(u) = 0$.
+\end{proof}
+
+\begin{example}[Cayley--Hamilton en el trabajo]\label{ex:b2:reduction:chwork}
+$A = \begin{pmatrix} 1 & 2\\ 3 & 4\end{pmatrix}$: $\chi_A = X^2 -
+5X - 2$, entonces $A^2 = 5A + 2I$. Cada poder de $A$ colapsa a un
+combinación de $I$ y $A$:
+\[
+A^4 = (5A + 2I)^2 = 25A^2 + 20A + 4I = 145A + 54I =
+\begin{pmatrix} 199 & 290\\ 435 & 634\end{pmatrix},
+\]
+y el inverso sale gratis: $A(A - 5I) = 2I$ da
+\[
+A^{-1} = \tfrac12(A - 5I)
+= \begin{pmatrix} -2 & 1\\ 3/2 & -1/2\end{pmatrix}.
+\]
+La idea final: Cayley--Hamilton comprime todo el álgebra
+$K[A]$ en $\operatorname{Vect}(I, A, \dots, A^{n-1})$ ---
+$\dim K[A] = \deg\mu_A \leq n$, por grandes que sean las potencias que necesites.
+\end{example}
+
+\begin{remark}[Errores comunes]\label{rem:b2:reduction:pitfalls}
+(i) \omterm{def:b2:reduction:eigen}{Valores propios} no agregue: $\operatorname{Sp}(A + B)$ no es
+$\operatorname{Sp}A + \operatorname{Sp}B$, y una suma de
+Las matrices \omterm{def:b2:reduction:diag}{diagonalizable} no necesitan ser \omterm{def:b2:reduction:diag}{diagonalizable} ---
+$\begin{psmallmatrix}1 & 1\\ 0 & 0\end{psmallmatrix} +
+\begin{psmallmatrix}0 & 0\\ 0 & 1\end{psmallmatrix} =
+\begin{psmallmatrix}1 & 1\\ 0 & 1\end{psmallmatrix}$ es una suma de
+dos matrices \omterm{def:b2:reduction:diag}{diagonalizable} (cada una tiene \omterm{def:b2:reduction:eigen}{valores propios} distinta) y
+no es \omterm{def:b2:reduction:diag}{diagonalizable}; solo se comportan las familias \emph{desplazarse}
+(\cref{exo:b2:reduction:9}). (ii) ``$\chi_u$ divisiones'' es una
+hipótesis sobre el \emph{campo}: una rotación del plano tiene $\chi =
+X^2 - 2\cos\theta\,X + 1$, dividido sobre $\C$, no sobre $\R$ ---
+\omterm{def:b2:reduction:diag}{diagonalizable} en $\mathcal{M}_2(\C)$, no \omterm{def:b2:reduction:diag}{trigonalizable} en
+$\mathcal{M}_2(\R)$. (iii) La desigualdad es geométrica $\leq$
+algebraico, nunca al revés; probar solo $\dim E_\lambda \geq
+1$ no prueba nada sobre \omterm{def:b2:reduction:diag}{diagonalizabilidad}. (iv)$\mu_u$ no es
+$\chi_u$: la igualdad se cumple exactamente cuando cada \omterm{def:b2:reduction:eigen}{valor propio} tiene un
+cadena de bloques única (por ejemplo, matrices complementarias, las de este capítulo).
+problema de fin de semana); usando $\chi$ donde se necesita $\mu$ se infla
+cada cálculo de potencia. (v) $d$ y $\nu$ de Dunford son
+polinomios en $u$ --- una descomposición $u = d' + \nu'$ con el
+propiedades correctas pero $d'\nu' \neq \nu'd'$ es \emph{no} Dunford
+y nunca es único.
+\end{remark}
+
+\begin{remark}[Dónde se utiliza este capítulo]
+La reducción es el caballo de batalla del resto del libro: poderes y
+exponenciales de matrices impulsan los sistemas diferenciales lineales de
+\cref{ch:b2:diffeq}; el teorema espectral de \cref{ch:b2:quadratic}
+¿La diagonalización se hace ortogonal? funciones generadoras
+(\cref{ch:b2:genfun}) volver a derivar las asintóticas de recurrencia de este
+Analíticamente el problema del fin de semana del capítulo. En el volumen del año 3,
+mismo programa se ejecuta en dimensión infinita: la teoría espectral de
+operadores autoadjuntos compactos, donde las secuencias \omterm{def:b2:reduction:eigen}{valor propio} reemplazan
+espectros finitos, y la teoría de Perron-Frobenius de
+matrices, lo que explica \emph{por qué} \omterm{def:b2:reduction:eigen}{valores propios} dominante de
+Los problemas de conteo son positivos y simples.
+\end{remark}
+
+\section{Nilpotentes y la descomposición de Dunford}
+
+\begin{proposition}[endomorfismos nilpotentes]\label{prop:b2:reduction:nilpotent}
+Para $u$ con división $\chi_u$, lo siguiente es equivalente: $u^n =
+0$; $u^k = 0$ para algunos $k$; $\operatorname{Sp}(u) = \{0\}$; $\chi_u
+= X^n$; $u$ es \omterm{def:b2:reduction:diag}{trigonalizable} con diagonal cero. Un \omterm{prop:b2:reduction:nilpotent}{nilpotente
+endomorfismo} tiene $\mu_u = X^{\text{(nilpotence index)}}$ y un índice
+$\leq n$.\index{endomorfismo nilpotente}
+\end{proposition}
+
+\begin{proof}
+$u^k = 0$ hace que cada \omterm{def:b2:reduction:eigen}{valor propio} sea una raíz de $X^k$: \omterm{def:b2:reduction:eigen}{espectro} $\{0\}$
+(no vacío cuando $\chi$ se divide --- sobre $\C$ siempre). Luego $\chi_u =
+X^n $(todas las raíces son cero) y Cayley-Hamilton da $u^n = 0$;
+trigonalización (\cref{thm:b2:reduction:trigonalization}) pone
+ceros en la diagonal (la diagonal lleva el \omterm{def:b2:reduction:eigen}{valores propios}).
+Por el contrario, sea $A$ estrictamente triangular superior: $a_{ij} = 0$
+para $j \leq i$. Demostramos por inducción que
+\[
+(A^k)_{ij} = 0 \qquad \text{whenever } j \leq i + k - 1,
+\]
+es decir, cada potencia empuja la región cero una diagonal más arriba. Para
+$k = 1$ esta es la hipótesis. Para el paso,
+\[
+(A^{k+1})_{ij} = \sum_{\ell} (A^k)_{i\ell}\,a_{\ell j} ,
+\]
+y cada término desaparece: $\ell \leq i + k - 1$ (el primero
+factor es $0$ por inducción) o $\ell \geq i + k$, en cuyo caso
+$j \leq i + k \leq \ell$ mata el segundo factor. En $k = n$ el
+La condición $j \leq i + n - 1$ se cumple para todos los $i, j \leq n$: $A^n =
+0$. El \omterm{def:b2:reduction:polyu}{polinomio mínimo} divide $X^n$ y la aniquilación
+define el índice.
+\end{proof}
+
+\begin{theorem}[Desglose de Dunford]\label{thm:b2:reduction:dunford}
+Supongamos que $\chi_u$ se divide en $K$ (automático para $K = \C$). entonces
+hay un par \emph{único} $(d, \nu)$ con
+\[
+u = d + \nu, \qquad d \text{ diagonalizable}, \quad \nu
+\text{ nilpotent}, \quad d\nu = \nu d ,
+\]
+y además $d$ y $\nu$ son polinomios en
+$u$.\index{Descomposición de Dunford}
+\end{theorem}
+
+\begin{proof}
+\emph{Existencia.} Escriba $\chi_u = \prod_{i=1}^{r} (X -
+\lambda_i)^{m_i}$($\lambda_i $distinto) y configure $N_i = \ker(u -
+\lambda_i)^{m_i}$, el \emph{subespacios característicos}. Por
+Cayley--Hamilton y el lema del núcleo
+(\cref{thm:b2:reduction:kernels}),
+\[
+E = N_1 \oplus \dots \oplus N_r ,
+\]
+con proyecciones del polinomio $\pi_i$ en $u$; cada $N_i$ es estable
+(Los polinomios en $u$ conmutan con $u$). Defina $d = \sum_i \lambda_i
+\pi_i$: un polinomio en $u$, \omterm{def:b2:reduction:diag}{diagonalizable} (actúa como $\lambda_i$
+en $N_i$, por lo que $E$ se descompone en su \omterm{def:b2:reduction:eigen}{espacios propios}). Entonces $\nu = u -
+d $es un polinomio en $u$(por lo tanto conmuta con $d$), y en cada
+$N_i$ actúa como $u - \lambda_i$, con $(u - \lambda_i)^{m_i} = 0$
+allí: $\nu^{\max m_i} = 0$ en cada sumando, por lo que $\nu$ es nilpotente.
+
+\emph{Unicidad.} Sea $u = d' + \nu'$ otro par de esos. desde
+$d'$ y $\nu'$ conmutan entre sí, conmutan con $u = d' +
+\nu'$, por lo tanto con cada polinomio en $u$--- en particular con $d$
+y $\nu$. Entonces $d - d'$ es \omterm{def:b2:reduction:diag}{diagonalizable} (dos
+Los mapas \omterm{def:b2:reduction:diag}{diagonalizable} son simultáneamente \omterm{def:b2:reduction:diag}{diagonalizable}:
+\cref{exo:b2:reduction:9}) y es igual a $\nu' - \nu$, que es
+nilpotente: si $\nu^k = 0$ y $\nu'^{k'} = 0$, conmutación
+licencia la expansión del binomio
+\[
+(\nu' - \nu)^{k + k' - 1}
+= \sum_{j=0}^{k+k'-1}\binom{k + k' - 1}{j}
+\,\nu'^{\,j}\,(-\nu)^{k + k' - 1 - j} ,
+\]
+en el que cada término muere: ya sea $j \geq k'$ (primer factor
+cero) o $k + k' - 1 - j \geq k$ (segundo factor cero), y uno
+de los dos siempre se cumple. Un nilpotente \omterm{def:b2:reduction:diag}{diagonalizable} es cero (su
+\omterm{def:b2:reduction:eigen}{espectro} es $\{0\}$ y es diagonal en alguna base): $d = d'$,
+$\nu = \nu'$.
+\end{proof}
+
+\begin{example}[Potencias y exponenciales]\label{ex:b2:reduction:powers}
+$A = \begin{pmatrix} 3 & 1\\ -1 & 1\end{pmatrix}$: $\chi_A = X^2 -
+4X + 4 = (X-2)^2$, único \omterm{def:b2:reduction:eigen}{valor propio}$2$, \omterm{def:b2:reduction:eigen}{espacio propio} de dimensión
+$1$: no \omterm{def:b2:reduction:diag}{diagonalizable}. Dunford: $D = 2I$, $N = A - 2I =
+\begin{pmatrix} 1 & 1\\ -1 & -1\end{pmatrix}$, $N^2 = 0$. entonces
+\[
+A^k = (2I + N)^k = 2^k I + k\,2^{k-1} N ,
+\qquad
+\eu^{tA} = \eu^{2t}(I + tN),
+\]
+por el teorema del binomio de conmutación, respectivamente\ la serie exponencial
+(\cref{ch:b2:diffeq}) dividido en órdenes de traslado. Giros de reducción
+dinámica matricial en dinámica escalar.
+\end{example}
+
+\begin{remark}[Perspectivas dentro de este volumen]\label{rem:b2:reduction:perspectives}
+La reducción es un centro; Aquí están los cuatro radios a tener en cuenta. en
+\cref{ch:b2:nvs}, las normas adaptadas convierten ``todos los \omterm{def:b2:reduction:eigen}{valores propios} de
+módulo $< 1$'' en ``alguna norma de operador $< 1$'', haciendo
+Los espectros gobiernan la convergencia de potencias y series. en
+\cref{ch:b2:diffeq}, la receta de
+\cref{ex:b2:reduction:powers} se convierte en la solución general de
+$X' = AX$: Dunford divide $\eu^{tA}$ en
+bloques polinomiales multiplicados por exponenciales y lecturas de estabilidad
+las partes reales de \omterm{def:b2:reduction:eigen}{valores propios}. En \cref{ch:b2:quadratic}, un
+El producto escalar fuerza lo que el mero álgebra lineal no puede: simétrico.
+las matrices se convierten en \emph{ortogonalmente} \omterm{def:b2:reduction:diag}{diagonalizable}, sin
+parte nilpotente en absoluto. Y en \cref{ch:b2:genfun}, el
+\omterm{def:b2:reduction:eigen}{valor propio dominante} asintóticas del fin de semana de este capítulo.
+problema reaparece analíticamente, como la singularidad más pequeña de un
+Función generadora: dos idiomas para una tasa de crecimiento.
+\end{remark}
+
+\section{Ceremonias}
+
+\begin{exercise}[$\star$]\label{exo:b2:reduction:1}
+Diagonalizar (\omterm{def:b2:reduction:eigen}{valores propios}, bases de \omterm{def:b2:reduction:eigen}{espacios propios}, invertible $P$):
+\[
+A = \begin{pmatrix} 1 & 2\\ 2 & 1 \end{pmatrix},
+\qquad
+B = \begin{pmatrix} 0 & 1 & 1\\ 1 & 0 & 1\\ 1 & 1 & 0
+\end{pmatrix}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:reduction:2}
+Mostrar que $C = \begin{pmatrix} 1 & 1\\ 0 & 1\end{pmatrix}$ no lo es
+\omterm{def:b2:reduction:diag}{diagonalizable}, dos veces: vía \omterm{def:b2:reduction:eigen}{espacios propios} y vía \omterm{def:b2:reduction:polyu}{mínimo
+polinomio}.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:reduction:3}
+Deje que $u$ satisfaga a $u^2 - 5u + 6\,\mathrm{id} = 0$. Demuestre que $u$ es
+\omterm{def:b2:reduction:diag}{diagonalizable}, determine los espectros posibles y calcule $u^k$
+como una combinación de $\mathrm{id}$ y $u$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:4}
+Sea $u$ \omterm{def:b2:reduction:diag}{diagonalizable} y $F$ un subespacio estable. demostrar que
+$u|_F$ es \omterm{def:b2:reduction:diag}{diagonalizable} \emph{(restringir un polinomio aniquilador
+con raíces simples divididas)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:5}
+(Fibonacci) Sea $A = \begin{pmatrix} 1 & 1\\ 1 & 0\end{pmatrix}$.
+Diagonalice $A$ sobre $\R$ y deduzca la fórmula de Binet para
+Secuencia de Fibonacci ($F_0 = 0$, $F_1 = 1$, $F_{n+1} = F_n +
+F_{n-1}$):
+\[
+F_n = \frac{\varphi^n - \psi^n}{\sqrt 5},
+\qquad \varphi = \frac{1 + \sqrt5}{2},\ \psi = \frac{1 -
+\sqrt5}{2}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:6}
+Vamos $u \in \mathcal{L}(E)$ con $u^2$ \omterm{def:b2:reduction:diag}{diagonalizable} y $u$
+reversible ($K = \C$). Demuestre que $u$ es \omterm{def:b2:reduction:diag}{diagonalizable}. dar un
+contraejemplo cuando $u$ no es invertible.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:7}
+Calcule \omterm{thm:b2:reduction:dunford}{Descomposición de Dunford}, $A^k$ y $\eu^{tA}$ para
+\[
+A = \begin{pmatrix} 2 & 1 & 0\\ 0 & 2 & 1\\ 0 & 0 & 2
+\end{pmatrix}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:8}
+Deje $A \in \mathcal{M}_n(\C)$ con $A^k = I$ para algunos $k \geq 1$.
+Demuestre que $A$ es \omterm{def:b2:reduction:diag}{diagonalizable} y su \omterm{def:b2:reduction:eigen}{valores propios} es $k$-ésimo
+raíces de la unidad. Deducir que una matriz compleja invertible de orden finito
+similar a una matriz triangular con diagonal unitaria es la identidad.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:reduction:9}
+(Diagonalización simultánea) Sea $u, v$ \omterm{def:b2:reduction:diag}{diagonalizable} y
+desplazamientos. Demostrar que son \emph{simultáneamente}
+\omterm{def:b2:reduction:diag}{diagonalizable}: alguna base diagonaliza a ambos. \emph{(Each \omterm{def:b2:reduction:eigen}{espacio propio}
+of $u$ is $v$-stable; diagonalize the restrictions of $v$ there,
+using \cref{exo:b2:reduction:4}.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:reduction:10}
+Deje $u \in \mathcal{L}(\C^n)$. Demuestre que $u$ es \omterm{def:b2:reduction:diag}{diagonalizable} si
+y solo si cada subespacio estable $u$ tiene un subespacio estable $u$
+subespacio suplementario. \emph{(For $\Leftarrow$: apply the property
+to $F = \sum_\lambda E_\lambda(u)$, the sum of all \omterm{def:b2:reduction:eigen}{espacios propios}; if a
+stable supplement $G$ were nonzero, trigonalizing $u|_G$ would
+produce an \omterm{def:b2:reduction:eigen}{vector propio} of $u$ inside $G$ --- contradicting $G \cap
+F = \{0\}$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:reduction:11}
+(Radio espectral por Gelfand-lite, $2\times2$ sabor de análisis para
+ven) Dejemos $A \in \mathcal{M}_2(\C)$ con ambos \omterm{def:b2:reduction:eigen}{valores propios} de
+módulo $< 1$. Demuestre que $A^k \to 0$ de entrada es $k \to \infty$.
+\emph{(Trigonalize: $A = P(T)P^{-1}$ with $T$ upper triangular;
+compute $T^k$ explicitly --- distinguish equal and distinct
+\omterm{def:b2:reduction:eigen}{valores propios} --- and bound.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:12}
+Deje $u \in \mathcal{L}(\C^n)$ con $\operatorname{rk} u = 1$ ($n
+\geq 2$). Muestre que $\chi_u = X^{n-1}(X - \operatorname{tr} u)$,
+y que $u$ es \omterm{def:b2:reduction:diag}{diagonalizable} si y sólo si $\operatorname{tr} u
+\neq 0$. \emph{(Recall from \cref{exo:b2:linalg:5} that $u^2 =
+(\operatorname{tr} u)\,u$.)}
+\end{exercise}
+
+\section{Problema: recurrencias lineales y matrices complementarias}
+
+Una recurrencia lineal $u_{n+k} = a_{k-1}u_{n+k-1} + \dots + a_0 u_n$
+es un poder matricial disfrazado, y la reducción lo convierte en
+fórmulas cerradas, tasas de crecimiento y estimaciones de errores. este fin de semana
+El problema desarrolla el diccionario --- matrices complementarias en una.
+lado, el operador de turno en el espacio de secuencias en el otro
+--- prueba el \emph{teorema fundamental de las recurrencias lineales}
+(la solución general es $\sum_i Q_i(n)\lambda_i^n$ sobre las raíces
+del \omterm{def:b2:reduction:charpoly}{polinomio característico}), y gasta los dividendos en
+Aproximación diofántica de $\sqrt2$, sobre el recuento de paseos
+y palabras, y en un anillo de secuencias acopladas que sólo
+La diagonalización simultánea puede desenredar.
+
+\begin{problem}[{Problema del fin de semana --- el teorema fundamental de
+recurrencias lineales}]
+\label{pb:b2:reduction:1}
+Se corrigieron $k \geq 1$, los escalares $a_0, \dots, a_{k-1} \in \C$ con $a_0
+\neq 0$, el polinomio mónico $P = X^k - a_{k-1}X^{k-1} - \dots -
+a_1 X - a_0$ y la recurrencia.
+\[
+(\mathcal R)\colon\quad u_{n+k} = a_{k-1}u_{n+k-1} + \dots +
+a_1 u_{n+1} + a_0 u_n \qquad (n \geq 0).
+\]
+El \emph{matriz acompañante} de $P$ es
+\[
+C =
+\begin{pmatrix}
+0 & 1 & & \\
+ & \ddots & \ddots & \\
+ & & 0 & 1\\
+a_0 & a_1 & \cdots & a_{k-1}
+\end{pmatrix}
+\in \mathcal{M}_k(\C).
+\]
+
+\medskip
+\noindent\textbf{Parte I --- The companion dictionary.}
+\begin{enumerate}
+ \item Demuestre que una secuencia $(u_n)$ satisface $(\mathcal R)$ si
+ y sólo si los vectores $v_n = (u_n, u_{n+1}, \dots,
+ u_{n+k-1})^{\mathsf T}$ satisfacen $v_{n+1} = Cv_n$, por lo tanto
+ $v_n = C^n v_0$.
+ \item Demuestre que $\chi_C = P$ (expandir $\det(XI - C)$ a lo largo del
+ primera columna e inducción en $k$), luego ese $\mu_C = P$
+ también \emph{(pass to $C^{\mathsf T}$, for which $e_1$
+ is \omterm{def:b2:structures:generated}{cíclico}, and note that a matrix and its \omterm{def:b2:linalg:transpose}{transponer} have
+ the same \omterm{def:b2:reduction:polyu}{polinomio mínimo})}.
+ \item Demuestre que para cada raíz $\lambda$ de $P$, el vector
+ $(1, \lambda, \dots, \lambda^{k-1})^{\mathsf T}$ abarca
+ el \omterm{def:b2:reduction:eigen}{espacio propio} de $C$ para $\lambda$; deducir que
+ \emph{cada} \omterm{def:b2:reduction:eigen}{espacio propio} de $C$ tiene la dimensión $1$, y
+ que $C$ es \omterm{def:b2:reduction:diag}{diagonalizable} si y sólo si $P$ tiene $k$
+ raíces distintas.
+ \item Supongamos que $P$ tiene raíces distintas $\lambda_1, \dots,
+ \lambda_k$. Demuestre que las sucesiones geométricas
+ $(\lambda_i^n)_n$ forman la base del espacio de soluciones.
+ de $(\mathcal R)$, por lo que cada solución es $u_n = \sum_i
+ c_i\lambda_i^n $para constantes únicas $c_i$.
+ \item Resolver completamente: $u_{n+2} = u_{n+1} + 6u_n$, $u_0 = 1$,
+ $u_1 = 8$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte II --- The shift operator and the
+fundamental theorem.} Sea $\mathcal{S}$ el espacio vectorial $\C$
+de todas las secuencias complejas y $S \in
+\mathcal{L}(\mathcal{S})$el turno, $S\bigl((u_n)_n\bigr) =
+(u_{n+1})_n$.
+\begin{enumerate}[resume]
+ \item Demuestre que el conjunto de soluciones de $(\mathcal R)$ es $\ker
+ P(S)$y que tiene la dimensión exactamente $k$ \emph{(mapa un
+ solución a sus valores iniciales)}.
+ \item Explique por qué el lema de descomposición del núcleo
+ (\cref{thm:b2:reduction:kernels}) se aplica a $S$ en el
+ $\mathcal{S}$ de dimensión infinita sin ningún cambio,
+ y escriba la descomposición resultante de $\ker P(S)$ para
+ $P = \prod_{i=1}^{r}(X - \lambda_i)^{m_i}$ (distinto
+ $\lambda_i$, todos distintos de cero desde $a_0 \neq 0$).
+ \item Para $\lambda \neq 0$ y $m \geq 1$, mostrar
+ \[
+ \ker\,(S - \lambda\,\mathrm{id})^m
+ = \bigl\{\,\bigl(Q(n)\,\lambda^n\bigr)_n : Q \in
+ \C_{m-1}[X]\,\bigr\},
+ \]
+ de dimensión $m$. \emph{(Compute $(S -
+ \lambda)\bigl(Q(n)\lambda^n\bigr) =
+ \lambda^{n+1}(\Delta Q)(n)$with $\Delta Q = Q(X + 1) -
+ Q(X)$, and use that $\Delta$ drops the degree; for the
+ dimension, bound it by $m$ via initial values.)}
+ \item (El teorema fundamental de las recurrencias lineales) Concluye:
+ si $P = \prod_{i=1}^{r}(X - \lambda_i)^{m_i}$ con el
+ $\lambda_i$ distintos y distintos de cero, las soluciones de
+ $(\mathcal R)$ son exactamente las secuencias
+ \[
+ u_n = \sum_{i=1}^{r} Q_i(n)\,\lambda_i^n,
+ \qquad Q_i \in \C_{m_i - 1}[X],
+ \]
+ con polinomios determinados de forma única $Q_i$.
+ \item Resuelva completamente: $u_{n+2} = 4u_{n+1} - 4u_n$, $u_0 =
+ 1$, $u_1 = 0$y verifique la respuesta en $u_2$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte III --- Dominant roots and Diophantine
+dividends.}
+\begin{enumerate}[resume]
+ \item Supongamos que las raíces son simples con $\abs{\lambda_1} >
+ \abs{\lambda_i}$ para $i \geq 2$y $u_n = \sum_i c_i
+ \lambda_i^n $con $c_1 \neq 0$. Mostrar $u_n \sim
+ c_1\lambda_1^n $y$u_{n+1}/u_n \to \lambda_1$.
+ \item (Pell) Defina $a_{n+1} = a_n + 2b_n$, $b_{n+1} = a_n +
+ b_n$, $a_0 = b_0 = 1$. Muestra que $q(a, b) = a^2 - 2b^2$
+ satisface $q(a_{n+1}, b_{n+1}) = -q(a_n, b_n)$, por lo tanto
+ $a_n^2 - 2b_n^2 = (-1)^{n+1}$; relacionar esto con el
+ \omterm{def:b2:linalg:det}{determinante} de $M = \begin{psmallmatrix}1 & 2\\ 1 &
+ 1\end{psmallmatrix}$.
+ \item Deducir la estimación del error
+ \[
+ \Bigl|\frac{a_n}{b_n} - \sqrt2\Bigr|
+ = \frac{1}{b_n\,(a_n + \sqrt2\,b_n)}
+ \leq \frac{1}{2b_n^2},
+ \]
+ y muestre que decae geométricamente con la relación $3 -
+ 2\sqrt2$\emph{(find the \omterm{def:b2:reduction:eigen}{valores propios} of $M$ and the
+ growth of $b_n$)}.
+ \item (Crecimiento general) De la pregunta 9, demuestre: (a) si cada
+ raíz satisface $\abs{\lambda_i} \leq \rho$, entonces
+ $\abs{u_n} \leq C\,n^{m-1}\rho^n$ con $m = \max_i m_i$;
+ (b) si hay una raíz única $\lambda_1$ de máximo
+ módulo y $Q_1 \neq 0$, luego $u_{n+1}/u_n \to
+ \lambda_1$ --- verifíquelo en la solución de la pregunta 10.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Parte IV --- Counting walks and words.} Para un
+gráfico finito con conjunto de vértices $\{1, \dots, N\}$, el
+\emph{matriz de adyacencia} $A$ tiene $A_{ij} = 1$ si $ij$ es una ventaja,
+más $0$.
+\begin{enumerate}[resume]
+ \item Demuestre que $(A^n)_{ij}$ es el número de recorridos de longitud
+ $n$ de $i$ a $j$ (secuencias de aristas $n$, cada paso
+ a lo largo de un borde).
+ \item (El triángulo) Para ver el gráfico completo en los vértices $3$,
+ $A = J - I$: usando el \omterm{def:b2:reduction:eigen}{espectro} de $J$
+ (\cref{ex:b2:linalg:onesmatrix}), mostrar
+ \[
+ (A^n)_{ii} = \frac{2^n + 2(-1)^n}{3},
+ \qquad
+ (A^n)_{ij} = \frac{2^n - (-1)^n}{3} \quad (i \neq j),
+ \]
+ y verifique ambos en $n = 2$ enumerando los paseos.
+ \item (Palabras sin $11$) Sea $w_n$ el número de binarios
+ palabras de longitud $n$ sin dos $1$ consecutivos.
+ Codifica palabras por su última letra para obtener una transferencia
+ matriz, mostrar $w_{n+2} = w_{n+1} + w_n$, deducir $w_n =
+ F_{n+2}$ (Fibonacci, \cref{exo:b2:reduction:5}), y
+ dé la tasa de crecimiento $\lim w_{n+1}/w_n$.
+ \item (La ruta) Para el gráfico de ruta $1 - 2 - 3$, muestre el
+ \omterm{def:b2:reduction:eigen}{valores propios} de $A$ son $\sqrt2, 0, -\sqrt2$ con
+ \omterm{def:b2:reduction:eigen}{vectores propios} $(1, \pm\sqrt2, 1)$ y $(1, 0, -1)$, y
+ deducir que el número de recorridos de longitud $n$ desde el final
+ para finalizar es $\bigl((\sqrt2)^n + (-\sqrt2)^n\bigr)/4$:
+ cero para $n$ impar y $2^{\,n/2 - 1}$ para $n$ par.
+ Consultar en $n = 4$.
+ \item (Fórmula de seguimiento) Muestra que el número total de
+ caminatas de longitud $n$ (todos los puntos de partida) son
+ $\operatorname{tr}(A^n) = \sum_i \lambda_i^n$, y
+ verifíquelo en el triángulo.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part V --- A ring of sequences: simultaneous
+diagonalization.} Reparar $k \geq 3$, dejar $\omega = \eu^{2\iu\pi/k}$,
+y sea $W \in \mathcal{M}_k(\C)$ el turno \omterm{def:b2:structures:generated}{cíclico}: $W e_i =
+e_{i+1}$(índices mod $k$, columnas indexadas $0, \dots, k-1$).
+\begin{enumerate}[resume]
+ \item Demuestre que $W^{\mathsf T}$ es la matriz compañera de
+ $X^k - 1$, deduzca $\chi_W = \mu_W = X^k - 1$, y que $W$ es
+ \omterm{def:b2:reduction:diag}{diagonalizable} con el $k$ simple \omterm{def:b2:reduction:eigen}{valores propios}
+ $\omega^j$ y \omterm{def:b2:reduction:eigen}{vectores propios} $f_j = (1, \omega^{-j},
+ \omega^{-2j}, \dots, \omega^{-(k-1)j})^{\mathsf T}$.
+ \item Una matriz \emph{circulante} es $C = c_0 I + c_1 W + \dots
+ + c_{k-1}W^{k-1}$. Demuestre que todos los circulantes viajan,
+ que la base $(f_0, \dots, f_{k-1})$ diagonaliza
+ \emph{todo} de ellos simultáneamente, y que el
+ \omterm{def:b2:reduction:eigen}{valores propios} de $C$ son $\widehat c(\omega^j) = \sum_m
+ c_m \omega^{jm}$, $j = 0, \dots, k-1$.
+ \item Deduce $\det C = \prod_{j=0}^{k-1} \widehat
+ c(\omega^j)$, y comprueba que $k = 3$ recupera el
+ factorización de \cref{exo:b2:linalg:8}.
+ \item (El collar promedio) Deja $x^{(n+1)} = Mx^{(n)}$ con
+ $M = \frac12(W + W^{-1})$: cada uno de los números $k$ ordenados
+ en un anillo se reemplaza por el promedio de sus dos
+ vecinos. Mostrar el \omterm{def:b2:reduction:eigen}{valores propios} de $M$ son
+ $\cos(2\pi j/k)$, y que el coeficiente de $x^{(0)}$
+ en $f_0$ es la media $\frac1k\sum_m x^{(0)}_m$
+ \emph{(sume las coordenadas de $f_j$)}.
+ \item Concluye: para $k$ impar, $x^{(n)}$ converge al
+ vector constante cuyo valor es la media del inicial
+ valores; para $k = 4$, exhiba el responsable de \omterm{def:b2:reduction:eigen}{valor propio}.
+ por la no convergencia y la obstrucción exacta
+ (un coeficiente de media alterna que debe desaparecer).
+ \item (Síntesis) En una frase cada uno: cómo el compañero
+ La matriz convierte el análisis de $(\mathcal R)$ en
+ reducción; donde se necesita el lema de descomposición del núcleo
+ ninguna dimensión finita; por qué gobierna el dominante \omterm{def:b2:reduction:eigen}{valores propios}
+ tasas de crecimiento y error diofántico; ¿Por qué los poderes del
+ paseos de recuento de matriz de adyacencia; y que desplazamientos
+ comprar matrices. Nombra las dos cumbres: la fundamental
+ teorema de recurrencias lineales, y --- para el positivo
+ matrices de la Parte IV, en el volumen del Año 3 --- el
+ Teorema de Perron-Frobenius.
+\end{enumerate}
+\end{problem}

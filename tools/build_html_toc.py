@@ -43,6 +43,9 @@ def fail(msg):
 
 def detex(text, where):
     text = text.replace("---", "—").replace("--", "–").replace("~", " ")
+    # same typographic quotes the chapter converter produces
+    text = text.replace("``", "“").replace("''", "”")
+    text = text.replace("`", "‘").replace("'", "’")
     if "\\" in text or "{" in text or "}" in text:
         fail(f"{where}: title {text!r} contains LaTeX markup — extend "
              "build_html_toc.py deliberately instead of letting it guess")
