@@ -256,8 +256,8 @@ Cross-chapter `\cref`/`\omterm`: the manifest stores each chapter's label
 map, and references to another chapter resolve to links into its page.
 Forward references are handled by a `--labels-only` pre-pass that
 registers every chapter's labels before the full conversion —
-`tools/build_html_book.sh /path/to/saas` runs both passes for the whole
-book plus the toc tool; use it rather than hand-ordering chapters.
+`tools/build_html_book.sh <entry.tex> <book-key> /path/to/saas` runs
+both passes for the whole book plus the toc tool; use it rather than hand-ordering chapters.
 Generated output is committed in the saas repo only, never here.
 
 `tools/build_html_toc.py` writes the book's FULL table of contents (every

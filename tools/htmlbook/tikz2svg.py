@@ -41,6 +41,13 @@ PREAMBLE = r"""
 \definecolor{omProp}{RGB}{190,90,20}
 \definecolor{omMeth}{RGB}{20,110,60}
 \definecolor{omExo}{RGB}{80,80,80}
+\definecolor{ocMint}{HTML}{06D6A0}
+\definecolor{ocYellow}{HTML}{FFD166}
+\definecolor{ocRed}{HTML}{EF476F}
+\definecolor{ocBlue}{HTML}{118AB2}
+\definecolor{ocInk}{HTML}{1F2430}
+\colorlet{ocPaleBlue}{ocBlue!14!white}
+\colorlet{ocDarkBlue}{ocBlue!80!black}
 \newcommand{\N}{\mathbb{N}}
 \newcommand{\Z}{\mathbb{Z}}
 \newcommand{\Q}{\mathbb{Q}}

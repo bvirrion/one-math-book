@@ -90,6 +90,14 @@ class Emitter:
     # ------------------------------------------------------------- helpers
 
     def math_ph(self, tex, display):
+        # \cref inside a formula: KaTeX cannot carry a hyperlink, so the
+        # localized reference text is substituted in (text, no link)
+        tex = re.sub(
+            r"\\[cC]ref\{([^{}]*)\}",
+            lambda m: "\\text{" + self.lang.cref_text(
+                *(lambda i: (i["kind"], i["number"]))(
+                    self.resolve(m.group(1), "\\cref in math"))) + "}",
+            tex)
         self.math.append((tex, display))
         return f"\x00M{len(self.math) - 1}\x00"
 
@@ -124,6 +132,9 @@ class Emitter:
                 out.append(f"<strong>{self.inlines(node['inl'])}</strong>")
             elif t == "sup":
                 out.append(f"<sup>{self.inlines(node['inl'])}</sup>")
+            elif t == "sc":
+                out.append(f'<span class="om-sc">'
+                           f"{self.inlines(node['inl'])}</span>")
             elif t == "footnote":
                 self.footnotes.append(self.inlines(node["inl"]))
                 n = len(self.footnotes)
@@ -218,6 +229,11 @@ class Emitter:
                 out.append(self.figure(node))
             elif t == "table":
                 out.append(self.table(node))
+            elif t == "tables":
+                inner = "\n".join(self.table_inner(tbl)
+                                  for tbl in node["tables"])
+                out.append(f'<div class="om-table-wrap om-table-row">'
+                           f"{inner}</div>")
             else:
                 raise ParseError(f"emitter: unknown block {t!r}")
         return "\n".join(out)
@@ -334,11 +350,20 @@ class Emitter:
             f'<img src="{fig["url"]}" alt="{alt}" '
             f'width="{fig["width"]}" height="{fig["height"]}" loading="lazy">'
             for fig in (self.figures[tikz] for tikz in node["tikzs"]))
-        return (f'<figure class="om-figure">\n<div class="om-figure-row">\n'
-                f"{imgs}\n</div>\n"
+        anchor = ""
+        if node.get("label"):
+            anchor = f' id="{anchor_for(node["label"])}"'
+            caption = (f'<strong>{self.lang.names["figure"]} '
+                       f"{node['number']}.</strong> {caption}")
+        return (f'<figure class="om-figure"{anchor}>\n'
+                f'<div class="om-figure-row">\n{imgs}\n</div>\n'
                 f"<figcaption>{caption}</figcaption>\n</figure>")
 
     def table(self, node):
+        return ('<div class="om-table-wrap">' + self.table_inner(node)
+                + "</div>")
+
+    def table_inner(self, node):
         rows = []
         if node["header"]:
             cells = "".join(f"<th>{self.inlines(c)}</th>"
@@ -351,8 +376,7 @@ class Emitter:
             attr = ' class="om-rule"' if row["rule"] else ""
             body_rows.append(f"<tr{attr}>{cells}</tr>")
         rows.append("<tbody>" + "".join(body_rows) + "</tbody>")
-        return ('<div class="om-table-wrap"><table class="om-table">'
-                + "".join(rows) + "</table></div>")
+        return '<table class="om-table">' + "".join(rows) + "</table>"
 
 
 def footnotes_html(emitter):

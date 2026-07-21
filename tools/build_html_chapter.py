@@ -22,6 +22,7 @@ pdflatex + dvisvgm (or pdftocairo) for the figures.
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -73,6 +74,7 @@ KATEX_MACROS = {
     # amsthm's in-line QED placement: the HTML proof block draws its own
     # tombstone, so the marker vanishes from the formula itself
     "\\qedhere": "",
+    "\\qed": "",
 }
 
 
@@ -94,13 +96,26 @@ def chapter_paths(chapter, lang):
     return body, sols
 
 
+def _clean_math(t):
+    """\index{} is print-only metadata; psmallmatrix (mathtools) is
+    rewritten to KaTeX-native smallmatrix in parentheses."""
+    t = re.sub(r"\\index\{[^{}]*\}", "", t)
+    t = t.replace("\\begin{psmallmatrix}",
+                  "\\left(\\begin{smallmatrix}")
+    t = t.replace("\\end{psmallmatrix}",
+                  "\\end{smallmatrix}\\right)")
+    return t
+
+
 def render_math(segments, macros):
     """Batch-render formulas with KaTeX via node."""
     if not segments:
         return []
+    # \index{...} inside math is print-only metadata KaTeX cannot parse
     payload = json.dumps({
         "macros": macros,
-        "segments": [{"tex": t, "display": d} for t, d in segments],
+        "segments": [{"tex": _clean_math(t), "display": d}
+                      for t, d in segments],
     })
     res = subprocess.run(
         ["node", "katex_render.mjs"], cwd=HTMLBOOK_DIR, input=payload,

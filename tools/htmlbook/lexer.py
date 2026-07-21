@@ -309,9 +309,12 @@ class Parser:
                     if self.chapter_label is None and not blocks and not parbuf:
                         self.chapter_label = label
                     else:
-                        # a stray label at block level anchors nothing we
-                        # can point at in HTML — refuse rather than drop
-                        cur.err(f"unexpected block-level \\label{{{label}}}")
+                        # a label placed late in an environment body (the
+                        # style file's page-break workaround): surface it
+                        # as a node for parse_env to attach; anywhere else
+                        # the emitter fails loudly on it
+                        flush()
+                        blocks.append({"t": "label", "name": label})
                     continue
                 # anything else: part of the running paragraph text
                 parbuf.append(self.take_inline_atom(cur))
@@ -338,7 +341,7 @@ class Parser:
                         "emph": 1, "textbf": 1, "index": 1, "label": 1,
                         "textsuperscript": 1, "footnote": 1,
                         "texorpdfstring": 2, "hspace": 1, "rule": 2,
-                        "H": 1}.get(name, 0)
+                        "H": 1, "c": 1, "textsc": 1}.get(name, 0)
             out = [s[start:cur.i]]
             for _ in range(n_groups):
                 while cur.i < len(s) and s[cur.i] in " \n":
@@ -366,6 +369,10 @@ class Parser:
         if name == "omfigure":
             body = find_env_end(cur, "omfigure")
             return self.parse_figure(body)
+        if name == "figure":
+            read_optional(cur)  # float placement ([ht]...): print-only
+            body = find_env_end(cur, "figure")
+            return self.parse_figure(body, floated=True)
         if name == "center":
             body = find_env_end(cur, "center")
             return self.parse_center(body)
@@ -407,12 +414,19 @@ class Parser:
                 cur.i += m.end() - 1
                 label = read_group(cur)
             body = find_env_end(cur, name)
+            body_blocks = self.parse_blocks(body)
+            # adopt a label written late in the body (page-break pattern)
+            for node in body_blocks[:]:
+                if node["t"] == "label":
+                    if label is None:
+                        label = node["name"]
+                    body_blocks.remove(node)
             return {"t": "env", "kind": name, "title": title, "label": label,
                     "difficulty": difficulty, "sol_key": sol_key,
-                    "body": self.parse_blocks(body)}
+                    "body": body_blocks}
         cur.err(f"unknown environment {name!r}")
 
-    def parse_figure(self, body):
+    def parse_figure(self, body, floated=False):
         """An omfigure holds one or more tikzpictures (side-by-side plots
         are two pictures separated by \\qquad) plus a {\\small ...} caption."""
         tikzs = []
@@ -430,31 +444,67 @@ class Parser:
             rest = rest[:m.start()] + rest[e + len(end_pat):]
         if not tikzs:
             raise ParseError(f"{self.filename}: omfigure without tikzpicture")
+        if floated:
+            # floats: \caption{...} + optional \label, \centering etc.
+            label = None
+            mcap = re.search(r"\\caption\{", rest)
+            caption_text = ""
+            if mcap:
+                gcur = Cursor(rest, self.filename)
+                gcur.i = mcap.end() - 1
+                caption_text = read_group(gcur)
+                rest = rest[:mcap.start()] + rest[gcur.i:]
+            mlab = re.search(r"\\label\{([^{}]*)\}", rest)
+            if mlab:
+                label = mlab.group(1)
+                rest = rest[:mlab.start()] + rest[mlab.end():]
+            rest = re.sub(
+                r"\\centering|\\leavevmode|\\qquad|\\quad|\\hfill",
+                " ", rest)
+            if rest.strip():
+                raise ParseError(
+                    f"{self.filename}: unsupported figure content "
+                    f"{rest.strip()[:60]!r}")
+            return {"t": "figure", "tikzs": tikzs, "label": label,
+                    "caption": self.parse_inlines(caption_text)}
         # what remains is the caption (plus separators like \qquad)
         caption = re.sub(r"\\qquad|\\quad|\\hfill", " ", rest).strip()
         m2 = re.fullmatch(r"\{\\small\s+(.*)\}", caption, re.S)
         if m2:
             caption = m2.group(1)
-        return {"t": "figure", "tikzs": tikzs,
+        return {"t": "figure", "tikzs": tikzs, "label": None,
                 "caption": self.parse_inlines(caption)}
 
     def parse_center(self, body):
+        """A center block holds one or more tabulars (side-by-side tables
+        are separated by \\qquad), optionally after an \\arraystretch
+        row-height tweak (print-only; CSS handles it in HTML)."""
         body = body.strip()
-        # row-height tweak for print (sign tables); CSS handles it in HTML
         body = re.sub(r"^\\renewcommand\{\\arraystretch\}\{[\d.]+\}\s*",
                       "", body)
-        if not body.startswith("\\begin{tabular}"):
-            raise ParseError(
-                f"{self.filename}: only tabular is supported inside center")
+        body = re.sub(r"^\\small\s+", "", body)  # print-only sizing
+        tables = []
         cur = Cursor(body, self.filename)
-        cur.i = len("\\begin")
-        read_group(cur)  # "tabular"
-        colspec = read_group(cur)
-        tab_body = find_env_end(cur, "tabular")
-        if cur.s[cur.i:].strip():
-            raise ParseError(
-                f"{self.filename}: unexpected content after tabular")
-        return self.parse_tabular(colspec, tab_body)
+        while True:
+            rest = cur.s[cur.i:]
+            stripped = re.match(r"(\s|\\qquad\b|\\quad\b)*", rest).end()
+            cur.i += stripped
+            if cur.i >= len(cur.s):
+                break
+            if not cur.s.startswith("\\begin{tabular}", cur.i):
+                raise ParseError(
+                    f"{self.filename}: only tabular is supported inside "
+                    "center")
+            cur.i += len("\\begin")
+            read_group(cur)  # "tabular"
+            colspec = read_group(cur)
+            tab_body = find_env_end(cur, "tabular")
+            tables.append(self.parse_tabular(colspec, tab_body))
+        if not tables:
+            raise ParseError(f"{self.filename}: empty center block")
+        if len(tables) == 1:
+            return tables[0]
+        return {"t": "tables", "tables": tables}
 
     def parse_tabular(self, colspec, body):
         """Rows are dicts {"cells": [...], "rule": bool} — `rule` marks a
@@ -539,16 +589,25 @@ class Parser:
                 m = CMD_RE.match(s, cur.i)
                 if not m:
                     nxt = s[cur.i + 1:cur.i + 2]
+                    following = s[cur.i + 2:cur.i + 3]
                     if nxt in ("'", "`", "^", '"', "~") \
-                            and s[cur.i + 2:cur.i + 3].isalpha():
-                        # accents in prose: \'e -> e-acute, \"O -> O-uml
+                            and (following.isalpha() or following == "{"):
+                        # accents in prose, bare (\'e) or braced (\'{e})
                         import unicodedata
                         combining = {"'": "\u0301", "`": "\u0300",
                                      "^": "\u0302", '"': "\u0308",
                                      "~": "\u0303"}[nxt]
+                        if following == "{":
+                            cur.i += 2
+                            letter = read_group(cur)
+                            if len(letter) != 1 or not letter.isalpha():
+                                cur.err(f"unsupported accent argument "
+                                        f"{letter!r}")
+                        else:
+                            letter = following
+                            cur.i += 3
                         text.append(unicodedata.normalize(
-                            "NFC", s[cur.i + 2] + combining))
-                        cur.i += 3
+                            "NFC", letter + combining))
                         continue
                     if nxt in (" ", "\n", ""):    # "\ " explicit space
                         # ("" = trailing "\<newline>" whose newline was
@@ -558,6 +617,8 @@ class Parser:
                         text.append(" ")
                     elif nxt in ("%", "&", "_", "#", "$"):
                         text.append(nxt)
+                    elif nxt == "-":
+                        pass  # discretionary hyphen: hyphenation hint only
                     else:
                         cur.err(f"unsupported escape '\\{nxt}'")
                     cur.i += 2
@@ -615,8 +676,8 @@ class Parser:
                     out.extend(self.parse_inlines(tex_arg))
                 elif name == "checkmark":
                     text.append("✓")
-                elif name == "hfill":
-                    pass  # horizontal fill: no HTML equivalent needed
+                elif name in ("hfill", "leavevmode", "centering"):
+                    pass  # print-layout commands: no HTML equivalent
                 elif name == "hspace":
                     read_group(cur)
                     text.append(" ")
@@ -626,6 +687,27 @@ class Parser:
                     read_group(cur)
                 elif name == "small":
                     pass  # size switch inside a group; CSS owns sizing
+                elif name == "textsc":
+                    emit_text()
+                    inner = read_group(cur)
+                    out.append({"t": "sc",
+                                "inl": self.parse_inlines(inner)})
+                elif name == "linebreak":
+                    text.append(" ")
+                elif name == "guillemotleft":
+                    text.append("\u00ab")
+                elif name == "guillemotright":
+                    text.append("\u00bb")
+                elif name in ("oe", "OE"):
+                    text.append("\u0153" if name == "oe" else "\u0152")
+                elif name == "c":
+                    # cedilla accent: \c{c} -> c-cedilla
+                    import unicodedata
+                    inner = read_group(cur)
+                    if len(inner) != 1 or not inner.isalpha():
+                        cur.err(f"unsupported \\c{{{inner}}}")
+                    text.append(unicodedata.normalize(
+                        "NFC", inner + "\u0327"))
                 elif name == "H":
                     # Hungarian umlaut accent (Erd\H{o}s)
                     inner = read_group(cur)
@@ -689,9 +771,15 @@ def parse_solutions(path):
     """Parse a solutions file; returns dict sol_key -> body blocks."""
     with open(path, encoding="utf-8") as f:
         text = f.read()
-    # Drop the \section*{Chapter \ref{...} --- ...} header line: it repeats
-    # the chapter title and its \ref cannot be resolved standalone.
-    text = re.sub(r"\\section\*\{[^\n]*\}\s*\n", "", text, count=1)
+    # Drop the \section*{Chapter \ref{...} --- ...} header (it repeats the
+    # chapter title and its \ref cannot be resolved standalone). The title
+    # may span lines, so strip the balanced group, not a single line.
+    m = re.match(r"\s*\\section\*", text)
+    if m:
+        cur = Cursor(text, str(path))
+        cur.i = m.end()
+        read_group(cur)
+        text = text[cur.i:]
     p = Parser(str(path), text)
     blocks = p.parse()
     solutions = {}

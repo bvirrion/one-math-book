@@ -41,7 +41,33 @@ def fail(msg):
     sys.exit(f"error: {msg}")
 
 
+ACCENTS = {"'": "́", "`": "̀", "^": "̂",
+           '"': "̈", "~": "̃", "c": "̧", "H": "̋"}
+
+
 def detex(text, where):
+    import unicodedata
+
+    # accents first (\'e, \`{a}, \c{c}, ...) — before quote curling,
+    # which would otherwise eat the accent characters
+    text = re.sub(
+        r"\\(['`^\"~cH])\{?([A-Za-z])\}?",
+        lambda m: unicodedata.normalize(
+            "NFC", m.group(2) + ACCENTS[m.group(1)]),
+        text)
+    sup = {"a": "ᵃ", "e": "ᵉ", "r": "ʳ", "n": "ⁿ", "d": "ᵈ", "t": "ᵗ",
+           "h": "ʰ", "s": "ˢ", "o": "ᵒ"}
+
+    def superscript(m):
+        letters = m.group(1)
+        if any(ch not in sup for ch in letters):
+            fail(f"{where}: \\textsuperscript{{{letters}}} has no Unicode "
+                 "superscript mapping — extend build_html_toc.py")
+        return "".join(sup[ch] for ch in letters)
+
+    text = re.sub(r"\\textsuperscript\{([A-Za-z]+)\}", superscript, text)
+    text = text.replace("\\oe{}", "œ").replace("\\oe ", "œ")
+    text = text.replace("\\,", " ")  # thin space, as the chapter parser
     text = text.replace("---", "—").replace("--", "–").replace("~", " ")
     # same typographic quotes the chapter converter produces
     text = text.replace("``", "“").replace("''", "”")

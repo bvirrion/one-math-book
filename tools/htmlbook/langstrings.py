@@ -62,6 +62,11 @@ class LangStrings:
         # list conjunction — not in the lang files (cleveref supplies it
         # in LaTeX); extend here when a new language is added
         self.and_word = {"en": "and", "fr": "et", "nl": "en"}[lang]
+        # figure cref names come from babel in print, not the lang files
+        self.names["figure"] = {"en": "Figure", "fr": "Figure",
+                                "nl": "Figuur"}[lang]
+        self.plurals["figure"] = {"en": "Figures", "fr": "Figures",
+                                  "nl": "Figuren"}[lang]
         # \st -> its \text{...} body, fed to KaTeX as a macro
         m = re.search(r"\\newcommand\{\\st\}\{(.*)\}", text)
         if not m:
