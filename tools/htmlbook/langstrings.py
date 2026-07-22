@@ -61,20 +61,24 @@ class LangStrings:
                 self.plurals[kind] = plural
         # list conjunction — not in the lang files (cleveref supplies it
         # in LaTeX); extend here when a new language is added
-        self.and_word = {"en": "and", "fr": "et", "nl": "en"}[lang]
+        self.and_word = {"en": "and", "fr": "et", "nl": "en",
+                         "es": "y"}[lang]
         # figure cref names come from babel in print, not the lang files
         self.names["figure"] = {"en": "Figure", "fr": "Figure",
-                                "nl": "Figuur"}[lang]
+                                "nl": "Figuur", "es": "Figura"}[lang]
         self.plurals["figure"] = {"en": "Figures", "fr": "Figures",
-                                  "nl": "Figuren"}[lang]
+                                  "nl": "Figuren", "es": "Figuras"}[lang]
         self.names["equation"] = {"en": "Equation", "fr": "Équation",
-                                  "nl": "Vergelijking"}[lang]
+                                  "nl": "Vergelijking",
+                                  "es": "Ecuación"}[lang]
         self.names["section"] = {"en": "Section", "fr": "Section",
-                                 "nl": "Sectie"}[lang]
+                                 "nl": "Sectie", "es": "Sección"}[lang]
         self.plurals["section"] = {"en": "Sections", "fr": "Sections",
-                                   "nl": "Secties"}[lang]
+                                   "nl": "Secties",
+                                   "es": "Secciones"}[lang]
         self.plurals["equation"] = {"en": "Equations", "fr": "Équations",
-                                    "nl": "Vergelijkingen"}[lang]
+                                    "nl": "Vergelijkingen",
+                                    "es": "Ecuaciones"}[lang]
         # \st -> its \text{...} body, fed to KaTeX as a macro
         m = re.search(r"\\newcommand\{\\st\}\{(.*)\}", text)
         if not m:

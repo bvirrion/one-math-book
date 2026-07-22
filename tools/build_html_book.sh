@@ -10,7 +10,8 @@
 set -u
 ENTRY="${1:?usage: build_html_book.sh <entry.tex> <book-key> /path/to/saas}"
 BOOK="${2:?usage: build_html_book.sh <entry.tex> <book-key> /path/to/saas}"
-SAAS="${3:?usage: build_html_book.sh <entry.tex> <book-key> /path/to/saas}"
+SAAS="${3:?usage: build_html_book.sh <entry.tex> <book-key> /path/to/saas [languages]}"
+LANGS="${4:-en,fr,nl}"
 OUT="$SAAS/resources/onecourse/chapters"
 SVG_OUT="$SAAS/public/images/onecourse/chapters"
 cd "$(dirname "$0")/.."
@@ -31,7 +32,7 @@ for part in "${PARTS[@]}"; do
         python3 tools/build_html_chapter.py \
             --chapter "parts/$part/$slug.tex" \
             --chapter-number "$n" \
-            --book "$BOOK" --languages en,fr,nl \
+            --book "$BOOK" --languages "$LANGS" \
             --out "$OUT" --svg-out "$SVG_OUT" \
             --labels-only || exit 1
     done
@@ -48,7 +49,7 @@ for part in "${PARTS[@]}"; do
             --chapter "parts/$part/$slug.tex" \
             --chapter-number "$n" \
             --book "$BOOK" \
-            --languages en,fr,nl \
+            --languages "$LANGS" \
             --out "$OUT" --svg-out "$SVG_OUT"; then
             failed+=("$n:$part/$slug")
         fi
@@ -64,5 +65,5 @@ fi
 
 python3 tools/build_html_toc.py \
     --entry "$ENTRY" \
-    --book "$BOOK" --languages en,fr,nl --out "$OUT"
+    --book "$BOOK" --languages "$LANGS" --out "$OUT"
 echo "ALL DONE: $n chapters"

@@ -47,12 +47,13 @@ one `\input` line in the *Parts* section of the relevant book's entry file,
 and mirror the solutions directory in its *Solutions* appendix
 (`solutions/solutions.tex`). A new book (e.g.\ University Year 3) gets a
 new entry file copied from an existing one, plus a line in `latexmkrc`'s
-`@default_files` and in both GitHub workflows.
+`@default_files` and in the GitHub release workflow
+(`.github/workflows/release.yml`).
 
 To add a **new language** for an existing book: add `styles/lang/<lang>.tex`,
 translate under `parts/<year>/<lang>/` and `parts/<year>/solutions/<lang>/`
 (keep labels identical), add an entry file with `\booklang`, and register it
-in `latexmkrc` and the workflows.
+in `latexmkrc` and the release workflow.
 
 **Cross-volume references:** `\cref` only works within one book. Never
 reference a label that lives in another book; name the volume in prose

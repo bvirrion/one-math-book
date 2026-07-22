@@ -46,10 +46,12 @@ grep -ci 'undefined' $L         # undefined references — must be 0
 grep -c 'Overfull' $L           # overfull boxes — keep at 0 (fix by breaking long inline math into displays / align*)
 ```
 
-CI (`.github/workflows/build.yml`) builds all books on every push;
-`release.yml` additionally generates `version.tex` (overriding
-`\bookversion`/`\bookdate` in the entry files) and attaches
-`one_math_book_<N>_<slug>_vX.Y.Z.pdf` to the release.
+CI builds only on tagged releases (`v*`):
+`.github/workflows/release.yml` compiles all books, generates
+`version.tex` (overriding `\bookversion`/`\bookdate` in the entry
+files) and attaches `one_math_book_<N>_<slug>_vX.Y.Z.pdf` to the
+release. Pushes to `main` are not built — the quality gate before
+pushing is the local log.
 
 ## Architecture
 
@@ -88,7 +90,7 @@ CI (`.github/workflows/build.yml`) builds all books on every push;
    `parts/<year>/solutions/<lang>/` (same file names and labels).
 3. Add entry file `one_math_book_<N>_<slug>_<lang>.tex` with
    `\newcommand{\booklang}{<lang>}` before `\usepackage{styles/onemath}`.
-4. Register the entry in `latexmkrc` and both GitHub workflows.
+4. Register the entry in `latexmkrc` and the GitHub release workflow.
 5. Write `tools/term_config/book<N>_<lang>.py` (curated, NOT a translation of
    the English config — see the termlink notes below), then generate `\omterm`
    links: `python3 tools/link_defined_terms.py --book N --lang <lang> --apply`.

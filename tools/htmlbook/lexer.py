@@ -680,8 +680,10 @@ class Parser:
                         # ("" = trailing "\<newline>" whose newline was
                         # stripped at a paragraph boundary)
                         text.append(" ")
-                    elif nxt == ",":               # thin space
+                    elif nxt in (",", ";"):        # thin/thick space
                         text.append(" ")
+                    elif nxt == "\\":
+                        text.append(" ")  # forced line break
                     elif nxt in ("%", "&", "_", "#", "$", "{", "}"):
                         text.append(nxt)
                     elif nxt == "-":
