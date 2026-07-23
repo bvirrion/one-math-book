@@ -1,0 +1,900 @@
+\chapter{Formas quadráticas}\label{ch:b2:quadratic}
+
+UM forma quadrática é a sombra algébrica de uma geometria: assinatura
+zero partes achatadas, peças positivas curvam em uma direção, negativas
+outro. Este capítulo reduz cada real forma quadrática a uma soma de
+$\pm $ quadrados (Gauss), prova que as contagens de sinais são intrínsecas
+(Sylvester), e então coroa a geometria euclidiana com o
+\emph{teorema espectral}: endomorfismos \omterm{def:b2:quadratic:adjoint}{simétricos} diagonalizar em
+bases ortonormais --- o teorema mais usado de aplicação
+álgebra linear.
+
+\section{Formas bilineares e quadráticas}
+
+\begin{definition}\label{def:b2:quadratic:def}
+UM \emph{\omterm{def:b2:quadratic:adjoint}{simétrico} forma bilinear} em um espaço vetorial real $ E $ é um
+bilinear $\varphi \colon E \times E \to \R $ com $\varphi(x, y) =
+\varphi(y, x)$; o associado \emph{quadrático
+formulário}\index{quadrático
+formulário} é $ q(x) = \varphi(x, x)$. O formulário
+$\varphi $ é recuperado de $ q $ por
+\emph{polarização}\index{polarização}:
+\[
+\varphi(x, y) = \tfrac12\bigl(q(x + y) - q(x) - q(y)\bigr).
+\]
+Em uma base $(e_i)$, o \emph{matriz} de $\varphi $ é o \omterm{def:b2:quadratic:adjoint}{simétrico}
+$ B = (\varphi(e_i, e_j))$, com $ q(x) = X^{\mathsf T} B X $; uma mudança
+de base com matriz $ P $ substitui $ B $ por $ P^{\mathsf T} B P $
+(\emph{congruência}\index{congruência} --- não semelhança!).
+O \emph{classificação} de $ q $ é $\operatorname{rk} B $ (invariante:
+congruência multiplicada por matrizes invertíveis).
+\end{definition}
+
+\begin{example}
+Sobre $\R^2$: $ q(x, y) = x^2 + 4xy + y^2$ tem matriz $\begin{pmatrix}
+1 & 2\\ 2 & 1\end{pmatrix}$. Um produto interno é exatamente um
+forma bilinear simétrica cujo forma quadrática é positivo definido;
+este capítulo estuda o caso geral com sinal indefinido.
+\end{example}
+
+\begin{example}[Congruência em ação]\label{ex:b2:quadratic:congruence}
+Pegar $ q(x, y) = x^2 + 4xy + y^2$ (matriz $ B = \begin{pmatrix} 1
+& 2\\ 2 & 1\end{pmatrix}$) e a nova base $ e_1' = (1, 1)$,
+$ e_2' = (1, -1)$, ou seja\ $ P = \begin{pmatrix} 1 & 1\\ 1 &
+-1\end{pmatrix}$. Então
+\[
+P^{\mathsf T}BP
+= \begin{pmatrix} 1 & 1\\ 1 & -1\end{pmatrix}
+\begin{pmatrix} 1 & 2\\ 2 & 1\end{pmatrix}
+\begin{pmatrix} 1 & 1\\ 1 & -1\end{pmatrix}
+= \begin{pmatrix} 6 & 0\\ 0 & -2\end{pmatrix} :
+\]
+nas coordenadas $(u, v)$ ao longo da nova base, $ q = 6u^2 -
+2v^2$ --- verificar: $ x = u + v $, $ y = u - v $ dá $ x^2 + 4xy +
+y^2 = 6u^2 - 2v^2$ diretamente. Observe as novas entradas diagonais $6,
+-2$ são \emph{não} o valores próprios $3, -1$ de $ B $: \omterm{def:b2:quadratic:def}{congruência}
+redimensiona, apenas a similaridade preserva os \omterm{def:b2:reduction:eigen}{espectros} --- mas os sinais
+concordo, como exige o teorema de Sylvester. (A base aqui é
+ortogonal, mas não ortonormal; normalizando-o por
+$\frac{1}{\sqrt2}$ dividiria a diagonal por $2$ e
+recuperar o valores próprios.)
+\end{example}
+
+\begin{example}[Determinantes Gram medem área]\label{ex:b2:quadratic:gramarea}
+Para $ v_1, v_2$ em um espaço euclidiano, a matriz de Gram $ G =
+\bigl(\langle v_i, v_j\rangle\bigr)$ comprimentos de pacotes e
+ângulo; isso é determinante pacotes \emph{área}:
+\[
+\det G = \norm{v_1}^2\norm{v_2}^2 - \langle v_1, v_2\rangle^2
+= \norm{v_1}^2\norm{v_2}^2\bigl(1 - \cos^2\theta\bigr)
+= \bigl(\norm{v_1}\,\norm{v_2}\sin\theta\bigr)^2 ,
+\]
+a área quadrada do paralelogramo em $ v_1, v_2$ ---
+e Cauchy--Schwarz é exatamente a afirmação $\det G \geq 0$.
+Instância trabalhada: $ v_1 = (1, 2, 2)$, $ v_2 = (2, 1, -2)$ em
+$\R^3$:
+\[
+G = \begin{pmatrix} 9 & 0\\ 0 & 9 \end{pmatrix},
+\qquad
+\det G = 81 :
+\]
+os vetores são ortogonais de comprimento $3$, abrangendo um
+paralelogramo (aqui, um quadrado) de área $\sqrt{81} = 9$.
+Visão final: sem produto vetorial e sem dimensão $3$ magia
+foi usado --- $\sqrt{\det G}$ medidas $ k $ volume dimensional
+em \emph{qualquer} dimensão, o ponto de partida do fim de semana
+Parte I do problema e das integrais de área de superfície posteriormente
+este volume.
+\end{example}
+
+\section{Redução de Gauss e inércia de Sylvester}
+
+\begin{theorem}[Redução de Gauss]\label{thm:b2:quadratic:gauss}
+Todo forma quadrática $ q $ em um espaço real de dimensão finita pode ser
+escrito\index{Redução de Gauss}
+\[
+q = \sum_{i=1}^{s} \ell_i^2 - \sum_{j=1}^{t} m_j^2 ,
+\]
+onde $\ell_1, \dots, \ell_s, m_1, \dots, m_t $ são linearmente
+formas lineares independentes; equivalentemente, alguma base torna o
+matriz de $ q $ diagonal com entradas $+1$ ($ s $ vezes), $-1$ ($ t $
+vezes), $0$.
+\end{theorem}
+
+\begin{proof}
+Indução no número de variáveis, em coordenadas: $ q(x_1,
+\dots, x_n)$.
+
+\emph{Caso 1: aparece algum quadrado}, diga o coeficiente $ a $ de
+$ x_1^2$ é diferente de zero. Agrupe todos os $ x_1$-termos e preencha o
+quadrado:
+\[
+q = a\Bigl(x_1 + \frac{1}{a}\,\lambda(x_2, \dots,
+x_n)\Bigr)^{\!2} + q_1(x_2, \dots, x_n),
+\]
+onde $\lambda $ é linear e $ q_1$ quadrático no restante
+variáveis: uma forma independente dividida (envolve $ x_1$, o
+outros não), a indução se aplica a $ q_1$, e $\pm $ sinais vêm
+do sinal de $ a $ depois de redimensionar por $\sqrt{\abs a}$.
+
+\emph{Caso 2: nenhum quadrado, mas alguns termos cruzados}, dizer $ b\,x_1x_2$ com
+$ b \neq 0$. Utilize a identidade
+\[
+x_1x_2 = \tfrac14\bigl((x_1 + x_2)^2 - (x_1 - x_2)^2\bigr)
+\]
+após agrupar: escrever $ q = b\,x_1x_2 + x_1\alpha + x_2\beta +
+q_2$ (com $\alpha, \beta, q_2$ nas demais variáveis), verifica-se
+\[
+q = \frac{b}{4}\Bigl[\Bigl(x_1 + x_2 + \frac{\alpha +
+\beta}{b}\Bigr)^{2} - \Bigl(x_1 - x_2 + \frac{\beta -
+\alpha}{b}\Bigr)^{2}\Bigr] + \widetilde q ,
+\]
+com $\widetilde q $ livre de $ x_1, x_2$: duas formas independentes divididas
+desligado e a indução termina.
+
+Independência dos formulários coletados: ordene os lotes conforme
+produzido. Os formulários do primeiro lote contêm $ x_1$ (Caso 1)
+ou $ x_1, x_2$ (Caso 2); todos os formulários posteriores estão livres desses
+variáveis. Suponha uma combinação linear de todas as formas coletadas
+desaparece. Lendo o coeficiente de $ x_1$ (e $ x_2$): apenas
+o primeiro lote contribui, e dentro desse lote aquele ou
+duas formas são visivelmente independentes ($\ell $ sozinho; ou $\ell \pm
+m $ com independente $\ell, m $): os coeficientes do primeiro lote
+desaparecer. Retire o lote e repita: por indução ao longo do
+lotes, todos os coeficientes desaparecem --- toda a família é gratuita,
+triangularidade tornada explícita.
+\end{proof}
+
+\begin{theorem}[Lei da inércia de Sylvester]\label{thm:b2:quadratic:sylvester}
+O par $(s, t)$ em \cref{thm:b2:quadratic:gauss} depende apenas de
+$ q $, não na redução: é o
+\emph{assinatura}\index{assinatura} de $ q $.
+Além disso
+\[
+s = \max\{\dim F : q|_F \text{ positive definite}\},
+\]
+e simetricamente para $ t $.
+\end{theorem}
+
+\begin{proof}
+Deixar $ q = \sum_{i \leq s}\ell_i^2 - \sum_{j\leq t} m_j^2$ e deixe
+$ F_+$ seja a extensão do (pré-)\omterm{def:b2:linalg:dual}{dual} vetores sobre os quais $(\ell_i)$
+restringir às coordenadas --- concretamente: completar o
+família independente $(\ell_1, \dots, \ell_s, m_1, \dots, m_t)$
+em uma base de \omterm{def:b2:linalg:dual}{dual} $ E^*$, e deixe $(u_1, \dots, u_n)$ ser
+a base de $ E $ cujas formas de coordenadas são essas (o
+\omterm{def:b2:linalg:dual}{pré-dual} base: $\ell_i(u_k) = \delta_{ik}$ para $ k \leq s $,
+e as formas posteriores desaparecem nos vetores anteriores). Definir $ F_+ =
+\operatorname{Vect}(u_1, \dots, u_s)$: para $ x = \sum_{i\leq
+s}x_iu_i \in F_+$,
+\[
+\ell_i(x) = x_i,
+\qquad m_j(x) = 0,
+\qquad\text{so}\qquad
+q(x) = \sum_{i\leq s}x_i^2 > 0 \quad (x \neq 0) :
+\]
+$ q|_{F_+}$ é positivo definido e o máximo no display
+é $\geq s $. Por outro lado, deixe $ F $ seja qualquer subespaço com $ q|_F $
+definido positivo, e $ G = \{x : \ell_1(x) = \dots = \ell_s(x) =
+0\}$, de codimensão $\leq s $; sobre $ G $, $ q(x) = -\sum m_j^2 \leq 0$.
+Então $ F \cap G = \{0\}$ (um vetor diferente de zero teria $ q > 0$
+e $ q \leq 0$), então $\dim F \leq \dim E - \dim G \leq s $. Daí o
+máximo igual $ s $ para \emph{todo} redução: $ s $ é intrínseco e $ t
+= \operatorname{rk} q - s $ da mesma maneira.
+\end{proof}
+
+\begin{example}\label{ex:b2:quadratic:gaussexample}
+$ q(x, y, z) = xy + yz + zx $ (sem quadrados). Com $ x_1 = x $, $ x_2 =
+y $: $ q = xy + z(x + y)$, e a identidade de dois quadrados dá
+\[
+q = \tfrac14(x + y + 2z)^2 - \tfrac14(x - y)^2 - z^2 ,
+\]
+(expandir para verificar). Três formas independentes: assinatura $(1, 2)$,
+classificação $3$. Uma direção positiva, duas negativas: o ``cone de luz''
+geometria desta forma.
+\end{example}
+
+\begin{example}[Uma forma degenerada, totalmente reduzida]\label{ex:b2:quadratic:degenerate}
+$ q(x, y, z) = xy + yz $ sobre $\R^3$: sem quadrados, então Caso 2 com o
+agrupamento $ q = y(x + z)$. A identidade de dois quadrados no produto
+das formas independentes $ y $ e $ x + z $:
+\[
+q = \frac14\bigl(y + x + z\bigr)^2 -
+\frac14\bigl(y - x - z\bigr)^2 .
+\]
+As duas formas lineares $ y + x + z $ e $ y - x - z $ são
+independente (sua diferença é $2(x+z)$, sua soma $2y $), então
+Sylvester lê: assinatura $(1, 1)$, classificação $2$ ---
+\emph{degenerar}. O núcleo da forma \omterm{pb:b2:quadratic:1}{polar} é encontrado por
+resolvendo $\varphi(v, \cdot) = 0$: com matriz
+$\frac12\begin{pmatrix} 0&1&0\\ 1&0&1\\ 0&1&0\end{pmatrix}$,
+o núcleo é $\{y = 0,\ x + z = 0\} = \R\,(1, 0, -1)$, o
+direção ao longo da qual $ q $ não vê nada. Visão final: classificação
+deficiência aparece em Gauss como “ficar sem variáveis”
+--- a redução produziu apenas dois quadrados em três
+dimensões, e a dimensão que falta é exatamente o kernel.
+\end{example}
+
+\begin{example}[Um formulário, dois caminhos para a assinatura]\label{ex:b2:quadratic:tworoads}
+$ q(x, y, z) = 2x^2 + 2y^2 + 2z^2 + 2xy + 2yz $, matriz
+$\begin{pmatrix} 2 & 1 & 0\\ 1 & 2 & 1\\ 0 & 1 & 2
+\end{pmatrix}$. \emph{Estrada 1, Gauss:} quadrados \omterm{def:b2:metric:complete}{completos} em
+ordem,
+\[
+q = 2\Bigl(x + \frac y2\Bigr)^{\!2} + \frac32 y^2 + 2yz + 2z^2
+= 2\Bigl(x + \frac y2\Bigr)^{\!2}
++ \frac32\Bigl(y + \frac{2z}{3}\Bigr)^{\!2} + \frac43 z^2 :
+\]
+três quadrados positivos em formulários independentes, assinatura $(3,
+0)$: definido positivo. \emph{Estrada 2, valores próprios:} a matriz
+é a tridiagonal $2I + N $ com $ N $ a matriz vizinha; isso é
+valores próprios são $2 + \sqrt2$, $2$, $2 - \sqrt2$ (verifique o
+vetores próprios $(1, \pm\sqrt2, 1)$ e $(1, 0, -1)$), todos
+positivo: mesmo veredicto, por
+\cref{cor:b2:quadratic:principalaxes}. Gauss é mais rápido;
+valores próprios dizer mais (eles fornecem os eixos principais e os
+valores extremos de $ q $ na esfera). Visão final: o
+pivôs positivos $2, \frac32, \frac43$ de Gauss são exatamente os
+proporções $\frac{\Delta_k}{\Delta_{k-1}}$ do diretor principal
+menores ($\Delta_1 = 2$, $\Delta_2 = 3$, $\Delta_3 = 4$) --- o
+problema de fim de semana prova isso em geral.
+\end{example}
+
+\begin{method}[Calculando uma assinatura: três rotas]\label{met:b2:quadratic:signature}
+\begin{enumerate}
+  \item \emph{Gauss} (sempre funciona, mais rápido manualmente): \omterm{def:b2:metric:complete}{completo}
+        quadrados em ordem, Caso 2 quando nenhum quadrado estiver disponível;
+        conte os sinais. Verifique se as formas lineares coletadas
+        são independentes --- menos formas do que variáveis significa um
+        núcleo (\cref{ex:b2:quadratic:degenerate}).
+  \item \emph{Menores líderes} (para testes de definição): todos
+        $\Delta_k > 0$ se positivo definido
+        (\cref{exo:b2:quadratic:8}); os pivôs
+        $\Delta_k/\Delta_{k-1}$ até mesmo dar o Gauss
+        coeficientes (problema de fim de semana). Falha silenciosamente se algum
+        $\Delta_k = 0$: retorne à rota 1.
+  \item \emph{\omterm{def:b2:reduction:eigen}{Autovalores}} (mais informativo, mais caro):
+        sinais do \omterm{def:b2:reduction:eigen}{espectro}
+        (\cref{cor:b2:quadratic:principalaxes}); também rende
+        os eixos principais e os valores extremos de $ q $ ligado
+        a esfera unitária. Prefira quando a autoestrutura for
+        necessário de qualquer maneira.
+\end{enumerate}
+\end{method}
+
+\section{O teorema espectral}
+
+Agora deixe $ E $ ser euclidiano (produto interno $\langle\cdot,\cdot\rangle $,
+volume do ano 1).
+
+\begin{definition}[Adjunto; endomorfismos simétricos]\label{def:b2:quadratic:adjoint}
+Para $ u \in \mathcal{L}(E)$, o \emph{adjunto}\index{adjunto}
+$ u^*$ é o único endomorfismo com
+\[
+\langle u(x), y\rangle = \langle x, u^*(y)\rangle
+\qquad (x, y \in E);
+\]
+em uma base ortonormal, $\operatorname{Mat}(u^*) =
+\operatorname{Mat}(u)^{\mathsf T}$. $ u $ é
+\emph{simétrico}\index{simétrico} (auto-adjunto) quando
+$ u^* = u $ --- equivalentemente, sua matriz em uma base ortonormal é
+simétrico.
+\end{definition}
+
+\begin{proof}[Existência e singularidade do adjunto]
+Para fixo $ y $, a forma $ x \mapsto \langle u(x), y\rangle $ é
+linear, portanto (dimensão finita) da forma $\langle x,
+z_y\rangle $ para um único $ z_y $ --- o mapa $ y \mapsto z_y =:
+u^*(y)$ sendo linear por unicidade. A identificação da matriz:
+$\langle u(e_i), e_j\rangle $ leia nos dois sentidos.
+\end{proof}
+
+\begin{example}[O adjunto depende do produto interno]\label{ex:b2:quadratic:weightedadjoint}
+Sobre $\R^2$ pegue o \emph{ponderado} produto interno $\langle x,
+y\rangle_D = x_1y_1 + 2x_2y_2$ (matriz $ D =
+\operatorname{diag}(1,2)$) e $ u $ de matriz $ A =
+\begin{pmatrix} 0 & 1\\ 0 & 0\end{pmatrix}$ no canônico
+base. De $\langle u(x), y\rangle_D = (Ax)^{\mathsf T}Dy =
+x^{\mathsf T}(A^{\mathsf T}D)y $ e $\langle x, u^*(y)\rangle_D
+= x^{\mathsf T}(DA^*)y $, o adjuntoa matriz de é
+\[
+A^* = D^{-1}A^{\mathsf T}D
+= \begin{pmatrix} 1 & 0\\ 0 & \tfrac12\end{pmatrix}
+\begin{pmatrix} 0 & 0\\ 1 & 0\end{pmatrix}
+\begin{pmatrix} 1 & 0\\ 0 & 2\end{pmatrix}
+= \begin{pmatrix} 0 & 0\\ \tfrac12 & 0\end{pmatrix}
+\neq A^{\mathsf T} .
+\]
+Verificação de sanidade ativada $ x = (1,0)$, $ y = (0,1)$:
+\[
+\langle u(x), y\rangle_D = \langle (0,0), y\rangle_D = 0,
+\quad
+\langle x, u^*(y)\rangle_D
+= \langle(1,0), (0,\tfrac12)\rangle_D = 0 ;
+\]
+sobre $ x = (0,1)$, $ y = (1,0)$:
+\[
+\langle u(x), y\rangle_D = \langle(1,0),(1,0)\rangle_D = 1,
+\quad
+\langle x, u^*(y)\rangle_D =
+\langle(0,1),(0,\tfrac12)\rangle_D = 1 .
+\] Visão final: ``$\operatorname{Mat}(u^*)
+= \operatorname{Mat}(u)^{\mathsf T}$'' é uma declaração sobre
+\emph{ortonormal} apenas bases; em geral a métrica $ D $
+intervém, exatamente como na redução simultânea do
+problema de fim de semana.
+\end{example}
+
+\begin{theorem}[Teorema espectral]\label{thm:b2:quadratic:spectral}
+Deixar $ u $ seja um endomorfismo \omterm{def:b2:quadratic:adjoint}{simétrico} de um espaço euclidiano $ E $. Então
+$ E $ tem um \emph{base ortonormal de vetores próprios} de $ u $; todos
+valores próprios são reais e autoespaços para distinto valores próprios são
+ortogonal. Forma matricial: todo real \omterm{def:b2:quadratic:adjoint}{simétrico} matriz $ A $ escreve
+\[
+A = P\,D\,P^{\mathsf T},
+\qquad P \text{ orthogonal } (P^{\mathsf T} P = I),\ D
+\text{ diagonal}.\index{teorema espectral}
+\]
+\end{theorem}
+
+\begin{proof}
+\emph{Um vetor próprio existe.} A função $ x \mapsto \langle u(x),
+x\rangle $ é \omterm{def:b2:metric:continuity}{contínuo} na esfera unitária $ S $ de $ E $, que é
+\omterm{def:b2:metric:compact}{compactar} (dimensão finita, \cref{thm:b2:nvs:finitedim}): atinge
+seu máximo $\lambda $ em algum $ a \in S $. Nós reivindicamos $ u(a) = \lambda
+a $. Para qualquer $ y \perp a $ com $\norm y = 1$ e $ t \in \R $, o
+vetor $ x_t = \frac{a + ty}{\sqrt{1 + t^2}}$ mente $ S $
+($\norm{a + ty}^2 = 1 + t^2$ por Pitágoras); expandindo
+a função maximizada,
+\[
+g(t) = \langle u(x_t), x_t\rangle
+= \frac{\langle u(a), a\rangle + 2t\langle u(a), y\rangle +
+t^2\langle u(y), y\rangle}{1 + t^2}
+\]
+(simetria de $ u $ fundiu os dois termos cruzados: $\langle u(a),
+y\rangle = \langle a, u(y)\rangle = \langle u(y), a\rangle $).
+$ g $ é uma função diferenciável de $ t $ com máximo em $ t =
+0$; a regra do quociente em $0$ dá
+\[
+g'(0) = \frac{2\langle u(a), y\rangle\cdot 1 - \langle u(a),
+a\rangle\cdot 0}{1} = 2\langle u(a), y\rangle = 0 .
+\]
+Então $ u(a)$ é ortogonal a todo o hiperplano $ a^\perp $: $ u(a)
+\in (a^{\perp})^{\perp} = \R a $, ou seja\ $ u(a) = \mu a $; e $\mu =
+\langle u(a), a\rangle = \lambda $.
+
+\emph{Indução.} O complemento ortogonal $ F = a^\perp $ é
+$ u $-estável: para $ x \perp a $, $\langle u(x), a\rangle = \langle x,
+u(a)\rangle = \lambda\langle x, a\rangle = 0$. A restrição
+$ u|_F $ é \omterm{def:b2:quadratic:adjoint}{simétrico} para o produto interno induzido; por indução em
+a dimensão, $ F $ tem uma base própria ortonormal; acrescentar $ a $.
+
+\emph{Complementos.} \omterm{def:b2:reduction:eigen}{Autovalores} são os números reais $\langle u(e),
+e\rangle $ na base própria. Ortogonalidade de autoespaços: $ u(x) =
+\lambda x $, $ u(y) = \mu y $ dar $\lambda\langle x, y\rangle =
+\langle u(x), y\rangle = \langle x, u(y)\rangle = \mu\langle x,
+y\rangle $, então $\langle x, y\rangle = 0$ quando $\lambda \neq \mu $.
+Forma matricial: colunas de $ P $ = a autobase ortonormal.
+\end{proof}
+
+\begin{example}[Uma corrida espectral completa]\label{ex:b2:quadratic:fullrun}
+Diagonalizar ortogonalmente $ A = \begin{pmatrix} 1 & 2\\ 2 &
+1\end{pmatrix}$. Polinômio característico $(1 - \lambda)^2 -
+4$: valores próprios $3$ e $-1$. Autovetores: $(A - 3I)v = 0$
+dá $ v_1 = \frac{1}{\sqrt2}(1,1)$; $(A + I)v = 0$ dá $ v_2
+= \frac{1}{\sqrt2}(1,-1)$ --- ortogonal, como
+\cref{thm:b2:quadratic:spectral} garantias sem
+computação. Com $ P = (v_1\ v_2)$ (uma rotação por
+$\frac\pi4$):
+\[
+P^{\mathsf T}AP = \begin{pmatrix} 3 & 0\\ 0 & -1
+\end{pmatrix},
+\qquad
+x^2 + 4xy + y^2 = 3u^2 - v^2
+\quad\text{in the rotated frame} .
+\]
+Então a forma de \cref{exo:b2:quadratic:1} é um tipo de hipérbole
+formulário: assinatura $(1,1)$, consistente com sua \omterm{thm:b2:quadratic:gauss}{Redução de Gauss}
+$(x + 2y)^2 - 3y^2$ --- quadrados diferentes, mesma assinatura, como
+Sylvester exige. Visão final: Gauss deu a resposta
+mais rápido, mas a rota espectral também informa que na unidade
+círculo $ q $ varia exatamente acima $\intcc{-1}{3}$, alcançado ao longo
+$ v_2$ e $ v_1$: o trabalho extra compra geometria.
+\end{example}
+
+\begin{corollary}[Eixos principais; testes de positividade]\label{cor:b2:quadratic:principalaxes}
+\begin{enumerate}
+  \item Todo forma quadrática $ q $ em um espaço euclidiano diagonaliza
+        em alguns \emph{ortonormal} base: $ q(x) = \sum_i \lambda_i
+        x_i^2$ com $\lambda_i $ o valores próprios do \omterm{def:b2:quadratic:adjoint}{simétrico}
+        matriz de $ q $; a assinatura conta positiva e negativa
+        valores próprios.
+  \item UM \omterm{def:b2:quadratic:adjoint}{simétrico} matriz é positiva semidefinida (resp.\
+        definido) se todos os seus valores próprios são $\geq 0$ (resp.\ $>
+        0$); e então os valores extremos do quociente de Rayleigh
+        são
+        \[
+        \min_{\norm x = 1} \langle Ax, x\rangle = \lambda_{\min},
+        \qquad
+        \max_{\norm x = 1} \langle Ax, x\rangle = \lambda_{\max} .
+        \]
+\end{enumerate}
+\end{corollary}
+
+\begin{proof}
+(1) Escreva $ q(x) = \langle A x, x\rangle $ com $ A $ \omterm{def:b2:quadratic:adjoint}{simétrico} (o
+matriz de $ q $ numa base ortonormal); diagonalizar $ A $ pelo
+teorema espectral: para $ x = \sum x_ie_i $ no ortonormal
+base própria,
+\[
+q(x) = \Bigl\langle \sum_i \lambda_ix_ie_i,\ \sum_j
+x_je_j\Bigr\rangle = \sum_i \lambda_i x_i^2
+\]
+(a ortonormalidade mata os termos cruzados). O $\pm $ sinais do
+$\lambda_i $ conte a assinatura de Sylvester: redimensionando cada
+coordenar por $\sqrt{\abs{\lambda_i}}$ exibe um Gauss
+redução com formas independentes.
+
+(2) Na base própria, $\langle Ax, x\rangle = \sum \lambda_i
+x_i^2$, preso entre $\lambda_{\min}\norm x^2$ e
+$\lambda_{\max}\norm x^2$, com igualdade no correspondente
+vetores próprios; positividade de todos valores próprios é portanto equivalente
+à positividade da forma.
+\end{proof}
+
+\begin{example}\label{ex:b2:quadratic:spectralexample}
+$ A = \begin{pmatrix} 2 & 1\\ 1 & 2 \end{pmatrix}$: valores próprios $3$
+(vetor próprio $\frac{1}{\sqrt2}(1,1)$) e $1$
+($\frac{1}{\sqrt2}(1,-1)$). O forma quadrática $2x^2 + 2xy + 2y^2$
+torna-se $3X^2 + Y^2$ no quadro ortonormal girado: uma elipse
+eixos principais, calculados. O \omterm{thm:b2:quadratic:gauss}{Redução de Gauss} atinge uma diagonal
+forma também, mas apenas o teorema espectral a atinge \emph{sem
+comprimentos distorcidos}.
+\end{example}
+
+\begin{example}[Uma elipse totalmente identificada]\label{ex:b2:quadratic:ellipserun}
+Qual curva é $5x^2 + 4xy + 2y^2 = 6$? A matriz
+$\begin{pmatrix} 5 & 2\\ 2 & 2\end{pmatrix}$ tem \omterm{def:b2:reduction:charpoly}{característica
+polinômio} $\lambda^2 - 7\lambda + 6 = (\lambda - 1)(\lambda -
+6)$: valores próprios $1$ e $6$, ambos positivos --- uma elipse.
+Ortonormal vetores próprios: para $\lambda = 1$, resolver
+$\begin{pmatrix} 4 & 2\\ 2 & 1\end{pmatrix}v = 0$: $ v_1 =
+\frac{1}{\sqrt5}(1, -2)$; para $\lambda = 6$: $ v_2 =
+\frac{1}{\sqrt5}(2, 1)$. Nas coordenadas giradas $(X, Y)$
+junto $(v_2, v_1)$ a equação se torna
+\[
+6X^2 + Y^2 = 6,
+\qquad\text{i.e.}\qquad
+X^2 + \frac{Y^2}{6} = 1 :
+\]
+semieixos $1$ (junto $ v_2$) e $\sqrt6$ (junto $ v_1$).
+Visão final: a forma aproximada era gratuita --- $\det
+= 6 > 0$ e traço positivo anunciam uma elipse antes de qualquer
+vetor próprio é calculado --- mas apenas o teorema espectral
+fornece as direções e comprimentos dos eixos, ou seja,\ o real
+geometria.
+\end{example}
+
+\begin{example}[Extremos na esfera, lidos no espectro]\label{ex:b2:quadratic:sphereextremes}
+Quais são os valores extremos de $ q(x,y,z) = 2xy + 2yz + 2zx $ ligado
+a esfera unitária? Sua matriz (todos fora da diagonal de
+\cref{exo:b2:quadratic:2}) tem valores próprios $2$ e $-1$
+(duplo), então por \cref{cor:b2:quadratic:principalaxes}~(2):
+\[
+\max_{\norm v = 1} q(v) = 2
+\ \text{ at } v = \tfrac{1}{\sqrt3}(1,1,1),
+\qquad
+\min_{\norm v = 1} q(v) = -1
+\ \text{ on the circle } x + y + z = 0 .
+\]
+Sem cálculo, sem multiplicadores de Lagrange: o teorema espectral
+resolve essa otimização restrita de uma vez --- e exibe
+o maximizador. Visão final: compare com o multiplicador
+método do capítulo de cálculo diferencial, que encontra o
+mesmos pontos críticos com mais trabalho; para \emph{quadrático}
+objetivos nas esferas, os \omterm{def:b2:reduction:eigen}{espectros} são a estrada real (o fim de semana
+problema do capítulo hermitiano constrói todo o
+Courant - teoria de Fischer sobre esta observação).
+\end{example}
+
+\begin{remark}[Armadilhas comuns]
+\emph{(eu) \omterm{def:b2:quadratic:def}{Congruência} não é semelhança:} uma mudança de base para
+uma forma atua por $ P^{\mathsf T}BP $, não $ P^{-1}BP $; valores próprios
+são \emph{não} invariantes de um forma quadrática ($ I $ e $4I $
+são congruentes através $ P = 2I $) --- apenas seus sinais são
+(Silvestre). Fale do valores próprios de um formulário apenas uma vez por
+o produto interno é fixo. \emph{(ii) Entradas positivas comprovam
+nada:} $\begin{pmatrix} 1 & 2\\ 2 & 1\end{pmatrix}$ tem tudo
+entradas positivas mas com assinatura $(1,1)$ ($\det = -3$);
+inversamente, uma matriz definida positiva pode ter negativo
+entradas fora da diagonal (\cref{ex:b2:quadratic:tworoads} mudou:
+$2I - N $ funciona igualmente). Usar
+\cref{met:b2:quadratic:signature}. \emph{(iii) Dependente
+quadrados:} escrita $ q = \ell_1^2 - \ell_2^2$ não diz nada se
+$\ell_1, \ell_2$ são proporcionais --- $ x^2 + 2xy + y^2 =
+(x+y)^2$ tem classificação $1$, não $2$; sempre verifique a independência
+antes de ler a assinatura. \emph{(iv) Extremos da esfera
+sem compacidade:} os limites de Rayleigh de
+\cref{cor:b2:quadratic:principalaxes} são alcançados porque
+esfera é \omterm{def:b2:metric:compact}{compactar}; no \omterm{def:b2:metric:topology}{abrir} bola ou todo o espaço, um
+a forma indefinida não tem máximo nem mínimo.
+\end{remark}
+
+\begin{remark}[Onde isso é usado]
+O teorema espectral é o resultado mais exportado deste
+livro: estatística diagonaliza matrizes de covariância com ela
+(análise de componentes principais), a mecânica extrai modos normais
+de oscilação dele (a redução simultânea do
+problema de fim de semana), a análise numérica constrói Cholesky e
+decomposições de valores singulares nele (mesmo problema), e o próximo
+capítulo o transporta para espaços hermitianos complexos. O Ano 3
+volume prova seu avatar de dimensão infinita para \omterm{def:b2:metric:compact}{compactar}
+\omterm{def:b2:quadratic:adjoint}{auto-adjunto} operadores, onde a prova de dimensão finita
+compacidade o argumento se torna a história toda.
+\end{remark}
+
+\begin{remark}[Perspectivas dentro deste volume]
+Formas quadráticas passe pelo resto do Livro 4 em três
+disfarces. Como \emph{Hessianos}: o cálculo diferencial
+capítulo classifica os pontos críticos pela assinatura do
+forma de segunda ordem, então a invariância de Sylvester é o que faz
+``sela'' uma palavra bem definida. Como \emph{energias}: o
+os osciladores do capítulo de equações diferenciais carregam o
+energia quadrática $\frac12x'^2 + \frac12\omega^2x^2$, e o
+a redução simultânea do problema do fim de semana deste capítulo é
+exatamente a extração dos modos normais. Como \emph{geometria}:
+as cônicas deste capítulo crescem nas superfícies quádricas de
+os capítulos de geometria, onde a segunda forma fundamental de um
+superfície --- uma forma quadrática em cada plano tangente --- tem
+assinatura decidindo se a superfície se curva como uma tigela ou
+uma sela. O capítulo Hermitiano, a seguir, reproduz toda a partitura
+acabou $\C $.
+\end{remark}
+
+\section{Exercícios}
+
+\begin{exercise}[$\star $]\label{exo:b2:quadratic:1}
+\omterm{thm:b2:quadratic:gauss}{Redução de Gauss} e classificação e assinatura:
+\[
+q_1(x,y) = x^2 + 4xy + y^2,
+\qquad
+q_2(x,y,z) = x^2 + 2y^2 + 3z^2 + 2xy + 2yz .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star $]\label{exo:b2:quadratic:2}
+Diagonalizar ortogonalmente $ A = \begin{pmatrix} 0 & 1 & 1\\ 1 & 0 &
+1\\ 1 & 1 & 0\end{pmatrix}$ (valores próprios de
+\cref{ch:b2:reduction}cálculo de; agora faça a base
+ortonormal) e reduza a forma $ q(x,y,z) = 2xy + 2yz + 2zx $ para
+eixos principais.
+\end{exercise}
+
+\begin{exercise}[$\star $]\label{exo:b2:quadratic:3}
+Prove isso $ u^{**} = u $, $(u \circ v)^* = v^* \circ u^*$, e isso
+$\ker u^* = (\operatorname{im} u)^{\perp}$. Deduzir
+$\operatorname{rk} u^* = \operatorname{rk} u $.
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b2:quadratic:4}
+Deixar $ A $ seja real \omterm{def:b2:quadratic:adjoint}{simétrico} com $ A^3 = A $. Prove isso $ A^2$ é o
+matriz de uma projeção ortogonal. De modo mais geral, relacione o
+decomposições espectrais de $ A $ e $ P(A)$ para um polinômio $ P $.
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b2:quadratic:5}
+Prove isso $ O(n) = \{P : P^{\mathsf T}P = I\}$ é um \omterm{def:b2:metric:compact}{compactar} subconjunto
+de $\mathcal{M}_n(\R)$ \emph{(fechado: pré-imagem de $\{I\}$ sob um
+\omterm{def:b2:metric:continuity}{contínuo} mapa; limitado: colunas são vetores unitários)}. É isso
+\omterm{def:b2:metric:connected}{conectado}?
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b2:quadratic:6}
+(Raiz quadrada) Deixe $ A $ ser \omterm{def:b2:quadratic:adjoint}{simétrico} positivo semidefinido. Construir
+um \omterm{def:b2:quadratic:adjoint}{simétrico} positivo semidefinido $ B $ com $ B^2 = A $, e provar
+que é \emph{exclusivo} \emph{(existência: tirar raízes quadradas do
+valores próprios numa base espectral; singularidade: um candidato $ B $
+viaja com $ A = B^2$, portanto preserva seu autoespaços --- reduzir para
+o caso escalar em cada um)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b2:quadratic:7}
+Sério \omterm{def:b2:quadratic:adjoint}{simétrico} $ A $, prove que $\vertiii{A}_2 :=
+\sup_{\norm x_2 = 1}\norm{Ax}_2 = \max_i \abs{\lambda_i}$
+(raio espectral) e calcular $\vertiii{A}_2$ para $ A =
+\begin{pmatrix} 1 & 2\\ 2 & 1\end{pmatrix}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star $]\label{exo:b2:quadratic:8}
+(Critério de Sylvester) Deixe $ A $ seja real \omterm{def:b2:quadratic:adjoint}{simétrico} com liderança
+principais menores $\Delta_1, \dots, \Delta_n $ (determinantes do
+blocos superiores esquerdos). Prove isso $ A $ é positivo definido se e somente
+se tudo $\Delta_k > 0$. \emph{(Para $\Rightarrow $: restrições de um
+forma definida são definidos, e a determinante de um positivo
+matriz definida --- o produto de sua valores próprios --- é positivo.
+Para $\Leftarrow $: induzir em $ n $; o canto superior esquerdo $(n-1)$-bloco é
+definido positivo, diagonalize a forma nesse subespaço e
+complete o quadrado na última variável; o sinal do último
+a entrada diagonal é governada por $\det A = \Delta_n > 0$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star $]\label{exo:b2:quadratic:9}
+(Courant - Fischer, segundo \omterm{def:b2:reduction:eigen}{autovalor}) Deixar $ u $ ser \omterm{def:b2:quadratic:adjoint}{simétrico} com
+valores próprios $\lambda_1 \geq \lambda_2 \geq \dots \geq \lambda_n $.
+Provar
+\[
+\lambda_2 = \min_{\substack{H \text{ hyperplane}}}\;
+\max_{\substack{x \in H,\ \norm x = 1}} \langle u(x), x\rangle .
+\]
+\emph{(Para $\leq $: qualquer hiperplano atende ao $2$-plano medido por
+os dois primeiros vetores próprios. Para $\geq $: escolher $ H =
+(e_1)^{\perp}$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b2:quadratic:10}
+Determine a classificação e a assinatura de $ q(x_1, \dots, x_n) = \sum_{i <
+j} x_ix_j $ sobre $\R^n $ ($ n \geq 2$), de duas maneiras: pela algébrica
+identidade $2q = \bigl(\sum x_i\bigr)^2 - \sum x_i^2$ juntos
+com a restrição de $ q $ para o hiperplano $\sum x_i = 0$;
+e calculando o valores próprios da sua matriz $\frac12(J - I)$,
+onde $ J $ é a matriz de todos.
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b2:quadratic:11}
+Deixar $ A $, $ B $ seja real \omterm{def:b2:quadratic:adjoint}{simétrico} com $ B $ positivo semidefinido.
+Provar
+\[
+\lambda_{\min}(A)\operatorname{tr} B
+\;\leq\;
+\operatorname{tr}(AB)
+\;\leq\;
+\lambda_{\max}(A)\operatorname{tr} B .
+\]
+\emph{(Escrever $ B = C^{\mathsf T}C $ e $\operatorname{tr}(AB) =
+\sum_i \langle A c_i, c_i\rangle $ sobre as colunas $ c_i $ de
+$ C^{\mathsf T}$.)} Em particular $\operatorname{tr}(AB) \geq 0$
+quando ambos são semidefinidos positivos.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star $]\label{exo:b2:quadratic:12}
+Sobre $ E = \mathcal{M}_n(\R)$, considere $ q(M) =
+\operatorname{tr}(M^2)$.
+\begin{enumerate}
+  \item Mostre isso $ q $ é um forma quadrática com forma \omterm{pb:b2:quadratic:1}{polar}
+        $\varphi(M, N) = \operatorname{tr}(MN)$.
+  \item Mostre que o \omterm{def:b2:quadratic:adjoint}{simétrico} e matrizes antissimétricas formam
+        $\varphi $-subespaços ortogonais nos quais $ q $ é
+        respectivamente definido positivo e definido negativo
+        \emph{(calcular $\operatorname{tr}(M^2)$ entrada em
+        cada caso)}.
+  \item Concluir: $ q $ tem assinatura $\bigl(\frac{n(n+1)}{2},
+        \frac{n(n-1)}{2}\bigr)$ e classificação $ n^2$.
+\end{enumerate}
+\end{exercise}
+
+\section{Problema: Cholesky, Hadamard e o polar
+decomposição}
+
+\begin{problem}\label{pb:b2:quadratic:1}
+O teorema espectral é um microscópio; este problema usa-o como um
+fábrica. A partir de matrizes de Gram fabricamos \emph{Cholesky
+fatoração}\index{Cholesky
+fatoração} (e identificar o
+Os pivôs de Gauss são razões de menores), então prove \emph{Hadamard
+desigualdade}\index{Hadamard
+desigualdade} sobre determinantes, construir
+o \emph{polar}\index{polar} $ A =
+QS $ e o \emph{decomposição de valor singular}, classificar avião
+cônicas, e terminam com a redução simultânea de duas formas ---
+o teorema por trás dos modos normais de oscilação. Por todo, $ E =
+\R^n $ com seu produto interno padrão.
+
+\medskip
+\noindent\textbf{Part I --- Gram matrices and Cholesky.} Para
+vetores $ v_1, \dots, v_n \in E $, deles \emph{Matriz Gram} é
+$ G = \bigl(\langle v_i, v_j\rangle\bigr)_{i,j}$.
+\begin{enumerate}
+  \item Mostre isso $ G $ é \omterm{def:b2:quadratic:adjoint}{simétrico} semidefinido positivo, e
+        definido positivo se e somente se $(v_1, \dots, v_n)$ é
+        linearmente independente \emph{(calcular $ X^{\mathsf T}GX $)}.
+  \item Por outro lado, mostre que cada \omterm{def:b2:quadratic:adjoint}{simétrico} positivo
+        semidefinido $ A $ é uma matriz Gram: $ A = C^{\mathsf T}C $
+        para alguns $ C $ (use a raiz quadrada de
+        \cref{exo:b2:quadratic:6}), com $ C $ invertível se $ A $
+        é definitivo.
+  \item Deduza que um semidefinido positivo $ A $ satisfaz
+        $\abs{a_{ij}} \leq \sqrt{a_{ii}\,a_{jj}}$ para todos $ i,
+        j $ \emph{(restrito a duas coordenadas)} --- o
+        Desigualdade de Cauchy-Schwarz, relida matricialmente.
+  \item (Cholesky) Deixe $ A $ seja positivo definido. Prove isso
+        há um \emph{exclusivo} triangular superior $ T $ com
+        entradas diagonais positivas tais que
+        \[
+        A = T^{\mathsf T}\,T
+        \]
+        \emph{(existência: aplicar Gram--Schmidt a vetores
+        percebendo $ A $ como uma matriz Gram; singularidade: se
+        $ T_1^{\mathsf T}T_1 = T_2^{\mathsf T}T_2$, mostrar
+        $ T_1T_2^{-1}$ é ortogonal e triangular com
+        diagonal positiva, portanto $ I $)}.
+  \item Mostre que os principais menores líderes satisfazem
+        $\Delta_k = (t_{11}\cdots t_{kk})^2$, e deduza que
+        os pivôs produzidos pelo \omterm{thm:b2:quadratic:gauss}{Redução de Gauss} de um
+        forma definida positiva, tomada na variável natural
+        ordem, são
+        \[
+        d_k = \frac{\Delta_k}{\Delta_{k-1}}
+        \qquad (\Delta_0 = 1) :
+        \]
+        os menores do critério de Sylvester
+        (\cref{exo:b2:quadratic:8}) e os pivôs de Gauss são
+        os mesmos dados. Verifique
+        \cref{ex:b2:quadratic:tworoads}.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part II --- Hadamard's inequality.}
+\begin{enumerate}[resume]
+  \item Deixar $ A $ seja positivo definido. Provar
+        \[
+        \det A \leq a_{11}\,a_{22}\cdots a_{nn}
+        \]
+        \emph{(normalizar: $ B = DAD $ com $ D =
+        \operatorname{diag}(a_{ii}^{-1/2})$ tem diagonal unitária;
+        vinculado $\det B = \prod \mu_i $ por AM - GM contra
+        $\operatorname{tr} B = n $)}.
+  \item Mostre que a igualdade é válida se $ A $ é diagonal.
+  \item Deduzir \emph{A desigualdade de Hadamard}: para cada real
+        matriz quadrada $ M $ com colunas $ c_1, \dots, c_n $,
+        \[
+        \abs{\det M} \leq \prod_{i=1}^{n}\norm{c_i}_2 ,
+        \]
+        com igualdade (para invertível $ M $) se as colunas forem
+        ortogonal aos pares \emph{(aplique as questões 6 a 7 para
+        $ M^{\mathsf T}M $)}.
+  \item Dividendos geométricos e combinatórios: interpretar
+        questão 8 como ``o volume de um paralelepípedo é de
+        a maior parte é o produto de seus comprimentos de borda''; e mostre que um
+        matriz com todas as entradas em $\intcc{-1}{1}$ tem
+        $\abs{\det M} \leq n^{n/2}$. (Matrizes que atingem este
+        vinculado --- matrizes Hadamard --- existem para $ n = 1, 2$
+        e muitos múltiplos de $4$; seja para \emph{todos}
+        múltiplos de $4$ é um famoso problema aberto.)
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part III --- Decomposição \omterm{pb:b2:quadratic:1}{polar} and singular
+values.}
+\begin{enumerate}[resume]
+  \item Deixar $ A $ ser invertível. Mostre isso $ A^{\mathsf T}A $ é
+        definido positivo, e que
+        \[
+        S = \sqrt{A^{\mathsf T}A}
+        \quad\text{(the square root of
+        \cref{exo:b2:quadratic:6})},
+        \qquad Q = AS^{-1}
+        \]
+        dê uma fatoração $ A = QS $ com $ Q $ ortogonal e
+        $ S $ definido positivo.
+  \item Prove que esta fatoração de um invertível $ A $ é
+        único.
+  \item Estender a existência ao arbitrário $ A $: escolher
+        $\varepsilon_k \to 0$ com $ A + \varepsilon_k I $
+        invertível, escreva $ A + \varepsilon_kI = Q_kS_k $ e
+        use o compacidade de $ O(n)$
+        (\cref{exo:b2:quadratic:5}) para extrair $ Q_k \to Q $;
+        mostrar $ S_k = Q_k^{\mathsf T}(A + \varepsilon_kI)$
+        converge para algum semidefinido positivo $ S $ com $ A =
+        QS $ e $ S = \sqrt{A^{\mathsf T}A}$. Onde é que
+        exclusividade falha para singular $ A $?
+  \item (Decomposição de valores singulares) Deduza que todo real
+        quadrado $ A $ escreve
+        \[
+        A = U\,\Sigma\,V^{\mathsf T},
+        \qquad U, V \in O(n),\quad
+        \Sigma = \operatorname{diag}(\sigma_1, \dots,
+        \sigma_n),\ \sigma_i \geq 0 ,
+        \]
+        onde o $\sigma_i $ (o \emph{valores singulares}) são
+        o valores próprios de $\sqrt{A^{\mathsf T}A}$.
+  \item Três consequências: $\vertiii{A}_2 = \sigma_{\max}$ para
+        \emph{todo} real $ A $ (generalizando
+        \cref{exo:b2:quadratic:7}); $\abs{\det A} =
+        \sigma_1\cdots\sigma_n $; e a imagem da unidade
+        esfera sob um invertível $ A $ é um elipsóide com
+        semieixos $\sigma_1, \dots, \sigma_n $ ao longo das colunas
+        de $ U $.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part IV --- Conics, by the spectral theorem.}
+Uma cônica plana é o conjunto zero de $ f(x) = q(x) + \langle b,
+x\rangle + c $, com $ q \neq 0$ um forma quadrática de matriz $ A $,
+$ b \in \R^2$, $ c \in \R $.
+\begin{enumerate}[resume]
+  \item Reduzir $ f $ por uma rotação (eixos principais,
+        \cref{cor:b2:quadratic:principalaxes}) seguido por um
+        tradução e classificar o possível não vazio,
+        formas não degeneradas pela assinatura de $ q $: elipse
+        ($\det A > 0$), hipérbole ($\det A < 0$), parábola
+        ($\det A = 0$, classificação $1$, com o termo linear não
+        absorvido).
+  \item Execute a redução integralmente para
+        \[
+        x^2 + 4xy + y^2 + 2x - 2y = 4 :
+        \]
+        coordenadas giradas, equação reduzida, natureza e
+        centro da cônica.
+  \item (Cônicas centrais) Suponha $\det A \neq 0$. Mostrar o
+        \emph{centro} é $ x_0 = -\frac12 A^{-1}b $, e que o
+        \omterm{def:b2:quadratic:def}{congruência} por $\begin{pmatrix} I & x_0\\ 0 &
+        1\end{pmatrix}$ do $3\times3$ matriz $\widetilde Q
+        = \begin{pmatrix} A & b/2 \\ b^{\mathsf T}/2 &
+        c\end{pmatrix}$ rendimentos
+        \[
+        \det\widetilde Q = f(x_0)\,\det A :
+        \]
+        a cônica central é degenerada (um ponto ou duas linhas)
+        exatamente quando $\det\widetilde Q = 0$.
+  \item Verifique a questão 17 no exemplo da questão 16:
+        calcular $ x_0$, $ f(x_0)$ e $\det\widetilde Q $ e
+        concluir novamente que a cônica é uma não degenerada
+        hipérbole.
+  \item (Um lápis quádrico) Para $\lambda \in \R $, classifique o
+        superfície
+        \[
+        x^2 + y^2 + z^2 + 2\lambda(xy + yz + zx) = 1
+        \]
+        pelo valores próprios da sua matriz \emph{(todos-uns
+        estrutura: valores próprios $1 + 2\lambda $ e $1 -
+        \lambda $ dobro)}: esfera/elipsóide, cilindro, par de
+        planos, hiperbolóides de uma e duas folhas, conforme
+        para $\lambda $.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part V --- Two forms at once: simultaneous
+reduction.}
+\begin{enumerate}[resume]
+  \item Deixar $ q $ ser positivo definido e $ q'$ um arbitrário
+        forma quadrática sobre $ E $. Prove que existe uma base de
+        $ E $ que é ortonormal para $ q $ e ortogonal para
+        $ q'$: nele, $ q = \sum x_i^2$ e $ q' = \sum \mu_i
+        x_i^2$ \emph{(usar $ q $ como o produto interno e aplique
+        o teorema espectral para o endomorfismo representando
+        $ q'$)}.
+  \item Forma matricial: para $ A $ definido positivo e $ B $
+        \omterm{def:b2:quadratic:adjoint}{simétrico}, existe um invertível $ P $ com
+        $ P^{\mathsf T}AP = I $ e $ P^{\mathsf T}BP =
+        \operatorname{diag}(\mu_1, \dots, \mu_n)$, onde o
+        $\mu_i $ são as raízes de $\det(B - \mu A) = 0$.
+  \item Execute-o na íntegra por
+        \[
+        A = \begin{pmatrix} 2 & 1\\ 1 & 1 \end{pmatrix},
+        \qquad
+        B = \begin{pmatrix} 0 & 1\\ 1 & 0 \end{pmatrix} :
+        \]
+        o generalizado valores próprios $\mu_\pm $ e vetores
+        diagonalizando ambas as formas.
+  \item Mostre que a definição positiva não pode ser abandonada: por
+        \[
+        A = \begin{pmatrix} 1 & 0\\ 0 & -1 \end{pmatrix},
+        \qquad
+        B = \begin{pmatrix} 0 & 1\\ 1 & 0 \end{pmatrix},
+        \]
+        nenhuma base diagonaliza ambas as formas \emph{(se $ P $
+        diagonalizou ambos, $\det(B - \mu A)$ iria dividir com
+        raízes reais; calcule isso)}.
+  \item Mostre que o $\mu_i $ da questão 21 são os
+        valores próprios de $ A^{-1}B $, e isso $ A^{-1}B $, embora não
+        \omterm{def:b2:quadratic:adjoint}{simétrico} em geral, é sempre \omterm{def:b2:reduction:diag}{diagonalizável} com
+        verdadeiro valores próprios \emph{(conjugado por $\sqrt A $)}.
+  \item Síntese. Em uma frase cada: (i) o único teorema
+        cada parte se apoiou; (ii) quais resultados das Partes
+        I-III sobrevivem com certeza \emph{semi}definitivo
+        matrizes, e que precisam de definição; (iii) o
+        sistema físico cujas pequenas oscilações questionam
+        20--22 diagonalizar (energia cinética e potencial como
+        as duas formas) e qual o $\mu_i$ significa lá.
+\end{enumerate}
+\end{problem}

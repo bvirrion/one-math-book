@@ -1,0 +1,1014 @@
+\chapter{Variáveis aleatórias discretas}\label{ch:b2:randomvar}
+
+Variáveis aleatórias organizar cálculos de probabilidade em torno
+funções em vez de \omterm{def:b2:proba:space}{eventos}. Sobre \omterm{def:b2:structures:countable}{contável} espaços a teoria é
+alimentado pelo resumido famílias de \cref{ch:b2:series}:
+\omterm{def:b2:randomvar:expectation}{expectativa} é a soma de uma família indexada pelo \omterm{def:b2:proba:space}{espaço amostral},
+e todas as suas propriedades --- linearidade, transferência, fórmula do produto
+para \omterm{def:b2:proba:independence}{independente} variáveis --- são teoremas sobre resumido
+famílias. O capítulo prova as principais desigualdades de Markov,
+Chebyshev, Cauchy--Schwarz e Jensen, e termina com o clássico
+\omterm{def:b2:randomvar:law}{leis} e a \omterm{def:b2:randomvar:law}{lei} fraca dos grandes números, cuja prova são duas linhas
+assim que Chebyshev estiver disponível.
+
+\section{Variáveis aleatórias e suas leis}
+
+\begin{definition}[Variável aleatória discreta; lei]\label{def:b2:randomvar:law}
+Deixar $(\Omega, \P)$ seja um \omterm{def:b2:structures:countable}{contável} espaço de probabilidade. UM
+\emph{variável calculada}\index{variável calculada} é um mapa $ X \colon \Omega \to E $ ($ E $ qualquer
+conjunto; \emph{real} variável aleatória quando $ E = \R $). Isso é \emph{lei}\index{lei}
+(ou \emph{distribuição}\index{distribuição}) é o medida de probabilidade $\P_X $ no
+conjunto \omterm{def:b2:structures:countable}{contável} $ X(\Omega)$ definido por
+\[
+\P_X(\{x\}) = \P(X = x)
+= \P\bigl(\{\omega : X(\omega) = x\}\bigr) .
+\]
+\end{definition}
+
+\begin{example}[As leis clássicas]\label{ex:b2:randomvar:laws}
+\leavevmode
+\begin{itemize}
+\item \emph{Bernoulli} $\mathcal{B}(p)$: $ X \in \{0, 1\}$, $\P(X =
+1) = p $. Indicador de um evento.
+\item \emph{Binômio} $\mathcal{B}(n, p)$: $\P(X = k) =
+\binom nk p^k(1-p)^{n-k}$, $0 \leq k \leq n $: número de sucessos
+em $ n $ \omterm{def:b2:proba:independence}{independente} Ensaios de Bernoulli (volume do ensino médio; reprovado
+abaixo através de somas de \omterm{def:b2:proba:independence}{independente} variáveis).
+\item \emph{Geométrico} $\mathcal{G}(p)$: $\P(X = k) =
+(1-p)^{k-1}p $, $ k \in \N^*$: classificação do primeiro sucesso
+(\cref{ex:b2:proba:geometric}).
+\item \emph{Poisson} $\mathcal{P}(\lambda)$: $\P(X = k) =
+e^{-\lambda}\frac{\lambda^k}{k!}$, $ k \in \N $ --- um \omterm{def:b2:proba:space}{probabilidade
+medir} pela série exponencial. A \omterm{def:b2:randomvar:law}{lei} dos \omterm{def:b2:proba:space}{eventos} raros
+(\cref{ch:b2:genfun}).
+\end{itemize}
+\end{example}
+
+\begin{remark}[Qual lei modela o que]
+Os quatro \omterm{def:b2:randomvar:law}{leis} responder a quatro questões primitivas: Bernoulli,
+``isso aconteceu?''; binomial, ``quantas vezes em $ n $
+tenta?''; geométrico, ``quanto tempo até a primeira vez?'';
+Poisson, ``quantos \omterm{def:b2:proba:space}{eventos} em uma determinada taxa, quando as tentativas são
+muitos e individualmente improváveis?''. Reconhecendo a pergunta
+é nove décimos da modelagem: somas de indicadores apontam para
+o binomial, tempos de espera para o geométrico, evento raro
+conta para o Poisson --- com a passagem do binômio para
+Poisson tornada precisa pela \omterm{def:b2:randomvar:law}{lei} dos \omterm{def:b2:proba:space}{eventos} raros em
+\cref{ch:b2:genfun}.
+\end{remark}
+
+\begin{proposition}[Falta de memória do geométrico
+lei]\label{prop:b2:randomvar:memoryless}
+Se $ X \sim \mathcal{G}(p)$, então para todos $ m, n \in \N $:
+\[
+\P(X > m + n \mid X > m) = \P(X > n) ,
+\]
+e o geométrico \omterm{def:b2:randomvar:law}{leis} são os únicos \omterm{def:b2:randomvar:law}{leis} sobre $\N^*$ com isso
+propriedade.
+\end{proposition}
+
+\begin{proof}
+Somando os pesos geométricos, $\P(X > n) = (1-p)^n $. Por isso
+\[
+\P(X > m + n \mid X > m)
+= \frac{\P(X > m + n)}{\P(X > m)}
+= \frac{(1-p)^{m+n}}{(1-p)^m} = (1-p)^n = \P(X > n).
+\]
+Por outro lado, se $ G(n) = \P(X > n)$ satisfaz $ G(m + n) =
+G(m)G(n)$ com $ G(0) = 1$, então $ G(n) = G(1)^n $ por indução; $ q =
+G(1) \in \intco{0}{1}$, e $ q = 0$ ou o \omterm{def:b2:randomvar:law}{lei} é
+$\mathcal{G}(1 - q)$: $\P(X = k) = G(k-1) - G(k) =
+q^{k-1}(1 - q)$.
+\end{proof}
+
+\begin{example}[Nenhum número é "devido"]
+Jogue um dado, esperando o seis: o tempo de espera é $ X \sim
+\mathcal G(1/6)$. A falta de memória diz que depois $10$
+rolos infrutíferos, o \emph{restante} espere $ X - 10$, dado
+$ X > 10$, é novamente $\mathcal G(1/6)$: o condicional
+a espera esperada ainda é $6$ rola, exatamente como no início.
+O dado não lembra, e nenhum seis é “devido” --- o
+A falácia do jogador é a crença de que o condicional \omterm{def:b2:randomvar:law}{lei}
+deveria ter mudado. Por outro lado, a singularidade da proposição
+metade diz essa indiferença \emph{caracteriza} geométrico
+tempos de espera: qualquer tempo de espera cuja previsão nunca é atualizada
+é geométrico. Filas e tempos de vida reais geralmente são atualizados,
+que é precisamente como se detecta que eles não são
+geométrico.
+\end{example}
+
+\section{Expectativa}
+
+\begin{definition}[Expectativa]\label{def:b2:randomvar:expectation}
+Um verdadeiro variável aleatória $ X $ sobre $(\Omega, \P)$ \emph{tem um
+expectativa} se a família
+$\bigl(X(\omega)\,\P(\{\omega\})\bigr)_{\omega \in \Omega}$ é
+resumido (\cref{ch:b2:series}); isso é \emph{expectativa}\index{expectativa} é então
+\[
+\E(X) = \sum_{\omega \in \Omega} X(\omega)\,\P(\{\omega\}) .
+\]
+\end{definition}
+
+\begin{theorem}[Teorema de transferência]\label{thm:b2:randomvar:transfer}
+$ X $ tem um \omterm{def:b2:randomvar:expectation}{expectativa} se e somente se a família $\bigl(x\,\P(X =
+x)\bigr)_{x \in X(\Omega)}$ é resumido, e então
+\[
+\E(X) = \sum_{x \in X(\Omega)} x\,\P(X = x) .
+\]
+Mais genericamente, para $ f \colon X(\Omega) \to \R $, a variável
+$ f(X)$ tem um \omterm{def:b2:randomvar:expectation}{expectativa} se $\sum_x \abs{f(x)}\,\P(X = x) <
+\infty $, e então $\E(f(X)) = \sum_x f(x)\,\P(X = x)$.
+\end{theorem}
+
+\begin{proof}
+Partição $\Omega $ nos conjuntos de níveis $\Omega_x = \{X = x\}$, $ x
+\in X(\Omega)$. Pelo teorema da soma por pacotes para resumido
+famílias (\cref{ch:b2:series}), a família
+$(X(\omega)\P(\{\omega\}))_\omega $ é resumido se cada pacote for
+(automático: $\sum_{\omega \in \Omega_x}\abs{x}\P(\{\omega\}) =
+\abs x\,\P(X = x)$) \emph{e} a família das somas em pacotes
+$\bigl(x\,\P(X = x)\bigr)_x $ é resumido --- e então o total
+somas concordam. Para $ f(X)$: aplique a declaração comprovada à variável $ Y =
+f \circ X $, cujos conjuntos de níveis são $\{Y = y\} =
+\bigsqcup_{x : f(x) = y}\{X = x\}$; uma segunda soma por
+pacotes convertidos $\sum_y y\,\P(Y = y)$ em $\sum_x
+f(x)\,\P(X = x)$, os pacotes agora agrupam os valores $ x $
+pela imagem deles $ f(x)$, com absoluto somabilidade de um
+família equivalente à da outra.
+\end{proof}
+
+\begin{theorem}[Propriedades de expectativa]\label{thm:b2:randomvar:linearity}
+No conjunto de variáveis aleatórias com \omterm{def:b2:randomvar:expectation}{expectativa}:
+\begin{enumerate}
+\item (Linearidade) $\E(aX + bY) = a\,\E(X) + b\,\E(Y)$.
+\item (Positividade e monotonicidade) $ X \geq 0 \Rightarrow \E(X)
+\geq 0$; $ X \leq Y \Rightarrow \E(X) \leq \E(Y)$; e
+$\abs{\E(X)} \leq \E(\abs X)$.
+\item (Dominação) Se $\abs X \leq Z $ e $ Z $ tem um \omterm{def:b2:randomvar:expectation}{expectativa},
+o mesmo acontece $ X $.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+Todas são propriedades de somas de resumido famílias
+(\cref{ch:b2:series}): linearidade da soma, termo de positividade por
+prazo, e o critério de dominação para somabilidade. (Observe que
+a linearidade é imediata no \emph{definição} sobre $\Omega $,
+embora fosse estranho na fórmula de transferência --- um benefício
+de definir $\E $ rio acima.)
+\end{proof}
+
+\begin{example}\label{ex:b2:randomvar:expectations}
+$ X \sim \mathcal{B}(n, p)$: escrita $ X = X_1 + \dots + X_n $ como um
+soma dos indicadores de Bernoulli e usando linearidade, $\E(X) = np $ ---
+não são necessários coeficientes binomiais. $ X \sim \mathcal{G}(p)$: $\E(X) =
+\sum_{k\geq1}k(1-p)^{k-1}p = p\cdot\frac{1}{(1 - (1-p))^2} =
+\frac1p $, diferenciando a série geométrica dentro de seu disco
+(\cref{ch:b2:powerseries}). $ X \sim \mathcal{P}(\lambda)$: $\E(X)
+= \sum_{k\geq1}k e^{-\lambda}\frac{\lambda^k}{k!} = \lambda
+e^{-\lambda}\sum_{j\geq0}\frac{\lambda^j}{j!} = \lambda $.
+\end{example}
+
+\begin{example}[Transferência em ação]\label{ex:b2:randomvar:transferex}
+Para $ X \sim \mathcal P(\lambda)$, calcular
+$\E\bigl(\frac1{1+X}\bigr)$ --- o \omterm{def:b2:randomvar:law}{lei} de $\frac1{1+X}$
+em si é estranho, mas a transferência nunca pede isso:
+\[
+\E\Bigl(\frac1{1+X}\Bigr)
+= \sum_{k\geq0}\frac{1}{k+1}\,\eu^{-\lambda}
+\frac{\lambda^k}{k!}
+= \frac{\eu^{-\lambda}}{\lambda}\sum_{k\geq0}
+\frac{\lambda^{k+1}}{(k+1)!}
+= \frac{\eu^{-\lambda}}{\lambda}\bigl(\eu^\lambda - 1\bigr)
+= \frac{1 - \eu^{-\lambda}}{\lambda} .
+\]
+Duas lições. Computacionalmente: reconhecendo uma mudança
+série exponencial é todo o trabalho --- a transferência reduz
+\omterm{def:b2:randomvar:expectation}{expectativas} de $ f(X)$ para manipulação em série. Estruturalmente:
+o valor ingênuo do plug-in seria $\frac1{1 + \E X} =
+\frac1{1 + \lambda}$, e a resposta verdadeira é maior,
+\[
+\frac{1 - \eu^{-\lambda}}{\lambda} \geq
+\frac{1}{1 + \lambda},
+\]
+exatamente como a desigualdade de Jensen para a função convexa $ t
+\mapsto \frac1{1+t}$ demandas. \omterm{def:b2:randomvar:expectation}{Expectativas} de
+\omterm{def:b2:affine:convex}{convexo} as imagens ficam acima do valor ingênuo do plug-in e transferem
+além disso, uma verificação de série torna concreta a desigualdade abstrata.
+\end{example}
+
+\begin{theorem}[Independência e produtos]\label{thm:b2:randomvar:product}
+Variáveis aleatórias $ X, Y $ são \emph{\omterm{def:b2:proba:independence}{independente}} se $\P(X = x, Y =
+y) = \P(X = x)\P(Y = y)$ para todos $ x, y $ --- equivalentemente, o
+\omterm{def:b2:proba:space}{eventos} $\{X \in A\}$ e $\{Y \in B\}$ são \omterm{def:b2:proba:independence}{independente} para todos $ A,
+B $. Se $ X $ e $ Y $ são \omterm{def:b2:proba:independence}{independente} variáveis reais com
+\omterm{def:b2:randomvar:expectation}{expectativas}, então $ XY $ tem um \omterm{def:b2:randomvar:expectation}{expectativa} e
+\[
+\E(XY) = \E(X)\,\E(Y) .
+\]
+\end{theorem}
+
+\begin{proof}
+A equivalência das duas formulações segue pela soma dos
+\omterm{def:b2:funcseq:def}{pontualmente} identidade sobre $(x, y) \in A \times B $
+($\sigma $-aditividade duas vezes). Para o produto: a família dupla
+$\bigl(xy\,\P(X = x)\P(Y = y)\bigr)_{(x,y)}$ é resumido, já que por
+Fubini para famílias (\cref{ch:b2:series})
+\[
+\sum_{x, y}\abs x \abs y\,\P(X{=}x)\P(Y{=}y)
+= \Bigl(\sum_x \abs x \P(X{=}x)\Bigr)
+\Bigl(\sum_y \abs y \P(Y{=}y)\Bigr) < \infty ;
+\]
+por independência essa família é exatamente $\bigl(xy\,\P(X = x, Y =
+y)\bigr)$, cuja soma é $\E(XY)$ por transferência aplicada ao
+variável $(X, Y) \mapsto xy $; Fubini avalia novamente o não assinado
+soma como o produto $\E(X)\E(Y)$.
+\end{proof}
+
+\begin{example}[Produtos com e sem
+independência]\label{ex:b2:randomvar:productcontrast}
+Jogue dois dados justos. Se $ Y $ é o segundo dado (\omterm{def:b2:proba:independence}{independente} de
+o primeiro), $\E(XY) = \E(X)\E(Y) = 3.5^2 = 12.25$. Se em vez disso
+$ Y = X $ (o ``produto'' de um dado consigo mesmo),
+\[
+\E(X^2) = \frac{1 + 4 + 9 + 16 + 25 + 36}{6} = \frac{91}{6}
+\approx 15.17 \neq 12.25 :
+\]
+mesma margem \omterm{def:b2:randomvar:law}{leis} em ambos os cenários, diferentes articulações \omterm{def:b2:randomvar:law}{leis},
+produto diferente \omterm{def:b2:randomvar:expectation}{expectativas}. A moral, que vale a pena gravar:
+$\E(XY)$ é um funcional do \emph{par}, não dos dois
+marginais --- e a lacuna $\E(X^2) - \E(X)^2 \approx 2.92$
+é, por König – Huygens, precisamente o \omterm{def:b2:randomvar:variance}{variação}
+$\frac{35}{12}$ do dado.
+\end{example}
+
+\section{Variância, covariância e as desigualdades clássicas}
+
+\begin{definition}[Momentos, variação]\label{def:b2:randomvar:variance}
+$ X $ tem um \emph{momento da ordem 2} se $ X^2$ tem um \omterm{def:b2:randomvar:expectation}{expectativa}
+(então o mesmo acontece $ X $, por dominação: $\abs X \leq \frac{1 +
+X^2}{2}$). Isso é \emph{variação}\index{variação} e \emph{padrão
+desvio}\index{padrão
+desvio} são
+então
+\[
+V(X) = \E\bigl((X - \E(X))^2\bigr)
+= \E(X^2) - \E(X)^2 ,
+\qquad
+\sigma(X) = \sqrt{V(X)} ,
+\]
+(a segunda forma --- a \emph{König--Huygens} fórmula --- por
+expandindo o quadrado e usando linearidade:
+\[
+\E\bigl((X - \E X)^2\bigr)
+= \E\bigl(X^2 - 2X\,\E X + \E(X)^2\bigr)
+= \E(X^2) - 2\,\E(X)^2 + \E(X)^2 ,
+\]
+o meio termo usando isso $\E X $ é uma constante). Para $ X, Y $ com segundos momentos,
+o \emph{covariância}\index{covariância} é
+\[
+\operatorname{Cov}(X, Y)
+= \E\bigl((X - \E X)(Y - \E Y)\bigr)
+= \E(XY) - \E(X)\E(Y) .
+\]
+\end{definition}
+
+\begin{theorem}[Kit de ferramentas de variação]\label{thm:b2:randomvar:variancerules}
+Para variáveis com segundos momentos:
+\begin{enumerate}
+\item $ V(aX + b) = a^2\,V(X)$;
+\item $ V(X + Y) = V(X) + V(Y) + 2\operatorname{Cov}(X, Y)$ e
+mais geralmente
+\[
+V\Bigl(\sum_{i=1}^n X_i\Bigr)
+= \sum_{i=1}^n V(X_i)
++ 2\sum_{i < j}\operatorname{Cov}(X_i, X_j) ;
+\]
+\item se $ X, Y $ são \omterm{def:b2:proba:independence}{independente}, $\operatorname{Cov}(X, Y) = 0$
+(o inverso é falso), então variações de \omterm{def:b2:proba:independence}{independente} variáveis
+adicionar.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\emph{1} e \emph{2} são expansões de quadrados mais linearidade;
+os produtos $ X_iX_j $ ter \omterm{def:b2:randomvar:expectation}{expectativas} por Cauchy--Schwarz abaixo
+(ou por $\abs{X_iX_j} \leq \frac{X_i^2 + X_j^2}{2}$). \emph{3} é
+\cref{thm:b2:randomvar:product} aplicado ao centro
+variáveis. Um contra-exemplo padrão para o inverso: $ X $ uniforme
+ligado $\{-1, 0, 1\}$ e $ Y = X^2$ não estão correlacionados
+($\E(XY) = \E(X^3) = 0 = \E X \cdot \E Y $) mas claramente dependente.
+\end{proof}
+
+\begin{theorem}[Markov e Chebyshev
+desigualdades]\label{thm:b2:randomvar:markov}
+\leavevmode
+\begin{enumerate}
+\item (Markov) Se $ X \geq 0$ tem um \omterm{def:b2:randomvar:expectation}{expectativa}, então para cada $ a
+> 0$:
+\[
+\P(X \geq a) \leq \frac{\E(X)}{a} .
+\]
+\item (Chebyshev) Se $ X $ tem um segundo momento, então para cada
+$\varepsilon > 0$:
+\[
+\P\bigl(\abs{X - \E(X)} \geq \varepsilon\bigr)
+\leq \frac{V(X)}{\varepsilon^2} .
+\]
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\emph{1.} \omterm{def:b2:funcseq:def}{Pontualmente}, $ a\,\mathbf{1}_{X \geq a} \leq X $ (no
+evento o lado esquerdo é $ a \leq X $; fora disso, $0 \leq X $). Pegar
+\omterm{def:b2:randomvar:expectation}{expectativas}: $ a\,\P(X \geq a) \leq \E(X)$ pela monotonicidade e
+$\E(\mathbf{1}_A) = \P(A)$.
+\emph{2.} Aplique Markov à variável não negativa $(X - \E
+X)^2$ no nível $ a = \varepsilon^2$: o evento $\{(X - \E X)^2
+\geq \varepsilon^2\}$ é exatamente $\{\abs{X - \E X} \geq
+\varepsilon\}$.
+\end{proof}
+
+\begin{example}[Não correlacionado, mas colado
+juntos]\label{ex:b2:randomvar:sumdiff}
+Jogue dois dados justos, $ X $ e $ Y $ independentee definir $ S = X +
+Y $, $ D = X - Y $. Pela bilinearidade do \omterm{def:b2:randomvar:variance}{covariância},
+\[
+\operatorname{Cov}(S, D) = V(X) - V(Y) +
+\operatorname{Cov}(Y, X) - \operatorname{Cov}(X, Y) = V(X) -
+V(Y) = 0 :
+\]
+soma e diferença não estão correlacionadas. \omterm{def:b2:proba:independence}{Independente}? Certamente
+não: $ S = 12$ forças $ D = 0$, enquanto $\P(D = 0) =
+\frac16$ incondicionalmente. A correlação apenas testa o
+\emph{linear} parte de uma dependência; aqui a dependência é
+levado pela restrição que $ S $ e $ D $ tem o mesmo
+paridade, invisível para \omterm{def:b2:randomvar:variance}{covariância}. (Para este par, zero
+\omterm{def:b2:randomvar:variance}{covariância} necessário $ V(X) = V(Y)$: idêntico distribuições,
+não independência, fez o trabalho.)
+\end{example}
+
+\begin{example}[Quando Markov é exato]\label{ex:b2:randomvar:markovsharp}
+A desigualdade de Markov é uma igualdade precisamente quando nada é
+desperdiçado no limite $ a\,\mathbf 1_{X\geq a} \leq X $: o
+variável deve levar apenas os valores $0$ e $ a $. Concretamente,
+se $\P(X = a) = \pi $ e $\P(X = 0) = 1 - \pi $, então $\E(X)
+= a\pi $ e
+\[
+\P(X \geq a) = \pi = \frac{\E(X)}{a} .
+\]
+Uma leitura realista: numa população onde a riqueza média é
+$100$ e a riqueza é $0$ ou $10^6$, a proporção de
+milionários é exatamente $10^{-4}$ --- Markov está vinculado, acertou
+exatamente pela desigualdade máxima. Em qualquer momento $ X $ se espalha
+valores intermediários o limite é estrito, muitas vezes de forma descontrolada;
+mas como mostra o caso extremo, nenhuma desigualdade melhor pode ser
+extraído apenas da média.
+\end{example}
+
+\begin{example}[Chebyshev é afiado --- sem mais
+hipóteses]\label{ex:b2:randomvar:chebsharp}
+Consertar $\varepsilon > 0$, $ q \in \intoc01$, e deixe $ X $ pegue o
+valores $\pm\varepsilon $ com probabilidade $\frac q2$ cada um e
+$0$ com probabilidade $1 - q $. Então $\E(X) = 0$, $ V(X) =
+q\varepsilon^2$, e
+\[
+\P\bigl(\abs{X - \E X} \geq \varepsilon\bigr) = q
+= \frac{V(X)}{\varepsilon^2} :
+\]
+igualdade em Chebyshev. Portanto, a desigualdade não pode ser melhorada
+usando apenas o \omterm{def:b2:randomvar:variance}{variação} --- o $1/\varepsilon^2$ decadência é
+o preço exato da informação do segundo momento. Decadência mais rápida
+requer hipóteses mais fortes: limitação da variável
+compra \emph{exponencial} concentração, como
+\cref{exo:b2:randomvar:7} prévias e o fim de semana deste capítulo
+problema se desenvolve sistematicamente.
+\end{example}
+
+\begin{theorem}[Cauchy – Schwarz e Jensen]\label{thm:b2:randomvar:jensen}
+\leavevmode
+\begin{enumerate}
+\item (Cauchy - Schwarz) Se $ X, Y $ ter segundos momentos, $ XY $ tem um
+\omterm{def:b2:randomvar:expectation}{expectativa} e $\E(XY)^2 \leq \E(X^2)\,\E(Y^2)$; consequentemente
+$\operatorname{Cov}(X,Y)^2 \leq V(X)V(Y)$.
+\item (Jensen) Se $\varphi \colon I \to \R $ é \omterm{def:b2:affine:convex}{convexo} em um
+intervalo contendo $ X(\Omega)$, e $ X $, $\varphi(X)$ ter
+\omterm{def:b2:randomvar:expectation}{expectativas}, então
+\[
+\varphi\bigl(\E(X)\bigr) \leq \E\bigl(\varphi(X)\bigr) .
+\]
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\emph{1.} Somabilidade de $ XY $: $\abs{XY} \leq \frac{X^2 + Y^2}2$.
+O mapa $(X, Y) \mapsto \E(XY)$ é um positivo bilinear \omterm{def:b2:quadratic:adjoint}{simétrico}
+formulário no espaço de variáveis com segundos momentos, então o resumo
+Desigualdade de Cauchy-Schwarz de \cref{ch:b2:quadratic} aplica-se
+(positivo \emph{semi}-definido é suficiente para a desigualdade).
+Aplicá-lo às variáveis centralizadas dá o \omterm{def:b2:randomvar:variance}{covariância} vinculado.
+
+\emph{2.} Primeiro, $ m = \E(X)$ reside em $ I $: $ I $ é um intervalo
+contendo todos os valores de $ X $, e \omterm{def:b2:randomvar:expectation}{expectativa} é monótono, então $ m $
+está entre $\inf X(\Omega)$ e $\sup X(\Omega)$. Pelo
+teorema da linha de suporte para funções convexas
+(\cref{ch:b2:realfun}), há $\alpha, \beta $ com
+$\varphi(t) \geq \alpha t + \beta $ para todos $ t \in I $ e
+$\varphi(m) = \alpha m + \beta $. Então, \omterm{def:b2:funcseq:def}{pontualmente} sobre $\Omega $,
+$\varphi(X) \geq \alpha X + \beta $; tirando \omterm{def:b2:randomvar:expectation}{expectativas},
+\[
+\E\bigl(\varphi(X)\bigr) \geq \alpha\,\E(X) + \beta
+= \varphi\bigl(\E(X)\bigr). \qedhere
+\]
+\end{proof}
+
+\begin{example}
+Jensen com $\varphi(t) = t^2$ dá $\E(X)^2 \leq \E(X^2)$ ---
+positividade do \omterm{def:b2:randomvar:variance}{variação}; com $\varphi(t) = 1/t $ sobre
+$\intoo{0}{\infty}$: $\frac{1}{\E X} \leq \E\bigl(\frac1X\bigr)$
+--- a média harmônica está abaixo da média aritmética, agora de forma aleatória
+formulário.
+\end{example}
+
+\begin{remark}[Armadilhas comuns]
+(eu) $\E(XY) = \E(X)\E(Y)$ \emph{requer} independência (ou em
+menos zero \omterm{def:b2:randomvar:variance}{covariância}): tirando $ Y = X $ dá $\E(X^2) \neq
+\E(X)^2$ em qualquer momento $ V(X) > 0$. (ii) Da mesma forma $ V(X + X) =
+4V(X)$, não $2V(X)$: variações adicione apenas entre \omterm{def:b2:proba:independence}{independente}
+(ou não correlacionados). (iii) $\E(f(X))$ não é
+$ f(\E(X))$; para \omterm{def:b2:affine:convex}{convexo} $ f $ Jensen ainda te conta o
+direção do erro, como em
+\cref{ex:b2:randomvar:transferex}. (iv) A existência é uma realidade
+hipótese: para a variável de São Petersburgo $ X = 2^K $ com
+$\P(K = k) = 2^{-k}$ ($ k \geq 1$),
+\[
+\sum_{k\geq1}2^k\cdot2^{-k} = \sum_{k\geq1}1 = \infty :
+\]
+$ X $ é finito quase certamente ainda não tem expectativae não
+existe um preço de entrada justo para o jogo. Somabilidade no
+definição de $\E $ não é pedantismo contábil --- é
+onde caudas pesadas são detectadas. (v) Finalmente, a transferência
+necessidades do teorema \emph{absoluto} somabilidade antes de qualquer
+o rearranjo da soma sobre os valores é legítimo
+(\cref{ch:b2:series}).
+\end{remark}
+
+
+\begin{example}[Chebyshev em cem
+joga]\label{ex:b2:randomvar:hundredtosses}
+Para $ X \sim \mathcal B(100, \frac12)$: $\E X = 50$, $ V(X) =
+25$. Chebyshev com $\varepsilon = 6$:
+\[
+\P(45 \leq X \leq 55) = \P(\abs{X - 50} < 6)
+\geq 1 - \frac{25}{36} \approx 0.31 ,
+\]
+enquanto a soma binomial exata dá $\approx 0.73$. O
+garantido $31\%$ está longe da verdade, mas exigiu
+\emph{apenas} a média e \omterm{def:b2:randomvar:variance}{variação} --- o mesmo certificado
+aplica-se literalmente a qualquer variável com $\E = 50$, $ V = 25$,
+por mais exótico que seja, e \cref{ex:b2:randomvar:chebsharp} mostra
+alguma dessas variáveis a satura. A universalidade tem um preço;
+quando o \omterm{def:b2:randomvar:law}{distribuição} é genuinamente binomial, o exponencial
+as ferramentas do problema do fim de semana fecham a maior parte da lacuna.
+\end{example}
+
+\begin{example}[A correlação de uma parte com seu
+inteiro]\label{ex:b2:randomvar:partwhole}
+Para \omterm{def:b2:proba:independence}{independente} distribuído de forma idêntica $ X, Y $ com \omterm{def:b2:randomvar:variance}{variação}
+$\sigma^2 > 0$, quão correlacionado é um somando com a soma
+$ S = X + Y $? Calcular
+\[
+\operatorname{Cov}(X, S) = \operatorname{Cov}(X, X) +
+\operatorname{Cov}(X, Y) = \sigma^2 + 0 = \sigma^2,
+\qquad V(S) = 2\sigma^2,
+\]
+então o coeficiente de correlação é
+\[
+\rho(X, S) = \frac{\operatorname{Cov}(X,
+S)}{\sigma(X)\,\sigma(S)}
+= \frac{\sigma^2}{\sigma\cdot\sigma\sqrt2}
+= \frac{1}{\sqrt2} \approx 0.707 ,
+\]
+qualquer que seja o comum \omterm{def:b2:randomvar:law}{lei} --- dados, moedas, contagens de Poisson. Com
+$ n $ soma o mesmo cálculo dá $\rho(X_1, S_n) =
+1/\sqrt n $: a influência de cada termo individual no total
+dilui como uma raiz quadrada, que é a sombra correlacional
+do $\sqrt n $ escala de flutuações. Cauchy-Schwarz
+garantias $\abs\rho \leq 1$ sempre; aqui o limite é cumprido
+exatamente no caso degenerado $ n = 1$ e decai previsivelmente
+depois.
+\end{example}
+
+\begin{example}[Ponderado AM-GM de
+Jensen]\label{ex:b2:randomvar:amgm}
+Deixar $ Y $ pegue os valores positivos $ a_1, \dots, a_k $ com
+probabilidades $\lambda_1, \dots, \lambda_k $. A função
+$-\ln $ é \omterm{def:b2:affine:convex}{convexo} sobre $\intoo0\infty $, então Jensen dá
+$-\ln\E(Y) \leq \E(-\ln Y)$, ou seja
+\[
+a_1^{\lambda_1}a_2^{\lambda_2}\cdots a_k^{\lambda_k}
+\;\leq\; \lambda_1a_1 + \lambda_2a_2 + \dots + \lambda_ka_k :
+\]
+a desigualdade aritmética-geométrica ponderada, com igualdade
+se $ Y $ é constante. Pesos iguais $\lambda_i = \frac1k $
+recuperar o clássico AM-GM. A probabilidade provou silenciosamente
+um teorema puramente algébrico: escolhendo uma probabilidade \omterm{def:b2:randomvar:law}{lei} é
+apenas um dispositivo de contabilidade para \omterm{def:b2:affine:convex}{convexo} combinações --- o
+ponto de vista baricênico de \cref{ch:b2:affine} mais uma vez, agora
+com Jensen como motor.
+\end{example}
+
+\section{A lei fraca dos grandes números}
+
+\begin{theorem}[Lei fraca dos grandes números]\label{thm:b2:randomvar:lln}
+Deixar $(X_k)_{k \geq 1}$ ser em pares \omterm{def:b2:proba:independence}{independente} variáveis aleatórias
+com o mesmo \omterm{def:b2:randomvar:law}{lei}, admitindo um segundo momento; escrever $ m = \E(X_1)$
+e $ S_n = X_1 + \dots + X_n $. Então para cada $\varepsilon > 0$:
+\[
+\P\Bigl(\,\Bigl|\frac{S_n}{n} - m\Bigr| \geq \varepsilon\Bigr)
+\;\leq\; \frac{V(X_1)}{n\,\varepsilon^2}
+\xrightarrow[n \to \infty]{} 0 .
+\]
+\end{theorem}
+
+\begin{proof}
+Por linearidade $\E(S_n/n) = m $; por
+\cref{thm:b2:randomvar:variancerules} (em pares independência
+mata o \omterm{def:b2:randomvar:variance}{covariâncias}) $ V(S_n) = n\,V(X_1)$, então $ V(S_n/n) =
+V(X_1)/n $. A desigualdade de Chebyshev aplicada a $ S_n/n $ dá o
+vinculado.
+\end{proof}
+
+\begin{remark}
+Este é o teorema que conecta probabilidade à frequência: para
+$ X_k $ o indicador de um evento $ A $ em \omterm{def:b2:proba:independence}{independente} repetições,
+$ S_n/n $ é a frequência observada de $ A $, e a \omterm{def:b2:randomvar:law}{lei} dos grandes
+números dizem que se concentra em torno $\P(A)$ à taxa
+$\frac{p(1-p)}{n\varepsilon^2}$. O \emph{forte} \omterm{def:b2:randomvar:law}{lei} ($ S_n/n \to
+m $ quase certamente) é um teorema do Ano 3 --- sua prova para o quarto
+momentos está ao seu alcance: veja \cref{exo:b2:randomvar:9},
+que executa Borel--Cantelli no limite do tipo Chebyshev. O mesmo
+A estimativa de Chebyshev alimentou a prova polinomial de Bernstein do
+Teorema de aproximação de Weierstrass em \cref{ch:b2:funcseq} --- o
+contando lema lá \emph{era} a \omterm{def:b2:randomvar:law}{lei} fraca dos grandes números em
+disfarce.
+\end{remark}
+
+\begin{example}[Coletando cinquenta cupons]
+\label{ex:b2:randomvar:couponnumeric}
+O colecionador de cupons de \cref{exo:b2:randomvar:3} com $ n =
+50$ brinquedos distintos: o total esperado é
+\[
+\E(T_{50}) = 50\,H_{50} = 50\sum_{k=1}^{50}\frac1k
+\approx 50 \times 4.499 \approx 225
+\]
+caixas --- quatro vezes e meia o palpite ingênuo $50$. O
+crescimento harmônico é toda a história: o primeiro $25$ brinquedos
+chegar em cerca de $50\ln2 \approx 35$ caixas, enquanto o
+\emph{durar} custo do brinquedo sozinho $50$ caixas em média (uma
+espera geométrica do parâmetro $\frac1{50}$). Conclusão
+problemas são dominados pelo seu final de jogo, e é por isso que
+\cref{exo:b2:randomvar:12} encontra flutuações de ordem $ n $
+--- o tamanho dessa espera geométrica final --- em torno do
+significa $ n\ln n $.
+\end{example}
+
+\begin{example}[Qual deve ser o tamanho $ n $ ser?]\label{ex:b2:randomvar:llnnumeric}
+Para fixar a frequência observada dentro $\varepsilon = 0.01$ de
+$\P(A)$ com confiança $95\%$, As demandas vinculadas de Chebyshev
+\[
+\frac{p(1-p)}{n\varepsilon^2} \leq \frac{1}{4n\varepsilon^2}
+\leq 0.05,
+\qquad\text{i.e.}\qquad
+n \geq \frac{1}{4\cdot0.05\cdot(0.01)^2} = 50\,000 .
+\]
+A dependência é brutal em $\varepsilon $ (quadrático) e
+leve na confiança (linear em $1/\alpha $). Ambos os recursos
+são propriedades do \emph{vinculado}, não da verdade: o
+as desigualdades exponenciais do problema do fim de semana reduzem o preço do
+confiança de $1/\alpha $ para $\ln(1/\alpha)$ --- o mesmo
+especificação custará cerca de $18\,500$ amostras lá ---
+enquanto o $1/\varepsilon^2$ escala é genuína e
+improvável. Saber qual parte de um limite está solta é tão
+útil quanto o próprio limite.
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}[x=5.5cm, y=1.05cm]
+  \draw[->] (-0.05,0) -- (1.1,0) node[below] {$ S_n/n $};
+  \draw[->] (0,-0.1) -- (0,2.35);
+  \draw[dashed] (0.4,0) -- (0.4,2.15);
+  \draw[dashed] (0.6,0) -- (0.6,2.15);
+  \node[below, font=\scriptsize] at (0.4,0)
+    {$ m{-}\varepsilon $};
+  \node[below, font=\scriptsize] at (0.5,0) {$ m $};
+  \node[below, font=\scriptsize] at (0.6,0)
+    {$ m{+}\varepsilon $};
+  \draw[omDef, thick] plot[domain=0.06:0.94, samples=80]
+    (\x, {0.8*exp(-(\x-0.5)^2/0.0288)});
+  \draw[omThm, very thick] plot[domain=0.32:0.68, samples=80]
+    (\x, {2.0*exp(-(\x-0.5)^2/0.0032)});
+  \node[omDef, font=\small] at (0.16, 0.85) {small $ n $};
+  \node[omThm, font=\small] at (0.71, 1.95) {large $ n $};
+\end{tikzpicture}
+
+{\small A \omterm{def:b2:randomvar:law}{lei} dos grandes números como uma imagem: o \omterm{def:b2:randomvar:law}{lei} de
+$ S_n/n $ (desenhado esquematicamente) mantém seu centro $ m $ mas
+estreita como $ n $ cresce, então a probabilidade fora da banda
+$\intcc{m-\varepsilon}{m+\varepsilon}$ --- as duas caudas ---
+encolhe a zero. Chebyshev limita as caudas por
+$ V(X_1)/(n\varepsilon^2)$; o problema do fim de semana mostra que eles são
+na verdade, exponencialmente pequeno.}
+\end{omfigure}
+
+\begin{remark}[Perspectivas dentro deste volume]
+Avante, tudo aqui alimenta \cref{ch:b2:genfun}: o
+\omterm{def:b2:randomvar:expectation}{expectativa} $\E(t^X)$ de uma função astuta de $ X $ pacotes
+o todo \omterm{def:b2:randomvar:law}{lei} em uma série de potências, os momentos se tornam
+derivativos em $1$ e identidades do tipo Wald para somas aleatórias
+levar a teoria do processo de ramificação; o teorema do produto para
+\omterm{def:b2:proba:independence}{independente} variáveis torna-se multiplicatividade de gerando
+funções. Para trás, \omterm{def:b2:randomvar:expectation}{expectativa} é um \omterm{def:b2:affine:barycenter}{baricentro} com
+pesos de probabilidade (\cref{ch:b2:affine}), Jensen
+desigualdade é a geometria da linha de suporte de funções convexas
+(\cref{ch:b2:realfun}) e o método do momento exponencial de
+o problema de fim de semana deste capítulo é Markov aplicado a
+$\eu^{tX}$ --- uma desigualdade, aumentada por uma boa mudança
+de variável, abrangendo três capítulos.
+\end{remark}
+
+\section{Exercícios}
+
+\begin{exercise}[$\star $]\label{exo:b2:randomvar:1}
+Calcular $\E(X)$ e $ V(X)$ para $ X \sim \mathcal{B}(n, p)$ (através
+indicadores), $ X \sim \mathcal{P}(\lambda)$ (mostrar $ V(X) =
+\lambda $), e $ X \sim \mathcal{G}(p)$ (mostrar $ V(X) =
+\frac{1-p}{p^2}$; usar $\E(X(X-1))$ e a segunda derivada de
+a série geométrica).
+\end{exercise}
+
+\begin{exercise}[$\star $]\label{exo:b2:randomvar:2}
+Deixar $ X \sim \mathcal{P}(\lambda)$ e $ Y \sim \mathcal{P}(\mu)$ ser
+\omterm{def:b2:proba:independence}{independente}. Mostre isso $ X + Y \sim \mathcal{P}(\lambda + \mu)$
+(convolução dos pesos; teorema binomial), e que o
+condicional \omterm{def:b2:randomvar:law}{lei} de $ X $ dado $ X + Y = n $ é binomial
+$\mathcal{B}\bigl(n, \frac{\lambda}{\lambda + \mu}\bigr)$.
+\end{exercise}
+
+\begin{exercise}[$\star $]\label{exo:b2:randomvar:3}
+(Colecionador de cupons, \omterm{def:b2:randomvar:expectation}{expectativa}) Uma marca de cereal esconde um dos $ n $
+brinquedos distintos, \omterm{def:b2:funcseq:def}{uniformemente}, em cada caixa. Deixar $ T_n $ seja o número de
+caixas necessárias para coletar todos $ n $ brinquedos. Escrita $ T_n $ como uma soma de
+\omterm{def:b2:proba:independence}{independente} variáveis geométricas (hora de ver uma \emph{novo} brinquedo quando
+$ k $ ainda estão faltando), mostrar
+\[
+\E(T_n) = n\sum_{k=1}^{n}\frac{1}{k} \sim n\ln n
+\]
+(equivalente pela comparação integral da série de
+\cref{ch:b2:comparison}).
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b2:randomvar:4}
+Deixar $ X \geq 0$ ter valor inteiro. Prove o \emph{fórmula da cauda}
+\[
+\E(X) = \sum_{n=1}^{\infty} \P(X \geq n)
+\]
+(quando qualquer um dos lados é finito), escrevendo $ X =
+\sum_{n\geq1}\mathbf{1}_{X \geq n}$ e trocando somatórios
+(Fubini para famílias não negativas). Recuperar $\E(X) = \frac1p $ para
+o geométrico \omterm{def:b2:randomvar:law}{lei}.
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b2:randomvar:5}
+(A amostragem sem reposição é mais concentrada) Uma urna tem $ N $
+bolas, $ M $ deles brancos. Empate $ n \leq N $ sem substituição e
+deixe $ X $ conte os brancos (\emph{hipergeométrico} \omterm{def:b2:randomvar:law}{lei}). Usando
+indicadores $ X = \sum_{i=1}^n Y_i $ com $ Y_i $ o $ i $-º sorteio:
+mostrar cada $ Y_i $ é Bernoulli do parâmetro $ p = M/N $ (simetria!),
+concluir $\E(X) = np $ exatamente como na substituição e mostre
+$\operatorname{Cov}(Y_i, Y_j) = -\frac{p(1-p)}{N-1} < 0$ para $ i
+\neq j $, por isso $ V(X) = np(1-p)\frac{N - n}{N - 1} \leq np(1-p)$.
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b2:randomvar:6}
+Deixar $ X $ tenha um segundo momento. Mostre isso $ c \mapsto \E\bigl((X -
+c)^2\bigr)$ é mínimo exatamente em $ c = \E(X)$, com mínimo
+$ V(X)$. Então mostre isso $\P(X = \E(X)) = 1$ se e somente se $ V(X) =
+0$. \emph{(Para o segundo ponto: se $ V(X) = 0$, use Chebyshev
+com $\varepsilon = 1/n $ e monótono continuidade,
+\cref{thm:b2:proba:continuity}.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star $]\label{exo:b2:randomvar:7}
+(A concentração vence Markov) Vamos $ S_n \sim \mathcal{B}(n,
+\frac12)$ (número de cabeças em $ n $ lançamentos justos). Compare o
+limites dados por Markov ($\P(S_n \geq \frac{3n}{4})$), de Chebyshev,
+e pelo método exponencial (Chernoff):
+\[
+\P\Bigl(S_n \geq \frac{3n}4\Bigr)
+\leq \E\bigl(e^{tS_n}\bigr)e^{-3nt/4}
+= \Bigl(\frac{1 + e^t}{2}\Bigr)^n e^{-3nt/4}
+\quad (t > 0),
+\]
+e otimizar $ t $ para obter um limite exponencialmente pequeno. \emph{(No
+$ t = \ln 3$: vinculado $\bigl(2\cdot 3^{-3/4}\bigr)^n \approx
+(0.877)^n $.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star $]\label{exo:b2:randomvar:8}
+(Weierstrass novamente, probabilisticamente) Vamos $ f \colon [0,1] \to \R $
+ser \omterm{def:b2:metric:continuity}{contínuo} e $ S_n \sim \mathcal{B}(n, x)$. Mostre que o
+Polinômio de Bernstein $ B_nf(x) = \sum_{k=0}^n f\bigl(\frac
+kn\bigr)\binom nk x^k(1-x)^{n-k}$ é igual
+$\E\bigl[f\bigl(\frac{S_n}{n}\bigr)\bigr]$, e derivar novamente o
+estimativa $\abs{B_nf(x) - f(x)} \leq \omega_f(\delta) +
+\frac{2\norm f_\infty}{4n\delta^2}$ de \cref{ch:b2:funcseq} em
+esta linguagem probabilística (dividida em $\bigl|\frac{S_n}{n} -
+x\bigr| \geq \delta $ e use Chebyshev).
+\end{exercise}
+
+\begin{exercise}[$\star\star\star $]\label{exo:b2:randomvar:9}
+(Forte \omterm{def:b2:randomvar:law}{lei} no quarto momento) Deixe $(X_k)$ ser \omterm{def:b2:proba:independence}{independente},
+distribuído de forma idêntica, centrado ($\E X_1 = 0$), com
+$\E(X_1^4) < \infty $. Expandindo $\E(S_n^4)$ e contando o
+termos sobreviventes (apenas $\E(X_i^4)$ e $\E(X_i^2X_j^2)$ termos, $ i
+\neq j $), mostrar $\E(S_n^4) \leq C n^2$ para uma constante $ C $. Deduzir
+$\sum_n \P\bigl(\abs{S_n/n} \geq \varepsilon\bigr) < \infty $
+para cada $\varepsilon > 0$ (Markov na ordem 4) e conclua com
+Borel-Cantelli (\cref{thm:b2:proba:borelcantelli}) que
+$ S_n/n \to 0$ quase certamente ao longo de uma formulação adequada: o
+evento $\bigcap_{j}\bigcup_N\bigcap_{n \geq N}\{\abs{S_n/n} <
+\frac1j\}$ tem probabilidade $1$.
+\end{exercise}
+
+\begin{exercise}[$\star $]\label{exo:b2:randomvar:10}
+Dois dados justos são lançados; deixar $ M $ seja o maior dos dois
+resultados. Usando a fórmula da cauda de \cref{exo:b2:randomvar:4}
+(versão finita), mostre
+\[
+\E(M) = \sum_{k=1}^{6}\P(M \geq k)
+= 6 - \sum_{j=0}^5\Bigl(\frac j6\Bigr)^2 = \frac{161}{36}
+\approx 4.47 .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b2:randomvar:11}
+Deixar $ F_n $ ser o número de pontos fixos de um conjunto \omterm{def:b2:funcseq:def}{uniformemente} aleatório
+permutação de $\{1, \dots, n\}$ ($ n \geq 2$). Escrita $ F_n =
+\sum_i\mathbf 1_{\sigma(i) = i}$, calcular $\E(F_n) = 1$,
+$\operatorname{Cov}(\mathbf 1_{\sigma(i)=i}, \mathbf
+1_{\sigma(j)=j}) = \frac1{n^2(n-1)}$ para $ i \neq j $ e
+concluir $ V(F_n) = 1$: em média uma letra é fixa, com
+\omterm{def:b2:randomvar:variance}{variação} exatamente $1$, qualquer que seja $ n $.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star $]\label{exo:b2:randomvar:12}
+(Colecionador de cupons, concentração) No cenário de
+\cref{exo:b2:randomvar:3}, mostrar
+\[
+V(T_n) = \sum_{k=1}^n\frac{1 - k/n}{(k/n)^2}
+\leq n^2\sum_{k=1}^n\frac{1}{k^2} \leq \frac{\pi^2}{6}n^2,
+\]
+usando independência dos estágios geométricos e $ V(\mathcal
+G(p)) = \frac{1-p}{p^2}$ (\cref{exo:b2:randomvar:1}; o valor
+$\pi^2/6$ é \cref{ex:b2:fourier:basel}). Deduza com
+Chebyshev que $\dfrac{T_n}{n\ln n} \to 1$ \emph{em
+probabilidade}: o tempo total do coletor é $ n\ln n $ até
+flutuações de ordem $ n $.
+\end{exercise}
+
+\section{Problema: a caixa de ferramentas de concentração, de Markov a
+Hoefding}
+
+\begin{problem}[{Problema de fim de semana --- concentração exponencial
+manualmente e quantas pessoas uma enquete deve perguntar}]
+\label{pb:b2:randomvar:1}
+A desigualdade de Markov custa um momento e compra um $1/a $ decadência;
+Chebyshev custa dois momentos e compra $1/\varepsilon^2$ ---
+e \cref{ex:b2:randomvar:chebsharp} mostra que é tudo isso
+momentos podem comprar. Este problema sobe o resto da escada:
+o método exponencial (Chernoff) com seu \emph{exato} taxa
+para lançamentos de moeda, a desigualdade de Hoeffding para todos limitados
+variáveis e a recompensa --- tamanhos de amostra explícitos e honestos
+para pesquisas, convocações eleitorais e testes de moedas.
+\index{desigualdades de concentração}\index{Hoefding's
+desigualdade}\index{Chernoff vinculado} Por todo, $ S_n \sim
+\mathcal B(n, p)$ é uma soma de $ n $ \omterm{def:b2:proba:independence}{independente} Bernoulli
+variáveis e $\widehat p_n = S_n/n $ a frequência empírica.
+
+\medskip
+\noindent\textbf{Part I --- Calibration on the fair coin.}
+Aqui $ p = \frac12$ e $ a \in \intoo{\frac12}{1}$.
+\begin{enumerate}
+  \item Markov em nível $ an $: mostrar $\P(S_n \geq an) \leq
+        \frac1{2a}$, um limite que nem tende a $0$.
+        Onde Markov perde tanto?
+  \item Chebyshev: usando a simetria do binômio justo
+        sobre $ n/2$, mostrar
+        \[
+        \P(S_n \geq an) = \tfrac12\,
+        \P\bigl(\abs{S_n - \tfrac n2} \geq n(a -
+        \tfrac12)\bigr)
+        \leq \frac{1}{8n(a - 1/2)^2},
+        \]
+        ou seja\ $\frac2n $ no $ a = \frac34$: decaimento polinomial em
+        último.
+  \item (Chernoff, nível geral) Computação
+        $\E(\eu^{tS_n}) = \bigl(\frac{1 + \eu^t}2\bigr)^n $ e
+        otimizar $\P(S_n \geq an) \leq
+        \E(\eu^{tS_n})\eu^{-tan}$ sobre $ t > 0$: mostrar o
+        \omterm{def:b2:structures:ideal}{ideal} $ t $ é $\ln\frac{a}{1-a}$ e
+        \[
+        \P(S_n \geq an) \leq \eu^{-n\,I(a)},
+        \qquad
+        I(a) = \ln 2 + a\ln a + (1-a)\ln(1-a) > 0 .
+        \]
+        Verifique isso $ a = \frac34$ recupera o limite
+        $\bigl(2\cdot3^{-3/4}\bigr)^n $ de
+        \cref{exo:b2:randomvar:7}.
+  \item (O expoente é exato) Deixe $ k = an $ seja um número inteiro.
+        Do fato de que $\binom nk a^k(1-a)^{n-k}$ é o
+        maior dos $ n + 1$ termos de uma probabilidade
+        \omterm{def:b2:randomvar:law}{distribuição}, provar $\binom nk \geq
+        \frac{\eu^{nH(a)}}{n+1}$ com $ H(a) = -a\ln a -
+        (1-a)\ln(1-a)$ e deduza o limite inferior correspondente
+        \[
+        \P(S_n \geq an) \geq \binom{n}{an}2^{-n}
+        \geq \frac{\eu^{-n\,I(a)}}{n + 1} .
+        \]
+  \item Tabule os três limites em $ n = 100$, $ a =
+        \frac34$: Markov $\frac23$, Chebyshev $0.02$,
+        Chernoff $\approx 2.1\cdot10^{-6}$ (o valor verdadeiro é
+        $\approx 2.8\cdot10^{-7}$). Moral, em uma frase?
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part II --- Hoeffding's inequality.}
+\begin{enumerate}[resume]
+  \item (caso Rademacher) Para $\varepsilon = \pm1$ com
+        probabilidade $\frac12$ cada um, provar
+        \[
+        \E(\eu^{t\varepsilon}) = \cosh t \leq \eu^{t^2/2}
+        \qquad (t \in \R)
+        \]
+        comparando as duas séries termo a termo ($(2k)! \geq
+        2^kk!$).
+  \item Deduza, por \omterm{def:b2:proba:independence}{independente} Variáveis Rademacher
+        $\varepsilon_1, \dots, \varepsilon_n $ e cada $ s >
+        0$:
+        \[
+        \P\Bigl(\sum_{i=1}^n\varepsilon_i \geq s\Bigr)
+        \leq \eu^{-s^2/(2n)} .
+        \]
+  \item Traduzir para moedas justas ($ X_i =
+        \frac{1+\varepsilon_i}2$): $\P\bigl(\widehat p_n -
+        \tfrac12 \geq \delta\bigr) \leq \eu^{-2n\delta^2}$,
+        e a versão bilateral com um fator $2$.
+  \item (Lema de Hoeffding) Deixe $ X \in \intcc01$ com $\E X =
+        p $, e $\psi(t) = \ln\E(\eu^{tX})$. Justifique isso
+        $\psi $ é duas vezes \omterm{def:b2:diffcalc:differential}{diferenciável} com
+        \[
+        \psi''(t) = \E_t(X^2) - \E_t(X)^2, \qquad
+        \E_t(Y) := \frac{\E(Y\eu^{tX})}{\E(\eu^{tX})},
+        \]
+        um \emph{\omterm{def:b2:randomvar:variance}{variação}} de uma variável reponderada ainda
+        levando valores em $\intcc01$; vinculado por $\frac14$
+        (\cref{exo:b2:randomvar:6}argumento da minimalidade) e
+        concluir por Taylor:
+        \[
+        \E\bigl(\eu^{t(X - p)}\bigr) \leq \eu^{t^2/8} .
+        \]
+  \item (Desigualdade de Hoeffding) Para \omterm{def:b2:proba:independence}{independente} $ X_i \in
+        \intcc01$ com média comum $ p $, deduzir
+        \[
+        \P\bigl(\abs{\widehat p_n - p} \geq \delta\bigr)
+        \leq 2\,\eu^{-2n\delta^2}
+        \qquad (\delta > 0).
+        \]
+  \item Compare a taxa Chebyshev
+        $\frac{p(1-p)}{n\delta^2}$ com Hoeffding
+        $2\eu^{-2n\delta^2}$: qual hipótese cada
+        exigir, e do qual $ n $ (aproximadamente) o
+        vitória vinculada exponencial em $\delta = 0.03$, $ p =
+        \frac12$?
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part III --- How many people must a poll
+ask?} Uma enquete pergunta $ n $ \omterm{def:b2:proba:independence}{independente}, eleitores escolhidos \omterm{def:b2:funcseq:def}{uniformemente};
+cada um responde honestamente; $ p $ é a pontuação verdadeira, $\widehat p_n $
+o número da enquete.
+\begin{enumerate}[resume]
+  \item Mostre que a enquete está correta para $\pm\delta $ com
+        confiança $1 - \alpha $ (ou seja,\
+        $\P(\abs{\widehat p_n - p} \geq \delta) \leq \alpha $)
+        assim que
+        \[
+        n \;\geq\; \frac{\ln(2/\alpha)}{2\,\delta^2} .
+        \]
+  \item Calcule o necessário $ n $ para o padrão ``três
+        pontos, especificação de noventa e cinco por cento'' ($\delta
+        = 0.03$, $\alpha = 0.05$): $ n \geq 2050$; e por um
+        ponto: $ n \geq 18\,445$. Observe --- e explique ---
+        o fato surpreendente de que a resposta não envolve
+        o tamanho da população.
+  \item Refaça a questão 13 com Chebyshev ($ V(X_1) = p(1-p)
+        \leq \frac14$): $ n \geq \frac1{4\alpha\delta^2} =
+        5556$ em três pontos. Observe que a amostragem
+        \emph{sem} substituição só ajuda
+        (\cref{exo:b2:randomvar:5}: o \omterm{def:b2:randomvar:variance}{variação} encolhe em
+        $\frac{N-n}{N-1}$).
+  \item (Convocando uma eleição) A pontuação verdadeira de um candidato é $ p
+        = 0.52$. Quantos eleitores devem ser ouvidos para que
+        $\P(\widehat p_n \leq \tfrac12) \leq 0.01$? Mostrar $ n
+        \geq \frac{\ln 100}{2\cdot(0.02)^2} \approx 5757$ ---
+        chamar uma disputa acirrada custa muito mais do que estimar um
+        pontuação.
+  \item O que a matemática faz \emph{não} capa: liste os
+        suposições de modelagem usadas (\omterm{def:b2:proba:independence}{independente} uniforme
+        amostragem, respostas honestas, fixas $ p $) e explique em
+        um pequeno parágrafo por que erros reais de votação são
+        dominado por \emph{viés} (amostragem não uniforme,
+        não resposta), que nenhum aumento de $ n $ reduz.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part IV --- Sharper and cheaper.}
+\begin{enumerate}[resume]
+  \item (Mediana das médias: decaimento exponencial de dois momentos)
+        Dividir um orçamento de $ km $ amostras em $ k $ \omterm{def:b2:proba:independence}{independente}
+        grupos de $ m $; deixar $\widehat p^{(1)}, \dots, \widehat
+        p^{(k)}$ ser o grupo significa e $ M $ sua mediana.
+        Escolher $ m $ para que cada grupo satisfaça
+        $\P(\abs{\widehat p^{(i)} - p} \geq \delta) \leq
+        \frac18$ (Chebyshev: $ m \geq \frac2{\delta^2}$
+        é suficiente). Mostre que se $\abs{M - p} \geq \delta $
+        então pelo menos $ k/2$ grupos erram e deduzem
+        \[
+        \P(\abs{M - p} \geq \delta)
+        \leq \binom{k}{\lceil k/2\rceil}\Bigl(\frac18
+        \Bigr)^{k/2}
+        \leq 2^k\cdot 8^{-k/2} = 2^{-k/2} :
+        \]
+        concentração exponencial usando nada além
+        variações.
+  \item (Paley - Zygmund) Para $ X \geq 0$ com um segundo momento,
+        provar $\P(X > 0) \geq \dfrac{\E(X)^2}{\E(X^2)}$
+        \emph{(Cauchy--Schwarz em $ X\mathbf 1_{X>0}$)}: o
+        ferramenta de direção reversa --- momentos também podem forçar
+        \omterm{def:b2:proba:space}{eventos} acontecer.
+  \item (Pinsker Lite) Show $ I(a) \geq 2\bigl(a -
+        \tfrac12\bigr)^2$ sobre $\intoo{\frac12}1$ \emph{(o
+        diferença desaparece para segunda ordem em $\frac12$ e
+        sua segunda derivada é $\frac1{a(1-a)} - 4 \geq
+        0$)}: O expoente exato de Chernoff sempre bate
+        O quadrático de Hoeffding.
+  \item Expandir $ I\bigl(\tfrac12 + \delta\bigr) = 2\delta^2 +
+        O(\delta^4)$ e combine com a pergunta 4: para pequenos
+        desvios do expoente de Hoeffding $2n\delta^2$ é
+        assintoticamente \emph{exato} --- nenhum método pode vencê-lo
+        por mais do que fatores polinomiais.
+  \item Elabore a tabela da caixa de ferramentas: para Markov, Chebyshev, o
+        limite do quarto momento de \cref{exo:b2:randomvar:9},
+        Hoeffding e Chernoff com expoente $ I $, estado em
+        uma linha cada: hipótese necessária, decaimento obtido,
+        e a questão neste problema onde estava
+        mais nítido.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part V --- Dividends.}
+\begin{enumerate}[resume]
+  \item (Testando uma moeda) Uma moeda é justa ou tendenciosa com
+        $ p = 0.55$. Você vira $ n $ vezes e declarar
+        ``tendencioso'' quando $\widehat p_n > 0.525$. Mostre isso
+        ambas as probabilidades de erro são no máximo
+        $\eu^{-2n(0.025)^2}$, e isso $ n \geq 3685$ vira
+        garanta ambos abaixo $1\%$.
+  \item (Cru \omterm{def:b2:proba:space}{eventos} precisa de um limite com reconhecimento de \omterm{def:b2:randomvar:variance}{variação}) Deixe $ p =
+        0.01$ e pegue a especificação relativa $\delta =
+        p/2 = 0.005$, $\alpha = 0.05$. Compare a amostra
+        tamanhos exigidos pela Hoeffding ($ n \approx 74\,000$) e
+        por Chebyshev com o verdadeiro \omterm{def:b2:randomvar:variance}{variação} $ p(1-p)$ ($ n
+        \approx 7920$): o limite exponencial cego à variância
+        perde para o humilde segundo momento. Declarar a moral,
+        e onde a ferramenta que falta (uma ferramenta com reconhecimento de \omterm{def:b2:randomvar:variance}{variação}
+        limite exponencial; a aproximação de Poisson de
+        \cref{ch:b2:genfun}) virá.
+  \item (Forte \omterm{def:b2:randomvar:law}{lei} para moedas) De $\sum_n
+        2\eu^{-2n\delta^2} < \infty $ e Borel-Cantelli
+        (\cref{thm:b2:proba:borelcantelli}), prove que
+        $\widehat p_n \to p $ quase certamente para \omterm{def:b2:proba:independence}{independente}
+        lançamentos de moeda: formule o quase certo evento como
+        $\bigcap_j\bigcup_N\bigcap_{n\geq N}
+        \{\abs{\widehat p_n - p} < \tfrac1j\}$ como em
+        \cref{exo:b2:randomvar:9}e conclua. (Limite
+        substitui o quarto momento usado lá.)
+  \item Síntese. Em cinco frases: o que cada degrau do
+        escada (momentos um, dois, quatro; exponencial limitado;
+        expoente exato) custos e compras; por que votação $2050$
+        pessoas são suficientes para um país de qualquer tamanho; e qual
+        desses limites, o volume do Ano 3 será aprimorado
+        as constantes exatas do teorema do limite central.
+\end{enumerate}
+\end{problem}

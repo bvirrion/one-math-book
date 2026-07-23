@@ -1,0 +1,479 @@
+\chapter{Integração}\label{ch:g12:integ}
+
+A integração responde a duas perguntas ao mesmo tempo: qual é a área sob uma curva,
+e como alguém pode recuperar um \omterm{def:g11:func:function}{função} de sua taxa de mudança? O fundamental
+teorema do cálculo afirma que estas são a mesma questão --- o mais profundo
+e descoberta mais útil da matemática do século XVII.
+
+\section{A integral de uma função contínua}
+
+\begin{definition}[Integral de uma função positiva]\label{def:g12:integ:area}
+Deixar $f $ ser contínuo e positivo em $\intcc{a}{b}$. O
+\emph{membro}\index{membro}
+\[
+\int_a^b f(x)\,\dd x
+\]
+é a área, em unidades de área, da região delimitada pela curva de $ f $,
+o $ x $-eixo e as linhas verticais $ x = a $ e $ x = b $.
+\end{definition}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[
+  width=8.4cm, height=5cm,
+  axis lines=middle, xmin=-0.4, xmax=3.4, ymin=-0.3, ymax=2.3,
+  xtick={0.5,2.7}, xticklabels={$ a $,$ b $}, ytick=\empty,
+  samples=100, domain=-0.2:3.3]
+  \addplot[name path=curve, omDef, thick, domain=0.2:3.2]
+    {1 + 0.5*sin(deg(2*x)) + 0.2*x};
+  \path[name path=axis] (0.5,0) -- (2.7,0);
+  \addplot[omDef!20] fill between[of=curve and axis, soft clip={domain=0.5:2.7}];
+  \node at (axis cs:1.6,0.55) {$\displaystyle\int_a^b f $};
+\end{axis}
+\end{tikzpicture}
+\end{omfigure}
+
+Por um \omterm{def:g11:func:function}{função} de sinal arbitrário, áreas abaixo do $ x $-eixos são contados
+negativamente; e um conjunto
+$\int_b^a f(x)\,\dd x = -\int_a^b f(x)\,\dd x $.
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=9.6cm, height=4.8cm,
+  xmin=-0.5, xmax=7, ymin=-1.4, ymax=1.4,
+  xtick={3.1416,6.2832}, xticklabels={$\pi $,$2\pi $}, ytick={-1,1}]
+  \addplot[name path=sine, omDef, thick, domain=0:6.2832, samples=120]
+    {sin(deg(x))};
+  \path[name path=xaxis] (0,0) -- (6.2832,0);
+  \addplot[omDef!20] fill between[of=sine and xaxis,
+    soft clip={domain=0:3.1416}];
+  \addplot[omThm!20] fill between[of=sine and xaxis,
+    soft clip={domain=3.1416:6.2832}];
+  \node at (axis cs:1.57,0.4) {$+$};
+  \node at (axis cs:4.71,-0.4) {$-$};
+\end{axis}
+\end{tikzpicture}
+
+{\small Áreas sinalizadas: $\int_0^{2\pi} \sin x\,\dd x = 0$, a região
+abaixo do eixo (vermelho) cancelando a região acima (azul).}
+\end{omfigure}
+
+\begin{proposition}[Propriedades da integral]\label{prop:g12:integ:properties}
+Deixar $ f, g $ ser contínuo em um \omterm{def:g10:numbers:interval}{intervalo} contendo $ a, b, c $, e
+$\lambda \in \R $.
+\begin{enumerate}
+  \item \emph{Linearidade:}
+        $\displaystyle\int_a^b (f + \lambda g) = \int_a^b f + \lambda \int_a^b g $.
+  \item \emph{Relação de Chasles:}
+        $\displaystyle\int_a^c f = \int_a^b f + \int_b^c f $.
+  \item \emph{Positividade:} se $ a \leq b $ e $ f \geq 0$ sobre $\intcc{a}{b}$,
+        então $\displaystyle\int_a^b f \geq 0$; se $ f \leq g $, então
+        $\displaystyle\int_a^b f \leq \int_a^b g $.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+Chasles e positividade são imediatos na interpretação da área (áreas adicionam
+aumenta quando as regiões são justapostas; uma região de altura positiva tem positivo
+área). A comparação segue aplicando positividade a $ g - f $. Linearidade é
+intuitivamente claro para a soma de positivos funções (empilhar as áreas) e é
+comprovado rigorosamente na universidade; \emph{é admitido aqui}.
+\end{proof}
+
+\section{O teorema fundamental do cálculo}
+
+\begin{definition}[Primitivo]\label{def:g12:integ:primitive}
+UM \emph{primitivo}\index{primitivo} (ou antiderivada) de $ f $ em um \omterm{def:g10:numbers:interval}{intervalo}
+$ I $ é um \omterm{def:g12:deriv:derivative}{diferenciável} \omterm{def:g11:func:function}{função} $ F $ sobre $ I $ tal que $ F' = f $.
+\end{definition}
+
+\begin{proposition}\label{prop:g12:integ:primunique}
+Se $ F $ é um \omterm{def:g12:integ:primitive}{primitivo} de $ f $ em um \omterm{def:g10:numbers:interval}{intervalo} $ I $, o \omterm{def:g12:integ:primitive}{primitivos} de $ f $ sobre
+$ I $ são exatamente os funções $ F + c $, $ c \in \R $. Dado $ x_0 \in I $ e
+$ y_0 \in \R $, existe um único \omterm{def:g12:integ:primitive}{primitivo} com $ F(x_0) = y_0$.
+\end{proposition}
+
+\begin{proof}
+Se $ G' = F' = f $, então $(G - F)' = 0$ no \omterm{def:g10:numbers:interval}{intervalo} $ I $, então $ G - F $ é
+constante.\footnote{That a \omterm{def:g11:func:function}{função} with zero derivado on an \omterm{def:g10:numbers:interval}{intervalo} is
+constant follows from \cref{thm:g12:deriv:variations}: it is both \omterm{def:g12:seq:monotonic}{aumentando}
+and diminuindo.} Por outro lado, cada $ F + c $ é um \omterm{def:g12:integ:primitive}{primitivo}. A condição
+$ F(x_0) = y_0$ fixa a constante.
+\end{proof}
+
+\begin{theorem}[Teorema fundamental do cálculo]\label{thm:g12:integ:ftc}
+\index{teorema fundamental do cálculo}
+Deixar $ f $ ser contínuo em um \omterm{def:g10:numbers:interval}{intervalo} $ I $ e $ a \in I $. O \omterm{def:g11:func:function}{função}
+\[
+F \colon x \longmapsto \int_a^x f(t)\,\dd t
+\]
+é o \omterm{def:g12:integ:primitive}{primitivo} de $ f $ sobre $ I $ desaparecendo em $ a $. Consequentemente, para qualquer
+\omterm{def:g12:integ:primitive}{primitivo} $ G $ de $ f $ e $ a, b \in I $:
+\[
+\int_a^b f(t)\,\dd t = \bigl[G(t)\bigr]_a^b = G(b) - G(a).
+\]
+\end{theorem}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=9.2cm, height=5.6cm,
+  xmin=-0.4, xmax=4.2, ymin=-0.4, ymax=2.9,
+  xtick={0.5,2.2,2.7}, xticklabels={$ a $,$ x $,\ $ x+h $}, ytick=\empty]
+  \addplot[name path=curve, omDef, thick, domain=0:3.9, samples=80]
+    {1 + 0.4*x + 0.2*sin(deg(2*x))};
+  \path[name path=xaxis] (0,0) -- (3.9,0);
+  \addplot[omDef!20] fill between[of=curve and xaxis,
+    soft clip={domain=0.5:2.2}];
+  \addplot[omProp!40] fill between[of=curve and xaxis,
+    soft clip={domain=2.2:2.7}];
+  \draw[black, dashed, thin] (axis cs:2.2,1.69) -- (axis cs:2.7,1.69);
+  \draw[black, dashed, thin] (axis cs:2.2,1.925) -- (axis cs:2.7,1.925)
+    node[above right, font=\small] {$ f(x+h)$};
+  \node at (axis cs:1.35,0.6) {$ F(x)$};
+\end{axis}
+\end{tikzpicture}
+
+{\small A ideia da prova: o incremento $ F(x+h) - F(x)$ é a área
+da \omterm{def:g10:stats:quartiles}{faixa} estreita (laranja), espremida entre os retângulos de alturas
+$ f(x)$ e $ f(x+h)$ sobre uma base de comprimento $ h $.}
+\end{omfigure}
+
+\begin{proof}[Prova quando $ f $ está aumentando]
+Correção $ x \in I $ e $ h > 0$ com $ x + h \in I $. Por Chasles,
+\[
+F(x+h) - F(x) = \int_x^{x+h} f(t)\,\dd t .
+\]
+Desde $ f $ é \omterm{def:g12:seq:monotonic}{aumentando}, $ f(x) \leq f(t) \leq f(x+h)$ para
+$ t \in \intcc{x}{x+h}$, e por comparação de integrais (o integrante de um
+constante $ c $ ao longo de um \omterm{def:g10:numbers:interval}{intervalo} de comprimento $ h $ é $ ch $):
+\[
+h\,f(x) \leq F(x+h) - F(x) \leq h\,f(x+h),
+\]
+então
+\[
+f(x) \leq \frac{F(x+h) - F(x)}{h} \leq f(x+h).
+\]
+Como $ h \to 0^+$, $ f(x+h) \to f(x)$ por continuidade, e o teorema do aperto
+dá que o quociente de diferença tende a $ f(x)$; o caso $ h < 0$ é
+simétrico. Por isso $ F' = f $, e $ F(a) = 0$. O geral (não monotônico)
+contínuo caso é comprovado na universidade.
+
+Finalmente, se $ G $ é qualquer \omterm{def:g12:integ:primitive}{primitivo}, $ G = F + c $
+(\cref{prop:g12:integ:primunique}), então
+$ G(b) - G(a) = F(b) - F(a) = \int_a^b f $.
+\end{proof}
+
+\begin{example}
+$\displaystyle\int_0^1 x^2\,\dd x = \left[\frac{x^3}{3}\right]_0^1 =
+\frac13$: a área sob o \omterm{def:g11:quad:parabola}{parábola} é um terço do quadrado unitário, como
+Arquimedes sabia.
+\end{example}
+
+A mesa de \omterm{def:g12:integ:primitive}{primitivos} é lido na tabela de derivados
+($ u $ denota um \omterm{def:g12:deriv:derivative}{diferenciável} \omterm{def:g11:func:function}{função}, $ c $ uma constante arbitrária):
+\begin{center}
+\renewcommand{\arraystretch}{1.7}
+\begin{tabular}{c|c||c|c}
+$ f(x)$ & \omterm{def:g12:integ:primitive}{primitivo} & $ f $ & \omterm{def:g12:integ:primitive}{primitivo} \\
+\hline
+$ x^n \ (n \neq -1)$ & $\dfrac{x^{n+1}}{n+1} + c $ &
+$ u'u^n \ (n \neq -1)$ & $\dfrac{u^{n+1}}{n+1} + c $\\
+$\dfrac1x \ (x > 0)$ & $\ln x + c $ &
+$\dfrac{u'}{u} \ (u > 0)$ & $\ln u + c $\\
+$\eu^x $ & $\eu^x + c $ &
+$ u'\eu^u $ & $\eu^u + c $\\
+$\cos x $ & $\sin x + c $ &
+$\dfrac{u'}{\sqrt u} \ (u>0)$ & $2\sqrt u + c $\\
+$\sin x $ & $-\cos x + c $ & &
+\end{tabular}
+\end{center}
+
+\begin{method}[Reconhecendo o formulário $ u' \times (\text{something in } u)$]\label{met:g12:integ:uprime}
+Para integrar um produto, procure um fator que seja o derivado de um interior
+\omterm{def:g11:func:function}{função} $ u $, até uma constante multiplicativa. Por exemplo em
+$\int_0^1 x\,\eu^{x^2}\dd x $, o fator $ x $ é $\frac12 (x^2)'$:
+\[
+\int_0^1 x\,\eu^{x^2}\dd x = \frac12\left[\eu^{x^2}\right]_0^1
+= \frac{\eu - 1}{2}.
+\]
+\end{method}
+
+\begin{theorem}[Integração por partes]\label{thm:g12:integ:ibp}
+\index{integração por partes}
+Deixar $ u, v $ ser \omterm{def:g12:deriv:derivative}{diferenciável} sobre $\intcc{a}{b}$ com contínuo derivados.
+Então
+\[
+\int_a^b u'(t)\,v(t)\,\dd t
+= \bigl[u(t)\,v(t)\bigr]_a^b - \int_a^b u(t)\,v'(t)\,\dd t .
+\]
+\end{theorem}
+
+\begin{proof}
+A regra do produto dá $(uv)' = u'v + uv'$; integrando ambos os lados
+$\intcc{a}{b}$ e usando o teorema fundamental para o lado esquerdo
+rendimentos $\bigl[uv\bigr]_a^b = \int_a^b u'v + \int_a^b uv'$.
+\end{proof}
+
+\begin{example}\label{ex:g12:integ:ibp}
+$\displaystyle\int_0^1 t\,\eu^{t}\,\dd t $: pegar $ u' = \eu^t $, $ v = t $, então
+$ u = \eu^t $, $ v' = 1$:
+\[
+\int_0^1 t\,\eu^t\,\dd t = \bigl[t\,\eu^t\bigr]_0^1 - \int_0^1 \eu^t\,\dd t
+= \eu - (\eu - 1) = 1 .
+\]
+\end{example}
+
+\section{Aplicativos}
+
+\begin{definition}[Valor médio]\label{def:g12:integ:mean}
+O \emph{valor médio}\index{valor médio} de um contínuo \omterm{def:g11:func:function}{função} $ f $ sobre
+$\intcc{a}{b}$ ($ a<b $) é
+\[
+\mu = \frac{1}{b-a}\int_a^b f(t)\,\dd t .
+\]
+\end{definition}
+
+\begin{proposition}\label{prop:g12:integ:meanbounds}
+Se $ m \leq f \leq M $ sobre $\intcc{a}{b}$, então $ m \leq \mu \leq M $.
+\end{proposition}
+
+\begin{proof}
+Integrar as desigualdades $ m \leq f(t) \leq M $ sobre $\intcc{a}{b}$ e
+dividir por $ b - a > 0$.
+\end{proof}
+
+\begin{method}[Área entre duas curvas]\label{met:g12:integ:areabetween}
+Se $ f \geq g $ sobre $\intcc{a}{b}$, a área entre as duas curvas é
+$\int_a^b \bigl(f(x) - g(x)\bigr)\dd x $. Se as curvas se cruzarem, divida o
+\omterm{def:g10:numbers:interval}{intervalo} nos pontos de passagem e integrar $\abs{f - g}$ pedaço por pedaço.
+\end{method}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=8.4cm, height=5.8cm,
+  xmin=-2.1, xmax=2.9, ymin=-1.8, ymax=5.6,
+  xtick={-1,2}, ytick=\empty]
+  \addplot[name path=line, omThm, thick, domain=-1.7:2.5] {x + 1};
+  \addplot[name path=parab, omDef, thick, domain=-1.9:2.45] {x^2 - 1};
+  \addplot[omDef!20] fill between[of=line and parab,
+    soft clip={domain=-1:2}];
+  \fill (axis cs:-1,0) circle (1.5pt);
+  \fill (axis cs:2,3) circle (1.5pt);
+\end{axis}
+\end{tikzpicture}
+
+{\small A área entre a linha $ y = x + 1$ (vermelho) e o \omterm{def:g11:quad:parabola}{parábola}
+$ y = x^2 - 1$ (azul) é $\int_{-1}^{2}
+\bigl((x+1) - (x^2-1)\bigr)\dd x = \frac92$.}
+\end{omfigure}
+
+\section{Exercícios}
+
+\begin{exercise}[$\star $]\label{exo:g12:integ:1}
+Calcular
+\[
+\int_1^2 \left(3x^2 - \frac{1}{x^2}\right)\dd x, \qquad
+\int_0^{\pi/2} \cos t \,\dd t, \qquad
+\int_0^{1} \frac{\dd t}{2t+1} .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star $]\label{exo:g12:integ:2}
+Encontre o \omterm{def:g12:integ:primitive}{primitivo} $ F $ de $ f(x) = x\eu^{x^2}$ sobre $\R $ tal que $ F(0) = 1$.
+\end{exercise}
+
+\begin{exercise}[$\star $]\label{exo:g12:integ:3}
+Calcule o \omterm{def:g12:integ:mean}{valor médio} de $ f(t) = \sin t $ sobre $\intcc{0}{\pi}$ e interpretar
+o resultado em um \omterm{def:g10:functions:graph}{gráfico}.
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:g12:integ:4}
+Usando \omterm{thm:g12:integ:ibp}{integração por partes}, calcular
+\[
+\int_1^{\eu} \ln t\,\dd t
+\qquad\text{and}\qquad
+\int_0^{\pi} t \sin t\,\dd t .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:g12:integ:5}
+Calcule a área da região entre \omterm{def:g11:quad:parabola}{parábola} $ y = x^2$ e a linha
+$ y = x + 2$.
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:g12:integ:6}
+Deixar $ I = \displaystyle\int_0^1 \frac{\dd t}{1 + t}$.
+\begin{enumerate}
+  \item Calcular $ I $.
+  \item Para $ n \in \N $, deixar $ I_n = \displaystyle\int_0^1 \frac{t^n}{1+t}\dd t $.
+        Mostre isso $ I_n + I_{n+1} = \dfrac{1}{n+1}$, e isso
+        $0 \leq I_n \leq \dfrac{1}{n+1}$.
+  \item Deduza isso
+        $1 - \frac12 + \frac13 - \dots + \frac{(-1)^{n-1}}{n}
+        \xrightarrow[n \to +\infty]{} \ln 2$.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:g12:integ:7}
+A velocidade de um trem (em m/s) durante a primeira $100$ segundos após a partida
+é modelado por $ v(t) = 30\bigl(1 - \eu^{-t/50}\bigr)$. Calcule a distância
+viajou durante esses $100$ segundos, e a velocidade média do trem ao longo do
+\omterm{def:g10:numbers:interval}{intervalo}.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star $]\label{exo:g12:integ:8}
+Para $ n \geq 1$, deixar $ S_n = \dfrac1n \displaystyle\sum_{k=1}^{n} \frac{1}{1 + k/n}$.
+\begin{enumerate}
+  \item Interpretar $ S_n $ como uma área de retângulos que se aproxima de uma região
+        sob a curva de $ t \mapsto \frac{1}{1+t}$ sobre $\intcc{0}{1}$.
+  \item Usando a monotonicidade de $ t \mapsto \frac{1}{1+t}$, mostre que
+        \[
+        S_n \leq \int_0^1 \frac{\dd t}{1+t} \leq S_n + \frac1n\left(1 - \frac12\right),
+        \]
+        e deduzir $\lim\limits_{n\to+\infty} S_n = \ln 2$.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star $]\label{exo:g12:integ:9}
+\emph{(Wallis integrais.)} Para $ n \in \N $, deixar
+$ W_n = \displaystyle\int_0^{\pi/2} \sin^n t\,\dd t $.
+\begin{enumerate}
+  \item Calcular $ W_0$ e $ W_1$.
+  \item Escrita $\sin^{n+2}t = \sin t \cdot \sin^{n+1} t $ e integrando por
+        partes, mostre que $ W_{n+2} = \dfrac{n+1}{n+2}\,W_n $.
+  \item Deduzir $ W_2$, $ W_3$, $ W_4$ e mostre isso $(W_n)$ é diminuindo e
+        positivo.
+\end{enumerate}
+\end{exercise}
+
+\section{Problema: Arquimedes contra a máquina}
+
+\begin{problem}[{Problema de fim de semana --- a área sob a parábola,
+computado de três maneiras ao longo de vinte e dois séculos, e o
+identidade secreta do logaritmo como uma área}]
+\label{pb:g12:integ:1}
+Por volta de 240 a.C., Arquimedes calculou a área exata de uma parabólica
+segmento --- sem \omterm{def:g10:coordgeom:system}{coordenadas}, sem limites, sem álgebra.
+Dezanove séculos mais tarde, os rectângulos de Riemann refizeram-no por força bruta.
+apertar; e o teorema fundamental do cálculo
+(\cref{thm:g12:integ:ftc}) agora faz isso em uma linha. Este problema
+joga todas as três partidas e depois usa a mesma máquina para revelar
+o que logaritmo realmente é: uma área com simetria de escala.
+
+\medskip
+\noindent\textbf{Part I --- Fluency.}
+\begin{enumerate}
+  \item Calcular $\displaystyle\int_0^1 (3x^2 - 2x + 1)\,\dd x $,
+        \ $\displaystyle\int_1^{\eu} \frac{\dd x}{x}$, \ e
+        $\displaystyle\int_0^{\pi/2} \cos x\,\dd x $.
+  \item Identifique o $ u'u $-formulários
+        (\cref{met:g12:integ:uprime}):
+        $\displaystyle\int_0^1 x\,\eu^{x^2}\dd x $ e
+        $\displaystyle\int_0^1 \frac{2x}{x^2 + 1}\,\dd x $.
+  \item Por partes (\cref{thm:g12:integ:ibp}):
+        $\displaystyle\int_0^1 x\,\eu^x \dd x $ e
+        $\displaystyle\int_1^{\eu} \ln x\,\dd x $.
+  \item Calcule o \omterm{def:g12:integ:mean}{valor médio}
+        (\cref{def:g12:integ:mean}) de $\sin $ sobre
+        $\intcc{0}{\pi}$ --- e observe que é \emph{não}
+        $\frac12$.
+  \item Calcule a área entre a linha $ y = x $ e o
+        \omterm{def:g11:quad:parabola}{parábola} $ y = x^2$ sobre $\intcc{0}{1}$
+        (\cref{met:g12:integ:areabetween}).
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part II --- The \omterm{def:g11:quad:parabola}{parábola}, three ways.}
+\begin{enumerate}[resume]
+  \item A configuração de Riemann para a área sob $ y = x^2$ sobre
+        $\intcc{0}{1}$: escreva a soma inferior $ L_n $ e o superior
+        soma $ U_n $ sobre $ n $ retângulos iguais (como em
+        \cref{exo:g12:integ:8}).
+  \item Prove por indução (\cref{pb:g12:seq:1}máquina) o
+        fórmula da soma dos quadrados
+        \[
+        1^2 + 2^2 + \dots + n^2 = \frac{n(n+1)(2n+1)}{6} .
+        \]
+  \item Deduzir formulários fechados para $ U_n $ e $ L_n $, calcule seus
+        limite comum, e concluímos: a área é $\frac13$.
+  \item Agora a máquina: computar
+        $\int_0^1 x^2\,\dd x $ pelo teorema fundamental, em
+        uma linha. Compare os esforços.
+  \item Arquimedes afirmou o contrário: \emph{uma parabólica
+        segmento é $\frac43$ do seu triângulo inscrito}. Para
+        o segmento cortado de $ y = x^2$ pela \omterm{def:g10:numbers:interunion}{união} do acorde
+        $(-1, 1)$ para $(1, 1)$: calcule a área do segmento com
+        um integrante, a área do triângulo inscrito (vértice no
+        vértice $(0, 0)$) e verifique a proporção do mestre.
+  \item Método próprio de Arquimedes: preencher o segmento com o grande
+        triângulo $ T $, então dois triângulos totalizando
+        $\frac T4$, então quatro totalizando $\frac{T}{16}$, e assim
+        ligado. Some as séries geométricas e recupere
+        $\frac43 T $ --- a barra de chocolate infinitamente mordida de
+        o volume do ensino médio, comido por um geômetra grego.
+  \item Uma frase cada: exaustão (Arquimedes), aperto
+        (Riemann), antidiferenciação (Newton--Leibniz) ---
+        o que cada um precisa e o que cada um oferece?
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part III --- The logaritmo is an area.}
+Para $ x > 0$, definir
+$ A(x) = \displaystyle\int_1^x \frac{\dd t}{t}$.
+\begin{enumerate}[resume]
+  \item Dar $ A(1)$ e $ A'(x)$
+        (\cref{thm:g12:integ:ftc}) e concluo que $ A $ é
+        exatamente o logaritmo natural de
+        \cref{def:g12:exp:ln}.
+  \item O milagre do dimensionamento: correção $ a > 0$ e estudar
+        $ g(x) = A(ax) - A(x)$. Calcular $ g'$ (regra da cadeia),
+        deduzir isso $ g $ é constante, avalie a constante ---
+        e conclua o funcional equação
+        \[
+        \ln(ab) = \ln a + \ln b ,
+        \]
+        provado por cálculo puro: a área de $1$ para $ ab $
+        se divide em cópias em escala.
+  \item Deduza da questão 14: $\ln(a^n) = n\ln a $ e
+        $\ln\frac1a = -\ln a $.
+  \item \Cref{exo:g12:integ:8} lê
+        $\frac{1}{n+1} + \frac{1}{n+2} + \dots + \frac{1}{2n}$
+        como retângulos abaixo $\frac{1}{1 + t}$: calcule esta soma
+        para $ n = 10$ (três casas decimais) e compare com
+        $\ln 2$. Quais somas com sabor harmônico, termo divergente
+        por termo, aqui convergem para uma área?
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part IV --- Accumulation.}
+\begin{enumerate}[resume]
+  \item Um carro acelera com velocidade $ v(t) = 3t^2$ m/s para
+        $ t \in \intcc{0}{10}$. Calcule a distância percorrida,
+        o significar velocidade e o instante em que o
+        velocidade instantânea é igual a significar velocidade.
+  \item UM $4$ A haste do medidor tem densidade linear
+        $\rho(x) = 2 + x $ kg/m. Calcule sua massa total e seu
+        centro de massa
+        $\dfrac{\int_0^4 x\,\rho(x)\,\dd x}{\int_0^4
+        \rho(x)\,\dd x}$ --- o ponto de equilíbrio do Meio
+        Triângulo de papelão do volume escolar, finalmente calculado
+        com pesos que variam.
+  \item Wallis integrais (\cref{exo:g12:integ:9}): calcular
+        $ W_0$, $ W_1$, e
+        $ W_2 = \int_0^{\pi/2} \sin^2 t\,\dd t $ usando o
+        linearização de \cref{pb:g12:trigo:1}. (Seu infinito
+        escada sobe, nos volumes universitários, para um produto
+        fórmula para $\pi $ e para a normalização do sino
+        curva.)
+  \item Finale --- as três faces da integração: uma \emph{área}
+        por definição, um \emph{acumulação} no mundo
+        (distância, massa), um \emph{anti-derivado} pelo
+        teorema fundamental; e sua história em três nomes.
+        Fechar com a pérola do capítulo: qual botão do dia a dia
+        na calculadora está secretamente a área abaixo
+        $\frac1t$ --- e qual identidade essa área provou?
+\end{enumerate}
+\end{problem}

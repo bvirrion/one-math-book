@@ -13,18 +13,22 @@ $out_dir = 'build';
     'one_math_book_2_high_school_fr.tex',
     'one_math_book_2_high_school_nl.tex',
     'one_math_book_2_high_school_es.tex',
+    'one_math_book_2_high_school_pt.tex',
     'one_math_book_3_university_year_1.tex',
     'one_math_book_3_university_year_1_fr.tex',
     'one_math_book_3_university_year_1_nl.tex',
     'one_math_book_3_university_year_1_es.tex',
+    'one_math_book_3_university_year_1_pt.tex',
     'one_math_book_4_university_year_2.tex',
     'one_math_book_4_university_year_2_fr.tex',
     'one_math_book_4_university_year_2_nl.tex',
     'one_math_book_4_university_year_2_es.tex',
+    'one_math_book_4_university_year_2_pt.tex',
     'one_math_book_5_university_year_3.tex',
     'one_math_book_5_university_year_3_fr.tex',
     'one_math_book_5_university_year_3_nl.tex',
     'one_math_book_5_university_year_3_es.tex',
+    'one_math_book_5_university_year_3_pt.tex',
 );
 # The books' many TikZ/pgfplots figures exceed pdfTeX's default main
 # memory (5M words); raise the runtime limits.

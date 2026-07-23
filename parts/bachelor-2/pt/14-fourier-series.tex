@@ -1,0 +1,909 @@
+\chapter{Série Fourier}\label{ch:b2:fourier}
+
+Todo sinal periódico pode ser reconstruído a partir de senos e cossenos puros?
+O audacioso “sim” de Fourier criou um século de análises. Isto
+capítulo comprova os dois pilares ao alcance do MP*: \emph{Dirichlet
+teorema} (\omterm{def:b2:funcseq:def}{pontualmente} reconstrução por partes $C^1$ funções,
+através do \omterm{lem:b2:fourier:kernel}{Kernel de Dirichlet}) e \emph{Identidade de Parseval} (a energia
+de um sinal é a soma das energias de seus harmônicos), e
+colhe a série numérica clássica --- Basel $\sum 1/n^2 =
+\pi^2/6$ primeiro entre eles.
+
+Durante todo o processo, as funções são $2\pi $-periódico, por partes \omterm{def:b2:metric:continuity}{contínuo},
+valor complexo; $\mathcal{C}$ denota o \omterm{def:b2:metric:continuity}{contínuo} uns.
+
+\section{Coeficientes de Fourier}
+
+\begin{definition}\label{def:b2:fourier:coefficients}
+O \emph{Coeficientes de Fourier}\index{Coeficientes de Fourier} de $ f $
+são
+\[
+c_n(f) = \frac{1}{2\pi}\int_{-\pi}^{\pi} f(t)\,\eu^{-\iu n t}\,\dd
+t \qquad (n \in \Z),
+\]
+e os coeficientes de forma real $ a_n = c_n + c_{-n}$, $ b_n = \iu(c_n
+- c_{-n})$, para que o \emph{Somas parciais de Fourier}\index{Somas parciais de Fourier} são
+\[
+S_N(f)(t) = \sum_{n=-N}^{N} c_n(f)\,\eu^{\iu nt}
+= \frac{a_0}{2} + \sum_{n=1}^{N}\bigl(a_n\cos nt + b_n \sin
+nt\bigr).
+\]
+Sobre $\mathcal{C}$, defina o \omterm{def:b2:hermitian:def}{Produto interno hermitiano} $\langle f,
+g\rangle = \frac{1}{2\pi}\int_{-\pi}^{\pi}\conj f\,g $: o
+exponenciais $ e_n(t) = \eu^{\iu nt}$ são \emph{ortonormal}
+($\langle e_m, e_n\rangle = \delta_{mn}$, computação direta) e
+$ c_n(f) = \langle e_n, f\rangle $: A análise de Fourier é \omterm{def:b2:hermitian:adjoint}{Hermitiano}
+geometria (\cref{ch:b2:hermitian}) em dimensão infinita.
+\end{definition}
+
+\begin{proposition}[Desigualdade de Bessel]\label{prop:b2:fourier:bessel}
+$ S_N(f)$ é a projeção ortogonal de $ f $ para o espaço
+$\mathcal{T}_N $ de polinômios trigonométricos de grau $\leq N $,
+e\index{Desigualdade de Bessel}
+\[
+\sum_{n=-N}^{N} \abs{c_n(f)}^2 \leq \norm f_2^2 =
+\frac{1}{2\pi}\int_{-\pi}^{\pi} \abs f^2 :
+\]
+a série $\sum \abs{c_n}^2$ converge, e $ c_n(f) \to 0$ como
+$\abs n \to \infty $ (Riemann--Lebesgue para coeficientes).
+\end{proposition}
+
+\begin{proof}
+$ f - S_N(f)$ é ortogonal a cada $ e_k $, $\abs k \leq N $ ($\langle
+e_k, f - S_N f\rangle = c_k - c_k = 0$): $ S_Nf $ é o ortogonal
+projeção em $\mathcal{T}_N = \operatorname{Vect}(e_{-N}, \dots,
+e_N)$ (Teorema da projeção do volume do ano 1, literalmente no
+\omterm{def:b2:hermitian:adjoint}{Hermitiano} contexto). Pitágoras: $\norm f_2^2 = \norm{S_Nf}_2^2 +
+\norm{f - S_Nf}_2^2 \geq \norm{S_Nf}_2^2 = \sum_{\abs n \leq N}
+\abs{c_n}^2$; deixar $ N \to \infty $.
+\end{proof}
+
+\begin{example}[Melhor aproximação, medida]\label{ex:b2:fourier:bestapprox}
+Quão bem os polinômios trigonométricos de baixo grau se aproximam
+o dente de serra $ f(t) = t $ (sobre $\intoo{-\pi}{\pi}$) no
+média quadrática? Por \cref{prop:b2:fourier:bessel} o melhor
+grau-$ N $ aproximação \emph{é} $ S_N(f)$, com erro quadrático
+\[
+\norm{f - S_Nf}_2^2 = \norm f_2^2 -
+\sum_{\abs n\leq N}\abs{c_n}^2 .
+\]
+Aqui $\norm f_2^2 = \frac{1}{2\pi}\int_{-\pi}^\pi t^2\dd t =
+\frac{\pi^2}{3}$, e de $ b_n = \frac{2(-1)^{n+1}}{n}$
+(\cref{ex:b2:fourier:basel}): $\abs{c_n}^2 + \abs{c_{-n}}^2 =
+\frac{b_n^2}{2} = \frac{2}{n^2}$. Então
+\[
+\norm{f - S_Nf}_2^2
+= \frac{\pi^2}{3} - \sum_{n=1}^{N}\frac{2}{n^2}
+\qquad\text{: numerically } 1.29,\ 0.79,\ 0.57,\ 0.44
+\]
+para $ N = 1, 2, 3, 4$ --- diminuindo, mas lentamente: a cauda
+$\sum_{n>N}\frac2{n^2} \sim \frac2N $ é governado pela lentidão
+$\frac1n $ decaimento dos coeficientes, em si a assinatura de
+o salto (\cref{exo:b2:fourier:6} leia de trás para frente). Fechando
+insight: Parseval transforma a qualidade da aproximação na cauda de um
+série numérica --- e prevê, antes de qualquer imagem, que
+saltos fazem as séries de Fourier convergirem com relutância.
+\end{example}
+
+\begin{method}[Calculando coeficientes de Fourier de forma eficiente]\label{met:b2:fourier:coefficients}
+Antes de integrar qualquer coisa:
+\begin{enumerate}
+  \item \emph{Paridade:} até $ f $ tem $ b_n = 0$, chance $ f $ tem $ a_n
+        = 0$, e as integrais sobreviventes se reduzem a $\frac2\pi
+        \int_0^\pi $ --- metade do trabalho, o dobro da confiabilidade.
+  \item \emph{Polinômios trigonométricos já estão feitos:}
+        linearizar produtos ($\cos^3$, $\sin^2\cos $, \dots) e
+        leia os coeficientes
+        (\cref{exo:b2:fourier:9}); ortonormalidade faz com que qualquer
+        integração adicional é redundante.
+  \item \emph{Exponenciais complexas para exponenciais:} para
+        fatores $\eu^{at}$ ou oscilações amortecidas, calcule
+        $ c_n $ diretamente --- uma integral de $\eu^{(a - \iu
+        n)t}$ vence duas integrações por partes
+        (\cref{exo:b2:fourier:10}).
+  \item \emph{Diferencie uma expansão conhecida:} se $ f' $ tem
+        coeficientes conhecidos e $ f $ é \omterm{def:b2:metric:continuity}{contínuo}, $ c_n(f) =
+        \frac{c_n(f')}{\iu n}$ ($ n \neq 0$) recupera tudo menos
+        $ c_0$, que é a média --- geralmente a rota mais rápida,
+        e legítimo exatamente sob as hipóteses de
+        \cref{thm:b2:fourier:parseval}~(1).
+\end{enumerate}
+\end{method}
+
+\section{Teorema de Dirichlet}
+
+\begin{lemma}[Kernel de Dirichlet]\label{lem:b2:fourier:kernel}
+$ S_N(f)(x) = \frac{1}{2\pi}\int_{-\pi}^{\pi} f(x + u)\,D_N(u)\,\dd
+u $, onde\index{Kernel de Dirichlet}
+\[
+D_N(u) = \sum_{n=-N}^{N} \eu^{\iu nu}
+= \frac{\sin\bigl((N + \frac12)u\bigr)}{\sin\frac u2}
+\quad (u \notin 2\pi\Z),
+\qquad
+\frac{1}{2\pi}\int_{-\pi}^{\pi} D_N = 1 .
+\]
+\end{lemma}
+
+\begin{proof}
+Insira a definição de $ c_n $ em $ S_N $ e trocar soma e integral
+(legítimo: a soma é finita):
+\[
+S_N(f)(x)
+= \sum_{n=-N}^{N}\Bigl(\frac{1}{2\pi}\int_{-\pi}^{\pi}
+f(t)\,\eu^{-\iu nt}\dd t\Bigr)\eu^{\iu nx}
+= \frac{1}{2\pi}\int_{-\pi}^{\pi} f(t)
+\sum_{n=-N}^{N}\eu^{\iu n(x-t)}\,\dd t ;
+\]
+substituir $ u = t - x $ e deslize o segmento de integração para trás
+para $\intcc{-\pi}{\pi}$ por $2\pi $-periodicidade do integrando;
+o \omterm{def:b2:quadratic:adjoint}{simétrico} intervalo de índice faz $\sum_n\eu^{-\iu nu} = D_N(u)$.
+A forma fechada: soma geométrica com razão $\eu^{\iu u}$,
+\[
+D_N(u) = \eu^{-\iu Nu}\,\frac{\eu^{\iu(2N+1)u} - 1}{\eu^{\iu u} -
+1}
+= \frac{\eu^{\iu(N + \frac12)u} - \eu^{-\iu(N+\frac12)u}}
+{\eu^{\iu u/2} - \eu^{-\iu u/2}} ,
+\]
+que é o quociente seno. Sua média é $1$: apenas $ n = 0$
+contribui.
+\end{proof}
+
+\begin{theorem}[Lema de Riemann-Lebesgue]\label{thm:b2:fourier:riemannlebesgue}
+Para $ g $ por partes \omterm{def:b2:metric:continuity}{contínuo} em um segmento,
+$\int_a^b g(t)\sin(\lambda t + \varphi)\,\dd t \to 0$ como $\lambda
+\to +\infty $.\index{Lema de Riemann-Lebesgue}
+\end{theorem}
+
+\begin{proof}
+Aproximado $ g $ \omterm{def:b2:funcseq:def}{uniformemente} funções passo a passo
+(\cref{thm:b2:funcseq:weierstrass} não é necessário --- o elementar
+aproximação de função degrau por partes \omterm{def:b2:metric:continuity}{contínuo} funções
+é suficiente) e integrar cada passo explicitamente: cada peça
+contribui $ O\bigl(\frac1\lambda\bigr)$, e a aproximação
+erro contribui $\varepsilon(b - a)$. Este argumento foi levado
+na íntegra como o exercício final do volume do Ano 1
+capítulo de integração; para $ C^1$ peças que podem ser integradas por
+partes e vinculado por $\frac C\lambda $.
+\end{proof}
+
+\begin{example}[Com que rapidez os coeficientes morrem?]\label{ex:b2:fourier:decaytable}
+Riemann--Lebesgue diz que os coeficientes tendem a $0$; deles
+\emph{avaliar} é um medidor de suavidade. Três exemplares deste
+capítulo e seus exercícios:
+\[
+\text{square wave: } b_n = \frac{4}{\pi n}\ (n\ \text{odd}),
+\qquad
+\abs t : a_n = \frac{-4}{\pi n^2}\ (n\ \text{odd}),
+\qquad
+\abs{\sin t} : a_{2k} = \frac{-4}{\pi(4k^2-1)} .
+\]
+Um salto para dentro $ f $ (onda quadrada, dente de serra) deixa coeficientes de
+ordem $\frac1n $: não convergência normal, Gibbs ultrapassa o
+salta. Continuidade com um canto --- um salto $ f'$ apenas ---
+melhora a ordem para $\frac{1}{n^2}$: convergência normal,
+reconstrução uniforme. Em geral $ k $ compra de derivativos $ c_n =
+O(n^{-k})$ (\cref{exo:b2:fourier:6}) e, inversamente, um \omterm{def:b2:reduction:eigen}{espectro}
+decaindo mais rápido do que todas as forças de poder $ f $ ser $ C^\infty $
+(diferenciar termo por termo, agora legitimamente). Fechando
+insight: regularidade do sinal e decaimento do \omterm{def:b2:reduction:eigen}{espectro}
+são as mesmas informações --- um engenheiro lê uma no
+inclinação do outro sem nunca traçar a função.
+\end{example}
+
+\begin{theorem}[Dirichlet]\label{thm:b2:fourier:dirichlet}
+Deixar $ f $ ser $2\pi $-periódico e por partes $ C^1$. Então para cada $ x $,
+\[
+S_N(f)(x) \xrightarrow[N \to \infty]{}
+\frac{f(x^+) + f(x^-)}{2}
+\]
+(a média dos limites unilaterais) --- em particular $ S_N(f)(x) \to
+f(x)$ em cada ponto de continuidade.\index{Teorema de Dirichlet}
+\end{theorem}
+
+
+\begin{proof}
+Pelo lema do kernel e sua média unitária, dividindo a integral em
+$ u > 0$ e $ u < 0$ metades (cada uma com média $\frac12$):
+\begin{align*}
+S_N(f)(x) - \frac{f(x^+) + f(x^-)}{2}
+&= \frac{1}{2\pi}\int_{0}^{\pi} \bigl(f(x+u) -
+f(x^+)\bigr)D_N(u)\,\dd u\\
+&\quad+ \frac{1}{2\pi}\int_{-\pi}^{0}\bigl(f(x+u) -
+f(x^-)\bigr)D_N(u)\,\dd u .
+\end{align*}
+Trate o primeiro (o segundo é \omterm{def:b2:quadratic:adjoint}{simétrico}). Escrever
+\[
+\bigl(f(x + u) - f(x^+)\bigr)\,D_N(u)
+= \underbrace{\frac{f(x+u) - f(x^+)}{\sin\frac u2}}_{g(u)}\,
+\sin\Bigl(\Bigl(N + \frac12\Bigr)u\Bigr) .
+\]
+A função $ g $ é por partes \omterm{def:b2:metric:continuity}{contínuo} sobre $\intoc{0}{\pi}$ e
+tem um \emph{limite finito em $0^+$}: escrita
+\[
+g(u) = \frac{f(x+u) - f(x^+)}{u}\cdot\frac{u}{\sin\frac u2} ,
+\]
+o primeiro fator tende a $ f'(x^+)$ (unilateral
+diferenciabilidade, de por partes $ C^1$) e o segundo para $2$
+(o limite padrão $\frac{\sin v}{v} \to 1$ no $ v = \frac
+u2$): $ g(0^+) = 2f'(x^+)$ existe. Então $ g $ estende-se por partes
+continuamente para $\intcc{0}{\pi}$ e Riemann--Lebesgue
+(\cref{thm:b2:fourier:riemannlebesgue}) envia a integral para
+$0$. Este é o ponto principal da hipótese: sem
+derivadas unilaterais, o fator $\frac{1}{\sin(u/2)}$ golpes
+em $0$ mais rápido do que Riemann--Lebesgue pode compensar, e
+convergência pontual pode genuinamente falhar por apenas \omterm{def:b2:metric:continuity}{contínuo}
+$ f $ --- a lacuna que Fejteorema de er (problema de fim de semana)
+fecha pela média.
+\end{proof}
+
+\begin{example}[Dirichlet em um salto]\label{ex:b2:fourier:jumpvalue}
+Para o dente de serra $ f(t) = t $ sobre $\intoo{-\pi}{\pi}$
+(\cref{ex:b2:fourier:basel} abaixo), a prorrogação periódica
+pula em $ t = \pi $ de $ f(\pi^-) = \pi $ para $ f(\pi^+) = -\pi $.
+Dirichlet promete o valor $\frac{\pi + (-\pi)}{2} = 0$
+lá, e de fato cada termo de $\sum
+\frac{2(-1)^{n+1}}{n}\sin nt $ desaparece em $ t = \pi $: o
+série converge educadamente para o ponto médio, ignorando ambos
+valores unilaterais. Movendo o ponto de avaliação para $ t =
+\frac\pi2$ em vez disso (um continuidade ponto) transforma a mesma série
+em Leibniz $\frac\pi4$. Uma série, dois comportamentos ---
+exatamente as duas cláusulas do teorema.
+\end{example}
+
+\begin{theorem}[Convergência normal para $ C^1$; Parseval]\label{thm:b2:fourier:parseval}
+\begin{enumerate}
+  \item Se $ f $ é \omterm{def:b2:metric:continuity}{contínuo}, $2\pi $-periódico e por partes $ C^1$,
+        então $ c_n(f') = \iu n\,c_n(f)$, a série de Fourier de $ f $
+        converge \emph{\omterm{def:b2:funcseq:series}{normalmente}} sobre $\R $, e sua soma é $ f $.
+  \item (Parseval) Para cada pedaço \omterm{def:b2:metric:continuity}{contínuo} $2\pi $-periódico
+        $ f $:\index{Identidade de Parseval}
+        \[
+        \frac{1}{2\pi}\int_{-\pi}^{\pi}\abs{f}^2
+        = \sum_{n=-\infty}^{\infty} \abs{c_n(f)}^2
+        = \frac{\abs{a_0}^2}{4} + \frac12\sum_{n\geq1}
+        \bigl(\abs{a_n}^2 + \abs{b_n}^2\bigr).
+        \]
+        \emph{(Provado aqui para $ f $ \omterm{def:b2:metric:continuity}{contínuo} por partes $ C^1$;
+        admitido em geral.)}
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) Integração por partes em cada $ C^1$ peça (termos de limite cancelados
+por continuidade e periodicidade): $ c_n(f') = \iu n c_n(f)$. Então, por
+Cauchy--Schwarz sobre os dois soma-quadrado famílias
+(\cref{prop:b2:fourier:bessel} para $ f'$):
+\[
+\sum_{n \neq 0} \abs{c_n(f)} = \sum_{n\neq0}
+\frac{\abs{c_n(f')}}{\abs n}
+\leq \Bigl(\sum \abs{c_n(f')}^2\Bigr)^{1/2}
+\Bigl(\sum_{n\neq0}\frac{1}{n^2}\Bigr)^{1/2} < \infty :
+\]
+convergência normal da série de Fourier. Sua soma é \omterm{def:b2:metric:continuity}{contínuo} e
+coincide com $ f $ em cada ponto por Dirichlet
+(\cref{thm:b2:fourier:dirichlet}: $ f $ é \omterm{def:b2:metric:continuity}{contínuo}): a série
+converge para $ f $, \omterm{def:b2:funcseq:def}{uniformemente}.
+
+(2) Para tal $ f $: $ S_N f \to f $ \omterm{def:b2:funcseq:def}{uniformemente}, então $\norm{f - S_Nf}_2
+\leq \norm{f - S_Nf}_\infty \to 0$ e Pitágoras
+($\norm f_2^2 = \sum_{\abs n \leq N}\abs{c_n}^2 + \norm{f -
+S_Nf}_2^2$) passa ao limite. A verdadeira forma é a escrituração contábil com
+$ a_n, b_n $.
+\end{proof}
+
+\begin{example}[O $ C^1$ amarrado à cauda, feito quantitativo]\label{ex:b2:fourier:tailbound}
+A prova de \cref{thm:b2:fourier:parseval}~(1) esconde um utilizável
+estimativa. Para \omterm{def:b2:metric:continuity}{contínuo} por partes-$ C^1$ $ f $, o mesmo
+Cauchy--Schwarz aplicado na cauda apenas dá
+\[
+\sum_{\abs n > N}\abs{c_n(f)}
+= \sum_{\abs n > N}\frac{\abs{c_n(f')}}{\abs n}
+\leq \Bigl(\sum_{\abs n > N}\abs{c_n(f')}^2\Bigr)^{\!1/2}
+\Bigl(\sum_{\abs n>N}\frac{1}{n^2}\Bigr)^{\!1/2}
+\leq \norm{f'}_2\,\sqrt{\frac{2}{N}} ,
+\]
+usando Bessel para $ f'$ e $\sum_{n>N}n^{-2} \leq \frac1N $. Então
+o erro uniforme das somas parciais obedece
+\[
+\norm{f - S_Nf}_\infty
+\leq \sum_{\abs n>N}\abs{c_n(f)}
+\leq \norm{f'}_2\,\sqrt{\frac2N} .
+\]
+Para $ f(t) = \abs t $: $\norm{f'}_2 = 1$ (a derivada é
+$\pm1$), então dez termos já reconstroem $\abs t $ \omterm{def:b2:funcseq:def}{uniformemente}
+dentro de $\sqrt{0.2} \approx 0.45$, e $ N = 10^4$ dentro de
+$0.015$. Visão final: um derivativo compra o
+$\frac{1}{\sqrt N}$ taxa uniforme; comparando com o
+$\frac1n $-coeficiente mundial da onda quadrada (não uniforme
+convergência em absoluto), o dicionário de
+\cref{ex:b2:fourier:decaytable} adquire números.
+\end{example}
+
+\begin{example}[Basileia e amigos]\label{ex:b2:fourier:basel}
+Deixar $ f(t) = t $ sobre $\intoo{-\pi}{\pi}$, estendido $2\pi $-periodicamente
+(um dente de serra, em pedaços $ C^1$). Computação, $ a_n = 0$ (estranheza) e
+\[
+b_n = \frac{1}{\pi}\int_{-\pi}^{\pi} t\sin nt\,\dd t
+= \frac{2(-1)^{n+1}}{n} .
+\]
+Dirichlet em $ t = \frac\pi2$ recupera o de Leibniz $\frac\pi4 = 1 -
+\frac13 + \frac15 - \dots $; Parseval dá
+\[
+\frac{1}{2\pi}\int_{-\pi}^{\pi} t^2\,\dd t = \frac{\pi^2}{3}
+= \frac12\sum_{n\geq1}\frac{4}{n^2}
+\quad\Longrightarrow\quad
+\boxed{\;\sum_{n\geq1}\frac{1}{n^2} = \frac{\pi^2}{6}\;}
+\]
+--- Soma de Basileia de Euler, em duas linhas. A função $ f(t) = t^2$
+da mesma forma produz $\sum \frac1{n^4} = \frac{\pi^4}{90}$
+(\cref{exo:b2:fourier:3}).
+\end{example}
+
+\begin{example}[Uma expansão completa com verificação integrada: $\abs{\sin t}$]\label{ex:b2:fourier:abssin}
+A função $ f(t) = \abs{\sin t}$ é \omterm{def:b2:metric:continuity}{contínuo}, até,
+$\pi $-periódico (portanto $2\pi $-periódico), por partes $ C^1$.
+A uniformidade mata o $ b_n $; $ a_0 = \frac1\pi\int_{-\pi}^{\pi}
+\abs{\sin t}\dd t = \frac4\pi $; e para $ n \geq 1$,
+produto-soma dá
+\[
+a_n = \frac2\pi\int_0^\pi \sin t\cos nt\,\dd t
+= \frac{1}{\pi}\int_0^\pi\bigl(\sin(1+n)t +
+\sin(1-n)t\bigr)\dd t
+= \frac2\pi\cdot\frac{1 + \cos n\pi}{1 - n^2}
+\]
+para $ n \neq 1$ (e $ a_1 = 0$ diretamente): zero para ímpar $ n $, e
+$ a_{2k} = \frac{-4}{\pi(4k^2-1)}$. Por
+\cref{thm:b2:fourier:parseval}~ (1) a convergência é normal,
+e
+\[
+\abs{\sin t} = \frac{2}{\pi} - \frac{4}{\pi}
+\sum_{k\geq1}\frac{\cos(2kt)}{4k^2 - 1}
+\qquad (t \in \R) .
+\]
+Verificação integrada em $ t = 0$: a identidade exige
+$\sum_{k\geq1}\frac{1}{4k^2-1} = \frac12$, que telescópica
+confirma:
+\[
+\sum_{k\geq1}\frac{1}{4k^2-1}
+= \frac12\sum_{k\geq1}\Bigl(\frac{1}{2k-1} -
+\frac{1}{2k+1}\Bigr) = \frac12 . \checkmark
+\]
+Visão final: o \omterm{def:b2:reduction:eigen}{espectro} de $\abs{\sin}$ vive no
+\emph{até} frequências apenas --- retificar um seno dobra seu
+conteúdo de frequência, e é por isso que os retificadores de onda completa zumbem
+$100$ ou $120$ hertz, o dobro da frequência da rede.
+\end{example}
+
+\begin{example}[Parseval como um dispositivo de computação]\label{ex:b2:fourier:zetafourodd}
+Parseval transforma expansões em séries numéricas no atacado.
+Aplique-o a $ f(t) = \abs t $ (\cref{exo:b2:fourier:2}: $ a_0 =
+\pi $, $ a_n = \frac{-4}{\pi n^2}$ por estranho $ n $, o resto zero):
+\[
+\frac{1}{2\pi}\int_{-\pi}^{\pi}t^2\,\dd t = \frac{\pi^2}{3}
+= \frac{a_0^2}{4} + \frac12\sum_{n \text{ odd}} a_n^2
+= \frac{\pi^2}{4} +
+\frac{8}{\pi^2}\sum_{n\text{ odd}}\frac{1}{n^4} ,
+\]
+de onde
+\[
+\sum_{n\text{ odd}}\frac{1}{n^4}
+= \frac{\pi^2}{8}\Bigl(\frac{\pi^2}{3} -
+\frac{\pi^2}{4}\Bigr) = \frac{\pi^4}{96} .
+\]
+Verificação cruzada com \cref{exo:b2:fourier:3}: divisão
+$\sum\frac1{n^4}$ em partes pares e ímpares dá $\zeta $-estilo
+escrituração contábil $ S = S_{\mathrm{odd}} + \frac{S}{16}$, então $ S =
+\frac{16}{15}\cdot\frac{\pi^4}{96} = \frac{\pi^4}{90}$ ---
+exatamente o valor encontrado lá por uma função diferente. Dois
+expansões, um número: a consistência é a isometria de Parseval
+no trabalho. Visão final: cada nova expansão de Fourier é uma
+máquina geradora de identidades de série; o fim de semana
+A Parte II do problema explica por que a máquina nunca pode
+contradiz a si mesmo.
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=9.2cm, height=5.6cm,
+    xmin=-3.6, xmax=3.6, ymin=-1.5, ymax=1.5,
+    xtick={-3.1416, 0, 3.1416},
+    xticklabels={$-\pi $, $0$, $\pi $}, ytick={-1,1}]
+  \addplot[omExo, thick] coordinates {(-3.1416,-1) (0,-1)};
+  \addplot[omExo, thick] coordinates {(0,1) (3.1416,1)};
+  \addplot[omDef, thick, domain=-3.3:3.3, samples=200]
+    {4/pi*sin(deg(x))};
+  \addplot[omThm, very thick, domain=-3.3:3.3, samples=400]
+    {4/pi*(sin(deg(x)) + sin(deg(3*x))/3 + sin(deg(5*x))/5 +
+     sin(deg(7*x))/7 + sin(deg(9*x))/9)};
+\end{axis}
+\end{tikzpicture}
+
+{\small A onda quadrada (cinza) e o \omterm{def:b2:fourier:coefficients}{Somas parciais de Fourier} $ S_1$
+(azul) e $ S_9$ (vermelho): convergência em cada continuidade ponto, mas
+um persistente $\sim 9\%$ ultrapassar perto dos saltos --- o
+\emph{Fenômeno de Gibbs}\index{Fenômeno de Gibbs}. Uniforme
+convergência falha exatamente porque o limite é descontínuo.}
+\end{omfigure}
+
+\begin{example}[Tradução e modulação]\label{ex:b2:fourier:shiftrules}
+Duas regras de uma linha geram muitas expansões a partir de uma. Para $ a
+\in \R $, substituindo $ s = t - a $:
+\[
+c_n\bigl(f(\cdot - a)\bigr)
+= \frac{1}{2\pi}\int_{-\pi}^{\pi}f(t - a)\eu^{-\iu nt}\dd t
+= \eu^{-\iu na}\,c_n(f)
+\qquad\text{(translation modulates the spectrum)},
+\]
+e diretamente da definição,
+\[
+c_n\bigl(\eu^{\iu kt}f\bigr) = c_{n-k}(f)
+\qquad\text{(modulation translates the spectrum)}.
+\]
+Instância trabalhada: o dente de serra deslocado por $\pi $, $ g(t) = f(t -
+\pi)$ com $ f(t) = t $, tem $ b_n $-coeficientes
+$(-1)^n\cdot\frac{2(-1)^{n+1}}{n} = -\frac2n $: a expansão
+$ g \sim -2\sum\frac{\sin nt}{n}$ do dente de serra que salta
+$0$ em vez de em $\pi $ --- nenhuma integral recalculada. Fechando
+insight: mudanças de tempo apenas mudam fases, nunca amplitudes
+($\abs{c_n}$ é invariante ao deslocamento), razão pela qual a energia
+(Parseval) e classe de convergência são propriedades do sinal
+\emph{forma}, não de onde o relógio começa.
+\end{example}
+
+\begin{remark}[Armadilhas comuns]
+\emph{(i) Três convergências, três moedas:} \omterm{def:b2:funcseq:def}{pontualmente}
+(Dirichlet: precisa por partes $ C^1$, paga o \emph{ponto médio} em
+cada salto --- nunca o valor unilateral), uniforme (precisa de um
+\omterm{def:b2:metric:continuity}{contínuo} limite; impossível através de um salto, Gibbs é o
+sintoma visível) e média quadrática (Parseval: o mais
+robusto, cego para pontos individuais). Sempre diga qual você
+estão reivindicando. \emph{(ii) Nenhuma diferenciação temporal por
+padrão:} diferenciando a série dente de serra de
+\cref{ex:b2:fourier:basel} rendimentos termo a prazo $\sum
+2(-1)^{n+1}\cos nt $, cujos termos nem sequer tendem a $0$ ---
+os teoremas de transferência do capítulo de sequências de funções precisam
+convergência uniforme do \emph{derivado} série, que o
+pular destrói. Suavidade primeiro, diferenciação depois
+(\cref{exo:b2:fourier:6} é o dicionário). \emph{(iii)
+\omterm{def:b2:quadratic:adjoint}{Simétrico} somas parciais:} O teorema de Dirichlet diz respeito $ S_N =
+\sum_{-N}^{N}$; reorganizar ou somar um lado primeiro pode
+transforme a divergência em convergência e vice-versa. \emph{(iv)
+Desvio de normalização:} as convenções diferem entre os livros
+($\frac{1}{2\pi}$ ou $\frac1\pi $ na frente, ponto final $2\pi $ ou
+$1$); os invariantes confiáveis são as relações de ortonormalidade
+--- recalcular $\langle e_m, e_n\rangle $ na convenção em
+mão antes de confiar em qualquer fórmula.
+\end{remark}
+
+\begin{remark}[Onde isso é usado]
+Parseval é o germe do $ L^2$ teoria da série de Fourier: o
+O volume do ano 3 completa o quadro (as exponenciais são uma
+Base de Hilbert de $ L^2$, e o mapa $ f \mapsto (c_n)$ é um
+isometria bijetiva). Dentro deste volume, o problema do fim de semana
+prova \emph{Fejteorema de er} --- o Cesàro significa do
+Série de Fourier converge \omterm{def:b2:funcseq:def}{uniformemente} para cada \omterm{def:b2:metric:continuity}{contínuo} periódico
+$ f $ --- que atualiza o Parseval geral admitido para um
+teorema, produz o teorema trigonométrico de Weierstrass e paga
+dois dividendos espetaculares: o teorema da equidistribuição de Weyl e
+a desigualdade isoperimétrica. Matemática aplicada lê isto
+capítulo diário: \omterm{def:b2:reduction:eigen}{espectros} de sinais, harmônicos de vibração
+sistemas e a transformada rápida de Fourier (o avatar finito foi
+\cref{exo:b2:hermitian:10}).
+\end{remark}
+
+\begin{remark}[Perspectivas dentro deste volume]
+Três capítulos conversam com este. Para trás: o \omterm{def:b2:hermitian:adjoint}{Hermitiano}
+capítulo forneceu a geometria (famílias ortonormais,
+projeções, Bessel), e o capítulo de sequências de funções
+análise (convergência uniforme, teoremas de transferência, aproximados
+identidades --- FejÓ kernel de er é para a série de Fourier o que
+Os polinômios de Bernstein eram para Weierstrass). Lateralmente: o
+a teoria dos limites do capítulo da série de potências retorna através Abel
+soma, realizado aqui pelo kernel de Poisson
+(\cref{exo:b2:fourier:12}) --- o raio do disco $ r $ jogando
+a função do parâmetro de soma. Avançar: o
+capítulo de equações diferenciais decompõe forçamento periódico
+em harmônicos e alimenta cada um com a frequência do oscilador
+resposta; ressonância acontece quando um modo de Fourier da entrada
+corresponde a uma frequência natural, e é por isso que seu problema de fim de semana
+e este capítulo são duas metades de uma história.
+\end{remark}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=9.2cm, height=5.6cm,
+    xmin=-3.6, xmax=3.6, ymin=-2.5, ymax=9.5,
+    xtick={-3.1416, 0, 3.1416},
+    xticklabels={$-\pi $, $0$, $\pi $}, ytick={8}]
+  \addplot[omDef, thick, domain=0.02:3.3, samples=300]
+    {sin(deg(8.5*x))/sin(deg(0.5*x))};
+  \addplot[omDef, thick, domain=-3.3:-0.02, samples=300]
+    {sin(deg(8.5*x))/sin(deg(0.5*x))};
+  \addplot[omThm, very thick, domain=0.02:3.3, samples=300]
+    {sin(deg(4*x))^2/(8*sin(deg(0.5*x))^2)};
+  \addplot[omThm, very thick, domain=-3.3:-0.02, samples=300]
+    {sin(deg(4*x))^2/(8*sin(deg(0.5*x))^2)};
+  \node[font=\small, omDef] at (axis cs:1.05,5.2) {$ D_8$};
+  \node[font=\small, omThm] at (axis cs:-0.75,6.2) {$ F_8$};
+\end{axis}
+\end{tikzpicture}
+
+{\small O \omterm{lem:b2:fourier:kernel}{Kernel de Dirichlet} $ D_8$ (azul) oscila e leva
+valores negativos; o Fejśeu kernel $ F_8$ (vermelho) não é negativo,
+concentra-se em $0$, e tem média $1$: um \emph{aproximado
+identidade}. Positividade é exatamente o que \omterm{lem:b2:fourier:kernel}{Kernel de Dirichlet}
+falta, e o que faz Fejteorema de er no problema do fim de semana
+incondicional.}
+\end{omfigure}
+
+\section{Exercícios}
+
+\begin{exercise}[$\star $]\label{exo:b2:fourier:1}
+Calcule o \omterm{def:b2:fourier:coefficients}{Coeficientes de Fourier} da onda quadrada ($ f = -1$ sobre
+$\intoo{-\pi}{0}$, $+1$ sobre $\intoo{0}{\pi}$), afirma Dirichlet
+conclusão em $ t = \frac\pi2$ e no salto $ t = 0$ e recuperar
+A série de Leibniz.
+\end{exercise}
+
+\begin{exercise}[$\star $]\label{exo:b2:fourier:2}
+Expandir $ f(t) = \abs t $ ($\abs t \leq \pi $, $2\pi $-periódico) em
+Série de Fourier; justificar \emph{normal} convergência; avaliar em $ t =
+0$ para obter $\sum_{k\geq0}\frac{1}{(2k+1)^2} = \frac{\pi^2}{8}$,
+e derivar novamente Basileia dele.
+\end{exercise}
+
+\begin{exercise}[$\star $]\label{exo:b2:fourier:3}
+Expandir $ f(t) = t^2$ ($\abs t \leq \pi $) e deduzir
+\[
+\sum_{n\geq1}\frac{(-1)^{n+1}}{n^2} = \frac{\pi^2}{12},
+\qquad
+\sum_{n\geq1}\frac{1}{n^4} = \frac{\pi^4}{90}
+\quad\text{(Parseval)}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b2:fourier:4}
+Deixar $ f $ ser \omterm{def:b2:metric:continuity}{contínuo} $2\pi $-periódico com $ c_n(f) = 0$ para todos
+$ n $. Provar $ f = 0$ \emph{(Parseval --- para qual classe está provado
+aqui? justifique isso continuidade mais por partes $ C^1$ pode ser descartado
+admitindo o Parseval geral, ou apresentando o argumento da densidade em
+esboço)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b2:fourier:5}
+Para $\alpha \notin \Z $, expandir $ f(t) = \cos(\alpha t)$ ($\abs t
+\leq \pi $) e deduza a expansão em frações parciais do
+cotangente:
+\[
+\pi\cot(\pi\alpha) = \frac{1}{\alpha} + \sum_{n\geq1}
+\frac{2\alpha}{\alpha^2 - n^2} .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b2:fourier:6}
+Prove que se $ f $ é $2\pi $-periódico e $ C^k $ com $ f^{(k)}$
+por partes \omterm{def:b2:metric:continuity}{contínuo}, então $ c_n(f) = O\bigl(\abs n^{-k}\bigr)$:
+suavidade do sinal $=$ decadência do seu \omterm{def:b2:reduction:eigen}{espectro}.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star $]\label{exo:b2:fourier:7}
+(Desigualdade de Wirtinger) Deixe $ f $ ser $ C^1$, $2\pi $-periódico, com
+$\int_{-\pi}^{\pi} f = 0$. Provar
+\[
+\int_{-\pi}^{\pi} \abs{f}^2 \leq \int_{-\pi}^{\pi} \abs{f'}^2 ,
+\]
+com igualdade se $ f(t) = a\cos t + b\sin t $. \emph{(Parseval em
+ambos os lados; comparar $\abs{c_n}^2$ e $ n^2\abs{c_n}^2$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star $]\label{exo:b2:fourier:8}
+(A constante de Gibbs) Para a onda quadrada de
+\cref{exo:b2:fourier:1}, avalie a soma parcial em $ x_N =
+\frac{\pi}{2N}$: escrita $ u_k = \frac{(2k+1)\pi}{2N}$ e $\Delta u
+= \frac{\pi}{N}$, mostre que
+\[
+S_{2N-1}\Bigl(\frac{\pi}{2N}\Bigr)
+= \frac{4}{\pi}\sum_{k=0}^{N-1} \frac{\sin u_k}{2k+1}
+= \frac{2}{\pi}\sum_{k=0}^{N-1} \frac{\sin u_k}{u_k}\,\Delta u
+\xrightarrow[N\to\infty]{}
+\frac{2}{\pi}\int_0^{\pi}\frac{\sin u}{u}\,\dd u \approx 1.179 :
+\]
+uma soma de Riemann de $\frac{2}{\pi}\cdot\frac{\sin u}{u}$ sobre
+$\intcc{0}{\pi}$ em pontos médios. Conclua que a ultrapassagem além
+o valor do salto $1$ não desaparece como $ N \to \infty $.
+\end{exercise}
+
+\begin{exercise}[$\star $]\label{exo:b2:fourier:9}
+Expandir $\cos^3 t $ e $\sin^2 t\,\cos t $ na série de Fourier
+\emph{(linearizar; um polinômio trigonométrico é seu próprio Fourier
+série, pela singularidade dos coeficientes)}. O que são $ c_n $,
+$ a_n $, $ b_n $ para cada um?
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b2:fourier:10}
+Deixar $ a > 0$ e $ f(t) = \eu^{at}$ sobre $\intoc{-\pi}{\pi}$,
+estendido $2\pi $-periodicamente. Calcular
+\[
+c_n(f) = \frac{(-1)^n\sinh(a\pi)}{\pi(a - \iu n)} ,
+\]
+aplique o teorema de Dirichlet no salto $ t = \pi $, e deduza o
+expansão em frações parciais da cotangente hiperbólica:
+\[
+\coth(\pi a) = \frac{1}{\pi a} + \sum_{n\geq1}
+\frac{2a}{\pi(a^2 + n^2)} .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b2:fourier:11}
+(Convolução) Para $ f, g $ \omterm{def:b2:metric:continuity}{contínuo} e $2\pi $-definição periódica
+\[
+(f * g)(x) = \frac{1}{2\pi}\int_{-\pi}^{\pi} f(x - t)\,g(t)\,
+\dd t .
+\]
+Mostre isso $ f * g = g * f $, que $ c_n(f*g) = c_n(f)\,c_n(g)$
+\emph{(para trocar as duas integrais de um \omterm{def:b2:metric:continuity}{contínuo} integrando,
+compare as duas funções do limite superior: ambas desaparecem no
+ponto final esquerdo e têm a mesma derivada, por continuidade e
+diferenciação sob o sinal integral)}, e isso $ S_N(f) =
+f * D_N $ para o \omterm{lem:b2:fourier:kernel}{Kernel de Dirichlet}. (O problema do fim de semana é
+Fejérrrr meios são igualmente convoluções, $\sigma_N(f) = f *
+F_N $.)
+\end{exercise}
+
+\begin{exercise}[$\star\star\star $]\label{exo:b2:fourier:12}
+(Núcleo de Poisson: Abel significa da série de Fourier) Para $0 \leq r <
+1$ definir $ P_r(t) = \sum_{n\in\Z} r^{\abs n}\eu^{\iu nt}$.
+\begin{enumerate}
+  \item Some as duas séries geométricas e mostre
+        \[
+        P_r(t) = \frac{1 - r^2}{1 - 2r\cos t + r^2} > 0,
+        \qquad
+        \frac{1}{2\pi}\int_{-\pi}^{\pi}P_r = 1 .
+        \]
+  \item Mostre isso para $\delta \leq \abs t \leq \pi $: $ P_r(t)
+        \leq \frac{1 - r^2}{1 - 2r\cos\delta + r^2} \to 0$ como
+        $ r \to 1^-$, \omterm{def:b2:funcseq:def}{uniformemente}.
+  \item Deduza isso para cada \omterm{def:b2:metric:continuity}{contínuo} $2\pi $-periódico $ f $,
+        o \emph{Abel significa} $(f * P_r)(x) = \sum_n
+        r^{\abs n}c_n(f)\,\eu^{\iu nx}$ \omterm{def:b2:integration:improper}{convergir} para $ f $
+        \omterm{def:b2:funcseq:def}{uniformemente} como $ r \to 1^-$ --- o parâmetro \omterm{def:b2:metric:continuity}{contínuo}
+        irmão de Fejteorema de er, e o Fourier
+        encarnação de \omterm{thm:b2:series:abel}{Resumo de Abel} da série de potência
+        capítulo.
+\end{enumerate}
+\end{exercise}
+
+\section{Problema: Fejteorema de er e seus dividendos}
+
+\begin{problem}\label{pb:b2:fourier:1}
+O teorema de Dirichlet precisa $ f $ por partes $ C^1$; por apenas
+\omterm{def:b2:metric:continuity}{contínuo} $ f $ as somas parciais $ S_N(f)$ pode se comportar mal. Fejérr
+descoberta: seu \emph{Cesàro significa} nunca faça. O motor está
+a positividade do Fejérrrr kernel, e a colheita é
+imenso: aproximação trigonométrica uniforme (Weierstrass),
+singularidade de \omterm{def:b2:fourier:coefficients}{Coeficientes de Fourier}, Parseval para cada função
+deste capítulo (removendo o ``admitido'' em
+\cref{thm:b2:fourier:parseval}), Equidistribuição de Weyl
+teorema, e --- coroando um século de geometria --- o
+desigualdade isoperimétrica.\index{Fejer's theorem@Fejérrrr's
+theorem}\index{equidistribuição}\index{desigualdade isoperimétrica}
+Por todo, $ f $ é $2\pi $-periódico e por partes \omterm{def:b2:metric:continuity}{contínuo},
+e
+\[
+\sigma_N(f) = \frac{S_0(f) + S_1(f) + \dots +
+S_{N-1}(f)}{N} .
+\]
+
+\medskip
+\noindent\textbf{Part I --- The Fejérrrr kernel.}
+\begin{enumerate}
+  \item Mostre isso $\sigma_N(f)(x) =
+        \frac{1}{2\pi}\int_{-\pi}^{\pi}f(x+u)\,F_N(u)\,\dd u $
+        com $ F_N = \frac{D_0 + \dots + D_{N-1}}{N}$ e
+        isso $\frac{1}{2\pi}\int_{-\pi}^{\pi}F_N = 1$.
+  \item Prove a forma fechada, para $ u \notin 2\pi\Z $:
+        \[
+        F_N(u) = \frac{1}{N}\,
+        \frac{\sin^2\bigl(\frac{Nu}{2}\bigr)}
+        {\sin^2\bigl(\frac u2\bigr)} \;\geq\; 0
+        \]
+        \emph{(soma $\sin\bigl((n+\frac12)u\bigr)$ como o
+        parte imaginária de uma série geométrica)}.
+  \item Mostre a estimativa de concentração: para $0 < \delta \leq
+        \abs u \leq \pi $,
+        \[
+        F_N(u) \leq \frac{1}{N\sin^2\frac\delta2}
+        \xrightarrow[N\to\infty]{} 0
+        \quad\text{uniformly} :
+        \]
+        $(F_N)$ é uma identidade aproximada positiva.
+  \item (Fejteorema de er) Prove: se $ f $ é \omterm{def:b2:metric:continuity}{contínuo} e
+        $2\pi $-periódico, então $\sigma_N(f) \to f $
+        \emph{\omterm{def:b2:funcseq:def}{uniformemente}} sobre $\R $ \emph{(dividir a integral de
+        $\bigl(f(x+u) - f(x)\bigr)F_N(u)$ no $\abs u =
+        \delta $; use Heine e perguntas 1--3)}.
+  \item Para pedaços \omterm{def:b2:metric:continuity}{contínuo} $ f $, mostre o \omterm{def:b2:funcseq:def}{pontualmente}
+        versão $\sigma_N(f)(x) \to \frac{f(x^+) +
+        f(x^-)}{2}$ a cada $ x $, e o limite uniforme
+        $\norm{\sigma_N(f)}_\infty \leq \norm f_\infty $
+        \emph{(positividade!)}.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part II --- Weierstrass, uniqueness,
+Parseval.}
+\begin{enumerate}[resume]
+  \item (Weierstrass trigonométrico) Deduza: cada \omterm{def:b2:metric:continuity}{contínuo}
+        $2\pi $-função periódica é um limite uniforme de
+        polinômios trigonométricos.
+  \item (Singularidade) Deduza: a \omterm{def:b2:metric:continuity}{contínuo} $ f $ com $ c_n(f) = 0$
+        para todos $ n $ é identicamente zero --- dois \omterm{def:b2:metric:continuity}{contínuo}
+        funções periódicas com o mesmo \omterm{def:b2:fourier:coefficients}{Coeficientes de Fourier}
+        coincidir (\cref{exo:b2:fourier:4}, agora sem
+        admissão).
+  \item (Parseval, \omterm{def:b2:metric:continuity}{contínuo} caso) Usando a projeção
+        propriedade de $ S_N $ (\cref{prop:b2:fourier:bessel}) e
+        $\sigma_Nf \in \mathcal T_{N-1} \subseteq \mathcal
+        T_N $, provar
+        \[
+        \norm{f - S_Nf}_2 \leq \norm{f - \sigma_Nf}_2
+        \leq \norm{f - \sigma_Nf}_\infty
+        \xrightarrow[N\to\infty]{} 0 ,
+        \]
+        e concluir a identidade de Parseval para cada
+        \emph{\omterm{def:b2:metric:continuity}{contínuo}} $2\pi $-periódico $ f $.
+  \item (Parseval, por partes \omterm{def:b2:metric:continuity}{contínuo} caso) Dado $ f $
+        por partes \omterm{def:b2:metric:continuity}{contínuo} e $\varepsilon > 0$, construir um
+        \omterm{def:b2:metric:continuity}{contínuo} periódico $ g $ com $\norm{f - g}_2 \leq
+        \varepsilon $ \emph{(substituir $ f $ por um afim
+        interpolação em pequenos intervalos ao redor dos saltos)},
+        e deduzir $\norm{f - S_Nf}_2 \to 0$
+        \emph{(use Bessel: $\norm{S_Nh}_2 \leq \norm h_2$)}:
+        Parseval mantém a generalidade completa declarada em
+        \cref{thm:b2:fourier:parseval} --- o ``admitido''
+        desapareceu.
+  \item (Sem Gibbs para Fejérrrr) Contraste com
+        \cref{exo:b2:fourier:8}: mostre que para a onda quadrada
+        $ f $, $\abs{\sigma_N(f)} \leq 1$ em todos os lugares, para cada
+        $ N $ --- Cesàro média apaga o overshoot que
+        assombra $ S_N $. Explique em uma frase qual propriedade
+        de $ F_N $ é responsável.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part III --- Rates.}
+\begin{enumerate}[resume]
+  \item Prove os dois limites do kernel, para $0 < \abs u \leq
+        \pi $:
+        \[
+        F_N(u) \leq N,
+        \qquad
+        F_N(u) \leq \frac{\pi^2}{N u^2}
+        \]
+        \emph{(para o primeiro, $\abs{\sin N\theta} \leq
+        N\abs{\sin\theta}$ por indução; para o segundo,
+        $\sin\frac u2 \geq \frac{u}{\pi}$ sobre
+        $\intcc{0}{\pi}$)}.
+  \item Deduzir a estimativa do primeiro momento
+        \[
+        \frac{1}{2\pi}\int_{-\pi}^{\pi}\abs u\,F_N(u)\,\dd u
+        \;\leq\; \frac{C\,\ln N}{N}
+        \qquad (N \geq 2)
+        \]
+        para uma constante explícita \emph{(dividido em $\abs u =
+        \frac1N $)}.
+  \item Conclua: se $ f $ é $ L $-Lipschitz e $2\pi $-periódico,
+        então
+        \[
+        \norm{\sigma_N f - f}_\infty \leq \frac{C\,L\ln N}{N} .
+        \]
+  \item (Saturação) Computação $\sigma_N(e_1)$ para $ e_1(t) =
+        \eu^{\iu t}$ e mostrar $\norm{\sigma_Ne_1 - e_1}_\infty
+        = \frac1N $: mesmo para as funções mais suaves, Fejérrrr
+        não converge mais rápido do que $\frac1N $ --- o exato
+        análogo da saturação de Bernstein no
+        problema de fim de semana do capítulo sobre sequências de funções.
+  \item (Localização) Mostrar: se $ f $ (por partes \omterm{def:b2:metric:continuity}{contínuo})
+        desaparece em $\intoo{x - \delta}{x + \delta}$, então
+        $\sigma_N(f)(x) \to 0$, por mais selvagem que seja $ f $ está em outro lugar
+        --- convergência das médias em $ x $ só vê $ f $ aproximar
+        $ x $.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part IV --- Weyl's equidistribution theorem.}
+Uma sequência $(x_n)_{n\geq1}$ em $\intco{0}{1}$ é
+\emph{equidistribuído} quando, para cada intervalo
+$\intcc{a}{b} \subseteq \intcc{0}{1}$,
+\[
+\frac{\#\{n \leq N : x_n \in \intcc ab\}}{N}
+\xrightarrow[N\to\infty]{} b - a .
+\]
+\begin{enumerate}[resume]
+  \item Mostre isso $(x_n)$ é equidistribuído assim que
+        $\frac1N\sum_{n\leq N}f(x_n) \to \int_0^1 f $ para cada
+        \emph{\omterm{def:b2:metric:continuity}{contínuo}} $1$-periódico $ f $ \emph{(aperte o
+        indicador de $\intcc ab $ entre dois \omterm{def:b2:metric:continuity}{contínuo}
+        funções afins por partes cujas integrais diferem por
+        $\varepsilon $)}.
+  \item (Critério de Weyl, suficiência) Suponha
+        \[
+        \frac{1}{N}\sum_{n=1}^{N}\eu^{2\iu\pi kx_n}
+        \xrightarrow[N\to\infty]{} 0
+        \qquad\text{for every } k \in \Z\setminus\{0\} .
+        \]
+        Mostrar $\frac1N\sum f(x_n) \to \int_0^1f $ primeiro para
+        polinômios trigonométricos, então para todos \omterm{def:b2:metric:continuity}{contínuo}
+        $1$-periódico $ f $ pela questão 6 (transportado para o período
+        $1$): com a questão 16, $(x_n)$ é equidistribuído.
+  \item Deixar $\alpha $ ser irracional e $ x_n = \{n\alpha\}$
+        (parte fracionária). Limite a soma geométrica
+        \[
+        \Bigl|\sum_{n=1}^{N}\eu^{2\iu\pi kn\alpha}\Bigr|
+        \leq \frac{2}{\abs{1 - \eu^{2\iu\pi k\alpha}}}
+        \qquad (k \neq 0),
+        \]
+        e concluir \emph{Teorema de Weyl}: $(\{n\alpha\})$ é
+        equidistribuído em $\intco{0}{1}$.
+  \item Deduza isso $(\{n\alpha\})$ é denso em
+        $\intcc{0}{1}$ para irracional $\alpha $, e explique em
+        uma frase porque a equidistribuição é estritamente mais forte
+        do que a densidade.
+  \item (dígitos iniciais) Prove que a proporção de inteiros
+        $ n \leq N $ tal que $2^n $ tem dígito inicial (decimal)
+        $1$ tende a $\log_{10}2 \approx 0.301$ \emph{(liderando
+        dígito $1$ significa $\{n\log_{10}2\} \in
+        \intco{0}{\log_{10}2}$; mostrar $\log_{10}2$ é
+        irracional)}.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part V --- The isoperimetric inequality.} Deixar
+$\Gamma $ seja um simples fechado $ C^1$ curva de comprimento $ L $ encerrando
+uma área sinalizada $ A $, parametrizado pelo comprimento do arco escalonado: $ z(t) =
+x(t) + \iu y(t)$, $2\pi $-periódico, com $\abs{z'(t)} =
+\frac{L}{2\pi}$ constante; a área fechada é
+\[
+A = \frac12\int_0^{2\pi}\bigl(x\,y' - y\,x'\bigr)\dd t
+= \frac{1}{2}\,\Im\int_0^{2\pi}\conj{z}\,z'\,\dd t
+\]
+(tomada aqui como a definição da área sinalizada; o capítulo
+em integrais múltiplas prova que concorda com o intuitivo,
+através da fórmula de Green).
+\begin{enumerate}[resume]
+  \item Expandir $ z(t) = \sum_{n\in\Z}c_n\eu^{\iu nt}$ (o
+        série de um $ C^1$ função, \omterm{def:b2:funcseq:series}{normalmente} convergente) e
+        provar, por Parseval aplicado a $ z'$:
+        \[
+        \frac{L^2}{2\pi} = \int_0^{2\pi}\abs{z'}^2\dd t
+        = 2\pi\sum_{n\in\Z}n^2\abs{c_n}^2 .
+        \]
+  \item Prove o mesmo $ A = \pi\sum_{n\in\Z}
+        n\,\abs{c_n}^2$ \emph{(Parseval em sua forma polarizada:
+        $\frac{1}{2\pi}\int\conj f g = \sum
+        \conj{c_n(f)}c_n(g)$, aplicado a $ f = z $, $ g = z'$)}.
+  \item (Hurwitz) Conclua:
+        \[
+        L^2 - 4\pi A = 4\pi^2\sum_{n\in\Z}
+        (n^2 - n)\abs{c_n}^2 \;\geq\; 0 ,
+        \]
+        com igualdade se e somente se $ z(t) = c_0 +
+        c_1\eu^{\iu t}$ --- um círculo. O isoperimétrico
+        desigualdade: entre curvas fechadas de comprimento $ L $, apenas
+        o círculo envolve a área $\frac{L^2}{4\pi}$.
+  \item Verificações de sanidade: verifique a igualdade para o círculo de
+        raio $ R $ e a desigualdade estrita para o quadrado de
+        lado $ a $; explique por que $ n^2 - n \geq 0$ para cada
+        inteiro $ n $, incluindo os negativos, e onde
+        foi utilizada a velocidade constante da parametrização.
+  \item Síntese. Em uma frase cada: (i) o único
+        propriedade de $ F_N $ de onde fluem as Partes I-III, e
+        qual $ D_N $ falta; (ii) como Cesàro resumo aqui
+        está relacionado ao problema de fim de semana do capítulo da série de potências
+        (Frobenius); (iii) qual dividendo utilizado apenas
+        Weierstrass (pergunta 6) e que necessitava de
+        Parseval; (iv) uma frase sobre o volume do Ano 3
+        adiciona ($ L^2$ completude: Série de Fourier como Hilbert
+        base).
+\end{enumerate}
+\end{problem}

@@ -1,0 +1,793 @@
+\chapter{Comparação de funções}\label{ch:b2:comparison}
+
+Análise assintótica --- a arte de substituir uma quantidade complicada
+por um simples mais um erro controlado --- foi iniciado no Ano 1
+volume com expansões de Taylor. Este capítulo faz dela uma disciplina de
+próprio: expansões ao longo de escalas gerais, a série - integral
+comparação com sua força assintótica total, a fórmula de Stirling (provada
+completamente), e o estudo sistemático de
+sequências. Estas técnicas são o pão diário da assintótica
+análise, e cada capítulo posterior que estima qualquer coisa ---
+séries, integrais, probabilidades --- come desta tabela.
+
+\section{Relações e escalas de comparação}
+
+\begin{definition}\label{def:b2:comparison:landau}
+Perto de um ponto $a $ ($ a \in \R $ ou $\pm\infty $), para funções (ou
+sequências, com $ n \to \infty $): $ f = o(g)$, $ f = O(g)$, $ f \sim g $
+como no volume do Ano 1. UM \emph{comparação
+escala}\index{comparação
+escala} no $ a $ é uma família de positivo
+funções, comparáveis aos pares, totalmente ordenadas por $ o(\cdot)$ ---
+a escala padrão em $+\infty $ ser
+\[
+x^{\alpha} (\ln x)^{\beta}
+\qquad (\alpha, \beta \in \R),
+\]
+ordenado lexicograficamente em $(\alpha, \beta)$, refinado quando necessário
+por exponenciais $\eu^{\gamma x}$.
+\end{definition}
+
+\begin{definition}[Expansão assintótica]\label{def:b2:comparison:expansion}
+$ f $ admite o \emph{expansão assintótica}\index{expansão assintótica}
+\[
+f = c_1 \varphi_1 + c_2\varphi_2 + \dots + c_k \varphi_k +
+o(\varphi_k)
+\qquad (\varphi_{i+1} = o(\varphi_i) \text{ in the scale})
+\]
+quando os restos sucessivos satisfazem as estimativas exibidas. O
+os coeficientes são então únicos: $ c_1 = \lim f/\varphi_1$ e
+indutivamente $ c_{i+1} = \lim\,(f - \sum_{j \leq i}
+c_j\varphi_j)/\varphi_{i+1}$.
+\end{definition}
+
+\begin{example}
+As expansões de Taylor são expansões assintóticas ao longo da escala $(x -
+a)^k $ no $ a $. Mas a noção é estritamente mais ampla: em $+\infty $,
+\[
+\frac{1}{x - \ln x}
+= \frac1x \cdot \frac{1}{1 - \frac{\ln x}{x}}
+= \frac1x + \frac{\ln x}{x^2} + o\Bigl(\frac{\ln x}{x^2}\Bigr),
+\]
+uma expansão ao longo da escala mista --- nenhum teorema de Taylor se aplica,
+apenas a expansão geométrica e o cálculo de $ o $'s.
+\end{example}
+
+\begin{example}[A escala padrão é realmente ordenada]\label{ex:b2:comparison:scaleorder}
+A afirmação lexicográfica de \cref{def:b2:comparison:landau}
+precisa de uma linha de prova por caso. Comparar
+$ x^{\alpha}(\ln x)^{\beta}$ e $ x^{\alpha'}(\ln x)^{\beta'}$
+no $+\infty $. Se $\alpha < \alpha'$: a proporção é
+$ x^{\alpha - \alpha'}(\ln x)^{\beta - \beta'} \to 0$, porque um
+potência negativa de $ x $ esmaga qualquer poder de $\ln x $ (definir $ x =
+\eu^t $: $\eu^{(\alpha - \alpha')t}\,t^{\beta - \beta'} \to 0$
+pelo limite polinomial de batidas exponenciais do ano 1
+volume). Se $\alpha = \alpha'$ e $\beta < \beta'$: a proporção
+é $(\ln x)^{\beta - \beta'} \to 0$ diretamente. Então os pares
+$(\alpha, \beta)$, ordenado lexicograficamente, ordene a escala
+por $ o(\cdot)$ --- e a substituição $ x = \eu^t $ é o
+truque de tamanho único para comparações de registros de potência mistos.
+\end{example}
+
+\begin{example}[Classificando um zoológico]\label{ex:b2:comparison:ranking}
+As balanças devem ser \emph{encomendado}; aqui está a broca padrão. No
+$+\infty $, comparar $ n^{10}$, $\eu^{\sqrt{\ln n}\,\cdot\,\sqrt n}$,
+$2^n $ e $ n^{\ln n}$ tomando logaritmos:
+\[
+10\ln n
+\;\ll\; (\ln n)^2
+\;\ll\; \sqrt{n\ln n}
+\;\ll\; n\ln 2 ,
+\]
+onde $ a_n \ll b_n $ significa $ a_n = o(b_n)$; a segunda entrada é
+$\ln(n^{\ln n})$. Os exponenciais preservam essas lacunas estritas (se
+$\ln u_n - \ln v_n \to -\infty $ então $ u_n/v_n \to 0$), então
+\[
+n^{10} = o\bigl(n^{\ln n}\bigr),
+\qquad
+n^{\ln n} = o\bigl(\eu^{\sqrt{n\ln n}}\bigr),
+\qquad
+\eu^{\sqrt{n\ln n}} = o(2^n) .
+\]
+Moral dupla: compare sempre por meio de logaritmos
+(diferenças de logaritmos, não proporções de logaritmos), e nunca concluir
+$ u_n \sim v_n $ de $\ln u_n \sim \ln v_n $ --- o par $ n^{10}$
+e $ n^{\ln n}$ tem $\ln $-razão tendendo a $\infty $, mas $2^n $
+e $4^n $ ter $\ln $-razão exatamente $2$ e são descontroladamente
+desigual.
+\end{example}
+
+\section{Série - comparação integral, assintoticamente}
+
+\begin{theorem}\label{thm:b2:comparison:seriesintegral}
+Deixar $ f $ ser \omterm{def:b2:metric:continuity}{contínuo}, positivo, \emph{diminuindo} sobre
+$\intco{1}{+\infty}$.
+\begin{enumerate}
+  \item Se $\int_1^{\infty} f $ converge, os restos satisfazem
+        \[
+        \int_{n+1}^{\infty} f \;\leq\; \sum_{k > n} f(k) \;\leq\;
+        \int_{n}^{\infty} f .
+        \]
+  \item Se $\int_1^\infty f $ diverge, as somas parciais satisfazem
+        $\sum_{k=1}^{n} f(k) = \int_1^n f + C + o(1)$ para alguns
+        constante $ C $: a diferença $\sum_{k \leq n} f(k) -
+        \int_1^n f $ \emph{converge}.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+O agrupamento $ f(k+1) \leq \int_k^{k+1} f \leq f(k)$ (diminuição) foi
+o dispositivo do Ano 1; resumindo $ k \geq n+1$, resp.\ $ k \geq n $,
+dá (1). Para (2), defina $ u_k = f(k) - \int_k^{k+1} f $: pelo
+colchetes, $0 \leq u_k \leq f(k) - f(k+1)$, então as somas parciais de
+$\sum u_k $ são limitados pelo telescópico $ f(1) - f(n+1) \leq
+f(1)$: a série converge. Além disso a sequência $\bigl(\int_n^{n+1}
+f\bigr)_n $ é não crescente ($ f $ diminui) e não negativo, portanto
+convergente. Escrita
+\[
+\sum_{k=1}^{n} f(k) - \int_1^n f
+= \sum_{k=1}^{n} u_k + \int_n^{n+1} f ,
+\]
+o lado direito converge como $ n \to \infty $: a diferença converge
+para uma constante $ C $, que é a afirmação (2).
+\end{proof}
+
+\begin{example}[A expansão harmônica]\label{ex:b2:comparison:harmonic}
+Para $ f(t) = \frac1t $: $ H_n = \ln n + \gamma + o(1)$, recuperando
+Constante de Euler (volume do ano 1) com uma prova mais limpa. Empurrando um
+peça mais (\cref{exo:b2:comparison:3}):
+\[
+H_n = \ln n + \gamma + \frac{1}{2n} + o\Bigl(\frac1n\Bigr).
+\]
+Os números tornam o ganho visível em $ n = 10$: $ H_{10} =
+2.928968\dots $ e $\ln 10 = 2.302585\dots $, então a estimativa bruta
+de $\gamma $ é $ H_{10} - \ln 10 = 0.626383$, fora por $0.049$;
+subtraindo a correção $\frac1{20}$ dá $0.576383$,
+fora de $\gamma = 0.577216$ por apenas $8.3\cdot10^{-4}$ ---
+que é o próximo termo $\frac{1}{12\cdot100}$ do
+expansão, como prova o problema do fim de semana (questão 8).
+\end{example}
+
+\begin{example}[Um bruto $\ln(n!)$ sem Stirling]\label{ex:b2:comparison:lnfactorial}
+O dispositivo de bracketing por si só já localiza $\ln(n!)$. Desde
+$\ln $ aumenta,
+\[
+\int_{k-1}^{k}\ln t\,\dd t \;\leq\; \ln k \;\leq\;
+\int_{k}^{k+1}\ln t\,\dd t ,
+\]
+e resumindo $ k = 2, \dots, n $ (com $\int_1^n\ln = n\ln n
+- n + 1$):
+\[
+n\ln n - n + 1 \;\leq\; \ln(n!) \;\leq\; (n+1)\ln(n+1) - n .
+\]
+Ambas as cercas são $ n\ln n - n + O(\ln n)$: por isso $\ln(n!) = n\ln
+n - n + O(\ln n)$, e em particular $\ln(n!) \sim n\ln n $.
+O que Stirling acrescenta são os próximos dois degraus --- o $\frac12\ln n $
+e a constante $\ln\sqrt{2\pi}$ --- que custa o melhor
+telescópica de \cref{thm:b2:comparison:stirling}. Sabendo
+a precisão que cada ferramenta adquire é metade da arte assintótica.
+\end{example}
+
+\begin{example}[Cancelamento exige ampliações]\label{ex:b2:comparison:cancellation}
+Calcule o limite de $\sqrt{n^2 + n} - n $. Ambos os termos são
+$\sim n $ e ``$\sim n - n $'' não tem sentido: equivalentes
+não pode ser subtraído. Em vez disso, expanda:
+\[
+\sqrt{n^2 + n} - n
+= n\Bigl(\sqrt{1 + \tfrac1n} - 1\Bigr)
+= n\Bigl(\frac{1}{2n} - \frac{1}{8n^2} +
+O\Bigl(\frac1{n^3}\Bigr)\Bigr)
+= \frac12 - \frac{1}{8n} + O\Bigl(\frac1{n^2}\Bigr) :
+\]
+limite $\frac12$, com a velocidade de aproximação $\frac1{8n}$ como um
+bônus. O mecanismo merece um nome: uma diferença de dois grandes
+quantidades equivalentes vivem inteiramente em seus \emph{próximo}
+termos, então é preciso expandir para a primeira ordem em que os dois
+lados diferem --- e carregamos o restante para certificar que
+nada mais sobrevive nessa ordem.
+\end{example}
+
+\begin{example}[Uma comparação divergente, funcionou]\label{ex:b2:comparison:loglog}
+Para $ f(t) = \frac{1}{t\ln t}$ sobre $\intco{2}{+\infty}$
+(\omterm{def:b2:metric:continuity}{contínuo}, positivo, decrescente): $\int_2^x f = \ln\ln x -
+\ln\ln 2 \to \infty $, então por
+\cref{thm:b2:comparison:seriesintegral}~(2),
+\[
+\sum_{k=2}^{n}\frac{1}{k\ln k} = \ln\ln n + C + o(1)
+\]
+para alguma constante $ C $. Duas lições. Primeiro, a divergência é
+real, mas glacial: a soma parcial excede primeiro $4$ em volta $ n
+\approx \eu^{\eu^{4 - C}}$, astronomicamente grande. Em segundo lugar, o
+\emph{forma} $\ln\ln n $ foi entregue por uma antiderivada, não
+adivinhou: para termos monótonos, a integral é a canônica
+dispositivo somador e a constante $ C $ --- como o de Euler $\gamma $
+--- é a memória dos termos iniciais.
+\end{example}
+
+\section{Fórmula de Stirling}
+
+\begin{lemma}[Integrais de Wallis, revisitadas]\label{lem:b2:comparison:wallis}
+Deixar $ W_n = \int_0^{\pi/2} \sin^n t\,\dd t $. Então $ nW_nW_{n-1} =
+\frac\pi2$ para $ n \geq 1$, $(W_n)$ diminui, e $ W_n \sim
+\sqrt{\dfrac{\pi}{2n}}$.
+\end{lemma}
+
+\begin{proof}
+Integração por partes dá $ nW_n = (n-1)W_{n-2}$ ($ n \geq 2$), então
+$ nW_nW_{n-1}$ é constante em $ n $, igual a $1 \cdot W_1 W_0 =
+\frac\pi2$. Diminuir: $\sin^{n+1} \leq \sin^n $ sobre
+$\intcc{0}{\frac\pi2}$. O aperto, em detalhe: monotonicidade
+dá $ W_{n+1} \leq W_n \leq W_{n-1}$, e dividindo por $ W_{n-1}
+> 0$,
+\[
+\frac{n}{n+1} = \frac{W_{n+1}}{W_{n-1}} \leq
+\frac{W_n}{W_{n-1}} \leq 1 ,
+\]
+a identidade esquerda da recorrência no índice $ n + 1$. Ambos
+limites tendem a $1$: $ W_n \sim W_{n-1}$, de onde
+\[
+nW_n^2 \sim nW_nW_{n-1} = \frac\pi2
+\qquad\Longrightarrow\qquad
+W_n \sim \sqrt{\frac{\pi}{2n}} .
+\]
+\end{proof}
+
+\begin{example}[As primeiras integrais de Wallis]\label{ex:b2:comparison:wallisvalues}
+De $ W_0 = \frac\pi2$, $ W_1 = 1$ e a recorrência $ nW_n =
+(n-1)W_{n-2}$:
+\[
+W_2 = \frac\pi4, \qquad
+W_3 = \frac23, \qquad
+W_4 = \frac{3\pi}{16}, \qquad
+W_5 = \frac{8}{15}, \qquad
+W_6 = \frac{5\pi}{32}.
+\]
+Mesmo os índices carregam uma $\pi $, os ímpares são racionais --- os dois
+produtos intercalados das formas fechadas. Numericamente $ W_6
+\approx 0.4909$ contra o assintótico
+$\sqrt{\pi/12} \approx 0.5116$: no $ n = 6$ o equivalente é
+já dentro $5\%$, e a identidade do produto é exata em todos
+$ n $: $6\,W_6W_5 = 6\cdot\frac{5\pi}{32}\cdot\frac8{15} =
+\frac\pi2$. Mesas pequenas como esta são a forma mais barata de
+pegar um erro de álgebra antes que ele infecte um argumento assintótico.
+\end{example}
+
+\begin{theorem}[Stirling]\label{thm:b2:comparison:stirling}
+\[
+n! \;\sim\; \sqrt{2\pi n}\, \Bigl(\frac{n}{\eu}\Bigr)^{\!n}
+.\index{Fórmula de Stirling}
+\]
+\end{theorem}
+
+\begin{proof}
+\emph{Etapa 1: $ n! \sim C \sqrt n\, (n/\eu)^n $ para alguma constante $ C >
+0$.} Definir
+\[
+d_n = \ln(n!) - \Bigl(n + \frac12\Bigr)\ln n + n .
+\]
+Então
+\[
+d_n - d_{n+1}
+= \Bigl(n + \frac12\Bigr) \ln\frac{n+1}{n} - 1
+= \Bigl(n + \frac12\Bigr)\Bigl(\frac1n - \frac{1}{2n^2} +
+\frac{1}{3n^3} + o\bigl(n^{-3}\bigr)\Bigr) - 1
+= \frac{1}{12n^2} + o\Bigl(\frac{1}{n^2}\Bigr),
+\]
+pela expansão de Taylor de $\ln(1 + \frac1n)$. A série $\sum (d_n
+- d_{n+1})$ portanto converge absolutamente (comparação com $\sum
+n^{-2}$), então $(d_n)$ converge, digamos para $ d $; exponenciando, $ n! \sim
+C\sqrt n\,(n/\eu)^n $ com $ C = \eu^{d}$.
+
+\emph{Etapa 2: $ C = \sqrt{2\pi}$ através de Wallis.} O formulário fechado $ W_{2p}
+= \frac{(2p)!}{4^p (p!)^2}\cdot\frac\pi2$ (da recorrência,
+Cálculo do ano 1 refeito em \cref{lem:b2:comparison:wallis}de
+configuração) combina com a Etapa 1:
+\[
+W_{2p} \sim \frac{C\sqrt{2p}\,(2p/\eu)^{2p}}
+{4^p\,\bigl(C\sqrt p\,(p/\eu)^p\bigr)^2}\cdot\frac{\pi}{2}
+= \frac{\sqrt{2p}}{C\,p}\cdot\frac{\pi}{2}
+= \frac{\pi}{C}\cdot\frac{1}{\sqrt{2p}} .
+\]
+Comparando com $ W_{2p} \sim \sqrt{\frac{\pi}{4p}}$
+(\cref{lem:b2:comparison:wallis}): $\frac{\pi}{C\sqrt{2p}} =
+\sqrt{\frac{\pi}{4p}}\,(1 + o(1))$ forças $ C = \pi
+\sqrt{\frac{4p}{2p\,\pi}} = \sqrt{2\pi}$.
+\end{proof}
+
+\begin{example}[Coeficiente binomial central]\label{ex:b2:comparison:centralbinomial}
+\[
+\binom{2n}{n} = \frac{(2n)!}{(n!)^2}
+\sim \frac{\sqrt{4\pi n}\,(2n/\eu)^{2n}}{2\pi n\,(n/\eu)^{2n}}
+= \frac{4^n}{\sqrt{\pi n}} :
+\]
+a probabilidade de que um passeio aleatório simétrico retorne a $0$ de vez em quando
+$2n $ é $\sim \frac{1}{\sqrt{\pi n}}$ --- um anúncio de
+\cref{ch:b2:randomvar}.
+\end{example}
+
+\begin{remark}[Perspectivas dentro deste volume]\label{rem:b2:comparison:perspectives}
+Cada capítulo quantitativo à frente fala do propósito deste capítulo
+linguagem. \cref{ch:b2:series} classifica séries comparando
+termos para a escala $ n^{-\alpha}(\ln n)^{-\beta}$ --- é
+O problema do fim de semana mapeia essa fronteira completamente.
+\cref{ch:b2:integration} faz o mesmo para integrais impróprias,
+com escala idêntica no \omterm{def:b2:metric:continuity}{contínuo} variável.
+\cref{ch:b2:powerseries} calcula raios de convergência de
+$\limsup\abs{a_n}^{1/n}$, um equivalente de $ n $- raízes
+exercício onde Stirling é a chave padrão ($\sqrt[n]{n!}
+\sim \frac n\eu $, \cref{exo:b2:comparison:4}). E o
+capítulos de probabilidade em dinheiro Stirling diretamente: o local
+estimativas de \cref{ch:b2:randomvar} para coeficientes binomiais
+são \cref{ex:b2:comparison:centralbinomial} e
+\cref{ex:b2:comparison:lopsided} literalmente. Assintóticos não são
+um capítulo aqui; é o acento do volume.
+\end{remark}
+
+\begin{method}[A lista de verificação de inicialização]\label{met:b2:comparison:checklist}
+Antes de confiar em uma expansão inicializada, audite quatro pontos.
+(1) \emph{Existência primeiro:} a raiz ou sequência deve ser fixada
+para baixo (monotonicidade, valores intermediários) antes de qualquer expansão
+--- símbolos sem referentes se expandem lindamente e significam
+nada. (2) \emph{Um pedido por passe:} cada substituição pode
+confiar apenas na ordem do orçamento inserido; extraindo
+dois novos termos de uma passagem é a fonte clássica de erro
+coeficientes. (3) \emph{Os restantes seguem em frente:} carregue o
+$ o(\cdot)$ através de cada etapa algébrica e deixe a absorção
+(termos menores engolidos por restos maiores) acontecem no
+final, explicitamente. (4) \emph{Auditoria numérica:} avaliar em um
+valor honesto de $ n $; um erro de coeficiente sobrevive algébrico
+re-derivação com surpreendente frequência e quase nunca sobrevive
+aritmética.
+\end{method}
+
+\begin{remark}[Armadilhas comuns]\label{rem:b2:comparison:pitfalls}
+(i) Equivalentes \emph{adicionar} mal: de $ u_n \sim n + \ln n $ e
+$ v_n \sim -n $ alguém pode \emph{não} concluir $ u_n + v_n \sim \ln
+n $; cancelamentos exigem expansões com sobras explícitas,
+nunca há equivalentes. (ii) Nunca exponenciar uma equivalência:
+$ n + 1 \sim n $ mas $\eu^{n+1} \not\sim \eu^n $; o cofre
+direção está tomando logaritmos de equivalentes tendendo a
+$+\infty $ (problema de fim de semana deste capítulo, questão 24). (iii)
+Um \omterm{def:b2:comparison:expansion}{expansão assintótica} está anexado a um \emph{escala}: escrita
+$ f = \frac1x + o\bigl(\frac1{x^2}\bigr)$ afirma mais do que $ f =
+\frac1x + o\bigl(\frac1x\bigr)$, e misturar os dois invalida
+álgebra subsequente. (iv) No bootstraps, substitua o
+\emph{todo} expansão atual, restante incluído --- caindo
+um $ o(\cdot)$ mid-pass produz plausível, mas errado
+coeficientes. (v) A comparação integral da série precisa
+monotonicidade: para termos oscilantes ele falha completamente (compare
+$\sum\frac{\sin k}k $, \cref{ch:b2:series}).
+\end{remark}
+
+\begin{example}[Stirling em números]\label{ex:b2:comparison:stirlingnum}
+No $ n = 10$: a fórmula dá $\sqrt{20\pi}\,(10/\eu)^{10}
+\approx 3\,598\,696$ contra $10! = 3\,628\,800$: erro relativo
+$8.3\cdot10^{-3}$, notável por uma declaração ``assiptótica'' em
+$ n = 10$. O erro tem uma estrutura --- o refinamento exato $ n!
+= \sqrt{2\pi n}\,(n/\eu)^n\bigl(1 + \frac1{12n} +
+O(n^{-2})\bigr)$ --- cuja primeira correção $\frac1{120} \approx
+8.3\cdot10^{-3}$ explica a lacuna observada quase exatamente. O
+A maquinaria Euler-Maclaurin do problema do fim de semana é precisamente a
+fonte sistemática de tais termos de correção.
+\end{example}
+
+\begin{remark}[Onde este capítulo é usado]
+A comparação assintótica é a gramática de tudo que é quantitativo
+downstream: os testes de convergência e o panorama Bertrand de
+\cref{ch:b2:series}, os critérios de integrabilidade de
+\cref{ch:b2:integration}, os cálculos do raio de convergência
+de \cref{ch:b2:powerseries}, e os teoremas limites de
+\cref{ch:b2:randomvar} (onde Stirling dirige o de
+Estimativas de Moivre-Laplace). O volume do Ano 3 industrializa o
+uma ideia que provamos manualmente aqui --- extraia o termo principal, vinculado
+o resto --- no método de Laplace e na convergência dominada.
+\end{remark}
+
+\begin{example}[Uma integral comparada a si mesma: $\int_2^x \frac{\dd t}{\ln t}$]\label{ex:b2:comparison:liworked}
+A caixa de ferramentas de comparação também funciona com integrais. Deixar $ F(x) =
+\int_2^x\frac{\dd t}{\ln t}$ (o integrando é \omterm{def:b2:metric:continuity}{contínuo} sobre
+$\intco2\infty $). Integrar por partes:
+\[
+F(x) = \Bigl[\frac{t}{\ln t}\Bigr]_2^x +
+\int_2^x\frac{\dd t}{(\ln t)^2}
+= \frac{x}{\ln x} + O\Bigl(\int_2^x\frac{\dd t}{(\ln
+t)^2}\Bigr) + O(1),
+\]
+e a integral restante é $ o\bigl(\frac{x}{\ln x}\bigr)$:
+divida em $\sqrt x $, delimitando por
+\[
+\int_2^{\sqrt x}\frac{\dd t}{(\ln t)^2} \leq \sqrt x
+\qquad\text{and}\qquad
+\int_{\sqrt x}^{x}\frac{\dd t}{(\ln t)^2} \leq
+\frac{x}{(\ln\sqrt x)^2} = \frac{4x}{(\ln x)^2} .
+\]
+Por isso $ F(x) \sim \frac{x}{\ln x}$. Leitores que conheceram o principal
+teorema do número no problema de fim de semana deste capítulo reconhecerá
+$ F $: é a integral logarítmica, o melhor estimador de
+$\pi(x)$, e o cálculo mostra que concorda com
+$\frac{x}{\ln x}$ para primeira ordem.
+\end{example}
+
+\begin{example}[Stirling em um binômio desequilibrado]\label{ex:b2:comparison:lopsided}
+A mesma rotina trifatorial que para
+\cref{ex:b2:comparison:centralbinomial} dá, por
+$\binom{3n}{n} = \frac{(3n)!}{n!\,(2n)!}$:
+\[
+\binom{3n}{n} \sim
+\frac{\sqrt{6\pi n}\,(3n/\eu)^{3n}}
+{\sqrt{2\pi n}\,(n/\eu)^{n}\cdot\sqrt{4\pi n}\,(2n/\eu)^{2n}}
+= \sqrt{\frac{3}{4\pi n}}\,
+\Bigl(\frac{27}{4}\Bigr)^{\!n} .
+\]
+A taxa exponencial $\frac{27}4 = \frac{3^3}{2^2}$ é
+$\eu^{3n\,H(1/3)}$ na notação de entropia da informação
+teoria: binômios desequilibrados crescem estritamente mais lento que o central
+$4^n $ por duas etapas --- aqui $(27/4)^{1/3} \approx 1.89 < 2$ por
+passo. Cada binômio assintótico em combinatória e probabilidade
+(\cref{ch:b2:randomvar}) é este um cálculo com diferentes
+pesos.
+\end{example}
+
+\section{Sequências implicitamente definidas}
+
+\begin{method}\label{met:b2:comparison:implicit}
+Para encontrar a assintótica das soluções $ x_n $ de uma equação $ F(x, n) =
+0$:\index{sequência implícita}
+\begin{enumerate}
+  \item \emph{Localizar}: provar a existência e unicidade de $ x_n $ em
+        um intervalo definido (monotonicidade, valor intermediário
+        teorema) e encontre seu comportamento bruto (limite, ordem de
+        crescimento).
+  \item \emph{Inicialização}: substitua a forma bruta $ x_n = (\text{main
+        term})(1 + \varepsilon_n)$ na equação e resolva
+        a próxima ordem de $\varepsilon_n $; repita, cada passagem
+        refinando um pedido.
+\end{enumerate}
+\end{method}
+
+\begin{example}\label{ex:b2:comparison:tan}
+Para $ n \geq 1$, a equação $\tan x = x $ tem exatamente uma solução
+$ x_n $ em $\intoo{n\pi - \frac\pi2}{n\pi + \frac\pi2}$ (a função
+$\tan x - x $ aumenta de $-\infty $ para $+\infty $ aí, é
+ser derivado $\tan^2 x \geq 0$). \emph{Bruto:} $ x_n = n\pi +
+\frac\pi2 - y_n $ com $ y_n \in \intoo{0}{\pi}$; desde $ x_n \to
+\infty $ e $\tan x_n = x_n \to +\infty $, $ x_n $ se aproxima do
+assíntota da esquerda: $ y_n \to 0$. \emph{Inicialização:} $\tan x_n =
+\cot y_n = \frac{1}{\tan y_n} \sim \frac{1}{y_n}$, e a equação
+$\cot y_n = x_n \sim n\pi $ dá $ y_n \sim \frac{1}{n\pi}$. Por isso
+\[
+x_n = n\pi + \frac\pi2 - \frac{1}{n\pi} +
+o\Bigl(\frac1n\Bigr),
+\]
+e o processo continua em qualquer ordem
+(\cref{exo:b2:comparison:6}).
+\end{example}
+
+\begin{example}[Uma segunda execução do método]\label{ex:b2:comparison:xplusln}
+Resolver $ x + \ln x = n $ assintoticamente. \emph{Localizar:} $ x
+\mapsto x + \ln x $ aumenta de $-\infty $ para $+\infty $ sobre
+$\intoo{0}{+\infty}$: uma raiz única $ x_n $, e $ x_n \to \infty $.
+\emph{Bruto:} $\ln x_n = o(x_n)$ dá $ x_n \sim n $.
+\emph{Inicialização:} de $ x_n = n - \ln x_n $ e $\ln x_n = \ln n
++ o(1)$ (logaritmos de equivalentes, ambos os lados $\to \infty $):
+\[
+x_n = n - \ln n + o(1) ;
+\]
+mais uma passagem, com $\ln x_n = \ln\bigl(n - \ln n + o(1)\bigr) =
+\ln n - \frac{\ln n}{n} + o\bigl(\frac{\ln n}n\bigr)$:
+\[
+x_n = n - \ln n + \frac{\ln n}{n} +
+o\Bigl(\frac{\ln n}{n}\Bigr).
+\]
+(Verifique em $ n = 100$: a raiz é $ x \approx 95.4415$; o
+fórmula de três termos dá $100 - 4.6052 + 0.0461 = 95.4409$, o
+dois mandatos um $95.3948$ --- cada passagem ganha o previsto
+ordem.) Mesmo loop, terceira paisagem: o método de
+\cref{met:b2:comparison:implicit} não se importa com o que
+equação se parece, apenas que cada passagem isola o dominante
+desconhecido.
+\end{example}
+
+\section{Exercícios}
+
+\begin{exercise}[$\star $]\label{exo:b2:comparison:1}
+Expandir em $+\infty $, dois termos além do principal:
+\[
+\sqrt{x^2 + x + 1} ,
+\qquad
+\ln(x^2 + x) - 2\ln x,
+\qquad
+\frac{x + \sin x}{x - \ln x} .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star $]\label{exo:b2:comparison:2}
+Dê a natureza (convergência/divergência) e, quando divergente, a
+principais assintóticos de $\sum_{k \leq n} k^\alpha $ para $\alpha >
+-1$, $\alpha = -1$, $\alpha < -1$, através
+\cref{thm:b2:comparison:seriesintegral}.
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b2:comparison:3}
+Provar $ H_n = \ln n + \gamma + \frac{1}{2n} + o\bigl(\frac1n\bigr)$.
+\emph{(Estudar $ v_n = H_n - \ln n - \gamma $: mostrar $ v_n - v_{n+1} =
+\frac{1}{2n^2} + O(n^{-3})$ e somar a cauda, comparando com
+$\sum_{k \geq n} \frac{1}{2k^2} \sim \frac{1}{2n}$ ---
+\cref{thm:b2:comparison:seriesintegral}~(1).)}
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b2:comparison:4}
+Usando Stirling, encontre equivalentes de: $\dfrac{(3n)!}{(n!)^3}$;
+$\;\dfrac{n!}{n^n}$; $\;\sqrt[n]{n!}$ (como $\frac n\eu(1 + o(1))$,
+precisado em dois termos).
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b2:comparison:5}
+Para $ n \geq 2$, prove que $ x^n + x = 1$ tem uma solução única $ x_n
+\in \intoo{0}{1}$, que $ x_n \to 1$, e estabelecer
+\[
+x_n = 1 - \frac{\ln n}{n} + o\Bigl(\frac{\ln n}{n}\Bigr).
+\]
+\emph{(De $ x_n^n = 1 - x_n $: pegue logaritmos e inicialize com
+$ x_n = 1 - \varepsilon_n $.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b2:comparison:6}
+Empurrar \cref{ex:b2:comparison:tan} mais um pedido:
+\[
+x_n = n\pi + \frac\pi2 - \frac{1}{n\pi} + \frac{1}{2n^2\pi} +
+o\Bigl(\frac{1}{n^2}\Bigr).
+\]
+\emph{(Escrever $\cot y_n = x_n $ exatamente, expandir $\cot y = \frac1y -
+\frac y3 + o(y)$ e $ x_n = n\pi(1 + \frac{1}{2n} - \dots)$ e
+identificar.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b2:comparison:7}
+Determinar $\lim_{n\to\infty} \dfrac{1}{n!}\sum_{k=0}^{n} k!$
+\emph{(vinculado a soma de todos os termos, exceto os dois últimos)}, e deduza o
+\omterm{def:b2:comparison:expansion}{expansão assintótica} $\sum_{k \leq n} k! = n!\bigl(1 + \frac1n +
+O(n^{-2})\bigr)$.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star $]\label{exo:b2:comparison:8}
+Deixar $ u_0 > 0$ e $ u_{n+1} = u_n + \dfrac{1}{u_n}$. Prove isso $ u_n
+\to \infty $, então isso $ u_n \sim \sqrt{2n}$ \emph{(estudar $ u_n^2$:
+seus incrementos são $2 + u_n^{-2}$; soma)}e refinar:
+\[
+u_n = \sqrt{2n}\Bigl(1 + \frac{\ln n}{8n} +
+o\Bigl(\frac{\ln n}{n}\Bigr)\Bigr).
+\]
+\emph{(De $ u_n^2 = 2n + \sum_{k<n} u_k^{-2} + u_0^2$ e $ u_k^2
+\sim 2k $: a soma é $\sim \frac12\ln n $ por
+\cref{thm:b2:comparison:seriesintegral}.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star $]\label{exo:b2:comparison:9}
+(Uma soma de Riemann com torção) Determine o comportamento assintótico de
+\[
+S_n = \sum_{k=1}^{n} \frac{1}{n + k\ln n} .
+\]
+\emph{(Fator $ n $: $ S_n = \frac1n\sum_k \bigl(1 +
+\frac{k\ln n}{n}\bigr)^{-1}$; reconhecer uma soma do tipo Riemann com um
+parâmetro de variação lenta $ t = \ln n $, calcular $\int_0^1
+\frac{\dd u}{1 + tu} = \frac{\ln(1+t)}{t}$, e concluir $ S_n \sim
+\frac{\ln\ln n}{\ln n}$.)}
+\end{exercise}
+
+\begin{exercise}[$\star $]\label{exo:b2:comparison:10}
+Prove a identidade $(\ln n)^{\ln n} = n^{\ln\ln n}$, em seguida, classifique o
+seguindo em aumento $ o(\cdot)$ ordem no infinito, com
+provas: $ n^2$, $(\ln n)^{\ln n}$, $2^n $, $ n!$, $ n^n $.
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b2:comparison:11}
+(Cauda de $\sum 1/k^2$, dois termos) Usando a telescopia exata
+$\sum_{k > n} \frac{1}{k(k+1)} = \frac{1}{n+1}$ e o
+decomposição $\frac1{k^2} = \frac{1}{k(k+1)} +
+\frac{1}{k^2(k+1)}$, provar
+\[
+\sum_{k > n} \frac{1}{k^2}
+= \frac1n - \frac{1}{2n^2} + O\Bigl(\frac{1}{n^3}\Bigr).
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star\star $]\label{exo:b2:comparison:12}
+Deixar $ u_0 = \frac12$ e $ u_{n+1} = u_n + \eu^{-u_n}$. Prove isso
+$ u_n \to \infty $, então --- configuração $ v_n = \eu^{u_n}$ e mostrando
+$ v_{n+1} = v_n + 1 + \frac{1}{2v_n} + O\bigl(v_n^{-2}\bigr)$ ---
+estabelecer
+\[
+u_n = \ln n + \frac{\ln n}{2n} + O\Bigl(\frac1n\Bigr).
+\]
+\end{exercise}
+
+\section{Problema: Bootstrapping, de Euler-Maclaurin ao
+Primos}
+
+Uma quantidade implícita ou acumulada raramente entrega seu
+assintóticos de uma só vez; extraímo-los em passagens, cada passagem
+alimentando a estimativa anterior de volta na relação definidora.
+Este problema de fim de semana treina esse loop em novas equações, prova
+a primeira ordem \emph{Fórmula de Euler-Maclaurin} (o trapézio
+atualização da série - comparação integral, com erro rigoroso
+barras), inverte $ x\ln x = n $, e desconta o método mais famoso
+cheque: do teorema dos números primos admitido, o assintótico
+lei $ p_n \sim n\ln n $ do $ n $-º primo.
+
+\begin{problem}[{Problema de fim de semana --- o Euler--Maclaurin
+correção e assintótica do $ n $-º primo}]
+\label{pb:b2:comparison:1}
+
+\medskip
+\noindent\textbf{Part I --- The bootstrap loop on a fresh
+equation.}
+\begin{enumerate}
+  \item Prove a afirmação de unicidade de
+        \cref{def:b2:comparison:expansion}: se $ f = \sum_{i\leq
+        k} c_i\varphi_i + o(\varphi_k) = \sum_{i \leq k}
+        c_i'\varphi_i + o(\varphi_k)$ na mesma escala, então
+        $ c_i = c_i'$ para todos $ i $. Então empurre o curso misto
+        exemplo, um degrau adiante:
+        \[
+        \frac{1}{x - \ln x} = \frac1x + \frac{\ln x}{x^2} +
+        \frac{(\ln x)^2}{x^3} + o\Bigl(\frac{(\ln
+        x)^2}{x^3}\Bigr) \qquad (x \to +\infty),
+        \]
+        e explique por que nenhum termo $\frac{c}{x^2}$ aparece.
+  \item Mostre isso para cada $ n \geq 1$ a equação $\eu^x + x =
+        n $ tem exatamente uma solução real $ x_n $, e isso $ x_n
+        \to +\infty $ com $ x_n \sim \ln n $.
+  \item Bootstrap duas vezes:
+        \[
+        x_n = \ln n - \frac{\ln n}{n} - \frac{(\ln n)^2}{2n^2} +
+        o\Bigl(\frac{(\ln n)^2}{n^2}\Bigr).
+        \]
+  \item Verifique numericamente em $ n = 1000$: comparar $ x_{1000}
+        \approx 6.90083$ com um, dois e três termos
+        valores da questão 3, com cinco casas decimais.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part II --- Euler--Maclaurin, order one.}
+\begin{enumerate}[resume]
+  \item Prove a identidade do kernel trapezoidal: para $ g $ de classe
+        $ C^2$ sobre $\intcc{0}{1}$,
+        \[
+        \int_0^1 g(t)\,\dd t = \frac{g(0) + g(1)}{2}
+        - \frac12\int_0^1 t(1 - t)\,g''(t)\,\dd t
+        \]
+        \emph{(integrar $\frac12 t(1-t)g''$ por partes duas vezes)}.
+  \item Deixar $ f $ ser $ C^2$ sobre $\intco{1}{+\infty}$ com
+        $\int_1^\infty \abs{f''} < \infty $. Mostre isso
+        \[
+        E_n = \sum_{k=1}^{n} f(k) - \int_1^n f -
+        \frac{f(1) + f(n)}{2}
+        \]
+        converge para uma constante $ E $, com a cauda amarrada
+        $\abs{E - E_n} \leq \frac18\int_n^\infty\abs{f''}$: o
+        \emph{Fórmula de Euler-Maclaurin} para primeira ordem.
+  \item Aplique isso a $ f(t) = \frac1t $: provar
+        \[
+        H_n = \ln n + \gamma + \frac{1}{2n} + \varepsilon_n,
+        \qquad \abs{\varepsilon_n} \leq \frac{1}{8n^2},
+        \]
+        fortalecimento \cref{exo:b2:comparison:3} (identificar o
+        constante com $\gamma $ comparando com
+        \cref{ex:b2:comparison:harmonic}).
+  \item Extraia o próximo coeficiente: mostre $\varepsilon_n =
+        -\frac{1}{12n^2} + o\bigl(\frac1{n^2}\bigr)$
+        \emph{(os incrementos de $ E_n $ são
+        $\frac12\int_0^1t(1-t)f''(n+t)\dd t =
+        \frac1{12}f''(n) + o(f''(n))$; somar a cauda com
+        \cref{thm:b2:comparison:seriesintegral})}.
+  \item Aplique a questão 6 a $ f = \ln $: derivar novamente em três linhas
+        a convergência de $ d_n = \ln n! - (n +
+        \frac12)\ln n + n $ (Etapa 1 de
+        \cref{thm:b2:comparison:stirling}), com o erro de bônus
+        taxa $ d_n = d + O\bigl(\frac1n\bigr)$.
+  \item Aplique a questão 6 a $ f(t) = \frac{1}{\sqrt t}$: mostrar
+        \[
+        \sum_{k=1}^{n}\frac1{\sqrt k} = 2\sqrt n + c +
+        \frac{1}{2\sqrt n} + O\Bigl(\frac{1}{n^{3/2}}\Bigr)
+        \]
+        para alguma constante $ c $ e avalie todos os termos em $ n =
+        10^4$ (a constante é $ c \approx -1.4604$).
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part III --- Inversion: the equation $ x\ln x =
+n $.}
+\begin{enumerate}[resume]
+  \item Mostre isso $ x\ln x = n $ tem exatamente uma solução $ x_n \in
+        \intco{1}{+\infty}$ para $ n \geq 1$, que $ x_n \to
+        \infty $, e isso $\ln x_n \sim \ln n $.
+  \item Deduza a inversão de um termo $ x_n \sim
+        \dfrac{n}{\ln n}$, então inicialize mais uma vez:
+        \[
+        \ln x_n = \ln n - \ln\ln n + o(1),
+        \qquad
+        x_n = \frac{n}{\ln n}\Bigl(1 + \frac{\ln\ln n}{\ln n}
+        + o\Bigl(\frac{\ln\ln n}{\ln n}\Bigr)\Bigr).
+        \]
+  \item Teste em $ n = 10^6$: a verdadeira raiz é $ x \approx
+        87\,848$; compare com o termo único ($\approx 72\,382$)
+        e dois mandatos ($\approx 86\,140$) valores e explique o
+        ganho lento (o parâmetro de expansão é $\frac{\ln\ln
+        n}{\ln n}$, apenas $\approx 0.19$ no $ n = 10^6$).
+  \item Nós agora \emph{admitir} o teorema dos números primos: o número
+        $\pi(x)$ de primos $\leq x $ satisfaz $\pi(x) \sim
+        \frac{x}{\ln x}$ como $ x \to \infty $ (provado honestamente em
+        o volume do Ano 3). Escrita $ p_n $ para o $ n $-º primo,
+        justificar $\pi(p_n) = n $ e execute a inversão de
+        questões 11-12 para provar
+        \[
+        p_n \sim n \ln n .
+        \]
+  \item Dividendos: (a) mostrar $\sum_{k \leq n} p_k \sim
+        \frac{n^2\ln n}{2}$ \emph{(comparar $\sum k\ln k $ com
+        $\int t\ln t\,\dd t $)}; (b) calcular o valor aproximado
+        chance de que um número inteiro uniformemente aleatório com $100$
+        dígitos é primo ($\ln 10^{100} \approx 230.26$: sobre
+        um em $230$).
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part IV --- The method exported: $ x\tan x =
+1$.}
+\begin{enumerate}[resume]
+  \item Mostre que para cada $ n \geq 1$ a equação $\tan x =
+        \frac1x $ tem exatamente uma solução $ x_n $ em
+        $\intoo{n\pi}{\,n\pi + \frac\pi2}$, e isso $ z_n = x_n
+        - n\pi \to 0^+$.
+  \item Um termo: $ z_n \sim \dfrac{1}{n\pi}$.
+  \item Mostre que a expansão de $ z_n $ tem \emph{não}
+        $\frac{c}{n^2}$ prazo: $ z_n = \frac1{n\pi} +
+        O\bigl(\frac{1}{n^3}\bigr)$.
+  \item Três termos: usando $\arctan u = u - \frac{u^3}3 +
+        O(u^5)$ e $\frac1{x_n} = \frac{1}{n\pi} -
+        \frac{z_n}{(n\pi)^2} + O(n^{-3}\cdot z_n^2)$, provar
+        \[
+        x_n = n\pi + \frac{1}{n\pi} -
+        \frac{4}{3\pi^3 n^3} + o\Bigl(\frac{1}{n^3}\Bigr).
+        \]
+  \item Verifique em $ n = 3$: raiz verdadeira $ x_3 \approx 9.5293344$;
+        comparar os valores de um e três termos e contrastar em
+        uma frase com o curso $\tan x = x $
+        (\cref{ex:b2:comparison:tan}): onde cada sequência fica
+        em sua janela e por quê.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part V --- A dynamical bootstrap, rules of the
+game, synthesis.}
+\begin{enumerate}[resume]
+  \item Deixar $ u_0 \in \intoo{0}{\pi}$ e $ u_{n+1} = \sin u_n $.
+        Mostrar $ u_n \to 0$ decrescentemente e calcule o limite de
+        $\dfrac{1}{u_{n+1}^2} - \dfrac{1}{u_n^2}$ \emph{(expandir
+        $\sin^{-2}$ através de $\sin u = u - \frac{u^3}6 + o(u^3)$)}.
+  \item Deduzir, via Cesàro significa (volume do ano 1), o clássico
+        \[
+        u_n \sim \sqrt{\frac{3}{n}} .
+        \]
+  \item (Números certificados) Usando o limite rigoroso da pergunta 7,
+        mostrar que avaliando $\ln n + \gamma + \frac1{2n}$ no $ n
+        = 10^6$ rendimentos $ H_{10^6}$ com erro no máximo
+        $1.25\cdot10^{-13}$ --- uma soma de um milhão de prazos calculada para
+        treze dígitos por três termos.
+  \item (Regras do jogo) Prove ou refute, com provas ou
+        contra-exemplos: (a) se $ u_n \sim v_n \to +\infty $ então
+        $\ln u_n \sim \ln v_n $; (b) se $ u_n \sim v_n $ então
+        $\eu^{u_n} \sim \eu^{v_n}$; (c) se $ f \sim g $ no
+        $+\infty $ ($ f, g $ diferenciável) então $ f' \sim g'$.
+  \item (Síntese) Em uma frase cada: o loop bootstrap de
+        \cref{met:b2:comparison:implicit} conforme usado nas Partes I,
+        III,IV; o que a correção trapezoidal acrescenta
+        \cref{thm:b2:comparison:seriesintegral}; por que inversão
+        de $ x\ln x $ é exatamente a ponte de $\pi(x)$ para
+        $ p_n $; e quais das regras da pergunta 24 protegiam quais
+        passo. Nomeie os dois cumes: a fórmula de Euler-Maclaurin
+        (primeira ordem) e a lei assintótica do $ n$-º
+        principal.
+\end{enumerate}
+\end{problem}

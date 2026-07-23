@@ -1,0 +1,814 @@
+\chapter{Série de potência}\label{ch:b2:powerseries}
+
+As séries de potências são as séries de funções mais bem comportadas em
+matemática: dentro de seu disco de convergência eles convergem
+\omterm{def:b2:funcseq:series}{normalmente} sobre compactos, pode ser termo diferenciado e integrado por
+prazo sem pensar duas vezes, e suas somas --- \emph{\omterm{def:b2:powerseries:analytic}{analítico}
+funções} --- são determinados por seus coeficientes. Este capítulo
+prova todo esse pacote e recupera, honestamente, cada Taylor
+série do volume Ano 1; gerando funções feche-o com
+dividendos algébricos.
+
+\section{Raio de convergência}
+
+\begin{lemma}[Abel]\label{lem:b2:powerseries:abel}
+Se a sequência $(a_n z_0^n)$ é limitado por alguns $ z_0 \neq 0$,
+então $\sum a_n z^n $ converge \omterm{def:b2:series:def}{absolutamente} para cada $\abs z < \abs
+{z_0}$, e \omterm{def:b2:funcseq:series}{normalmente} em cada disco $\abs z \leq r < \abs{z_0}$.
+\end{lemma}
+
+\begin{proof}
+Com $\abs{a_n z_0^n} \leq M $ e $\abs z \leq r $:
+\[
+\abs{a_n z^n} = \abs{a_n z_0^n}\,\Bigl|\frac{z}{z_0}\Bigr|^n
+\leq M\Bigl(\frac{r}{\abs{z_0}}\Bigr)^{\!n},
+\]
+um limite geométrico convergente, uniforme no disco.
+\end{proof}
+
+\begin{definition}[Raio de convergência]\label{def:b2:powerseries:radius}
+O \emph{raio de convergência}\index{raio de convergência} de
+$\sum a_n z^n $ é
+\[
+R = \sup\{r \geq 0 : (a_n r^n) \text{ bounded}\} \in
+\intcc{0}{+\infty} .
+\]
+Por \cref{lem:b2:powerseries:abel}: convergência absoluta para $\abs
+z < R $ (normal em \omterm{def:b2:metric:compact}{compactar} subdiscos), divergência --- na verdade ilimitada
+termos --- para $\abs z > R $. No círculo limite, qualquer coisa pode
+acontecer (\cref{exo:b2:powerseries:2}). Na prática $ R $ é computado
+pelo teste de razão de d'Alembert em $\abs{a_n}\abs z^n $ ou por comparação.
+\end{definition}
+
+\begin{example}[Um raio sem teste de proporção]\label{ex:b2:powerseries:sinn}
+Qual é o raio de $\sum \sin(n)\,z^n $? A proporção
+$\abs{\sin(n+1)/\sin n}$ não tem limite, mas a definição funciona
+diretamente. \emph{$ R \geq 1$:} $\abs{\sin n} \leq 1$, então $(\sin
+n\cdot r^n)$ é limitado para cada $ r < 1$ --- de fato para $ r =
+1$. \emph{$ R \leq 1$:} basta que $\sin n \not\to 0$.
+Suponha $\sin n \to 0$; a fórmula de adição
+\[
+\sin(n+1) = \sin n\cos 1 + \cos n\sin 1
+\]
+forçaria $\cos n \to 0$ (resolver para $\cos n $: $\sin 1 \neq
+0$), contradizendo $\sin^2 n + \cos^2 n = 1$. Então os termos
+$\sin(n)\,1^n $ não tende a $0$: a série diverge em $ z =
+1$, e $ R \leq 1$. Conclusão: $ R = 1$. Visão final: o
+raio é uma afirmação sobre $\abs{a_n}r^n $ sendo limitado ---
+nenhum limite de proporções é exigido, e argumentos de limitação
+resolver casos que o teste de proporção não pode tocar (compare o
+coeficientes oscilantes de \cref{exo:b2:powerseries:1}).
+\end{example}
+
+\begin{proposition}[Operações]\label{prop:b2:powerseries:operations}
+Deixar $\sum a_nz^n $, $\sum b_nz^n $ tem raios $ R_a, R_b $. Então, por
+$\abs z < \min(R_a, R_b)$:
+\[
+\sum (a_n + b_n)z^n = \sum a_nz^n + \sum b_nz^n,
+\qquad
+\Bigl(\sum a_nz^n\Bigr)\Bigl(\sum b_nz^n\Bigr) = \sum c_n z^n,
+\quad c_n = \sum_{k=0}^{n} a_kb_{n-k},
+\]
+ambas as séries tendo raio $\geq \min(R_a, R_b)$. (O produto é
+o Produto Cauchy, legítimo pela convergência absoluta e
+\cref{thm:b2:series:fubini}.)
+\end{proposition}
+
+\begin{proof}
+A fórmula da soma é a linearidade das séries convergentes, e
+$(a_n + b_n)r^n $ é limitado sempre que ambos $ a_nr^n $ e $ b_nr^n $
+são: raio $\geq \min(R_a, R_b)$. Para o produto, corrija $\abs z
+< \min(R_a, R_b)$: ambas as séries convergem \emph{\omterm{def:b2:series:def}{absolutamente}}
+lá (\cref{lem:b2:powerseries:abel}), então o duplamente indexado
+família $(a_kz^k\,b_lz^l)_{k,l}$ é resumido, e
+\cref{thm:b2:series:fubini} permite qualquer agrupamento. Agrupando por $ k
++ l = n $:
+\[
+\Bigl(\sum_k a_kz^k\Bigr)\Bigl(\sum_l b_lz^l\Bigr)
+= \sum_{n\geq0}\Bigl(\sum_{k+l=n}a_kb_l\Bigr)z^n
+= \sum_{n\geq0}c_nz^n ,
+\]
+\omterm{def:b2:series:def}{absolutamente} convergente para cada um desses $ z $: a série de produtos
+tem raio $\geq \min(R_a, R_b)$ também.
+\end{proof}
+
+\begin{example}[Um quadrado de Cauchy, verificado]\label{ex:b2:powerseries:cauchysquare}
+Quadrar a série geométrica: para $\abs x < 1$, o coeficiente
+de $ x^n $ em $\bigl(\sum x^k\bigr)^2$ é $ c_n = \sum_{k+l=n}
+1\cdot1 = n + 1$, então
+\[
+\frac{1}{(1-x)^2} = \sum_{n\geq0}(n+1)\,x^n .
+\]
+Verificação cruzada por diferenciação termo a termo
+(\cref{thm:b2:powerseries:calculus} abaixo): diferenciando
+$\frac{1}{1-x} = \sum x^n $ dá $\frac{1}{(1-x)^2} = \sum
+nx^{n-1} = \sum(n+1)x^n $ --- a mesma série por dois não relacionados
+mecanismos. Visão final: quando uma identidade de coeficiente parece
+misterioso, um desses dois motores (convolução ou
+diferenciação) geralmente produz em uma linha; o fim de semana
+pergunta do problema em $\sum\binom{2k}k\binom{2n-2k}{n-k} = 4^n $
+executa o mecanismo de convolução com potência total.
+\end{example}
+
+\begin{example}[Multiplicando por $\frac{1}{1-x}$ soma os coeficientes]\label{ex:b2:powerseries:partialsums}
+UM Produto Cauchy contra a série geométrica tem um memorável
+significado: para qualquer $\sum a_nx^n $ de raio $ R > 0$ e $\abs x <
+\min(R, 1)$,
+\[
+\frac{1}{1-x}\sum_{n\geq0}a_nx^n
+= \sum_{n\geq0}\Bigl(\sum_{k=0}^{n}a_k\Bigr)x^n :
+\]
+multiplicação por $\frac{1}{1-x}$ substitui coeficientes por
+suas somas parciais (convolvem com a sequência de todos).
+Exemplo: $\dfrac{\eu^x}{1-x} = \sum_n s_n x^n $ com $ s_n =
+\sum_{k\leq n}\frac{1}{k!}$, as somas parciais de $\eu $ ---
+comparar \cref{exo:b2:powerseries:11}, onde o mesmo produto
+com $\eu^{-x}$ codifica as contagens de perturbação. Fechando
+insight: operações em séries de potências são operações em
+sequências de coeficientes disfarçadas (multiplicar por $\frac1{1-x}$:
+soma; multiplique por $ x $: mudança; diferenciar: multiplicar por $ n $
+e shift) --- um dicionário, o capítulo de funções geradoras
+lerá fluentemente.
+\end{example}
+
+\section{Regularidade da soma}
+
+\begin{theorem}[Cálculo termo a termo]\label{thm:b2:powerseries:calculus}
+Deixar $ f(x) = \sum_{n\geq0} a_n x^n $ tem raio $ R > 0$ (real
+variável $ x \in \intoo{-R}{R}$).
+\begin{enumerate}
+  \item A série derivada $\sum n\,a_n x^{n-1}$ tem o \emph{mesmo}
+        raio $ R $, e $ f $ é $ C^1$ com $ f'(x) = \sum_{n \geq 1}
+        n a_n x^{n-1}$. Iterando, $ f $ é $ C^\infty $ e
+        \[
+        a_n = \frac{f^{(n)}(0)}{n!} :
+        \]
+        os coeficientes de uma série de potências são únicos (duas séries
+        com a mesma soma próxima $0$ têm coeficientes iguais).
+  \item Primitiva termo a termo: $\sum \frac{a_n}{n+1}x^{n+1}$ tem
+        raio $ R $ e derivada $ f $.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\emph{Mesmo raio:} se $(a_nr^n)$ é limitado e $ r' < r $, então
+$ n\abs{a_n} r'^{\,n-1} = \frac{n}{r'}\abs{a_nr^n}
+\bigl(\frac{r'}{r}\bigr)^n $ é limitado (na verdade $\to 0$: geométrico
+batidas $ n $), então $ R' \geq R $; por outro lado $\abs{a_n x^n} \leq \abs x
+\cdot n\abs{a_n}\abs x^{n-1}$ dá $ R \geq R'$.
+
+\emph{Diferenciação:} sobre $\intcc{-r}{r}$, $ r < R $, a derivada
+série converge \omterm{def:b2:funcseq:series}{normalmente} ($ n\abs{a_n}r^{n-1}$ resumido pelo
+cálculo do raio); o original converge em $ x = 0$: o
+teorema da diferenciação para séries
+(\cref{thm:b2:funcseq:seriestransfer}) se aplica a todos esses
+segmento, portanto em $\intoo{-R}{R}$. Iterando $ k $ vezes e
+avaliando em $0$: explicitamente, o $ k $-a série derivada é
+\[
+f^{(k)}(x) = \sum_{n\geq k} n(n-1)\cdots(n-k+1)\,a_n\,x^{n-k},
+\]
+e em $ x = 0$ cada termo com $ n > k $ desaparece, deixando apenas
+o termo constante $ k(k-1)\cdots1\cdot a_k $: $ f^{(k)}(0) =
+k!\,a_k $. Segue a singularidade dos coeficientes: duas séries de potências
+com a mesma soma próxima $0$ têm as mesmas derivadas em $0$,
+daí o mesmo $ a_k $. Primitivos: mesmo raio pelo mesmo
+cálculo e diferenciar termo por termo de volta.
+\end{proof}
+
+\begin{example}[Avaliando uma série em um ponto]\label{ex:b2:powerseries:evaluate}
+O que é $\sum_{n\geq1}\dfrac{n^2}{2^n}$? É a soma
+$\sum n^2x^n $ de \cref{exo:b2:powerseries:3} avaliado
+\emph{dentro} o disco, em $ x = \frac12 < 1 = R $, onde cada
+a manipulação usada para derivar a forma fechada era legítima:
+\[
+\sum_{n\geq1} n^2x^n = \frac{x(1+x)}{(1-x)^3}
+\quad\Longrightarrow\quad
+\sum_{n\geq1}\frac{n^2}{2^n}
+= \frac{\frac12\cdot\frac32}{(\frac12)^3}
+= \frac{3/4}{1/8} = 6 .
+\]
+Mesmo motor, outros mostradores: $ x = \frac13$ dá
+$\sum\frac{n^2}{3^n} = \frac{\frac13\cdot\frac43}{(2/3)^3} =
+\frac32$. Visão final: uma identidade em série de potências é um
+máquina, não uma única fórmula --- uma derivação precifica cada
+série numérica $\sum n^2q^n $ de uma vez, para todos $\abs q < 1$;
+é assim que o capítulo sobre funções geradoras calculará
+expectativas e variações no atacado.
+\end{example}
+
+\begin{example}[Os clássicos, desta vez honestamente]\label{ex:b2:powerseries:classics}
+$\displaystyle\frac{1}{1 - x} = \sum x^n $ ($ R = 1$); integrando
+termo por termo (\cref{thm:b2:powerseries:calculus}~(2)):
+\[
+-\ln(1 - x) = \sum_{n\geq1} \frac{x^n}{n},
+\qquad
+\arctan x = \sum_{n \geq 0} \frac{(-1)^n x^{2n+1}}{2n+1}
+\quad (\abs x < 1),
+\]
+o segundo em duas etapas: substituir $-x^2$ na geometria
+série para obter $\frac{1}{1+x^2} = \sum(-1)^nx^{2n}$ (raio
+$1$, desde $\abs{x^2} < 1 \iff \abs x < 1$), então pegue o
+primitivo termo a termo desaparecendo em $0$; ambos os lados estão
+primitivas da mesma função com o mesmo valor em $0$,
+portanto igual em $\intoo{-1}{1}$. E $\exp $:
+a série $ E(x) = \sum \frac{x^n}{n!}$ ($ R = \infty $) satisfaz
+$ E' = E $, $ E(0) = 1$ por diferenciação termo, então $ E = \exp $ por
+a singularidade do Ano 1. Cada ``expansão padrão'' do Ano 1
+o volume é agora um teorema sobre sua série de potências completas.
+\end{example}
+
+\begin{example}[Um logaritmo calculado de dentro do disco]\label{ex:b2:powerseries:lntwo}
+Avaliando $-\ln(1-x) = \sum\frac{x^n}{n}$ no interior
+ponto $ x = \frac12$:
+\[
+\sum_{n\geq1}\frac{1}{n\,2^n} = \ln 2 ,
+\]
+uma representação de rápida convergência de $\ln 2$ (dez termos já
+dar $0.69306\ldots $ contra $\ln 2 = 0.69314\ldots $), longe
+melhor que a série alternada $1 - \frac12 + \frac13 -
+\dots $ disponível apenas na fronteira. Visão final:
+sempre que uma constante é alcançável tanto na borda quanto estritamente
+dentro do disco, o interior ganha numericamente --- geométrico
+decaimento contra decaimento harmônico.
+\end{example}
+
+\begin{example}[A diferenciação preserva o raio, não o limite]\label{ex:b2:powerseries:boundaryloss}
+A série $\sum_{n\geq1}\frac{x^n}{n^2}$ tem raio $1$ e
+converge em \emph{ambos} pontos finais ($\sum\frac1{n^2}$ e seu
+gêmeo alternado). Sua série derivada,
+\[
+\sum_{n\geq1}\frac{x^{n-1}}{n} ,
+\]
+tem o mesmo raio $1$ --- como
+\cref{thm:b2:powerseries:calculus} garantias --- mas agora
+diverge em $ x = 1$ (série harmônica) enquanto ainda converge
+em $ x = -1$ (\omterm{def:b2:linalg:alternating}{alternando}). Mais uma diferenciação rende
+$\sum_{n\geq2}\frac{n-1}{n}x^{n-2}$, divergente em ambas as extremidades
+(os termos não tendem a $0$). Visão final: cada
+diferenciação multiplica os coeficientes por $ n $, que
+nunca move o raio (a geometria bate o polinômio), mas come
+uma ordem de decadência de limites; cálculo termo a termo é um
+esporte interior, e tudo o que acontece no aro deve ser
+reexaminado --- a teoria de Abel-Tauber do problema do fim de semana é
+exatamente esse reexame.
+\end{example}
+
+\begin{example}[Dividir uma série por resíduos --- trabalhou até o fim]\label{ex:b2:powerseries:quarter}
+Calcular $ f(x) = \sum_{n\geq0} \dfrac{x^{4n}}{(4n)!}$ em fechado
+formulário. Ambos $\cosh x = \sum \frac{x^{2m}}{(2m)!}$ e $\cos x =
+\sum \frac{(-1)^m x^{2m}}{(2m)!}$ tem raio $\infty $, então seu
+a média pode ser calculada termo a termo:
+\[
+\frac{\cosh x + \cos x}{2}
+= \sum_{m\geq0}\frac{1 + (-1)^m}{2}\,\frac{x^{2m}}{(2m)!}
+= \sum_{m \text{ even}}\frac{x^{2m}}{(2m)!}
+= \sum_{n\geq0}\frac{x^{4n}}{(4n)!} = f(x) .
+\]
+O filtro $\frac{1+(-1)^m}{2}$ mantém exatamente o mesmo $ m $: isso
+é o verdadeiro avatar do filtro de raízes da unidade (o complexo
+versão, com $\iu^n $, extrai módulo de resíduos $4$ em um
+acidente vascular cerebral). Verificação de fechamento: $ f $ resolve $ f'''' = f $ com $ f(0) = 1$,
+$ f'(0) = f''(0) = f'''(0) = 0$ --- diferenciar a série quatro
+vezes (\cref{thm:b2:powerseries:calculus}) e assista
+reproduzir-se; $\frac{\cosh + \cos}{2}$ satisfaz o mesmo
+dados.
+\end{example}
+
+\begin{definition}[Funções analíticas]\label{def:b2:powerseries:analytic}
+$ f $ é \emph{analítico}\index{analítico} no $ x_0$ quando é
+a soma de uma série de potências em $(x - x_0)$ em um bairro; em um
+intervalo, quando em todos os pontos. Somas de séries de potências são analíticas
+dentro de seu disco (rearranjo da expansão --- admitido em
+este nível para recentragem, o caso $ x_0 = 0$ ser
+\cref{thm:b2:powerseries:calculus}). Analítico implica $ C^\infty $;
+o inverso \emph{falhar}: a função plana $\eu^{-1/x^2}$
+(\cref{exo:b2:powerseries:7}).
+\end{definition}
+
+\begin{example}[Centralização e o raio como distância]\label{ex:b2:powerseries:recenter}
+Expandir $ f(x) = \frac{1}{1-x}$ em volta $ x_0 = \frac12$: escrita
+$ x = \frac12 + h $,
+\[
+\frac{1}{1 - x} = \frac{1}{\frac12 - h}
+= \frac{2}{1 - 2h}
+= \sum_{n\geq0} 2^{n+1}\,h^n
+= \sum_{n\geq0} 2^{n+1}\Bigl(x - \frac12\Bigr)^{\!n},
+\]
+válido para $\abs{2h} < 1$, ou seja\ $\abs{x - \frac12} < \frac12$.
+O novo raio é exatamente a distância do novo centro até
+a singularidade $ x = 1$: a recentralização diminui (ou aumenta) o
+disco para encaixar na obstrução mais próxima. Visão final: isso é
+a imagem por trás da definição de analiticidade --- um
+função, muitas séries de potências locais, cada uma vivendo na maior
+disco evitando problemas; o volume do Ano 3 transforma o
+heurística ``raio $=$ distância até o complexo mais próximo
+singularidade'' em um teorema.
+\end{example}
+
+\begin{remark}[Armadilhas comuns]
+\emph{(i) O teste da razão é suficiente, não necessário:} quando
+$\abs{a_{n+1}/a_n}$ não tem limite
+(\cref{ex:b2:powerseries:sinn}, \cref{exo:b2:powerseries:1}),
+volte para a definição: $ R = \sup\{r : (a_nr^n)$
+limitado $\}$. \emph{(ii) Nada atravessa a fronteira de graça:}
+diferenciação e integração termo a termo são teoremas
+\emph{dentro} o \omterm{def:b2:metric:topology}{abrir} disco; no $\abs x = R $ cada série deve
+ser reexaminado (esse é o assunto do fim de semana
+problema). \emph{(iii) Raio de uma soma:} $\min(R_a, R_b)$ é
+apenas um limite inferior --- cancelamentos podem ampliá-lo ($ a_n = 1,
+b_n = -1$: soma idêntica $0$, raio $\infty $). \emph{(4)
+$ C^\infty $ não é \omterm{def:b2:powerseries:analytic}{analítico}:} uma série de Taylor convergente pode
+\omterm{def:b2:integration:improper}{convergir} para o \emph{errado} função
+(\cref{exo:b2:powerseries:7}); antes de escrever $ f(x) = \sum
+\frac{f^{(n)}(0)}{n!}x^n $, prove --- através de uma EDO
+(\cref{met:b2:powerseries:ode}), uma estimativa de resto ou um
+fórmula integral.
+\end{remark}
+
+\begin{remark}[Onde isso é usado]
+As séries de potência são o carro-chefe de três capítulos posteriores: o
+O capítulo de equações diferenciais resolve EDOs lineares injetando
+$\sum a_nx^n $ (quadro de método abaixo, industrializado); o
+O capítulo de funções geradoras converte identidades sobre
+probabilidades em identidades sobre séries de potências e vice-versa; e
+o volume do Ano 3 oficializa a variável complexa, onde
+a analiticidade torna-se equivalente à diferenciabilidade complexa e
+a “recentralização admitida” acima obtém sua prova honesta. O
+O problema do fim de semana explora o único lugar onde os teoremas deste capítulo
+fique em silêncio: o limite $\abs x = R $ em si.
+\end{remark}
+
+\begin{method}[Expandindo por meio de uma equação diferencial]\label{met:b2:powerseries:ode}
+Para expandir uma função $ f $ em uma série de potências: encontre uma EDO linear com
+coeficientes polinomiais satisfeitos por $ f $; injetar $\sum a_nx^n $;
+identificar coeficientes para obter uma recorrência para $(a_n)$; resolver, e
+verifique o raio e as condições iniciais. Exemplo --- o binômio
+série: $ f(x) = (1+x)^\alpha $ satisfaz $(1+x)f' = \alpha f $, $ f(0)
+= 1$; injetando dá $(n+1)a_{n+1} = (\alpha - n)a_n $, então $ a_n =
+\binom{\alpha}{n}$, raio $1$ (teste de razão), e a soma, satisfazendo
+a mesma EDO com o mesmo valor inicial, é igual $(1 + x)^\alpha $
+pelo teorema da unicidade para EDOs lineares (volume do ano 1).
+\end{method}
+
+\begin{example}[O método em uma equação forçada]\label{ex:b2:powerseries:odeforced}
+Resolver $ y' = y + x $, $ y(0) = 0$, por séries de potências. Injetando $ y =
+\sum a_nx^n $:
+\[
+\sum_{n\geq0}(n+1)a_{n+1}x^n
+= \sum_{n\geq0}a_nx^n + x ,
+\]
+e identificando coeficientes: $ a_1 = a_0 = 0$, $2a_2 = a_1 + 1
+= 1$, e $(n+1)a_{n+1} = a_n $ para $ n \geq 2$. Então $ a_2 =
+\frac{1}{2!}$ e, por indução, $ a_n = \frac{1}{n!}$ para cada
+$ n \geq 2$: raio $\infty $, e
+\[
+y(x) = \sum_{n\geq2}\frac{x^n}{n!} = \eu^x - 1 - x .
+\]
+Verificar: $ y' = \eu^x - 1 = y + x $ e $ y(0) = 0$. Fechando
+insight: a recorrência \emph{é} a equação, coeficiente por
+coeficiente; o termo forçado apenas perturba um número finito
+coeficientes iniciais, após os quais o padrão homogêneo assume
+over --- uma sombra discreta de ``solução particular mais
+solução homogênea''.
+\end{example}
+
+\section{Gerando funções}
+
+\begin{example}[Fibonacci]\label{ex:b2:powerseries:fibonacci}
+Deixar $ F(x) = \sum_{n\geq0} F_n x^n $ (números de Fibonacci, $ F_0 = 0$,
+$ F_1 = 1$). A recorrência $ F_{n+2} = F_{n+1} + F_n $ traduz,
+multiplicando por $ x^{n+2}$ e somando, em
+\[
+F(x) - x = x\,F(x) + x^2 F(x)
+\quad\Longrightarrow\quad
+F(x) = \frac{x}{1 - x - x^2} ,
+\]
+válido onde a série converge. O raio é
+$\frac{1}{\varphi}$: de $ F_n \sim
+\frac{\varphi^n}{\sqrt5}$ (Binet, próximo exemplo --- ou o bruto
+indução $ F_n \leq 2^n $ mais a recorrência), o teste de razão
+dá
+\[
+\frac{F_{n+1}\abs x^{n+1}}{F_n\abs x^n}
+\longrightarrow \varphi\abs x ,
+\qquad\text{convergence iff } \abs x < \frac1\varphi
+\approx 0.618 .
+\] Frações parciais em
+$\frac{x}{1 - x - x^2}$ e a série geométrica deriva novamente de Binet
+fórmula --- gerando funções industrializar linear
+recorrências.\index{função geradora}
+\end{example}
+
+\begin{example}[A fórmula de Binet, realizada]\label{ex:b2:powerseries:binet}
+Deixar $\varphi = \frac{1+\sqrt5}{2}$ e $\psi =
+\frac{1-\sqrt5}{2}$, as raízes de $ X^2 = X + 1$; desde $\varphi
++ \psi = 1$ e $\varphi\psi = -1$,
+\[
+1 - x - x^2 = (1 - \varphi x)(1 - \psi x) .
+\]
+Frações parciais: buscando $\frac{x}{(1-\varphi x)(1-\psi x)} =
+\frac{A}{1 - \varphi x} + \frac{B}{1 - \psi x}$, a constante
+termo dá $ A + B = 0$ e o $ x $-coeficiente $-A\psi - B\varphi
+= 1$, então $ A(\varphi - \psi) = 1$: $ A = \frac{1}{\sqrt5} = -B $.
+Duas séries geométricas depois,
+\[
+F(x) = \frac{1}{\sqrt5}\sum_{n\geq0}
+\bigl(\varphi^n - \psi^n\bigr)x^n
+\quad\Longrightarrow\quad
+F_n = \frac{\varphi^n - \psi^n}{\sqrt5}
+\]
+pela singularidade dos coeficientes
+(\cref{thm:b2:powerseries:calculus}). Desde $\abs\psi < 1$, O termo $\frac{\psi^n}{\sqrt5}$ tem valor absoluto $< \frac12$:
+$ F_n $ é o \emph{número inteiro mais próximo} para
+$\frac{\varphi^n}{\sqrt5}$. Visão final: o raio
+$\frac1\varphi $ de $ F $ é o inverso da raiz dominante
+--- crescimento dos coeficientes e \omterm{def:b2:powerseries:radius}{raio de convergência} são os
+mesma informação lida em direções opostas.
+\end{example}
+
+\begin{example}[Números catalães]\label{ex:b2:powerseries:catalan}
+O \omterm{ex:b2:powerseries:catalan}{Números catalães} $ C_n $ (número de triangulações, de colchetes,
+dos caminhos de Dyck, \dots) satisfazer $ C_0 = 1$ e $ C_{n+1} = \sum_{k=0}^n
+C_kC_{n-k}$. O \omterm{ex:b2:powerseries:fibonacci}{função geradora} $ C(x) = \sum C_nx^n $ então
+satisfaz (Produto Cauchy!)
+\[
+C(x) = 1 + x\,C(x)^2
+\quad\Longrightarrow\quad
+C(x) = \frac{1 - \sqrt{1 - 4x}}{2x} ,
+\]
+escolhendo a raiz com $ C(0) = 1$: resolvendo a quadrática
+$ xC^2 - C + 1 = 0$ dá aos dois candidatos $\frac{1 \pm
+\sqrt{1-4x}}{2x}$, e como $ x \to 0$ o ``$+$'' raiz explode
+gosto $\frac1x $ enquanto o ``$-$'' raiz tende a $1$ (expandir
+$\sqrt{1-4x} = 1 - 2x + O(x^2)$) --- apenas o sinal de menos pode
+transportar uma série de potências com $ C_0 = 1$. Expandindo $\sqrt{1 - 4x}$ pelo
+série binomial dá a forma fechada
+\[
+C_n = \frac{1}{n+1}\binom{2n}{n} ,
+\]
+realizado em \cref{exo:b2:powerseries:8}.\index{Números catalães}
+\end{example}
+
+\begin{remark}[Série formal versus série convergente]
+Cada cálculo de \omterm{ex:b2:powerseries:fibonacci}{função geradora} acima termina invocando
+a singularidade dos coeficientes, e esse teorema vive
+\emph{dentro} um disco de raio positivo: antes da ``leitura''
+$ F_n $ ou $ C_n $, é preciso saber $ R > 0$. Um limite bruto a priori
+é suficiente --- $ F_n \leq 2^n $ (indução imediata) dá $ R \geq
+\frac12$ para Fibonacci; $ C_n \leq 4^n $ (cada número catalão
+conta subconjuntos de caminhos) dá $ R \geq \frac14$. Cuidado com o
+final degenerado da escala: $\sum n!\,x^n $ tem raio $0$ e
+manipulá-lo como uma função não tem sentido --- identidades
+envolvendo tais séries pertencem ao \emph{formal} cálculo de
+coeficientes, um jogo puramente algébrico com seus próprios (diferentes)
+regras. Neste nível: sempre garanta primeiro um raio positivo,
+então calcule livremente dentro dele.
+\end{remark}
+
+\begin{remark}[Perspectivas dentro deste volume]
+A série Power é uma das duas grandes expansões do livro
+máquinas; a outra é a série de Fourier do harmônico
+capítulos, e compará-los é instrutivo. Uma série de potências é
+rígido: seus coeficientes são forçados ($ a_n = f^{(n)}(0)/n!$),
+sua convergência é implacável (normal por dentro, sem esperança por fora),
+e sua soma é \omterm{def:b2:powerseries:analytic}{analítico} --- infinitamente rígido
+(\cref{def:b2:powerseries:analytic}). Uma série de Fourier é
+flexível: representa apenas sinais suaves por partes, no
+preço de questões delicadas de convergência na fronteira do
+suavidade. As duas teorias se encontram no fim de semana deste capítulo
+problema: Cesàro e \omterm{thm:b2:series:abel}{Resumo de Abel}, desenvolvido aqui para o
+círculo limite, retorne no capítulo de Fourier como Fejérr
+e grãos de Poisson. Enquanto isso, as equações diferenciais
+capítulo consome séries de potências diretamente ($\eu^{tA}$, série
+soluções), e o capítulo sobre funções geradoras se transforma
+\cref{ex:b2:powerseries:fibonacci}o truque em uma sistemática
+cálculo de probabilidades.
+\end{remark}
+
+\section{Exercícios}
+
+\begin{exercise}[$\star $]\label{exo:b2:powerseries:1}
+Raios de convergência:
+$\sum \dfrac{n^2}{2^n}z^n $; $\;\sum \dfrac{z^n}{\binom{2n}{n}}$;
+$\;\sum z^{n!}$; $\;\sum \bigl(2 + (-1)^n\bigr)^n z^n $.
+\end{exercise}
+
+\begin{exercise}[$\star $]\label{exo:b2:powerseries:2}
+Mostre isso $\sum z^n $, $\sum \frac{z^n}{n}$, $\sum \frac{z^n}{n^2}$
+todos têm raio $1$ mas se comporta de maneira diferente em $ z = 1$ e $ z = -1$:
+divergência/divergência, divergência/convergência,
+convergência/convergência.
+\end{exercise}
+
+\begin{exercise}[$\star $]\label{exo:b2:powerseries:3}
+Calcule as somas, por $\abs x < 1$:
+\[
+\sum_{n\geq0} n x^n,
+\qquad
+\sum_{n\geq0} n^2 x^n,
+\qquad
+\sum_{n\geq0} \frac{x^{2n+1}}{2n+1} .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b2:powerseries:4}
+Expanda em séries de potências em $0$, com raio: $\dfrac{1}{(1-x)(2-x)}$
+(frações parciais); $\;\ln(1 + x + x^2)$ \emph{(escrever $1 + x + x^2
+= \frac{1 - x^3}{1 - x}$)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b2:powerseries:5}
+Prove isso $ f(x) = \sum_{n\geq1} H_n x^n = -\dfrac{\ln(1 -
+x)}{1 - x}$ para $\abs x < 1$, onde $ H_n $ é o número harmônico
+\emph{(Produto Cauchy de $\sum x^n $ e $\sum \frac{x^n}{n}$)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b2:powerseries:6}
+Resolver por \omterm{ex:b2:powerseries:fibonacci}{função geradora} a recorrência $ u_0 = 1$, $ u_{n+1} =
+2u_n + n $: calcular $ U(x) = \sum u_nx^n $ em forma fechada, decompor,
+e leia $ u_n = 2^{n+1} - n - 1$.
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b2:powerseries:7}
+Deixar $ f(x) = \eu^{-1/x^2}$ para $ x \neq 0$, $ f(0) = 0$. Prove isso
+$ f $ é $ C^\infty $ sobre $\R $ com $ f^{(n)}(0) = 0$ para todos $ n $
+\emph{(mostre por indução que $ f^{(n)}(x) = P_n\bigl(\frac1x\bigr)
+\eu^{-1/x^2}$ para polinômios $ P_n $, e use o crescimento
+comparação)}. Conclua isso $ f $ não é \omterm{def:b2:powerseries:analytic}{analítico} no $0$: é Taylor
+série em $0$ converge --- para a função errada.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star $]\label{exo:b2:powerseries:8}
+\omterm{def:b2:metric:complete}{Completo} \cref{ex:b2:powerseries:catalan}: expandir $\sqrt{1 - 4x}$
+com a série binomial, mostrando
+\[
+\binom{1/2}{n+1}(-4)^{n+1} = -\frac{2}{n+1}\binom{2n}{n},
+\]
+e deduzir $ C_n = \frac{1}{n+1}\binom{2n}{n}$; determinar o \omterm{def:b2:powerseries:radius}{raio
+de convergência} de $ C(x)$ e os assintóticos de $ C_n $ através de
+Stirling.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star $]\label{exo:b2:powerseries:9}
+(Teorema do limite radial de Abel, caso especial) Suponha $\sum a_n $
+converge. Prove isso $\lim_{x \to 1^-} \sum_{n} a_n x^n = \sum_n
+a_n $. \emph{(\omterm{thm:b2:series:abel}{Resumo de Abel}: com $ A_n $ as somas parciais e $ A =
+\lim A_n $, escrever $\sum a_nx^n = (1 - x)\sum A_n x^n $; então $\sum
+a_nx^n - A = (1-x)\sum (A_n - A)x^n $, divida a soma em grande
+$ N $.)} Aplicativo: $\sum \frac{(-1)^{n-1}}{n} = \ln 2$ e $\sum
+\frac{(-1)^n}{2n+1} = \frac\pi4$, provado novamente a partir da série de potências.
+\end{exercise}
+
+\begin{exercise}[$\star $]\label{exo:b2:powerseries:10}
+Mostre isso $\displaystyle\sum_{n\geq1}\frac{x^n}{n(n+1)} = 1 +
+\frac{1-x}{x}\,\ln(1-x)$ para $0 < \abs x < 1$, determine o
+raio e verifique se a convergência é normal em
+$\intcc{-1}{1}$; verifique se o valor em $ x = 1$ previsto por
+continuidade concorda com a soma telescópica $\sum
+\frac{1}{n(n+1)} = 1$.
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b2:powerseries:11}
+(Desarranjos) Deixe $ D_n $ seja o número de permutações de $ n $
+objetos sem ponto fixo ($ D_0 = 1$). Classificando o
+permutações de $\{1, \dots, n\}$ pelo seu conjunto de ponto fixo dá
+$ n! = \sum_{k=0}^{n}\binom nk D_{n-k}$. Multiplicar por
+$\frac{x^n}{n!}$, somar e reconhecer um Produto Cauchy para obter
+o exponencial \omterm{ex:b2:powerseries:fibonacci}{função geradora}
+\[
+\sum_{n\geq0} D_n\,\frac{x^n}{n!} = \frac{\eu^{-x}}{1-x}
+\qquad (\abs x < 1),
+\]
+então leia o formulário fechado $\dfrac{D_n}{n!} =
+\sum_{k=0}^{n}\dfrac{(-1)^k}{k!}$ e o limite $\dfrac{D_n}{n!}
+\to \eu^{-1}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star $]\label{exo:b2:powerseries:12}
+Prove, com a série binomial de
+\cref{met:b2:powerseries:ode}, que
+\[
+\frac{1}{\sqrt{1 - 4x}} = \sum_{n\geq0}\binom{2n}{n}x^n
+\qquad \Bigl(\abs x < \frac14\Bigr),
+\]
+e deduza, elevando ao quadrado (Produto Cauchy contra
+$\frac{1}{1-4x} = \sum 4^nx^n $), a identidade de convolução
+\[
+\sum_{k=0}^{n}\binom{2k}{k}\binom{2n-2k}{n-k} = 4^n .
+\]
+\end{exercise}
+
+\section{Problema: Abel, Tauber e o limite de convergência}
+
+\begin{problem}\label{pb:b2:powerseries:1}
+Dentro do disco de convergência tudo é fácil; todos os
+drama da série de poder acontece \emph{sobre} o limite. Isto
+problema constrói a teoria da fronteira na variável real: Abel
+teorema em sua forma uniforme, seu inverso sob o teorema de Tauber
+condição, o Cesàro - hierarquia Abel de métodos de soma
+(com o teorema de Frobenius), integração termo a termo até o
+limite com constantes clássicas como dividendos e, finalmente, o
+rigidez de funções analíticas --- a identidade
+teorema.\index{Teorema de Abel}\index{Teorema de Tauber}
+Por todo, $(a_n)$ é uma sequência real, $ f(x) = \sum_{n\geq0}
+a_nx^n $, e $ A_n = a_0 + \dots + a_n $.
+
+\medskip
+\noindent\textbf{Part I --- Abel's theorem, \omterm{def:b2:funcseq:def}{uniformemente}.} Suponha
+nesta parte que $\sum a_n $ converge e define $ r_n =
+\sum_{k\geq n} a_k $ (então $ r_n \to 0$ e $ a_n = r_n -
+r_{n+1}$).
+\begin{enumerate}
+  \item Prove, somando por partes, que para todos $0 \leq x
+        \leq 1$ e $ N \leq M $:
+        \[
+        \Bigl|\sum_{n=N}^{M} a_n x^n\Bigr|
+        \leq 2\sup_{n \geq N}\,\abs{r_n} .
+        \]
+  \item Deduza isso $\sum a_nx^n $ converge \emph{\omterm{def:b2:funcseq:def}{uniformemente}} sobre
+        $\intcc{0}{1}$, que sua soma é \omterm{def:b2:metric:continuity}{contínuo} lá, e
+        recuperar o limite radial de
+        \cref{exo:b2:powerseries:9}: $ f(x) \to \sum a_n $ como $ x
+        \to 1^-$.
+  \item (Teorema de Abel para Produtos Cauchy) Deixar $\sum a_n = A $,
+        $\sum b_n = B $ e suponha que Produto Cauchy $\sum
+        c_n $, $ c_n = \sum_{k} a_kb_{n-k}$, \emph{converge},
+        com soma $ C $. Provar $ C = AB $ \emph{(dentro do disco o
+        identidade do produto mantida por
+        \cref{prop:b2:powerseries:operations}; deixar $ x \to
+        1^-$)}.
+  \item Mostrar a hipótese é importante: para $ a_n = b_n =
+        \frac{(-1)^n}{\sqrt{n+1}}$, ambas as séries convergem, mas
+        $\abs{c_n} \geq \frac{2(n+1)}{n+2} \geq 1$ \emph{(vinculado
+        cada fator $\sqrt{(k+1)(n-k+1)}$ por AM--GM)}: o
+        Produto Cauchy de duas séries convergentes podem divergir.
+  \item (Um dividendo de \cref{exo:b2:powerseries:5}) Mostre que
+        $\bigl(\ln(1-x)\bigr)^2 = 2\sum_{n\geq1}
+        \frac{H_n}{n+1}x^{n+1}$ sobre $\intoo{-1}{1}$, verifique isso
+        $\bigl(\frac{H_n}{n+1}\bigr)_{n\geq1}$ diminui para
+        $0$, e conclui com Abel:
+        \[
+        \sum_{n\geq1} (-1)^{n+1}\,\frac{H_n}{n+1}
+        = \frac{(\ln 2)^2}{2} .
+        \]
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part II --- Tauber's converse.} Chamar $\sum
+a_n $ \emph{Abel-sumável} para $ L $ quando $ f(x) \to L $ como $ x \to
+1^-$.
+\begin{enumerate}[resume]
+  \item Mostre isso $\sum (-1)^n $ é Abel-sumável para $\frac12$
+        ainda divergente: o teorema de Abel não tem incondicional
+        conversar.
+  \item (Cesàro lema) Se $ u_n \to 0$ então $\frac{u_1 + \dots
+        + u_N}{N} \to 0$ \emph{(dividir a soma em um valor fixo $ m $)}.
+  \item Suponha agora $ n\,a_n \to 0$ e $ f(x) \to L $. Com $ x_N =
+        1 - \frac1N $, prove as duas estimativas
+        \[
+        \Bigl|\sum_{n=0}^{N} a_n\bigl(1 - x_N^n\bigr)\Bigr|
+        \leq \frac{1}{N}\sum_{n=1}^{N} n\,\abs{a_n},
+        \qquad
+        \Bigl|\sum_{n>N} a_n x_N^n\Bigr|
+        \leq \sup_{n>N}\bigl(n\abs{a_n}\bigr)
+        \]
+        \emph{(para o primeiro, $1 - x^n \leq n(1-x)$; para o
+        segundo, $\abs{a_n} \leq \frac{1}{N}\sup_{m>N}
+        m\abs{a_m}$ e $\sum x_N^n \leq N $)}.
+  \item Concluir \emph{Teorema de Tauber}: se $ n\,a_n \to 0$ e
+        $\sum a_n $ é Abel-sumável para $ L $, então $\sum a_n $
+        converge para $ L $.
+  \item (O Tauberiano fácil para coeficientes positivos) Se $ a_n
+        \geq 0$ e $ f $ está limitado $\intco{0}{1}$, mostre que
+        $\sum a_n $ converge e $\sum a_n = \lim_{x\to1^-}
+        f(x)$ \emph{(vinculado $\sum_{n\leq N}a_nx^n \leq f(x)$ e
+        deixe $ x \to 1^-$, então use Abel)}.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part III --- Cesàro means and Frobenius'
+theorem.} Chamar $\sum a_n $ \emph{Cesàro-sumável} para $ L $ quando
+$\sigma_N = \frac{A_0 + \dots + A_{N-1}}{N} \to L $.
+\begin{enumerate}[resume]
+  \item Mostre que uma série convergente é Cesàro-sumável para
+        sua soma \emph{(pergunta 7 aplicada a $ A_n - L $)}.
+  \item Calcule o Cesàro valor de $\sum(-1)^n $ e verifique
+        concorda com o valor de Abel $\frac12$ da questão 6.
+  \item Com $ S_n = A_0 + \dots + A_n = (n+1)\,\sigma_{n+1}$,
+        provar as duas identidades, por $0 \leq x < 1$:
+        \[
+        f(x) = (1-x)^2\sum_{n\geq0}(n+1)\,\sigma_{n+1}x^n,
+        \qquad
+        (1-x)^2\sum_{n\geq0}(n+1)x^n = 1 .
+        \]
+  \item (Frobenius) Deduza: se $\sigma_N \to L $ então $ f(x) \to
+        L $ como $ x \to 1^-$ --- Cesàro-sumável implica
+        Abel-sumável, para o mesmo valor \emph{(subtraia os dois
+        identidades e dividir a soma em grande $ N $, como em
+        \cref{exo:b2:powerseries:9})}.
+  \item Mostre que a hierarquia
+        \[
+        \text{convergent} \;\Longrightarrow\;
+        \text{Cesàro-summable} \;\Longrightarrow\;
+        \text{Abel-summable}
+        \]
+        é estrito em ambas as setas: questão 6 para a primeira;
+        para o segundo, mostre que $\sum(-1)^n(n+1)$ é
+        Abel-sumável para $\frac14$ (calcular $ f $) mas não
+        Cesàro-sumável (calcular $\sigma_N $ separadamente para
+        par e ímpar $ N $).
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part IV --- Integrating to the boundary.}
+\begin{enumerate}[resume]
+  \item Suponha $\sum a_nx^n $ converge em $\intco{0}{1}$ e
+        $\sum \frac{a_n}{n+1}$ converge. Prove que o
+        integral imprópria $\int_0^1 f $ existe e
+        \[
+        \int_0^1 \Bigl(\sum_{n\geq0} a_nx^n\Bigr)\dd x
+        = \sum_{n\geq0}\frac{a_n}{n+1}
+        \]
+        \emph{(o primitivo $ F(x) = \sum\frac{a_n}{n+1}x^{n+1}$
+        é \omterm{def:b2:metric:continuity}{contínuo} no $1$ pela Parte I)}.
+  \item Deixar $\eta = \sum_{n\geq1}\frac{(-1)^{n-1}}{n^2}$. Mostrar
+        $\int_0^1 \frac{\ln(1+x)}{x}\dd x = \eta $ e, por
+        divisão de índices pares e ímpares no \omterm{def:b2:series:def}{absolutamente}
+        convergente $\sum \frac1{n^2}$, que $\eta =
+        \frac12\sum_{n\geq1}\frac{1}{n^2}$. (O Fourier
+        o problema do fim de semana do capítulo avalia
+        $\sum\frac1{n^2} = \frac{\pi^2}{6}$.)
+  \item Provar
+        \[
+        \sum_{n\geq0}\frac{(-1)^n}{3n+1}
+        = \int_0^1\frac{\dd x}{1+x^3}
+        = \frac13\Bigl(\ln 2 + \frac{\pi}{\sqrt3}\Bigr)
+        \]
+        \emph{(a série converge por Leibniz; integre o
+        série geométrica $\sum(-1)^nx^{3n}$ com a questão 16;
+        então frações parciais: $\frac{1}{1+x^3} =
+        \frac{1/3}{1+x} + \frac{(2-x)/3}{x^2-x+1}$)}.
+  \item Da série binomial para $(1-t)^{-1/2}$
+        (\cref{exo:b2:powerseries:12}) derivar
+        \[
+        \arcsin x = \sum_{n\geq0}
+        \frac{\binom{2n}{n}}{4^n(2n+1)}\,x^{2n+1}
+        \quad(\abs x < 1),
+        \qquad\text{then}\qquad
+        \sum_{n\geq0}\frac{\binom{2n}{n}}{4^n(2n+1)}
+        = \frac\pi2 ,
+        \]
+        justificando o valor limite por \emph{normal}
+        convergência em $\intcc{-1}{1}$ (usar
+        $\binom{2n}n4^{-n} \sim \frac{1}{\sqrt{\pi n}}$,
+        \cref{ex:b2:comparison:centralbinomial}) --- aqui não
+        até mesmo Abel é necessário.
+  \item (Catalão na fronteira) Mostre que $\sum C_n 4^{-n} =
+        2$: a série catalã de
+        \cref{ex:b2:powerseries:catalan} converge \emph{no}
+        seu raio $\frac14$ (assintóticos de
+        \cref{exo:b2:powerseries:8}), sua soma é \omterm{def:b2:metric:continuity}{contínuo} sobre
+        $\intcc{0}{\frac14}$, e o formulário fechado tem limite $2$
+        lá.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part V --- Rigidity: the identity theorem.}
+\begin{enumerate}[resume]
+  \item (Zeros isolados) Deixe $ f = \sum a_nx^n $ tem raio $ R >
+        0$ e nem todos $ a_n = 0$; deixar $ m $ seja o menor índice
+        com $ a_m \neq 0$. Mostrar $ f(x) = x^m g(x)$ com $ g $ um
+        série de potências do raio $ R $, $ g(0) = a_m \neq 0$ e
+        deduzir isso $ f $ não tem zero em alguns perfurados
+        bairro de $0$.
+  \item (Teorema da identidade) Deixe $ f, h $ ser somas de séries de potências
+        perto $0$ e $(x_k)$ uma sequência de \emph{diferente de zero}
+        pontos com $ x_k \to 0$ e $ f(x_k) = h(x_k)$. Provar
+        isso $ f $ e $ h $ têm os mesmos coeficientes, portanto
+        coincidir perto $0$.
+  \item Encontrar \emph{todos} funções $ f $ \omterm{def:b2:powerseries:analytic}{analítico} aproximar $0$ com
+        \[
+        f\Bigl(\frac1k\Bigr) = \frac{k^2}{k^2+1}
+        \qquad\text{for all large integers } k .
+        \]
+  \item Mostre que uma função \omterm{def:b2:powerseries:analytic}{analítico} em um \omterm{def:b2:metric:topology}{abrir} intervalo $ I $
+        que desaparece em um subintervalo desaparece de forma idêntica em
+        $ I $ \emph{(o conjunto de pontos em torno dos quais $ f $ desaparece
+        identicamente é \omterm{def:b2:metric:topology}{abrir} e, pelo teorema da identidade
+        aplicado em pontos de acumulação, fechados em $ I $)}.
+        Conclua que não há nada diferente de zero função analítica sobre $\R $ tem
+        \omterm{def:b2:metric:compact}{compactar} suporte --- enquanto $ C^\infty$ funções de colisão
+        existe (\cref{exo:b2:powerseries:7} fornece o
+        bloco de construção): a analiticidade é rígida, a suavidade é
+        flácido.
+  \item Síntese. Em uma frase cada: (i) o que Abel
+        teorema adiciona ao pacote de convergência normal de
+        \cref{lem:b2:powerseries:abel}; (ii) o exato
+        hipóteses sob as quais o inverso é válido (Tauber) e
+        o degrau intermediário (Frobenius); (iii) um limite
+        constante da Parte IV você poderia agora derivar para um
+        amigo em duas linhas; (iv) onde Cesàro significa vontade
+        reaparecem neste livro, para séries de um estilo muito diferente
+        gentil.
+\end{enumerate}
+\end{problem}

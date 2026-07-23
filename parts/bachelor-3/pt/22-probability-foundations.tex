@@ -1,0 +1,912 @@
+\chapter{Probabilidade: Fundações e a Lei das Grandes
+Números}\label{ch:b3:probability}
+
+O ano 2 construiu probabilidade em espaços contáveis; \omterm{def:b3:measure:measure}{medir} teoria
+agora remove todas as restrições. UM \omterm{def:b3:probability:space}{espaço de probabilidade} é um
+\omterm{def:b3:measure:measure}{medir} o espaço de massa total $1$, variáveis aleatórias são
+\omterm{def:b3:lebesgue:measurable}{mensurável} mapas, \omterm{def:b3:probability:space}{expectativa} é a integral de Lebesgue --- e
+de uma só vez todo o arsenal analítico
+(\cref{ch:b3:measure,ch:b3:lebesgue,ch:b3:product}) se aplica a
+chance. Este capítulo instala o dicionário, constrói
+sequências infinitas de \omterm{def:b3:probability:independence}{independente} variáveis aleatórias (sobre
+$\intcc01$, de dígitos binários: a aleatoriedade está escondida dentro
+Medida Lebesgue), prova os lemas de Borel-Cantelli e
+Kolmogorov \omterm{thm:b3:probability:zeroone}{zero-uma lei}, classifica os modos de
+convergência e prova a \omterm{def:b3:probability:space}{lei} de grandes números --- o
+teorema que faz as frequências convergirem para probabilidades e
+estatísticas possíveis. O problema do fim de semana dá a prova de Etemadi
+do forte \omterm{def:b3:probability:space}{lei} em sua definitiva $ L^1$ forma.
+
+\section{O dicionário}
+
+\begin{definition}\label{def:b3:probability:space}
+UM \emph{espaço de probabilidade}\index{espaço de probabilidade} é um
+\omterm{def:b3:measure:measure}{medir} o espaço $(\Omega, \mathcal A, \P)$ com $\P(\Omega) =
+1$; elementos de $\mathcal A $ são \emph{eventos}, e uma propriedade
+detém \emph{quase certamente} (a.s.) se seu evento tiver
+probabilidade $1$. UM \emph{variável calculada}\index{variável calculada} é um \omterm{def:b3:lebesgue:measurable}{mensurável} mapa $ X \colon \Omega \to \R $ (ou
+$\R^d $: um vetor aleatório); isso é \emph{lei}\index{lei} é a probabilidade pushforward \omterm{def:b3:measure:measure}{medir} $\P_X =
+X_*\P $ sobre $\R $ (\cref{exo:b3:product:9}), determinado pelo
+\emph{função de distribuição} $ F_X(t) = \P(X \leq t)$
+(\cref{exo:b3:measure:3}). $ X $ tem \emph{\omterm{ex:b3:lebesgue:gamma}{densidade}} $ f $ se
+$\P_X = f\,\dd\lambda $; isso é \emph{discreto} se $\P_X $ é um
+combinação contável de massas de Dirac. O
+\emph{expectativa}\index{expectativa} é
+\[
+\E[X] = \int_\Omega X\,\dd\P
+\qquad (X \geq 0 \text{ or } X \in L^1(\P)),
+\]
+e o \emph{teorema de transferência} (\cref{exo:b3:product:9})
+calcula na lei: $\E[g(X)] = \int_\R g\,\dd\P_X $ ---
+$= \sum g(x_k)p_k $ no caso discreto, $= \int
+g(x)f(x)\dd x $ no \omterm{ex:b3:lebesgue:gamma}{densidade} caso: fórmulas do ano 2, agora
+teoremas de uma teoria. O \emph{variação} é $\V(X) =
+\E[(X - \E X)^2] = \E[X^2] - (\E X)^2$ para $ X \in L^2$.
+\end{definition}
+
+\begin{example}\label{ex:b3:probability:laws}
+O padrão \omterm{def:b3:probability:space}{leis} e suas transformações dignas de nota: Bernoulli
+$\mathcal B(p)$, binômio $\mathcal B(n, p)$, geométrico,
+Poisson $\mathcal P(\lambda)$ (discreto: tabelas do ano 2
+permanecem válidos); uniforme em $\intcc01$ (Medida Lebesgue
+em si); exponencial $\mathcal E(\lambda)$ (\omterm{ex:b3:lebesgue:gamma}{densidade}
+$\lambda\eu^{-\lambda x}\mathbf 1_{x>0}$); o
+\emph{Gaussiano}\index{Gaussiano} $\mathcal N(m, \sigma^2)$
+com \omterm{ex:b3:lebesgue:gamma}{densidade} $\frac1{\sigma\sqrt{2\pi}}\exp\bigl(-\frac{(x -
+m)^2}{2\sigma^2}\bigr)$ --- uma probabilidade \omterm{ex:b3:lebesgue:gamma}{densidade} por
+\cref{pb:b3:lebesgue:1}, com média $ m $ e variação
+$\sigma^2$ (momentos gaussianos, \cref{exo:b3:product:10}).
+\end{example}
+
+\begin{proposition}[Markov e Chebyshev]
+\label{prop:b3:probability:markov}
+Para $ X \geq 0$ e $ a > 0$: $\P(X \geq a) \leq \frac{\E
+X}{a}$; para $ X \in L^2$: $\P\bigl(\abs{X - \E X} \geq
+a\bigr) \leq \frac{\V(X)}{a^2}$.\index{de Markov
+desigualdade}\index{A desigualdade de Chebyshev}
+\end{proposition}
+
+\begin{proof}
+\cref{exo:b3:lebesgue:5}(um); Chebyshev é Markov aplicado a
+$(X - \E X)^2$.
+\end{proof}
+
+\section{Independência}
+
+\begin{definition}\label{def:b3:probability:independence}
+Sub-$\sigma $-álgebras $\mathcal A_1, \dots, \mathcal A_n
+\subseteq \mathcal A $ são \emph{independente}\index{independente}
+se $\P(A_1\cap\dots\cap A_n) = \prod\P(A_i)$ para todos $ A_i \in
+\mathcal A_i $; os eventos são independentes se o $\sigma $-álgebras
+$\{\varnothing, A_i, A_i^c, \Omega\}$ são; variáveis aleatórias
+$ X_1, \dots, X_n $ se o $\sigma $-álgebras $\sigma(X_i) =
+X_i^{-1}(\mathcal B(\R))$ são. Uma família infinita é
+independente se toda subfamília finita for.
+\end{definition}
+
+\begin{theorem}\label{thm:b3:probability:independence}
+$ X_1, \dots, X_n $ são \omterm{def:b3:probability:independence}{independente} se o \omterm{def:b3:probability:space}{lei} do vetor
+$(X_1, \dots, X_n)$ é o \omterm{thm:b3:product:existence}{medida do produto}
+$\P_{X_1}\otimes\cdots\otimes\P_{X_n}$. Nesse caso, por
+$ g_i \geq 0$ (ou tal que os produtos sejam \omterm{def:b3:lebesgue:l1}{integrável}):
+\[
+\E\Bigl[\prod_ig_i(X_i)\Bigr] = \prod_i\E[g_i(X_i)],
+\]
+em particular $\E[XY] = \E X\,\E Y $ e $\V(X_1 + \dots +
+X_n) = \sum\V(X_i)$ para \omterm{def:b3:probability:independence}{independente} $ L^2$ variáveis.
+\end{theorem}
+
+\begin{proof}
+Se o $ X_i $ são \omterm{def:b3:probability:independence}{independente}, as duas probabilidades medidas
+$\P_{(X_1,\dots,X_n)}$ e $\bigotimes\P_{X_i}$ concordo com tudo
+produtos $ B_1\times\dots\times B_n $ de conjuntos de Borel --- um
+$\pi $-geração de sistema $\mathcal B(\R^n)$
+(\cref{prop:b3:product:sections}(b)) --- portanto em todos os lugares
+(\cref{thm:b3:measure:uniqueness}). Por outro lado, um produto \omterm{def:b3:probability:space}{lei}
+fatora todos os eventos $\bigcap_iX_i^{-1}(B_i)$: independência. O \omterm{def:b3:probability:space}{expectativa} fórmula é então
+Tonelli/Fubini (\cref{thm:b3:product:tonelli}) através do
+teorema da transferência; $\E[XY] = \E X\E Y $ é o caso $ g_i =
+\mathrm{id}$, e expandir o quadrado dá a aditividade
+de variações (termos cruzados $\E[(X_i - \E X_i)(X_j - \E X_j)]
+= 0$).
+\end{proof}
+
+\begin{theorem}[Existência de sequências independentes]
+\label{thm:b3:probability:existence}
+Sobre $\bigl(\intcc01, \mathcal L, \lambda\bigr)$ existe um
+sequência $(U_n)_{n\geq1}$ de \omterm{def:b3:probability:independence}{independente} variáveis aleatórias,
+cada uniforme $\intcc01$. Consequentemente, para qualquer prescrição
+\omterm{def:b3:probability:space}{leis} $(\mu_n)$ sobre $\R $ existe \omterm{def:b3:probability:independence}{independente} $(X_n)$ com
+$\P_{X_n} = \mu_n $.\index{sequências independentes, existência}
+\end{theorem}
+
+\begin{proof}
+\emph{Dígitos.} Para $\omega \in \intcc01$, deixar $(b_k(\omega))$
+sejam seus dígitos binários ($\omega = \sum b_k2^{-k}$; escolha o
+expansão não termina em tudo $1$'s --- a ambiguidade diz respeito apenas
+um conjunto contável e, portanto, nulo). Cada $ b_k $ é um aleatório
+variável ($\{b_k = 1\}$ é uma união finita de diádica
+intervalos) e o vetor $(b_1, \dots, b_m)$ leva cada
+valor em $\{0,1\}^m $ em um intervalo diádico de comprimento $2^{-m}$:
+o $ b_k $ são \omterm{def:b3:probability:independence}{independente} Bernoulli $(\frac12)$.
+
+\emph{Reagrupamento.} Dividir $\N^*$ em infinitos disjuntos
+conjuntos infinitos $(I_n)$ (por exemplo,\ por potências principais ou diagonais);
+deixar $(k^n_j)_j $ enumerar $ I_n $ e definir
+\[
+U_n = \sum_{j\geq1} b_{k^n_j}\,2^{-j} .
+\]
+Cada $ U_n $ é uniforme: seus dígitos binários são \omterm{def:b3:probability:independence}{independente} justo
+pedaços, então $\P(U_n \in [l2^{-m}, (l+1)2^{-m})) = 2^{-m}$ para
+cada intervalo diádico, e os intervalos diádicos determinam o \omterm{def:b3:probability:space}{lei}
+(\cref{thm:b3:measure:uniqueness}). O $ U_n $ são \omterm{def:b3:probability:independence}{independente}:
+são funções de blocos disjuntos do \omterm{def:b3:probability:independence}{independente}
+família $(b_k)$ --- formalmente, eventos $\{U_n \in D_n\}$ para
+diádico $ D_n $ dependem de um número finito de dígitos disjuntos
+conjuntos e fatorar; o $\pi $-o argumento do sistema é atualizado para
+todos os conjuntos do Borel.
+
+\emph{Arbitrário \omterm{def:b3:probability:space}{leis}.} Deixar $ G_n(u) = \inf\{t : F_{\mu_n}(t)
+\geq u\}$ (o \emph{função quantil} da distribuição
+função $ F_{\mu_n}$); a equivalência chave $ G_n(u) \leq t
+\iff u \leq F_{\mu_n}(t)$ (continuidade à direita de $ F $,
+monotonicidade) mostra $ X_n = G_n(U_n)$ é \omterm{def:b3:lebesgue:measurable}{mensurável} com
+$\P(X_n \leq t) = \P(U_n \leq F_{\mu_n}(t)) =
+F_{\mu_n}(t)$: \omterm{def:b3:probability:space}{lei} $\mu_n $; independência é herdado
+(funções de \omterm{def:b3:probability:independence}{independente} variáveis,
+\cref{exo:b3:probability:3}).
+\end{proof}
+
+\begin{example}[O problema do aniversário, honestamente]
+\label{ex:b3:probability:birthday}
+Entre $ n $ pessoas com \omterm{def:b3:probability:independence}{independente}, aniversários uniformes acabaram
+$ N = 365$ dias, a probabilidade de todos os aniversários serem diferentes é
+\[
+p_n = \prod_{k=1}^{n-1}\Bigl(1 - \frac kN\Bigr),
+\]
+por condicionamento iterado (ou diretamente: o favorável
+$ N(N-1)\cdots(N - n + 1)$ acima do total $ N^n $, uma contagem
+argumento a fórmula do produto de independência faz
+rigoroso). Tomando logaritmos e usando $-\ln(1 - x) = x +
+O(x^2)$:
+\[
+\ln p_n = -\frac{n(n-1)}{2N} +
+O\Bigl(\frac{n^3}{N^2}\Bigr),
+\qquad\text{so}\qquad
+p_n \approx \eu^{-n^2/2N} .
+\]
+O ponto de inflexão $ p_n = \frac12$ senta-se em $ n \approx
+\sqrt{2N\ln2} \approx 1.18\sqrt N $: para $ N = 365$, $ n = 23$
+($ p_{23} = 0.4927$). Duas morais. Primeiro, as colisões entre $ n $
+itens em $ N $ caixas aparecem na escala $ n \sim \sqrt N $, não
+$ n \sim N $ --- o \emph{escala de aniversário} que governa o hash
+colisões e o $\sqrt N $ custo dos ataques de aniversário em
+criptografia. Em segundo lugar, o cálculo é um modelo: o
+$\binom n2$ eventos de colisão de pares não são \omterm{def:b3:probability:independence}{independente}, ainda
+a resposta se comporta como se fossem
+($\eu^{-\binom n2/N}$ são exatamente os pares \omterm{def:b3:probability:independence}{independentes}
+heurística) --- uma primeira instância do Poisson
+aproximação feita rigorosamente em \cref{ch:b3:clt}fim de semana
+problema (desigualdade de Le Cam).
+\end{example}
+
+\section{Borel-Cantelli e a lei zero-um}
+
+\begin{theorem}[Borel-Cantelli]
+\label{thm:b3:probability:borelcantelli}
+Deixar $(A_n)$ sejam eventos e $\limsup A_n = \bigcap_N
+\bigcup_{n\geq N}A_n $ (``$ A_n $ ocorre infinitamente
+frequentemente'').\index{Lemas de Borel-Cantelli}
+\begin{enumerate}
+  \item Se $\sum\P(A_n) < \infty $, então $\P(\limsup A_n) =
+        0$.
+  \item Se $\sum\P(A_n) = \infty $ \emph{e o $ A_n $ são
+        \omterm{def:b3:probability:independence}{independente}}, então $\P(\limsup A_n) = 1$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) é \cref{exo:b3:measure:4}. (2): para $ N \leq M $,
+independência de complementos (\cref{exo:b3:probability:3})
+dá
+\[
+\P\Bigl(\bigcap_{n=N}^{M}A_n^c\Bigr) = \prod_{n=N}^M\bigl(1
+- \P(A_n)\bigr) \leq
+\exp\Bigl(-\sum_{n=N}^M\P(A_n)\Bigr) \xrightarrow[M \to
+\infty]{} 0
+\]
+($1 - x \leq \eu^{-x}$; a série diverge). Então
+$\P\bigl(\bigcup_{n\geq N}A_n\bigr) = 1$ para cada $ N $ e
+a intersecção decrescente sobre $ N $ ainda tem probabilidade
+$1$ (continuidade de cima, \cref{prop:b3:measure:basics}).
+\end{proof}
+
+\begin{theorem}[Lei zero-um de Kolmogorov]
+\label{thm:b3:probability:zeroone}
+Deixar $(X_n)$ ser \omterm{def:b3:probability:independence}{independente} e $\mathcal T =
+\bigcap_N\sigma(X_N, X_{N+1}, \dots)$ o \emph{cauda
+$\sigma $-álgebra}\index{cauda
+$\sigma $-álgebra} (eventos
+insensível a qualquer número finito de $ X_n $: convergência de
+$\sum X_n $, de $\frac{S_n}n $, valores de $\limsup $ é, \dots).
+Então cada $ T \in \mathcal T $ tem $\P(T) \in \{0,
+1\}$.\index{zero-uma lei}
+\end{theorem}
+
+\begin{proof}
+Consertar $ N $. O $\sigma $-álgebras $\sigma(X_1, \dots, X_N)$ e
+$\sigma(X_{N+1}, \dots)$ são \omterm{def:b3:probability:independence}{independente}: eventos dependendo
+blocos disjuntos são fatorados na geração $\pi $-sistemas
+(cilindros $\bigcap_{i\leq N}\{X_i \in B_i\}$, resp.\ finito
+condições em variáveis posteriores) e Dynkin
+(\cref{thm:b3:measure:dynkin}, aplicado duas vezes, um lado de cada
+tempo) estende a fatoração. Um evento de cauda $ T $ reside em
+$\sigma(X_{N+1}, \dots)$ para cada $ N $: $ T $ é \omterm{def:b3:probability:independence}{independente} de
+cada $\sigma(X_1, \dots, X_N)$, portanto do $\sigma $-álgebra
+eles geram, $\sigma(X_1, X_2, \dots)$ (Dynkin mais uma vez:
+a união do $\sigma(X_1,\dots,X_N)$ é um $\pi $-sistema
+gerando-o). Mas $ T \in \sigma(X_1, X_2, \dots)$ também: $ T $
+é \omterm{def:b3:probability:independence}{independente} \emph{por si só}, $\P(T) = \P(T\cap T) =
+\P(T)^2$: $\P(T) \in \{0, 1\}$.
+\end{proof}
+
+\section{Modos de convergência}
+
+\begin{definition}\label{def:b3:probability:modes}
+$ X_n \to X $ \emph{quase certamente} se $\P(X_n \to X) = 1$;
+\emph{em probabilidade} se $\P(\abs{X_n - X} \geq \varepsilon)
+\to 0$ para cada $\varepsilon > 0$; \emph{em $ L^p $} se
+$\E\abs{X_n - X}^p \to 0$.\index{convergência de aleatório
+variáveis}
+\end{definition}
+
+\begin{proposition}\label{prop:b3:probability:modes}
+(a) como convergência implica convergência em probabilidade;
+(b) $ L^p $ convergência implica convergência em probabilidade;
+(c) convergência em probabilidade implica como\ convergência
+\emph{ao longo de uma subsequência};
+(d) nenhuma outra implicação é válida em geral.
+\end{proposition}
+
+\begin{proof}
+(um) $\P(\abs{X_n - X} \geq \varepsilon) \leq
+\P\bigl(\sup_{m\geq n}\abs{X_m - X} \geq \varepsilon\bigr)
+\downarrow \P\bigl(\limsup\{\abs{X_m - X} \geq
+\varepsilon\}\bigr) = 0$ sob como\ convergência (continuidade
+de cima; o evento limsup exclui convergência). (b)
+Markov: $\P(\abs{X_n - X} \geq \varepsilon) \leq
+\varepsilon^{-p}\,\E\abs{X_n - X}^p $. (c) Escolha $ n_k $ com
+$\P(\abs{X_{n_k} - X} \geq 2^{-k}) \leq 2^{-k}$;
+Borel-Cantelli (1) faz $\abs{X_{n_k} - X} < 2^{-k}$
+eventualmente, como. (d) A máquina de escrever (\cref{exo:b3:lp:3}) sobre
+$(\intcc01, \lambda)$ converge em $ L^1$ e em probabilidade
+mas em nenhum lugar pontual; $ n\mathbf 1_{\intoo0{1/n}} \to 0$
+como\ mas não em $ L^1$; detalhes e o restante
+contra-exemplos em \cref{exo:b3:probability:6}.
+\end{proof}
+
+\section{A lei dos grandes números}
+
+Por todo, $(X_n)$ são \omterm{def:b3:probability:independence}{independente} com o mesmo \omterm{def:b3:probability:space}{lei}
+(\emph{eu.i.d.}), $ S_n = X_1 + \dots + X_n $.
+
+\begin{theorem}[Lei fraca dos grandes números]
+\label{thm:b3:probability:wlln}
+Se $ X_1 \in L^2$, com $ m = \E X_1$:
+\[
+\P\Bigl(\Bigl|\frac{S_n}{n} - m\Bigr| \geq
+\varepsilon\Bigr) \leq
+\frac{\V(X_1)}{n\,\varepsilon^2}
+\xrightarrow[n\to\infty]{} 0 :
+\]
+$\frac{S_n}n \to m $ em probabilidade (e em $ L^2$).\index{lei
+de grandes números (fraco)}
+\end{theorem}
+
+\begin{proof}
+$\E\frac{S_n}n = m $ e $\V\bigl(\frac{S_n}n\bigr) =
+\frac{n\V(X_1)}{n^2}$
+(\cref{thm:b3:probability:independence}); Chebyshev.
+\end{proof}
+
+\begin{theorem}[Lei forte dos grandes números]
+\label{thm:b3:probability:slln}
+Se $ X_1 \in L^1$, então\index{lei dos grandes números (forte)}
+\[
+\frac{S_n}{n} \xrightarrow[n\to\infty]{\text{a.s.}} \E[X_1].
+\]
+Provamos isso aqui sob a hipótese mais forte $ X_1 \in
+L^4$; o caso geral ($ L^1$: prova de Etemadi) é o
+problema de fim de semana.
+\end{theorem}
+
+\begin{proof}[Prova abaixo $\E X_1^4 < \infty $]
+Centralização ($ X_i \mapsto X_i - m $), suponha $ m = 0$. Expandir:
+\[
+\E[S_n^4] = \sum_{i,j,k,l}\E[X_iX_jX_kX_l]
+= n\,\E[X_1^4] + 3n(n-1)\,\bigl(\E[X_1^2]\bigr)^2 \leq
+C\,n^2 ,
+\]
+desde independência e centrar mata todos os termos contendo
+um fator isolado ($\E[X_iX_jX_kX_l] =
+\E[X_i]\E[\cdots] = 0$ a menos que os \omterm{def:b3:holomorphic:index}{índices} formem pares: o único
+os sobreviventes são os $ n $ termos $ i=j=k=l $ e o $3n(n-1)$
+termos com dois pares distintos). Markov:
+\[
+\P\Bigl(\Bigl|\frac{S_n}n\Bigr| \geq \varepsilon\Bigr)
+= \P\bigl(S_n^4 \geq n^4\varepsilon^4\bigr)
+\leq \frac{Cn^2}{n^4\varepsilon^4} =
+\frac{C}{\varepsilon^4n^2},
+\]
+resumido: Borel--Cantelli (1) dá, para cada racional
+$\varepsilon $, que $\abs{S_n/n} < \varepsilon $ eventualmente,
+como; cruzando $\varepsilon \in \Q_+^*$ (contável
+muitas probabilidades-$1$ eventos): $ S_n/n \to 0$ como.
+\end{proof}
+
+\begin{example}[O que a lei forte compra]
+\label{ex:b3:probability:sllnapps}
+(um) \emph{Frequências}: para lançamentos de moeda i.i.d.\, o valor observado
+frequência de cabeças converge como $ p $ --- o empírico
+justificativa da própria probabilidade.
+(b) \emph{Monte Carlo}\index{Monte Carlo}: para $ g \in
+L^1(\intcc01)$ e $(U_n)$ i.i.d.\ uniforme
+(\cref{thm:b3:probability:existence}),
+$\frac1n\sum_{k\leq n}g(U_k) \to \int_0^1g $ a.s.: integrais
+por amostragem, em qualquer dimensão, no \omterm{def:b3:probability:independence}{independente} de dimensão
+avaliar $\sim n^{-1/2}$ preciso em \cref{ch:b3:clt}.
+(c) \emph{Números normais}: quase todo número real tem, em
+sua expansão binária, frequência assintótica $\frac12$ de uns
+(aplique o forte \omterm{def:b3:probability:space}{lei} para as variáveis de dígitos de
+\cref{thm:b3:probability:existence}) --- Teorema de Borel, um
+declaração sobre \emph{todo}números de dias comprovados por \omterm{def:b3:measure:measure}{medir}:
+\cref{pb:b3:probability:1} completa isso em todas as \omterm{def:b3:topology:basis}{bases}.
+\end{example}
+
+\begin{method}\label{met:b3:probability:toolkit}
+A ordem de funcionamento para declarações assintóticas sobre
+sequências: (1) \emph{O evento é um evento final?} Então é
+probabilidade é $0$ ou $1$
+(\cref{thm:b3:probability:zeroone}) e basta
+decida qual. (2) \emph{Para provar declarações como}:
+Borel--Cantelli --- probabilidades somáveis para o
+eventos ``ruins'', via limites do tipo Markov/Chebyshev em
+quaisquer momentos que existam; independência necessário apenas para
+direção inversa. (3) \emph{Subsequência + sanduíche}: provar
+convergência ao longo de uma subsequência gerenciável, controlar o
+oscilação intermediária por monotonicidade ou máxima
+desigualdades --- o esqueleto da prova de Etemadi. (4) Para
+limites de distribuição, aguarde \cref{ch:b3:clt}.
+\end{method}
+
+\section{Exercícios}
+
+\begin{exercise}[$\star $]\label{exo:b3:probability:1}
+(a) Deixe $ X $ ter \omterm{def:b3:topology:continuity}{contínuo} distribuição estritamente crescente
+função $ F $. Mostre isso $ F(X)$ é uniforme em $\intcc01$ e
+isso $ G(U) \sim F $ para $ U $ uniforme, $ G = F^{-1}$: simulação
+por inversão.
+(b) Calcule a função de distribuição e \omterm{ex:b3:lebesgue:gamma}{densidade} de $ X^2$
+para $ X $ uniforme em $\intcc{-1}1$, e de $-\frac1\lambda\ln
+U $ para $ U $ uniforme em $\intoo01$.
+\end{exercise}
+
+\begin{exercise}[$\star $]\label{exo:b3:probability:2}
+(a) Calcular média e variância do Poisson $\mathcal
+P(\lambda)$ e geométrico \omterm{def:b3:probability:space}{leis} através do teorema da transferência.
+(b) Mostre que um valor positivo variável aleatória $ T $ com $\P(T > t)
+> 0$ para todos $ t $ satisfaz o \emph{sem memória} propriedade $\P(T > t + s \mid
+T > t) = \P(T > s)$ para todos $ s, t \geq 0$ se $ T $ é
+exponencial. \emph{(A função de sobrevivência satisfaz o critério de Cauchy
+equação funcional; a monotonicidade substitui continuidade.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b3:probability:3}
+(a) Mostre que se $ X_1, \dots, X_n $ são \omterm{def:b3:probability:independence}{independente} e $ f_i $
+são funções de Borel, o $ f_i(X_i)$ são \omterm{def:b3:probability:independence}{independente}.
+(b) Mostre que os eventos $ A_1, \dots, A_n $ são \omterm{def:b3:probability:independence}{independente} se
+seus complementos são, se os indicadores $\mathbf 1_{A_i}$
+são \omterm{def:b3:probability:independence}{independente} variáveis aleatórias.
+(c) (Em pares é mais fraco) Duas moedas justas: $ A = $ primeiro é
+cabeças, $ B = $ o segundo é cara, $ C = $ os dois concordam. Mostrar
+$ A, B, C $ são pares \omterm{def:b3:probability:independence}{independente} mas não \omterm{def:b3:probability:independence}{independente}.
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b3:probability:4}
+(a) (Macaco infinito) Uma sequência i.i.d.\ de uniforme
+pressionamentos de tecla em um alfabeto finito, pois contém todos os
+texto infinitamente: prove com Borel-Cantelli (2) em
+blocos disjuntos.
+(b) (Executa) Para i.i.d.\ fair bits, deixe $ R_n $ seja o comprimento de
+a corrida daqueles que começam na posição $ n $. Mostre isso como
+$ R_n \geq (1+\varepsilon)\log_2n $ com uma frequência finita e $ R_n
+\geq \log_2 n $ infinitamente frequentemente \emph{(ambas as metades
+Borel-Cantelli; para o segundo, passe para blocos disjuntos para
+ganhar independência)}: a corrida mais longa no primeiro $ n $ dígitos
+cresce como $\log_2n $.
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b3:probability:5}
+Deixar $(X_n)$ ser \omterm{def:b3:probability:independence}{independente}.
+(a) Mostre que o raio de convergência de $\sum X_n z^n $ é
+uma constante as.s. (possivelmente $0$ ou $\infty $).
+(b) Mostre que $\P(\sum X_n \text{ converges}) \in \{0, 1\}$
+e $\P(S_n/n \to m) \in \{0,1\}$.
+(c) Dê um evento sobre $(X_n)$ aquilo é \emph{não} uma cauda
+evento e verifique se o \omterm{thm:b3:probability:zeroone}{zero-uma lei} pode falhar por isso.
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b3:probability:6}
+Sobre $(\intcc01, \lambda)$, exposição --- com provas --- aleatório
+variáveis tal que:
+(a) $ X_n \to 0$ em probabilidade e em cada $ L^p $, mas
+em nenhum lugar;
+(b) $ X_n \to 0$ como\ mas em nenhum $ L^p $;
+(c) $ X_n \to 0$ em $ L^1$ mas não em $ L^2$;
+(d) e mostre: se $ X_n \to X $ em probabilidade e $\abs{X_n}
+\leq Y \in L^1$, então $ X_n \to X $ em $ L^1$
+\emph{(subsequências + convergência dominada +
+o truque da subsubsequência)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b3:probability:7}
+Uma pesquisa de opinião estima uma proporção desconhecida $ p $ pelo
+frequência empírica $\hat p_n $ de $ n $ \omterm{def:b3:probability:independence}{independente} empates.
+(a) Chebyshev: mostrar $\P(\abs{\hat p_n - p} \geq \varepsilon)
+\leq \frac1{4n\varepsilon^2}$ (usar $ p(1-p) \leq \frac14$).
+(b) Quantos empates garantem um erro $\leq 3\%$ com
+probabilidade $\geq 95\%$ por este limite? (A verdadeira resposta,
+através de \cref{ch:b3:clt}, é sobre $1070$: Chebyshev é honesto
+mas bruto.)
+\end{exercise}
+
+\begin{exercise}[$\star\star\star $]\label{exo:b3:probability:8}
+(Bernstein) Para $ f \in \mathcal C(\intcc01)$ definir o
+Polinômio de Bernstein $ B_nf(x) =
+\sum_{k=0}^n\binom nkx^k(1-x)^{n-k}f\bigl(\frac kn\bigr)$.
+(a) Reconhecer $ B_nf(x) = \E\bigl[f\bigl(\frac
+{S_n}n\bigr)\bigr]$ para $ S_n $ binômio $\mathcal B(n, x)$.
+(b) Provar $ B_nf \to f $ \emph{uniformemente} sobre $\intcc01$: dividir
+ligado $\{\abs{\frac{S_n}n - x} \leq \delta\}$ e seu
+complemento, usando uniforme continuidade e Chebyshev com o
+limite uniforme $\V(\frac{S_n}n) \leq \frac1{4n}$.
+(c) Concluir: uma segunda prova probabilística da
+Teorema de aproximação de Weierstrass
+(\cref{cor:b3:complete:weierstrass}), com a taxa explícita
+$\norm{B_nf - f}_\infty \leq \frac32\,\omega_f(n^{-1/2})$
+para o módulo de continuidade $\omega_f $ --- provar pelo menos
+o $ O(\omega_f(n^{-1/2}))$ forma.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star $]\label{exo:b3:probability:9}
+(Colecionador de cupons) Cartões de $ n $ tipos são desenhados uniformemente
+com substituição; deixar $ T_n $ será o número de sorteios até todos
+tipos são vistos.
+(a) Escreva $ T_n = \sum_{k=1}^{n}\tau_k $ com $\tau_k $
+geométrico do parâmetro $\frac{n - k + 1}n $, o $\tau_k $
+\omterm{def:b3:probability:independence}{independente}, e deduza $\E T_n = n\,H_n \sim n\ln n $
+($ H_n $ o número harmônico) e $\V(T_n) \leq
+\frac{\pi^2}6n^2$.
+(b) Tchebyshev: $\frac{T_n}{n\ln n} \to 1$ em probabilidade.
+(c) Refinar com Borel-Cantelli: mostrar diretamente $\P(T_n >
+\beta n\ln n) \leq n^{1 - \beta}$ para $\beta > 1$
+\emph{(união vinculada ao evento em que algum tipo é perdido
+depois $\beta n\ln n $ desenha, usando $1 - x \leq \eu^{-x}$)},
+e deduza isso junto $ n = 2^m $, como.\ $ T_n \leq \beta n\ln
+n $ eventualmente, para cada $\beta > 2$.
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b3:probability:10}
+Usando a construção de dígitos
+(\cref{thm:b3:probability:existence}):
+(a) verificar por cálculo direto que $ U = \sum b_{2k}2^{-k}$
+(dígitos pares indexados de um uniforme $\omega $) é uniforme e
+\omterm{def:b3:probability:independence}{independente} de $ V = \sum b_{2k-1}2^{-k}$;
+(b) deduzir um \omterm{def:b3:lebesgue:measurable}{mensurável} bijeção-para-conjuntos nulos entre
+$\intcc01$ e $\intcc01^2$ preservando medire comente:
+um número aleatório uniforme contém dois (e muitos contáveis)
+\omterm{def:b3:probability:independence}{independente} uns --- compare com a curva de Peano
+(\cref{pb:b3:topology:1}), que alcançou a sobrejetividade, mas
+não preservação de medida ou injetividade.
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b3:probability:11}
+(Registros) Deixe $(X_n)_{n\geq1}$ ser i.i.d.\ com \omterm{def:b3:topology:continuity}{contínuo}
+função de distribuição, e digamos um \emph{registro} ocorre em
+hora $ n $ se $ X_n > \max(X_1, \dots, X_{n-1})$ (tempo $1$ é
+um recorde). Deixar $ R_n $ ser o indicador de registro.
+(a) Mostrar $\P(R_n = 1) = \frac1n $ \emph{(por simetria, cada um dos
+o $ n!$ pedidos de $ X_1, \dots, X_n $ é igualmente provável
+e empates têm probabilidade $0$)}.
+(b) Mostre que $ R_n $ são \emph{\omterm{def:b3:probability:independence}{independente}} \emph{(contar
+pedidos compatíveis com posições de registro prescritas, ou
+argumentam que a ordem relativa de $ X_1, \dots, X_{n-1}$ é
+\omterm{def:b3:probability:independence}{independente} da classificação de $ X_n $ entre eles)}.
+(c) Deduzir de Borel-Cantelli
+(\cref{thm:b3:probability:borelcantelli}, ambas as metades) que
+infinitos registros ocorrem como, mas registros em
+vezes consecutivas $ n, n+1$ ocorrem infinitamente frequentemente com
+probabilidade --- decida qual! --- e calcular
+$\sum_n\P(R_n = 1, R_{n+1} = 1)$.
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b3:probability:12}
+(Corrida mais longa) Jogue uma moeda honesta infinitamente e
+deixe $ L_n $ ser a duração da série mais longa de consecutivos
+cabeças dentro do primeiro $ n $ vira.
+(a) Mostre que para todo $\varepsilon > 0$, como.\ $ L_n \leq
+(1 + \varepsilon)\log_2n $ eventualmente \emph{(a probabilidade
+que alguma extensão de comprimento $\ell $ começa entre os primeiros $ n $
+flips é no \omterm{def:b3:rings:primemaximal}{máximo} $ n2^{-\ell}$; Borel--Cantelli junto $ n =
+2^k $)}.
+(b) Mostre que como $ L_n \geq (1 - \varepsilon)\log_2n $
+eventualmente \emph{(corte o primeiro $ n $ se transforma em
+$\lfloor n/\ell\rfloor $ blocos disjuntos de comprimento $\ell =
+\lceil(1 - \varepsilon)\log_2n\rceil $; os blocos são
+\omterm{def:b3:probability:independence}{independente}, cada um com todas as caras com probabilidade $2^{-\ell}$,
+e a probabilidade de que nenhum dê cara é no \omterm{def:b3:rings:primemaximal}{máximo}
+$\exp(-n2^{-\ell}/\ell)$; soma junto $ n = 2^k $ de novo)}.
+(c) Concluir $\frac{L_n}{\log_2n} \to 1$ as.s.: em um milhão
+lançamentos justos, deve-se esperar uma corrida de cerca de $20$ cabeças ---
+e um conjunto de dados sem ele provavelmente é fabricado.
+\end{exercise}
+
+\section{Problema: a prova da lei forte de Etemadi}
+
+\begin{problem}[{Problema de fim de semana --- a forte lei dos grandes
+números para i.i.d.\ variáveis integráveis}]
+\label{pb:b3:probability:1}
+O forte de Kolmogorov \omterm{def:b3:probability:space}{lei} --- $\frac{S_n}n \to \E X_1$ como.\
+para identificação\ $ X_n \in L^1$ --- por muito tempo tinha apenas provas complexas;
+em 1981, N.~Etemadi encontrou uma economia impressionante, usando
+nada além deste capítulo (e até enfraquecendo independência
+emparelhar independência). Nós o seguimos. Deixar $(X_n)$ ser
+aos pares \omterm{def:b3:probability:independence}{independente}, distribuído de forma idêntica, \omterm{def:b3:lebesgue:l1}{integrável};
+$ m = \E X_1$, $ S_n = X_1 + \dots + X_n $.
+
+\medskip
+\noindent\textbf{Part I --- Reductions.}
+\begin{enumerate}
+  \item Mostre que basta tratar $ X_n \geq 0$
+        \emph{(dividir $ X_n = X_n^+ - X_n^-$: verifique os dois
+        metades são novamente aos pares \omterm{def:b3:probability:independence}{independente} eu.i.d.\
+        \omterm{def:b3:lebesgue:l1}{integrável})}. Suponha daqui em diante $ X_n \geq 0$.
+  \item (Truncamento) Deixe $ Y_n = X_n\,\mathbf 1_{X_n \leq n}$
+        e $ S_n^* = Y_1 + \dots + Y_n $. Mostrar
+        \[
+        \sum_{n\geq1}\P(X_n \neq Y_n) =
+        \sum_{n\geq1}\P(X_1 > n) \leq \E[X_1] < \infty
+        \]
+        (\cref{exo:b3:product:3}) e deduza via
+        Borel-Cantelli que $\frac{S_n - S_n^*}{n} \to 0$
+        as.s.: basta provar $\frac{S^*_n}n \to m $
+        como.
+  \item Mostrar $\E Y_n = \E\bigl[X_1\mathbf 1_{X_1\leq
+        n}\bigr] \to m $ (convergência monótona), portanto
+        $\frac1n\sum_{k\leq n}\E Y_k \to m $ (Cesàro): isso
+        basta para provar $\frac{S_n^* - \E S_n^*}{n} \to 0$
+        como.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part II --- The variance estimate.}
+\begin{enumerate}[resume]
+  \item Mostrar
+        \[
+        \V(Y_n) \leq \E[Y_n^2] = \E\bigl[X_1^2\,\mathbf
+        1_{X_1 \leq n}\bigr]
+        \]
+        e, usando o bolo de camadas
+        (\cref{prop:b3:product:layercake}), o limite da chave
+        \[
+        \sum_{n\geq1}\frac{\V(Y_n)}{n^2}
+        \leq \sum_{n\geq1}\frac1{n^2}\,
+        \E\bigl[X_1^2\mathbf 1_{X_1\leq n}\bigr]
+        \leq C\,\E[X_1] < \infty
+        \]
+        \emph{(trocar a soma e o \omterm{def:b3:probability:space}{expectativa} ---
+        Tonelli para série --- e encadernado $\sum_{n \geq
+        x}\frac1{n^2} \leq \frac2{\max(x,1)}$ para o \omterm{def:b3:topology:interior}{interior}
+        estimativa $ x^2\sum_{n\geq x}n^{-2} \leq 2x $)}.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part III --- Convergence along geometric
+subsequences.} Consertar $\alpha > 1$ e deixe $ k_j =
+\lfloor\alpha^j\rfloor $.
+\begin{enumerate}[resume]
+  \item Usando pares independência (variâncias adicionadas,
+        \cref{thm:b3:probability:independence} --- verifique isso
+        aditividade de variâncias precisa apenas de pares
+        independência) e Chebyshev, show para cada
+        $\varepsilon > 0$:
+        \[
+        \sum_{j\geq1}\P\Bigl(\Bigl|
+        \frac{S^*_{k_j} - \E S^*_{k_j}}{k_j}\Bigr| \geq
+        \varepsilon\Bigr)
+        \leq
+        \frac1{\varepsilon^2}\sum_{j\geq1}\frac1{k_j^2}
+        \sum_{n\leq k_j}\V(Y_n)
+        = \frac1{\varepsilon^2}\sum_{n\geq1}\V(Y_n)
+        \sum_{j\,:\,k_j\geq n}\frac1{k_j^2} .
+        \]
+  \item Mostrar $\sum_{j : k_j \geq n}k_j^{-2} \leq
+        \frac{C_\alpha}{n^2}$ \emph{(série geométrica;
+        cuidado com o chão: $ k_j \geq \frac{\alpha^j}2$ para
+        $\alpha^j \geq 2$-tipo de cuidado)}, e concluo com
+        questão 4 e Borel-Cantelli:
+        \[
+        \frac{S^*_{k_j} - \E S^*_{k_j}}{k_j}
+        \xrightarrow[j\to\infty]{\text{a.s.}} 0,
+        \qquad\text{hence}\qquad
+        \frac{S^*_{k_j}}{k_j} \to m \ \text{a.s.}
+        \]
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part IV --- Sandwich and conclusion.}
+\begin{enumerate}[resume]
+  \item Para $ k_j \leq n \leq k_{j+1}$, use a monotonicidade
+        de $ S^*_n $ (somas não negativas!) para mostrar
+        \[
+        \frac{k_j}{k_{j+1}}\,\frac{S^*_{k_j}}{k_j}
+        \;\leq\; \frac{S^*_n}{n} \;\leq\;
+        \frac{k_{j+1}}{k_j}\,\frac{S^*_{k_{j+1}}}{k_{j+1}},
+        \]
+        e deduza, como:
+        \[
+        \frac m\alpha \leq \liminf\frac{S^*_n}n \leq
+        \limsup\frac{S^*_n}n \leq \alpha\,m .
+        \]
+  \item Deixar $\alpha \downarrow 1$ ao longo de uma sequência e
+        concluir $\frac{S_n^*}n \to m $ como, portanto (Parte I)
+        o \emph{forte \omterm{def:b3:probability:space}{lei} de grandes números}:
+        \[
+        \boxed{\ \frac{S_n}{n}
+        \xrightarrow[n\to\infty]{\text{a.s.}} \E[X_1].\ }
+        \]
+  \item Onde exatamente estava em pares independência (em vez de
+        cheio independência) suficiente? Liste os três lugares
+        onde hipóteses do tipo independência foram invocadas.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part V --- Dividends.}
+\begin{enumerate}[resume]
+  \item (Números normais de Borel) Mostre que
+        $\lambda $-quase todos $ x \in \intcc01$ é
+        \emph{\omterm{def:b3:groups:normal}{normal} em todas as \omterm{def:b3:topology:basis}{bases}} $ b \geq 2$: cada dígito
+        $0, \dots, b-1$ aparece com frequência assintótica
+        $\frac1b $ \emph{(consertar $ b $ e um dígito, aplique o
+        forte \omterm{def:b3:probability:space}{lei} às variáveis indicadoras --- justificar
+        aquela base-$ b $ dígitos de uma variável uniforme são
+        i.i.d.\ uniforme em $\{0,\dots,b-1\}$ como em
+        \cref{thm:b3:probability:existence} --- então
+        interceptar as muitas probabilidades contáveis-um
+        eventos)}. Exibir um número não \omterm{def:b3:groups:normal}{normal} explícito,
+        e refletir: o teorema afirma a normalidade de quase
+        todos os números, mas comprovando a normalidade $\sqrt2$ ou
+        $\pi $ permanece aberto.
+  \item (\omterm{ex:b3:probability:sllnapps}{Monte Carlo}, garantido) Justifique completamente o
+        método de \cref{ex:b3:probability:sllnapps}(b) para
+        $ g \in L^1(\intcc01^d)$: construir o i.i.d.\
+        amostra uniforme em $\intcc01^d $ de
+        \cref{thm:b3:probability:existence} e
+        \cref{exo:b3:probability:10}, e indique o que
+        forte \omterm{def:b3:probability:space}{lei} entrega.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part VI --- What full independência buys:
+maximal inequalities and random series.} Etemadi gasta
+apenas aos pares independência; as partes restantes exploram o
+versão completa (mútua). Deixar $(Z_n)$ ser \omterm{def:b3:probability:independence}{independente} centrado
+variáveis de $ L^2$ e $ S_k = Z_1 + \dots + Z_k $ (um fresco
+notação, sem relação com o $ X_n $ acima).
+\begin{enumerate}[resume]
+  \item (Desigualdade máxima de Kolmogorov) Para $\varepsilon
+        > 0$ provar
+        \[
+        \P\Bigl(\max_{1\leq k\leq n}\abs{S_k} \geq
+        \varepsilon\Bigr) \;\leq\;
+        \frac1{\varepsilon^2}\sum_{k=1}^n\V(Z_k) :
+        \]
+        O preço de Chebyshev compra o \omterm{def:b3:rings:primemaximal}{máximo} \emph{(partição
+        o evento de acordo com o primeiro \omterm{def:b3:holomorphic:index}{índice} $ k $ com
+        $\abs{S_k} \geq \varepsilon $; naquela peça escreva
+        $ S_n^2 \geq S_k^2 + 2S_k(S_n - S_k)$ e use o
+        independência das coligações $(Z_1, \dots, Z_k)$
+        e $(Z_{k+1}, \dots, Z_n)$,
+        \cref{thm:b3:probability:independence})}. Apontar
+        a etapa em que aos pares independência não iria
+        mais tempo é suficiente.
+  \item (Teorema da série única de Khhinchin-Kolmogorov) Deduza:
+        se $\sum_n\V(Z_n) < \infty $, então $\sum_nZ_n $
+        converge quase certamente \emph{(mostre isso como o
+        somas parciais formam uma sequência de Cauchy: seja $ m \to
+        \infty $ na desigualdade máxima aplicada a
+        $ Z_{N+1}, \dots, Z_{N+m}$, então deixe $ N \to
+        \infty $)}.
+  \item (série Rademacher) Vamos $(\varepsilon_n)$ ser
+        sinais de identificação, $\P(\varepsilon_n = \pm1) =
+        \frac12$ (\cref{thm:b3:probability:existence}) e
+        deixe $(x_n)$ sejam números reais. Mostre isso
+        $\sum_nx_n\varepsilon_n $ converge como\ assim que
+        $\sum_nx_n^2 < \infty $; mostre também que, seja qual for
+        $(x_n)$, a probabilidade de que
+        $\sum_nx_n\varepsilon_n $ converge é $0$ ou $1$
+        (\cref{thm:b3:probability:zeroone}).
+  \item O inverso, elementarmente. Definir $ T_n = \sum_{k\leq
+        n}x_k\varepsilon_k $ e $ s_n^2 = \sum_{k\leq
+        n}x_k^2$, e suponha $ s_n \to \infty $.
+        (a) Prove o \emph{Desigualdade de Paley-Zygmund}: para
+        $ Z \geq 0$ com $\E Z^2 < \infty $ e $0 < \theta <
+        1$,
+        \[
+        \P\bigl(Z > \theta\,\E Z\bigr) \;\geq\; (1 -
+        \theta)^2\,\frac{(\E Z)^2}{\E Z^2}
+        \]
+        \emph{(dividir $\E Z $ ao nível $\theta\E Z $ e
+        aplique Cauchy--Schwarz na parte superior)}.
+        (b) Mostrar $\E T_n^4 \leq 3s_n^4$.
+        (c) Deduzir $\P\bigl(\abs{T_n} > \frac{s_n}2\bigr)
+        \geq \frac3{16}$ e concluir que
+        $\sum_nx_n\varepsilon_n $ diverge como; daí o
+        dicotomia
+        \[
+        \sum_nx_n\varepsilon_n\ \text{converges a.s.}
+        \iff \sum_nx_n^2 < \infty .
+        \]
+  \item (Série harmônica aleatória) Conclua que
+        $\sum_n\frac{\varepsilon_n}{n^s}$ converge como
+        se e somente se $ s > \frac12$. Para $\frac12 < s \leq
+        1$ a série converge como\ enquanto
+        $\sum_nn^{-s} = \infty $: sinais aleatórios produzem
+        cancelamento de força de raiz quadrada --- compare com
+        a série alternada $\sum_n\frac{(-1)^n}{n^s}$,
+        que converge para \emph{todo} $ s > 0$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part VII --- Concentration: Hoeffding's
+inequality.} O forte \omterm{def:b3:probability:space}{lei} diz $\frac{S_n}n \to m $;
+desigualdades de concentração dizem quão improvável é um desvio
+\emph{em cada fixo $ n $}.
+\begin{enumerate}[resume]
+  \item (Lema de Hoeffding)
+        (a) Mostrar $\cosh\lambda \leq \eu^{\lambda^2/2}$ para
+        tudo $\lambda \in \R $, comparando as duas séries
+        termicamente.
+        (b) Deixe $ Z $ estar centrado com $ a \leq Z \leq b $,
+        $ a < b $. Mostrar
+        \[
+        \E\,\eu^{\lambda Z} \leq
+        \exp\Bigl(\frac{\lambda^2(b - a)^2}8\Bigr)
+        \]
+        \emph{(vinculado $\eu^{\lambda z}$ sobre $\intcc ab $ por
+        seu acorde, pegue expectativase estudar $\varphi(t)
+        = -pt + \log(1 - p + p\eu^t)$ com $ p =
+        \frac{-a}{b-a}$ e $ t = \lambda(b - a)$: mostrar
+        $\varphi(0) = \varphi'(0) = 0$ e $\varphi''
+        \leq \frac14$)}.
+  \item (Desigualdade de Hoeffding) Deixe $ X_1, \dots, X_n $ ser
+        \omterm{def:b3:probability:independence}{independente} com $ a_i \leq X_i \leq b_i $ e $ S_n =
+        X_1 + \dots + X_n $. Prove, por $ t > 0$,
+        \[
+        \P\bigl(S_n - \E S_n \geq t\bigr) \leq
+        \exp\Bigl(\frac{-2t^2}{\sum_{i=1}^n(b_i -
+        a_i)^2}\Bigr),
+        \]
+        e o mesmo limite para a cauda inferior
+        \emph{(Chebyshev exponencial: vinculado
+        $\E\,\eu^{\lambda(S_n - \E S_n)}$ usando
+        independência e pergunta 17, então otimize
+        $\lambda > 0$)}.
+  \item (O forte \omterm{def:b3:probability:space}{lei}, caso limitado, com uma taxa) Deixe o
+        $ X_i $ ser i.i.d.\ com valores em $\intcc ab $ e $ m
+        = \E X_1$. Mostrar
+        \[
+        \P\Bigl(\Bigl|\frac{S_n}n - m\Bigr| \geq
+        \varepsilon\Bigr) \leq
+        2\exp\Bigl(\frac{-2n\varepsilon^2}{(b - a)^2}\Bigr)
+        \]
+        e recuperar $\frac{S_n}n \to m $ como por
+        Borel-Cantelli: uma segunda prova do forte \omterm{def:b3:probability:space}{lei}
+        para variáveis limitadas --- sem truncamento, um
+        taxa exponencial em cada finito $ n $, mas limitado
+        convocações e completo independência. Compare o
+        hipóteses com as de Etemadi.
+  \item (\omterm{ex:b3:probability:sllnapps}{Monte Carlo}, garantido em fixo $ n $) Deixar $ g
+        \colon \intcc01^d \to \intcc01$ ser \omterm{def:b3:lebesgue:measurable}{mensurável} e
+        $(U_k)$ a amostra uniforme i.i.d. da questão 11.
+        Dado $\varepsilon, \delta > 0$, mostrar
+        \[
+        n \geq \frac{\log(2/\delta)}{2\varepsilon^2}
+        \implies
+        \P\Bigl(\Bigl|\frac1n\sum_{k=1}^ng(U_k) -
+        \int g\,\dd\lambda_d\Bigr| \geq \varepsilon\Bigr)
+        \leq \delta,
+        \]
+        e avaliar o limite para $\varepsilon =
+        \delta = 10^{-2}$. O limite não envolve $ d $:
+        compare com a questão 11 e com determinístico
+        grades.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part VIII --- How big is a random walk?
+Toward the iterated logarithm.} Deixar $ S_n = \varepsilon_1 +
+\dots + \varepsilon_n $ seja o passeio aleatório \omterm{def:b3:groups:simple}{simples} construído a partir de
+i.i.d.\ sinais justos.
+\begin{enumerate}[resume]
+  \item (Caudas sub-Gaussianas) Mostrar $\E\,\eu^{\lambda S_n} =
+        (\cosh\lambda)^n \leq \eu^{n\lambda^2/2}$ e
+        deduzir, por $ x > 0$,
+        \[
+        \P(S_n \geq x) \leq \eu^{-x^2/(2n)},
+        \qquad
+        \P(\abs{S_n} \geq x) \leq 2\,\eu^{-x^2/(2n)} .
+        \]
+  \item Deduza, via Borel-Cantelli,
+        \[
+        \limsup_{n\to\infty}\frac{\abs{S_n}}
+        {\sqrt{2n\log n}} \leq 1 \quad\text{a.s.}
+        \]
+        \emph{(para $\eta > 0$, some os limites da cauda em $ x =
+        (1 + \eta)\sqrt{2n\log n}$, então cruze
+        $\eta = \frac1p $)}. Em particular, a caminhada continua viva
+        a escala CLT $\sqrt n $ até um fator logarítmico
+        --- muito abaixo do limite bruto $\abs{S_n} \leq n $.
+  \item Ao longo da subsequência de duplicação $ n_j = 2^j $, mostrar
+        \[
+        \limsup_{j\to\infty}\frac{S_{n_j}}
+        {\sqrt{2n_j\log\log n_j}} \leq 1 \quad\text{a.s.},
+        \]
+        e reflita: o \emph{\omterm{def:b3:probability:space}{lei} do iterado
+        logaritmo} (Khinchin; Hartman--Wintner para geral
+        centrado $ L^2$ intimações) afirma que
+        \[
+        \limsup_{n\to\infty}\frac{S_n}
+        {\sqrt{2n\log\log n}} = 1 \quad\text{a.s.}
+        \]
+        Explique precisamente o que separa a subsequência
+        estimativa acabou de ser provada na metade superior deste
+        declaração (deve-se controlar $\max_{n_j \leq n \leq
+        n_{j+1}}S_n $ dentro de cada bloco, o que requer um
+        desigualdade máxima no \emph{exponencial} escala)
+        e verifique quantitativamente a questão 12
+        a desigualdade é demasiado fraca para esse efeito. O inferior
+        metade repousa no segundo lema de Borel-Cantelli
+        aplicado a \omterm{def:b3:probability:independence}{independente} blocos; ambas as metades são
+        material honesto do Ano 3 para uma probabilidade dedicada
+        claro.
+
+  \item (Desvio uniforme sobre uma classe finita) Seja $ A_1,
+        \dots, A_N $ ser eventos em um experimento repetível,
+        e estimar cada probabilidade por seu empírico
+        frequência $\hat p_i $ sobre $ n $ i.i.d.\ repetições.
+        Combinando a desigualdade de Hoeffding com uma ligação sindical,
+        mostrar
+        \[
+        \P\Bigl(\max_{i\leq N}\,\abs{\hat p_i - \P(A_i)} >
+        \varepsilon\Bigr) \;\leq\; 2N\,\eu^{-2n\varepsilon^2},
+        \]
+        e deduza a regra do tamanho da amostra: $ n \geq
+        \frac{\ln(2N/\delta)}{2\varepsilon^2}$ garantias
+        tudo $ N $ estimativas simultaneamente
+        $\varepsilon $-preciso com probabilidade $\geq 1 -
+        \delta $. Calcular $ n $ para $ N = 10^6$, $\varepsilon =
+        0.01$, $\delta = 0.05$: o preço logarítmico de
+        uniformidade.
+  \item (A janela harmônica aleatória) Combinando os dois
+        metades da teoria das séries aleatórias, mostram que para
+        i.i.d.\ sinais $(\varepsilon_n)$ a série
+        $\sum_n\frac{\varepsilon_n}{n^\alpha}$ converge
+        como se $\alpha > \frac12$ e diverge como\ se
+        $\alpha \leq \frac12$; contraste com absoluto
+        convergência (que requer $\alpha > 1$): no
+        janela $\alpha \in \intoc{\frac12}1$, convergência
+        é um fenômeno genuinamente probabilístico ---
+        cancelamento, não tamanho.
+\end{enumerate}
+\end{problem}

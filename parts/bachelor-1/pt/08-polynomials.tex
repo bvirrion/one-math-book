@@ -1,0 +1,819 @@
+\chapter{Polinômios}\label{ch:b1:poly}
+
+\omterm{def:b1:poly:def}{Polinômios} são as funções favoritas do algebrista --- exceto que
+eles não são tratados como funções aqui, mas como expressões formais em
+um indeterminado $X $, somado e multiplicado pelas regras de um
+comutativo \omterm{def:b1:structures:ring}{anel}. A teoria corre surpreendentemente paralela à
+\cref{ch:b1:arith}: uma \omterm{thm:b1:logic:partition}{divisão} euclidiana, um mdc e relações de Bézout,
+elementos irredutíveis e uma fatoração única. Por todo, $ K $
+denota $\Q $, $\R $ ou $\C $.
+
+\section{O anel $ K[X]$}
+
+\begin{definition}[Polinômio, grau]\label{def:b1:poly:def}
+UM \emph{polinômio}\index{polinômio} com coeficientes em $ K $ é um
+soma formal
+\[
+P = a_0 + a_1 X + a_2 X^2 + \dots + a_n X^n
+= \sum_{k} a_k X^k,
+\]
+com $ a_k \in K $ tudo zero a partir de algum índice. Com a naturalidade
+adição e o produto
+\[
+\Bigl(\sum_i a_i X^i\Bigr)\Bigl(\sum_j b_j X^j\Bigr)
+= \sum_k \Bigl(\sum_{i+j=k} a_i b_j\Bigr) X^k,
+\]
+o \omterm{def:b1:logic:sets}{definir} $ K[X]$ é comutativo \omterm{def:b1:structures:ring}{anel}. O \emph{grau} $\deg P $ de
+$ P \neq 0$ é o maior $ n $ com $ a_n \neq 0$; $ a_n $ é o
+\emph{coeficiente líder} ($ P $ é \emph{Mônica}\index{Mônica} quando $ a_n = 1$) e por convenção $\deg 0 = -\infty $.
+Cada polinômio define uma função $ x \mapsto P(x)$ sobre $ K $ por
+substituição.
+\end{definition}
+
+\begin{proposition}[Regras de graduação; domínio integral]\label{prop:b1:poly:degree}
+Para $ P, Q \in K[X]$:
+\[
+\deg(P + Q) \leq \max(\deg P, \deg Q),
+\qquad
+\deg(PQ) = \deg P + \deg Q .
+\]
+Consequentemente $ K[X]$ é um domínio integral, e suas unidades são
+constantes diferentes de zero.
+\end{proposition}
+
+\begin{proof}
+A regra da soma é clara (coeficientes além do máximo desaparecem). Para o
+produto, deixe $ a_m $ e $ b_n $ sejam os coeficientes principais: o
+coeficiente de $ X^{m+n}$ em $ PQ $ é $ a_m b_n \neq 0$ ($ K $ é um
+\omterm{def:b1:structures:field}{campo}, daí um domínio integral), e todos os coeficientes mais altos desaparecem.
+Se $ P, Q \neq 0$ então $\deg PQ = \deg P + \deg Q \geq 0$, então $ PQ \neq
+0$: domínio integral. Se $ PQ = 1$ então $\deg P + \deg Q = 0$ forças
+$\deg P = \deg Q = 0$: elementos invertíveis são os invertíveis
+constantes, ou seja,\ todos $ K^*$.
+\end{proof}
+
+\begin{theorem}[Divisão euclidiana]\label{thm:b1:poly:division}
+Deixar $ A, B \in K[X]$ com $ B \neq 0$. Há exatamente um par $(Q,
+R)$ de \omterm{def:b1:poly:def}{polinômios} com
+\[
+A = BQ + R, \qquad \deg R < \deg B .
+\]
+\end{theorem}
+
+\begin{proof}
+\emph{Existência}, por forte indução em $\deg A $. Se $\deg A < \deg
+B $, pegar $(Q, R) = (0, A)$. Caso contrário, escreva $ A = a X^m + \dots $, $ B =
+b X^n + \dots $ com $ m \geq n $; o polinomial $ A_1 = A - \frac ab
+X^{m-n} B $ tem diploma $< m $ (os termos iniciais são cancelados), então por
+indução $ A_1 = BQ_1 + R $ com $\deg R < \deg B $, e $ A = B(Q_1 +
+\frac ab X^{m-n}) + R $.
+
+\emph{Singularidade}: se $ BQ + R = BQ' + R'$, então $ B(Q - Q') = R' - R $
+com $\deg(R' - R) < \deg B $; pela regra de grau isso força $ Q - Q'
+= 0$, então $ R = R'$.
+\end{proof}
+
+\begin{example}\label{ex:b1:poly:division}
+Dividir $ A = X^4 + X^3 - 2X + 1$ por $ B = X^2 + 1$:
+\[
+X^4 + X^3 - 2X + 1 = (X^2 + 1)(X^2 + X - 1) + (-3X + 2).
+\]
+(Calcular: subtrair $ X^2 B $, então $ X B $, então $-B $; o restante
+$-3X + 2$ tem diploma $1 < 2$.)
+\end{example}
+
+\begin{method}[Esquema de Horner]\label{met:b1:poly:horner}
+Para avaliar $ P = a_nX^n + \dots + a_0$ no $ x $, ou para dividir $ P $ por
+$ X - x $, evite poderes de computação: leia os coeficientes restantes para
+certo, e iterar \emph{multiplique por $ x $, adicione o próximo
+coeficiente}:
+\[
+b_n = a_n, \qquad b_{k} = a_{k} + x\,b_{k+1}
+\quad (k = n-1, \dots, 0) .
+\]
+Então $ b_0 = P(x)$, e o anterior $ b_k $ são os do quociente
+coeficientes: $ P = (X - x)(b_nX^{n-1} + \dots + b_1) + b_0$
+(expandir e comparar). Exemplo: $ P = X^4 - 5X^3 + 6X^2 + 4X - 8$
+no $ x = 2$: o $ b $ são $1, -3, 0, 4, 0$, então $ P(2) = 0$ e $ P
+= (X-2)(X^3 - 3X^2 + 4)$ --- uma linha em vez de uma longa
+\omterm{thm:b1:logic:partition}{divisão}, e $ n $ multiplicações em vez do $\approx n^2/2$
+da avaliação ingênua. Iterando o esquema no mesmo ponto
+extrai \omterm{def:b1:poly:derivative}{multiplicidades} (compare
+\cref{ex:b1:poly:multexample}).
+\end{method}
+
+\begin{remark}[{Aritmética de $ K[X]$}]
+Com a \omterm{thm:b1:logic:partition}{divisão} euclidiana em mãos, toda a aritmética de
+\cref{ch:b1:arith} transferências para $ K[X]$, com as mesmas provas, grau
+desempenhando o papel de valor absoluto: mdc (normalizado para ser \omterm{def:b1:poly:def}{Mônica}),
+estendido \omterm{met:b1:arith:euclid}{Algoritmo euclidiano}, Identidade de Bézout, Lema de Gauss,
+irredutível \omterm{def:b1:poly:def}{polinômios} e fatoração única. Nós usamos livremente estes
+resultados transferidos, e \cref{exo:b1:poly:6} ensaia um deles.
+\end{remark}
+
+\section{Raízes}
+
+\begin{theorem}[Teorema do fator]\label{thm:b1:poly:factor}
+Deixar $ P \in K[X]$ e $ a \in K $. O restante $ P $ mediante \omterm{thm:b1:logic:partition}{divisão} por
+$ X - a $ é a constante $ P(a)$. Em particular
+\[
+P(a) = 0 \iff (X - a) \mid P .
+\]
+Mais geralmente, raízes distintas $ a_1, \dots, a_r $ de $ P $ dê o
+fatoração $ P = (X - a_1)\cdots(X - a_r)\, Q $.
+\end{theorem}
+
+\begin{proof}
+Dividir: $ P = (X - a) Q + R $ com $\deg R < 1$, então $ R $ é uma constante
+$ c $; substituindo $ X = a $ (a substituição respeita somas e produtos)
+dá $ P(a) = c $. A equivalência segue. Para várias raízes,
+induzir $ r $: o caso $ r = 1$ é a equivalência que acabamos de provar.
+Suponha que \omterm{def:b1:logic:statement}{declaração} para $ r - 1$ raízes e deixe $ a_1, \dots, a_r $
+ser raízes distintas de $ P $. Escrever $ P = (X - a_1)Q_1$; para cada $ i
+\geq 2$, substituindo $ a_i $:
+\[
+0 = P(a_i) = (a_i - a_1)\,Q_1(a_i),
+\qquad a_i - a_1 \neq 0 ,
+\]
+e desde então $ K $ não tem divisores zero, $ Q_1(a_i) = 0$: o $ r - 1$
+pontos distintos $ a_2, \dots, a_r $ são raízes de $ Q_1$. O
+fatores de hipótese de indução $ Q_1 = (X - a_2)\cdots(X - a_r)\,Q $,
+e substituindo de volta dá a reivindicação.
+\end{proof}
+
+\begin{corollary}[Um polinômio de grau $ n $ tem no máximo $ n $ raízes]\label{cor:b1:poly:nroots}
+Um diferente de zero $ P \in K[X]$ de grau $ n $ tem no máximo $ n $ raízes distintas
+em $ K $. Consequentemente, um polinomial (de grau $\leq n $) desaparecendo em
+$ n + 1$ pontos distintos é o zero polinomiale dois \omterm{def:b1:poly:def}{polinômios}
+de grau $\leq n $ concordando em $ n+1$ os pontos são iguais.
+\end{corollary}
+
+\begin{proof}
+Se $ a_1, \dots, a_r $ são raízes distintas, \cref{thm:b1:poly:factor}
+dá $ P = (X-a_1)\cdots(X-a_r) Q $, então $ n = \deg P \geq r $. Os dois
+as consequências seguem por contradição e por diferença.
+\end{proof}
+
+\begin{example}[O truque do polinômio auxiliar]\label{ex:b1:poly:auxiliary}
+Deixar $ P $ seja o polinomial de grau $\leq n $ com
+\[
+P(k) = \frac{k}{k+1} \qquad (k = 0, 1, \dots, n) ;
+\]
+existe e é único por \omterm{thm:b1:poly:lagrange}{Interpolação de Lagrange} abaixo. O que é
+$ P(n+1)$? Denominadores claros: o polinomial $ Q = (X+1)P - X $ tem
+grau $\leq n + 1$ e desaparece no $ n + 1$ pontos $0, 1,
+\dots, n $, então por \cref{thm:b1:poly:factor}
+\[
+Q = c\,X(X-1)(X-2)\cdots(X-n)
+\]
+para alguma constante $ c $. Avalie onde $ Q $ é conhecido independentemente:
+em $ X = -1$, $ Q(-1) = 0 \cdot P(-1) + 1 = 1$, enquanto o produto
+é igual $(-1)(-2)\cdots(-1-n) = (-1)^{n+1}(n+1)!$; por isso $ c =
+\frac{(-1)^{n+1}}{(n+1)!}$. Agora avalie em $ X = n + 1$:
+\[
+(n+2)\,P(n+1) - (n+1) = Q(n+1) = c\,(n+1)! = (-1)^{n+1} ,
+\]
+então $ P(n+1) = \dfrac{(n+1) + (-1)^{n+1}}{n+2}$: igual a $1$ para
+estranho $ n $, e para $\frac{n}{n+2}$ até mesmo $ n $ --- o
+interpolando polinomial faz \emph{não} continuar o padrão
+$\frac{n+1}{n+2}$. O truque para lembrar: codifique os dados como
+raízes de um auxiliar polinomial, identifique a constante desconhecida
+em um ponto fora dos dados e colheita.
+\end{example}
+
+\begin{definition}[Derivada, multiplicidade]\label{def:b1:poly:derivative}
+O \emph{derivada formal} de $ P = \sum a_k X^k $ é $ P' = \sum_{k
+\geq 1} k\,a_k X^{k-1}$; satisfaz as regras habituais $(P+Q)' = P' +
+Q'$, $(PQ)' = P'Q + PQ'$ (verificado em monômios e estendido por
+linearidade). Uma raiz $ a $ de $ P $ tem
+\emph{multiplicidade}\index{multiplicidade} $ m \geq 1$ quando
+$(X-a)^m \mid P $ mas $(X-a)^{m+1} \nmid P $; a raiz é \emph{simples}
+se $ m = 1$, \emph{múltiplo} se $ m \geq 2$.
+\end{definition}
+
+\begin{proposition}[Multiplicidade via derivadas]\label{prop:b1:poly:multiplicity}
+$ a $ é uma raiz de $ P $ de \omterm{def:b1:poly:derivative}{multiplicidade} $\geq m $ se e somente se
+\[
+P(a) = P'(a) = \dots = P^{(m-1)}(a) = 0 .
+\]
+Em particular, $ a $ é uma raiz múltipla de $ P $ se e somente se $ P(a) =
+P'(a) = 0$.
+\end{proposition}
+
+\begin{proof}
+Escrever $ P = (X - a)^m Q + R $ onde $ R $ é o resto da \omterm{thm:b1:logic:partition}{divisão}
+por $(X-a)^m $, $\deg R < m $. Diferenciando $ k \leq m - 1$ vezes e
+avaliando em $ a $: o primeiro termo contribui $0$ (cada derivada
+retém um fator $(X-a)$), então $ P^{(k)}(a) = R^{(k)}(a)$.
+
+Agora um polinomial $ R $ de grau $< m $ é determinado por $ R(a), R'(a),
+\dots, R^{(m-1)}(a)$: escrita $ R = \sum_{k < m} c_k (X - a)^k $
+(possível: expandir os poderes de $ X = (X - a) + a $), encontra-se
+$ R^{(k)}(a) = k!\, c_k $. Portanto: todos $ P^{(k)}(a) = 0$ para $ k < m $
+$\iff $ todos $ c_k = 0$ $\iff $ $ R = 0$ $\iff $ $(X-a)^m \mid P $.
+\end{proof}
+
+\begin{example}[Calculando uma multiplicidade]\label{ex:b1:poly:multexample}
+Qual é o \omterm{def:b1:poly:derivative}{multiplicidade} da raiz $2$ em $ P = X^4 - 5X^3 + 6X^2
++ 4X - 8$? Avalie as derivadas sucessivas em $2$:
+\[
+P(2) = 16 - 40 + 24 + 8 - 8 = 0, \qquad
+P'(2) = 32 - 60 + 24 + 4 = 0,
+\]
+\[
+P''(2) = 48 - 60 + 12 = 0, \qquad
+P'''(2) = 48 - 30 = 18 \neq 0
+\]
+(com $ P' = 4X^3 - 15X^2 + 12X + 4$, $ P'' = 12X^2 - 30X + 12$,
+$ P''' = 24X - 30$). Três valores que desaparecem e depois um valor diferente de zero:
+\omterm{def:b1:poly:derivative}{multiplicidade} exatamente $3$. Dividindo, $ P = (X - 2)^3(X + 1)$ ---
+qual deles verifica expandindo $(X-2)^3 = X^3 - 6X^2 + 12X - 8$ e
+multiplicando por $ X + 1$. O insight: \omterm{def:b1:poly:derivative}{multiplicidades} são lidas
+\emph{avaliações}, nenhuma fatoração necessária --- o que é exatamente
+como detectá-los quando a fatoração está fora de alcance.
+\end{example}
+
+\begin{example}[Detectando múltiplas raízes com um mdc]\label{ex:b1:poly:gcdmultiple}
+Quando nenhuma raiz é conhecida, \cref{prop:b1:poly:multiplicity} ainda
+dá um \emph{global} detector de múltiplas raízes: $ a $ é um múltiplo
+raiz de $ P $ se for uma raiz comum de $ P $ e $ P'$, então $ P $ tem um
+raiz múltipla (em $\C $) se $\gcd(P, P') \neq 1$ --- computável por
+o \omterm{met:b1:arith:euclid}{Algoritmo euclidiano} sem resolver nada. Amostra: $ P =
+X^3 - 3X + 2$, $ P' = 3X^2 - 3 = 3(X - 1)(X + 1)$. Testando o
+raízes $\pm1$ de $ P'$ dentro $ P $: $ P(1) = 0$ mas $ P(-1) = 4$, então
+\[
+\gcd(P, P') = X - 1 :
+\]
+a raiz $1$ é múltiplo; dividindo duas vezes, $ P = (X - 1)^2(X + 2)$.
+O gcd até relata o completo \omterm{def:b1:logic:sets}{definir} de múltiplas raízes, cada uma com
+\omterm{def:b1:poly:derivative}{multiplicidade} reduzido em um --- o fato de toda álgebra computacional
+explorações do sistema para ``factorizar sem quadrados'' antes de qualquer
+caça às raízes e o polinomial gêmeo de
+\cref{exo:b1:poly:9}argumentos sem raiz múltipla.
+\end{example}
+
+\begin{theorem}[Teorema fundamental da álgebra]\label{thm:b1:poly:fta}
+Cada inconstante polinomial de $\C[X]$ tem uma raiz em
+$\C $.\index{teorema fundamental da álgebra}
+\end{theorem}
+\admitted
+
+\begin{remark}
+Apesar do nome, o teorema é um \omterm{def:b1:logic:statement}{declaração} de \emph{análise}:
+toda prova conhecida usa a completude de $\R $ de alguma forma, e
+nenhum é puramente \omterm{pb:b1:logic:1}{algébrico} --- a prova honesta é dada no
+Volume do ano 3, uma vez que integração complexa ou compactação
+argumentos estão disponíveis. O que este capítulo prova genuinamente é
+o \emph{redução}: concedida uma raiz para cada não constante
+polinomial, as fatorações completas sobre $\C $ e $\R $ abaixo
+siga pela álgebra pura.
+\end{remark}
+
+\begin{corollary}[Fatoração terminada $\C $ e mais $\R $]\label{cor:b1:poly:factorization}
+\begin{enumerate}
+  \item Todo diferente de zero $ P \in \C[X]$ fatores como
+        \[
+        P = c\, (X - a_1)^{m_1} \cdots (X - a_r)^{m_r},
+        \]
+        com $ c $ o coeficiente líder, $ a_i $ o complexo distinto
+        raízes, $\sum m_i = \deg P $: \emph{contado com \omterm{def:b1:poly:derivative}{multiplicidade},
+        um polinomial de grau $ n $ tem exatamente $ n $ raízes complexas}.
+  \item Todo diferente de zero $ P \in \R[X]$ fatores acima $\R $ como
+        \[
+        P = c \prod_i (X - a_i)^{m_i} \prod_j (X^2 + p_j X +
+        q_j)^{n_j},
+        \]
+        os fatores quadráticos sendo distintos com $ p_j^2 - 4q_j < 0$
+        (sem raízes reais).
+\end{enumerate}
+\end{corollary}
+
+\begin{proof}
+(1) Indução no grau, dividindo uma raiz de cada vez por
+\cref{thm:b1:poly:factor}; a contagem de graus corresponde a cada etapa.
+
+(2) Deixe $ P $ têm coeficientes reais. Se $ z $ é uma raiz complexa de
+\omterm{def:b1:poly:derivative}{multiplicidade} $ m $, assim é $\conj z $: conjugando $ P(z) = 0$ dá
+$ P(\conj z) = \conj{P(z)} = 0$ (os coeficientes são próprios
+\omterm{def:b1:complex:field}{conjugados}), e o mesmo se aplica aos derivados
+(\cref{prop:b1:poly:multiplicity}). Agrupe as raízes não reais em
+pares \omterm{def:b1:complex:field}{conjugados}: cada par contribui
+\[
+(X - z)(X - \conj z) = X^2 - 2\Re(z)\, X + \abs z^2 ,
+\]
+uma quadrática real com discriminante negativo. As verdadeiras raízes contribuem
+os fatores lineares.
+\end{proof}
+
+\begin{example}\label{ex:b1:poly:factorexample}
+$ X^4 + 4$ foi fatorado $\R $ em \cref{exo:b1:complex:5} por emparelhamento
+as quatro raízes complexas $\pm 1 \pm \iu $:
+$ X^4 + 4 = (X^2 - 2X + 2)(X^2 + 2X + 2)$. Nem divisões quadráticas
+acabou $\R $ (discriminantes $-4$). Nota: um \emph{irredutível} real
+polinomial tem diploma $1$ ou $2$ --- isso é exatamente o que
+teorema da fatoração diz. O mesmo emparelhamento \omterm{def:b1:complex:field}{conjugado} é executado em
+$ X^4 + 1$, cujas raízes são $\eu^{\pm\iu\pi/4}$ e
+$\eu^{\pm3\iu\pi/4}$: cada par contribui $ X^2 -
+2\cos\theta\,X + 1$, então
+\[
+X^4 + 1 = \bigl(X^2 - \sqrt2\,X + 1\bigr)
+\bigl(X^2 + \sqrt2\,X + 1\bigr) ,
+\]
+uma identidade invisível às tentativas ingênuas de factoring $\Q $ ---
+o preço de insistir no real (aqui até irracional)
+coeficientes e uma entrada padrão para integração $\frac1{x^4 +
+1}$ em \cref{ch:b1:integration}.
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}[xscale=2.6, yscale=1.35]
+  \draw[->, thin] (-1.15,0) -- (1.2,0) node[below] {$ x $};
+  \draw[->, thin] (0,-1.35) -- (0,1.4) node[left] {$ y $};
+  \draw[dashed, gray] (-1,1) -- (1,1);
+  \draw[dashed, gray] (-1,-1) -- (1,-1);
+  \draw[gray, thin] (-1,-1.1) -- (-1,1.1) (1,-1.1) -- (1,1.1);
+  \draw[omThm, very thick, domain=-1:1, samples=300, smooth]
+    plot (\x, {16*\x^5 - 20*\x^3 + 5*\x});
+  \node[right, font=\small] at (1.02,1) {$1$};
+  \node[right, font=\small] at (1.02,-1) {$-1$};
+  \fill[omThm] (-1,-1) circle (0.018) (-0.809,1) circle (0.018)
+    (-0.309,-1) circle (0.018) (0.309,1) circle (0.018)
+    (0.809,-1) circle (0.018) (1,1) circle (0.018);
+\end{tikzpicture}
+
+{\small O Tchebyshev polinomial $ T_5 = 16X^5 - 20X^3 + 5X $ sobre
+$\intcc{-1}1$: oscila exatamente entre $-1$ e $1$,
+tocando os limites em seis pontos (marcados). Esse
+\emph{equioscilação} é o que faz $2^{-4}T_5$ o \omterm{def:b1:poly:def}{Mônica}
+quintico da menor sup-norma no intervalo
+(\cref{exo:b1:poly:10} e o problema do fim de semana).}
+\end{omfigure}
+
+\begin{remark}[Armadilhas comuns com polinômios]\label{rem:b1:poly:pitfalls}
+\begin{enumerate}
+  \item \emph{Polinomial versus função.} Sobre $ K = \Q, \R, \C $
+        as duas noções correspondem (funções iguais têm iguais
+        coeficientes, por \cref{cor:b1:poly:nroots} e
+        infinidade de $ K $), mas conceitualmente um polinomial é
+        sua lista de coeficientes: sobre os dois elementos \omterm{def:b1:structures:field}{campo}
+        $\Z/2\Z $ de \cref{ch:b1:structures}, $ X^2 + X $ desaparece
+        em ambos os pontos, ainda não é o zero polinomial.
+  \item \emph{Graus sob adição.} $\deg(P + Q)$ pode cair
+        abaixo $\max(\deg P, \deg Q)$ quando os termos iniciais são cancelados;
+        escrevendo ``$\deg(P + Q) = \max(\dots)$'' só é seguro para
+        graus distintos.
+  \item \emph{Raízes contadas corretamente.} ``$ n $ raízes'' em
+        \cref{cor:b1:poly:factorization} significa \emph{com
+        \omterm{def:b1:poly:derivative}{multiplicidade}, em $\C $}: $ X^2 + 1$ não tem raízes reais e
+        $(X-1)^2$ tem uma raiz distinta, mas duas com
+        \omterm{def:b1:poly:derivative}{multiplicidade}. Declarações misturar as três contagens são os
+        fonte mais comum de provas falsas.
+  \item \emph{A irredutibilidade depende \omterm{def:b1:structures:field}{campo}.} $ X^2 - 2$ é
+        irredutível sobre $\Q $, se \omterm{def:b1:arith:divides}{divide} $\R $; $ X^2 + 1$ é
+        irredutível sobre $\R $, se \omterm{def:b1:arith:divides}{divide} $\C $. A palavra nua
+        ``irredutível'' não significa nada até que o coeficiente
+        \omterm{def:b1:structures:field}{campo} é nomeado.
+\end{enumerate}
+\end{remark}
+
+\section{Coeficientes e raízes}
+
+\begin{theorem}[Fórmulas de Vieta]\label{thm:b1:poly:vieta}
+Deixar $ P = X^n + c_{n-1} X^{n-1} + \dots + c_0$ ser \omterm{def:b1:poly:def}{Mônica} com raízes
+$ a_1, \dots, a_n \in \C $ (com \omterm{def:b1:poly:derivative}{multiplicidade}). Então\index{Vieta
+fórmulas}
+\[
+\sum_i a_i = -c_{n-1},
+\qquad
+\sum_{i < j} a_i a_j = c_{n-2},
+\qquad \dots, \qquad
+a_1 a_2 \cdots a_n = (-1)^n c_0 ,
+\]
+o $ k $-ésima função simétrica das raízes sendo $(-1)^k c_{n-k}$.
+\end{theorem}
+
+\begin{proof}
+Por \cref{cor:b1:poly:factorization}, $ P = (X - a_1)\cdots(X -
+a_n)$ (\omterm{def:b1:poly:def}{Mônica}, todas as raízes listadas). Expandindo o produto
+produz distributivamente um termo por forma de escolha, em cada
+fator, quer $ X $ ou o termo raiz $-a_i $: escolhendo as raízes em
+os fatores indexados por $ i_1 < \dots < i_k $ e $ X $ no $ n - k $
+outros contribuem $(-a_{i_1})\cdots(-a_{i_k})\,X^{n-k}$. Agrupamento
+pelo poder de $ X $:
+\[
+P = \sum_{k=0}^{n} (-1)^k
+\Bigl(\sum_{i_1 < \dots < i_k} a_{i_1}\cdots a_{i_k}\Bigr)
+X^{n-k} ,
+\]
+e identificando-se com $ P = \sum_k c_{n-k}X^{n-k}$ (coeficientes
+são únicos, \cref{def:b1:poly:def}) dá $ c_{n-k} = (-1)^k
+\sigma_k $, ou seja\ $\sigma_k = (-1)^kc_{n-k}$, onde $\sigma_k $
+denota o $ k $-ésima função simétrica exibida acima. Os três
+os casos exibidos são $ k = 1$, $ k = 2$ e $ k = n $.
+\end{proof}
+
+\begin{example}\label{ex:b1:poly:vieta}
+Para o quadrático $ X^2 - sX + p $: soma das raízes $ s $, produto $ p $ ---
+já usado repetidamente (\cref{exo:b1:complex:8}). Por um \omterm{def:b1:poly:def}{Mônica} cúbico
+$ X^3 + aX^2 + bX + c $ com raízes $\alpha, \beta, \gamma $:
+\[
+\alpha + \beta + \gamma = -a,
+\quad
+\alpha\beta + \beta\gamma + \gamma\alpha = b,
+\quad
+\alpha\beta\gamma = -c ,
+\]
+que permite calcular quantidades simétricas como $\alpha^2 + \beta^2
++ \gamma^2 = a^2 - 2b $ sem resolver.
+\end{example}
+
+\begin{example}[Transformando as raízes sem encontrá-las]\label{ex:b1:poly:transformroots}
+Deixar $\alpha, \beta $ sejam as raízes de $ X^2 - 3X + 1$. Qual \omterm{def:b1:poly:def}{Mônica}
+quadrático tem raízes $\alpha^2, \beta^2$? Por Vieta, $\alpha +
+\beta = 3$ e $\alpha\beta = 1$, então
+\[
+\alpha^2 + \beta^2 = (\alpha+\beta)^2 - 2\alpha\beta = 7,
+\qquad
+\alpha^2\beta^2 = (\alpha\beta)^2 = 1 :
+\]
+a resposta é $ X^2 - 7X + 1$ --- obtido sem computação
+$\alpha = \frac{3 + \sqrt5}2$. (Verificar: $\alpha^2 = \frac{7 +
+3\sqrt5}2$ e de fato $\alpha^2 + \beta^2 = 7$.) O mesmo
+estratégia lida com recíprocos ($ X^2 - \frac ba X + \frac
+ca $ transformações de tipo), mudanças e quaisquer dados simétricos: Vieta
+converte perguntas sobre \emph{desconhecido} raízes em álgebra em
+\emph{conhecido} coeficientes. Servirá constantemente quando o
+raízes são autovalores (\cref{ch:b1:det}).
+\end{example}
+
+\begin{example}[Equações palindrômicas]\label{ex:b1:poly:palindrome}
+Resolver $ X^4 + X^3 - 4X^2 + X + 1 = 0$. Os coeficientes lêem o
+iguais em ambas as direções, então $0$ não é uma raiz e dividindo por
+$ X^2$ não perde soluções:
+\[
+X^2 + X - 4 + \frac1X + \frac1{X^2} = 0 .
+\]
+\omterm{def:b1:logic:sets}{Definir} $ y = X + \frac1X $: então $ X^2 + \frac1{X^2} = y^2 - 2$ e
+a equação entra em colapso para
+\[
+y^2 + y - 6 = 0 \iff (y + 3)(y - 2) = 0 .
+\]
+Desdobre cada valor através $ X^2 - yX + 1 = 0$: para $ y = 2$, $ X^2 -
+2X + 1 = (X - 1)^2$ dá a raiz dupla $1$; para $ y = -3$,
+$ X^2 + 3X + 1 = 0$ dá $ X = \frac{-3 \pm \sqrt5}2$. Quatro raízes
+com \omterm{def:b1:poly:derivative}{multiplicidade} para um quártico, como
+\cref{cor:b1:poly:factorization} requer --- obtido resolvendo
+duas quadráticas. O truque cobre todos \emph{palíndromo}
+polinomial: suas raízes vêm em pares recíprocos $\{x, 1/x\}$
+(substituir $ X $ por $1/X $ e denominadores claros), e $ y = X +
+\frac1X $ é precisamente a constante de quantidade em tais pares,
+reduzindo pela metade o grau.
+\end{example}
+
+\begin{theorem}[Interpolação de Lagrange]\label{thm:b1:poly:lagrange}
+Deixar $ x_0, \dots, x_n $ ser pontos distintos de $ K $ e $ y_0, \dots, y_n
+\in K $. Existe exatamente um $ P \in K[X]$ de grau $\leq n $ com
+$ P(x_i) = y_i $ para todos $ i $, nomeadamente\index{Interpolação de Lagrange}
+\[
+P = \sum_{i=0}^{n} y_i\, L_i,
+\qquad
+L_i = \prod_{j \neq i} \frac{X - x_j}{x_i - x_j} .
+\]
+\end{theorem}
+
+\begin{proof}
+Cada $ L_i $ tem diploma $ n $ e satisfaz $ L_i(x_i) = 1$, $ L_i(x_j) =
+0$ para $ j \neq i $ (cada fator desaparece no correspondente $ x_j $).
+Então o exibido $ P $ tem diploma $\leq n $ e interpola. Singularidade:
+dois interpolando \omterm{def:b1:poly:def}{polinômios} de grau $\leq n $ concordo em $ n+1$
+pontos $ x_i $, portanto, são iguais (\cref{cor:b1:poly:nroots}).
+\end{proof}
+
+\begin{remark}[Interlúdio: polinômios também são vetores]\label{rem:b1:poly:interlude}
+Uma mudança de ponto de vista que \cref{ch:b1:vspaces} fará
+oficial: o \omterm{def:b1:poly:def}{polinômios} de grau $\leq n $ formar um espaço em
+cuja adição e escala se comportam exatamente como coordenadas ---
+um polinomial \emph{é} sua lista de $ n + 1$ coeficientes. Três
+declarações deste capítulo são secretamente álgebra linear.
+\omterm{thm:b1:poly:lagrange}{Interpolação de Lagrange} (\cref{thm:b1:poly:lagrange}) diz que
+os dados de avaliação $(P(x_0), \dots, P(x_n))$ determina $ P $
+exclusivamente: avaliação em $ n + 1$ pontos é uma bijeção linear,
+e o $ L_i $ são a base adaptada a ele. A expansão $ R =
+\sum c_k(X - a)^k $ na prova de
+\cref{prop:b1:poly:multiplicity} diz que os poderes
+$(X - a)$ formar outro sistema de coordenadas, com $ c_k =
+R^{(k)}(a)/k!$ como coordenadas. E
+\cref{cor:b1:poly:nroots} --- mais raízes do que as forças de grau
+o zero polinomial --- é o motor de toda singularidade: ele irá
+tornar-se ``um linear \omterm{def:b1:logic:map}{mapa} \omterm{def:b1:logic:inj}{injetivo} em um espaço de dimensão $ n + 1$''
+em \cref{ch:b1:findim}. Quando esses capítulos chegam, o espaço
+$ K_n[X]$ será o seu exemplo favorito; vale a pena chegar
+já é fluente nisso.
+\end{remark}
+
+\begin{remark}[Onde este capítulo é usado]\label{rem:b1:poly:whereused}
+Fatoração terminada $\R $ e $\C $
+(\cref{cor:b1:poly:factorization}) é o motor de parcial
+frações em \cref{ch:b1:fractions}, portanto, de uma grande classe de
+integrais em \cref{ch:b1:integration}. A expansão de um
+polinomial em poderes de $(X - a)$, encontrado na prova de
+\cref{prop:b1:poly:multiplicity}, é a sombra algébrica do
+Fórmulas de Taylor de \cref{ch:b1:taylor}. \omterm{def:b1:diffeq:linear2}{Característica polinômios}
+já apareceu para equações diferenciais (\cref{ch:b1:diffeq})
+e retorno para matrizes em \cref{ch:b1:det}; Lagrange
+interpolação é o primeiro teorema de existência e unicidade de
+análise numérica e o \omterm{pb:b1:poly:1}{Polinômios de Chebyshev} de
+\cref{exo:b1:poly:10} --- cuja otimalidade é o problema do fim de semana
+abaixo estabelece --- diga essa disciplina \emph{onde} para
+interpolar. Finalmente toda a aritmética de $ K[X]$, copiado de
+\cref{ch:b1:arith}, alimenta o estudo de $ K[X]$-ideais e quociente
+anéis no volume do Ano 2.
+\end{remark}
+
+\section{Exercícios}
+
+\begin{exercise}[$\star $]\label{exo:b1:poly:1}
+Faça as divisões euclidianas: $ X^5 - 1$ por $ X^2 + X + 1$; então
+$2X^4 + X^3 - X + 3$ por $ X^2 - 2$.
+\end{exercise}
+
+\begin{exercise}[$\star $]\label{exo:b1:poly:2}
+Para qual $ n \in \N $ faz $ X^2 + X + 1$ dividir $ X^{2n} + X^n + 1$?
+\emph{Dica: as raízes de $ X^2 + X + 1$ são $ j $ e $ j^2$ com $ j =
+\eu^{2\iu\pi/3}$; discutir $ n $ moda $3$.}
+\end{exercise}
+
+\begin{exercise}[$\star $]\label{exo:b1:poly:3}
+Determine o verdadeiro $ a, b $ para que $(X-1)^2$ \omterm{def:b1:arith:divides}{divide} $ P = X^4 + aX^3 +
+bX^2 + 1$, então fatore $ P $ sobre $\R $ para esses valores.
+\end{exercise}
+
+\begin{exercise}[$\star $]\label{exo:b1:poly:4}
+Fatorar mais $\C $ e mais $\R $: $ X^3 - 1$; $\;X^4 + X^2 + 1$;
+$\;X^6 - 1$.
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b1:poly:5}
+Deixar $ P = X^3 - 6X^2 + 11X - 6$.
+\begin{enumerate}
+  \item Encontre as raízes racionais \emph{(uma raiz racional $ p/q $ em
+        termos mais baixos de um \omterm{def:b1:poly:def}{Mônica} inteiro polinomial é um número inteiro
+        dividindo o termo constante --- prove)}e fator $ P $.
+  \item Sem resolver, calcule a soma dos quadrados e a soma
+        dos inversos das raízes via Vieta, e verifique no
+        fatoração.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b1:poly:6}
+Calcular $\gcd(X^4 - 1,\; X^3 - X^2 + X - 1)$ pelo Euclidiano
+algoritmo, e escreva-o como uma combinação $ AU + BV $ dos dois
+\omterm{def:b1:poly:def}{polinômios}.
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b1:poly:7}
+Deixar $ P \in \R[X]$ com $ P(x) \geq 0$ para todos $ x \in \R $. Prove isso
+$ P $ é a soma de dois quadrados de reais \omterm{def:b1:poly:def}{polinômios}: $ P = A^2 + B^2$.
+\emph{Dica: na fatoração real, as raízes reais têm números pares
+\omterm{def:b1:poly:derivative}{multiplicidade}; escreva os fatores quadráticos como $(X - z)(X - \conj z)$
+e usar $\abs{\,\cdot\,}^2 = (\Re)^2 + (\Im)^2$ sobre o produto do
+$(X - z)$'s.}
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b1:poly:8}
+Encontre o polinomial $ P $ de grau $\leq 2$ com $ P(0) = 1$, $ P(1) =
+3$, $ P(2) = 2$, primeiro pela fórmula de Lagrange, depois resolvendo o
+sistema linear nos coeficientes. Verifique se ambas as respostas concordam.
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b1:poly:9}
+Prove isso $ P = X^{2n+1} - 1$ tem exatamente uma raiz real, e isso para
+cada $ n \geq 1$ o polinomial $1 + X + \frac{X^2}{2!} + \dots +
+\frac{X^n}{n!}$ não tem raiz múltipla \emph{(comparar $ P $ e
+$ P'$)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star $]\label{exo:b1:poly:10}
+(\omterm{pb:b1:poly:1}{Polinômios de Chebyshev}) \omterm{def:b1:logic:sets}{Definir} $ T_0 = 1$, $ T_1 = X $ e $ T_{n+1} =
+2X\,T_n - T_{n-1}$.
+\begin{enumerate}
+  \item Prove por indução que $ T_n(\cos\theta) = \cos n\theta $ para
+        tudo $\theta $.
+  \item Deduza o $ n $ raízes de $ T_n $ e seu coeficiente líder.
+  \item Prove isso $\sup_{x \in \intcc{-1}{1}} \abs{T_n(x)} = 1$,
+        alcançado em $ n + 1$ pontos de $\intcc{-1}{1}$.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star $]\label{exo:b1:poly:11}
+Deixar $ P \in \C[X]$ ser inconstante com raízes distintas $ a_1, \dots,
+a_r $ (\omterm{def:b1:poly:derivative}{multiplicidades} $ m_1, \dots, m_r $). Prove a identidade de
+funções racionais
+\[
+\frac{P'(X)}{P(X)} = \sum_{i=1}^{r} \frac{m_i}{X - a_i},
+\]
+e deduzir o teorema de Gauss-Lucas: toda raiz de $ P'$ encontra-se no
+casca convexa das raízes de $ P $ \emph{(avaliar a identidade em um
+raiz $ w $ de $ P'$ que não é uma raiz de $ P $, pegue \omterm{def:b1:complex:field}{conjugados} e
+leia o resultado como $ w $ sendo uma média ponderada do $ a_i $)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star $]\label{exo:b1:poly:12}
+(Filtro de raízes da unidade) Deixe $ n \in \N^*$ e $ j = \eu^{2\iu\pi/3}$.
+Avaliando $(1 + X)^n $ no $1$, $ j $ e $ j^2$, prove que
+\[
+\sum_{k \geq 0} \binom{n}{3k}
+= \frac{2^n + 2\cos\frac{n\pi}{3}}{3} ,
+\]
+e verifique a fórmula para $ n = 3$ e $ n = 6$. \emph{Dica: $1 +
+j^m + j^{2m}$ é igual $3$ se $3 \mid m $ e $0$ de outra forma; e $1 +
+j = \eu^{\iu\pi/3}$.}
+\end{exercise}
+
+\section{Problema: polinômios de Chebyshev e o polinômio mais plano}
+
+\begin{problem}\label{pb:b1:poly:1}
+Entre todos \emph{\omterm{def:b1:poly:def}{Mônica}} \omterm{def:b1:poly:def}{polinômios} de grau $ n $, qual fica
+mais próximo de zero em $\intcc{-1}1$? A resposta --- Chebyshev
+teorema, a certidão de nascimento da teoria da aproximação --- é
+$2^{1-n}T_n $, onde $ T_n $ é o Chebyshev polinomial de
+\cref{exo:b1:poly:10}e não \omterm{def:b1:poly:def}{Mônica} concorrente pode vencer seu
+desvio $2^{1-n}$.\index{Polinômios de Chebyshev} Este problema
+desenvolve a álgebra da família $(T_n)$ (lei de composição,
+coeficientes explícitos, a família de segundo tipo $ U_n $, um
+equação diferencial), prova o teorema da extremalidade com seu
+caso de igualdade e coleta aplicações: interpolação ideal
+nós, o valor exato de $\cos 36^\circ $, e um \omterm{def:b1:arith:congruence}{congruência}
+$ T_p \equiv X^p \pmod p $. Por todo, $ T_0 = 1$, $ T_1 = X $,
+$ T_{n+1} = 2X\,T_n - T_{n-1}$, e usamos livremente
+$ T_n(\cos\theta) = \cos n\theta $ de \cref{exo:b1:poly:10}.
+
+\medskip
+\noindent\textbf{Part I --- The family $(T_n)$.}
+\begin{enumerate}
+  \item Calcular $ T_2, T_3, T_4, T_5$ da recorrência. (Comparar
+        $ T_3$ com a identidade $\cos3\theta = 4\cos^3\theta -
+        3\cos\theta $ de \cref{ex:b1:complex:cos3}.)
+  \item Prove por indução: $\deg T_n = n $ com liderança
+        coeficiente $2^{n-1}$ para $ n \geq 1$, e $ T_n $ tem o
+        paridade de $ n $ (aparecem apenas potências pares ou ímpares).
+  \item Prove o princípio da unicidade: $ T_n $ é o \emph{apenas}
+        polinomial satisfatório $ P(\cos\theta) = \cos n\theta $ para
+        tudo $\theta $. (Dois \omterm{def:b1:poly:def}{polinômios} concordando em $\intcc{-1}1$
+        concordo em todos os lugares: \cref{cor:b1:poly:nroots}.)
+  \item Deduza a composição e as leis do produto:
+        \[
+        T_m \circ T_n = T_{mn},
+        \qquad
+        2\,T_m T_n = T_{m+n} + T_{\abs{m-n}} .
+        \]
+  \item Lembrar de \cref{exo:b1:poly:10} as raízes $ x_k =
+        \cos\frac{(2k+1)\pi}{2n}$ e os pontos de equioscilação
+        $ y_k = \cos\frac{k\pi}n $ com $ T_n(y_k) = (-1)^k $. Escreva
+        abaixo a fatoração completa de $ T_n $ sobre $\R $ e
+        justificar que o $ y_k $ entrelaçar: $ y_n < x_{n-1} < y_{n-1}
+        < \dots < x_0 < y_0$.
+  \item Prove isso $ T_n(\cosh t) = \cosh(nt)$ para todos $ t \in \R $
+        (mesma indução, usando
+        \cref{prop:b1:functions:hyprules}) e deduza para $ x
+        \geq 1$ a forma fechada
+        \[
+        T_n(x) = \frac{\bigl(x + \sqrt{x^2 - 1}\bigr)^n +
+        \bigl(x - \sqrt{x^2 - 1}\bigr)^n}{2} ,
+        \]
+        então $ T_n(x) > 1$ para $ x > 1$: fora $\intcc{-1}1$ o
+        polinomial escapa de uma vez.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part II --- Coefficients, the family $ U_n $, a
+differential equation.}
+\begin{enumerate}[resume]
+  \item Da fórmula de de Moivre
+        (\cref{cor:b1:complex:demoivre}), prove o explícito
+        expressão
+        \[
+        T_n(x) = \sum_{0 \leq 2j \leq n} \binom{n}{2j}\,
+        x^{\,n-2j}\,(x^2 - 1)^j ,
+        \]
+        e verifique isso para $ n = 3$.
+  \item Calcular $ T_n(1)$, $ T_n(-1)$ e $ T_n(0)$ para todos $ n $.
+  \item \omterm{def:b1:logic:sets}{Definir} $ U_n $ (\emph{segundo tipo}) por $ U_0 = 1$, $ U_1 =
+        2X $, $ U_{n+1} = 2X\,U_n - U_{n-1}$. Prove isso
+        $ U_n(\cos\theta) = \frac{\sin(n+1)\theta}{\sin\theta}$
+        para $\theta \notin \pi\Z $, e isso $ T_n' = n\,U_{n-1}$
+        para $ n \geq 1$.
+  \item Prove isso $\abs{\sin n\theta} \leq n\,\abs{\sin\theta}$
+        para todos $\theta $ (indução) e deduza o tipo de Markov
+        vinculado
+        \[
+        \abs{T_n'(x)} \leq n^2
+        \quad\text{on } \intcc{-1}1,
+        \qquad\text{with } T_n'(\pm1) = (\pm1)^{n-1}\,n^2 .
+        \]
+  \item Mostre isso $ y = T_n $ satisfaz a equação diferencial
+        \[
+        (1 - x^2)\,y'' - x\,y' + n^2\,y = 0 ,
+        \]
+        diferenciando a identidade $\sin\theta\,
+        T_n'(\cos\theta) = n\sin n\theta $ em relação a
+        $\theta $; verifique diretamente para $ T_2$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part III --- Chebyshev's extremality theorem.}
+Deixar $\widetilde T_n = 2^{1-n}\,T_n $ (\omterm{def:b1:poly:def}{Mônica} pela pergunta 2) e
+escrever $\norm{P}_\infty = \sup_{x \in \intcc{-1}1}\abs{P(x)}$.
+\begin{enumerate}[resume]
+  \item Justificar $\norm{\widetilde T_n}_\infty = 2^{1-n}$, alcançado
+        com sinais alternados no $ n + 1$ pontos $ y_n < \dots
+        < y_0$.
+  \item Suponha que algum \omterm{def:b1:poly:def}{Mônica} $ P $ de grau $ n $ tive
+        $\norm P_\infty < 2^{1-n}$ e \omterm{def:b1:logic:sets}{definir} $ D = \widetilde T_n -
+        P $. Mostrar $\deg D \leq n - 1$, e isso $ D(y_k)$ tem o
+        sinal estrito de $(-1)^k $ para cada $ k = 0, \dots, n $.
+  \item Deduza isso $ D $ tem pelo menos $ n $ raízes reais distintas (uma
+        em cada lacuna, pela propriedade de valor intermediário, utilizada
+        aqui no ensino médio e comprovado em
+        \cref{ch:b1:continuity}) e concluo \emph{Chebyshev
+        teorema}: todo \omterm{def:b1:poly:def}{Mônica} $ P $ de grau $ n $ satisfaz
+        \[
+        \norm{P}_\infty \geq 2^{1-n} .
+        \]
+  \item (Caso de igualdade, primeiro passo) Suponha agora $\norm P_\infty =
+        2^{1-n}$ exatamente, $ P $ \omterm{def:b1:poly:def}{Mônica} de grau $ n $, e deixe $ D =
+        \widetilde T_n - P $. Mostre isso $(-1)^kD(y_k) \geq 0$ para
+        tudo $ k $, e que se $ D(y_k) = 0$ por um \emph{interior}
+        apontar $ y_k $ ($0 < k < n $), então $ D'(y_k) = 0$ também.
+        \emph{(Em um interior $ y_k $, ambos $\widetilde T_n $ e
+        $ P $ atingir um extremo de valor absoluto $\norm{\cdot}
+        _\infty $; uma função diferenciável tem derivada zero
+        em um extremo interior --- usado no ensino médio,
+        comprovado em \cref{ch:b1:derivative}.)}
+  \item (Caso de igualdade, conclusão) Conte as raízes de $ D $ com
+        \omterm{def:b1:poly:derivative}{multiplicidade} mostrar $ D = 0$: o minimizador é
+        \emph{exclusivo}, $ P = \widetilde T_n $.
+  \item Transporte para um segmento arbitrário $\intcc ab $: mostre isso
+        a sup-norma mínima de um \omterm{def:b1:poly:def}{Mônica} grau-$ n $ polinomial sobre
+        $\intcc ab $ é $2\bigl(\frac{b-a}4\bigr)^n $, alcançado por um
+        redimensionado Chebyshev polinomial. \emph{(Substituir $ x =
+        \frac{a+b}2 + \frac{b-a}2\,t $ e acompanhe os principais
+        coeficiente.)}
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part IV --- Applications.}
+\begin{enumerate}[resume]
+  \item Resolva o caso $ n = 3$ manualmente: localize os extremos de
+        $\widetilde T_3 = X^3 - \frac34X $ sobre $\intcc{-1}1$,
+        verifique a equioscilação quádrupla com valor
+        $\frac14$, e concluímos que não \omterm{def:b1:poly:def}{Mônica} cúbico se sai \omterm{def:b1:arith:prime}{melhor}.
+  \item (Nós de interpolação ideal) Para $ n + 1$ nós $ x_0,
+        \dots, x_n \in \intcc{-1}1$, o erro de interpolação é
+        governado por $\omega(X) = \prod_i (X - x_i)$ (como
+        \cref{ch:b1:taylor} quantificará). Prove que a escolha
+        minimizando $\norm\omega_\infty $ é o \omterm{def:b1:logic:sets}{definir} de $ n + 1$
+        raízes de $ T_{n+1}$, com $\norm\omega_\infty = 2^{-n}$:
+        Os nós Chebyshev são os locais certos para interpolar.
+  \item Usando $ T_5$, prove que $ c = \cos 36^\circ $ satisfaz
+        $16c^5 - 20c^3 + 5c + 1 = 0$, fatore isso polinomial como
+        $(x + 1)(4x^2 - 2x - 1)^2$, e concluir
+        \[
+        \cos 36^\circ = \frac{1 + \sqrt5}4 .
+        \]
+        Verifique a consistência com $\cos 72^\circ =
+        \frac{\sqrt5 - 1}4$ de \cref{exo:b1:complex:8}.
+  \item Estimativa $ T_{10}(1.1)$ com a forma fechada da questão 6
+        (dois algarismos significativos são suficientes) e interprete: a
+        polinomial limitado por $1$ sobre $\intcc{-1}1$ já pode
+        exceder $40$ no $ x = 1.1$. (Que $ T_n $ cresce
+        \emph{mais rápido} entre tais \omterm{def:b1:poly:def}{polinômios} é outro
+        propriedade extrema da família, além deste problema.)
+  \item Prove o \omterm{def:b1:arith:congruence}{congruência}: para cada ímpar \omterm{def:b1:arith:prime}{melhor} $ p $, tudo
+        coeficientes de $ T_p - X^p $ são divisíveis por $ p $.
+        \emph{(Use a pergunta 7 e $ p \mid \binom p{2j}$ para $0 <
+        2j < p $, a partir da prova de
+        \cref{thm:b1:arith:fermat}.)} Verifique em $ T_3$ e $ T_5$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part V --- Synthesis.}
+\begin{enumerate}[resume]
+  \item Calcule explicitamente o \omterm{def:b1:poly:def}{Mônica} quadrática do mínimo
+        sup-norma ativada $\intcc01$ e seu desvio. (Pergunta 17
+        com $ n = 2$.)
+  \item Onde exatamente o problema usou: (i) a rigidez do
+        \omterm{def:b1:poly:def}{polinômios} (\cref{cor:b1:poly:nroots}); (ii) o
+        trigonometria de \cref{ch:b1:complex} e
+        \cref{ch:b1:functions}; (iii) a aritmética de binômio
+        coeficientes de \cref{ch:b1:arith}? Uma frase cada.
+  \item Síntese, num pequeno parágrafo: o teorema diz que
+        o mais plano \omterm{def:b1:poly:def}{polinômio} mônico é aquele que
+        \emph{equioscila}, e a prova converte a otimalidade
+        na contagem de raízes. Comente sobre este mecanismo, sobre o
+        papel da substituição $ x = \cos\theta$ como uma ponte
+        entre álgebra e trigonometria, e nomeie os dois
+        locais onde o problema precisava de fatos de análise (IVT,
+        extremo interior) que os capítulos posteriores comprovam.
+\end{enumerate}
+\end{problem}
