@@ -20,21 +20,62 @@
 % ----------------------------------------------------------------------------
 % Core packages
 % ----------------------------------------------------------------------------
-\RequirePackage[T1]{fontenc}
-\RequirePackage[utf8]{inputenc}
-\RequirePackage{lmodern}
+% Engine / script detection. Hindi editions use Devanagari and must be built
+% with XeLaTeX (or LuaLaTeX); pdfTeX cannot load OpenType Devanagari fonts.
+% Other languages stay on the historical pdfTeX path (T1 + lmodern).
+\RequirePackage{iftex}
+\edef\om@booklang@exp{\booklang}%
+\def\om@lang@fr{fr}%
+\def\om@lang@nl{nl}%
+\def\om@lang@es{es}%
+\def\om@lang@pt{pt}%
+\def\om@lang@hi{hi}%
+\newif\ifom@hindi
+\ifx\om@booklang@exp\om@lang@hi
+  \om@hinditrue
+\fi
+
+\ifom@hindi
+  \ifPDFTeX
+    \PackageError{onemath}{%
+      Hindi editions require XeLaTeX (or LuaLaTeX).\MessageBreak
+      Use: xelatex \jobname.tex\MessageBreak
+      (or latexmk, which picks XeLaTeX for *_hi.tex)}{Build with XeLaTeX.}%
+  \fi
+  \RequirePackage{fontspec}%
+  % Bundled under assets/fonts/ so CI and local builds do not depend on
+  % system font packages. Noto Sans Devanagari covers Devanagari + basic Latin.
+  \IfFileExists{assets/fonts/NotoSansDevanagari-Regular.ttf}{%
+    \setmainfont{NotoSansDevanagari}[%
+      Path=assets/fonts/,%
+      Extension=.ttf,%
+      UprightFont=*-Regular,%
+      BoldFont=*-Bold,%
+      Script=Devanagari,%
+    ]%
+  }{%
+    \setmainfont{Noto Sans Devanagari}[Script=Devanagari]%
+  }%
+\else
+  \ifPDFTeX
+    \RequirePackage[T1]{fontenc}%
+    \RequirePackage[utf8]{inputenc}%
+    \RequirePackage{lmodern}%
+  \fi
+\fi
 \RequirePackage{microtype}
+% microtype letterspacing (\textls) is not implemented for XeTeX; Hindi
+% editions use XeLaTeX for Devanagari. Provide a no-op so the cover wordmark
+% and branded header still compile (tracking is cosmetic).
+\ifXeTeX
+  \DeclareRobustCommand{\textls}[2][]{#2}%
+\fi
 \RequirePackage[a4paper,inner=2.2cm,outer=2.2cm,top=2.4cm,bottom=2.6cm,headheight=14pt]{geometry}
 
 % babel: only for non-English editions (keeps English builds unchanged).
 % Compare expanded token lists so \newcommand{\booklang}{fr} matches.
 % Load language babel only when the .ldf is installed; UI strings still
 % come from styles/lang/<lang>.tex either way.
-\edef\om@booklang@exp{\booklang}%
-\def\om@lang@fr{fr}%
-\def\om@lang@nl{nl}%
-\def\om@lang@es{es}%
-\def\om@lang@pt{pt}%
 % shorthands=off: French (and Dutch/Spanish/Portuguese) babel makes characters
 % such as ":" active for punctuation spacing. Our labels use colons throughout
 % (type:year:slug:name) and cleveref cannot parse active characters in
@@ -89,6 +130,12 @@
       }%
     }%
   }%
+\fi
+% Hindi: no babel.ldf is required. Modern babel-hindi needs a full TeX Live
+% Indic install and conflicts with our colon-bearing labels if shorthands are
+% left on. UI strings come from styles/lang/hi.tex; hyphenation is optional.
+\ifom@hindi
+  \PackageInfo{onemath}{Hindi edition: fontspec + styles/lang/hi.tex (no babel)}%
 \fi
 
 \RequirePackage{amsmath}
