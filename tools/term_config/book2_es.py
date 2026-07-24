@@ -1,37 +1,58 @@
 """Book 2 -- es. Curation only; the rules live in tools/termlink/.
 
-The Spanish bodies (parts/grade-10..12/es) write their accents as raw UTF-8, so
-the terms below are spelled the same way.
+Spanish bodies use raw UTF-8 accents. School book: nearest-preceding policy.
+Aligned with book2_fr STOP ideas (ordinary language vs defined notions).
 """
 
-# Spanish translation of the default NOT_A_TERM keywords (English defaults
-# would let Spanish result-names through and over-link).
 NOT_A_TERM = ("teorema", "lema", "desigualdad", "fórmula", "criterio",
               "principio", "identidad", "regla", "ley de", "ley de los",
               "paradoja", "problema")
 
 STOP = {
-    # ordinary language harvested from definitions
+    # ordinal / ordinary language
+    "primero",
+    "primera",
+    # sum of anything (vector sum is phrase-linked in chapter)
     "suma",
+    # "par" as pair vs función par (chapter-local links still work)
     "par",
+    # arithmetic/geometric as ordinary adjectives outside sequences
+    "aritmética",
+    "geométrica",
+    "aritmético",
+    "geométrico",
+    # linear combination sense outside combinatorics
     "combinación",
+    # coordinate "ordenada" vs ordered list
+    "ordenada",
+    "ordenado",
+    # ordinary emphasis
     "todas",
     "estrictamente",
     "simultáneamente",
-    "ordenado",
-    "ordenada",
-    "primero",
-    "primera",
+    # plane geometry "media" as half vs statistical mean is handled by
+    # chapter locality; bare "media" still needs care in geometry chapters
 }
 
 NO_CAPITAL = {
     "desarrollar",
     "factorizar",
+    "calcular",
+    "demostrar",
+    "mostrar",
+    "completar",
 }
 
 EXTRA = {}
 DROP = set()
-DERIVED = {}
+DERIVED = {
+    "creciente": ["crecientes"],
+    "decreciente": ["decrecientes"],
+    "continua": ["continuo", "continuas", "continuos"],
+    "derivable": ["derivables"],
+    "convergente": ["convergentes"],
+    "divergente": ["divergentes"],
+}
 PRIMARY_OK = set()
 AMBIG_POLICY = "nearest-preceding"
 MAX_TERM_WORDS = 5
