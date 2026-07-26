@@ -69,13 +69,29 @@ jobs:
         run: |
           # Glob, not a hardcoded slug list: a new edition is then picked up by
           # registering it in root_file: above and nowhere else.
+          # Each PDF is attached twice: once versioned, once under its plain
+          # slug — the plain name is what makes the README's
+          # releases/latest/download/<slug>.pdf links permanent.
           for pdf in build/one_math_book_*.pdf
           do
             slug="$(basename "$pdf" .pdf)"
             cp "$pdf" "${slug}_${GITHUB_REF_NAME}.pdf"
+            cp "$pdf" "${slug}.pdf"
           done
 
       - name: Create release and attach PDFs
         uses: softprops/action-gh-release@v2
         with:
-          files: one_math_book_*_${{ github.ref_name }}.pdf
+          files: one_math_book_*.pdf
+          generate_release_notes: true
+          body: |
+            All five books of the **One Math Book** series — grades 1 to the
+            end of the bachelor's degree — in English, French, Dutch, Spanish,
+            Portuguese and Hindi, compiled at `${{ github.ref_name }}`.
+
+            - **Download**: pick the PDF for your book and language below.
+              Files without a version suffix are stable names — linking to
+              `releases/latest/download/<name>.pdf` always fetches the newest
+              edition.
+            - **Read online**: https://www.one-course.com/books
+            - Found a mistake? [Report an erratum](https://github.com/${{ github.repository }}/issues/new?template=errata.yml).
