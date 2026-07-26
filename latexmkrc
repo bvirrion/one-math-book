@@ -35,15 +35,37 @@ $out_dir = 'build';
     'one_math_book_5_university_year_3_pt.tex',
     'one_math_book_5_university_year_3_hi.tex',
 );
-# The books' many TikZ/pgfplots figures exceed pdfTeX's default main
-# memory (5M words); raise the runtime limits.
-$pdflatex = 'pdflatex -cnf-line=main_memory=12000000 -cnf-line=extra_mem_top=6000000 -cnf-line=extra_mem_bot=6000000 -interaction=nonstopmode -halt-on-error %O %S';
-# Hindi editions (*_hi.tex) need XeLaTeX for OpenType Devanagari. Entry files
-# carry "% !TEX program = xelatex"; also force the engine when the jobname
-# ends in _hi so a bare `latexmk file_hi.tex` works without relying on the
-# magic-comment scan order.
-$xelatex = 'xelatex -interaction=nonstopmode -halt-on-error %O %S';
-if ($ARGV[0] && $ARGV[0] =~ /_hi(\.tex)?$/) {
-    $pdf_mode = 5;  # xelatex
+# Hindi editions (*_hi.tex) need XeLaTeX for OpenType Devanagari; every other
+# edition builds with pdfTeX. The choice is made per *source file*, inside the
+# command latexmk runs, and deliberately not by setting $pdf_mode:
+#
+#   * a command-line engine flag beats the rc file, and the release workflow
+#     calls `latexmk -pdf <root>` for every book, so any $pdf_mode this file
+#     sets is overwritten before the Hindi entry is compiled;
+#   * keying off $ARGV[0] only worked for a bare `latexmk file_hi.tex` — with
+#     options in front ("-pdf -halt-on-error … file_hi.tex") $ARGV[0] is the
+#     first option, so the test silently failed.
+#
+# Both routes sent the Hindi books through pdflatex, where the guard in
+# styles/onemath.sty stops the build ("Hindi editions require XeLaTeX").
+# Dispatching on %S is immune to both, because latexmk hands the routine the
+# file it is actually compiling.
+#
+# The books' many TikZ/pgfplots figures also exceed pdfTeX's default main
+# memory (5M words), hence the raised runtime limits.
+$pdflatex = 'internal om_compile %O %S';
+$xelatex  = 'internal om_compile %O %S';
+
+sub om_compile {
+    my @args = @_;
+    my $source = pop @args;
+    my @engine = $source =~ /_hi\.tex$/
+        ? ('xelatex', '-interaction=nonstopmode', '-halt-on-error')
+        : ('pdflatex',
+           '-cnf-line=main_memory=12000000',
+           '-cnf-line=extra_mem_top=6000000',
+           '-cnf-line=extra_mem_bot=6000000',
+           '-interaction=nonstopmode', '-halt-on-error');
+    return system(@engine, @args, $source);
 }
 $makeindex = 'makeindex %O -o %D %S';
