@@ -133,7 +133,116 @@ EXTRA = {
     # the nearest example (odd-telescoping) is the wrong target -- as in
     # book3_en.py, point it at the problem.
     "constante van Euler":     "pb:b1:series:1",
+
+    # ---------------------------------------------------------------- #
+    # Coverage parity with EN.                                          #
+    # ---------------------------------------------------------------- #
+    # Three shared-rule gaps cost the Dutch edition ~440 links that the
+    # English edition gets for free. None of them may be fixed in
+    # tools/term_config/lang_nl.py (that would silently re-link all five
+    # books), so the forms are declared here, each read in context first.
+    #
+    #   (a) WORD_TAIL = (?:e?[ns])? spells -n/-s/-en/-es but NOT the bare
+    #       attributive -e. English links "continuous" in every position;
+    #       Dutch loses every "continue functie".
+    #   (b) NO_TAIL_END = ("s", ...) in tools/termlink/morphology.py gives a
+    #       term ending in -s no tail at all, so "reeks" never matches
+    #       "reeksen" and "basis" never matches "bases"; and Dutch plurals
+    #       are irregular far more often than English ones (interval ->
+    #       intervallen, lichaam -> lichamen, spoor -> sporen, supremum ->
+    #       suprema, isometrie -> isometrieën).
+    #   (c) the harvester's \\emph leaf test compares the stripped term with
+    #       the label leaf, so "orthogonaal" vs leaf "orthogonal" fails and
+    #       the term is never harvested at all -- EN 55 links, NL 3.
+
+    # (a) attributive -e adjectives
+    "continue":           "def:b1:continuity:continuous",
+    "lineaire":           "def:b1:linmaps:def",
+    "vrije":              "def:b1:vspaces:free",
+    "dichte":             "def:b1:topology:dense",
+    "monische":           "def:b1:poly:def",
+    "kritieke":           "thm:b1:multivar:critical",
+    "complementaire":     "def:b1:vspaces:sum",
+    "transcendente":      "pb:b1:logic:1",
+    "eindigdimensionale": "def:b1:findim:def",
+    "afleidbare":         "def:b1:derivative:def",
+    "bijectieve":         "def:b1:logic:inj",
+    "injectieve":         "def:b1:logic:inj",
+    "surjectieve":        "def:b1:logic:inj",
+
+    # (b) plurals the tail cannot reach
+    "reeksen":       "def:b1:series:def",
+    "bases":         "def:b1:vspaces:free",
+    "intervallen":   "prop:b1:reals:intervals",
+    "uitspraken":    "def:b1:logic:statement",
+    "integralen":    "thm:b1:integration:def",
+    "isometrieën":   "def:b1:euclid:isometry",
+    "priemgetallen": "def:b1:arith:prime",
+    "lichamen":      "def:b1:structures:field",
+    "hypervlakken":  "def:b1:linmaps:forms",
+    "sporen":        "def:b1:matrices:transpose",
+    "originelen":    "def:b1:logic:map",
+    "suprema":       "def:b1:reals:bounds",
+    "infima":        "def:b1:reals:bounds",
+    "bovengrenzen":  "def:b1:reals:bounds",
+    "ondergrenzen":  "def:b1:reals:bounds",
+    # the plural phrases too, so that the longest-first rule keeps them on
+    # their own theorem instead of dropping them onto "reeksen".
+    "alternerende reeksen":   "thm:b1:series:alternating",
+    "meetkundige reeksen":    "ex:b1:series:geometric",
+    "telescoperende reeksen": "prop:b1:series:first",
+    "Riemann-reeksen":        "thm:b1:series:riemann",
+
+    # (c) never harvested: the \\emph leaf test rejects the Dutch spelling
+    "orthogonaal":     "def:b1:euclid:orthogonal",
+    "orthogonale":     "def:b1:euclid:orthogonal",
+    "orthonormale":    "def:b1:euclid:orthogonal",
+
+    # Dutch solid compounds where English uses a spaced index term the
+    # harvester accepts ("normal equations", "regression line", "prime
+    # divisor"); the index-only path requires a space, so Dutch loses them.
+    "normaalvergelijking":   "pb:b1:multivar:1",
+    "normaalvergelijkingen": "pb:b1:multivar:1",
+    "regressierechte":       "pb:b1:multivar:1",
+    "priemdeler":            "def:b1:arith:prime",
+
+    # WRONG-SENSE REPAIR. "inwendige" (the interior of ch. 12) was landing on
+    # the nine "inwendige product(en)" of ch. 23/25 -- the inner product, a
+    # different object. Declaring the two-word phrase lets longest-first take
+    # it to the euclidean definition instead. ("inwendig product", singular
+    # attributive, is already harvested and unaffected.)
+    "inwendige product":     "def:b1:euclid:def",
+    # and the neuter predicative form of the interior itself ("$x_0$ is
+    # inwendig aan $I$", "een inwendig punt", "een inwendig extremum"), which
+    # WORD_TAIL cannot reach from the harvested "inwendige". The phrase above
+    # is longer, so "inwendig product" still wins where it occurs.
+    "inwendig":              "def:b1:topology:closure",
 }
+
+# Forms deliberately NOT declared, after reading them in context:
+#
+#   euclidische   -- "euclidische ruimte" (ch. 23) but also "euclidische
+#                    deling" (ch. 6/8, six uses), "euclidische norm",
+#                    "euclidische meetkunde". Two senses, both live outside
+#                    ch. 23; the same call Book 5 made.
+#   vrijheid, volledigheid, orthogonaliteit, lineariteit, convexiteit,
+#   injectiviteit, surjectiviteit, transcendentie, geslotenheid
+#                 -- the -heid/-iteit abstract nouns. English does NOT link
+#                    theirs: lang_en.py DERIVE spells -ally/-ously/-ability/
+#                    -ely/-ce/-ly but never -ity, and the book contains 0
+#                    links on "linearity", "convexity", "injectivity",
+#                    "surjectivity", "orthogonality", "completeness". Adding
+#                    them in Dutch would put the NL edition ~110 links AHEAD
+#                    of EN on those targets. ("continuïteit", "dichtheid",
+#                    "afleidbaarheid", "deelbaarheid" stay linked: English
+#                    links "continuity", "density", "differentiability",
+#                    "divisibility", which are harvested or derived there.)
+#   bijectie, injectie, surjectie (and plurals)
+#                 -- same reason: EN links only the adjectives
+#                    (injective/surjective/bijective), never the nouns
+#                    "bijection"/"injection".
+#   dicht bij     -- protected below rather than dropped: "dicht" itself is a
+#                    good term, only the collocation is ordinary Dutch.
 
 NO_CAPITAL = set()   # Dutch imperatives use the stem ("Ontbind", "Bereken"),
                      # which never collides with the infinitive/adjective terms
@@ -152,4 +261,9 @@ EXTRA_PROTECT = [
     # uitdrukking" (closed form). "gesloten verzameling" keeps its link.
     r'gesloten\s+vorm', r'gesloten\s+uitdrukking(?:en)?',
     r'geen\s+gesloten',
+    # WRONG-SENSE REPAIR. "dicht" is the dense subset of ch. 12, but "dicht
+    # bij" is ordinary "close to" -- seven links pointed at the wrong notion
+    # (ch. 12, 14, 24 and two solutions). English is spared: it writes
+    # "close to", not "dense to". Same protection as book5_nl.py.
+    r'dicht\s+bij',
 ]

@@ -22,25 +22,30 @@ STOP = {
     "equivalent",      # "de drie voorwaarden zijn equivalent"
     "algebra",         # "lineaire algebra", "de algebra is mechanisch"
     "convergeert",     # defined for improper integrals; series uses would land there
-    "absoluut",        # "absoluut convergent" series vs ordinary "absoluut"
     # sense changes by chapter / ordinary language
     "alternerend",     # form (ch.2) vs series
     "signatuur",       # permutation (ch.1) vs quadratic form (ch.12); EN never links bare
     "exact",           # exact form vs "exacte waarde"
-    "lengte",          # arc length vs ordinary length / cycle length
-    "wet",             # law of RV vs ordinary "wet"
-    "open",            # open set -- over-links ordinary Dutch "open"
-    "duale",           # "duale basis" is the phrase; bare "duale" is noisy
-    "affien",          # adjective on many nouns; phrases keep the link
+    "wet",             # law of RV vs ordinary "wet"; EN protects "(strong|weak) law"
+    "affien",          # bare adjective; the "affiene ..." forms are in EXTRA below
     "cyclisch",        # cyclic group vs cyclic order / cyclic product
     "congruentie",     # matrix congruence vs ordinary congruence
     "normaal",         # normal convergence vs normal endomorphism / principal normal
-    "continu",         # ordinary adjective; chapter-local link still allowed (STOP is soft)
-    "verdeling",       # ordinary "verdeling" + law of RV
     "spectrum",
     "potentiaal",
-    "uniform",         # uniform convergence via the longer phrase
+    "uniform",         # bare adverb: already at English's count (NL 47 / EN 43);
+                       # the attributive "uniforme" is pinned in EXTRA instead
     "gesloten",        # closed form / closed set / closed arc — too mixed
+    # Removed from STOP after a per-target density audit against English, which
+    # links all four book-wide (EN: open 80, law/distribution 87, absolutely 52,
+    # length 42). Their ordinary-language uses are guarded by the EXTRA_PROTECT
+    # look-aheads at the bottom of this file, exactly as book4_en.py guards
+    # "paths of length", "run length", "uniformly at random":
+    #   open      -- every use in this book is the topological one
+    #   verdeling -- always the law of a random variable (chs. 21-23)
+    #   absoluut  -- "absolute convergentie" is the notion, and it is the only use
+    #   lengte    -- arc length from ch. 18 on; the ch. 21 path lengths are protected
+    #   duale     -- the dual space/basis, chs. 2 and 8 only (pinned in EXTRA)
 }
 
 # Never linked anywhere (hard). Result-names that reach via \emph{}\index{}
@@ -60,12 +65,57 @@ DROP = {
     "polarisatie-identiteit",
     "polarisatie",
     "Hessematrice",                  # harvest lands on Taylor thm; EN never links Hessian
+    "hessiaan",                      # ditto: EN term is the 2-word "Hessian matrix",
+    "hessianen",                     # which never matches; keeps omterm parity with EN
     "puntsgewijs",                   # adverb; "puntsgewijze convergentie" keeps link
 }
 
 # Manual term -> label. Solid compounds + weekend-problem notions EN links +
 # forms the harvest misses or pins wrong.
 EXTRA = {
+    # Dutch attributive -e forms and abstract nouns: WORD_TAIL is (?:e?[ns])?,
+    # so the bare "-e" adjective and the "-heid/-iteit" noun never match on
+    # their own. English gets them from DERIVE (continuity/continuously,
+    # compactness, countable) and links them book-wide; declaring them here
+    # keeps the Dutch reader's link coverage at the English level.
+    "continue":                     "def:b2:metric:continuity",
+    "continuïteit":                 "def:b2:metric:continuity",
+    "compacte":                     "def:b2:metric:compact",
+    "compactheid":                  "def:b2:metric:compact",
+    "aftelbare":                    "def:b2:structures:countable",
+    "aftelbaarheid":                "def:b2:structures:countable",
+    "convexe":                      "def:b2:affine:convex",
+    "affiene":                      "def:b2:affine:subspace",
+    "affiene deelruimte":           "def:b2:affine:subspace",
+    "affiene deelruimten":          "def:b2:affine:subspace",
+    "hermitische":                  "def:b2:hermitian:adjoint",
+    "unitaire":                     "def:b2:hermitian:adjoint",
+    "antihermitisch":               "def:b2:hermitian:adjoint",
+    "antihermitische":              "def:b2:hermitian:adjoint",
+    "symmetrische":                 "def:b2:quadratic:adjoint",
+    "zelftoegevoegd":               "def:b2:quadratic:adjoint",
+    "zelftoegevoegde":              "def:b2:quadratic:adjoint",
+    "diagonaliseerbare":            "def:b2:reduction:diag",
+    "sommeerbare":                  "def:b2:series:summable",
+    "sommeerbaarheid":              "def:b2:series:summable",
+    "volledigheid":                 "def:b2:metric:complete",
+    "samenhang":                    "def:b2:metric:connected",
+    "samenhangende":                "def:b2:metric:connected",
+    "differentieerbaarheid":        "def:b2:diffcalc:differential",
+    "puntsgewijze":                 "def:b2:funcseq:def",
+    "uniforme":                     "def:b2:funcseq:def",
+    "absolute convergentie":        "def:b2:series:def",
+    # the wrapper never links a term before the chapter that defines it, so
+    # these two reach only chs. 21-23 (the probabilistic sense) and never the
+    # "lineair/affien onafhankelijk" of chs. 1-20 -- the same guard that lets
+    # English link "independent" 117 times
+    "onafhankelijke":               "def:b2:proba:independence",
+    "onafhankelijkheid":            "def:b2:proba:independence",
+    "voortgebracht":                "def:b2:structures:generated",
+    "voortgebrachte":               "def:b2:structures:generated",
+    "barycentra":                   "def:b2:affine:barycenter",
+    "oppervlakten":                 "def:b2:surfaces:area",
+    "duale":                        "def:b2:linalg:dual",
     # plurals / compounds
     "quotiëntringen":               "def:b2:structures:quotientring",
     "aftelbare verzamelingen":      "def:b2:structures:countable",
@@ -123,15 +173,24 @@ EXTRA_PROTECT = [
     # closed form / expression (not closed 1-form of ch. 20)
     r'gesloten\s+vorm', r'gesloten\s+uitdrukking(?:en)?',
     r'gesloten\s+formule', r'in\s+gesloten',
-    # uniform law / uniform continuity (not uniform convergence)
-    r'uniform\s+(?:verdeeld|gekozen|toevallig|continu)',
+    # uniform law / uniform continuity (not uniform convergence). Look-ahead:
+    # the noun after it stays linkable ("uniforme \omterm{...}{verdeling}").
+    r'uniform(?:e)?(?=\s+(?:verdeeld|gekozen|toevallig|continu\w*|gewicht\w*|'
+    r'maat|kans|letter\w*|rangschikking\w*|steekproe\w+|verdeling\w*|'
+    r'som|sommen|dichtheid|oppervlakte\w*))',
     r'uniform\)',
+    # arc length (ch. 18) vs the length of a run / of a lattice path (ch. 21) --
+    # book4_en.py protects the same three phrases
+    r'pad(?:en)?\s+van\s+lengte', r'paden\s+van\s+lengte',
+    r'lengte\s+van\s+de\s+reeks', r'tekst\s+van\s+elke\s+lengte',
+    # the mirrored event of a random walk, not a symmetric endomorphism
+    r'symmetrische?(?=\s+gebeurtenis)',
     # differential as subject adjective
     r'differentiaal\s*(?:rekening|vergelijking(?:en)?|meetkunde|systeem)',
     # independent of $n$
     r'onafhankelijk(?=\s+van\s+\$)',
-    # convex function vs convex set
-    r'convex\s+(?:functie|functies|kromme)',
+    # convex function vs convex set (also the attributive "convexe")
+    r'convexe?\s+(?:functie|functies|kromme|krommen|afbeelding\w*)',
     # open problem
     r'open\s+probleem', r'open\s+de\s+',
     # law of large numbers

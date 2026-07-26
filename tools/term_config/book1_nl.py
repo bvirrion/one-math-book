@@ -39,6 +39,11 @@ STOP = {
     # "gelijkbenige driehoek", "gelijkzijdige driehoek", "vierkantswortel",
     # "overstaande hoeken", "symmetrieas".
     "hoek", "driehoek", "vierkant", "rechthoek", "cirkel",
+    # "aantal" is the count of a statistical value in parts/grade-7/06, and
+    # ordinary Dutch ("het aantal negatieve factoren", "een oneven aantal
+    # delers") in every other chapter: the English "count" is linked nowhere
+    # else either. SOFT keeps the link inside the statistics chapter.
+    "aantal",
 }
 
 # Linked mid-sentence, not sentence-initially: "Afronden op het dichtstbijzijnde
@@ -57,6 +62,7 @@ SOFT = {
     "omgekeerde",  # parts/grade-8/02: the reciprocal of a fraction, all four uses
     "vlak",        # parts/grade-2/05 and grade-5/07: the face of a solid
     "schaal",      # parts/grade-7/05: the scale of a map or model
+    "aantal",      # parts/grade-7/06: the count of a value in a survey
 }
 
 DROP = (set(STOP) - SOFT) | {
@@ -65,7 +71,12 @@ DROP = (set(STOP) - SOFT) | {
     "waarde van een cijfer hangt af van zijn plaats",
 }
 
-DERIVED = {}          # {base: [other forms]}
+# {base: [other forms]} -- nothing to add: Dutch has a single verb "afronden"
+# where English has "round" (grade 4) and "rounding" (grade 6), so the word is
+# ambiguous and AMBIG_POLICY resolves it per chapter; a DERIVED entry for the
+# participle "afgerond" would never fire (DERIVED only extends unambiguous
+# terms).
+DERIVED = {}
 PRIMARY_OK = set()
 AMBIG_POLICY = "nearest-preceding"   # a spiral curriculum re-defines its terms
 MAX_TERM_WORDS = 5
@@ -77,7 +88,11 @@ EXTRA_PROTECT = [
     # phrase split across two lines slips past a literal space.
     # "even": the adverb, "equally" -- "beide even ver", "even waarschijnlijk",
     # "een andere snede werkt even goed", "de kosten even delen".
-    r'even\s+(?:ver|goed|waarschijnlijk|veel|groot|lang|snel|zwaar|duur)\b',
+    # Dutch inflects the adjective after "even" ("twee even lange stukken",
+    # "even waarschijnlijke uitkomsten"), so both forms must be listed.
+    r'even\s+(?:ver|veel|goed|waarschijnlijke?|grote?|lange?|snelle?|zware?'
+    r'|dure?|hoge?|brede?|dikke?|kleine?|oude?|sterke?'
+    r'|groot|lang|snel|zwaar|duur|hoog|breed|dik|klein|oud|sterk)\b',
     r'\bdelen\b[^.]{0,45}\beven\b', r'\beven\b[^.]{0,12}\bdelen\b',
     # "net": the adverb, "just" -- "net na het eerste cijfer", "net voorbij"
     r'net\s+(?:na|onder|boven|voorbij|eronder|erboven|als|zoals|zo)\b',

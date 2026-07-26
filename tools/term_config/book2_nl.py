@@ -12,7 +12,12 @@ and safer: "wortel" never lands inside "vierkantswortel".
 # "ongelijkheid van Markov", "wet van de grote aantallen" through.
 NOT_A_TERM = ("stelling", "lemma", "ongelijkheid", "formule", "criterium",
               "principe", "identiteit", "regel", "wet van", "paradox",
-              "probleem")
+              "probleem",
+              # "binomium van Newton" is the Dutch NAME OF THE THEOREM whose
+              # English index key ("binomial theorem") the shared default
+              # already refuses; without this the Dutch edition would link a
+              # result name the English edition deliberately leaves plain.
+              "binomium van")
 
 # Ordinary Dutch, or a word whose sense in the book is not the definition's.
 STOP = {
@@ -31,20 +36,24 @@ STOP = {
 # shared rule keeps chapter-local senses), which is what we want: "even" and
 # "oneven" are right in the parity chapter and wrong everywhere else.
 
-NO_CAPITAL = set()    # Dutch instructions use the stem ("Ontbind", "Ontwikkel",
-                      # "Bereken"), which never matches the infinitive terms
-                      # "ontbinden" / "ontwikkelen" -- no imperative collides
+NO_CAPITAL = set()    # Dutch instructions use the stem ("Ontbind", "Werk uit",
+                      # "Bereken"), which never matches the infinitive term
+                      # "ontbinden" -- no imperative collides
 
 EXTRA = {
     # the inflected adjective (-aal -> -ale) is not reachable from the
     # harvested base form
     "orthogonale": "def:g11:scal:orthogonal",
     "orthonormale": "def:g10:coordgeom:system",
+    # Dutch writes solid compounds, so the index-only harvest (which requires
+    # a space in the term) never sees these two; English links both from
+    # "confidence interval" / "growth comparison".
+    "betrouwbaarheidsinterval": "met:g12:contdist:fluctuation",
+    "groeiorden": "thm:g12:exp:growth",
 }
 
 DROP = {
     "(Insluitstelling)",   # a result, not a term
-    "Ontwikkelen",         # duplicate of "ontwikkelen"
 }
 
 DERIVED = {}
@@ -74,6 +83,10 @@ EXTRA_PROTECT = [
     # "vergelijking" is an equation -- but it is also the ordinary word for a
     # comparison, and Dutch uses both senses in this book
     r'[Vv]ergelijking(?:en)?\s+van\s+(?:beelden|argumenten|integralen)\b',
+    # "vergelijking van groeiorden" = COMPARISON of growth orders, not an
+    # equation. Lookahead so only "vergelijking" is masked and "groeiorden"
+    # stays linkable (EXTRA above).
+    r'[Vv]ergelijking(?:en)?(?=\s+van\s+groeiorden)',
     r'\bVergelijking\s+volgt\b',
     # "het risico deelt" = shares/divides the risk, not "a divides b"
     r'\bdeelt\s+het\s+risico\b',
