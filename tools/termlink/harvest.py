@@ -18,6 +18,7 @@ Theorem names ("Baire's theorem") are not terms: the point is to link
 definitions, not results.
 """
 import collections
+import os
 import re
 
 from . import morphology
@@ -59,6 +60,69 @@ def read(path):
     return open(path, encoding="utf8").read()
 
 
+def _en_twin(path, lang):
+    """parts/<year>[/solutions]/<lang>/NN-slug.tex -> the English twin path.
+
+    The language directory is always the last one before the filename, so
+    dropping it yields the canonical English body. Returns None for English.
+    """
+    parts = path.replace("\\", "/").split("/")
+    if lang == "en" or len(parts) < 2 or parts[-2] != lang:
+        return None
+    return "/".join(parts[:-2] + parts[-1:])
+
+
+def _bare_emph_ordinals(body, leaf):
+    """Positions, among a definition body's bare \\emph's, that name the term.
+
+    This is the English rule of record: a bare \\emph counts only when it agrees
+    with the definition's own label leaf. Returns the ordinals so a translation
+    can harvest the *same* emphases without re-testing them against an English
+    leaf it cannot match.
+    """
+    out, i = set(), 0
+    for e in re.finditer(EMPH, body):
+        if e.group(2):
+            continue
+        term = re.sub(r'\s+', ' ', e.group(1)).strip()
+        key = re.sub(r'[^a-z]', '', morphology.to_text(term).lower())
+        if key and len(key) >= 4 and (key.startswith(leaf) or leaf.startswith(key)):
+            out.add(i)
+        i += 1
+    return out
+
+
+def bare_emph_map(files, lang):
+    """{def label: {ordinal}} harvested from the English twins of `files`.
+
+    A bare \\emph is accepted in a translation when the English twin accepted
+    the emphasis in the same position. Matching on the English label leaf
+    cannot work once the term is translated ("clases" vs the leaf "classes"),
+    which silently dropped every such definition from the translated editions;
+    the structural mirror the translation gates enforce makes the ordinal
+    correspondence exact.
+    """
+    out = {}
+    if lang == "en":
+        return out
+    for path, _, is_sol in files:
+        if is_sol:
+            continue
+        twin = _en_twin(path, lang)
+        if not twin or not os.path.exists(twin):
+            continue
+        s = read(twin)
+        for m in DEF_RE.finditer(s):
+            body = m.group(1)
+            lab = re.search(r'\\label\{(def:[^}]*)\}', body)
+            if not lab:
+                continue
+            ords = _bare_emph_ordinals(body, lab.group(1).split(":")[-1].lower())
+            if ords:
+                out[lab.group(1)] = ords
+    return out
+
+
 def harvest(files, cfg, lang, langcfg, load=read):
     """-> (terms, def_seq, local, primary, nearest, stats)
 
@@ -69,6 +133,7 @@ def harvest(files, cfg, lang, langcfg, load=read):
     nearest : {term: [(seq, label)]} AMBIG_POLICY = "nearest-preceding"
     """
     course = [(p, seq) for p, seq, is_sol in files if not is_sol]
+    bare_ok = bare_emph_map(files, lang)       # label -> {ordinal}, non-English
     defs = collections.defaultdict(list)      # term -> [(label, seq)]
     def_seq = {}                              # label -> seq
     all_seq = {}                              # every label -> seq, for EXTRA
@@ -92,13 +157,25 @@ def harvest(files, cfg, lang, langcfg, load=read):
                 if d:
                     defs[d].append((lab, seq))
             leaf = lab.split(":")[-1].lower()
+            # English decides by its own label leaf; a translation defers to the
+            # ordinals its English twin accepted (empty set = accept none, so a
+            # term that merely happens to look like the English leaf is not
+            # picked up by accident).
+            ords = None if lang == "en" else bare_ok.get(lab, frozenset())
+            i = 0
             for e in re.finditer(EMPH, body):
                 if e.group(2):
                     continue
                 term = re.sub(r'\s+', ' ', e.group(1)).strip()
-                key = re.sub(r'[^a-z]', '', morphology.to_text(term).lower())
-                if key and len(key) >= 4 and (key.startswith(leaf) or leaf.startswith(key)):
+                if ords is None:
+                    key = re.sub(r'[^a-z]', '', morphology.to_text(term).lower())
+                    ok = (key and len(key) >= 4
+                          and (key.startswith(leaf) or leaf.startswith(key)))
+                else:
+                    ok = i in ords
+                if ok:
                     defs[term].append((lab, seq))
+                i += 1
 
     ambig = {t for t, v in defs.items() if len({l for l, _ in v}) > 1}
     terms = {t: v[0][0] for t, v in defs.items()

@@ -46,12 +46,9 @@ NO_CAPITAL = {
 EXTRA = {}
 DROP = set()
 DERIVED = {
-    "creciente": ["crecientes"],
-    "decreciente": ["decrecientes"],
     "continua": ["continuo", "continuas", "continuos"],
-    "derivable": ["derivables"],
-    "convergente": ["convergentes"],
-    "divergente": ["divergentes"],
+    "permutación": ["permutaciones"],
+    "distribución normal": ["distribuciones normales"],
 }
 PRIMARY_OK = set()
 AMBIG_POLICY = "nearest-preceding"
@@ -61,4 +58,14 @@ MAX_TERM_CHARS = 40
 EXTRA_PROTECT = [
     r'\bra[ií]ces?\s+cuadradas?\b',
     r'\bra[ií]ces?\s+cúbicas?\b',
+    # "muestra/muestran" is both the noun (sample) and the verb (shows).
+    # Protect the verb readings only; the two lookbehinds keep the genuine
+    # noun in "la muestra que ..." / "una muestra que ..." linkable.
+    r'(?<![Ll]a )(?<!una )(?<!ada )[Mm]uestran?'
+    r'(?:\s+(?:que|qué|cómo|lo|entonces|a la|un|una|cada|el|la|los|las)\b'
+    r'|\s+\\emph)',
+    # "divide" is the arithmetic term, but also the ordinary verb
+    r'\bdivide\s+el\s+riesgo\b',
+    # "un continuo de valores" is the noun, not the continuity property
+    r'\bcontinuo\s+de\s+valores\b',
 ]
