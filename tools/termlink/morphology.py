@@ -63,9 +63,26 @@ def _cap(word):
 
 NO_TAIL_END = ("s", "$", "]", ")")
 
+# Devanagari dependent signs -- matras, virama, nukta, anusvara, candrabindu,
+# visarga -- are Unicode category Mn/Cf, so Python's \w is FALSE for every one
+# of them. A boundary written as [\w-] therefore LEAKS in Hindi: it happily
+# ends a term in the middle of a word, because the next character is a matra
+# and not a "word character". Two book agents independently measured the
+# damage at ~1250 wrong-sense links: "भुज" (abscissa) matched inside "भुजा"
+# (side), "ज्या" inside "त्रिज्या", "सम" (even) inside "समुच्चय", "लंब"
+# (perpendicular) inside "लंबाई". The lookbehind leaks the same way, and a
+# term starting right after the virama of "क्" split the conjunct across two
+# boxes -- which XeLaTeX renders as a dotted circle.
+_DEV_MARK = (r'ऀ-ःऺ-़ा-ॏ'
+             r'॑-ॗॢॣ‌‍')
+
+# Keep the hyphen last in each class so it stays literal and does not open a
+# range with the codepoint before it.
+_BEFORE = r'(?<![\w\\@' + _DEV_MARK + r'-])'
+
 # in the escaped trees a word can be followed by an accent macro belonging to
 # the same word ("pair" inside "pair\'e"), which \w does not see
-_AFTER = r'(?!(?:[\w-]|\\[\'`^"~]|\\c\s*\{?[a-zA-Z]))'
+_AFTER = (r'(?!(?:[\w' + _DEV_MARK + r'-]|\\[\'`^"~]|\\c\s*\{?[a-zA-Z]))')
 
 
 def pattern(term, lang, langcfg, no_capital=()):
@@ -93,7 +110,7 @@ def pattern(term, lang, langcfg, no_capital=()):
         pieces.append(p)
     body = r'\s+'.join(pieces)
     head = langcfg.HEAD if len(words) == 1 else ""
-    return re.compile(r'(?<![\w\\@-])(' + head + body + r')' + _AFTER)
+    return re.compile(_BEFORE + r'(' + head + body + r')' + _AFTER)
 
 
 def derive(term, langcfg):

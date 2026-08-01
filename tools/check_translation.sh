@@ -85,7 +85,7 @@ check_year_lang() {
   fi
   # "samples at={1,...,16}" is pgfplots syntax, not drafty prose.
   if grep -rn '\.\.\.' "$tdir" "$tsdir" 2>/dev/null \
-       | grep -qv '\\dots\|\\ldots\|\\cdots\|\\foreach\|samples at'; then
+       | grep -qv '\\dots\|\\ldots\|\\cdots\|\\foreach\|samples at\|xtick=\|ytick='; then
     bad "drafty ... in prose (use \\dots)" "$year/$lang"
   fi
   dup=$(grep -rho 'label{[^}]*}' "$tdir" "$tsdir" 2>/dev/null | sort | uniq -d)
@@ -97,13 +97,26 @@ check_year_lang() {
   if grep -rqn "\\\\['\`^\"]{\?[aeiouAEIOU]" "$tdir" "$tsdir" 2>/dev/null; then
     bad "TeX accent escapes (use UTF-8)" "$year/$lang"
   fi
+
+  # ---- 7. Devanagari prose hygiene. Gates 5 and 6 are Latin-oriented and
+  #         score nothing on Hindi: a Hindi tree can pass every gate above
+  #         and still be the raw machine translation it was in July 2026.
+  #         See tools/check_hindi_prose.py for the failure classes.
+  if [ "$lang" = "hi" ]; then
+    python3 tools/check_hindi_prose.py --quiet "$tdir" "$tsdir" \
+      || bad "Devanagari prose hygiene" "$year/$lang"
+  fi
 }
 
 if [ $# -eq 2 ]; then
   check_year_lang "$1" "$2"
 else
-  for year in bachelor-1 bachelor-2 bachelor-3; do
-    for lang in fr nl; do
+  for year in grade-1 grade-2 grade-3 grade-4 grade-5 grade-6 grade-7 \
+              grade-8 grade-9 grade-10 grade-11 grade-12 \
+              bachelor-1 bachelor-2 bachelor-3; do
+    for lang in fr nl es pt hi; do
+      # Skip years that have no translation directory yet.
+      [ -d "parts/$year/$lang" ] || continue
       check_year_lang "$year" "$lang"
     done
   done

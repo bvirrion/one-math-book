@@ -45,17 +45,34 @@
   \RequirePackage{fontspec}%
   % Bundled under assets/fonts/ so CI and local builds do not depend on
   % system font packages. Noto Sans Devanagari covers Devanagari + basic Latin.
+  %
+  % Noto Sans Devanagari ships Regular and Bold only: no italic, no small
+  % caps. Left undeclared, every \emph and \textsc in the book raised
+  % "Font shape TU/NotoSansDevanagari(0)/m/it undefined" and silently fell
+  % back to upright — so every defined term, which the sources mark as
+  % \emph{term}\index{term} inside a definition, was typographically
+  % invisible in the Hindi PDFs. Alias the missing shapes onto the faces we
+  % have (the warnings go away and nothing changes shape), then carry
+  % emphasis with WEIGHT instead, which is what Devanagari typography does:
+  % the script has no italic tradition.
   \IfFileExists{assets/fonts/NotoSansDevanagari-Regular.ttf}{%
     \setmainfont{NotoSansDevanagari}[%
       Path=assets/fonts/,%
       Extension=.ttf,%
       UprightFont=*-Regular,%
       BoldFont=*-Bold,%
+      ItalicFont=*-Regular,%
+      BoldItalicFont=*-Bold,%
+      SmallCapsFont=*-Regular,%
       Script=Devanagari,%
     ]%
   }{%
     \setmainfont{Noto Sans Devanagari}[Script=Devanagari]%
   }%
+  % \emph -> bold at the first level, upright at the second (nested emphasis
+  % toggles back, as \em does in Latin scripts). \DeclareEmphSequence is the
+  % supported hook for this; do not \renewcommand\emph, which breaks nesting.
+  \DeclareEmphSequence{\bfseries,\normalfont}%
 \else
   \ifPDFTeX
     \RequirePackage[T1]{fontenc}%
@@ -136,6 +153,17 @@
 % left on. UI strings come from styles/lang/hi.tex; hyphenation is optional.
 \ifom@hindi
   \PackageInfo{onemath}{Hindi edition: fontspec + styles/lang/hi.tex (no babel)}%
+  % Table of contents: book.cls sizes the page-number box at \@pnumwidth =
+  % 1.55em, which fits three Latin Modern digits. Noto Sans Devanagari's
+  % digits are wider, so every three-digit entry overflowed by exactly
+  % 1.12782pt -- that single cause accounted for ALL of the overfull boxes
+  % in the Hindi editions (195/102/79/74/81 in books 1-5), while every other
+  % language sat at zero. Not a prose problem: the logs show no "Overfull
+  % \hbox ... in paragraph" at all, so Hindi needs no hyphenation patterns
+  % here. Widen the box and push the entry's right margin out by the same
+  % amount so the leader dots still stop clear of the number.
+  \renewcommand{\@pnumwidth}{2.2em}%
+  \renewcommand{\@tocrmarg}{3.2em}%
 \fi
 
 \RequirePackage{amsmath}
