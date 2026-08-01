@@ -203,6 +203,18 @@ def main():
                         for lang, e in editions.items()})
     ch_key = editions[langs[0]]["label"].split(":", 1)[1].replace(":", "-")
 
+    def edition_slug(lang):
+        """Localized URL slug. Scripts with no ASCII decomposition (hi)
+        slugify to nothing (or bare digits) — those editions reuse the
+        English slug so URLs stay meaningful and stable."""
+        for source in (lang, "en"):
+            e = editions.get(source)
+            if e:
+                s = slugify(plaintext(e["title"]).strip())
+                if re.search(r"[a-z]", s):
+                    return f"{args.chapter_number}-{s}"
+        return f"{args.chapter_number}-{ch_key}"
+
     # the chapter's own label is referenceable too (\cref{ch:...})
     for e in editions.values():
         e["labels"][e["label"]] = {
@@ -254,8 +266,7 @@ def main():
             "label": editions[langs[0]]["label"],
             "languages": {
                 lang: {
-                    "slug": f"{args.chapter_number}-"
-                            + slugify(plaintext(e["title"]).strip()),
+                    "slug": edition_slug(lang),
                     "title": plaintext(e["title"]).strip(),
                 }
                 for lang, e in editions.items()
@@ -311,7 +322,7 @@ def main():
         html_body = substitute_math(html_body, rendered)
 
         title_text = plaintext(e["title"]).strip()
-        slug = f"{args.chapter_number}-{slugify(title_text)}"
+        slug = edition_slug(lang)
         rel = f"{args.book}/{lang}/{ch_key}.html"
         frag_path = out_dir / rel
         frag_path.parent.mkdir(parents=True, exist_ok=True)

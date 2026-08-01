@@ -38,6 +38,12 @@ def _newcommands(text):
     return out
 
 
+def _typo(s):
+    """LaTeX typography in lang strings (e.g. hi \\omsolutionof 'हल ---')
+    must reach the HTML as real punctuation, like titles do in the toc."""
+    return s.replace("---", "\u2014").replace("--", "\u2013").replace("~", " ")
+
+
 class LangStrings:
     def __init__(self, repo_root, lang):
         path = Path(repo_root) / "styles" / "lang" / f"{lang}.tex"
@@ -49,36 +55,42 @@ class LangStrings:
             key = f"omname{macro}"
             if key not in cmds:
                 raise ParseError(f"{path}: missing \\{key}")
-            self.names[kind] = cmds[key]
-        self.proof = cmds["omnameProof"]
-        self.solution_of = cmds["omsolutionof"]
-        self.admitted = cmds["omadmittedtext"]
+            self.names[kind] = _typo(cmds[key])
+        self.proof = _typo(cmds["omnameProof"])
+        self.solution_of = _typo(cmds["omsolutionof"])
+        self.admitted = _typo(cmds["omadmittedtext"])
         # plural cref names (\omname<Kind>s) for multi-label \cref
         self.plurals = {}
         for kind, macro in KIND_TO_NAME_MACRO.items():
             plural = cmds.get(f"omname{macro}s")
             if plural:
-                self.plurals[kind] = plural
+                self.plurals[kind] = _typo(plural)
         # list conjunction — not in the lang files (cleveref supplies it
         # in LaTeX); extend here when a new language is added
         self.and_word = {"en": "and", "fr": "et", "nl": "en",
-                         "es": "y"}[lang]
+                         "es": "y", "pt": "e", "hi": "और"}[lang]
         # figure cref names come from babel in print, not the lang files
         self.names["figure"] = {"en": "Figure", "fr": "Figure",
-                                "nl": "Figuur", "es": "Figura"}[lang]
+                                "nl": "Figuur", "es": "Figura",
+                                "pt": "Figura", "hi": "आकृति"}[lang]
         self.plurals["figure"] = {"en": "Figures", "fr": "Figures",
-                                  "nl": "Figuren", "es": "Figuras"}[lang]
+                                  "nl": "Figuren", "es": "Figuras",
+                                  "pt": "Figuras", "hi": "आकृतियाँ"}[lang]
         self.names["equation"] = {"en": "Equation", "fr": "Équation",
                                   "nl": "Vergelijking",
-                                  "es": "Ecuación"}[lang]
+                                  "es": "Ecuación", "pt": "Equação",
+                                  "hi": "समीकरण"}[lang]
         self.names["section"] = {"en": "Section", "fr": "Section",
-                                 "nl": "Sectie", "es": "Sección"}[lang]
+                                 "nl": "Sectie", "es": "Sección",
+                                 "pt": "Seção", "hi": "अनुभाग"}[lang]
         self.plurals["section"] = {"en": "Sections", "fr": "Sections",
                                    "nl": "Secties",
-                                   "es": "Secciones"}[lang]
+                                   "es": "Secciones", "pt": "Seções",
+                                   "hi": "अनुभाग"}[lang]
         self.plurals["equation"] = {"en": "Equations", "fr": "Équations",
                                     "nl": "Vergelijkingen",
-                                    "es": "Ecuaciones"}[lang]
+                                    "es": "Ecuaciones", "pt": "Equações",
+                                    "hi": "समीकरण"}[lang]
         # \st -> its \text{...} body, fed to KaTeX as a macro
         m = re.search(r"\\newcommand\{\\st\}\{(.*)\}", text)
         if not m:

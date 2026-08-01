@@ -78,6 +78,26 @@ PREAMBLE = r"""
 \begin{document}
 """
 
+# Figures whose source contains Devanagari (localized node text in hi
+# editions) cannot go through pdfTeX; they compile with XeLaTeX and the
+# same bundled font the Hindi book uses. Latin-script figures stay on the
+# historical pdflatex path so their SVGs are byte-stable.
+DEVANAGARI = re.compile(r"[ऀ-ॿ]")
+
+FONTS_DIR = Path(__file__).resolve().parents[2] / "assets" / "fonts"
+
+FONTSPEC_BLOCK = rf"""\usepackage{{fontspec}}
+\setmainfont{{NotoSansDevanagari}}[
+  Path={FONTS_DIR}/,
+  Extension=.ttf,
+  UprightFont=*-Regular,
+  BoldFont=*-Bold,
+  ItalicFont=*-Regular,
+  BoldItalicFont=*-Bold,
+  Script=Devanagari,
+]
+"""
+
 
 def tikz_hash(tikz):
     normalized = re.sub(r"\s+", " ", tikz).strip()
@@ -85,19 +105,25 @@ def tikz_hash(tikz):
 
 
 def _run(cmd, cwd):
-    return subprocess.run(cmd, cwd=cwd, capture_output=True, text=True)
+    return subprocess.run(cmd, cwd=cwd, capture_output=True, text=True,
+                          errors="replace")
 
 
 def build_svg(tikz):
     """Compile one tikzpicture; returns (svg_text, width_px, height_px)."""
     with tempfile.TemporaryDirectory(prefix="omfig-") as tmp:
         tmp = Path(tmp)
+        preamble, engine = PREAMBLE, "pdflatex"
+        if DEVANAGARI.search(tikz):
+            preamble = PREAMBLE.replace(
+                "\\begin{document}", FONTSPEC_BLOCK + "\\begin{document}")
+            engine = "xelatex"
         (tmp / "fig.tex").write_text(
-            PREAMBLE + tikz + "\n\\end{document}\n", encoding="utf-8")
-        res = _run(["pdflatex", "-interaction=nonstopmode", "fig.tex"], tmp)
+            preamble + tikz + "\n\\end{document}\n", encoding="utf-8")
+        res = _run([engine, "-interaction=nonstopmode", "fig.tex"], tmp)
         if res.returncode != 0 or not (tmp / "fig.pdf").exists():
             tail = res.stdout[-2500:]
-            raise ParseError(f"pdflatex failed for a figure:\n{tail}")
+            raise ParseError(f"{engine} failed for a figure:\n{tail}")
 
         svg_path = tmp / "fig.svg"
         res = _run(["dvisvgm", "--pdf", "--no-fonts", "--exact-bbox",

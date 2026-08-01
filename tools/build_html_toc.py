@@ -58,7 +58,7 @@ def read_chapter_line(text, where):
                 break
         j += 1
     title = text[start + 1:j]
-    m = re.match(r"\s*\\label\{(ch:[a-z0-9:]+)\}", text[j + 1:])
+    m = re.match(r"\s*\\label\{(ch:[a-z0-9:-]+)\}", text[j + 1:])
     if not m:
         fail(f"{where}: no \\label{{ch:...}} after \\chapter")
     return title, m.group(1)
