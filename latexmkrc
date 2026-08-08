@@ -10,34 +10,40 @@ $out_dir = 'build';
     'one_math_book_1_primary_middle_school_es.tex',
     'one_math_book_1_primary_middle_school_pt.tex',
     'one_math_book_1_primary_middle_school_hi.tex',
+    'one_math_book_1_primary_middle_school_ar.tex',
     'one_math_book_2_high_school.tex',
     'one_math_book_2_high_school_fr.tex',
     'one_math_book_2_high_school_nl.tex',
     'one_math_book_2_high_school_es.tex',
     'one_math_book_2_high_school_pt.tex',
     'one_math_book_2_high_school_hi.tex',
+    'one_math_book_2_high_school_ar.tex',
     'one_math_book_3_university_year_1.tex',
     'one_math_book_3_university_year_1_fr.tex',
     'one_math_book_3_university_year_1_nl.tex',
     'one_math_book_3_university_year_1_es.tex',
     'one_math_book_3_university_year_1_pt.tex',
     'one_math_book_3_university_year_1_hi.tex',
+    'one_math_book_3_university_year_1_ar.tex',
     'one_math_book_4_university_year_2.tex',
     'one_math_book_4_university_year_2_fr.tex',
     'one_math_book_4_university_year_2_nl.tex',
     'one_math_book_4_university_year_2_es.tex',
     'one_math_book_4_university_year_2_pt.tex',
     'one_math_book_4_university_year_2_hi.tex',
+    'one_math_book_4_university_year_2_ar.tex',
     'one_math_book_5_university_year_3.tex',
     'one_math_book_5_university_year_3_fr.tex',
     'one_math_book_5_university_year_3_nl.tex',
     'one_math_book_5_university_year_3_es.tex',
     'one_math_book_5_university_year_3_pt.tex',
     'one_math_book_5_university_year_3_hi.tex',
+    'one_math_book_5_university_year_3_ar.tex',
 );
-# Hindi editions (*_hi.tex) need XeLaTeX for OpenType Devanagari; every other
-# edition builds with pdfTeX. The choice is made per *source file*, inside the
-# command latexmk runs, and deliberately not by setting $pdf_mode:
+# Hindi editions (*_hi.tex) need XeLaTeX for OpenType Devanagari, and Arabic
+# editions (*_ar.tex) need LuaLaTeX for babel's Lua bidi engine (bidi=basic);
+# every other edition builds with pdfTeX. The choice is made per *source file*,
+# inside the command latexmk runs, and deliberately not by setting $pdf_mode:
 #
 #   * a command-line engine flag beats the rc file, and the release workflow
 #     calls `latexmk -pdf <root>` for every book, so any $pdf_mode this file
@@ -55,12 +61,15 @@ $out_dir = 'build';
 # memory (5M words), hence the raised runtime limits.
 $pdflatex = 'internal om_compile %O %S';
 $xelatex  = 'internal om_compile %O %S';
+$lualatex = 'internal om_compile %O %S';
 
 sub om_compile {
     my @args = @_;
     my $source = pop @args;
     my @engine = $source =~ /_hi\.tex$/
         ? ('xelatex', '-interaction=nonstopmode', '-halt-on-error')
+        : $source =~ /_ar\.tex$/
+        ? ('lualatex', '-interaction=nonstopmode', '-halt-on-error')
         : ('pdflatex',
            '-cnf-line=main_memory=12000000',
            '-cnf-line=extra_mem_top=6000000',

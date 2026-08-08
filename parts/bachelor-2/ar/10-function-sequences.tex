@@ -1,0 +1,887 @@
+\chapter{متتاليات الدوال ومتسلسلاتها}\label{ch:b2:funcseq}
+
+حين تتقارب دوال إلى دالة، أي الخواص ينجو من
+الانتقال إلى النهاية؟ \omterm{def:b2:funcseq:def}{التقارب النقطي} لا يحفظ شيئًا
+تقريبًا؛ أما التقارب \emph{المنتظم} --- أي التقارب \omterm{def:b2:nvs:norm}{بمعيار} النهاية العليا
+--- فيحفظ الاتصال والتكاملات على القطع، ويحفظ المشتقات بلمسة
+واحدة. ويبرهن هذا الفصل على مبرهنات النقل الثلاث،
+وعلى نسخها للمتسلسلات، ويتوّجها بمبرهنة فايرشتراس
+في التقريب، مبرهَنةً \omterm{thm:b2:funcseq:weierstrass}{بكثيرات حدود برنشتاين} الاحتمالية
+الجميلة.
+
+\section{التقارب النقطي والمنتظم}
+
+\begin{definition}\label{def:b2:funcseq:def}
+لتكن $f_n, f \colon X \to \R$ (أو $\C$، أو فضاءً معياريًا)، ولتكن $X$ مجموعة
+كيفية. تتقارب $(f_n)$ إلى $f$
+\emph{نقطيًا}\index{تقارب نقطي} إذا كان $f_n(x) \to
+f(x)$ من أجل كل $x$؛ و\emph{بانتظام}\index{تقارب منتظم}
+إذا كان
+\[
+\norm{f_n - f}_\infty = \sup_{x \in X}\, \abs{f_n(x) - f(x)}
+\xrightarrow[n \to \infty]{} 0 .
+\]
+والمنتظم يستلزم النقطي؛ وعلى $C(\intcc{a}{b})$، يكون التقارب المنتظم
+بالضبط هو التقارب في \omterm{def:b2:nvs:banach}{فضاء باناخ}
+$\bigl(C(\intcc{a}{b}), \norm\cdot_\infty\bigr)$ المكوَّن من
+\cref{ch:b2:nvs}.
+\end{definition}
+
+\begin{example}\label{ex:b2:funcseq:xn}
+على $\intcc{0}{1}$، تتقارب $f_n(x) = x^n$ \omterm{def:b2:funcseq:def}{نقطيًا} إلى النهاية
+\emph{غير المتصلة} $f = \mathbf{1}_{\{1\}}$؛ والتقارب
+ليس منتظمًا: $\norm{f_n - f}_\infty \geq f_n\bigl(1 -
+\tfrac1n\bigr) = (1 - \tfrac1n)^n \to \eu^{-1} \neq 0$. وعلى
+$\intcc{0}{a}$ مع $a < 1$ \emph{يكون} منتظمًا ($\sup = a^n \to
+0$): فالانتظام خاصية لمجال التعريف بقدر ما هو خاصية
+للمتتالية.
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=8.2cm, height=5.6cm,
+    xmin=0, xmax=1.08, ymin=0, ymax=1.15,
+    xtick={0,1}, ytick={1}]
+  \addplot[omDef!40, thick, domain=0:1, samples=80] {x^2};
+  \addplot[omDef!60, thick, domain=0:1, samples=80] {x^5};
+  \addplot[omDef, thick, domain=0:1, samples=120] {x^15};
+  \addplot[omThm, very thick, domain=0:1, samples=160] {x^40};
+  \node[font=\small, omDef] at (axis cs:0.62,0.5) {$x^2$};
+  \node[font=\small, omDef] at (axis cs:0.83,0.48) {$x^5$};
+  \node[font=\small, omThm] at (axis cs:0.987,0.5) {$x^{40}$};
+\end{axis}
+\end{tikzpicture}
+
+{\small المتتالية $x^n$ على $\intcc{0}{1}$: تتهاوى المنحنيات نحو
+$0$ لكن عليها جميعًا أن تتسلق إلى $1$ عند $x = 1$ --- فمسافة النهاية العليا إلى
+النهاية النقطية غير المتصلة لا تنكمش تحت ثابت أبدًا.}
+\end{omfigure}
+
+\begin{example}[نهايتان ترفضان التبادل]\label{ex:b2:funcseq:doublelimit}
+الفصل كله عن تبادل النهايات، وهذا أصغر
+فشل ممكن. لتكن $a_{n,m} = \dfrac{n}{n+m}$ من أجل
+$n, m \geq 1$. عندئذٍ
+\[
+\lim_{m\to\infty}\Bigl(\lim_{n\to\infty}a_{n,m}\Bigr)
+= \lim_{m\to\infty} 1 = 1,
+\qquad
+\lim_{n\to\infty}\Bigl(\lim_{m\to\infty}a_{n,m}\Bigr)
+= \lim_{n\to\infty} 0 = 0 :
+\]
+فالنهايتان المتكررتان موجودتان وهما مختلفتان. وكل مبرهنة نقل
+في هذا الفصل رخصةٌ لتبادل نهايتين ---
+$\lim_n$ مع $\lim_{x\to a}$ (الاتصال)، ومع $\int$
+(المكاملة)، ومع $\frac{\dd}{\dd x}$ (الاشتقاق) ---
+\omterm{def:b2:funcseq:def}{والتقارب المنتظم} هو بالضبط الرسم الذي يجعل التبادل
+مشروعًا. والفكرة الختامية: كلما بدّل ``برهان''
+عمليتَي نهاية صامتًا، فهذا الجدول ذو السطرين هو
+المثال المضاد الذي يُرفع في وجهه؛ والنتوءات المنزلقة في
+\cref{exo:b2:funcseq:2} هي الظاهرة نفسها بلباس علامة
+تكامل.
+\end{example}
+
+\section{مبرهنات النقل الثلاث}
+
+\begin{theorem}[الاتصال]\label{thm:b2:funcseq:continuity}
+إذا كانت كل $f_n$ متصلة عند $a$ وكان $f_n \to f$ بانتظام على
+جوار للنقطة $a$، فإن $f$ متصلة عند $a$. والنهاية المنتظمة
+لدوال متصلة متصلة.
+\end{theorem}
+
+\begin{proof}
+حجة $3\varepsilon$ المستعملة بالفعل في
+\cref{thm:b2:metric:rncomplete}: نختار $n$ بحيث $\norm{f_n -
+f}_\infty \leq \varepsilon$، ثم $\delta$ من اتصال
+$f_n$ عند $a$؛ فمن أجل $\abs{x - a} \leq \delta$،
+\[
+\abs{f(x) - f(a)} \leq \abs{f(x) - f_n(x)} + \abs{f_n(x) - f_n(a)}
++ \abs{f_n(a) - f(a)} \leq 3\varepsilon . \qedhere
+\]
+\end{proof}
+
+\begin{example}[يفشل الانتظام بالضبط حيث تنكسر النهاية]\label{ex:b2:funcseq:threshold}
+على $\intcc{0}{2}$، لتكن $f_n(x) = \dfrac{x^n}{1 + x^n}$. النهاية
+النقطية دالة من ثلاث قطع:
+\[
+f(x) = \begin{cases} 0 & 0 \leq x < 1,\\[2pt]
+\tfrac12 & x = 1,\\[2pt]
+1 & 1 < x \leq 2, \end{cases}
+\]
+وهي غير متصلة عند $1$، ومن ثم لا يمكن أن يكون التقارب
+منتظمًا على $\intcc{0}{2}$ حسب \cref{thm:b2:funcseq:continuity}. لكنه منتظم على القطع
+المغلقة التي تتجنب العتبة: فمن أجل $0 \leq x \leq
+a < 1$،
+\[
+\sup_{\intcc{0}{a}}\abs{f_n - 0}
+= \frac{a^n}{1 + a^n} \leq a^n \to 0 ,
+\]
+ومن أجل $1 < b \leq x \leq 2$،
+\[
+\sup_{\intcc{b}{2}}\abs{f_n - 1}
+= \frac{1}{1 + b^n} \leq b^{-n} \to 0 ,
+\]
+وقد حُسبت النهايتان العلييان برتابة $u \mapsto
+\frac{u}{1+u}$ ورتابة $x \mapsto x^n$. والفكرة الختامية: يتوطّن
+فشل الانتظام عند نقطة عدم اتصال
+النهاية --- بالهندسة نفسها التي في \cref{ex:b2:funcseq:xn}، وهو
+سبب تكرار انضباط ``الانتظام على كل قطعة في الداخل''
+طوال الفصل.
+\end{example}
+
+\begin{theorem}[المكاملة على قطعة]\label{thm:b2:funcseq:integration}
+إذا كان $f_n \to f$ بانتظام على $\intcc{a}{b}$، مع $f_n$ متصلة
+على قطع (و$f$ كذلك)، فإن
+\[
+\int_a^b f_n \longrightarrow \int_a^b f .
+\]
+\end{theorem}
+
+\begin{proof}
+تعطي الخطية ومتراجحة المثلث للتكاملات أن
+\[
+\Bigl|\int_a^b f_n - \int_a^b f\Bigr|
+= \Bigl|\int_a^b (f_n - f)\Bigr|
+\leq \int_a^b\abs{f_n - f}
+\leq (b - a)\,\norm{f_n - f}_\infty \longrightarrow 0 .
+\]
+وعامل الطول $(b - a)$ هو حيث يدخل تراص القطعة:
+فعلى الفترات غير المتراصة يُنتج التقدير نفسه الحدَّ
+عديم الفائدة $\infty\cdot0$، ويفشل الاستنتاج فعلًا
+دون هيمنة --- فالنتوءات المسطحة $f_n =
+\frac1n\mathbf 1_{\intcc{0}{n}}$ تتقارب بانتظام إلى $0$ على
+$\intco{0}{\infty}$ ومع ذلك تُبقي $\int f_n = 1$ (انظر ملاحظة المزالق
+أدناه)، وتفعل النتوءات المنزلقة في ملاحظة
+\cref{ch:b2:integration} الشيء نفسه \omterm{def:b2:funcseq:def}{بتقارب نقطي}؛ \omterm{def:b2:funcseq:def}{فالتقارب
+المنتظم} يتحكم في الارتفاعات، لا في العروض أبدًا.
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=8.6cm, height=5.4cm,
+    xmin=0, xmax=1.05, ymin=0, ymax=1.9,
+    xtick={0,1}, ytick={1}]
+  \addplot[omDef!45, thick, domain=0:1.05, samples=120]
+    {2*x*exp(-2*x^2)};
+  \addplot[omDef!70, thick, domain=0:1.05, samples=120]
+    {5*x*exp(-5*x^2)};
+  \addplot[omDef, thick, domain=0:1.05, samples=160]
+    {15*x*exp(-15*x^2)};
+  \node[font=\small, omDef] at (axis cs:0.62,0.42) {$n=2$};
+  \node[font=\small, omDef] at (axis cs:0.40,0.80) {$n=5$};
+  \node[font=\small, omDef] at (axis cs:0.24,1.55) {$n=15$};
+\end{axis}
+\end{tikzpicture}
+
+{\small النتوءات $g_n(x) = nx\,\eu^{-nx^2}$ في
+\cref{exo:b2:funcseq:1}: تتقارب إلى $0$ عند كل نقطة،
+لكن القمم (بارتفاع $\sim\sqrt{n/(2\eu)}$، منجرفةً نحو
+$0$) تنمو بلا حدّ --- أي \omterm{def:b2:funcseq:def}{تقارب نقطي} مع
+$\norm{g_n}_\infty \to \infty$، و$\int_0^1 g_n \to \frac12
+\neq 0$: فالكتلة تختبئ تحت القمة المتحركة.}
+\end{omfigure}
+
+\begin{theorem}[الاشتقاق]\label{thm:b2:funcseq:differentiation}
+لتكن $f_n$ من الصنف $C^1$ على فترة $I$، بحيث: تتقارب $(f_n')$
+\emph{بانتظام} على $I$ (أو على كل قطعة من $I$) إلى دالة $g$ ما،
+وتتقارب $(f_n(x_0))$ عند نقطة واحدة $x_0$. عندئذٍ تتقارب $(f_n)$
+(بانتظام على القطع) إلى دالة $f$ من الصنف $C^1$، ويكون $f'
+= g$: أي إن نهاية الدوال قابلة للاشتقاق حدًّا حدًّا.
+\end{theorem}
+
+\begin{proof}
+نعرّف $f(x) = \lim f_n(x_0) + \int_{x_0}^x g$: وهذا مشروع، لأن $g$
+متصلة --- فعلًا، $g$ هي النهاية \emph{المنتظمة} على
+القطع للدوال المتصلة $f_n'$، ومن ثم تنطبق
+\cref{thm:b2:funcseq:continuity}، وتكامل الدالة المتصلة
+معرَّف جيدًا، ويكون بالمبرهنة الأساسية
+للتفاضل والتكامل
+\[
+f'(x) = g(x) \qquad (x \in I) :
+\]
+فالنهاية المرشحة من الصنف $C^1$ وبالمشتق الصحيح
+\emph{بحكم الإنشاء}، قبل برهان أي تقارب. وبالمبرهنة
+الأساسية من جديد، $f_n(x) = f_n(x_0) + \int_{x_0}^x
+f_n'$؛ وبالطرح،
+\[
+\abs{f_n(x) - f(x)} \leq \abs{f_n(x_0) - \lim f_n(x_0)}
++ \abs{x - x_0}\,\norm{f_n' - g}_{\infty} ,
+\]
+وهذا يؤول إلى $0$ بانتظام على كل قطعة. و$f$ من الصنف $C^1$
+مع $f' = g$ بحكم الإنشاء.
+\end{proof}
+
+\begin{example}[لماذا تقع الفرضية على المشتقات]\label{ex:b2:funcseq:sqrtabs}
+لتكن $F_n(x) = \sqrt{x^2 + \frac1n}$ على $\R$. وكل $F_n$ من الصنف
+$C^1$ (بل $C^\infty$)، والتقارب إلى $\abs x$
+منتظم على $\R$ كلها:
+\[
+0 \leq F_n(x) - \abs x
+= \frac{(x^2 + \frac1n) - x^2}{\sqrt{x^2+\frac1n} + \abs x}
+= \frac{1/n}{\sqrt{x^2 + \frac1n} + \abs x}
+\leq \frac{1/n}{1/\sqrt n} = \frac{1}{\sqrt n} .
+\]
+ومع ذلك فالنهاية $\abs x$ غير قابلة للاشتقاق عند $0$: \omterm{def:b2:funcseq:def}{فالتقارب
+المنتظم} \emph{للدوال}، مهما كان سريعًا، لا ينقل أي
+قابلية للاشتقاق. والفشل ظاهر على المشتقات:
+\[
+F_n'(x) = \frac{x}{\sqrt{x^2 + \frac1n}}
+\longrightarrow \begin{cases} 1 & x > 0,\\ 0 & x = 0,\\
+-1 & x < 0, \end{cases}
+\]
+وهي نهاية نقطية غير متصلة، ومن ثم لا يمكن أن تتقارب $(F_n')$
+بانتظام قرب $0$ (\cref{thm:b2:funcseq:continuity} من جديد).
+والفكرة الختامية: تفترض
+\cref{thm:b2:funcseq:differentiation} عمدًا
+\omterm{def:b2:funcseq:def}{التقارب المنتظم} للمشتقات $f_n'$، لا للدوال $f_n$ ---
+وهذا المثال هو السبب.
+\end{example}
+
+\section{متسلسلات الدوال}
+
+\begin{definition}\label{def:b2:funcseq:series}
+تتقارب متسلسلة دوال $\sum u_n$ \omterm{def:b2:funcseq:def}{نقطيًا} أو بانتظام حين تتقارب
+مجاميعها الجزئية كذلك. وتتقارب
+\emph{ناظميًا}\index{تقارب ناظمي} (على $X$) حين يكون $\sum
+\norm{u_n}_\infty < \infty$. ويستلزم التقارب الناظمي التقاربَ
+المنتظم (في \omterm{def:b2:nvs:banach}{فضاء باناخ} للدوال المحدودة:
+\cref{thm:b2:nvs:absoluteconvergence})، الذي يستلزم النقطي؛
+والاستلزامان تامّان.
+\end{definition}
+
+\begin{example}[متسلسلة واحدة، وثلاثة أحكام]\label{ex:b2:funcseq:threemodes}
+لنأخذ $u_n(x) = \frac{x^n}{n}$ على $\intco{0}{1}$. \emph{\omterm{def:b2:funcseq:def}{نقطيًا}:}
+تتقارب من أجل كل $x \in \intco01$ (بالمقارنة مع
+المتسلسلة الهندسية). \emph{\omterm{def:b2:funcseq:series}{ناظميًا} على $\intcc{0}{a}$، مع $a < 1$:}
+$\norm{u_n}_{\infty,\intcc0a} = \frac{a^n}{n}$، وهي \omterm{def:b2:series:summable}{قابلة للجمع}.
+\emph{وليست ناظمية على $\intco{0}{1}$:}
+$\norm{u_n}_{\infty,\intco01} = \frac1n$، و$\sum\frac1n$
+تتباعد. \emph{وليست حتى منتظمة على $\intco{0}{1}$:} إذ
+يقاوم الباقي قرب $1$،
+\[
+R_N(x) = \sum_{n>N}\frac{x^n}{n}
+\geq \sum_{n=N+1}^{2N}\frac{x^n}{n}
+\geq \frac{N\,x^{2N}}{2N} = \frac{x^{2N}}{2}
+\xrightarrow[x\to1^-]{} \frac12 ,
+\]
+ومن ثم $\sup_{\intco01}\abs{R_N} \geq \frac12$ من أجل كل $N$.
+والفكرة الختامية: تتعايش الأحكام الأربعة بسلام --- فالمجموع
+$-\ln(1-x)$ \omterm{def:b2:metric:continuity}{متصل} على $\intco{0}{1}$ لأن
+الاتصال لا يحتاج إلا الانتظام \emph{قرب كل نقطة}، أي
+على القطع $\intcc0a$؛ والانفجار عند الحافة حقٌّ
+للمجموع.
+\end{example}
+
+\begin{theorem}[النقل من أجل المتسلسلات]\label{thm:b2:funcseq:seriestransfer}
+إذا تقاربت $\sum u_n$ بانتظام (مثلًا \omterm{def:b2:funcseq:series}{ناظميًا}) على المجموعة
+المعنية: فينتقل اتصال كل $u_n$ عند $a$ إلى المجموع؛ ويمكن المكاملة
+على قطعة حدًّا حدًّا؛ وإذا تقاربت $\sum u_n(x_0)$
+وتقاربت $\sum u_n'$ بانتظام على القطع، فإن
+المجموع من الصنف $C^1$ ومشتقه $\sum u_n'$.
+\end{theorem}
+
+\begin{proof}
+كل شيء هو المبرهنة الموافقة مطبَّقةً على المجاميع
+الجزئية $S_N = \sum_{n\leq N}u_n$، وهي مجاميع منتهية لدوال
+تتمتع بالانتظام المعني. الاتصال: كل $S_N$
+متصلة عند $a$ و$S_N \to \sum u_n$ بانتظام:
+\cref{thm:b2:funcseq:continuity}. المكاملة: على القطعة،
+\[
+\int_a^b \sum_{n\geq0} u_n
+= \lim_N \int_a^b S_N
+= \lim_N \sum_{n=0}^{N}\int_a^b u_n
+= \sum_{n\geq0}\int_a^b u_n
+\]
+حسب \cref{thm:b2:funcseq:integration} (المساواة الأولى) و
+بخطية التكامل (الثانية). الاشتقاق: الدوال
+$S_N$ من الصنف $C^1$، وتتقارب $S_N(x_0)$، وتتقارب $S_N' =
+\sum_{n\leq N}u_n'$ بانتظام على القطع:
+فتعطي \cref{thm:b2:funcseq:differentiation} أن المجموع
+من الصنف $C^1$ بالمشتق $\lim S_N' = \sum u_n'$.
+\end{proof}
+
+\begin{remark}[مزالق شائعة]
+أربعة فخاخ، وقد رُئيت كلها في أوراق الامتحان. \emph{(1)
+النهايات العليا المتحقَّق منها نصفًا:} تقييم $f_n$ على امتداد متتالية
+مختارة جيدًا $x_n$ لا يحدّ $\norm{f_n - f}_\infty$ إلا
+من \emph{أسفل} --- وهذا يكفي لدحض الانتظام (كما في
+\cref{ex:b2:funcseq:xn})، ولا يكفي أبدًا لبرهانه؛ ولبرهانه، حُدّ
+النهاية العليا بحساب صالح من أجل \emph{كل} $x$. \emph{(2)
+الانتظام على المجموعة الخطأ:} كثيرًا ما يصحّ \omterm{def:b2:funcseq:series}{التقارب الناظمي} أو المنتظم
+على كل $\intcc{-a}{a}$ أو $\intco\delta\infty$
+لكنه يفشل على الاتحاد المفتوح؛ وليس ذلك عائقًا --- فالاتصال
+وقابلية الاشتقاق محليان، ومن ثم يعطيهما انضباط قطعةً قطعة
+في \cref{ex:b2:funcseq:zeta} على المجموعة \omterm{def:b2:metric:topology}{المفتوحة} كلها. \emph{(3)
+المكاملة على غير القطع:}
+\cref{thm:b2:funcseq:integration} قول عن
+القطع؛ فعلى $\intco0\infty$، لا يمنع \omterm{def:b2:funcseq:def}{التقارب المنتظم}
+هروب الكتلة إلى اللانهاية (فالدوال $f_n =
+\frac1n\mathbf 1_{\intcc{0}{n}}$ تتقارب بانتظام إلى $0$،
+مع $\int f_n = 1$) --- فاستعمل التقارب المهيمَن عليه هناك.
+\emph{(4) اشتقاق النهاية:}
+\cref{ex:b2:funcseq:sqrtabs}؛ فالفرضية على المشتقات $(f_n')$، ولا يمكن لأي معدل تقارب للدوال $(f_n)$ أن يعوّضها.
+\end{remark}
+
+\begin{example}[دالة ريمان $\zeta$]\label{ex:b2:funcseq:zeta}
+تتقارب $\zeta(s) = \sum_{n\geq1} n^{-s}$ \omterm{def:b2:funcseq:series}{ناظميًا} على كل نصف
+مستقيم $\intco{a}{+\infty}$، مع $a > 1$ (لأن $\norm{n^{-s}}_\infty =
+n^{-a}$، وهي \omterm{def:b2:series:summable}{قابلة للجمع}): ومن ثم فإن $\zeta$ متصلة على $\intoo{1}{+\infty}$؛
+وبالاشتقاق حدًّا حدًّا (فالمتسلسلة المشتقة $\sum -\ln n\; n^{-s}$
+تتقارب \omterm{def:b2:funcseq:series}{ناظميًا} هي أيضًا على $\intco{a}{\infty}$)، تكون $\zeta$ من الصنف $C^1$
+--- وبالتكرار، من الصنف $C^\infty$ --- مع $\zeta'(s) = -\sum \frac{\ln
+n}{n^s}$. ولاحظ الانضباط: يُتحقَّق من \omterm{def:b2:funcseq:series}{التقارب الناظمي} على
+\emph{أنصاف} المستقيمات الجزئية، لا على المفتوح $\intoo{1}{\infty}$
+نفسه، حيث يفشل.
+\end{example}
+
+\begin{example}[متسلسلة لوغاريتمية، منفَّذة إلى النهاية]\label{ex:b2:funcseq:logseries}
+لتكن $F(x) = \sum_{n\geq1} \frac{\eu^{-nx}}{n}$ على
+$\intoo{0}{\infty}$. وكل حدّ محدود على $\intco{\delta}
+\infty$ بالمقدار $\frac{\eu^{-n\delta}}{n} \leq \eu^{-n\delta}$، وهو حدّ
+متسلسلة هندسية متقاربة: \omterm{def:b2:funcseq:series}{فالتقارب ناظمي} على كل
+$\intco\delta\infty$، ومن ثم فإن $F$ متصلة على
+$\intoo{0}{\infty}$. والمتسلسلة المشتقة $\sum -\eu^{-nx}$
+متقاربة \omterm{def:b2:funcseq:series}{ناظميًا} كذلك على $\intco\delta\infty$
+($\norm{\eu^{-nx}}_{\infty,\intco\delta\infty} =
+\eu^{-n\delta}$)، ومن ثم فإن $F$ من الصنف $C^1$ بمشتق هندسي:
+\[
+F'(x) = -\sum_{n\geq1}\eu^{-nx}
+= \frac{-\eu^{-x}}{1 - \eu^{-x}}
+= \frac{-1}{\eu^{x} - 1} .
+\]
+وبالتكرار، تكون $F$ من الصنف $C^\infty$. وبمكاملة $F'$ (فكلٌّ من $F$ و$x
+\mapsto -\ln(1 - \eu^{-x})$ ينعدم عند $+\infty$ ولهما
+المشتق نفسه على $\intoo0\infty$):
+\[
+F(x) = -\ln\bigl(1 - \eu^{-x}\bigr),
+\]
+وهي المتسلسلة اللوغاريتمية عند $t = \eu^{-x}$. والفكرة الختامية: حين $x
+\to 0^+$، $F(x) = -\ln(x + O(x^2)) = \ln\frac1x + O(x)$ --- فتتباعد
+المتسلسلة لوغاريتميًا عند الحدّ، تمامًا مثل
+المتسلسلة التوافقية التي تصيرها عند $x = 0$؛ \omterm{def:b2:funcseq:series}{والتقارب الناظمي} على
+$\intco\delta\infty$ دون $\intoo0\infty$ هو
+العَرَض.
+\end{example}
+
+\begin{method}[كيف نبرهن على التقارب المنتظم أو ندحضه]\label{met:b2:funcseq:uniform}
+من أجل $f_n \to f$ \omterm{def:b2:funcseq:def}{نقطيًا} على $X$:
+\begin{enumerate}
+  \item احسب أو حُدّ $\norm{f_n - f}_\infty$: ادرس
+        الدالة $x \mapsto \abs{f_n(x) - f(x)}$ (بالمشتق و
+        الرتابة) لتحديد موضع أعظميتها؛ فحدٌّ صالح من أجل
+        كل $x$ ويؤول إلى $0$ يبرهن على الانتظام.
+  \item \emph{وللدحض}: أبرِز نقاطًا $x_n$ تحقق
+        $\abs{f_n(x_n) - f(x_n)} \not\to 0$ (وكثيرًا ما يتتبع $x_n$
+        النتوء المتحرك، كما في \cref{exo:b2:funcseq:1})؛ أو
+        استشهد بمبرهنة نقل بالعكس المنطقي --- نهاية غير
+        متصلة لدوال متصلة
+        (\cref{ex:b2:funcseq:threshold})، أو $\int f_n
+        \not\to \int f$ على قطعة.
+  \item ومن أجل المتسلسلات، جرّب \omterm{def:b2:funcseq:series}{التقارب الناظمي} أولًا
+        ($\sum\sup\abs{u_n} < \infty$)؛ فإذا فشل شموليًا،
+        فاختبره على القطع الجزئية المهمة
+        (\cref{ex:b2:funcseq:threemodes})؛ وإذا فشل
+        في كل مكان، فقد يصحّ \omterm{def:b2:funcseq:def}{التقارب المنتظم} مع ذلك عبر
+        حدّ باقي المتناوبات
+        (\cref{exo:b2:funcseq:4}) أو عبر الجمع بالتجزئة.
+\end{enumerate}
+\end{method}
+
+\section{مبرهنة فايرشتراس في التقريب}
+
+\begin{theorem}[فايرشتراس، عبر برنشتاين]\label{thm:b2:funcseq:weierstrass}
+كل دالة متصلة $f \colon \intcc{0}{1} \to \R$ نهايةٌ منتظمة
+لكثيرات حدود --- وبالتحديد، \emph{لكثيرات حدود
+برنشتاين}\index{كثيرات حدود برنشتاين}\index{مبرهنة فايرشتراس
+في التقريب} الخاصة بها
+\[
+B_n(f)(x) = \sum_{k=0}^{n} f\Bigl(\frac kn\Bigr)\binom nk x^k
+(1-x)^{n-k} .
+\]
+\end{theorem}
+
+\begin{proof}
+نثبّت $x \in \intcc{0}{1}$ ونضع $p_k(x) = \binom nk x^k(1 -
+x)^{n-k}$. وثلاث متطابقات ثنائية، نحصل عليها بتقييم
+$(x + y)^n$ ومشتقيه بالنسبة إلى $x$ عند $y = 1 - x$:
+\[
+\sum_k p_k = 1,
+\qquad
+\sum_k k\,p_k = nx,
+\qquad
+\sum_k k(k-1) p_k = n(n-1)x^2 .
+\]
+وبالتفصيل: $(x+y)^n = \sum_k\binom nk x^ky^{n-k}$ عند $y = 1-x$
+هي الأولى؛ وبالاشتقاق بالنسبة إلى $x$،
+\[
+n(x+y)^{n-1} = \sum_k k\binom nk x^{k-1}y^{n-k} ,
+\]
+ثم بالضرب في $x$ ووضع $y = 1 - x$ نحصل على
+الثانية؛ وبالاشتقاق مرتين والضرب في $x^2$ نحصل
+على الثالثة. وبنشر $(k - nx)^2 = k(k-1) + k(1 - 2nx) +
+n^2x^2$ وجمع الثلاث:
+\[
+\sum_k (k - nx)^2 p_k
+= n(n-1)x^2 + nx(1 - 2nx) + n^2x^2
+= nx(1 - x) \leq \frac n4 ,
+\]
+وهي \emph{متطابقة التباين}.
+
+ونقدّر الآن، مستعملين $\sum p_k = 1$:
+\[
+\abs{B_n(f)(x) - f(x)}
+\leq \sum_{k} \Bigl| f\Bigl(\frac kn\Bigr) - f(x)\Bigr|\, p_k(x)
+= \Sigma_{\text{قريب}} + \Sigma_{\text{بعيد}} ,
+\]
+بالفصل حسب $\abs{\frac kn - x} \leq \delta$ أو لا.
+ومن أجل $\varepsilon > 0$ معطى، يعطي الاتصال المنتظم للدالة $f$ (هاينه)
+عددًا $\delta$ يحقق $\Sigma_{\text{قريب}} \leq \varepsilon$. وأما المجموع
+البعيد، مع $M = \norm f_\infty$: فبمتطابقة التباين وبحيلة
+العدّ عند تشيبيشيف،
+\[
+\Sigma_{\text{بعيد}} \leq 2M \sum_{\abs{k - nx} > n\delta} p_k
+\leq 2M\,\frac{\sum_k (k - nx)^2 p_k}{n^2\delta^2}
+\leq \frac{2M}{4 n \delta^2} \cdot 1
+= \frac{M}{2n\delta^2}
+\xrightarrow[n\to\infty]{} 0 ,
+\]
+بانتظام في $x$. ومن ثم $\norm{B_n(f) - f}_\infty \leq \varepsilon +
+\frac{M}{2n\delta^2} \leq 2\varepsilon$ من أجل $n$ الكبيرة.
+\end{proof}
+
+\begin{remark}
+بالتعويض الأفيني تصحّ المبرهنة على أي قطعة
+$\intcc{a}{b}$. وهي تفشل على $\R$ (فالنهاية المنتظمة لكثيرات حدود على
+$\R$ كثير حدود: \cref{exo:b2:funcseq:8}). أما القراءة الاحتمالية
+--- فالمقدار $B_n(f)(x)$ هو القيمة المتوقعة للدالة $f$ عند متوسط
+ثنائي، وحدّ التباين هو متراجحة تشيبيشيف --- فتُصاغ بأمانة في \cref{ch:b2:genfun}.
+\end{remark}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=8.6cm, height=6.0cm,
+    xmin=0, xmax=1.05, ymin=0, ymax=1.08,
+    xtick={0,1}, ytick={1}]
+  \addplot[omThm, very thick, domain=0:1, samples=80] {x^2};
+  \addplot[omDef!45, thick, domain=0:1, samples=2] {x};
+  \addplot[omDef!70, thick, domain=0:1, samples=80]
+    {x^2 + x*(1-x)/2};
+  \addplot[omDef, thick, domain=0:1, samples=80]
+    {x^2 + x*(1-x)/6};
+  \node[font=\small, omDef] at (axis cs:0.30,0.37) {$B_1f$};
+  \node[font=\small, omDef] at (axis cs:0.52,0.46) {$B_2f$};
+  \node[font=\small, omDef] at (axis cs:0.76,0.56) {$B_6f$};
+  \node[font=\small, omThm] at (axis cs:0.88,0.68) {$f$};
+\end{axis}
+\end{tikzpicture}
+
+{\small تقريب برنشتاين للدالة $f(x) = x^2$ (بالأحمر)، باستعمال
+الصيغة الدقيقة $B_nf = x^2 + \frac{x(1-x)}{n}$ في
+\cref{exo:b2:funcseq:7}: $B_1f$ هو الوتر، وكل مضاعفة
+للعدد $n$ تنصّف الفجوة. موثوق لكنه بطيء --- وهو التشبّع من الرتبة
+$\frac1n$ الذي تجعله مبرهنة فورونوفسكايا (مسألة نهاية الأسبوع)
+دقيقًا.}
+\end{omfigure}
+
+\begin{remark}[أين يُستعمَل هذا]
+مبرهنة فايرشتراس في التقريب هي مبرهنة الكثافة في التحليل
+الكلاسيكي: فهي تجعل $C(\intcc ab)$ قابلًا للفصل، وتتيح التحقق من
+المتطابقات التكاملية على كثيرات الحدود وحدها (مسائل العزوم)، و
+تقوم تحت النسخة المثلثية المبرهَن عليها في فصل فورييه
+عبر نواة فييير. وتستخرج مسألة نهاية الأسبوع في هذا الفصل
+المضمونَ الكمّي لبرهان برنشتاين
+--- أي معدلات التقارب التي يحكمها مقياس الاتصال ---
+ثم تعزل ما جعله يعمل حقًا، في مبرهنة كوروفكين:
+الإيجابية مع ثلاث دوال اختبار. ويعمّم مجلد السنة
+الثالثة قول الكثافة على الجبور الجزئية الكيفية
+(ستون--فايرشتراس) وعلى الفضاءات المتراصة.
+\end{remark}
+
+\begin{example}[تقريب مضلّعي، بمعدل]\label{ex:b2:funcseq:polygonal}
+من أجل دالة $f$ ليبشيتزية بالثابت $L$ على $\intcc{0}{1}$، لتكن $I_nf$
+الدالة المستكمِلة الأفينية على قطع عند العقد $\frac kn$. وعلى
+خلية $\intcc{\frac kn}{\frac{k+1}n}$، يقع كلٌّ من $f(x)$ و
+$I_nf(x)$ بين القيمتين الحدّيتين اللتين يمكن لدالة ليبشيتزية بالثابت $L$
+أن تأخذهما بمعلومية القيمتين العقديتين، ومن ثم من أجل $x$ في
+الخلية، وبكتابة $x_k = \frac kn$:
+\[
+\abs{I_nf(x) - f(x)}
+\leq \abs{I_nf(x) - f(x_k)} + \abs{f(x_k) - f(x)}
+\leq L\,\abs{x - x_k} + L\,\abs{x - x_k}
+\leq \frac{2L}{n}
+\]
+(فالدالة المستكمِلة نفسها ليبشيتزية بالثابت $L$ على الخلية: إذ إن
+ميلها نسبةُ فروق للدالة $f$). ومنه $\norm{I_nf -
+f}_\infty \leq \frac{2L}{n}$: فالتقريب المضلّعي للدوال
+الليبشيتزية يتقارب بسرعة $\frac1n$ ---
+\emph{أسرع} من معدل برنشتاين $\frac{1}{\sqrt n}$ من أجل
+الصنف نفسه (مسألة نهاية الأسبوع، الجزء الثاني). والفكرة الختامية:
+المضلّع يستكمل لكنه ليس أملس، وبرنشتاين أملس
+لكنه بطيء؛ فلا غداء مجاني بين انتظام
+المقرِّب والسرعة --- وهي مقايضة تجعلها نتائج التشبّع
+في مسألة نهاية الأسبوع دقيقة.
+\end{example}
+
+\begin{remark}[آفاق داخل هذا المجلد]
+\omterm{def:b2:funcseq:def}{التقارب المنتظم} حصان عمل هذا الكتاب من الآن فصاعدًا. فيجري
+فصل متسلسلات القوى كله على \omterm{def:b2:funcseq:series}{التقارب الناظمي} على
+الأقراص الجزئية المتراصة --- وكل مبرهنة حدًّا حدًّا هناك
+حالةٌ خاصة من مبرهنات النقل في هذا الفصل. ويعيش فصل
+فورييه طابقًا أعلى: فمجاميعه الجزئية $S_N$ تفشل
+بالضبط حيث يحذّر هذا الفصل من أنها قد تفشل (\omterm{def:b2:funcseq:def}{نقطيًا} لا
+بانتظام عند القفزات)، وتنجح متوسطات فييير فيه بميكانيك
+$3\varepsilon$ نفسه الذي برهن على
+\cref{thm:b2:funcseq:continuity}. ويعرّف فصل المعادلات
+التفاضلية $\eu^{tA}$ بمتسلسلة متقاربة \omterm{def:b2:funcseq:series}{ناظميًا} و
+يشتقها حدًّا حدًّا --- وهي حرفيًا
+\cref{thm:b2:funcseq:seriestransfer} مطبَّقة على عناصر
+المصفوفات. وحين يخالجك الشك لاحقًا في الكتاب عن ``لماذا يجوز لنا
+أن نفعل هذا''، فالجواب عادةً مبرهنة من هذا الفصل.
+\end{remark}
+
+\section{تمارين}
+
+\begin{exercise}[$\star$]\label{exo:b2:funcseq:1}
+ادرس \omterm{def:b2:funcseq:def}{التقارب النقطي} والمنتظم على $\intcc{0}{1}$، ثم
+على $\intcc{0}{a}$ (مع $a < 1$) أو على $\intco{\delta}{1}$ حسب الاقتضاء، من أجل:
+\[
+f_n(x) = \frac{x}{1 + nx},
+\qquad
+g_n(x) = n x\,\eu^{-n x^2},
+\qquad
+h_n(x) = x^n(1 - x^n).
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:funcseq:2}
+برهن على أن $\displaystyle\int_0^1 g_n \not\to \int_0^1 \lim g_n$
+من أجل $g_n$ في \cref{exo:b2:funcseq:1}، ووفّق ذلك مع
+\cref{thm:b2:funcseq:integration}.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:funcseq:3}
+برهن على أن $S(x) = \sum_{n\geq1} \dfrac{x^n}{n^2}$ متصلة على
+$\intcc{-1}{1}$، وأن $S$ من الصنف $C^1$ على $\intoo{-1}{1}$ مع
+$S'(x) = -\frac{\ln(1-x)}{x}$ من أجل $0 < \abs x < 1$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:4}
+لتكن $F(x) = \sum_{n \geq 0} \dfrac{(-1)^n}{n + x}$ على
+$\intoo{0}{+\infty}$. برهن على \omterm{def:b2:funcseq:def}{التقارب المنتظم} (لا الناظمي) على
+$\intco{\delta}{\infty}$ عبر حدّ باقي المتسلسلات
+المتناوبة، وعلى الاتصال، وعلى المعادلة الوظيفية $F(x) + F(x + 1) =
+\frac1x$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:5}
+(ديني) لتكن $f_n \colon K \to \R$ متصلة على \omterm{def:b2:metric:def}{فضاء متري}
+\emph{متراص}، مع $f_n \to f$ \emph{\omterm{def:b2:funcseq:def}{نقطيًا}}، و$f$ متصلة،
+و$(f_n(x))$ \emph{متناقصة} في $n$ من أجل كل $x$. برهن على أن
+\omterm{def:b2:funcseq:def}{التقارب منتظم}. \emph{(من أجل $\varepsilon$ معطى، تتزايد المجموعات
+\omterm{def:b2:metric:topology}{المفتوحة} $U_n = \{x : f_n(x) - f(x) < \varepsilon\}$ وتغطي
+$K$؛ فاستخرج تغطية جزئية منتهية ---
+\cref{thm:b2:metric:borellebesgue}.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:6}
+برهن على أن $\displaystyle\lim_{n\to\infty} \int_0^1
+\frac{n\,f(x)}{1 + n^2x^2}\,\dd x = \frac{\pi}{2} f(0)$ من أجل كل
+دالة متصلة $f$ على $\intcc{0}{1}$. \emph{(عوّض $u = nx$؛ وافصل
+$f(0)$؛ وهيمن.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:7}
+احسب \omterm{thm:b2:funcseq:weierstrass}{كثيرات حدود برنشتاين} للدالة $f(x) = x^2$ صراحةً و
+تحقق من الخطأ المنتظم $\norm{B_n f - f}_\infty =
+O\bigl(\frac1n\bigr)$ المتنبَّأ به في برهان
+\cref{thm:b2:funcseq:weierstrass} --- وهو هنا $\frac{x(1 -
+x)}{n}$ بالضبط عند كل نقطة.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:8}
+برهن على أنه إذا تقاربت كثيرات حدود $P_n$ بانتظام \emph{على كل
+$\R$} إلى $f$، فإن $f$ كثير حدود. \emph{(من أجل $m, n$ الكبيرة،
+يكون $P_n - P_m$ كثير حدود محدودًا على $\R$، ومن ثم ثابتًا؛ فتستقر
+المتتالية إلى حدّ ثوابت.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:funcseq:9}
+(دالة متصلة غير قابلة للاشتقاق في أي نقطة --- موجَّه) لتكن
+$\varphi$ المسافة إلى أقرب عدد صحيح (وهي دورية بالدور $1$، و
+$\norm{\varphi}_\infty = \frac12$، وليبشيتزية بالثابت $1$) ولتكن
+\[
+W(x) = \sum_{n=0}^{\infty} \Bigl(\frac{3}{4}\Bigr)^{\!n}
+\varphi(4^n x) .
+\]
+برهن على: (أ) أن $W$ متصلة على $\R$ (\omterm{def:b2:funcseq:series}{بالتقارب الناظمي})؛ (ب) أنه من أجل
+كل $x$ وكل $m$، وباختيار $h_m = \pm\frac12\cdot 4^{-m}$
+بالإشارة التي تجعل $\varphi$ أفينية على القطعة من $4^m x$
+إلى $4^m(x + h_m)$، تحقق نسبة الفروق
+\[
+\Bigl|\frac{W(x + h_m) - W(x)}{h_m}\Bigr| \geq 3^m -
+\sum_{n<m} 3^n \geq \frac{3^m + 1}{2} \xrightarrow[m\to\infty]{}
+\infty
+\]
+(فالحدود $n > m$ تنعدم بالدورية؛ والحدّ $n = m$ يسهم
+بالمقدار $3^m$ بالضبط؛ والحدود $n < m$ محدودة بخاصية ليبشيتز).
+واختم بأن $W$ غير قابلة للاشتقاق في أي نقطة.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:funcseq:10}
+لتكن $u_n(x) = (-1)^n x^n(1 - x)$ على $\intcc{0}{1}$. بيّن أن
+$\sum u_n$ تتقارب \omterm{def:b2:funcseq:def}{نقطيًا} على $\intcc{0}{1}$ واحسب
+مجموعها؛ وبيّن أن \omterm{def:b2:funcseq:def}{التقارب منتظم} على $\intcc{0}{1}$
+\emph{(حُدّ الباقي $R_N(x) = \sum_{n > N} u_n(x)$، وهو ذيل
+هندسي، بحدّه الأول وعظّم $x^{N+1}(1-x)$)}
+لكنه \emph{ليس} \omterm{def:b2:funcseq:series}{ناظميًا} \emph{(احسب $\norm{u_n}_\infty$)}:
+\omterm{def:b2:funcseq:def}{فالتقارب المنتظم} أضعف تمامًا من \omterm{def:b2:funcseq:series}{التقارب الناظمي}.
+وقارِن بالمتسلسلة $\sum x^n(1-x)$، التي مجموعها غير \omterm{def:b2:metric:continuity}{متصل} عند
+$1$: فهناك يفشل حتى الانتظام.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:11}
+لتكن $f_n \to f$ بانتظام على \omterm{def:b2:metric:def}{فضاء متري} $X$، وكل $f_n$
+متصلة، وليكن $x_n \to x$ في $X$. برهن على أن $f_n(x_n) \to
+f(x)$. وبيّن بمثال على $X = \intcc{0}{1}$ أن \omterm{def:b2:funcseq:def}{التقارب النقطي}
+لا يكفي، حتى مع $f$ متصلة
+\emph{(استعمل النتوءات $g_n$ في \cref{exo:b2:funcseq:1} و$x_n =
+\frac{1}{\sqrt{2n}}$)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:funcseq:12}
+(معادلة تكاملية لفولتيرا بالمتسلسلات) من أجل $f \in
+C(\intcc{0}{1})$ نعرّف $Tf(x) = \int_0^x f(t)\,\dd t$.
+\begin{enumerate}
+  \item بيّن بالتراجع أنه من أجل $n \geq 1$:
+        \[
+        T^n f(x) = \int_0^x \frac{(x -
+        t)^{n-1}}{(n-1)!}\,f(t)\,\dd t,
+        \qquad
+        \norm{T^n f}_\infty \leq \frac{\norm f_\infty}{n!} .
+        \]
+  \item استنتج أن $S = \sum_{n\geq0} T^n f$ تتقارب \omterm{def:b2:funcseq:series}{ناظميًا}
+        على $\intcc{0}{1}$ وتحلّ المعادلة التكاملية $S = f
+        + TS$.
+  \item تحقق من أن $S(x) = f(x) + \int_0^x \eu^{x-t}f(t)\,\dd
+        t$ يحلّ المعادلة نفسها، وبرهن على وحدانية
+        الحلول المتصلة \emph{(إذا كان $S = TS$ فإن
+        $\norm{S}_\infty \leq \norm{T^nS}_\infty \to 0$)}:
+        واختم بالصورة المغلقة للمجموع.
+\end{enumerate}
+\end{exercise}
+
+\section{مسألة: معدلات التقريب ومبرهنة كوروفكين}
+
+\begin{problem}\label{pb:b2:funcseq:1}
+يخفي برهان برنشتاين للمبرهنة \cref{thm:b2:funcseq:weierstrass} كنزين.
+أولًا، إنه \emph{كمّي}: فسرعة $B_nf
+\to f$ يحكمها مقياس اتصال $f$، بالمعدل
+الأمثل المبلوغ عند $\abs{x - \frac12}$. وثانيًا، إنه
+\emph{بنيوي}: فكل ما أهمّ هو أن $B_n$ مؤثر خطي
+موجب يسلك سلوكًا حسنًا على $1$ و$x$ و$x^2$ ---
+وهذه الملاحظة، معزولةً، هي \emph{مبرهنة
+كوروفكين}\index{مبرهنة كوروفكين}. وتبرهن هذه المسألة على الاثنين،
+وتُختم بالمقارب الدقيق عند فورونوفسكايا. وفي كل ما يلي،
+$f \in C(\intcc{0}{1})$، $M = \norm f_\infty$، $p_k(x) = \binom
+nk x^k(1-x)^{n-k}$، ويرمز $e_j$ إلى $x \mapsto x^j$.
+
+\medskip
+\noindent\textbf{الجزء الأول --- مؤثر برنشتاين.}
+\begin{enumerate}
+  \item بيّن أن $B_n$ خطي و\emph{موجب} ($f \geq 0
+        \Rightarrow B_nf \geq 0$)، ومن ثم رتيب ($f \leq g
+        \Rightarrow B_nf \leq B_ng$)، مع
+        $\norm{B_nf}_\infty \leq \norm f_\infty$، وأن
+        $B_nf$ يستكمل $f$ عند الطرفين معًا.
+  \item أعد استنباط المتطابقات $B_n e_0 = e_0$ و$B_n e_1 =
+        e_1$ و$B_n e_2 = e_2 + \frac{e_1 - e_2}{n}$
+        \emph{(اشتق $(x + y)^n$ مرتين وضع $y = 1 -
+        x$)}.
+  \item استنتج متطابقة التباين $\sum_k \bigl(\frac kn -
+        x\bigr)^2 p_k(x) = \frac{x(1-x)}{n}$ ثم، بكوشي--شوارتز،
+        حدَّ العزم الأول
+        \[
+        \sum_{k=0}^{n}\Bigl|\frac kn - x\Bigr|\,p_k(x)
+        \leq \sqrt{\frac{x(1-x)}{n}} \leq \frac{1}{2\sqrt n} .
+        \]
+  \item بيّن أنه إذا كانت $f$ محدبة فإن $B_nf \geq f$ على
+        $\intcc{0}{1}$ \emph{(بمتراجحة جنسن المنتهية من أجل
+        الأوزان $p_k(x)$)}.
+  \item (حدّ العدّ عند تشيبيشيف، معادًا صياغته) من أجل $\delta > 0$
+        بيّن أن
+        \[
+        \sum_{\abs{k/n - x} > \delta} p_k(x)
+        \leq \frac{x(1-x)}{n\delta^2}
+        \leq \frac{1}{4n\delta^2} ,
+        \]
+        وأعطِ القراءة الاحتمالية: $B_nf(x)$ يأخذ متوسط
+        $f$ على متوسط عينة ثنائية يتركّز عند $x$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{الجزء الثاني --- المعدلات: مقياس الاتصال.}
+من أجل $\delta > 0$ نضع $\omega(\delta) = \sup\{\abs{f(s) - f(t)}
+: s, t \in \intcc{0}{1},\ \abs{s - t} \leq \delta\}$.
+\begin{enumerate}[resume]
+  \item بيّن أن: $\omega$ منته وغير متناقص، وأن
+        $\omega(\delta) \to 0$ حين $\delta \to 0^+$ (هاينه)، وأنه
+        تحت جمعي ($\omega(\delta_1 + \delta_2) \leq
+        \omega(\delta_1) + \omega(\delta_2)$)، وأن
+        $\omega(\lambda\delta) \leq (1 +
+        \lambda)\,\omega(\delta)$ من أجل كل $\lambda > 0$.
+  \item برهن على التقدير الرئيسي، من أجل كل $\delta > 0$:
+        \[
+        \abs{B_nf(x) - f(x)}
+        \leq \sum_k \omega\Bigl(\Bigl|\frac kn -
+        x\Bigr|\Bigr)p_k(x)
+        \leq \Bigl(1 + \frac1\delta\sum_k\Bigl|\frac kn -
+        x\Bigr|p_k(x)\Bigr)\,\omega(\delta) .
+        \]
+  \item اختر $\delta = n^{-1/2}$ واختم \emph{مبرهنة
+        فايرشتراس الكمّية}:
+        \[
+        \norm{B_nf - f}_\infty \leq
+        \frac32\,\omega\Bigl(\frac{1}{\sqrt n}\Bigr)
+        \xrightarrow[n\to\infty]{} 0 .
+        \]
+  \item استنتج المعدلات: $\norm{B_nf - f}_\infty \leq
+        \frac{3L}{2\sqrt n}$ من أجل $f$ ليبشيتزية بالثابت $L$، و$\leq
+        \frac32 C n^{-\alpha/2}$ من أجل $f$ هولدرية بالأس $\alpha$
+        ($\abs{f(s) - f(t)} \leq C\abs{s-t}^\alpha$).
+  \item (المثال الأمثل --- متطابقة ثنائية) من أجل $m
+        \geq 1$ برهن على أن
+        \[
+        \sum_{k=m+1}^{2m} (k - m)\binom{2m}{k}
+        = \frac{m}{2}\binom{2m}{m},
+        \qquad\text{ومنه}\qquad
+        \sum_{k=0}^{2m}\abs{k - m}\binom{2m}{k}
+        = m\binom{2m}{m}
+        \]
+        \emph{(استعمل $k\binom{2m}k = 2m\binom{2m-1}{k-1}$ و
+        تناظر السطر الثنائي، الذي يعطي
+        $\sum_{j=m}^{2m-1}\binom{2m-1}{j} = 2^{2m-2}$)}.
+  \item من أجل $f(t) = \abs{t - \frac12}$ استنتج القيمة الدقيقة
+        ومقارباتها (بالمعامل الثنائي المركزي،
+        \cref{ex:b2:comparison:centralbinomial}):
+        \[
+        B_{2m}f\Bigl(\frac12\Bigr) - f\Bigl(\frac12\Bigr)
+        = \frac{\binom{2m}{m}}{2\cdot4^{m}}
+        \;\sim\; \frac{1}{2\sqrt{\pi m}} :
+        \]
+        فالمعدل $\omega(n^{-1/2})$ في السؤال 8 مبلوغ
+        (إلى حدّ ثابت) --- ومن أجل $f$ المتصلة فحسب،
+        يكون معدل برنشتاين $n^{-1/2}$ أمينًا.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{الجزء الثالث --- مبرهنة كوروفكين.} لتكن $(L_n)$
+متتالية من المؤثرات \emph{الخطية الموجبة} من
+$C(\intcc{0}{1})$ إلى نفسه بحيث $L_ne_j \to e_j$
+بانتظام من أجل $j = 0, 1, 2$.
+\begin{enumerate}[resume]
+  \item بيّن أن المؤثر الخطي الموجب $L$ رتيب و
+        يحقق $\abs{Lf} \leq L\abs f$ \omterm{def:b2:funcseq:def}{نقطيًا}.
+  \item بيّن أنه من أجل كل $\varepsilon > 0$ يوجد $\delta > 0$
+        بحيث من أجل \emph{كل} $s, x \in \intcc{0}{1}$:
+        \[
+        \abs{f(s) - f(x)} \leq \varepsilon +
+        \frac{2M}{\delta^2}(s - x)^2
+        \]
+        \emph{(عالج $\abs{s - x} \leq \delta$ بهاينه و
+        $\abs{s-x} > \delta$ بالحدّ الخام $2M$)}.
+  \item ثبّت $x$، وطبّق $L_n$ على متراجحة السؤال 13
+        في المتغير $s$، واستنبط
+        \[
+        \abs{L_nf(x) - f(x)\,L_ne_0(x)}
+        \leq \varepsilon\,L_ne_0(x) + \frac{2M}{\delta^2}
+        \bigl(L_ne_2(x) - 2x\,L_ne_1(x) + x^2 L_ne_0(x)\bigr).
+        \]
+  \item بيّن أن $\sup_x \bigl(L_ne_2(x) - 2x\,L_ne_1(x) + x^2
+        L_ne_0(x)\bigr) \to 0$، ثم ركّب
+        \emph{مبرهنة كوروفكين}: $L_nf \to f$ بانتظام من أجل
+        \emph{كل} $f \in C(\intcc{0}{1})$.
+  \item تحقق من أن $(B_n)$ يحقق فرضيات كوروفكين:
+        فايرشتراس للمرة الثالثة، من ثلاث وحيدات الحدّ.
+  \item ليكن $I_n$ مؤثر الاستكمال الأفيني على قطع
+        عند العقد $\frac kn$. بيّن أن $I_n$
+        خطي موجب، وأن $I_ne_0 = e_0$، $I_ne_1 = e_1$، و
+        $\norm{I_ne_2 - e_2}_\infty = \frac{1}{4n^2}$
+        \emph{(فعلى كل خلية يكون خطأ الاستكمال الأفيني
+        للدالة $t^2$ هو $(t - a)(b - t)$)}. واختم بكوروفكين:
+        فالمستكمِلات المضلّعية تتقارب بانتظام من أجل كل
+        دالة متصلة $f$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{الجزء الرابع --- الأرباح: الكثافة والعزوم
+والمشتقات.}
+\begin{enumerate}[resume]
+  \item بيّن أن كثيرات الحدود ذوات المعاملات \emph{الناطقة}
+        كثيفة في $\bigl(C(\intcc{0}{1}),
+        \norm\cdot_\infty\bigr)$: فهذا الفضاء الباناخي
+        قابل للفصل.
+  \item (العزوم تحدّد الدالة) لتكن $f \in
+        C(\intcc{0}{1})$ مع $\int_0^1 f(t)\,t^n \dd t = 0$
+        من أجل كل $n \in \N$. بيّن أن $\int_0^1 f P = 0$ من أجل كل
+        كثير حدود، ثم أن $\int_0^1 f^2 = 0$، ثم أن $f = 0$.
+  \item برهن على متطابقة المشتق
+        \[
+        (B_nf)'(x) = n\sum_{k=0}^{n-1}\Bigl(
+        f\Bigl(\frac{k+1}{n}\Bigr) -
+        f\Bigl(\frac kn\Bigr)\Bigr)\,
+        \binom{n-1}{k}x^k(1-x)^{n-1-k}
+        \]
+        \emph{(اشتق $p_k$ وأعد الترقيم --- وهو \omterm{thm:b2:series:abel}{جمع
+        آبل})}.
+  \item لنفترض أن $f$ من الصنف $C^1$. وباستعمال مبرهنة التزايدات المنتهية في
+        كل تزايد وبالمقارنة مع $B_{n-1}(f')$، بيّن أن
+        $(B_nf)' \to f'$ بانتظام على $\intcc{0}{1}$. واستنتج:
+        من أجل $f \in C^1$ توجد كثيرات حدود تتقارب إلى $f$
+        \emph{مع} مشتقاتها.
+  \item لنفترض أن $f$ من الصنف $C^2$. وبتايلور--لاغرانج عند $x$ بيّن أن
+        \[
+        \abs{B_nf(x) - f(x)} \leq
+        \frac{\norm{f''}_\infty}{2}\cdot\frac{x(1-x)}{n}
+        \leq \frac{\norm{f''}_\infty}{8n} :
+        \]
+        فترقّي الملاسةُ المعدلَ من $n^{-1/2}$ إلى
+        $n^{-1}$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{الجزء الخامس --- التشبّع: مبرهنة
+فورونوفسكايا.}
+\begin{enumerate}[resume]
+  \item برهن على متطابقة العزم الرابع
+        \[
+        \sum_k (k - nx)^4 p_k(x)
+        = nx(1-x)\bigl(1 + 3(n-2)x(1-x)\bigr) \leq n^2
+        \quad (n \geq 1)
+        \]
+        \emph{(انشر $k^4$ بالعامليات النازلة $k(k-1)\cdots$
+        واستعمل حيلة الاشتقاق في السؤال 2 مرتين
+        أخريين)}.
+  \item (فورونوفسكايا) لتكن $f$ من الصنف $C^2$ وليكن $x \in
+        \intcc{0}{1}$. وبكتابة $f(t) = f(x) + f'(x)(t-x) +
+        \frac{f''(x)}2(t-x)^2 + \eta(t)(t-x)^2$ مع $\eta$
+        محدودة و$\eta(t) \to 0$ حين $t \to x$، برهن على أن
+        \[
+        n\bigl(B_nf(x) - f(x)\bigr)
+        \xrightarrow[n\to\infty]{}
+        \frac{x(1-x)}{2}\,f''(x)
+        \]
+        \emph{(افصل مجموع $\eta$ عند $\abs{t - x} \leq
+        \delta$؛ وتحكّم في الجزء البعيد بالسؤال 23)}. ومن ثم
+        فإن خطأ السؤال 22 دقيق في الرتبة \emph{وفي}
+        الثابت: أي إن $B_n$ \emph{يتشبّع} عند $\frac1n$، مهما كانت
+        $f$ ملساء --- وقارِن بالنتيجة
+        \cref{exo:b2:funcseq:7}.
+  \item تركيب. بجملة واحدة لكل بند: (1) ماذا اشترت الإيجابية
+        وحدها (الجزآن الأول والثالث)؛ (2) وأين دخل تراص
+        الفترة $\intcc{0}{1}$ في كل جزء؛ (3) ولماذا تكفي ثلاث
+        دوال اختبار في مبرهنة كوروفكين؛ (4) وما المقايضة التي
+        يعقدها برنشتاين (معدل $n^{-1/2}$ متين من أجل $f$
+        الخشنة، لكن بسقف $\frac1n$ من أجل $f$ الملساء)، وأي
+        فصل من هذا الكتاب سيلعب اللعبة نفسها بكثيرات
+        الحدود المثلثية.
+\end{enumerate}
+\end{problem}

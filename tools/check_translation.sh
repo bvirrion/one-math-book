@@ -101,10 +101,16 @@ check_year_lang() {
   # ---- 7. Devanagari prose hygiene. Gates 5 and 6 are Latin-oriented and
   #         score nothing on Hindi: a Hindi tree can pass every gate above
   #         and still be the raw machine translation it was in July 2026.
-  #         See tools/check_hindi_prose.py for the failure classes.
+  #         The same holds for Arabic, which additionally hides bidi control
+  #         characters and Arabic presentation forms that no Latin gate sees.
+  #         See tools/check_hindi_prose.py and tools/check_arabic_prose.py.
   if [ "$lang" = "hi" ]; then
     python3 tools/check_hindi_prose.py --quiet "$tdir" "$tsdir" \
       || bad "Devanagari prose hygiene" "$year/$lang"
+  fi
+  if [ "$lang" = "ar" ]; then
+    python3 tools/check_arabic_prose.py --quiet "$tdir" "$tsdir" \
+      || bad "Arabic prose hygiene" "$year/$lang"
   fi
 }
 
@@ -114,7 +120,7 @@ else
   for year in grade-1 grade-2 grade-3 grade-4 grade-5 grade-6 grade-7 \
               grade-8 grade-9 grade-10 grade-11 grade-12 \
               bachelor-1 bachelor-2 bachelor-3; do
-    for lang in fr nl es pt hi; do
+    for lang in fr nl es pt hi ar; do
       # Skip years that have no translation directory yet.
       [ -d "parts/$year/$lang" ] || continue
       check_year_lang "$year" "$lang"

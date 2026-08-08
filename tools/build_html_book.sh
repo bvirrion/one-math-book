@@ -66,4 +66,15 @@ fi
 python3 tools/build_html_toc.py \
     --entry "$ENTRY" \
     --book "$BOOK" --languages "$LANGS" --out "$OUT"
+
+# Printed-page maps, only when the PDFs have been built (latexmk leaves
+# the .aux/.toc files this reads in build/).
+if [ -f "build/${ENTRY%.tex}.aux" ]; then
+    python3 tools/build_html_pages.py \
+        --entry "$ENTRY" \
+        --book "$BOOK" --languages "$LANGS" --out "$OUT"
+else
+    echo "notice: build/${ENTRY%.tex}.aux missing — run latexmk first;" \
+         "page maps NOT updated"
+fi
 echo "ALL DONE: $n chapters"

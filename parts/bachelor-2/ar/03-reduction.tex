@@ -1,0 +1,945 @@
+\chapter{اختزال التشاكلات الذاتية}\label{ch:b2:reduction}
+
+لفهم تشاكل ذاتي، ابحث عن الاتجاهات التي يكتفي بتمديدها.
+ويبني هذا الفصل الآلة --- \omterm{def:b2:reduction:eigen}{القيم الذاتية}، وكثيري الحدود المميز
+والأدنى، والمبرهنة المساعدة لتفكيك النواة --- ويجني ثمارها:
+محكّات التقطير والتثليث، ومبرهنة كايلي--هاملتون، \omterm{thm:b2:reduction:dunford}{وتفكيك دنفورد}،
+وحساب القوى والأسّيات الذي سيتغذّى عليه
+\cref{ch:b2:diffeq}. وفي كل ما يلي، $E$ فضاء متجهي منتهي
+البعد على $K$ (مع $K = \R$ أو $\C$) و$u \in
+\mathcal{L}(E)$، $n = \dim E$.
+
+\section{القيم الذاتية والمتجهات الذاتية}
+
+\begin{definition}\label{def:b2:reduction:eigen}
+يكون $\lambda \in K$ \emph{قيمة ذاتية}\index{قيمة ذاتية} للتشاكل $u$
+إذا كان $u(x) = \lambda x$ من أجل $x \neq 0$ ما (وتُسمى
+\emph{متجهة ذاتية})؛ و\emph{الفضاء الذاتي} هو $E_\lambda(u) =
+\ker(u - \lambda\,\mathrm{id})$. ومجموعة القيم الذاتية هي
+\emph{الطيف}\index{طيف} $\operatorname{Sp}(u)$. ويكون الفضاء الجزئي $F$
+\emph{مستقرًا} إذا كان $u(F) \subseteq F$؛ والفضاءات الذاتية مستقرة،
+وتسمح الفضاءات الجزئية المستقرة بتعريف تشاكلات ذاتية مستحثّة $u|_F$.
+\end{definition}
+
+\begin{theorem}[استقلال الفضاءات الذاتية]\label{thm:b2:reduction:independence}
+\omterm{def:b2:reduction:eigen}{المتجهات الذاتية} المرافقة لقيم ذاتية مختلفة مثنى مثنى تشكّل
+عائلة حرة؛ وبعبارة مكافئة، يكون مجموع \omterm{def:b2:reduction:eigen}{الفضاءات الذاتية}
+$E_{\lambda_1} + \dots + E_{\lambda_r}$ (مع $\lambda_i$ مختلفة) مجموعًا
+مباشرًا. وعلى الخصوص لا يملك $u$ أكثر من $n$ \omterm{def:b2:reduction:eigen}{قيمة ذاتية}.
+\end{theorem}
+
+\begin{proof}
+بالتراجع على $r$. لنفترض $x_1 + \dots + x_r = 0$ مع $x_i \in
+E_{\lambda_i}$، والقول معلوم من أجل $r - 1$. نطبّق $u$ ونطرح
+$\lambda_r$ مضروبًا في العلاقة:
+\[
+\sum_{i=1}^{r-1} (\lambda_i - \lambda_r)\, x_i = 0 ,
+\]
+فبالتراجع يكون كل $(\lambda_i - \lambda_r)x_i = 0$، أي $x_i =
+0$ من أجل $i < r$، ثم $x_r = 0$. وأما المجاميع المباشرة لفضاءات غير معدومة في
+فضاء بعده $n$ فلا تحتوي أكثر من $n$ حدًّا.
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=0.9, >={Stealth}]
+  \draw[gray!40] (-2.6,-2.2) grid (2.6,2.2);
+  \draw[->] (-2.6,0) -- (2.7,0) node[below, font=\small] {$x$};
+  \draw[->] (0,-2.2) -- (0,2.3) node[left, font=\small] {$y$};
+  \draw[omDef, very thick, ->] (0,0) -- (0.7,0.7)
+    node[above, font=\small] {$v_1$};
+  \draw[omDef, thick, ->, dashed] (0,0) -- (2.1,2.1)
+    node[above right, font=\small] {$Av_1 = 3v_1$};
+  \draw[omThm, very thick, ->] (0,0) -- (0.9,-0.9)
+    node[below, font=\small] {$v_2$};
+  \draw[omThm, thick, ->, dashed] (0,0) -- (0.9,-0.9);
+  \draw[omProp, very thick, ->] (0,0) -- (1,0)
+    node[below right, font=\small] {$e_1$};
+  \draw[omProp, thick, ->, dashed] (0,0) -- (2,1)
+    node[right, font=\small] {$Ae_1$};
+\end{tikzpicture}
+
+{\small المصفوفة $A = \begin{psmallmatrix}2 & 1\\ 1 &
+2\end{psmallmatrix}$ وهي تؤثّر على المستوي: تُزاح المتجهة
+العامة $e_1$ عن مستقيمها، أما الاتجاهان الذاتيان $v_1 =
+(1,1)$ و$v_2 = (1,-1)$ فيكتفي التأثير بتمديدهما --- بالمعاملين $3$ و
+$1$ (ومنه $Av_2 = v_2$: فالصورة المنقّطة تنطبق على $v_2$).
+والتقطير هو الانتقال إلى الأساس $(v_1, v_2)$، حيث تصير
+$A$ المصفوفةَ $\operatorname{diag}(3, 1)$.}
+\end{omfigure}
+
+\begin{definition}[كثير الحدود المميز]\label{def:b2:reduction:charpoly}
+$\chi_u(X) = \det(X\,\mathrm{id} - u)$\index{كثير الحدود
+المميز} --- ويُحسب في أي أساس على صورة $\det(XI_n - A)$، وهو كثير حدود
+موحَّد درجته $n$، لا يتغير بالتشابه
+(\cref{thm:b2:linalg:detrules}). وجذوره في $K$ هي بالضبط
+\omterm{def:b2:reduction:eigen}{القيم الذاتية} ($\lambda$ \omterm{def:b2:reduction:eigen}{قيمة ذاتية} $\iff u - \lambda\,\mathrm{id}$
+غير متباين $\iff \chi_u(\lambda) = 0$)، ويكون
+\[
+\chi_u(X) = X^n - (\operatorname{tr} u)\, X^{n-1} + \dots +
+(-1)^n \det u .
+\]
+و\emph{التضاعف الجبري}\index{تضاعف جبري}
+$m_\lambda$ \omterm{def:b2:reduction:eigen}{لقيمة ذاتية} هو
+تضاعفها بوصفها جذرًا لكثير الحدود $\chi_u$؛ و\emph{التضاعف
+الهندسي}\index{تضاعف هندسي} هو $\dim E_\lambda$، ويكون $1 \leq \dim E_\lambda \leq
+m_\lambda$.
+\end{definition}
+
+\begin{proof}[برهان الوقائع المذكورة]
+أما أقوال المعاملات: فننشر $\det(XI - A)$ بصيغة
+التبديلات؛ فتسهم التبديلة المطابقة بالمقدار $\prod_i (X - a_{ii})
+= X^n - (\sum a_{ii})X^{n-1} + \dots$، وكل تبديلة أخرى
+تثبّت $n - 2$ موضعًا قطريًا على الأكثر، فتسهم بدرجة $\leq
+n - 2$: ومنه فالمعاملان الأعليان كما ذُكر؛ ويعطي $X = 0$
+الحدَّ الثابت $\det(-A) = (-1)^n\det A$.
+
+الهندسي $\leq$ الجبري: ليكن $d = \dim E_\lambda$ ونُتمّ أساسًا
+للفضاء $E_\lambda$ إلى أساس للفضاء $E$؛ فمصفوفة $u$ مثلثية
+عليا بالكتل وكتلتها العليا اليسرى $\lambda I_d$، ومنه $\chi_u(X) =
+(X - \lambda)^d\, \chi_{\text{الكتلة السفلى}}(X)$: أي إن تضاعف
+$\lambda$ يساوي $d$ على الأقل.
+\end{proof}
+
+\begin{example}[كثير الحدود $\chi$ نفسه، وهندستان مختلفتان]\label{ex:b2:reduction:samechi}
+المصفوفتان
+\[
+\begin{pmatrix}2 & 0\\ 0 & 2\end{pmatrix}
+\qquad\text{و}\qquad
+\begin{pmatrix}2 & 1\\ 0 & 2\end{pmatrix}
+\]
+تشتركان في \omterm{def:b2:reduction:charpoly}{كثير الحدود المميز} $(X - 2)^2$، وفي الأثر، وفي
+\omterm{def:b2:linalg:det}{المحدد}، وفي \omterm{def:b2:reduction:eigen}{الطيف} --- ومع ذلك فهما غير متشابهتين: فبعد $E_2$
+في الأولى $2$ (أي \omterm{def:b2:reduction:charpoly}{التضاعف الهندسي} $2$)، وفي الثانية
+$1$. \omterm{def:b2:reduction:charpoly}{فكثير الحدود المميز} لا يرى إلا التضاعفات
+الجبرية؛ وأبعاد \omterm{def:b2:reduction:eigen}{الفضاءات الذاتية} هي اللامتغيّر الأدقّ،
+\omterm{def:b2:reduction:polyu}{وكثير الحدود الأدنى} هو الحَكَم ($X - 2$
+في مقابل $(X - 2)^2$). والعبرة في كل مناقشات
+قابلية التقطير: يضع $\chi$ قائمةً بالمرشحين، لكن النوى هي التي
+تُدلي بالأصوات.
+\end{example}
+
+\begin{definition}[قابل للتقطير، قابل للتثليث]\label{def:b2:reduction:diag}
+يكون $u$ \emph{قابلًا للتقطير}\index{قابل للتقطير} إذا كان للفضاء $E$
+أساس من \omterm{def:b2:reduction:eigen}{المتجهات الذاتية} (وبلغة المصفوفات: مشابه لمصفوفة قطرية)؛
+ويكون \emph{قابلًا للتثليث}\index{قابل للتثليث} إذا كانت مصفوفته في
+أساس ما مثلثية عليا.
+\end{definition}
+
+\begin{theorem}[محكّات قابلية التقطير]\label{thm:b2:reduction:diagcrit}
+الأقوال التالية متكافئة:
+\begin{enumerate}
+  \item $u$ \omterm{def:b2:reduction:diag}{قابل للتقطير}؛
+  \item $E = \bigoplus_{\lambda \in \operatorname{Sp} u} E_\lambda$؛
+  \item ينحلّ $\chi_u$ على $K$ ويكون $\dim E_\lambda = m_\lambda$
+        من أجل كل \omterm{def:b2:reduction:eigen}{قيمة ذاتية}؛
+  \item (شرط كافٍ لا لازم) لكثير الحدود $\chi_u$ عدد $n$ من الجذور المختلفة
+        في $K$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1 $\iff$ 2): يُرتَّب أساس من \omterm{def:b2:reduction:eigen}{المتجهات الذاتية} إلى أسس للفضاءات
+$E_\lambda$، وعكسيًا يعطي تلاصق أسس الحدود المباشرة
+أساسًا للفضاء $E$
+(فالمبرهنة \cref{thm:b2:reduction:independence} تجعل المجموع مباشرًا؛ ويجعله تساوي
+الأبعاد الفضاءَ كله).
+
+(2 $\iff$ 3): في الأساس القطري، ينحلّ $\chi_u = \prod (X -
+\lambda)^{\dim E_\lambda}$ بتضاعفات متوافقة.
+وعكسيًا، لنفترض أن $\chi_u$ ينحلّ مع $\dim E_\lambda =
+m_\lambda$ في كل مكان؛ عندئذٍ يكون بعد المجموع المباشر للفضاءات الذاتية
+(وهو مباشر حسب \cref{thm:b2:reduction:independence}) يساوي
+\[
+\sum_{\lambda}\dim E_\lambda = \sum_{\lambda} m_\lambda =
+\deg\chi_u = n ,
+\]
+والمساواة الوسطى لأن درجة كثير حدود منحلّ هي مجموع
+تضاعفات جذوره: ومنه فالمجموع هو $E$ كله. ولاحظ
+أين عملت كل فرضية: فالانحلال ملأ الدرجة،
+وتساوي التضاعفات ملأ الأبعاد.
+
+(4 $\Rightarrow$ 1): تعطي $n$ \omterm{def:b2:reduction:eigen}{قيمة ذاتية} مختلفة عدد $n$ من \omterm{def:b2:reduction:eigen}{المتجهات
+الذاتية} المستقلة (\cref{thm:b2:reduction:independence}): أي أساسًا.
+\end{proof}
+
+\begin{method}[كيف نقرّر قابلية التقطير]\label{met:b2:reduction:decide}
+عمليًا، اختبر بهذا الترتيب --- فقد تُنهي كل خطوة
+المهمة. (1) هل يقدّم نفسه كثير حدود مُعدِم بجذور منحلّة
+بسيطة ($u^2 = \mathrm{id}$، $u^2 = u$، $u^k =
+\mathrm{id}$)؟ إذا كان الجواب نعم: فهو \omterm{def:b2:reduction:diag}{قابل للتقطير} بلا حساب
+(\cref{cor:b2:reduction:minpolycrit} أدناه). (2) احسب
+$\chi_u$؛ فإذا كان له $n$ جذرًا مختلفًا في $K$: فهو \omterm{def:b2:reduction:diag}{قابل للتقطير}
+(\cref{thm:b2:reduction:diagcrit}~(4)). (3) وإلا، ومن أجل كل
+جذر متعدد $\lambda$ فقط، قارن $\dim\ker(u -
+\lambda\,\mathrm{id})$ بالتضاعف $m_\lambda$: فأي
+نقص يقتل قابلية التقطير؛ والتساوي في كل مكان يبرهن عليها.
+ولا تحسب أبدًا \omterm{def:b2:reduction:eigen}{الفضاءات الذاتية} للجذور البسيطة (فبعدها
+مفروض ويساوي $1$)، ولا تُثلّث لمجرد أن تقرّر.
+\end{method}
+
+\begin{example}[التقطير في العمل]\label{ex:b2:reduction:diagwork}
+لتكن $A = I + J = \begin{psmallmatrix}2 & 1 & 1\\ 1 & 2 & 1\\ 1 & 1 &
+2\end{psmallmatrix}$، حيث $J$ المصفوفة التي كل عناصرها واحد: فمن
+$\operatorname{Sp}(J) = \{3, 0\}$
+(\cref{ex:b2:linalg:onesmatrix})، نجد $\operatorname{Sp}(A) = \{4,
+1\}$، وبفضاءين ذاتيين هما $\R(1,1,1)$ والمستوي $\{x + y + z =
+0\}$: وبأبعاد $1 + 2 = 3$، فهي قابلة للتقطير
+(\cref{thm:b2:reduction:diagcrit}~(2)). والقوى بلا أي
+مصفوفة تغيير أساس: فمع $\Pi = J/3$ الإسقاط على
+$\R(1,1,1)$،
+\[
+A = 4\,\Pi + 1\cdot(I - \Pi)
+\quad\Longrightarrow\quad
+A^k = 4^k\,\Pi + (I - \Pi)
+= \frac{4^k - 1}{3}\,J + I .
+\]
+(وللتحقق من $k = 1$: $\frac{4-1}3 J + I = A$.) والفكرة الختامية:
+حين تكون \omterm{def:b2:reduction:eigen}{الفضاءات الذاتية} ظاهرة، تحسب \emph{الإسقاطات} الطيفية
+القوى أسرع مما ستفعله $PDP^{-1}$ يومًا --- والصيغة
+تُظهر الحركية: فينمو $A^k$ مثل $4^k$ على امتداد
+$(1,1,1)$ ويبقى ثابتًا على المستوي المتعامد.
+\end{example}
+
+\begin{theorem}[التثليث]\label{thm:b2:reduction:trigonalization}
+يكون $u$ \omterm{def:b2:reduction:diag}{قابلًا للتثليث} على $K$ إذا وفقط إذا انحلّ $\chi_u$ على
+$K$. وعلى الخصوص فإن كل تشاكل ذاتي لفضاء متجهي على $\C$
+\omterm{def:b2:reduction:diag}{قابل للتثليث}.\index{تثليث}
+\end{theorem}
+
+\begin{proof}
+($\Rightarrow$) \omterm{def:b2:reduction:charpoly}{كثير الحدود المميز} لمصفوفة مثلثية هو
+$\prod(X - t_{ii})$: وهو منحلّ.
+
+($\Leftarrow$) بالتراجع على $n$. بما أن $\chi_u$ ينحلّ، فله
+جذر $\lambda$: فنختار \omterm{def:b2:reduction:eigen}{متجهة ذاتية} $e_1$. وفي أساس يبدأ بالمتجهة
+$e_1$، تكون المصفوفة $\begin{pmatrix} \lambda & \ast\\ 0 &
+B\end{pmatrix}$، ويكون $\chi_u = (X - \lambda)\chi_B$: أي إن $\chi_B$ ينحلّ
+هو أيضًا. وبفرضية التراجع مطبَّقة على المصفوفة $(n-1) \times
+(n-1)$ ذات القياس $B$، توجد $Q$ قابلة للقلب تجعل $Q^{-1}BQ$ مثلثية
+عليا؛ وبمقارنة المصفوفة كلها بالمصفوفة $\begin{pmatrix}1 & 0\\
+0 & Q\end{pmatrix}$ تصير مثلثية.
+\end{proof}
+
+\begin{example}[تثليث يدوي]\label{ex:b2:reduction:trigwork}
+$B = \begin{pmatrix}3 & -1\\ 1 & 1\end{pmatrix}$: $\chi_B = X^2 -
+4X + 4 = (X - 2)^2$، و$\ker(B - 2I) =
+\ker\begin{psmallmatrix}1 & -1\\ 1 & -1\end{psmallmatrix}$ هو
+المستقيم المولَّد بالمتجهة $e_1' = (1, 1)$: أي \omterm{def:b2:reduction:eigen}{قيمة ذاتية} واحدة، وفضاء ذاتي
+ذو بعد واحد --- فهي غير قابلة للتقطير، لكنها
+قابلة للتثليث (\cref{thm:b2:reduction:trigonalization}).
+نُتمّ الأساس بالمتجهة $e_2' = (1, 0)$ ونحسب:
+\[
+u(e_1') = (2, 2) = 2e_1',
+\qquad
+u(e_2') = (3, 1) = 1\cdot e_1' + 2\, e_2' ,
+\]
+ومنه تكون المصفوفة في الأساس $(e_1', e_2')$ هي $T =
+\begin{psmallmatrix}2 & 1\\ 0 & 2\end{psmallmatrix}$. والفكرة
+الختامية: كان قطر المصفوفة $T$ مفروضًا (فلا بد أن يكون العنصران
+القيمةَ الذاتية المضاعفة $2$)؛ ولم يتعلق بالاختيار $e_2'$
+إلا عنصر الزاوية، ويستطيع تغيير سلّم $e_2'$ أن يجعله
+أي قيمة غير معدومة --- فالعدد ``$1$'' العنيد ظلّ
+الجزء العديم القوى الذي سيعزله دنفورد.
+\end{example}
+
+\section{كثيرات حدود التشاكل الذاتي}
+
+\begin{definition}\label{def:b2:reduction:polyu}
+من أجل $P = \sum a_k X^k \in K[X]$، نضع $P(u) = \sum a_k u^k \in
+\mathcal{L}(E)$. والتطبيق $P \mapsto P(u)$ تشاكل جبور
+$K[X] \to \mathcal{L}(E)$ (\cref{def:b2:structures:algebra})؛
+ونواته $\{P : P(u) = 0\}$ \omterm{def:b2:structures:ideal}{مثالي} في $K[X]$، وهي غير معدومة (فالعائلة
+$(\mathrm{id}, u, \dots, u^{n^2})$ مرتبطة في الفضاء
+$n^2$ ذي البعد $\mathcal{L}(E)$)، ومن ثم فهي مولَّدة بكثير حدود موحَّد
+وحيد $\mu_u$: هو \emph{كثير الحدود
+الأدنى}\index{كثير الحدود الأدنى}
+(\cref{thm:b2:structures:principal}).
+\end{definition}
+
+\begin{proposition}\label{prop:b2:reduction:minpoly}
+\begin{enumerate}
+  \item $P(u) = 0 \iff \mu_u \mid P$؛ \omterm{def:b2:reduction:eigen}{والقيم الذاتية} للتشاكل $u$ جذورٌ
+        لكل كثير حدود مُعدِم، وجذور $\mu_u$
+        هي \emph{بالضبط} \omterm{def:b2:reduction:eigen}{القيم الذاتية}.
+  \item إذا كان $F$ مستقرًا، فإن $\mu_{u|_F} \mid \mu_u$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(1) قابلية القسمة هي تعريف المولّد. وإذا كان $u(x) =
+\lambda x$، $x \neq 0$، فإن $0 = P(u)(x) = P(\lambda)x$، ومنه
+$P(\lambda) = 0$: \omterm{def:b2:reduction:eigen}{فالقيم الذاتية} جذور لكثيرات الحدود المُعدِمة، وعلى
+الخصوص لكثير الحدود $\mu_u$. وعكسيًا، إذا كان $\lambda$ جذرًا، فإن $\mu_u =
+(X - \lambda)Q$ مع $Q(u) \neq 0$ (لأن درجة $\mu_u$ دنيا): فنختار
+$y$ بحيث $Q(u)(y) \neq 0$؛ عندئذٍ يُبرز $(u - \lambda)(Q(u)(y)) = \mu_u(u)(y)
+= 0$ \omterm{def:b2:reduction:eigen}{المتجهة الذاتية} $Q(u)(y)$.
+
+(2) $\mu_u(u|_F) = \mu_u(u)|_F = 0$، ثم نطبّق (1) على $u|_F$.
+\end{proof}
+
+\begin{example}[كثيرات حدود دنيا موجودة يدويًا]\label{ex:b2:reduction:minpolyhand}
+يُحسب \omterm{def:b2:reduction:polyu}{كثير الحدود الأدنى} باختبار الدرجات
+المتتالية. فمن أجل المصفوفة $J \in \mathcal{M}_3(\R)$ التي كل عناصرها واحد:
+$J \neq \lambda I$ (فالدرجة $1$ مستبعدة)، و$J^2 = 3J$، ومنه
+\[
+\mu_J = X^2 - 3X = X(X - 3) :
+\]
+وهو من الدرجة $2$، منحلّ، بجذور بسيطة --- فالمصفوفة $J$ قابلة للتقطير \omterm{def:b2:reduction:eigen}{بطيف}
+$\{0, 3\}$ (\cref{cor:b2:reduction:minpolycrit} أدناه)،
+وهذا يؤكد \cref{ex:b2:linalg:onesmatrix} دون أي
+\omterm{def:b2:linalg:det}{محدد}. ومن أجل مصفوفة التبادل $A$ في
+\cref{ex:b2:reduction:projectorswork}: يعطي $A \neq \pm I$ و$A^2
+= I$ أن $\mu_A = X^2 - 1$. وفي الحالتين النمط
+واحد: خمّن متطابقة من درجة صغيرة انطلاقًا من البنية
+(فالرتبة واحد تفرض $J^2 = (\operatorname{tr}J)\,J$؛ والتقابل الذاتي من الرتبة اثنين
+يفرض $A^2 = I$)، ثم تحقّق من أن لا قاسم فعلي
+يُعدم. فكثيرات الحدود الدنيا \emph{تُوجَد} عادةً، ولا تُحسب
+انطلاقًا من $\chi$.
+\end{example}
+
+\begin{theorem}[المبرهنة المساعدة لتفكيك النواة]\label{thm:b2:reduction:kernels}
+إذا كان $P = P_1 P_2 \cdots P_r$ والعوامل $P_i$ أولية فيما بينها مثنى مثنى،
+فإن\index{مبرهنة تفكيك النواة المساعدة}
+\[
+\ker P(u) = \ker P_1(u) \oplus \dots \oplus \ker P_r(u),
+\]
+وتكون الإسقاطات على الحدود كثيراتِ حدود في $u$.
+\end{theorem}
+
+\begin{proof}
+يكفي معالجة الحالة $r = 2$ ثم التراجع. بيزو في $K[X]$
+(\cref{thm:b2:structures:principal}): $U P_1 + V P_2 = 1$، ومنه من أجل
+كل $x$،
+\[
+x = \underbrace{U(u)P_1(u)(x)}_{=:\,x_2}
++ \underbrace{V(u)P_2(u)(x)}_{=:\,x_1}.
+\]
+فإذا كان $x \in \ker P(u)$: فإن $P_2(u)(x_2) = U(u)\,P(u)(x) = 0$ (لأن كثيرات الحدود
+في $u$ تتبادل)، ومنه $x_2 \in \ker P_2(u)$، وبالتناظر $x_1
+\in \ker P_1(u)$: فيملأ المجموع الفضاء $\ker P(u)$؛ ويقع الحدّان
+داخل $\ker P(u)$ ($P_i \mid P$). وأما كون المجموع مباشرًا: فيعطي $x \in \ker P_1(u)
+\cap \ker P_2(u)$ أن $x = U(u)P_1(u)x + V(u)P_2(u)x = 0$. وتُبرز
+صيغتا $x_1, x_2$ الإسقاطين على صورة $V(u)P_2(u)$ و
+$U(u)P_1(u)$.
+\end{proof}
+
+\begin{example}[المبرهنة المساعدة للنواة بإسقاطات صريحة]\label{ex:b2:reduction:projectorswork}
+ليكن $A = \begin{psmallmatrix}0 & 1 & 0\\ 1 & 0 & 0\\ 0 & 0 &
+1\end{psmallmatrix}$ (بتبادل الإحداثيتين الأوليين). عندئذٍ $A^2
+= I$: فكثير الحدود $X^2 - 1 = (X - 1)(X + 1)$ يُعدم $A$،
+وعاملاه أوليان فيما بينهما، وبيزو صريح:
+\[
+\frac{1}{2}(X + 1) - \frac12(X - 1) = 1 .
+\]
+واتّباعًا لبرهان \cref{thm:b2:reduction:kernels}، يكون الإسقاطان
+على $\ker(A - I)$ و$\ker(A + I)$ هما كثيرا الحدود في $A$
+\[
+\pi_+ = \frac{A + I}{2} = \frac12\begin{pmatrix}
+1 & 1 & 0\\ 1 & 1 & 0\\ 0 & 0 & 2\end{pmatrix},
+\qquad
+\pi_- = \frac{I - A}{2} = \frac12\begin{pmatrix}
+1 & -1 & 0\\ -1 & 1 & 0\\ 0 & 0 & 0\end{pmatrix}.
+\]
+وللتحقق: $\pi_+ + \pi_- = I$، $\pi_+\pi_- = 0$، $\pi_\pm^2 =
+\pi_\pm$، والصورتان هما المستوي $\{x = y\}$ (المتجهات
+المتماثلة، \omterm{def:b2:reduction:eigen}{بالقيمة الذاتية} $1$) والمستقيم $\R(1, -1, 0)$
+(ضدّ المتماثلة، \omterm{def:b2:reduction:eigen}{بالقيمة الذاتية} $-1$). فالمبرهنة المساعدة للنواة ليست
+قولًا في الوجود: بل إن معاملات بيزو \emph{هي}
+صيغتا الإسقاطين.
+\end{example}
+
+\begin{example}[الإسقاطات تحسب الأسّي أيضًا]\label{ex:b2:reduction:expprojectors}
+مصفوفة التبادل نفسها، وأرباح إضافية. فبما أن $A = \pi_+ -
+\pi_-$ بإسقاطين متعامدين بالمعنى الجبري
+($\pi_+\pi_- = 0$)، فإن كل قوة تخضع للعلاقة $A^k = \pi_+ +
+(-1)^k\pi_-$، وتتجمّع المتسلسلة الأسّية حسب الإسقاطين:
+\[
+\eu^{tA} = \sum_k \frac{t^k}{k!}\bigl(\pi_+ +
+(-1)^k\pi_-\bigr)
+= \eu^{t}\,\pi_+ + \eu^{-t}\,\pi_- =
+\begin{pmatrix}
+\cosh t & \sinh t & 0\\
+\sinh t & \cosh t & 0\\
+0 & 0 & \eu^{t}
+\end{pmatrix}.
+\]
+(وللتحقق من $t = 0$: نجد المطابق؛ والمشتق عند $0$: $A$.) فالتفكيك
+الذاتي يحوّل متسلسلة مصفوفية إلى متسلسلتين عدديتين ---
+وهي الآلية نفسها التي سيُشغّلها \cref{ch:b2:diffeq} على كل
+جملة قابلة للتقطير، والسبب في أن الدوال الزائدية تحكم
+الاقترانات المتماثلة.
+\end{example}
+
+\begin{corollary}[قابلية التقطير بكثير الحدود الأدنى]\label{cor:b2:reduction:minpolycrit}
+يكون $u$ \omterm{def:b2:reduction:diag}{قابلًا للتقطير} $\iff$ انحلّ $\mu_u$ على $K$ بجذور
+\emph{بسيطة} $\iff$ انحلّ كثير حدود مُعدِم ما للتشاكل $u$
+بجذور بسيطة.
+\end{corollary}
+
+\begin{proof}
+إذا كان $P(u) = 0$ مع $P = \prod_{i}(X - \lambda_i)$ (وقيم $\lambda_i$ مختلفة)، فإن المبرهنة المساعدة تعطي $E = \ker P(u) = \bigoplus_i \ker(u -
+\lambda_i)$: أي مجموعًا مباشرًا لفضاءات ذاتية، ومنه فإن $u$ \omterm{def:b2:reduction:diag}{قابل للتقطير}
+(\cref{thm:b2:reduction:diagcrit}). وعكسيًا، يُعدم كثير الحدود $\prod_{\lambda \in \operatorname{Sp}u}(X -
+\lambda)$ كلَّ تشاكل $u$ \omterm{def:b2:reduction:diag}{قابل للتقطير} (فهو يُعدم كل فضاء ذاتي)، وهو ينحلّ بجذور
+بسيطة؛ ويقسمه $\mu_u$ مع اشتراكهما في الجذور نفسها
+(\cref{prop:b2:reduction:minpoly}): ومنه فإن $\mu_u$ هو ذلك الجداء بالضبط.
+\end{proof}
+
+\begin{example}\label{ex:b2:reduction:projections}
+تحقق الإسقاطات $p^2 = p$: فهي مُعدَمة بكثير الحدود $X(X-1)$، المنحلّ بجذور
+بسيطة --- ومن ثم فهي قابلة للتقطير \omterm{def:b2:reduction:eigen}{بطيف} $\subseteq \{0, 1\}$، ويكون $E =
+\ker p \oplus \ker(p - \mathrm{id})$: أي إن تحليل السنة الأولى الهندسي
+قد أُعيد برهانه في سطر واحد. أما التناظرات (مع $s^2 = \mathrm{id}$،
+والمُعدِم $X^2 - 1$): فهي قابلة للتقطير حين $\operatorname{char} K
+\neq 2$، وطيفها $\subseteq \{\pm 1\}$. وأما تشاكل ذاتي يحقق $u^3 =
+u^2$ و$u^2 \neq u$: فهو مُعدَم بكثير الحدود $X^2(X - 1)$، و\emph{ليس}
+\omterm{def:b2:reduction:diag}{قابلًا للتقطير} بالضرورة --- ويكشف المحك ذلك (فلا بد من اختبار الجذر
+المضاعف $0$: وهو \omterm{def:b2:reduction:diag}{قابل للتقطير} إذا وفقط إذا كان أيضًا $\ker u^2 = \ker
+u$).
+\end{example}
+
+\begin{example}[الحقل هو الذي يقرّر: دوران في $\R^3$]\label{ex:b2:reduction:rotation3d}
+ليكن $R$ ربع دورة حول المحور $z$:
+\[
+R = \begin{pmatrix}
+0 & -1 & 0\\
+1 & 0 & 0\\
+0 & 0 & 1
+\end{pmatrix},
+\qquad
+\chi_R = (X - 1)(X^2 + 1).
+\]
+على $\R$: \omterm{def:b2:reduction:eigen}{القيمة الذاتية} الوحيدة هي $1$، وفضاؤها الذاتي هو المحور
+$\R e_3$ --- أي مستقيم واحد من المتجهات الثابتة، ولا مزيد من
+الاختزال: فالتشاكل $R$ غير \omterm{def:b2:reduction:diag}{قابل للتقطير} ولا للتثليث في
+$\mathcal{M}_3(\R)$ (إذ إن $\chi_R$ لا ينحلّ). وعلى $\C$: ثلاث
+قيم ذاتية مختلفة $1, \iu, -\iu$، ومن ثم فإن $R$ \omterm{def:b2:reduction:diag}{قابل للتقطير}،
+بمتجهات ذاتية $e_3$ و$e_1 \mp \iu e_2$. وقد كانت الهندسة
+مسموعة في \omterm{def:b2:structures:algebra}{الجبر}: فليس للدورانات في المستوي أي اتجاه
+لا متغيّر حقيقي، وتخزّن القيمتان الذاتيتان العقديتان $\pm\iu$ ذواتا
+الطويلة $1$ الزاويةَ ($\pm\frac\pi2$) التي لا تستطيع المصفوفة
+الحقيقية أن تعبّر عنها إلا بخلط الإحداثيات.
+\end{example}
+
+\begin{example}[الأدنى في مقابل المميز]\label{ex:b2:reduction:minvschar}
+من أجل $D = \operatorname{diag}(2, 2, 3)$: $\chi_D = (X - 2)^2(X -
+3)$ لكن $\mu_D = (X - 2)(X - 3)$، لأن $(D - 2I)(D - 3I) = 0$
+(بالتحقق على الأساس القانوني) في حين أن أيًا من العاملين وحده لا يُعدم
+$D$. ومن أجل كتلة الإزاحة $N = \begin{psmallmatrix}0 & 1\\ 0 &
+0\end{psmallmatrix} \oplus (3)$، أي $N' =
+\begin{psmallmatrix}0 & 1 & 0\\ 0 & 0 & 0\\ 0 & 0 &
+3\end{psmallmatrix}$: نجد $\chi_{N'} = X^2(X - 3)$ \emph{و}
+$\mu_{N'} = X^2(X - 3)$ --- فالجذر المضاعف مطلوب فعلًا
+لأن $N'$ غير \omterm{def:b2:reduction:diag}{قابل للتقطير} على جانب $\ker$ ($N'e_2 =
+e_1 \neq 0$). قاعدة عملية: يشترك $\mu$ و$\chi$ في الجذور
+(\cref{prop:b2:reduction:minpoly})؛ ويقيس التضاعف في $\mu$
+حجم أكبر كتلة عديمة القوى، والتضاعف في
+$\chi$ البعدَ الكلي للفضاء المميز.
+\end{example}
+
+\begin{theorem}[كايلي--هاملتون]\label{thm:b2:reduction:cayleyhamilton}
+$\chi_u(u) = 0$؛ ومن ثم $\mu_u \mid \chi_u$، ويكون $\deg \mu_u
+\leq n$.\index{مبرهنة كايلي--هاملتون}
+\end{theorem}
+
+\begin{proof}
+نثبّت $x \neq 0$ وليكن $d$ أعظميًا بحيث تكون $(x, u(x), \dots,
+u^{d-1}(x))$ حرة؛ ونكتب
+\[
+u^d(x) = -a_0 x - a_1 u(x) - \dots - a_{d-1}u^{d-1}(x),
+\]
+ونضع $P_x = X^d + a_{d-1}X^{d-1} + \dots + a_0$، ومنه $P_x(u)(x) =
+0$. ونُتمّ العائلة الحرة إلى أساس للفضاء $E$: فتكون للتشاكل $u$ عليه
+صورةٌ كتلية $\begin{pmatrix} C & \ast\\ 0 & D\end{pmatrix}$ حيث $C$
+هي المصفوفة المرافقة لكثير الحدود $P_x$، وكثير حدودها المميز هو
+$P_x$ (بنشر $\det(XI - C)$ على العمود الأول، وبالتراجع على
+$d$). ومنه $\chi_u = P_x \cdot \chi_D$، ويكون
+\[
+\chi_u(u)(x) = \chi_D(u)\bigl(P_x(u)(x)\bigr) = 0 .
+\]
+والحجة صالحة من أجل كل $x$: أي $\chi_u(u) = 0$.
+\end{proof}
+
+\begin{example}[كايلي--هاملتون في العمل]\label{ex:b2:reduction:chwork}
+$A = \begin{pmatrix} 1 & 2\\ 3 & 4\end{pmatrix}$: $\chi_A = X^2 -
+5X - 2$، ومنه $A^2 = 5A + 2I$. فتنهار كل قوة للمصفوفة $A$ إلى
+تركيب من $I$ و$A$:
+\[
+A^4 = (5A + 2I)^2 = 25A^2 + 20A + 4I = 145A + 54I =
+\begin{pmatrix} 199 & 290\\ 435 & 634\end{pmatrix},
+\]
+ويأتي المقلوب مجانًا: فالعلاقة $A(A - 5I) = 2I$ تعطي
+\[
+A^{-1} = \tfrac12(A - 5I)
+= \begin{pmatrix} -2 & 1\\ 3/2 & -1/2\end{pmatrix}.
+\]
+والفكرة الختامية: تضغط مبرهنة كايلي--هاملتون الجبرَ كله
+$K[A]$ في $\operatorname{Vect}(I, A, \dots, A^{n-1})$ ---
+أي $\dim K[A] = \deg\mu_A \leq n$، مهما كبرت القوى التي تحتاج إليها.
+\end{example}
+
+\begin{remark}[مزالق شائعة]\label{rem:b2:reduction:pitfalls}
+(1) \omterm{def:b2:reduction:eigen}{القيم الذاتية} لا تُجمَع: \omterm{def:b2:reduction:eigen}{فالطيف} $\operatorname{Sp}(A + B)$ ليس
+$\operatorname{Sp}A + \operatorname{Sp}B$، ولا يلزم أن يكون مجموع مصفوفتين قابلتين
+للتقطير \omterm{def:b2:reduction:diag}{قابلًا للتقطير} --- فالمصفوفة $\begin{psmallmatrix}1 & 1\\ 0 & 0\end{psmallmatrix} +
+\begin{psmallmatrix}0 & 0\\ 0 & 1\end{psmallmatrix} =
+\begin{psmallmatrix}1 & 1\\ 0 & 1\end{psmallmatrix}$ مجموع
+مصفوفتين قابلتين للتقطير (لكل منهما قيم ذاتية مختلفة)
+وهو غير \omterm{def:b2:reduction:diag}{قابل للتقطير}؛ ولا تُحسن السلوك إلا العائلات
+\emph{المتبادلة} (\cref{exo:b2:reduction:9}). (2) قولُ ``ينحلّ $\chi_u$'' فرضية
+عن \emph{الحقل}: فللدوران المستوي $\chi =
+X^2 - 2\cos\theta\,X + 1$، وهو منحلّ على $\C$ لا على $\R$ ---
+فهو \omterm{def:b2:reduction:diag}{قابل للتقطير} في $\mathcal{M}_2(\C)$، وغير \omterm{def:b2:reduction:diag}{قابل للتثليث} في
+$\mathcal{M}_2(\R)$. (3) تسير المتراجحة من الهندسي $\leq$
+الجبري، لا العكس أبدًا؛ واختبار $\dim E_\lambda \geq
+1$ وحده لا يبرهن على شيء في قابلية التقطير. (4) $\mu_u$ ليس
+$\chi_u$: وتتحقق المساواة بالضبط حين تكون لكل \omterm{def:b2:reduction:eigen}{قيمة ذاتية}
+سلسلةُ كتل واحدة (مثل المصفوفات المرافقة، وهي موضوع مسألة نهاية
+الأسبوع في هذا الفصل)؛ واستعمال $\chi$ حيث يلزم $\mu$ يضخّم
+كل حساب للقوى. (5) الجزآن $d$ و$\nu$ عند دنفورد
+كثيرا حدود في $u$ --- فالتفكيك $u = d' + \nu'$ بالخواص
+الصحيحة لكن مع $d'\nu' \neq \nu'd'$ \emph{ليس} \omterm{thm:b2:reduction:dunford}{تفكيك دنفورد}
+وليس وحيدًا أبدًا.
+\end{remark}
+
+\begin{remark}[أين يُستعمَل هذا الفصل]
+الاختزال حصان عمل بقية الكتاب: فقوى المصفوفات
+وأسّياتها تُدير الجمل التفاضلية الخطية في
+\cref{ch:b2:diffeq}؛ والمبرهنة الطيفية في \cref{ch:b2:quadratic}
+هي التقطير وقد صار متعامدًا؛ وتعيد الدوال المولّدة
+(\cref{ch:b2:genfun}) استنباط مقاربات التراجع في مسألة نهاية
+الأسبوع في هذا الفصل تحليليًا. وفي مجلد السنة الثالثة يجري
+البرنامج نفسه في البعد غير المنتهي: النظرية الطيفية للمؤثرات
+المتراصة ذاتية المرافق، حيث تحلّ متتاليات \omterm{def:b2:reduction:eigen}{القيم الذاتية} محلّ
+الأطياف المنتهية، ونظرية بيرون--فروبينيوس للمصفوفات الموجبة،
+التي تشرح \emph{لماذا} تكون \omterm{def:b2:reduction:eigen}{القيم الذاتية} المهيمنة في مسائل
+العدّ موجبة وبسيطة.
+\end{remark}
+
+\section{عديمات القوى وتفكيك دنفورد}
+
+\begin{proposition}[التشاكلات الذاتية عديمة القوى]\label{prop:b2:reduction:nilpotent}
+من أجل $u$ مع $\chi_u$ منحلّ، تتكافأ الأقوال التالية: $u^n =
+0$؛ $u^k = 0$ من أجل $k$ ما؛ $\operatorname{Sp}(u) = \{0\}$؛ $\chi_u
+= X^n$؛ $u$ \omterm{def:b2:reduction:diag}{قابل للتثليث} بقطر معدوم. ويحقق \omterm{prop:b2:reduction:nilpotent}{التشاكل الذاتي
+عديم القوى} العلاقة $\mu_u = X^{\text{(دليل انعدام القوى)}}$، ويكون الدليل
+$\leq n$.\index{تشاكل ذاتي عديم القوى}
+\end{proposition}
+
+\begin{proof}
+تجعل العلاقة $u^k = 0$ كل \omterm{def:b2:reduction:eigen}{قيمة ذاتية} جذرًا لكثير الحدود $X^k$: \omterm{def:b2:reduction:eigen}{فالطيف} $\{0\}$
+(وهو غير خالٍ حين ينحلّ $\chi$ --- وعلى $\C$ دائمًا). عندئذٍ $\chi_u =
+X^n$ (فكل الجذور معدومة) وتعطي مبرهنة كايلي--هاملتون أن $u^n = 0$؛
+ويضع التثليث (\cref{thm:b2:reduction:trigonalization})
+أصفارًا على القطر (فالقطر يحمل \omterm{def:b2:reduction:eigen}{القيم الذاتية}).
+وعكسيًا، لتكن $A$ مثلثية عليا تمامًا: أي $a_{ij} = 0$
+من أجل $j \leq i$. ونبيّن بالتراجع أن
+\[
+(A^k)_{ij} = 0 \qquad \text{كلما كان } j \leq i + k - 1,
+\]
+أي إن كل قوة تدفع منطقة الأصفار قطرًا واحدًا أعلى. فمن أجل
+$k = 1$ هذه هي الفرضية. وأما خطوة التراجع فهي
+\[
+(A^{k+1})_{ij} = \sum_{\ell} (A^k)_{i\ell}\,a_{\ell j} ,
+\]
+وينعدم كل حدّ: فإما $\ell \leq i + k - 1$ (فالعامل الأول
+$0$ بالتراجع) وإما $\ell \geq i + k$، وعندها
+يُعدم $j \leq i + k \leq \ell$ العاملَ الثاني. وعند $k = n$ يتحقق
+الشرط $j \leq i + n - 1$ من أجل كل $i, j \leq n$: أي $A^n =
+0$. ويقسم \omterm{def:b2:reduction:polyu}{كثير الحدود الأدنى} المقدارَ $X^n$، ويعرّف الإعدام
+الدليلَ.
+\end{proof}
+
+\begin{theorem}[تفكيك دنفورد]\label{thm:b2:reduction:dunford}
+لنفترض أن $\chi_u$ ينحلّ على $K$ (وهو تلقائي من أجل $K = \C$). عندئذٍ
+يوجد زوج \emph{وحيد} $(d, \nu)$ يحقق
+\[
+u = d + \nu, \qquad d \text{ قابل للتقطير}, \quad \nu
+\text{ عديم القوى}, \quad d\nu = \nu d ,
+\]
+وزيادة على ذلك يكون $d$ و$\nu$ كثيرَي حدود في
+$u$.\index{تفكيك دنفورد}
+\end{theorem}
+
+\begin{proof}
+\emph{الوجود.} نكتب $\chi_u = \prod_{i=1}^{r} (X -
+\lambda_i)^{m_i}$ (بقيم $\lambda_i$ مختلفة) ونضع $N_i = \ker(u -
+\lambda_i)^{m_i}$، وتُسمى \emph{الفضاءات المميزة}. وبمبرهنة
+كايلي--هاملتون والمبرهنة المساعدة للنواة
+(\cref{thm:b2:reduction:kernels})،
+\[
+E = N_1 \oplus \dots \oplus N_r ,
+\]
+مع إسقاطات $\pi_i$ كثيرة الحدود في $u$؛ وكل $N_i$ مستقر
+(فكثيرات الحدود في $u$ تتبادل مع $u$). ونعرّف $d = \sum_i \lambda_i
+\pi_i$: وهو كثير حدود في $u$، \omterm{def:b2:reduction:diag}{قابل للتقطير} (إذ يؤثّر كما يؤثّر $\lambda_i$
+على $N_i$، ومنه يتفكك $E$ إلى فضاءاته الذاتية). عندئذٍ يكون $\nu = u -
+d$ كثير حدود في $u$ (ومن ثم يتبادل مع $d$)، وهو يؤثّر على كل
+$N_i$ كما يؤثّر $u - \lambda_i$، مع $(u - \lambda_i)^{m_i} = 0$
+هناك: أي $\nu^{\max m_i} = 0$ على كل حدّ، ومنه فإن $\nu$ عديم القوى.
+
+\emph{الوحدانية.} ليكن $u = d' + \nu'$ زوجًا آخر كهذا. وبما أن
+$d'$ و$\nu'$ يتبادلان، فهما يتبادلان مع $u = d' +
+\nu'$، ومن ثم مع كل كثير حدود في $u$ --- وعلى الخصوص مع $d$
+و$\nu$. عندئذٍ يكون $d - d'$ \omterm{def:b2:reduction:diag}{قابلًا للتقطير} (فالتطبيقان المتبادلان
+القابلان للتقطير قابلان للتقطير في آن واحد:
+\cref{exo:b2:reduction:9}) ويساوي $\nu' - \nu$، وهو
+عديم القوى: إذ إن $\nu^k = 0$ و$\nu'^{k'} = 0$، ويرخّص التبادل
+بنشر ثنائي الحدّ
+\[
+(\nu' - \nu)^{k + k' - 1}
+= \sum_{j=0}^{k+k'-1}\binom{k + k' - 1}{j}
+\,\nu'^{\,j}\,(-\nu)^{k + k' - 1 - j} ,
+\]
+يموت فيه كل حدّ: فإما $j \geq k'$ (فالعامل الأول
+معدوم) وإما $k + k' - 1 - j \geq k$ (فالعامل الثاني معدوم)، وأحد
+الأمرين يتحقق دائمًا. والتشاكل عديم القوى \omterm{def:b2:reduction:diag}{القابل للتقطير} معدوم (إذ إن
+طيفه $\{0\}$ وهو قطري في أساس ما): ومنه $d = d'$ و
+$\nu = \nu'$.
+\end{proof}
+
+\begin{example}[القوى والأسّيات]\label{ex:b2:reduction:powers}
+$A = \begin{pmatrix} 3 & 1\\ -1 & 1\end{pmatrix}$: $\chi_A = X^2 -
+4X + 4 = (X-2)^2$، \omterm{def:b2:reduction:eigen}{وقيمة ذاتية} وحيدة $2$، وفضاء ذاتي بعده
+$1$: فهي غير قابلة للتقطير. ودنفورد: $D = 2I$، $N = A - 2I =
+\begin{pmatrix} 1 & 1\\ -1 & -1\end{pmatrix}$، $N^2 = 0$. عندئذٍ
+\[
+A^k = (2I + N)^k = 2^k I + k\,2^{k-1} N ,
+\qquad
+\eu^{tA} = \eu^{2t}(I + tN),
+\]
+بمبرهنة ثنائي الحدّ في الحالة المتبادلة، وبالمتسلسلة الأسّية على التوالي
+(\cref{ch:b2:diffeq}) موزَّعة على حدّين متبادلين. فالاختزال يحوّل
+الحركية المصفوفية إلى حركية عددية.
+\end{example}
+
+\begin{remark}[آفاق داخل هذا المجلد]\label{rem:b2:reduction:perspectives}
+الاختزال محور؛ وهذه أربعة أضلاع ينبغي مراقبتها. ففي
+\cref{ch:b2:nvs}، تحوّل المعايير المكيَّفة قولَ ``كل \omterm{def:b2:reduction:eigen}{القيم الذاتية} ذات
+طويلة $< 1$'' إلى ``معيار مؤثر ما $< 1$''، فتجعل
+الأطياف تحكم تقارب القوى والمتسلسلات. وفي
+\cref{ch:b2:diffeq}، تصير وصفة
+\cref{ex:b2:reduction:powers} الحلَّ العام للجملة
+$X' = AX$: فيقسم دنفورد $\eu^{tA}$ إلى
+كتل من نمط كثير حدود مضروب في أسّي، ويُقرأ الاستقرار
+من الأجزاء الحقيقية للقيم الذاتية. وفي \cref{ch:b2:quadratic}، يفرض
+جداء سلّمي ما لا يستطيعه \omterm{def:b2:structures:algebra}{الجبر} الخطي وحده: فتصير المصفوفات
+المتماثلة قابلة للتقطير \emph{تعامديًا}، بلا أي جزء
+عديم القوى. وفي \cref{ch:b2:genfun}، تعود مقاربات
+\omterm{def:b2:reduction:eigen}{القيمة الذاتية} المهيمنة في مسألة نهاية الأسبوع في هذا
+الفصل تحليليًا، بوصفها أصغر شذوذ لدالة
+مولّدة --- أي لغتان لمعدل نموّ واحد.
+\end{remark}
+
+\section{تمارين}
+
+\begin{exercise}[$\star$]\label{exo:b2:reduction:1}
+قطّر (\omterm{def:b2:reduction:eigen}{القيم الذاتية}، وأسس \omterm{def:b2:reduction:eigen}{الفضاءات الذاتية}، والمصفوفة $P$ القابلة للقلب):
+\[
+A = \begin{pmatrix} 1 & 2\\ 2 & 1 \end{pmatrix},
+\qquad
+B = \begin{pmatrix} 0 & 1 & 1\\ 1 & 0 & 1\\ 1 & 1 & 0
+\end{pmatrix}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:reduction:2}
+بيّن أن $C = \begin{pmatrix} 1 & 1\\ 0 & 1\end{pmatrix}$ غير قابلة
+للتقطير، بطريقتين: عبر \omterm{def:b2:reduction:eigen}{الفضاءات الذاتية}، وعبر \omterm{def:b2:reduction:polyu}{كثير الحدود
+الأدنى}.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:reduction:3}
+ليكن $u$ يحقق $u^2 - 5u + 6\,\mathrm{id} = 0$. برهن على أن $u$
+\omterm{def:b2:reduction:diag}{قابل للتقطير}، وعيّن الأطياف الممكنة، واحسب $u^k$
+بوصفه تركيبًا من $\mathrm{id}$ و$u$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:4}
+ليكن $u$ \omterm{def:b2:reduction:diag}{قابلًا للتقطير} وليكن $F$ فضاء جزئيًا مستقرًا. برهن على أن
+$u|_F$ \omterm{def:b2:reduction:diag}{قابل للتقطير} \emph{(اقصر كثير حدود مُعدِمًا بجذور
+منحلّة بسيطة)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:5}
+(فيبوناتشي) لتكن $A = \begin{pmatrix} 1 & 1\\ 1 & 0\end{pmatrix}$.
+قطّر $A$ على $\R$، واستنتج صيغة بينيه لمتتالية
+فيبوناتشي ($F_0 = 0$، $F_1 = 1$، $F_{n+1} = F_n +
+F_{n-1}$):
+\[
+F_n = \frac{\varphi^n - \psi^n}{\sqrt 5},
+\qquad \varphi = \frac{1 + \sqrt5}{2},\ \psi = \frac{1 -
+\sqrt5}{2}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:6}
+ليكن $u \in \mathcal{L}(E)$ مع $u^2$ قابلة للتقطير و$u$
+قابلة للقلب (مع $K = \C$). برهن على أن $u$ قابلة للتقطير. وأعطِ
+مثالًا مضادًا حين لا تكون $u$ قابلة للقلب.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:7}
+احسب \omterm{thm:b2:reduction:dunford}{تفكيك دنفورد}، و$A^k$، و$\eu^{tA}$ من أجل
+\[
+A = \begin{pmatrix} 2 & 1 & 0\\ 0 & 2 & 1\\ 0 & 0 & 2
+\end{pmatrix}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:8}
+ليكن $A \in \mathcal{M}_n(\C)$ مع $A^k = I$ من أجل $k \geq 1$ ما.
+برهن على أن $A$ قابلة للتقطير وأن قيمها الذاتية جذور
+للوحدة من الرتبة $k$. استنتج أن كل مصفوفة عقدية قابلة للقلب ذات رتبة منتهية
+ومشابهة لمصفوفة مثلثية بقطر واحدي تساوي المطابق.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:reduction:9}
+(التقطير المتزامن) لتكن $u, v$ قابلتين للتقطير
+ومتبادلتين. برهن على أنهما قابلتان للتقطير \emph{في آن
+واحد}: أي إن أساسًا ما يقطّرهما معًا. \emph{(كل فضاء ذاتي
+للمصفوفة $u$ مستقر تحت $v$؛ فقطّر مقصورات $v$ هناك،
+مستعملًا \cref{exo:b2:reduction:4}.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:reduction:10}
+ليكن $u \in \mathcal{L}(\C^n)$. برهن على أن $u$ \omterm{def:b2:reduction:diag}{قابل للتقطير} إذا
+وفقط إذا كان لكل فضاء جزئي مستقر تحت $u$ فضاءٌ جزئي مكمّل
+مستقر تحت $u$. \emph{(من أجل $\Leftarrow$: طبّق الخاصية
+على $F = \sum_\lambda E_\lambda(u)$، وهو مجموع كل \omterm{def:b2:reduction:eigen}{الفضاءات الذاتية}؛ فلو كان
+مكمّل مستقر $G$ غير معدوم، لأنتج تثليثُ $u|_G$
+متجهةً ذاتية للتشاكل $u$ داخل $G$ --- وهذا يناقض $G \cap
+F = \{0\}$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:reduction:11}
+(نصف القطر الطيفي على طريقة غلفاند المبسطة، $2\times2$ مذاق من التحليل
+الآتي) لتكن $A \in \mathcal{M}_2(\C)$ بقيمتين ذاتيتين ذواتَي
+طويلة $< 1$. برهن على أن $A^k \to 0$ عنصرًا عنصرًا حين $k \to \infty$.
+\emph{(ثلّث: $A = P(T)P^{-1}$ مع $T$ مثلثية عليا؛
+واحسب $T^k$ صراحةً --- مميّزًا بين حالتَي تساوي القيمتين
+الذاتيتين واختلافهما --- ثم حُدّ.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:12}
+لتكن $u \in \mathcal{L}(\C^n)$ مع $\operatorname{rk} u = 1$ (مع $n
+\geq 2$). بيّن أن $\chi_u = X^{n-1}(X - \operatorname{tr} u)$،
+وأن $u$ قابلة للتقطير إذا وفقط إذا كان $\operatorname{tr} u
+\neq 0$. \emph{(تذكّر من \cref{exo:b2:linalg:5} أن $u^2 =
+(\operatorname{tr} u)\,u$.)}
+\end{exercise}
+
+\section{مسألة: التراجعات الخطية والمصفوفات المرافقة}
+
+التراجع الخطي $u_{n+k} = a_{k-1}u_{n+k-1} + \dots + a_0 u_n$
+قوةُ مصفوفة متخفية، ويحوّله الاختزال إلى صيغ مغلقة
+ومعدلات نموّ وتقديرات للخطأ. وتطوّر مسألة نهاية الأسبوع
+هذه المعجمَ --- المصفوفات المرافقة من جهة، ومؤثر الإزاحة
+على فضاء المتتاليات من جهة أخرى ---
+وتبرهن على \emph{المبرهنة الأساسية للتراجعات الخطية}
+(الحل العام هو $\sum_i Q_i(n)\lambda_i^n$ على جذور
+\omterm{def:b2:reduction:charpoly}{كثير الحدود المميز})، وتنفق الأرباح على
+التقريب الديوفانتي للعدد $\sqrt2$، وعلى عدّ المسيرات
+والكلمات، وعلى حلقة من المتتاليات المقترنة لا يفكّها
+إلا التقطير المتزامن.
+
+\begin{problem}[{مسألة نهاية الأسبوع --- المبرهنة الأساسية
+للتراجعات الخطية}]
+\label{pb:b2:reduction:1}
+نثبّت $k \geq 1$، وأعدادًا $a_0, \dots, a_{k-1} \in \C$ مع $a_0
+\neq 0$، وكثير الحدود الموحَّد $P = X^k - a_{k-1}X^{k-1} - \dots -
+a_1 X - a_0$، والتراجع
+\[
+(\mathcal R)\colon\quad u_{n+k} = a_{k-1}u_{n+k-1} + \dots +
+a_1 u_{n+1} + a_0 u_n \qquad (n \geq 0).
+\]
+و\emph{المصفوفة المرافقة} لكثير الحدود $P$ هي
+\[
+C =
+\begin{pmatrix}
+0 & 1 & & \\
+ & \ddots & \ddots & \\
+ & & 0 & 1\\
+a_0 & a_1 & \cdots & a_{k-1}
+\end{pmatrix}
+\in \mathcal{M}_k(\C).
+\]
+
+\medskip
+\noindent\textbf{الجزء الأول --- المعجم المرافق.}
+\begin{enumerate}
+  \item بيّن أن المتتالية $(u_n)$ تحقق $(\mathcal R)$ إذا
+        وفقط إذا حققت المتجهات $v_n = (u_n, u_{n+1}, \dots,
+        u_{n+k-1})^{\mathsf T}$ العلاقة $v_{n+1} = Cv_n$، ومن ثم
+        $v_n = C^n v_0$.
+  \item برهن على أن $\chi_C = P$ (بنشر $\det(XI - C)$ على
+        العمود الأول والتراجع على $k$)، ثم على أن $\mu_C = P$
+        أيضًا \emph{(انتقل إلى $C^{\mathsf T}$، الذي تكون $e_1$
+        من أجله دورية، ولاحظ أن للمصفوفة ومنقولها \omterm{def:b2:reduction:polyu}{كثير
+        الحدود الأدنى} نفسه)}.
+  \item بيّن أنه من أجل كل جذر $\lambda$ لكثير الحدود $P$، تولّد المتجهة
+        $(1, \lambda, \dots, \lambda^{k-1})^{\mathsf T}$ الفضاءَ
+        الذاتي للمصفوفة $C$ الموافق للقيمة $\lambda$؛ واستنتج أن
+        \emph{كل} فضاء ذاتي للمصفوفة $C$ بعده $1$، وأن
+        $C$ قابلة للتقطير إذا وفقط إذا كان لكثير الحدود $P$ عدد $k$
+        من الجذور المختلفة.
+  \item لنفترض أن لكثير الحدود $P$ جذورًا مختلفة $\lambda_1, \dots,
+        \lambda_k$. بيّن أن المتتاليات الهندسية
+        $(\lambda_i^n)_n$ تشكّل أساسًا لفضاء حلول
+        $(\mathcal R)$، ومن ثم فكل حلّ هو $u_n = \sum_i
+        c_i\lambda_i^n$ من أجل ثوابت وحيدة $c_i$.
+  \item حُلّ كاملًا: $u_{n+2} = u_{n+1} + 6u_n$، $u_0 = 1$،
+        $u_1 = 8$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{الجزء الثاني --- مؤثر الإزاحة والمبرهنة
+الأساسية.} ليكن $\mathcal{S}$ الفضاء المتجهي على $\C$
+لكل المتتاليات العقدية وليكن $S \in
+\mathcal{L}(\mathcal{S})$ الإزاحة، $S\bigl((u_n)_n\bigr) =
+(u_{n+1})_n$.
+\begin{enumerate}[resume]
+  \item بيّن أن مجموعة حلول $(\mathcal R)$ هي $\ker
+        P(S)$، وأن بعدها $k$ بالضبط \emph{(أرسل كل
+        حلّ إلى قيمه الابتدائية)}.
+  \item اشرح لماذا تنطبق المبرهنة المساعدة لتفكيك النواة
+        (\cref{thm:b2:reduction:kernels}) على $S$ في الفضاء
+        $\mathcal{S}$ غير المنتهي البعد دون أي تغيير،
+        واكتب التفكيك الناتج للفضاء $\ker P(S)$ من أجل
+        $P = \prod_{i=1}^{r}(X - \lambda_i)^{m_i}$ (بقيم
+        $\lambda_i$ مختلفة، وكلها غير معدومة لأن $a_0 \neq 0$).
+  \item من أجل $\lambda \neq 0$ و$m \geq 1$، بيّن أن
+        \[
+        \ker\,(S - \lambda\,\mathrm{id})^m
+        = \bigl\{\,\bigl(Q(n)\,\lambda^n\bigr)_n : Q \in
+        \C_{m-1}[X]\,\bigr\},
+        \]
+        وأن بعده $m$. \emph{(احسب $(S -
+        \lambda)\bigl(Q(n)\lambda^n\bigr) =
+        \lambda^{n+1}(\Delta Q)(n)$ مع $\Delta Q = Q(X + 1) -
+        Q(X)$، واستعمل أن $\Delta$ يُنقص الدرجة؛ وأما
+        البعد فحُدّه بالمقدار $m$ بالقيم الابتدائية.)}
+  \item (المبرهنة الأساسية للتراجعات الخطية) استنتج:
+        إذا كان $P = \prod_{i=1}^{r}(X - \lambda_i)^{m_i}$ بقيم
+        $\lambda_i$ مختلفة وغير معدومة، فإن حلول
+        $(\mathcal R)$ هي بالضبط المتتاليات
+        \[
+        u_n = \sum_{i=1}^{r} Q_i(n)\,\lambda_i^n,
+        \qquad Q_i \in \C_{m_i - 1}[X],
+        \]
+        بكثيرات حدود $Q_i$ محدَّدة بكيفية وحيدة.
+  \item حُلّ كاملًا: $u_{n+2} = 4u_{n+1} - 4u_n$، $u_0 =
+        1$، $u_1 = 0$، وتحقق من الجواب عند $u_2$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{الجزء الثالث --- الجذور المهيمنة والأرباح
+الديوفانتية.}
+\begin{enumerate}[resume]
+  \item لنفترض أن الجذور بسيطة مع $\abs{\lambda_1} >
+        \abs{\lambda_i}$ من أجل $i \geq 2$، وأن $u_n = \sum_i c_i
+        \lambda_i^n$ مع $c_1 \neq 0$. بيّن أن $u_n \sim
+        c_1\lambda_1^n$ وأن $u_{n+1}/u_n \to \lambda_1$.
+  \item (بيل) نعرّف $a_{n+1} = a_n + 2b_n$، $b_{n+1} = a_n +
+        b_n$، $a_0 = b_0 = 1$. بيّن أن $q(a, b) = a^2 - 2b^2$
+        تحقق $q(a_{n+1}, b_{n+1}) = -q(a_n, b_n)$، ومن ثم
+        $a_n^2 - 2b_n^2 = (-1)^{n+1}$؛ واربط ذلك \omterm{def:b2:linalg:det}{بمحدد}
+        $M = \begin{psmallmatrix}1 & 2\\ 1 &
+        1\end{psmallmatrix}$.
+  \item استنتج تقدير الخطأ
+        \[
+        \Bigl|\frac{a_n}{b_n} - \sqrt2\Bigr|
+        = \frac{1}{b_n\,(a_n + \sqrt2\,b_n)}
+        \leq \frac{1}{2b_n^2},
+        \]
+        وبيّن أنه يتناقص هندسيًا بنسبة $3 -
+        2\sqrt2$ \emph{(جد قيم $M$ الذاتية ونموّ
+        $b_n$)}.
+  \item (النموّ العام) انطلاقًا من السؤال 9، برهن على: (أ) إذا حقق كل
+        جذر $\abs{\lambda_i} \leq \rho$، فإن
+        $\abs{u_n} \leq C\,n^{m-1}\rho^n$ مع $m = \max_i m_i$؛
+        (ب) وإذا وُجد جذر وحيد $\lambda_1$ ذو طويلة أعظمية
+        وكان $Q_1 \neq 0$، فإن $u_{n+1}/u_n \to
+        \lambda_1$ --- وتحقق من ذلك على حلّ السؤال 10.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{الجزء الرابع --- عدّ المسيرات والكلمات.} من أجل
+بيان منته مجموعة رؤوسه $\{1, \dots, N\}$، تكون
+\emph{مصفوفة التجاور} $A$ بالعنصر $A_{ij} = 1$ إذا كان $ij$ حرفًا،
+و$0$ فيما عدا ذلك.
+\begin{enumerate}[resume]
+  \item برهن على أن $(A^n)_{ij}$ هو عدد المسيرات ذات الطول
+        $n$ من $i$ إلى $j$ (أي متتاليات $n$ حرفًا، كل خطوة منها
+        على امتداد حرف).
+  \item (المثلث) من أجل البيان التام على $3$ رؤوس،
+        $A = J - I$: باستعمال \omterm{def:b2:reduction:eigen}{طيف} المصفوفة $J$
+        (\cref{ex:b2:linalg:onesmatrix})، بيّن أن
+        \[
+        (A^n)_{ii} = \frac{2^n + 2(-1)^n}{3},
+        \qquad
+        (A^n)_{ij} = \frac{2^n - (-1)^n}{3} \quad (i \neq j),
+        \]
+        وتحقق من الاثنين عند $n = 2$ بسرد المسيرات.
+  \item (الكلمات الخالية من $11$) ليكن $w_n$ عدد الكلمات
+        الثنائية ذات الطول $n$ التي ليس فيها رقمان $1$ متتاليان.
+        رمّز الكلمات بحرفها الأخير للحصول على مصفوفة
+        انتقال، وبيّن أن $w_{n+2} = w_{n+1} + w_n$، واستنتج $w_n =
+        F_{n+2}$ (فيبوناتشي، \cref{exo:b2:reduction:5})، وأعطِ
+        معدل النمو $\lim w_{n+1}/w_n$.
+  \item (المسار) من أجل بيان المسار $1 - 2 - 3$، بيّن أن
+        قيم $A$ الذاتية هي $\sqrt2, 0, -\sqrt2$ بمتجهات
+        ذاتية $(1, \pm\sqrt2, 1)$ و$(1, 0, -1)$، واستنتج
+        أن عدد المسيرات ذات الطول $n$ من طرف إلى
+        طرف هو $\bigl((\sqrt2)^n + (-\sqrt2)^n\bigr)/4$:
+        أي صفر من أجل $n$ فردي، و$2^{\,n/2 - 1}$ من أجل $n$ زوجي.
+        وتحقق عند $n = 4$.
+  \item (صيغة الأثر) بيّن أن العدد الكلي للمسيرات
+        المغلقة ذات الطول $n$ (بكل نقاط البداية) هو
+        $\operatorname{tr}(A^n) = \sum_i \lambda_i^n$،
+        وتحقق منه على المثلث.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{الجزء الخامس --- حلقة من المتتاليات: التقطير
+المتزامن.} نثبّت $k \geq 3$، ولتكن $\omega = \eu^{2\iu\pi/k}$،
+ولتكن $W \in \mathcal{M}_k(\C)$ الإزاحة الدورية: $W e_i =
+e_{i+1}$ (بأدلة بترديد $k$، وأعمدة مرقّمة $0, \dots, k-1$).
+\begin{enumerate}[resume]
+  \item بيّن أن $W^{\mathsf T}$ هي المصفوفة المرافقة لكثير الحدود
+        $X^k - 1$، واستنتج $\chi_W = \mu_W = X^k - 1$، وأن $W$
+        قابلة للتقطير بقيمها الذاتية البسيطة $k$
+        وهي $\omega^j$ وبمتجهات ذاتية $f_j = (1, \omega^{-j},
+        \omega^{-2j}, \dots, \omega^{-(k-1)j})^{\mathsf T}$.
+  \item المصفوفة \emph{الدائرية} هي $C = c_0 I + c_1 W + \dots
+        + c_{k-1}W^{k-1}$. بيّن أن كل الدائريات تتبادل،
+        وأن الأساس $(f_0, \dots, f_{k-1})$ يقطّرها
+        \emph{جميعًا} في آن واحد، وأن
+        قيم $C$ الذاتية هي $\widehat c(\omega^j) = \sum_m
+        c_m \omega^{jm}$، مع $j = 0, \dots, k-1$.
+  \item استنتج $\det C = \prod_{j=0}^{k-1} \widehat
+        c(\omega^j)$، وتحقق من أن $k = 3$ يستعيد
+        تفكيك \cref{exo:b2:linalg:8}.
+  \item (متوسط القلادة) لتكن $x^{(n+1)} = Mx^{(n)}$ مع
+        $M = \frac12(W + W^{-1})$: أي إن كل عدد من الأعداد $k$ المرتّبة
+        في حلقة يُعوَّض بمتوسط جاريه. بيّن أن قيم
+        $M$ الذاتية هي $\cos(2\pi j/k)$، وأن معامل $x^{(0)}$
+        على $f_0$ هو المتوسط $\frac1k\sum_m x^{(0)}_m$
+        \emph{(اجمع إحداثيات $f_j$)}.
+  \item استنتج: من أجل $k$ فردي، يتقارب $x^{(n)}$ إلى
+        المتجهة الثابتة التي قيمتها متوسط القيم
+        الابتدائية؛ ومن أجل $k = 4$، أبرِز \omterm{def:b2:reduction:eigen}{القيمة الذاتية} المسؤولة
+        عن عدم التقارب والعائق الدقيق
+        (معامل متوسط متناوب يجب أن ينعدم).
+  \item (تركيب) بجملة واحدة لكل بند: كيف تحوّل المصفوفة
+        المرافقة تحليل $(\mathcal R)$ إلى
+        اختزال؛ وأين لم تحتج المبرهنة المساعدة لتفكيك النواة
+        إلى بعد منته؛ ولماذا تحكم \omterm{def:b2:reduction:eigen}{القيم الذاتية} المهيمنة
+        معدلات النموّ والخطأ الديوفانتي؛ ولماذا تعدّ قوى
+        مصفوفة التجاور المسيرات؛ وماذا تشتري المصفوفات
+        المتبادلة. وسمِّ القمتين: المبرهنة الأساسية
+        للتراجعات الخطية، و--- من أجل المصفوفات الموجبة
+        في الجزء الرابع، في مجلد السنة الثالثة ---
+        مبرهنة بيرون--فروبينيوس.
+\end{enumerate}
+\end{problem}

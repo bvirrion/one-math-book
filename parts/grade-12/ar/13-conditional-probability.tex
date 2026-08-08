@@ -1,0 +1,386 @@
+\chapter{الاحتمال الشرطي والاستقلال}\label{ch:g12:condprob}
+
+يكمّم \omterm{def:g10:proba:distribution}{الاحتمال} اللايقين؛ ويكمّم \omterm{def:g12:condprob:cond}{الاحتمال الشرطي} كيف
+تغيّره المعلومة. فمعرفة أن \omterm{def:g11:prob:model}{حادثة} $B$ قد وقعت تعيد تشكيل
+احتمالات كل الحوادث الأخرى --- وهي آلية صاغها بايز
+ويُساء استعمالها يوميًا في المحاكم والصحف. ويرسي هذا الفصل قواعد
+الشرط والمعنى الدقيق \omterm{def:g12:condprob:indep}{للاستقلال}.
+
+\section{الفضاءات الاحتمالية (تذكير)}
+
+تُنمذَج تجربة ذات عدد منته من الإمكانيات بمجموعة \emph{الإمكانيات}
+$\Omega$ (وهي مجموعة النتائج الممكنة) \omterm{def:g10:proba:distribution}{واحتمال} $\P$ يرفق
+بكل \omterm{def:g11:prob:model}{حادثة} $A \subseteq \Omega$ عددًا $\P(A) \in \intcc{0}{1}$، جمعيًا
+على الاتحادات المنفصلة ومع $\P(\Omega) = 1$. وتذكّر القواعد الأساسية:
+\[
+\P(\bar A) = 1 - \P(A),
+\qquad
+\P(A \cup B) = \P(A) + \P(B) - \P(A \cap B).
+\]
+وعندما تكون كل الإمكانيات متساوية \omterm{def:g10:proba:distribution}{الاحتمال}، يكون
+$\P(A) = \frac{\abs A}{\abs\Omega}$ --- ويؤول حساب الاحتمالات
+إلى تقنيات العدّ في \cref{ch:g12:comb}.
+
+\section{الاحتمال الشرطي}
+
+\begin{definition}[الاحتمال الشرطي]\label{def:g12:condprob:cond}
+لتكن $B$ \omterm{def:g11:prob:model}{حادثة} حيث $\P(B) > 0$. \emph{احتمال $A$ علمًا بوقوع
+$B$}\index{احتمال شرطي} هو
+\[
+\pcond{B}{A} = \frac{\P(A \cap B)}{\P(B)} .
+\]
+\end{definition}
+
+والتطبيق $A \mapsto \pcond BA$ هو نفسه \omterm{def:g10:proba:distribution}{احتمال} (فتنطبق عليه كل القواعد)؛ وهو
+يمثّل الحالة المعرفية الجديدة لمن علم أن $B$ قد
+وقعت.
+
+\begin{proposition}[قاعدة الضرب]\label{prop:g12:condprob:product}
+من أجل حوادث ذات احتمالات غير معدومة:
+\[
+\P(A \cap B) = \P(B)\,\pcond{B}{A} = \P(A)\,\pcond{A}{B},
+\]
+وبوجه أعم
+$\P(A_1 \cap A_2 \cap A_3) = \P(A_1)\,\pcond{A_1}{A_2}\,
+\pcond{A_1 \cap A_2}{A_3}$، وهكذا.
+\end{proposition}
+
+\begin{proof}
+أعد \omterm{def:g10:coordgeom:system}{ترتيب} التعريف؛ وتنتج صيغة السلسلة بالتكرار.
+\end{proof}
+
+\begin{theorem}[قانون الاحتمالات الكلية]\label{thm:g12:condprob:total}
+\index{قانون الاحتمالات الكلية}
+لتكن $B_1, \dots, B_n$ تجزئة للمجموعة $\Omega$ إلى حوادث ذات \omterm{def:g10:proba:distribution}{احتمال}
+غير معدوم. عندئذٍ من أجل كل \omterm{def:g11:prob:model}{حادثة} $A$:
+\[
+\P(A) = \sum_{i=1}^{n} \P(B_i)\,\pcond{B_i}{A}.
+\]
+\end{theorem}
+
+\begin{proof}
+المجموعات $A \cap B_i$ منفصلة مثنى مثنى واتحادها $A$، إذن
+$\P(A) = \sum_i \P(A \cap B_i) = \sum_i \P(B_i)\pcond{B_i}{A}$ حسب
+قاعدة الضرب.
+\end{proof}
+
+\begin{method}[أشجار الاحتمالات]\label{met:g12:condprob:tree}
+ينظّم المخطط الشجري الاحتمالات الشرطية: فكل فرع يحمل
+\omterm{def:g10:proba:distribution}{احتمال} \omterm{def:g11:prob:model}{الحادثة} التالية \emph{علمًا} بالمسار حتى الآن.
+\begin{itemize}
+  \item \omterm{def:g10:proba:distribution}{احتمال} ورقة (أي مسار كامل) هو \emph{جداء}
+        الاحتمالات على طول فروعها (بقاعدة الضرب).
+  \item \omterm{def:g10:proba:distribution}{احتمال} \omterm{def:g11:prob:model}{حادثة} هو \emph{مجموع} احتمالات
+        الأوراق التي تحققها (بالاحتمالات الكلية).
+  \item مجموع الاحتمالات على الفروع الخارجة من عقدة واحدة هو $1$.
+\end{itemize}
+\end{method}
+
+\begin{omfigure}
+\begin{tikzpicture}[font=\small]
+  \coordinate (root) at (0,0);
+  \node (B)  at (2.6,1.2)  {$B$};
+  \node (Bc) at (2.6,-1.2) {$\bar B$};
+  \node (BA)  at (5.4,1.8)  {$A$};
+  \node (BAc) at (5.4,0.6)  {$\bar A$};
+  \node (BcA)  at (5.4,-0.6) {$A$};
+  \node (BcAc) at (5.4,-1.8) {$\bar A$};
+  \draw (root) -- (B)  node[midway, above] {$\P(B)$};
+  \draw (root) -- (Bc) node[midway, below] {$\P(\bar B)$};
+  \draw (B) -- (BA)   node[midway, above] {$\pcond{B}{A}$};
+  \draw (B) -- (BAc)  node[midway, below] {$\pcond{B}{\bar A}$};
+  \draw (Bc) -- (BcA)  node[midway, above] {$\pcond{\bar B}{A}$};
+  \draw (Bc) -- (BcAc) node[midway, below] {$\pcond{\bar B}{\bar A}$};
+  \node[anchor=west] at (6.0,1.8)  {$\P(A \cap B) = \P(B)\,\pcond{B}{A}$};
+  \node[anchor=west] at (6.0,0.6)  {$\P(\bar A \cap B)$};
+  \node[anchor=west] at (6.0,-0.6) {$\P(A \cap \bar B)$};
+  \node[anchor=west] at (6.0,-1.8) {$\P(\bar A \cap \bar B)$};
+\end{tikzpicture}
+
+{\small \omterm{met:g10:proba:tree}{شجرة} ذات مستويين: اضرب على طول المسار، واجمع على الأوراق.
+فمثلًا $\P(A)$ هو مجموع احتمالَي الورقة الأولى والورقة
+الثالثة.}
+\end{omfigure}
+
+\begin{theorem}[صيغة بايز]\label{thm:g12:condprob:bayes}
+\index{صيغة بايز}
+لتكن $B_1, \dots, B_n$ تجزئة للمجموعة $\Omega$ كما سبق ولتكن $A$ \omterm{def:g11:prob:model}{حادثة}
+حيث $\P(A) > 0$. عندئذٍ
+\[
+\pcond{A}{B_j} =
+\frac{\P(B_j)\,\pcond{B_j}{A}}{\sum_{i=1}^{n} \P(B_i)\,\pcond{B_i}{A}} .
+\]
+\end{theorem}
+
+\begin{proof}
+$\pcond{A}{B_j} = \frac{\P(A \cap B_j)}{\P(A)}$؛ ثم انشر البسط
+بقاعدة الضرب والمقام بالاحتمالات الكلية.
+\end{proof}
+
+\begin{example}[اختبار مسح]\label{ex:g12:condprob:test}
+مرض يصيب $1\%$ من السكان. واختبار يكشفه \omterm{def:g10:proba:distribution}{باحتمال}
+$0.99$ (وهي الحساسية) ويعطي إيجابيًا كاذبًا \omterm{def:g10:proba:distribution}{باحتمال} $0.05$.
+وعلمًا بأن الاختبار إيجابي، يكون \omterm{def:g10:proba:distribution}{احتمال} الإصابة بالمرض فعلًا
+\[
+\frac{0.01 \times 0.99}{0.01\times0.99 + 0.99\times0.05}
+= \frac{0.0099}{0.0099 + 0.0495} = \frac{1}{6} \approx 0.17 .
+\]
+ورغم دقة الاختبار، فإن خمسة إيجابيات من ست كاذبة --- لأن
+المرض نادر. والخلط بين $\pcond{A}{B}$ و $\pcond{B}{A}$ هو
+\emph{مغالطة المدّعي العام}.
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}[font=\small]
+  \coordinate (root) at (0,0);
+  \node (D)  at (2.6,1.2)  {$D$};
+  \node (Dc) at (2.6,-1.2) {$\bar D$};
+  \node (DT)  at (5.2,1.8)  {$T$};
+  \node (DTc) at (5.2,0.6)  {$\bar T$};
+  \node (DcT)  at (5.2,-0.6) {$T$};
+  \node (DcTc) at (5.2,-1.8) {$\bar T$};
+  \draw (root) -- (D)  node[midway, above] {$0.01$};
+  \draw (root) -- (Dc) node[midway, below] {$0.99$};
+  \draw (D) -- (DT)   node[midway, above] {$0.99$};
+  \draw (D) -- (DTc)  node[midway, below] {$0.01$};
+  \draw (Dc) -- (DcT)  node[midway, above] {$0.05$};
+  \draw (Dc) -- (DcTc) node[midway, below] {$0.95$};
+  \node[omThm, anchor=west] at (5.8,1.8)  {$0.0099$ \ (إيجابيات صحيحة)};
+  \node[anchor=west] at (5.8,0.6)  {$0.0001$};
+  \node[omThm, anchor=west] at (5.8,-0.6) {$0.0495$ \ (إيجابيات كاذبة)};
+  \node[anchor=west] at (5.8,-1.8) {$0.9405$};
+\end{tikzpicture}
+
+{\small اختبار المسح على صورة \omterm{met:g10:proba:tree}{شجرة} ($D$: مصاب، $T$: اختبار
+إيجابي). والورقتان الإيجابيتان (بالأحمر) وزنهما الكلي $0.0594$، و
+تسهم الإيجابيات الكاذبة بخمسة أسداسه.}
+\end{omfigure}
+
+\section{الاستقلال}
+
+\begin{definition}[الحادثتان المستقلتان]\label{def:g12:condprob:indep}
+تكون الحادثتان $A$ و $B$ \emph{مستقلتين}\index{استقلال} إذا كان
+\[
+\P(A \cap B) = \P(A)\,\P(B) .
+\]
+وعندما يكون $\P(B) > 0$، يكافئ هذا $\pcond{B}{A} = \P(A)$: أي إن معرفة $B$
+لا تغيّر \omterm{def:g10:proba:distribution}{احتمال} $A$.
+\end{definition}
+
+\begin{proposition}\label{prop:g12:condprob:indepcompl}
+إذا كانت $A$ و $B$ \omterm{def:g12:condprob:indep}{مستقلتين}، فكذلك $A$ و $\bar B$ (وكذلك $\bar A$ و
+$\bar B$).
+\end{proposition}
+
+\begin{proof}
+$\P(A \cap \bar B) = \P(A) - \P(A \cap B) = \P(A) - \P(A)\P(B)
+= \P(A)\bigl(1 - \P(B)\bigr) = \P(A)\,\P(\bar B)$.
+\end{proof}
+
+\begin{remark}
+لا تخلط بين \emph{\omterm{def:g12:condprob:indep}{المستقلتين}} ($\P(A\cap B) = \P(A)\P(B)$) و
+\emph{\omterm{def:g10:proba:operations}{المتنافيتين}} ($A \cap B = \varnothing$). \omterm{def:g10:proba:operations}{فحادثتان متنافيتان} ذواتا
+\omterm{def:g10:proba:distribution}{احتمال} غير معدوم لا تكونان \omterm{def:g12:condprob:indep}{مستقلتين} أبدًا: إذ إن معرفة وقوع إحداهما تضمن
+أن الأخرى لم تقع.
+\end{remark}
+
+\begin{definition}[التكرارات المستقلة]\label{def:g12:condprob:repet}
+عندما تُكرَّر تجربة $n$ مرة بحيث لا تؤثر نتيجة كل محاولة
+في الأخريات، يكون \omterm{def:g10:proba:distribution}{احتمال} \omterm{def:g12:seq:sequence}{متتالية} محدَّدة من
+النتائج جداء الاحتمالات المفردة. وهذا هو النموذج
+الذي يقوم عليه \omterm{def:g11:prob:rv}{التوزيع} الثنائي (\cref{ch:g12:randvar}).
+\end{definition}
+
+\section{تمارين}
+
+\begin{exercise}[$\star$]\label{exo:g12:condprob:1}
+تُسحب ورقة من رزمة عادية فيها 52 ورقة. احسب \omterm{def:g10:proba:distribution}{احتمال} أن
+تكون ملكًا، علمًا بأنها ورقة صورة (ولد أو ملكة أو ملك). وهل
+الحادثتان ``ملك'' و``قلب'' مستقلتان؟
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:condprob:2}
+كيس فيه 5 كرات حمراء و 3 زرقاء. وتُسحب كرتان تباعًا
+\emph{بدون} إرجاع.
+\begin{enumerate}
+  \item ارسم \omterm{met:g10:proba:tree}{شجرة الاحتمالات}.
+  \item احسب \omterm{def:g10:proba:distribution}{احتمال} أن تكون الكرتان حمراوين، \omterm{def:g10:proba:distribution}{واحتمال} أن تكون
+        الثانية حمراء.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:condprob:3}
+يُرمى حجرا نرد غير مغشوشين. ولتكن $A$ = ``المجموع يساوي $7$'' و $B$ = ``الحجر
+الأول يُظهر $3$'' و $C$ = ``المجموع يساوي $6$''. حدّد هل $A$ و $B$
+مستقلتان، ثم هل $B$ و $C$ مستقلتان.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:condprob:4}
+مصنع فيه ثلاث آلات تنتج على \omterm{def:g10:coordgeom:system}{الترتيب} $50\%$ و $30\%$ و
+$20\%$ من الإنتاج الكلي، بمعدلات عيب $1\%$ و $2\%$ و $4\%$.
+\begin{enumerate}
+  \item ما نسبة الإنتاج المعيب؟
+  \item قطعة مختارة عشوائيًا معيبة. فما \omterm{def:g10:proba:distribution}{احتمال} أنها
+        جاءت من الآلة الثالثة؟
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:condprob:5}
+في \cref{ex:g12:condprob:test}، عند أي انتشار للمرض $p$ (بدل
+$1\%$) يعني الاختبار الإيجابي \omterm{def:g10:proba:distribution}{احتمال} إصابة لا يقل عن $90\%$؟ حل
+المتراجحة وعلّق.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:condprob:6}
+قطعة نقد مغشوشة تسقط على الصورة \omterm{def:g10:proba:distribution}{باحتمال} $p \in \intoo{0}{1}$. وتُرمى
+ثلاث مرات، والرميات مستقلة.
+\begin{enumerate}
+  \item احسب \omterm{def:g10:proba:distribution}{احتمال} \omterm{def:g11:prob:model}{الحادثة} $E$ = ``صورتان بالضبط''.
+  \item من أجل أي $p$ يكون $\P(E)$ أعظميًا؟
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:condprob:7}
+\emph{(مونتي هول.)} تختبئ جائزة خلف أحد ثلاثة أبواب. فتختار أنت
+بابًا؛ ثم يفتح المقدّم، وهو يعرف أين الجائزة، أحد البابين
+الباقيين، كاشفًا دائمًا بابًا فارغًا (ويختار عشوائيًا إذا كان كلاهما
+فارغًا)، ويعرض عليك أن تبدّل إلى الباب المغلق الآخر. وباستعمال
+صيغة بايز، احسب \omterm{def:g10:proba:distribution}{احتمال} الفوز إذا بدّلت، وإذا لم
+تبدّل.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:condprob:8}
+قناة معلومات تنقل بتات. ويقلب الضجيج كل بت \omterm{def:g10:proba:distribution}{باحتمال}
+$\varepsilon = 0.1$، على نحو مستقل. ولحماية بت، يُرسل
+ثلاث مرات ويُفكّ ترميزه بالأغلبية.
+\begin{enumerate}
+  \item احسب \omterm{def:g10:proba:distribution}{احتمال} أن يكون البت المفكوك خاطئًا.
+  \item الكلمة المستقبَلة هي $101$. فما \omterm{def:g10:proba:distribution}{احتمال} أن يكون البت المرسل
+        هو $1$؟ (افترض أن $0$ و $1$ يُرسلان باحتمالين متساويين.)
+\end{enumerate}
+\end{exercise}
+
+\section{مسألة: الطبيب والقاضي ومرشِّح البريد المزعج}
+
+\begin{problem}[{مسألة نهاية الأسبوع --- صيغة بايز في مواجهة
+مغالطة المعدل القاعدي: لماذا قد يعني اختبار بنسبة $99\,\%$ نسبةَ $2\,\%$، ولماذا
+لا يدين تطابق بنسبة واحد في المليون أحدًا، وكيف يفكّر
+صندوق بريدك}]
+\label{pb:g12:condprob:1}
+اختبار يمسك $99\,\%$ من الحالات يعود إيجابيًا ---
+\omterm{def:g10:proba:distribution}{والاحتمال} الحقيقي للإصابة دون $2\,\%$. وسمة حمض نووي
+تطابق شخصًا واحدًا في المليون تُوجَد --- و
+المشتبه به بريء على الأرجح. والعبارتان صحيحتان، وقد
+أخطأ في الحكم عليهما أطباء ومحاكم، وكلتاهما تُحسم
+بسطر واحد من هذا الفصل: صيغة بايز
+(\cref{thm:g12:condprob:bayes}). وتتدرّب هذه المسألة عليها بالأكياس،
+ثم في العيادة والمحكمة وصندوق البريد.
+
+\medskip
+\noindent\textbf{الجزء الأول --- التمكّن.}
+\begin{enumerate}
+  \item قطعة نقد غير مغشوشة تختار الكيس I ($2$ حمراء و $1$ زرقاء) أو الكيس II
+        ($1$ حمراء و $3$ زرقاء)، ثم تُسحب كرة واحدة. احسب
+        $\P(\text{حمراء})$ بقانون الاحتمالات الكلية
+        (\cref{thm:g12:condprob:total}).
+  \item الكرة حمراء: احسب $\P(\text{الكيس I} \mid
+        \text{حمراء})$.
+  \item رمية نرد واحدة: هل الحادثتان ``زوجي'' و
+        ``$\leq 4$'' مستقلتان
+        (\cref{def:g12:condprob:indep})؟ وماذا عن ``زوجي'' و
+        ``$\leq 3$''؟
+  \item جهازا إنذار حريق مستقلان يعمل كل منهما \omterm{def:g10:proba:distribution}{باحتمال}
+        $0.9$ عند نشوب حريق. وباستعمال
+        \cref{prop:g12:condprob:indepcompl}، احسب
+        \omterm{def:g10:proba:distribution}{احتمال} أن يعمل واحد منهما على الأقل.
+  \item ورقتان بدون إرجاع: احسب
+        $\P(\text{ملكان})$ بقاعدة الضرب
+        (\cref{prop:g12:condprob:product}).
+\end{enumerate}
+
+\medskip
+\noindent\textbf{الجزء الثاني --- الطبيب.}
+مرض يصيب شخصًا $1$ من كل $1\,000$. والاختبار يكشف
+$99\,\%$ من المرضى (وهي الحساسية) لكنه ينطلق أيضًا على $5\,\%$ من
+الأصحاء (إيجابيات كاذبة).
+\begin{enumerate}[resume]
+  \item التواترات الطبيعية: تخيّل $100\,000$ شخص. فكم منهم
+        مريض، وكم منهم صحيح؟ وكم إيجابيًا تنتج كل
+        مجموعة، وكم إيجابيًا في
+        المجموع؟
+  \item انطلاقًا من الأعداد، احسب
+        $\P(\text{مريض} \mid \text{إيجابي})$. واستوعب
+        الصدمة.
+  \item أعد حسابه بصيغة بايز وتحقق من
+        التوافق.
+  \item في الاستطلاعات، يجيب معظم الأطباء ``نحو
+        $99\,\%$''. سمِّ الاحتمالين الشرطيين
+        اللذين يُخلَط بينهما، وفسّر لماذا يقود المعدل القاعدي الضئيل
+        الجواب الحقيقي.
+  \item ويعود اختبار ثانٍ مستقل إيجابيًا أيضًا.
+        حدّث: بأخذ $1.9\,\%$ قبليًا جديدًا، احسب
+        $\P(\text{مريض} \mid \text{إيجابيان})$. فماذا يفعل
+        \emph{تراكم} الأدلة؟
+  \item احسب $\P(\text{مريض} \mid \text{إيجابي})$ إذا استُعمل
+        الاختبار نفسه على مجموعة عالية الخطر فقط انتشار المرض فيها
+        $5\,\%$. واستنتج العبرة الصحية العامة
+        بخصوص المسح الشامل للحالات النادرة.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{الجزء الثالث --- القاضي.}
+\begin{enumerate}[resume]
+  \item سمة حمض نووي من مسرح جريمة تطابق شخصًا واحدًا في
+        المليون. والمشتبه به، الذي وُجد بالبحث في قاعدة بيانات
+        لسكان المدينة البالغين $10$ ملايين، يطابقها. فما العدد المأمول
+        للتطابقات البريئة في المدينة؟ وعلمًا بالتطابق وحده،
+        كم يساوي $\P(\text{بريء} \mid
+        \text{تطابق})$ \omterm{def:g10:numbers:approx}{تقريبًا}؟
+  \item سمِّ المغالطة --- أي \omterm{def:g10:proba:distribution}{احتمال} اقتبسه
+        المدّعي العام، وأي \omterm{def:g10:proba:distribution}{احتمال} احتاجت إليه المحكمة؟ ---
+        وموازاتها الدقيقة مع السؤال 9.
+  \item مصيدة \omterm{def:g12:condprob:indep}{الاستقلال}: مأساتان نادرتان في أسرة واحدة
+        رُبّعتا مرة إلى ``واحد في $73$ مليونًا'' بمعاملتهما
+        على أنهما مستقلتان، فأُدينت أم بريئة
+        (قضية سالي كلارك). فإذا كانت الحادثتان تتشاركان عوامل خطر
+        أسرية بحيث تكون الثانية، علمًا بالأولى، أرجح $5$ مرات
+        من المعدل القاعدي، فأعد حساب رتبة القدر ---
+        وصُغ الدرس بخصوص ضرب الاحتمالات.
+  \item والدفاع يستطيع الغش أيضًا: فعبارة ``عشرة أبرياء يطابقون، إذن
+        التطابق لا يبرهن على شيء'' تتجاهل كل ما عداه.
+        فماذا تفعل صيغة بايز مع \emph{عدة} قطع من
+        الأدلة، وأي جملة واحدة ينبغي أن يعرفها كل
+        محلَّف؟
+\end{enumerate}
+
+\medskip
+\noindent\textbf{الجزء الرابع --- مرشِّح البريد المزعج.}
+\begin{enumerate}[resume]
+  \item بريدك $40\,\%$ منه مزعج. وتظهر كلمة ``يانصيب''
+        في $15\,\%$ من البريد المزعج و $0.5\,\%$ من البريد
+        النزيه. ورسالة تحويها: احسب
+        $\P(\text{مزعج} \mid \text{يانصيب})$.
+  \item الترميز التكراري المصحِّح للأخطاء
+        (تتمة \cref{exo:g12:condprob:8}): مع \omterm{def:g10:proba:distribution}{احتمال} قلب
+        $\varepsilon = 0.1$، بأي \omterm{def:g10:proba:distribution}{احتمال} يفشل فكّ الترميز بالأغلبية
+        من \emph{خمس} نسخ؟
+        وقارن بترميز النسخ الثلاث.
+  \item يعبر بت $4$ مرحّلات مضجّة مستقلة، يقلبه كل منها
+        \omterm{def:g10:proba:distribution}{باحتمال} $0.1$: فيصل صحيحًا
+        بالضبط عندما يكون عدد القلبات زوجيًا. احسب ذلك
+        \omterm{def:g10:proba:distribution}{الاحتمال} مرتين: بجمع الحدود الثنائية، و
+        بالصيغة الأنيقة
+        $\frac{1 + (1 - 2\varepsilon)^4}{2}$.
+  \item تضرب مرشِّحات البريد المزعج الحقيقية أدلة كلمات كثيرة
+        كأنها مستقلة (وهو بايز ``الساذج''). فلماذا يكون ذلك
+        الافتراض خاطئًا من أجل كلمات مثل ``اربح'' و
+        ``يانصيب'' --- ولماذا يعمل المرشِّح جيدًا
+        رغم ذلك؟ (جملة أو جملتان.)
+  \item الخاتمة --- بايز حسابًا للاعتقاد: القبْلي
+        $\times$ الأرجحية، ثم إعادة التعيير، فالبعْدي. أعد
+        الأحكام الثلاثة (العيادة، المحكمة، صندوق البريد) في جملة
+        واحدة لكل منها، ثم اسرد المصائد الثلاث التي كشفتها هذه المسألة:
+        المعدلات القاعدية المنسية، \omterm{def:g12:condprob:indep}{والاستقلال} المزيف، والأدلة
+        المقروءة قطعة قطعة.
+\end{enumerate}
+\end{problem}

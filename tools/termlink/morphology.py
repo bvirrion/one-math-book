@@ -76,13 +76,23 @@ NO_TAIL_END = ("s", "$", "]", ")")
 _DEV_MARK = (r'ऀ-ःऺ-़ा-ॏ'
              r'॑-ॗॢॣ‌‍')
 
+# Arabic has the same hole: harakat, sukun, shadda, the superscript alef and
+# the Quranic marks are all category Mn, so \w is false for every one of them
+# and a boundary written [\w-] happily ends a term on a bare consonant that is
+# in fact carrying a vowel sign. Tatweel (U+0640) is Lm and \w already sees it,
+# but it is listed here so the class documents the whole joining apparatus.
+_ARAB_MARK = ('ً-ٰٟ'
+              'ۖ-ۭـ')
+
+_MARKS = _DEV_MARK + _ARAB_MARK
+
 # Keep the hyphen last in each class so it stays literal and does not open a
 # range with the codepoint before it.
-_BEFORE = r'(?<![\w\\@' + _DEV_MARK + r'-])'
+_BEFORE = r'(?<![\w\\@' + _MARKS + r'-])'
 
 # in the escaped trees a word can be followed by an accent macro belonging to
 # the same word ("pair" inside "pair\'e"), which \w does not see
-_AFTER = (r'(?!(?:[\w' + _DEV_MARK + r'-]|\\[\'`^"~]|\\c\s*\{?[a-zA-Z]))')
+_AFTER = (r'(?!(?:[\w' + _MARKS + r'-]|\\[\'`^"~]|\\c\s*\{?[a-zA-Z]))')
 
 
 def pattern(term, lang, langcfg, no_capital=()):
@@ -107,6 +117,13 @@ def pattern(term, lang, langcfg, no_capital=()):
                         and term not in no_capital) else _esc(w)
         if (last or langcfg.TAIL_ON_EVERY_WORD) and not w.endswith(NO_TAIL_END):
             p += langcfg.WORD_TAIL
+        # Arabic attaches its article and its one-letter prepositions to the
+        # FRONT of the word, and inside a noun phrase every word takes them
+        # ("عدد أولي" -> "العدد الأولي"). Every other language here only ever
+        # needs a head on a single word, so this is opt-in per language and
+        # the fr/nl/es/pt/hi patterns are unchanged.
+        if len(words) > 1 and getattr(langcfg, "HEAD_ON_EVERY_WORD", False):
+            p = langcfg.HEAD + p
         pieces.append(p)
     body = r'\s+'.join(pieces)
     head = langcfg.HEAD if len(words) == 1 else ""

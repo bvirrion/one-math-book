@@ -1,0 +1,479 @@
+\chapter{التكامل}\label{ch:g12:integ}
+
+يجيب \omterm{def:g12:integ:area}{التكامل} عن سؤالين في آن واحد: ما المساحة تحت \omterm{def:g10:functions:graph}{منحنى}،
+وكيف يمكن استعادة \omterm{def:g11:func:function}{دالة} من معدل تغيرها؟ وتنص المبرهنة
+الأساسية في التحليل على أنهما السؤال نفسه --- وهو أعمق
+اكتشافات رياضيات القرن السابع عشر وأنفعها.
+
+\section{تكامل دالة متصلة}
+
+\begin{definition}[تكامل دالة موجبة]\label{def:g12:integ:area}
+لتكن $f$ \omterm{def:g12:limcont:continuity}{متصلة} وموجبة على $\intcc{a}{b}$. فإن
+\emph{التكامل}\index{تكامل}
+\[
+\int_a^b f(x)\,\dd x
+\]
+هو مساحة المنطقة \omterm{def:g12:seq:bounded}{المحدودة} \omterm{def:g10:functions:graph}{بمنحنى} $f$، وبالمحور $x$،
+وبالمستقيمين الشاقوليين $x = a$ و $x = b$، مقيسةً بوحدات المساحة.
+\end{definition}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[
+  width=8.4cm, height=5cm,
+  axis lines=middle, xmin=-0.4, xmax=3.4, ymin=-0.3, ymax=2.3,
+  xtick={0.5,2.7}, xticklabels={$a$,$b$}, ytick=\empty,
+  samples=100, domain=-0.2:3.3]
+  \addplot[name path=curve, omDef, thick, domain=0.2:3.2]
+    {1 + 0.5*sin(deg(2*x)) + 0.2*x};
+  \path[name path=axis] (0.5,0) -- (2.7,0);
+  \addplot[omDef!20] fill between[of=curve and axis, soft clip={domain=0.5:2.7}];
+  \node at (axis cs:1.6,0.55) {$\displaystyle\int_a^b f$};
+\end{axis}
+\end{tikzpicture}
+\end{omfigure}
+
+وأما من أجل \omterm{def:g11:func:function}{دالة} ذات إشارة كيفية، فتُعدّ المساحات الواقعة تحت المحور $x$
+سالبةً؛ ونضع
+$\int_b^a f(x)\,\dd x = -\int_a^b f(x)\,\dd x$.
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=9.6cm, height=4.8cm,
+  xmin=-0.5, xmax=7, ymin=-1.4, ymax=1.4,
+  xtick={3.1416,6.2832}, xticklabels={$\pi$,$2\pi$}, ytick={-1,1}]
+  \addplot[name path=sine, omDef, thick, domain=0:6.2832, samples=120]
+    {sin(deg(x))};
+  \path[name path=xaxis] (0,0) -- (6.2832,0);
+  \addplot[omDef!20] fill between[of=sine and xaxis,
+    soft clip={domain=0:3.1416}];
+  \addplot[omThm!20] fill between[of=sine and xaxis,
+    soft clip={domain=3.1416:6.2832}];
+  \node at (axis cs:1.57,0.4) {$+$};
+  \node at (axis cs:4.71,-0.4) {$-$};
+\end{axis}
+\end{tikzpicture}
+
+{\small المساحات ذات الإشارة: $\int_0^{2\pi} \sin x\,\dd x = 0$، إذ تلغي المنطقة
+الواقعة تحت المحور (بالأحمر) المنطقة الواقعة فوقه (بالأزرق).}
+\end{omfigure}
+
+\begin{proposition}[خواص التكامل]\label{prop:g12:integ:properties}
+لتكن $f, g$ متصلتين على \omterm{def:g10:numbers:interval}{فترة} تحوي $a, b, c$، وليكن
+$\lambda \in \R$.
+\begin{enumerate}
+  \item \emph{الخطية:}
+        $\displaystyle\int_a^b (f + \lambda g) = \int_a^b f + \lambda \int_a^b g$.
+  \item \emph{علاقة شال:}
+        $\displaystyle\int_a^c f = \int_a^b f + \int_b^c f$.
+  \item \emph{الموجبية:} إذا كان $a \leq b$ و $f \geq 0$ على $\intcc{a}{b}$،
+        فإن $\displaystyle\int_a^b f \geq 0$؛ وإذا كان $f \leq g$، فإن
+        $\displaystyle\int_a^b f \leq \int_a^b g$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+علاقة شال والموجبية مباشرتان من تفسير المساحة (فالمساحات تُجمع
+عند تجاور المناطق؛ ومنطقة ارتفاعها موجب مساحتها
+موجبة). وتنتج المقارنة بتطبيق الموجبية على $g - f$. وأما الخطية،
+فواضحة حدسيًا من أجل مجموع دالتين موجبتين (كدّس المساحات)، ويُبرهن
+عليها بصرامة في الجامعة؛ و\emph{هي مقبولة هنا}.
+\end{proof}
+
+\section{المبرهنة الأساسية في التحليل}
+
+\begin{definition}[الدالة الأصلية]\label{def:g12:integ:primitive}
+\emph{الدالة الأصلية}\index{دالة أصلية} \omterm{def:g11:func:function}{للدالة} $f$ على \omterm{def:g10:numbers:interval}{فترة}
+$I$ هي \omterm{def:g11:func:function}{دالة} $F$ قابلة للاشتقاق على $I$ بحيث $F' = f$.
+\end{definition}
+
+\begin{proposition}\label{prop:g12:integ:primunique}
+إذا كانت $F$ \omterm{def:g12:integ:primitive}{دالة أصلية} \omterm{def:g11:func:function}{للدالة} $f$ على \omterm{def:g10:numbers:interval}{فترة} $I$، فإن الدوال الأصلية \omterm{def:g11:func:function}{للدالة} $f$ على
+$I$ هي بالضبط الدوال $F + c$، حيث $c \in \R$. وإذا أُعطي $x_0 \in I$ و
+$y_0 \in \R$، فتوجد \omterm{def:g12:integ:primitive}{دالة أصلية} وحيدة حيث $F(x_0) = y_0$.
+\end{proposition}
+
+\begin{proof}
+إذا كان $G' = F' = f$، فإن $(G - F)' = 0$ على \omterm{def:g10:numbers:interval}{الفترة} $I$، إذن $G - F$
+ثابتة.\footnote{وكون \omterm{def:g11:func:function}{دالة} مشتقتها معدومة على \omterm{def:g10:numbers:interval}{فترة} تكون
+ثابتة ينتج من \cref{thm:g12:deriv:variations}: فهي \omterm{def:g12:seq:monotonic}{متزايدة}
+\omterm{def:g10:functions:variations}{ومتناقصة} معًا.} وبالعكس، كل \omterm{def:g11:func:function}{دالة} $F + c$ \omterm{def:g12:integ:primitive}{دالة أصلية}. والشرط
+$F(x_0) = y_0$ يثبّت الثابت.
+\end{proof}
+
+\begin{theorem}[المبرهنة الأساسية في التحليل]\label{thm:g12:integ:ftc}
+\index{المبرهنة الأساسية في التحليل}
+لتكن $f$ \omterm{def:g12:limcont:continuity}{متصلة} على \omterm{def:g10:numbers:interval}{فترة} $I$ وليكن $a \in I$. \omterm{def:g11:func:function}{فالدالة}
+\[
+F \colon x \longmapsto \int_a^x f(t)\,\dd t
+\]
+هي \omterm{def:g12:integ:primitive}{الدالة الأصلية} \omterm{def:g11:func:function}{للدالة} $f$ على $I$ المنعدمة عند $a$. ومنه، من أجل أي
+\omterm{def:g12:integ:primitive}{دالة أصلية} $G$ \omterm{def:g11:func:function}{للدالة} $f$ ومن أجل $a, b \in I$:
+\[
+\int_a^b f(t)\,\dd t = \bigl[G(t)\bigr]_a^b = G(b) - G(a).
+\]
+\end{theorem}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=9.2cm, height=5.6cm,
+  xmin=-0.4, xmax=4.2, ymin=-0.4, ymax=2.9,
+  xtick={0.5,2.2,2.7}, xticklabels={$a$,$x$,\ $x+h$}, ytick=\empty]
+  \addplot[name path=curve, omDef, thick, domain=0:3.9, samples=80]
+    {1 + 0.4*x + 0.2*sin(deg(2*x))};
+  \path[name path=xaxis] (0,0) -- (3.9,0);
+  \addplot[omDef!20] fill between[of=curve and xaxis,
+    soft clip={domain=0.5:2.2}];
+  \addplot[omProp!40] fill between[of=curve and xaxis,
+    soft clip={domain=2.2:2.7}];
+  \draw[black, dashed, thin] (axis cs:2.2,1.69) -- (axis cs:2.7,1.69);
+  \draw[black, dashed, thin] (axis cs:2.2,1.925) -- (axis cs:2.7,1.925)
+    node[above right, font=\small] {$f(x+h)$};
+  \node at (axis cs:1.35,0.6) {$F(x)$};
+\end{axis}
+\end{tikzpicture}
+
+{\small فكرة البرهان: الزيادة $F(x+h) - F(x)$ هي مساحة
+الشريط الضيق (بالبرتقالي)، محصورةً بين المستطيلين اللذين ارتفاعاهما
+$f(x)$ و $f(x+h)$ على قاعدة طولها $h$.}
+\end{omfigure}
+
+\begin{proof}[البرهان عندما تكون $f$ متزايدة]
+ثبّت $x \in I$ و $h > 0$ حيث $x + h \in I$. وحسب علاقة شال،
+\[
+F(x+h) - F(x) = \int_x^{x+h} f(t)\,\dd t .
+\]
+وبما أن $f$ \omterm{def:g12:seq:monotonic}{متزايدة}، فإن $f(x) \leq f(t) \leq f(x+h)$ من أجل
+$t \in \intcc{x}{x+h}$، وبمقارنة التكاملات (\omterm{def:g12:integ:area}{فتكامل} الثابت
+$c$ على \omterm{def:g10:numbers:interval}{فترة} طولها $h$ هو $ch$):
+\[
+h\,f(x) \leq F(x+h) - F(x) \leq h\,f(x+h),
+\]
+إذن
+\[
+f(x) \leq \frac{F(x+h) - F(x)}{h} \leq f(x+h).
+\]
+ولما $h \to 0^+$، يكون $f(x+h) \to f(x)$ \omterm{def:g12:limcont:continuity}{بالاتصال}، وتعطي مبرهنة الحصر
+أن معدل التغير يؤول إلى $f(x)$؛ والحالة $h < 0$
+متناظرة. ومنه $F' = f$ و $F(a) = 0$. وأما الحالة \omterm{def:g12:limcont:continuity}{المتصلة} العامة (غير \omterm{def:g12:seq:monotonic}{الرتيبة})
+فيُبرهن عليها في الجامعة.
+
+وأخيرًا، إذا كانت $G$ أي \omterm{def:g12:integ:primitive}{دالة أصلية}، فإن $G = F + c$
+(\cref{prop:g12:integ:primunique})، إذن
+$G(b) - G(a) = F(b) - F(a) = \int_a^b f$.
+\end{proof}
+
+\begin{example}
+$\displaystyle\int_0^1 x^2\,\dd x = \left[\frac{x^3}{3}\right]_0^1 =
+\frac13$: فالمساحة تحت \omterm{def:g11:quad:parabola}{القطع المكافئ} هي ثلث مربع الوحدة، كما
+عرف أرخميدس.
+\end{example}
+
+ويُقرأ جدول الدوال الأصلية من جدول المشتقات
+(حيث ترمز $u$ إلى \omterm{def:g11:func:function}{دالة} قابلة للاشتقاق و $c$ إلى ثابت كيفي):
+\begin{center}
+\renewcommand{\arraystretch}{1.7}
+\begin{tabular}{c|c||c|c}
+$f(x)$ & \omterm{def:g12:integ:primitive}{الدالة الأصلية} & $f$ & \omterm{def:g12:integ:primitive}{الدالة الأصلية} \\
+\hline
+$x^n \ (n \neq -1)$ & $\dfrac{x^{n+1}}{n+1} + c$ &
+$u'u^n \ (n \neq -1)$ & $\dfrac{u^{n+1}}{n+1} + c$\\
+$\dfrac1x \ (x > 0)$ & $\ln x + c$ &
+$\dfrac{u'}{u} \ (u > 0)$ & $\ln u + c$\\
+$\eu^x$ & $\eu^x + c$ &
+$u'\eu^u$ & $\eu^u + c$\\
+$\cos x$ & $\sin x + c$ &
+$\dfrac{u'}{\sqrt u} \ (u>0)$ & $2\sqrt u + c$\\
+$\sin x$ & $-\cos x + c$ & &
+\end{tabular}
+\end{center}
+
+\begin{method}[التعرف على الصورة $u' \times (\text{عبارة في } u)$]\label{met:g12:integ:uprime}
+\omterm{def:g12:integ:area}{لتكامل} جداء، ابحث عن عامل يكون \omterm{def:g12:deriv:derivative}{مشتقة} \omterm{def:g11:func:function}{دالة}
+داخلية $u$، إلى غاية ثابت ضربي. فمثلًا في
+$\int_0^1 x\,\eu^{x^2}\dd x$، يكون العامل $x$ هو $\frac12 (x^2)'$:
+\[
+\int_0^1 x\,\eu^{x^2}\dd x = \frac12\left[\eu^{x^2}\right]_0^1
+= \frac{\eu - 1}{2}.
+\]
+\end{method}
+
+\begin{theorem}[التكامل بالتجزئة]\label{thm:g12:integ:ibp}
+\index{تكامل بالتجزئة}
+لتكن $u, v$ قابلتين للاشتقاق على $\intcc{a}{b}$ ومشتقتاهما متصلتان.
+عندئذٍ
+\[
+\int_a^b u'(t)\,v(t)\,\dd t
+= \bigl[u(t)\,v(t)\bigr]_a^b - \int_a^b u(t)\,v'(t)\,\dd t .
+\]
+\end{theorem}
+
+\begin{proof}
+تعطي قاعدة الجداء $(uv)' = u'v + uv'$؛ وبتكامل الطرفين على
+$\intcc{a}{b}$ واستعمال المبرهنة الأساسية من أجل الطرف الأيسر
+نجد $\bigl[uv\bigr]_a^b = \int_a^b u'v + \int_a^b uv'$.
+\end{proof}
+
+\begin{example}\label{ex:g12:integ:ibp}
+$\displaystyle\int_0^1 t\,\eu^{t}\,\dd t$: خذ $u' = \eu^t$ و $v = t$، فيكون
+$u = \eu^t$ و $v' = 1$:
+\[
+\int_0^1 t\,\eu^t\,\dd t = \bigl[t\,\eu^t\bigr]_0^1 - \int_0^1 \eu^t\,\dd t
+= \eu - (\eu - 1) = 1 .
+\]
+\end{example}
+
+\section{تطبيقات}
+
+\begin{definition}[القيمة المتوسطة]\label{def:g12:integ:mean}
+\emph{القيمة المتوسطة}\index{قيمة متوسطة} \omterm{def:g12:limcont:continuity}{لدالة متصلة} $f$ على
+$\intcc{a}{b}$ (حيث $a<b$) هي
+\[
+\mu = \frac{1}{b-a}\int_a^b f(t)\,\dd t .
+\]
+\end{definition}
+
+\begin{proposition}\label{prop:g12:integ:meanbounds}
+إذا كان $m \leq f \leq M$ على $\intcc{a}{b}$، فإن $m \leq \mu \leq M$.
+\end{proposition}
+
+\begin{proof}
+كامل المتراجحتين $m \leq f(t) \leq M$ على $\intcc{a}{b}$ ثم
+اقسم على $b - a > 0$.
+\end{proof}
+
+\begin{method}[المساحة بين منحنيين]\label{met:g12:integ:areabetween}
+إذا كان $f \geq g$ على $\intcc{a}{b}$، فالمساحة بين المنحنيين هي
+$\int_a^b \bigl(f(x) - g(x)\bigr)\dd x$. وإذا \omterm{def:g10:numbers:interunion}{تقاطع} المنحنيان، فقسّم
+\omterm{def:g10:numbers:interval}{الفترة} عند نقط \omterm{def:g10:numbers:interunion}{التقاطع} وكامل $\abs{f - g}$ قطعة قطعة.
+\end{method}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=8.4cm, height=5.8cm,
+  xmin=-2.1, xmax=2.9, ymin=-1.8, ymax=5.6,
+  xtick={-1,2}, ytick=\empty]
+  \addplot[name path=line, omThm, thick, domain=-1.7:2.5] {x + 1};
+  \addplot[name path=parab, omDef, thick, domain=-1.9:2.45] {x^2 - 1};
+  \addplot[omDef!20] fill between[of=line and parab,
+    soft clip={domain=-1:2}];
+  \fill (axis cs:-1,0) circle (1.5pt);
+  \fill (axis cs:2,3) circle (1.5pt);
+\end{axis}
+\end{tikzpicture}
+
+{\small المساحة بين المستقيم $y = x + 1$ (بالأحمر) \omterm{def:g11:quad:parabola}{والقطع المكافئ}
+$y = x^2 - 1$ (بالأزرق) هي $\int_{-1}^{2}
+\bigl((x+1) - (x^2-1)\bigr)\dd x = \frac92$.}
+\end{omfigure}
+
+\section{تمارين}
+
+\begin{exercise}[$\star$]\label{exo:g12:integ:1}
+احسب
+\[
+\int_1^2 \left(3x^2 - \frac{1}{x^2}\right)\dd x, \qquad
+\int_0^{\pi/2} \cos t \,\dd t, \qquad
+\int_0^{1} \frac{\dd t}{2t+1} .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:integ:2}
+أوجد \omterm{def:g12:integ:primitive}{الدالة الأصلية} $F$ \omterm{def:g11:func:function}{للدالة} $f(x) = x\eu^{x^2}$ على $\R$ حيث $F(0) = 1$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:integ:3}
+احسب \omterm{def:g12:integ:mean}{القيمة المتوسطة} \omterm{def:g11:func:function}{للدالة} $f(t) = \sin t$ على $\intcc{0}{\pi}$، وفسّر
+النتيجة على رسم بياني.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:integ:4}
+باستعمال \omterm{thm:g12:integ:ibp}{التكامل بالتجزئة}، احسب
+\[
+\int_1^{\eu} \ln t\,\dd t
+\qquad\text{و}\qquad
+\int_0^{\pi} t \sin t\,\dd t .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:integ:5}
+احسب مساحة المنطقة المحصورة بين \omterm{def:g11:quad:parabola}{القطع المكافئ} $y = x^2$ والمستقيم
+$y = x + 2$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:integ:6}
+ليكن $I = \displaystyle\int_0^1 \frac{\dd t}{1 + t}$.
+\begin{enumerate}
+  \item احسب $I$.
+  \item من أجل $n \in \N$، ليكن $I_n = \displaystyle\int_0^1 \frac{t^n}{1+t}\dd t$.
+        بيّن أن $I_n + I_{n+1} = \dfrac{1}{n+1}$، وأن
+        $0 \leq I_n \leq \dfrac{1}{n+1}$.
+  \item استنتج أن
+        $1 - \frac12 + \frac13 - \dots + \frac{(-1)^{n-1}}{n}
+        \xrightarrow[n \to +\infty]{} \ln 2$.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:integ:7}
+تُنمذَج سرعة قطار (بوحدة m/s) خلال الثواني $100$ الأولى بعد الانطلاق
+بالعلاقة $v(t) = 30\bigl(1 - \eu^{-t/50}\bigr)$. احسب المسافة
+المقطوعة خلال هذه الثواني $100$، والسرعة المتوسطة للقطار على
+\omterm{def:g10:numbers:interval}{الفترة}.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:integ:8}
+من أجل $n \geq 1$، ليكن $S_n = \dfrac1n \displaystyle\sum_{k=1}^{n} \frac{1}{1 + k/n}$.
+\begin{enumerate}
+  \item فسّر $S_n$ على أنه مساحة مستطيلات تقرّب منطقة
+        تحت \omterm{def:g10:functions:graph}{منحنى} $t \mapsto \frac{1}{1+t}$ على $\intcc{0}{1}$.
+  \item باستعمال رتابة $t \mapsto \frac{1}{1+t}$، بيّن أن
+        \[
+        S_n \leq \int_0^1 \frac{\dd t}{1+t} \leq S_n + \frac1n\left(1 - \frac12\right),
+        \]
+        ثم استنتج $\lim\limits_{n\to+\infty} S_n = \ln 2$.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:integ:9}
+\emph{(تكاملات واليس.)} من أجل $n \in \N$، ليكن
+$W_n = \displaystyle\int_0^{\pi/2} \sin^n t\,\dd t$.
+\begin{enumerate}
+  \item احسب $W_0$ و $W_1$.
+  \item بكتابة $\sin^{n+2}t = \sin t \cdot \sin^{n+1} t$ \omterm{thm:g12:integ:ibp}{والتكامل
+        بالتجزئة}، بيّن أن $W_{n+2} = \dfrac{n+1}{n+2}\,W_n$.
+  \item استنتج $W_2$ و $W_3$ و $W_4$ وبيّن أن $(W_n)$ \omterm{def:g10:functions:variations}{متناقصة} و
+        موجبة.
+\end{enumerate}
+\end{exercise}
+
+\section{مسألة: أرخميدس في مواجهة الآلة}
+
+\begin{problem}[{مسألة نهاية الأسبوع --- المساحة تحت القطع المكافئ،
+محسوبةً بثلاث طرائق عبر اثنين وعشرين قرنًا، و
+هوية اللوغاريتم السرية بوصفه مساحة}]
+\label{pb:g12:integ:1}
+نحو سنة 240 قبل الميلاد، حسب أرخميدس المساحة المضبوطة لقطعة
+من \omterm{def:g11:quad:parabola}{قطع مكافئ} --- بلا \omterm{def:g10:coordgeom:system}{إحداثيات}، وبلا نهايات، وبلا جبر.
+وبعد تسعة عشر قرنًا، أعادت مستطيلات ريمان الحساب بالحصر
+الغاشم؛ وأما المبرهنة الأساسية في التحليل
+(\cref{thm:g12:integ:ftc}) فتفعله الآن في سطر واحد. وتلعب هذه المسألة
+المباريات الثلاث كلها، ثم تستعمل الآلة نفسها لتكشف
+ما هو \omterm{def:g12:exp:ln}{اللوغاريتم} حقًا: مساحة ذات تناظر سلّمي.
+
+\medskip
+\noindent\textbf{الجزء الأول --- التمكّن.}
+\begin{enumerate}
+  \item احسب $\displaystyle\int_0^1 (3x^2 - 2x + 1)\,\dd x$،
+        \ $\displaystyle\int_1^{\eu} \frac{\dd x}{x}$، \ و
+        $\displaystyle\int_0^{\pi/2} \cos x\,\dd x$.
+  \item تعرّف على الصور من نمط $u'u$
+        (\cref{met:g12:integ:uprime}):
+        $\displaystyle\int_0^1 x\,\eu^{x^2}\dd x$ و
+        $\displaystyle\int_0^1 \frac{2x}{x^2 + 1}\,\dd x$.
+  \item بالتجزئة (\cref{thm:g12:integ:ibp}):
+        $\displaystyle\int_0^1 x\,\eu^x \dd x$ و
+        $\displaystyle\int_1^{\eu} \ln x\,\dd x$.
+  \item احسب \omterm{def:g12:integ:mean}{القيمة المتوسطة}
+        (\cref{def:g12:integ:mean}) \omterm{def:g11:func:function}{للدالة} $\sin$ على
+        $\intcc{0}{\pi}$ --- ولاحظ أنها \emph{ليست}
+        $\frac12$.
+  \item احسب المساحة بين المستقيم $y = x$ \omterm{def:g11:quad:parabola}{والقطع
+        المكافئ} $y = x^2$ على $\intcc{0}{1}$
+        (\cref{met:g12:integ:areabetween}).
+\end{enumerate}
+
+\medskip
+\noindent\textbf{الجزء الثاني --- \omterm{def:g11:quad:parabola}{القطع المكافئ} بثلاث طرائق.}
+\begin{enumerate}[resume]
+  \item إعداد ريمان من أجل المساحة تحت $y = x^2$ على
+        $\intcc{0}{1}$: اكتب المجموع الأدنى $L_n$ والمجموع
+        الأعلى $U_n$ على $n$ مستطيلًا متساويًا (كما في
+        \cref{exo:g12:integ:8}).
+  \item برهن بالتراجع (بآلة \cref{pb:g12:seq:1}) على
+        صيغة مجموع المربعات
+        \[
+        1^2 + 2^2 + \dots + n^2 = \frac{n(n+1)(2n+1)}{6} .
+        \]
+  \item استنتج صورتين مغلقتين للمقدارين $U_n$ و $L_n$، واحسب
+        نهايتهما المشتركة، ثم اختم: المساحة هي $\frac13$.
+  \item والآن الآلة: احسب
+        $\int_0^1 x^2\,\dd x$ بالمبرهنة الأساسية، في
+        سطر واحد. وقارن بين الجهدين.
+  \item وقد صاغها أرخميدس على نحو آخر: \emph{القطعة من \omterm{def:g11:quad:parabola}{قطع
+        مكافئ} تساوي $\frac43$ من المثلث المرسوم داخلها}. ومن أجل
+        القطعة المقتطعة من $y = x^2$ بالوتر الواصل بين
+        $(-1, 1)$ و $(1, 1)$: احسب مساحة القطعة
+        \omterm{def:g12:integ:area}{بتكامل}، ومساحة المثلث المرسوم داخلها (ورأسه عند
+        الرأس $(0, 0)$)، وتحقق من نسبة المعلّم.
+  \item منهج أرخميدس نفسه: املأ القطعة بالمثلث
+        الكبير $T$، ثم بمثلثين مجموعهما
+        $\frac T4$، ثم بأربعة مجموعها $\frac{T}{16}$، وهكذا
+        دواليك. اجمع المتسلسلة \omterm{def:g12:seq:arith-geom}{الهندسية} واستعد
+        $\frac43 T$ --- إنه لوح الشوكولاتة المقضوم بلا انتهاء في
+        الكتاب السابق، وقد أكله مهندس يوناني.
+  \item جملة واحدة لكل بند: الاستنفاد (أرخميدس)، والحصر
+        (ريمان)، والاشتقاق العكسي (نيوتن--لايبنتز) ---
+        ماذا يحتاج كل منها، وماذا يعطي؟
+\end{enumerate}
+
+\medskip
+\noindent\textbf{الجزء الثالث --- \omterm{def:g12:exp:ln}{اللوغاريتم} مساحة.}
+من أجل $x > 0$، ضع
+$A(x) = \displaystyle\int_1^x \frac{\dd t}{t}$.
+\begin{enumerate}[resume]
+  \item أعطِ $A(1)$ و $A'(x)$
+        (\cref{thm:g12:integ:ftc})، واستنتج أن $A$ هي
+        بالضبط \omterm{def:g12:exp:ln}{اللوغاريتم النيبيري} في
+        \cref{def:g12:exp:ln}.
+  \item المعجزة السلّمية: ثبّت $a > 0$ وادرس
+        $g(x) = A(ax) - A(x)$. احسب $g'$ (بقاعدة السلسلة)،
+        واستنتج أن $g$ ثابتة، وقدّر الثابت ---
+        ثم اختم \omterm{def:g10:algebra:equation}{بالمعادلة} الدالية
+        \[
+        \ln(ab) = \ln a + \ln b ,
+        \]
+        مبرهَنًا عليها بالتحليل الخالص: فالمساحة من $1$ إلى $ab$
+        تنقسم إلى نسخ مكبَّرة.
+  \item استنتج من السؤال 14: $\ln(a^n) = n\ln a$ و
+        $\ln\frac1a = -\ln a$.
+  \item يقرأ \Cref{exo:g12:integ:8} المقدار
+        $\frac{1}{n+1} + \frac{1}{n+2} + \dots + \frac{1}{2n}$
+        على أنه مستطيلات تحت $\frac{1}{1 + t}$: احسب هذا المجموع
+        من أجل $n = 10$ (بثلاثة أرقام عشرية) وقارنه بالمقدار
+        $\ln 2$. فأي مجاميع ذات نكهة توافقية، متباعدة حدًا
+        بعد حد، \omterm{def:g12:seq:limit}{تتقارب} هنا إلى مساحة؟
+\end{enumerate}
+
+\medskip
+\noindent\textbf{الجزء الرابع --- التراكم.}
+\begin{enumerate}[resume]
+  \item سيارة تتسارع بسرعة $v(t) = 3t^2$ m/s من أجل
+        $t \in \intcc{0}{10}$. احسب المسافة المقطوعة،
+        والسرعة المتوسطة، واللحظة التي تساوي عندها السرعة
+        اللحظية السرعة المتوسطة.
+  \item قضيب طوله $4$ أمتار كثافته الطولية
+        $\rho(x) = 2 + x$ kg/m. احسب كتلته الكلية و
+        مركز كتلته
+        $\dfrac{\int_0^4 x\,\rho(x)\,\dd x}{\int_0^4
+        \rho(x)\,\dd x}$ --- وهو نقطة توازن مثلث الورق المقوّى
+        في الكتاب السابق، محسوبةً أخيرًا
+        بأوزان متغيرة.
+  \item تكاملات واليس (\cref{exo:g12:integ:9}): احسب
+        $W_0$ و $W_1$ و
+        $W_2 = \int_0^{\pi/2} \sin^2 t\,\dd t$ باستعمال
+        تخطيط \cref{pb:g12:trigo:1}. (وسلّمها اللانهائي
+        يتسلق، في الكتب الجامعية، إلى صيغة جدائية
+        للعدد $\pi$ وإلى تعيير \omterm{def:g10:functions:graph}{منحنى}
+        الجرس.)
+  \item الخاتمة --- أوجه \omterm{def:g12:integ:area}{التكامل} الثلاثة: \emph{مساحة}
+        بالتعريف، و\emph{تراكم} في العالم
+        (المسافة، والكتلة)، و\emph{\omterm{def:g12:integ:primitive}{دالة أصلية}} حسب
+        المبرهنة الأساسية؛ وتاريخه في ثلاثة أسماء.
+        واختم بلؤلؤة الفصل: أي زر يومي
+        على الآلة الحاسبة هو سرًا المساحة تحت
+        $\frac1t$ --- وأي متطابقة برهنت عليها تلك المساحة؟
+\end{enumerate}
+\end{problem}

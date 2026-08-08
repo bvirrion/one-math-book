@@ -30,9 +30,14 @@
 \def\om@lang@es{es}%
 \def\om@lang@pt{pt}%
 \def\om@lang@hi{hi}%
+\def\om@lang@ar{ar}%
 \newif\ifom@hindi
+\newif\ifom@arabic
 \ifx\om@booklang@exp\om@lang@hi
   \om@hinditrue
+\fi
+\ifx\om@booklang@exp\om@lang@ar
+  \om@arabictrue
 \fi
 
 \ifom@hindi
@@ -74,10 +79,27 @@
   % supported hook for this; do not \renewcommand\emph, which breaks nesting.
   \DeclareEmphSequence{\bfseries,\normalfont}%
 \else
-  \ifPDFTeX
-    \RequirePackage[T1]{fontenc}%
-    \RequirePackage[utf8]{inputenc}%
-    \RequirePackage{lmodern}%
+  \ifom@arabic
+    % Arabic is the first right-to-left edition. It needs LuaTeX, not XeTeX:
+    % the bidirectional engine we use is babel's own "bidi=basic", which is
+    % implemented in Lua and therefore does not patch LaTeX internals the way
+    % the xetex "bidi" package does. That matters here because this stack
+    % leans on tcolorbox[most], tikz, pgfplots and hyperref, all of which
+    % "bidi" is known to fight with. See the babel block below for the four
+    % fixes the combination still needs.
+    \ifLuaTeX\else
+      \PackageError{onemath}{%
+        Arabic editions require LuaLaTeX.\MessageBreak
+        Use: lualatex \jobname.tex\MessageBreak
+        (or latexmk, which picks LuaLaTeX for *_ar.tex)}{Build with LuaLaTeX.}%
+    \fi
+    \RequirePackage{fontspec}%
+  \else
+    \ifPDFTeX
+      \RequirePackage[T1]{fontenc}%
+      \RequirePackage[utf8]{inputenc}%
+      \RequirePackage{lmodern}%
+    \fi
   \fi
 \fi
 \RequirePackage{microtype}
@@ -166,6 +188,75 @@
   \renewcommand{\@tocrmarg}{3.2em}%
 \fi
 
+% ----------------------------------------------------------------------------
+% Arabic: right-to-left, via babel's Lua bidi engine.
+%
+% "layout=graphics" is load-bearing, not cosmetic. Without it every pgfpicture
+% -- which includes the frame of every tcolorbox, i.e. every statement
+% environment in the series -- is drawn mirrored about the picture origin, so
+% the coloured box lands beside its own text, off the page. babel's own patch
+% (luababel.def, \bbl@pictsetdir) typesets pictures left-to-right and then
+% re-applies RTL at each tikz node, which is exactly what figures need: the
+% drawing coordinates stay untouched and only the node text reads RTL.
+%
+% Four more fixes live after the packages load; see "Arabic runtime fixes"
+% below.
+% ----------------------------------------------------------------------------
+\ifom@arabic
+  % layout=tabular is the second load-bearing one. babel's bidi=basic
+  % implements the Unicode algorithm's W1-W7 and N1-N2 but NOT N0, the paired
+  % bracket rule, so a table cell like "$V$ (\unit{mL})" ended with its
+  % closing parenthesis taking the paragraph direction: the cell rendered
+  % "(mLV (", with two opening brackets and none closing. \babelsublr around
+  % the cell does not help -- the direction is decided for the cell box.
+  % layout=tabular fixes the cells and, correctly for a right-to-left book,
+  % orders the columns right to left. Prose is unaffected: a parenthesised
+  % Latin run inside an Arabic sentence already resolved correctly, because
+  % there the closing bracket has following context to key on.
+  \RequirePackage[bidi=basic,layout=graphics.tabular]{babel}%
+  % Table of contents. Arabic prose uses ASCII digits, so this looked like it
+  % would not be needed -- but it is: Noto Naskh Arabic's ASCII digits are
+  % themselves wider than Latin Modern's, and every three-digit contents entry
+  % overflowed \@pnumwidth by 1.39063pt. That single cause produced 147 of the
+  % 149 overfull boxes in the first Arabic build, against 0 for English; the
+  % log said "detected at line", i.e. a box, not "in paragraph", so this is not
+  % a hyphenation problem and Arabic needs no patterns here either.
+  \renewcommand{\@pnumwidth}{2.2em}%
+  \renewcommand{\@tocrmarg}{3.2em}%
+  \babelprovide[import,main]{arabic}%
+  % One bundled variable font for every shape. Noto Naskh Arabic is a book
+  % face: it carries the full Arabic block AND full ASCII, which matters
+  % because the prose is full of parentheses, ASCII digits and Latin symbols.
+  % (The *static* Noto Naskh has no ASCII at all -- not even "(" -- so do not
+  % "simplify" this back to Regular/Bold .ttf files.)
+  %
+  % Every shape is aliased onto the one file, with the weight taken from the
+  % variable font's wght axis. Arabic has no italic and no small caps; left
+  % undeclared, the bold shape comes out undefined and every
+  % \emph{term}\index{term} -- the series' marker for a defined term -- is
+  % typographically invisible, exactly as it was in Hindi before its fix.
+  \IfFileExists{assets/fonts/NotoNaskhArabic-VF.ttf}{%
+    \babelfont{rm}[%
+      Path=assets/fonts/,%
+      Extension=.ttf,%
+      UprightFont=*, BoldFont=*, ItalicFont=*,%
+      BoldItalicFont=*, SmallCapsFont=*,%
+      UprightFeatures={RawFeature={axis={wght=400}}},%
+      BoldFeatures={RawFeature={axis={wght=700}}},%
+      ItalicFeatures={RawFeature={axis={wght=400}}},%
+      BoldItalicFeatures={RawFeature={axis={wght=700}}},%
+      SmallCapsFeatures={RawFeature={axis={wght=400}}},%
+      Script=Arabic,%
+    ]{NotoNaskhArabic-VF}%
+  }{%
+    \babelfont{rm}[Script=Arabic]{Noto Naskh Arabic}%
+  }%
+  % Emphasis by weight, as in the Hindi edition: the script has no italic
+  % tradition. \DeclareEmphSequence is the supported hook; do not
+  % \renewcommand\emph, which breaks nesting.
+  \DeclareEmphSequence{\bfseries,\normalfont}%
+\fi
+
 \RequirePackage{amsmath}
 \RequirePackage{amssymb}
 \RequirePackage{amsthm}
@@ -200,6 +291,50 @@
 \RequirePackage[colorlinks=true,linkcolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
 \RequirePackage[nameinlink,capitalize]{cleveref}
 \RequirePackage{etoolbox}
+
+% ----------------------------------------------------------------------------
+% Arabic runtime fixes. These must come AFTER mathtools, tikz, pgfplots and
+% tcolorbox are loaded, because each one repairs an interaction with them.
+% All four were found by building the real chapters, not by reading docs; a
+% green log does not reveal any of them, only the rendered page does.
+% ----------------------------------------------------------------------------
+\ifom@arabic
+  % 1. babel vs mathtools. luababel.def does \bbl@sreplace\intertext@{...}
+  %    when an RTL language is provided. mathtools has already redefined
+  %    \intertext@ in expl3 syntax, and \bbl@sreplace re-tokenises that body
+  %    WITHOUT expl3 catcodes, so \l_MT_below_intertext_sep comes back as \l
+  %    followed by garbage. Every single align/gather in the book then fails
+  %    with "Undefined control sequence". Save mathtools' meaning here and put
+  %    it back after babel's own \AtBeginDocument patch has run (ours is
+  %    declared later, so it runs later). \intertext is used nowhere in the
+  %    sources, so losing babel's baseline tweak for it costs nothing.
+  \let\om@saved@intertext\intertext@
+  \AtBeginDocument{\let\intertext@\om@saved@intertext}%
+  % 2. Whole pictures are typeset left-to-right. layout=graphics already does
+  %    this for pgfpicture, but pgfplots places its axis label and tick label
+  %    rows outside the tikz-node path that babel re-orients, so an axis came
+  %    out with its x labels mirrored and shifted a full picture-width left.
+  %    Use babel's OWN \bbl@textdir, not the raw \textdir primitive: the
+  %    primitive changes TeX's direction but not the attribute babel's Lua
+  %    filter reads, so the filter still walked the picture as RTL and died
+  %    with "babel-bidi-basic.lua:345: attempt to index a nil value" on the
+  %    first pgfplots mark glyph. Forcing it properly fixes the whole
+  %    family; babel still restores RTL inside each tikz node, so Arabic node
+  %    text reads correctly.
+  \AddToHook{env/tikzpicture/before}{\leavevmode\begingroup\bbl@textdir\z@}%
+  \AddToHook{env/tikzpicture/after}{\endgroup}%
+  % 3. ... but tcolorbox builds its content INSIDE that left-to-right picture
+  %    scope, so without this the Arabic inside every definition, theorem and
+  %    exercise box came out in reversed word order. Put the box body back to
+  %    RTL.
+  \tcbset{before upper={\pardir TRT\textdir TRT}}%
+  % 4. pgfplots axis labels and titles are Arabic prose and must read RTL
+  %    inside the otherwise left-to-right picture.
+  \pgfplotsset{every axis/.append style={%
+    label style={execute at begin node={\pardir TRT\textdir TRT}},%
+    title style={execute at begin node={\pardir TRT\textdir TRT}},%
+  }}%
+\fi
 
 \setlist[enumerate]{itemsep=1pt,topsep=3pt}
 \setlist[itemize]{itemsep=1pt,topsep=3pt}
@@ -465,6 +600,24 @@
 % could still produce a discarded zero-height first part. If a label that
 % plainly exists still reports as undefined, move it to just before the
 % environment's \end -- the counter is unchanged and the write survives.)
+% The coloured rule marks the edge a reader starts from, so it follows the
+% script: west for the left-to-right editions, east for Arabic, with the
+% asymmetric padding mirrored to match. The two option lists are written out
+% in full rather than assembled from a macro: pgfkeys does not expand a macro
+% while parsing key names, and a \om@statementrule{...} in there is read as
+% one long unknown key ("I do not know the key '/tcb/borderline west=...'").
+\ifom@arabic
+\newcommand{\omdecorate}[2]{%
+  \tcolorboxenvironment{#1}{%
+    enhanced jigsaw, breakable, frame hidden,
+    boxrule=0pt, sharp corners,
+    borderline east={2pt}{0pt}{#2},
+    left=4pt, right=8pt, top=4pt, bottom=4pt,
+    before skip=10pt, after skip=10pt,
+    lines before break=5,
+    colback=#2!4!white}%
+}
+\else
 \newcommand{\omdecorate}[2]{%
   \tcolorboxenvironment{#1}{%
     enhanced jigsaw, breakable, frame hidden,
@@ -475,6 +628,7 @@
     lines before break=5,
     colback=#2!4!white}%
 }
+\fi
 \omdecorate{definition}{omDef}
 \omdecorate{theorem}{omThm}
 \omdecorate{proposition}{omProp}
@@ -521,6 +675,61 @@
 \Crefname{exercise}{\omnameExercise}{\omnameExercises}
 \crefname{problem}{\omnameProblem}{\omnameProblems}
 \Crefname{problem}{\omnameProblem}{\omnameProblems}
+
+% Arabic refers to a numbered statement with the definite article: the heading
+% reads "مبرهنة 3.1" but the reference reads "حسب المبرهنة 3.1". The \omname*
+% strings above are the headings, so override the reference names here rather
+% than putting the article in styles/lang/ar.tex (which would prefix every
+% heading too). Written out attached, because the Arabic article is a bound
+% prefix, not a separate word: prefixing it in prose around \cref would put a
+% link boundary between ال and its noun and break the shaping.
+\ifom@arabic
+  \crefname{definition}{التعريف}{التعريفات}
+  \Crefname{definition}{التعريف}{التعريفات}
+  \crefname{theorem}{المبرهنة}{المبرهنات}
+  \Crefname{theorem}{المبرهنة}{المبرهنات}
+  \crefname{proposition}{القضية}{القضايا}
+  \Crefname{proposition}{القضية}{القضايا}
+  \crefname{lemma}{المبرهنة المساعدة}{المبرهنات المساعدة}
+  \Crefname{lemma}{المبرهنة المساعدة}{المبرهنات المساعدة}
+  \crefname{corollary}{النتيجة}{النتائج}
+  \Crefname{corollary}{النتيجة}{النتائج}
+  \crefname{method}{الطريقة}{الطرائق}
+  \Crefname{method}{الطريقة}{الطرائق}
+  \crefname{example}{المثال}{الأمثلة}
+  \Crefname{example}{المثال}{الأمثلة}
+  \crefname{notation}{الترميز}{الترميزات}
+  \Crefname{notation}{الترميز}{الترميزات}
+  \crefname{remark}{الملاحظة}{الملاحظات}
+  \Crefname{remark}{الملاحظة}{الملاحظات}
+  \crefname{chapter}{الفصل}{الفصول}
+  \Crefname{chapter}{الفصل}{الفصول}
+  \crefname{exercise}{التمرين}{التمارين}
+  \Crefname{exercise}{التمرين}{التمارين}
+  \crefname{problem}{المسألة}{المسائل}
+  \Crefname{problem}{المسألة}{المسائل}
+  % cleveref's conjunctions are English built-ins and babel does not localise
+  % them here, so a multi-reference printed "التمارين 1.1 and 1.2" and a range
+  % "1.1 to 1.3" in the middle of Arabic prose. The conjunction و is a bound
+  % prefix: it is written attached to the word that follows it, hence the
+  % space before it and none after.
+  % Deferred to the END of begindocument: cleveref creates these macros in
+  % its own \AtBeginDocument, so a \renewcommand at package-load time errors
+  % with "Command \crefpairconjunction undefined", and a plain
+  % \AtBeginDocument is only reliably later if ours was registered after
+  % cleveref's -- which held in one style file and not the other.
+  \AddToHook{begindocument/end}{%
+    \renewcommand{\crefpairconjunction}{ و}%
+    \renewcommand{\crefmiddleconjunction}{، }%
+    \renewcommand{\creflastconjunction}{ و}%
+    \renewcommand{\crefpairgroupconjunction}{ و}%
+    \renewcommand{\crefmiddlegroupconjunction}{، }%
+    \renewcommand{\creflastgroupconjunction}{ و}%
+    \renewcommand{\crefrangeconjunction}{ إلى }%
+    \renewcommand{\crefrangepreconjunction}{}%
+    \renewcommand{\crefrangepostconjunction}{}%
+  }%
+\fi
 
 % ----------------------------------------------------------------------------
 % Solutions appendix
