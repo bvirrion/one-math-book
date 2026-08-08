@@ -224,30 +224,46 @@
   \renewcommand{\@pnumwidth}{2.2em}%
   \renewcommand{\@tocrmarg}{3.2em}%
   \babelprovide[import,main]{arabic}%
-  % One bundled variable font for every shape. Noto Naskh Arabic is a book
-  % face: it carries the full Arabic block AND full ASCII, which matters
-  % because the prose is full of parentheses, ASCII digits and Latin symbols.
-  % (The *static* Noto Naskh has no ASCII at all -- not even "(" -- so do not
-  % "simplify" this back to Regular/Bold .ttf files.)
+  % Two bundled STATIC faces, cut from the Noto Naskh Arabic variable font at
+  % wght 400 and 700. Noto Naskh is a book face and these instances carry the
+  % full Arabic block AND full ASCII (95/95), which matters because the prose
+  % is full of parentheses, ASCII digits and Latin symbols -- the Noto Naskh
+  % statics published upstream have no ASCII at all, not even "(", which is
+  % why the variable font was bundled originally.
   %
-  % Every shape is aliased onto the one file, with the weight taken from the
-  % variable font's wght axis. Arabic has no italic and no small caps; left
-  % undeclared, the bold shape comes out undefined and every
-  % \emph{term}\index{term} -- the series' marker for a defined term -- is
-  % typographically invisible, exactly as it was in Hindi before its fix.
-  \IfFileExists{assets/fonts/NotoNaskhArabic-VF.ttf}{%
+  % DO NOT go back to instancing the variable font at run time
+  % (RawFeature={axis={wght=...}} or instance=Bold). luaotfload's variable
+  % instancing SEGFAULTS LuaHBTeX 1.24 on musl libc, which is what CI runs
+  % (ghcr.io/xu-cheng/texlive-full is Alpine). It killed the Arabic Book 5
+  % release build at page 308 with no error in the log at all, while the same
+  % engine on glibc built it perfectly -- so a local build proves nothing
+  % here. Any axis value crashed, including wght=400, the font's own default.
+  % The instances were cut once, offline:
+  %
+  %   python3 -c "from fontTools.ttLib import TTFont; \
+  %     from fontTools.varLib import instancer; \
+  %     f=TTFont('NotoNaskhArabic-VF.ttf'); \
+  %     instancer.instantiateVariableFont(f,{'wght':700},inplace=True, \
+  %       updateFontNames=True).save('NotoNaskhArabic-Bold.ttf')"
+  %
+  % NotoNaskhArabic-VF.ttf is kept beside them ONLY as the source for that
+  % command. Nothing loads it, and nothing should.
+  %
+  % Arabic has no italic and no small caps; left undeclared, the bold shape
+  % comes out undefined and every \emph{term}\index{term} -- the series'
+  % marker for a defined term -- is typographically invisible, exactly as it
+  % was in Hindi before its fix.
+  \IfFileExists{assets/fonts/NotoNaskhArabic-Regular.ttf}{%
     \babelfont{rm}[%
       Path=assets/fonts/,%
       Extension=.ttf,%
-      UprightFont=*, BoldFont=*, ItalicFont=*,%
-      BoldItalicFont=*, SmallCapsFont=*,%
-      UprightFeatures={RawFeature={axis={wght=400}}},%
-      BoldFeatures={RawFeature={axis={wght=700}}},%
-      ItalicFeatures={RawFeature={axis={wght=400}}},%
-      BoldItalicFeatures={RawFeature={axis={wght=700}}},%
-      SmallCapsFeatures={RawFeature={axis={wght=400}}},%
+      UprightFont=*-Regular,%
+      BoldFont=*-Bold,%
+      ItalicFont=*-Regular,%
+      BoldItalicFont=*-Bold,%
+      SmallCapsFont=*-Regular,%
       Script=Arabic,%
-    ]{NotoNaskhArabic-VF}%
+    ]{NotoNaskhArabic}%
   }{%
     \babelfont{rm}[Script=Arabic]{Noto Naskh Arabic}%
   }%

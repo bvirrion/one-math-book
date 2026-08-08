@@ -75,6 +75,29 @@ sub om_compile {
            '-cnf-line=extra_mem_top=6000000',
            '-cnf-line=extra_mem_bot=6000000',
            '-interaction=nonstopmode', '-halt-on-error');
-    return system(@engine, @args, $source);
+    # system() hands back the RAW wait status, not an exit code. Returning it
+    # verbatim is why a signal death reached latexmk as the meaningless
+    # "Command for 'pdflatex' gave return code 0.54296875" -- that is 139/256,
+    # and 139 is SIGSEGV+core. LuaTeX segfaulting on an Arabic book in CI was
+    # invisible until the number was decoded by hand. Decode it here instead.
+    my $status = system(@engine, @args, $source);
+    # Return the RAW wait status: latexmk divides what an internal routine
+    # returns by 256 to recover the exit code, so handing it a plain exit code
+    # makes an ordinary failure print as "return code 0.00390625".
+    #
+    # A death by SIGNAL is not a multiple of 256, though, and then that same
+    # division prints nonsense: LuaTeX segfaulting on an Arabic book in CI
+    # surfaced only as "gave return code 0.54296875" (139/256, i.e. SIGSEGV
+    # plus core), with no error anywhere in the log. Say so out loud instead.
+    if ($status == -1) {
+        warn "  !!! $engine[0] could not be run: $!\n";
+    }
+    elsif (my $signal = $status & 127) {
+        warn "  !!! $engine[0] was KILLED BY SIGNAL $signal"
+             . (($status & 128) ? " (core dumped)" : "")
+             . " while compiling $source -- this is a crash in the engine,\n"
+             . "      not a LaTeX error, so the .log will end without a '!' line.\n";
+    }
+    return $status;
 }
 $makeindex = 'makeindex %O -o %D %S';
