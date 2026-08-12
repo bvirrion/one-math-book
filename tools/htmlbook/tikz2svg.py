@@ -8,6 +8,7 @@ pictures across language editions build once.
 
 import hashlib
 import re
+import shutil
 import subprocess
 import tempfile
 from pathlib import Path
@@ -84,6 +85,15 @@ PREAMBLE = r"""
 # historical pdflatex path so their SVGs are byte-stable.
 DEVANAGARI = re.compile(r"[ऀ-ॿ]")
 
+# Figures with Arabic node text need the same stack as the Arabic book
+# itself: LuaLaTeX + babel's Lua bidi (bidi=basic), with layout=graphics so
+# the pgfpicture is not mirrored and only the node text reads RTL
+# (onemath.sty documents why XeTeX's "bidi" package is not an option).
+# onchar=ids fonts applies the Arabic font and direction to Arabic runs
+# inside the otherwise-LTR standalone document. Static faces only — the
+# variable font segfaults LuaHBTeX on musl (see arabic_style_card.md).
+ARABIC = re.compile(r"[؀-ۿ]")
+
 FONTS_DIR = Path(__file__).resolve().parents[2] / "assets" / "fonts"
 
 FONTSPEC_BLOCK = rf"""\usepackage{{fontspec}}
@@ -97,6 +107,26 @@ FONTSPEC_BLOCK = rf"""\usepackage{{fontspec}}
   Script=Devanagari,
 ]
 """
+
+ARABIC_BLOCK = r"""\usepackage[bidi=basic,layout=graphics]{babel}
+\babelprovide[onchar=ids fonts]{arabic}
+\babelfont[arabic]{rm}[
+  Path=./,
+  Extension=.ttf,
+  UprightFont=*-Regular,
+  BoldFont=*-Bold,
+  ItalicFont=*-Regular,
+  BoldItalicFont=*-Bold,
+  SmallCapsFont=*-Regular,
+  Script=Arabic,
+]{NotoNaskhArabic}
+"""
+
+# The faces named in ARABIC_BLOCK, copied beside fig.tex before compiling:
+# this luaotfload (3.18) resolves the bracketed [Path/file] lookup only
+# relative to the cwd — with an absolute Path= the PDF backend dies at
+# ship-out with "cannot find file ''".
+ARABIC_FACES = ("NotoNaskhArabic-Regular.ttf", "NotoNaskhArabic-Bold.ttf")
 
 
 def tikz_hash(tikz):
@@ -118,6 +148,12 @@ def build_svg(tikz):
             preamble = PREAMBLE.replace(
                 "\\begin{document}", FONTSPEC_BLOCK + "\\begin{document}")
             engine = "xelatex"
+        elif ARABIC.search(tikz):
+            preamble = PREAMBLE.replace(
+                "\\begin{document}", ARABIC_BLOCK + "\\begin{document}")
+            engine = "lualatex"
+            for face in ARABIC_FACES:
+                shutil.copy(FONTS_DIR / face, tmp / face)
         (tmp / "fig.tex").write_text(
             preamble + tikz + "\n\\end{document}\n", encoding="utf-8")
         res = _run([engine, "-interaction=nonstopmode", "fig.tex"], tmp)

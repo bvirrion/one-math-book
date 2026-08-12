@@ -173,16 +173,16 @@ class Emitter:
                     kinds = {info["kind"] for info in infos}
                     if len(kinds) == 1:
                         # \cref{a,b} same kind: "Chapters 9 and 10"
-                        name = self.lang.plurals.get(infos[0]["kind"])
+                        name = self.lang.cref_plurals.get(infos[0]["kind"])
                         if not name:
                             raise ParseError(
                                 f"no plural name for {infos[0]['kind']!r}")
                         links = [f'<a class="om-cref" href="{info["href"]}">'
                                  f'{info["number"]}</a>' for info in infos]
-                        joined = (f" {self.lang.and_word} ".join(links)
+                        joined = (self.lang.and_sep.join(links)
                                   if len(links) == 2
-                                  else ", ".join(links[:-1])
-                                  + f" {self.lang.and_word} " + links[-1])
+                                  else self.lang.list_sep.join(links[:-1])
+                                  + self.lang.and_sep + links[-1])
                         out.append(f"{name} {joined}")
                     else:
                         # mixed kinds: each reference spelled out in full
@@ -191,10 +191,10 @@ class Emitter:
                             + self.lang.cref_text(info["kind"],
                                                   info["number"])
                             + "</a>" for info in infos]
-                        joined = (f" {self.lang.and_word} ".join(links)
+                        joined = (self.lang.and_sep.join(links)
                                   if len(links) == 2
-                                  else ", ".join(links[:-1])
-                                  + f" {self.lang.and_word} " + links[-1])
+                                  else self.lang.list_sep.join(links[:-1])
+                                  + self.lang.and_sep + links[-1])
                         out.append(joined)
             else:
                 raise ParseError(f"emitter: unknown inline {t!r}")

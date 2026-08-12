@@ -29,6 +29,26 @@ KIND_TO_NAME_MACRO = {
 # \st is language-dependent and may appear inside math.
 ST_TEXT = "st"
 
+# Arabic back-references are definite (onemath.sty overrides the \crefname
+# declarations with these) while box headings stay indefinite
+# (styles/lang/ar.tex). Keep byte-identical to the sty's \ifom@arabic block.
+AR_CREF_NAMES = {
+    "definition": "التعريف", "theorem": "المبرهنة",
+    "proposition": "القضية", "lemma": "المبرهنة المساعدة",
+    "corollary": "النتيجة", "method": "الطريقة", "example": "المثال",
+    "notation": "الترميز", "remark": "الملاحظة", "chapter": "الفصل",
+    "exercise": "التمرين", "problem": "المسألة",
+    "figure": "الشكل", "equation": "المعادلة", "section": "القسم",
+}
+AR_CREF_PLURALS = {
+    "definition": "التعريفات", "theorem": "المبرهنات",
+    "proposition": "القضايا", "lemma": "المبرهنات المساعدة",
+    "corollary": "النتائج", "method": "الطرائق", "example": "الأمثلة",
+    "notation": "الترميزات", "remark": "الملاحظات", "chapter": "الفصول",
+    "exercise": "التمارين", "problem": "المسائل",
+    "figure": "الأشكال", "equation": "المعادلات", "section": "الأقسام",
+}
+
 
 def _newcommands(text):
     out = {}
@@ -68,29 +88,48 @@ class LangStrings:
         # list conjunction — not in the lang files (cleveref supplies it
         # in LaTeX); extend here when a new language is added
         self.and_word = {"en": "and", "fr": "et", "nl": "en",
-                         "es": "y", "pt": "e", "hi": "और"}[lang]
+                         "es": "y", "pt": "e", "hi": "और",
+                         "ar": "و"}[lang]
         # figure cref names come from babel in print, not the lang files
         self.names["figure"] = {"en": "Figure", "fr": "Figure",
                                 "nl": "Figuur", "es": "Figura",
-                                "pt": "Figura", "hi": "आकृति"}[lang]
+                                "pt": "Figura", "hi": "आकृति",
+                                "ar": "شكل"}[lang]
         self.plurals["figure"] = {"en": "Figures", "fr": "Figures",
                                   "nl": "Figuren", "es": "Figuras",
-                                  "pt": "Figuras", "hi": "आकृतियाँ"}[lang]
+                                  "pt": "Figuras", "hi": "आकृतियाँ",
+                                  "ar": "أشكال"}[lang]
         self.names["equation"] = {"en": "Equation", "fr": "Équation",
                                   "nl": "Vergelijking",
                                   "es": "Ecuación", "pt": "Equação",
-                                  "hi": "समीकरण"}[lang]
+                                  "hi": "समीकरण", "ar": "معادلة"}[lang]
         self.names["section"] = {"en": "Section", "fr": "Section",
                                  "nl": "Sectie", "es": "Sección",
-                                 "pt": "Seção", "hi": "अनुभाग"}[lang]
+                                 "pt": "Seção", "hi": "अनुभाग",
+                                 "ar": "قسم"}[lang]
         self.plurals["section"] = {"en": "Sections", "fr": "Sections",
                                    "nl": "Secties",
                                    "es": "Secciones", "pt": "Seções",
-                                   "hi": "अनुभाग"}[lang]
+                                   "hi": "अनुभाग", "ar": "أقسام"}[lang]
         self.plurals["equation"] = {"en": "Equations", "fr": "Équations",
                                     "nl": "Vergelijkingen",
                                     "es": "Ecuaciones", "pt": "Equações",
-                                    "hi": "समीकरण"}[lang]
+                                    "hi": "समीकरण", "ar": "معادلات"}[lang]
+        # Back-reference (\cref) names: same as the headings except in
+        # Arabic, where cleveref prints the definite forms. The list
+        # separators mirror cleveref's conjunctions: Arabic و is a bound
+        # prefix (space before, none after), the middle separator is the
+        # Arabic comma (onemath.sty's \crefpairconjunction overrides).
+        self.cref_names = dict(self.names)
+        self.cref_plurals = dict(self.plurals)
+        if lang == "ar":
+            self.cref_names.update(AR_CREF_NAMES)
+            self.cref_plurals.update(AR_CREF_PLURALS)
+            self.and_sep = " و"
+            self.list_sep = "، "
+        else:
+            self.and_sep = f" {self.and_word} "
+            self.list_sep = ", "
         # \st -> its \text{...} body, fed to KaTeX as a macro
         m = re.search(r"\\newcommand\{\\st\}\{(.*)\}", text)
         if not m:
@@ -99,4 +138,4 @@ class LangStrings:
 
     def cref_text(self, kind, number):
         """cleveref is loaded with [capitalize]: always 'Theorem 1.4'."""
-        return f"{self.names[kind]} {number}"
+        return f"{self.cref_names[kind]} {number}"

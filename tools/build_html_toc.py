@@ -239,6 +239,19 @@ def main():
                      f"{edition['title']!r}")
 
     book = manifest["books"].setdefault(args.book, {"chapters": []})
+    # merge per-language titles with any existing toc — a partial
+    # --languages run must not drop the other editions' titles
+    prev_parts = {p["key"]: p for p in book.get("toc", [])}
+    for part in toc:
+        prev = prev_parts.get(part["key"])
+        if not prev:
+            continue
+        part["titles"] = {**prev.get("titles", {}), **part["titles"]}
+        prev_ch = {c["key"]: c for c in prev.get("chapters", [])}
+        for ch in part["chapters"]:
+            if ch["key"] in prev_ch:
+                ch["titles"] = {**prev_ch[ch["key"]].get("titles", {}),
+                                **ch["titles"]}
     book["toc"] = toc
     manifest_path.write_text(
         json.dumps(manifest, indent=2, ensure_ascii=False) + "\n",

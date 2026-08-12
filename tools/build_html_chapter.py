@@ -204,8 +204,8 @@ def main():
     ch_key = editions[langs[0]]["label"].split(":", 1)[1].replace(":", "-")
 
     def edition_slug(lang):
-        """Localized URL slug. Scripts with no ASCII decomposition (hi)
-        slugify to nothing (or bare digits) — those editions reuse the
+        """Localized URL slug. Scripts with no ASCII decomposition (hi,
+        ar) slugify to nothing (or bare digits) — those editions reuse the
         English slug so URLs stay meaningful and stable."""
         for source in (lang, "en"):
             e = editions.get(source)
@@ -213,6 +213,13 @@ def main():
                 s = slugify(plaintext(e["title"]).strip())
                 if re.search(r"[a-z]", s):
                     return f"{args.chapter_number}-{s}"
+        # partial --languages run without en: reuse the published English
+        # slug from the manifest so hi/ar URLs match the other editions
+        for c in manifest["books"].get(args.book, {}).get("chapters", []):
+            if c["key"] == ch_key:
+                slug = c.get("languages", {}).get("en", {}).get("slug")
+                if slug:
+                    return slug
         return f"{args.chapter_number}-{ch_key}"
 
     # the chapter's own label is referenceable too (\cref{ch:...})
@@ -279,10 +286,14 @@ def main():
         existing = next((c for c in book["chapters"]
                          if c["key"] == ch_key), None)
         if existing:
+            # keep languages absent from this run — a partial --languages
+            # run (e.g. adding one new edition) must not drop the others
             existing.update(entry | {
                 "languages": {
-                    lang: {**existing["languages"].get(lang, {}), **data}
-                    for lang, data in entry["languages"].items()
+                    **existing.get("languages", {}),
+                    **{lang: {**existing.get("languages", {}).get(lang, {}),
+                              **data}
+                       for lang, data in entry["languages"].items()},
                 },
             })
         else:
@@ -357,6 +368,15 @@ def main():
                    for label, info in editions[langs[0]]["labels"].items()},
     }
     book = manifest["books"].setdefault(args.book, {"chapters": []})
+    # merge languages with any existing entry — a partial --languages run
+    # (e.g. adding one new edition) must not drop the other editions
+    prev = next((c for c in book["chapters"] if c["key"] == ch_key), None)
+    if prev:
+        entry["languages"] = {**prev.get("languages", {}), **manifest_langs}
+        # figures are the union across editions (localized text hashes to
+        # different files); a partial run only sees its own editions'
+        entry["figures"] = sorted(set(prev.get("figures", []))
+                                  | set(entry["figures"]))
     book["chapters"] = [c for c in book["chapters"] if c["key"] != ch_key]
     book["chapters"].append(entry)
     book["chapters"].sort(key=lambda c: c["number"])
