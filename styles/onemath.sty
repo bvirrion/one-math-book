@@ -288,8 +288,10 @@
 \usetikzlibrary{arrows.meta,calc,angles,quotes,patterns}
 % Unbreakable in-text figure block: keeps a picture and its caption line
 % on the same page. Use in place of "center" around tikzpicture figures.
+% [b] alignment: keeps the box's depth near zero so the page breaker
+% sees its full height (a deep [c] box overflows the footer silently).
 \newenvironment{omfigure}
-  {\par\medskip\noindent\begin{minipage}{\linewidth}\centering}
+  {\par\medskip\noindent\begin{minipage}[b]{\linewidth}\centering}
   {\end{minipage}\par\medskip}
 
 % Shared axis style for in-text figures: use with \begin{axis}[omaxis, ...].
@@ -655,6 +657,17 @@
 \omdecorate{method}{omMeth}
 \omdecorate{exercise}{omExo}
 \omdecorate{problem}{omExo}
+
+% A list opening as the very first thing in a statement environment used to
+% typeset its first item on the run-in heading's line ("Method 25.6  1. …"):
+% amsthm holds the heading as a pending trivlist label, and the first \item
+% attaches itself to it. While that label is pending @inlabel is true, so
+% \leavevmode there commits the heading to its own paragraph and the list
+% starts on a fresh line; lists that follow normal text are untouched.
+\newcommand{\om@listafterhead}{\if@inlabel\leavevmode\fi}
+\AtBeginEnvironment{enumerate}{\om@listafterhead}
+\AtBeginEnvironment{itemize}{\om@listafterhead}
+\AtBeginEnvironment{description}{\om@listafterhead}
 
 % amsthm's proof environment prints \proofname, which is English unless babel
 % localises it — and babel is optional here (see above). Without this, a French

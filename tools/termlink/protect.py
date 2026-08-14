@@ -46,6 +46,10 @@ BASE_PROTECT = [
     # heading is not masked and the link ends up in the contents and the
     # running head, where it has no business being
     r'\\(?:chapter|section|subsection|part)\*?\{' + GROUP + r'*\}',
+    # a graphics path is never prose: "moon-crescent.jpg" must not sprout an
+    # \omterm around "crescent" (it did, in the physics Book 1 -- the build
+    # then looks for a file literally named with the link inside)
+    r'\\includegraphics(?:\[[^\]]*\])?\s*\{[^{}]*\}',
     # a defining \emph{term}\index{...} is never linked: inside the definition
     # of "outer measure", the inner word "measure" must not link away.
     r'\\emph\{' + GROUP + r'*\}\s*\\index\{' + GROUP + r'*\}',
