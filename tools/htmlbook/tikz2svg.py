@@ -193,8 +193,88 @@ def _svg_size(svg):
     return dim("width"), dim("height")
 
 
+RASTER_MAX_WIDTH = 1200   # px; photos are downscaled to at most this
+RASTER_RE = re.compile(r"\\includegraphics(?:\[((?:[^\[\]{}]|\{[^{}]*\})*)\])?\s*\{([^{}]*)\}")
+
+
+def is_raster(source):
+    return source.lstrip().startswith("\\includegraphics")
+
+
+def raster_sizing(source):
+    """Print sizing hint carried into the HTML: `width=0.52\\linewidth` →
+    {"rel_width": 0.52}; `height=3.1cm` → {"height_cm": 3.1}; else {}."""
+    m = RASTER_RE.fullmatch(source.strip())
+    opts = (m and m.group(1)) or ""
+    mw = re.search(r"width\s*=\s*([\d.]+)\s*\\(?:line|text|column)width",
+                   opts)
+    if mw:
+        return {"rel_width": float(mw.group(1))}
+    mh = re.search(r"height\s*=\s*([\d.]+)\s*(cm|mm)", opts)
+    if mh:
+        h = float(mh.group(1)) / (10 if mh.group(2) == "mm" else 1)
+        return {"height_cm": h}
+    return {}
+
+
+def raster_trim(opts):
+    """`trim={l b r t}, clip` (bp; graphicx order left-bottom-right-top) →
+    an ffmpeg crop filter. Photos carry no density, so 1 bp = 1 px, which
+    is exactly how pdfTeX sizes them (a 1280 px jpg is 1280 bp wide)."""
+    if not re.search(r"\bclip\b", opts or ""):
+        return None
+    m = re.search(r"trim\s*=\s*\{?\s*([\d.]+)bp\s+([\d.]+)bp\s+([\d.]+)bp"
+                  r"\s+([\d.]+)bp\s*\}?", opts)
+    if not m:
+        raise ParseError(f"unsupported clip/trim option: [{opts}]")
+    l, b, r, t = (float(v) for v in m.groups())
+    return f"crop=iw-{l + r}:ih-{t + b}:{l}:{t}"
+
+
+def build_raster(path, opts=""):
+    """Transcode a photo (jpg/png) to a web-sized JPEG with ffmpeg; returns
+    (jpeg_bytes, width, height). Rasters are keyed by the hash of the
+    source file (+ crop) so an unchanged photo is never re-encoded."""
+    src = Path(path).resolve()
+    if not src.exists():
+        raise ParseError(f"raster figure not found: {path}")
+    filters = [f for f in (raster_trim(opts),
+                           f"scale='min({RASTER_MAX_WIDTH},iw)':-2") if f]
+    with tempfile.TemporaryDirectory(prefix="omimg-") as tmp:
+        out = Path(tmp) / "img.jpg"
+        res = _run(["ffmpeg", "-loglevel", "error", "-y", "-i", str(src),
+                    "-vf", ",".join(filters),
+                    "-q:v", "3", "-pix_fmt", "yuvj420p", str(out)], tmp)
+        if res.returncode != 0 or not out.exists():
+            raise ParseError(f"ffmpeg failed for {path}:\n{res.stderr[-1500:]}")
+        data = out.read_bytes()
+    return data, *_jpeg_size(data)
+
+
+def _jpeg_size(data):
+    """(width, height) from the first SOF marker of a JPEG stream."""
+    i = 2
+    while i + 9 < len(data):
+        if data[i] != 0xFF:
+            i += 1
+            continue
+        marker = data[i + 1]
+        if marker in (0xD8, 0x01) or 0xD0 <= marker <= 0xD7:
+            i += 2
+            continue
+        seg = int.from_bytes(data[i + 2:i + 4], "big")
+        if marker in (0xC0, 0xC1, 0xC2, 0xC3, 0xC5, 0xC6, 0xC7,
+                      0xC9, 0xCA, 0xCB, 0xCD, 0xCE, 0xCF):
+            h = int.from_bytes(data[i + 5:i + 7], "big")
+            w = int.from_bytes(data[i + 7:i + 9], "big")
+            return w, h
+        i += 2 + seg
+    raise ParseError("could not read JPEG dimensions")
+
+
 class FigureBuilder:
-    """Builds each distinct tikzpicture once, writes SVGs into svg_dir."""
+    """Builds each distinct picture once: tikzpictures compile to SVG,
+    \\includegraphics photos transcode to JPEG; both land in svg_dir."""
 
     def __init__(self, svg_dir, url_prefix):
         self.svg_dir = Path(svg_dir)
@@ -204,6 +284,8 @@ class FigureBuilder:
     def figure_info(self, tikz):
         if tikz in self.cache:
             return self.cache[tikz]
+        if is_raster(tikz):
+            return self.raster_info(tikz)
         h = tikz_hash(tikz)
         # identical picture, differently keyed source (whitespace): reuse
         for info in self.cache.values():
@@ -217,4 +299,36 @@ class FigureBuilder:
         info = {"hash": h, "file": filename, "width": width,
                 "height": height, "url": f"{self.url_prefix}/{filename}"}
         self.cache[tikz] = info
+        return info
+
+    def raster_info(self, source):
+        m = RASTER_RE.fullmatch(source.strip())
+        if not m:
+            raise ParseError(f"malformed \\includegraphics: {source!r}")
+        opts = m.group(1) or ""
+        path = Path(m.group(2).strip())   # relative to the book repo root
+        if not path.exists():
+            raise ParseError(f"raster figure not found: {path}")
+        crop = raster_trim(opts) or ""
+        h = hashlib.sha1(path.read_bytes() + crop.encode()).hexdigest()[:12]
+        sizing = raster_sizing(source)
+        for info in self.cache.values():
+            if info["hash"] == h:
+                info = {k: v for k, v in info.items()
+                        if k not in ("rel_width", "height_cm")}
+                info.update(sizing)
+                self.cache[source] = info
+                return info
+        filename = f"img-{h}.jpg"
+        target = self.svg_dir / filename
+        if target.exists():
+            width, height = _jpeg_size(target.read_bytes())
+        else:
+            data, width, height = build_raster(path, opts)
+            self.svg_dir.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(data)
+        info = {"hash": h, "file": filename, "width": width,
+                "height": height, "url": f"{self.url_prefix}/{filename}",
+                **sizing}
+        self.cache[source] = info
         return info

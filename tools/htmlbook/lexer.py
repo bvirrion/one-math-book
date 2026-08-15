@@ -469,23 +469,37 @@ class Parser:
         cur.err(f"unknown environment {name!r}")
 
     def parse_figure(self, body, floated=False):
-        """An omfigure holds one or more tikzpictures (side-by-side plots
-        are two pictures separated by \\qquad) plus a {\\small ...} caption."""
+        """An omfigure holds one or more pictures — tikzpictures, or raster
+        photos via \\includegraphics (side-by-side pictures are separated by
+        \\qquad/\\quad) — plus a {\\small ...} caption.
+
+        Every picture source (tikz env or the literal \\includegraphics
+        command) lands in "tikzs" in order; the FigureBuilder tells them
+        apart. A raster figure may also carry a labelled photo grid: a
+        {\\small ...} sub-caption right after the leading picture, then a
+        tabular whose rows alternate \\includegraphics cells and
+        {\\footnotesize label} cells (physics-1 solar system) — parsed into
+        "grid" = [[{"src", "label"}, ...], ...]."""
         tikzs = []
-        end_pat = "\\end{tikzpicture}"
         rest = body
         while True:
-            m = re.search(r"\\begin\{tikzpicture\}", rest)
+            m = re.search(r"\\begin\{(tikzpicture|circuitikz)\}", rest)
             if not m:
                 break
+            end_pat = f"\\end{{{m.group(1)}}}"
             e = rest.find(end_pat, m.start())
             if e < 0:
                 raise ParseError(
-                    f"{self.filename}: missing \\end{{tikzpicture}}")
+                    f"{self.filename}: missing {end_pat}")
             tikzs.append(rest[m.start():e + len(end_pat)])
             rest = rest[:m.start()] + rest[e + len(end_pat):]
+        grid, sublabels = None, {}
         if not tikzs:
-            raise ParseError(f"{self.filename}: omfigure without tikzpicture")
+            tikzs, grid, sublabels, rest = self.parse_raster_figure(rest)
+        if not tikzs:
+            raise ParseError(
+                f"{self.filename}: omfigure without tikzpicture or "
+                "\\includegraphics")
         if floated:
             # floats: \caption{...} + optional \label, \centering etc.
             label = None
@@ -514,8 +528,129 @@ class Parser:
         m2 = re.fullmatch(r"\{\\small\s+(.*)\}", caption, re.S)
         if m2:
             caption = m2.group(1)
-        return {"t": "figure", "tikzs": tikzs, "label": None,
+        node = {"t": "figure", "tikzs": tikzs, "label": None,
                 "caption": self.parse_inlines(caption)}
+        if grid is not None:
+            node["grid"] = grid
+        if sublabels:
+            node["sublabels"] = sublabels
+        return node
+
+    INCLUDEGRAPHICS = re.compile(
+        r"\\includegraphics(?:\[((?:[^\[\]{}]|\{[^{}]*\})*)\])?\s*\{([^{}]*)\}")
+
+    def parse_raster_figure(self, body):
+        """Extract \\includegraphics pictures from an omfigure body.
+
+        Returns (sources, grid, sublabels, rest): `sources` are the literal
+        \\includegraphics commands of the free-standing pictures (in
+        order), `grid` the optional labelled photo table (rows of
+        {"src", "label"} dicts) or None, `sublabels` = {index: inlines} for
+        a {\\small ...} sub-caption attached to a leading picture, and
+        `rest` the leftover text (the caption)."""
+        rest = re.sub(r"\\medskip|\\smallskip|\\bigskip|\\centering", " ",
+                      body)
+        grid = None
+        mt = re.search(r"\\begin\{tabular\}", rest)
+        if mt:
+            cur = Cursor(rest, self.filename)
+            cur.i = mt.start() + len("\\begin")
+            read_group(cur)   # "tabular"
+            read_group(cur)   # colspec (layout only)
+            tab_body = find_env_end(cur, "tabular")
+            grid = self.parse_photo_grid(tab_body)
+            before, rest = rest[:mt.start()], rest[cur.i:]
+        else:
+            before = rest
+            rest = ""
+        sources = []
+        while True:
+            m = self.INCLUDEGRAPHICS.search(before)
+            if not m:
+                break
+            sources.append(m.group(0))
+            before = before[:m.start()] + before[m.end():]
+        if not sources and grid is None:
+            return [], None, {}, body
+        sublabels = {}
+        if grid is not None:
+            # text left before the tabular is the leading picture's
+            # sub-caption; the real caption follows the tabular
+            sub = re.sub(r"\\qquad|\\quad|\\hfill", " ", before).strip()
+            m2 = re.fullmatch(r"\{\\small\s+(.*)\}", sub, re.S)
+            if m2:
+                sub = m2.group(1)
+            if sub:
+                if not sources:
+                    raise ParseError(
+                        f"{self.filename}: figure sub-caption without a "
+                        "leading picture")
+                sublabels[len(sources) - 1] = self.parse_inlines(sub)
+        else:
+            rest = before
+        return sources, grid, sublabels, rest
+
+    def parse_photo_grid(self, body):
+        """Rows alternate picture cells and {\\footnotesize label} cells."""
+        # `\\[4pt]` row spacing leaves a leading [4pt] on the next chunk
+        rows_raw = [re.sub(r"^\s*\[[^\]]*\]", "", r).strip() for r in
+                    split_top_level(body, "\\", self.filename)]
+        rows_raw = [r for r in rows_raw if r]
+        grid = []
+        i = 0
+        while i < len(rows_raw):
+            pics = [c.strip() for c in
+                    self.split_raw_cells(rows_raw[i])]
+            if not all(self.INCLUDEGRAPHICS.fullmatch(c) for c in pics):
+                raise ParseError(
+                    f"{self.filename}: photo grid row is not all "
+                    f"\\includegraphics: {rows_raw[i][:60]!r}")
+            labels = [""] * len(pics)
+            if i + 1 < len(rows_raw) and not self.INCLUDEGRAPHICS.search(
+                    rows_raw[i + 1]):
+                labels = [c.strip() for c in
+                          self.split_raw_cells(rows_raw[i + 1])]
+                if len(labels) != len(pics):
+                    raise ParseError(
+                        f"{self.filename}: photo grid label row has "
+                        f"{len(labels)} cells for {len(pics)} pictures")
+                i += 1
+            row = []
+            for src, lab in zip(pics, labels):
+                m2 = re.fullmatch(r"\{\\(?:footnotesize|small|scriptsize)"
+                                  r"\s+(.*)\}", lab, re.S)
+                if m2:
+                    lab = m2.group(1)
+                row.append({"src": src, "label": self.parse_inlines(lab)})
+            grid.append(row)
+            i += 1
+        if not grid:
+            raise ParseError(f"{self.filename}: empty photo grid")
+        return grid
+
+    def split_raw_cells(self, raw):
+        """Top-level `&` split without inline parsing."""
+        cells, buf, depth = [], [], 0
+        i, n = 0, len(raw)
+        while i < n:
+            c = raw[i]
+            if c == "\\":
+                buf.append(raw[i:i + 2])
+                i += 2
+                continue
+            if c == "{":
+                depth += 1
+            elif c == "}":
+                depth -= 1
+            elif c == "&" and depth == 0:
+                cells.append("".join(buf))
+                buf = []
+                i += 1
+                continue
+            buf.append(c)
+            i += 1
+        cells.append("".join(buf))
+        return cells
 
     def parse_center(self, body):
         """A center block holds one or more tabulars (side-by-side tables

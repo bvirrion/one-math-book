@@ -367,19 +367,56 @@ class Emitter:
 
     def figure(self, node):
         caption = self.inlines(node["caption"])
-        alt = html.escape(plaintext(node["caption"]).strip(), quote=True)
-        imgs = "\n".join(
-            f'<img src="{fig["url"]}" alt="{alt}" '
-            f'width="{fig["width"]}" height="{fig["height"]}" loading="lazy">'
-            for fig in (self.figures[tikz] for tikz in node["tikzs"]))
+        alt = plaintext(node["caption"]).strip()
+        sublabels = node.get("sublabels") or {}
+        parts = []
+        for i, src in enumerate(node["tikzs"]):
+            img = self.img_tag(self.figures[src], alt)
+            if i in sublabels:
+                # a photo with its own sub-caption (leading picture of a grid)
+                img = (f'<figure class="om-subfig">{img}'
+                       f'<figcaption>{self.inlines(sublabels[i])}'
+                       "</figcaption></figure>")
+            parts.append(img)
+        imgs = "\n".join(parts)
+        grid = ""
+        if node.get("grid"):
+            rows = []
+            for row in node["grid"]:
+                cells = "".join(
+                    f'<figure class="om-subfig">'
+                    f'{self.img_tag(self.figures[c["src"]], plaintext(c["label"]).strip() or alt)}'
+                    f'<figcaption>{self.inlines(c["label"])}</figcaption>'
+                    "</figure>"
+                    for c in row)
+                rows.append(f'<div class="om-figure-row">{cells}</div>')
+            grid = '\n<div class="om-figure-grid">\n' + "\n".join(rows) \
+                + "\n</div>"
         anchor = ""
         if node.get("label"):
             anchor = f' id="{anchor_for(node["label"])}"'
             caption = (f'<strong>{self.lang.names["figure"]} '
                        f"{node['number']}.</strong> {caption}")
         return (f'<figure class="om-figure"{anchor}>\n'
-                f'<div class="om-figure-row">\n{imgs}\n</div>\n'
+                f'<div class="om-figure-row">\n{imgs}\n</div>{grid}\n'
                 f"<figcaption>{caption}</figcaption>\n</figure>")
+
+    def img_tag(self, fig, alt):
+        """Photos keep their print proportion (`width=0.52\\linewidth` →
+        width:52%, floored so they stay readable on phones; `height=3.1cm`
+        → a CSS height, scaled up since the reader column is wider than
+        the printed page); SVG figures size themselves from their
+        intrinsic width."""
+        style = ""
+        if fig.get("rel_width"):
+            style = f' style="width:{max(50, round(fig["rel_width"] * 100))}%"'
+        elif fig.get("height_cm"):
+            style = (f' style="height:{round(fig["height_cm"] * 1.5, 2)}cm;'
+                     'width:auto"')
+        alt = html.escape(alt, quote=True)
+        return (f'<img src="{fig["url"]}" alt="{alt}" '
+                f'width="{fig["width"]}" height="{fig["height"]}"'
+                f'{style} loading="lazy">')
 
     def table(self, node):
         return ('<div class="om-table-wrap">' + self.table_inner(node)
