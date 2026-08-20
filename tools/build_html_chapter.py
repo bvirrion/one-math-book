@@ -132,10 +132,10 @@ def katex_version():
     return json.loads(pkg.read_text())["version"]
 
 
-def first_paragraph_text(blocks, limit=160):
+def first_paragraph_text(blocks, limit=160, refs=None):
     for b in blocks:
         if b["t"] == "para":
-            text = plaintext(b["inl"]).strip()
+            text = plaintext(b["inl"], refs).strip()
             if len(text) <= limit:
                 return text
             cut = text[:limit].rsplit(" ", 1)[0]
@@ -341,12 +341,13 @@ def main():
         frag_path.parent.mkdir(parents=True, exist_ok=True)
         frag_path.write_text(html_body + "\n", encoding="utf-8")
 
-        headings = [plaintext(b["inl"]).strip()
+        headings = [plaintext(b["inl"], emitter.plain_ref).strip()
                     for b in e["blocks"] if b["t"] == "section"]
         manifest_langs[lang] = {
             "slug": slug,
             "title": title_text,
-            "description_fallback": first_paragraph_text(e["blocks"]),
+            "description_fallback": first_paragraph_text(
+                e["blocks"], refs=emitter.plain_ref),
             "headings": headings,
             "fragment": rel,
         }

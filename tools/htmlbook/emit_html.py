@@ -40,7 +40,14 @@ def tex_to_alt(tex):
     return re.sub(r"\s+", " ", s).strip()
 
 
-def plaintext(inlines):
+def plaintext(inlines, refs=None):
+    """Visible text of an inline run (titles, headings, meta descriptions).
+
+    `refs` is an optional callable node -> str that spells out \cref /
+    \eqref nodes ("Chapter 3", "(2.1)"); the Emitter provides one via
+    plain_ref(). Without it references vanish, which leaves residues like
+    "appeared in ;" in a meta description — pass it whenever labels are
+    resolvable."""
     out = []
     for node in inlines:
         t = node["t"]
@@ -49,11 +56,11 @@ def plaintext(inlines):
         elif t == "math":
             out.append(tex_to_alt(node["tex"]))
         elif t in ("emph", "bold", "sup"):
-            out.append(plaintext(node["inl"]))
+            out.append(plaintext(node["inl"], refs))
         elif t == "term":
-            out.append(plaintext(node["inl"]))
-        elif t == "cref":
-            out.append("")  # resolved text needs labels; unused in meta
+            out.append(plaintext(node["inl"], refs))
+        elif t in ("cref", "eqref") and refs is not None:
+            out.append(refs(node))
     return "".join(out)
 
 
@@ -100,6 +107,30 @@ class Emitter:
             tex)
         self.math.append((tex, display))
         return f"\x00M{len(self.math) - 1}\x00"
+
+    def plain_ref(self, node):
+        """Plain-text rendering of a \cref / \eqref node (no links): the
+        `refs` callback of plaintext(), used for the manifest's
+        description_fallback and headings."""
+        if node["t"] == "eqref":
+            info = self.resolve(node["label"], "\\eqref")
+            return f"({info['number']})"
+        labels = [re.sub(r"\s+", "", part) for part in node["label"].split(",")]
+        infos = [self.resolve(lbl, "\\cref") for lbl in labels]
+        if len(infos) == 1:
+            return self.lang.cref_text(infos[0]["kind"], infos[0]["number"])
+        kinds = {info["kind"] for info in infos}
+        if len(kinds) == 1 and self.lang.cref_plurals.get(infos[0]["kind"]):
+            parts = [info["number"] for info in infos]
+            joined = (self.lang.and_sep.join(parts) if len(parts) == 2
+                      else self.lang.list_sep.join(parts[:-1])
+                      + self.lang.and_sep + parts[-1])
+            return f"{self.lang.cref_plurals[infos[0]['kind']]} {joined}"
+        parts = [self.lang.cref_text(info["kind"], info["number"])
+                 for info in infos]
+        return (self.lang.and_sep.join(parts) if len(parts) == 2
+                else self.lang.list_sep.join(parts[:-1])
+                + self.lang.and_sep + parts[-1])
 
     def resolve(self, label, where):
         """A reference target: in this chapter (anchor) or in another
