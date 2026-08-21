@@ -1,0 +1,500 @@
+\chapter{Turunan dan Kecembungan}\label{ch:g12:deriv}
+
+\omterm{def:g12:deriv:derivative}{Turunan} mengukur laju perubahan sesaat sebuah \omterm{def:g11:func:function}{fungsi}; \omterm{def:g12:deriv:derivative}{turunan} itu adalah
+\omterm{def:g10:reffunc:affine}{gradien} \omterm{def:g12:deriv:tangent}{garis singgung} \omterm{def:g10:functions:graph}{grafiknya}. Bab ini meninjau ulang dan memperluas
+aturan penurunan, mengaitkan tanda $f'$ dengan variasi $f$,
+lalu memperkenalkan \omterm{def:g12:deriv:convex}{kecembungan}, yang dikendalikan oleh \omterm{def:g12:deriv:derivative}{turunan} kedua.
+
+\section{Turunan}
+
+\begin{definition}[Turunan di sebuah titik]\label{def:g12:deriv:derivative}
+Misalkan $f$ terdefinisi pada \omterm{def:g10:numbers:interval}{interval} $I$ dan $a \in I$. \omterm{def:g11:func:function}{Fungsi} $f$ disebut
+\emph{dapat diturunkan di $a$}\index{turunan}\index{dapat diturunkan} bila hasil bagi selisih
+\[
+\frac{f(a+h) - f(a)}{h}
+\]
+mempunyai limit berhingga ketika $h \to 0$. Limit itu disebut \emph{turunan
+$f$ di $a$} dan ditulis $f'(a)$. Jika $f$ dapat diturunkan di setiap titik
+$I$, \omterm{def:g11:func:function}{fungsi} $f' \colon x \mapsto f'(x)$ disebut \emph{turunan}
+$f$.
+\end{definition}
+
+\begin{definition}[Garis singgung]\label{def:g12:deriv:tangent}
+Jika $f$ \omterm{def:g12:deriv:derivative}{dapat diturunkan} di $a$, \emph{garis singgung}\index{garis singgung}
+kurva $f$ di titik $(a, f(a))$ adalah garis dengan \omterm{def:g10:algebra:equation}{persamaan}
+\[
+y = f(a) + f'(a)(x - a).
+\]
+\end{definition}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, clip=false,
+  width=9.6cm, height=6.8cm,
+  xmin=-0.4, xmax=3.4, ymin=-0.4, ymax=4.3,
+  xtick={1,2.5}, xticklabels={$a$,$a+h$}, ytick=\empty]
+  \addplot[omProp!40, thick, domain=0.2:2.7] {1 + 1.75*(x-1)};
+  \addplot[omProp!70, thick, domain=0.07:2.95] {1 + 1.5*(x-1)};
+  \addplot[omProp, thick, domain=-0.12:3.3] {1 + 1.25*(x-1)};
+  \addplot[omThm, thick, domain=-0.4:3.3] {x};
+  \addplot[omDef, thick, domain=-0.4:2.72] {x^2/2 + 0.5};
+  \draw[black, dashed, thin] (axis cs:1,1) -- (axis cs:2.5,1)
+    node[midway, below, font=\small] {$h$};
+  \draw[black, dashed, thin] (axis cs:2.5,1) -- (axis cs:2.5,3.625)
+    node[midway, right, font=\small] {$f(a+h)-f(a)$};
+  \fill (axis cs:2.5,3.625) circle (1.5pt);
+  \fill (axis cs:2,2.5) circle (1.5pt);
+  \fill (axis cs:1.5,1.625) circle (1.5pt);
+  \fill (axis cs:1,1) circle (1.5pt)
+    node[above left, font=\small] {$A$};
+  \node[omThm, font=\small, anchor=west] at (axis cs:3.38,3.3) {singgung};
+\end{axis}
+\end{tikzpicture}
+
+{\small Ketika $h$ mengecil, \omterm{def:g11:deriv:rate}{garis sekan} yang melalui $A = (a, f(a))$ dan
+$(a+h, f(a+h))$ (jingga) berputar menuju \omterm{def:g12:deriv:tangent}{garis singgung} di $A$ (merah):
+\omterm{def:g10:reffunc:affine}{gradiennya} $\frac{f(a+h)-f(a)}{h}$ menuju $f'(a)$.}
+\end{omfigure}
+
+\begin{proposition}\label{prop:g12:deriv:diffcont}
+\omterm{def:g11:func:function}{Fungsi} yang \omterm{def:g12:deriv:derivative}{dapat diturunkan} di $a$ bersifat \omterm{def:g12:limcont:continuity}{kontinu} di $a$. Kebalikannya salah.
+\end{proposition}
+
+\begin{proof}
+Untuk $h \neq 0$ yang kecil, $f(a+h) - f(a) = h \cdot \frac{f(a+h)-f(a)}{h}$.
+Ketika $h \to 0$, ruas kanannya menuju $0 \times f'(a) = 0$, sehingga
+$f(a+h) \to f(a)$. Untuk kebalikannya, $x \mapsto \abs{x}$ \omterm{def:g12:limcont:continuity}{kontinu} di
+$0$, tetapi hasil bagi selisihnya di $0$ sama dengan $\frac{\abs h}{h} = \pm 1$
+bergantung pada tanda $h$, dan tidak berlimit.
+\end{proof}
+
+\subsection{Aturan penurunan}
+
+\begin{proposition}[Operasi]\label{prop:g12:deriv:operations}
+Misalkan $u, v$ \omterm{def:g12:deriv:derivative}{dapat diturunkan} pada $I$ dan $\lambda \in \R$. Maka $u + v$,
+$\lambda u$, $uv$ \omterm{def:g12:deriv:derivative}{dapat diturunkan} pada $I$, demikian pula $\frac{u}{v}$ di tempat
+$v \neq 0$, dan
+\[
+(u+v)' = u' + v', \quad (\lambda u)' = \lambda u', \quad
+(uv)' = u'v + uv', \quad
+\left(\frac{u}{v}\right)' = \frac{u'v - uv'}{v^2}.
+\]
+\end{proposition}
+
+\begin{proof}[Bukti aturan hasil kali]
+Tulislah hasil bagi selisih $uv$ di $a$ sebagai
+\[
+\frac{u(a+h)v(a+h) - u(a)v(a)}{h}
+= \frac{u(a+h) - u(a)}{h}\,v(a+h) + u(a)\,\frac{v(a+h) - v(a)}{h}.
+\]
+Ketika $h \to 0$, $v(a+h) \to v(a)$ menurut \omterm{def:g12:limcont:continuity}{kekontinuannya}
+(\cref{prop:g12:deriv:diffcont}), sehingga ruas kanannya menuju
+$u'(a)v(a) + u(a)v'(a)$. Aturan lainnya dibuktikan secara serupa.
+\end{proof}
+
+\begin{theorem}[Aturan rantai]\label{thm:g12:deriv:chain}
+\index{aturan rantai}
+Misalkan $u$ \omterm{def:g12:deriv:derivative}{dapat diturunkan} pada $I$ dengan nilai di $J$, dan $g$ \omterm{def:g12:deriv:derivative}{dapat
+diturunkan} pada $J$. Maka $g \circ u$ \omterm{def:g12:deriv:derivative}{dapat diturunkan} pada $I$ dan
+\[
+(g \circ u)' = (g' \circ u) \cdot u' .
+\]
+Khususnya, untuk $u$ yang \omterm{def:g12:deriv:derivative}{dapat diturunkan}:
+\[
+(u^n)' = n\,u'\,u^{n-1} \ (n \in \Z), \qquad
+\left(\sqrt{u}\right)' = \frac{u'}{2\sqrt{u}} \ (u > 0), \qquad
+\left(\eu^{u}\right)' = u'\,\eu^{u}.
+\]
+\end{theorem}
+
+\begin{proof}[Sketsa bukti]
+Ketika $u(a+h) \neq u(a)$ untuk $h$ yang kecil, tulislah
+\[
+\frac{g(u(a+h)) - g(u(a))}{h}
+= \frac{g(u(a+h)) - g(u(a))}{u(a+h) - u(a)} \cdot \frac{u(a+h) - u(a)}{h}.
+\]
+Ketika $h \to 0$, $u(a+h) \to u(a)$, sehingga faktor pertamanya menuju
+$g'(u(a))$ dan yang kedua menuju $u'(a)$. (Bukti yang lengkap harus menangani
+kasus $u(a+h) = u(a)$ untuk $h$ yang sekecil-kecilnya; butir teknis ini
+digarap di universitas.)
+\end{proof}
+
+\begin{example}
+\omterm{def:g12:deriv:derivative}{Turunan} yang lazim, yang berlaku pada \omterm{def:g11:func:function}{daerah asal} alaminya:
+\[
+(x^n)' = nx^{n-1}, \quad
+\left(\frac{1}{x}\right)' = -\frac{1}{x^2}, \quad
+(\sqrt{x})' = \frac{1}{2\sqrt{x}}, \quad
+(\cos x)' = -\sin x, \quad
+(\sin x)' = \cos x .
+\]
+Yang pertama dibuktikan lewat induksi dari aturan hasil kali, dan dua yang
+terakhir pada \cref{ch:g12:trigo}.
+\end{example}
+
+\section{Variasi dan nilai ekstrem}
+
+\begin{theorem}[Tanda turunan dan variasi]\label{thm:g12:deriv:variations}
+Misalkan $f$ \omterm{def:g12:deriv:derivative}{dapat diturunkan} pada sebuah \omterm{def:g10:numbers:interval}{interval} $I$.
+\begin{enumerate}
+  \item $f$ naik pada $I$ jika dan hanya jika $f' \geq 0$ pada $I$.
+  \item $f$ turun pada $I$ jika dan hanya jika $f' \leq 0$ pada $I$.
+  \item Jika $f' > 0$ pada $I$ kecuali di berhingga banyak titik tempat
+        \omterm{def:g12:deriv:derivative}{turunannya} lenyap, maka $f$ tegas naik pada $I$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}[Bukti sebagian]
+Jika $f$ naik, setiap hasil bagi selisihnya
+$\frac{f(a+h)-f(a)}{h}$ bernilai $\geq 0$, dan menerapkan limitnya memberi
+$f'(a) \geq 0$. Implikasi kebalikannya bersandar pada teorema nilai rata-rata,
+yang dibuktikan di universitas; keduanya \emph{diterima tanpa bukti pada tingkat ini}.
+\end{proof}
+
+\begin{definition}[Nilai ekstrem lokal]\label{def:g12:deriv:extremum}
+$f$ mempunyai \emph{maksimum lokal}\index{nilai ekstrem} di $a$ bila
+$f(x) \leq f(a)$ untuk semua $x$ di dekat $a$; \omterm{def:g10:functions:extrema}{minimum} lokal didefinisikan
+secara setangkup.
+\end{definition}
+
+\begin{proposition}[Syarat orde satu]\label{prop:g12:deriv:critical}
+Jika $f$ \omterm{def:g12:deriv:derivative}{dapat diturunkan} pada \omterm{def:g10:numbers:interval}{interval} \emph{terbuka} $I$ dan mempunyai
+\omterm{def:g12:deriv:extremum}{nilai ekstrem} lokal di $a \in I$, maka $f'(a) = 0$. Kebalikannya salah
+($f(x) = x^3$ di $a = 0$).
+\end{proposition}
+
+\begin{proof}
+Katakan $a$ sebuah \omterm{def:g12:deriv:extremum}{maksimum lokal}. Untuk $h > 0$ yang kecil,
+$\frac{f(a+h)-f(a)}{h} \leq 0$, sehingga membiarkan $h \to 0^+$ memberi
+$f'(a) \leq 0$; untuk $h < 0$ hasil baginya $\geq 0$, yang memberi
+$f'(a) \geq 0$. Jadi $f'(a) = 0$.
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=8.4cm, height=5.6cm,
+  xmin=-2.5, xmax=2.5, ymin=-4.2, ymax=4.2,
+  xtick={-1,1}, ytick={-2,2}]
+  \addplot[omProp, thick, domain=-1.8:-0.2] {2};
+  \addplot[omProp, thick, domain=0.2:1.8] {-2};
+  \addplot[omDef, thick, domain=-2.15:2.15] {x^3 - 3*x};
+  \fill (axis cs:-1,2) circle (1.5pt);
+  \fill (axis cs:1,-2) circle (1.5pt);
+\end{axis}
+\end{tikzpicture}
+
+{\small Pada \omterm{def:g12:deriv:extremum}{nilai ekstrem} lokal di dalam sebuah \omterm{def:g10:numbers:interval}{interval} terbuka, \omterm{def:g12:deriv:tangent}{garis
+singgungnya} (jingga) mendatar: $f'(a) = 0$. Di sini $f(x) = x^3 - 3x$, dengan
+\omterm{def:g12:deriv:extremum}{maksimum lokal} di $-1$ dan \omterm{def:g10:functions:extrema}{minimum} lokal di $1$.}
+\end{omfigure}
+
+\begin{method}[Tabel variasi]\label{met:g12:deriv:table}
+Untuk menelaah sebuah \omterm{def:g11:func:function}{fungsi} $f$: tentukan \omterm{def:g11:func:function}{daerah asalnya} dan limitnya di
+batasnya; hitunglah $f'$ lalu faktorkan; tentukan tanda $f'$ pada setiap
+subinterval; catat semuanya dalam sebuah \omterm{def:g10:functions:table}{tabel variasi}, dengan menandai \omterm{def:g12:deriv:extremum}{nilai
+ekstremnya}; lalu simpulkan banyaknya penyelesaian $f(x) = k$ dengan teorema
+bijeksi (\cref{thm:g12:limcont:bijection}).
+\end{method}
+
+\section{Kecembungan}
+
+\begin{definition}[Fungsi cembung]\label{def:g12:deriv:convex}
+Sebuah \omterm{def:g11:func:function}{fungsi} $f$ pada \omterm{def:g10:numbers:interval}{interval} $I$ disebut \emph{cembung}\index{kecembungan}
+pada $I$ bila setiap tali busur \omterm{def:g10:functions:graph}{grafiknya} terletak di atas \omterm{def:g10:functions:graph}{grafiknya}: untuk
+semua $a, b \in I$ dan $t \in \intcc{0}{1}$,
+\[
+f\bigl((1-t)a + t b\bigr) \leq (1-t) f(a) + t f(b).
+\]
+\omterm{def:g11:func:function}{Fungsi} itu disebut \emph{cekung}\index{cekung} bila ketaksamaannya terbalik ($-f$ cembung).
+\end{definition}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=8.8cm, height=6cm,
+  xmin=-1.9, xmax=2.5, ymin=-0.8, ymax=4.3,
+  xtick={-1,1.5}, xticklabels={$a$,$b$}, ytick=\empty]
+  \addplot[omThm, thick, domain=-1.25:1.75] {0.5*x + 1.5};
+  \addplot[omProp, thick, domain=-0.45:2.3] {x - 0.25};
+  \addplot[omDef, thick, domain=-1.6:2.0] {x^2};
+  \draw[black, dashed, thin] (axis cs:0.25,0.0625) -- (axis cs:0.25,1.625);
+  \fill (axis cs:-1,1) circle (1.5pt);
+  \fill (axis cs:1.5,2.25) circle (1.5pt);
+  \fill (axis cs:0.5,0.25) circle (1.5pt);
+  \node[omThm, font=\small, above left] at (axis cs:1.7,2.4) {tali busur};
+  \node[omProp, font=\small, below right] at (axis cs:1.75,1.5) {singgung};
+\end{axis}
+\end{tikzpicture}
+
+{\small Sebuah \omterm{def:g11:func:function}{fungsi} \omterm{def:g12:deriv:convex}{cembung}: setiap tali busurnya (merah) terletak di atas
+\omterm{def:g10:functions:graph}{grafiknya}, dan \omterm{def:g10:functions:graph}{grafiknya} terletak di atas setiap \omterm{def:g12:deriv:tangent}{garis singgungnya} (jingga).
+Ruas putus-putusnya memperlihatkan celah antara $f\bigl((1-t)a+tb\bigr)$ dan $(1-t)f(a)+tf(b)$.}
+\end{omfigure}
+
+\begin{theorem}[Kecembungan dan turunan]\label{thm:g12:deriv:convexity}
+Misalkan $f$ \omterm{def:g12:deriv:derivative}{dapat diturunkan} pada \omterm{def:g10:numbers:interval}{interval} $I$. Berikut ini setara:
+\begin{enumerate}
+  \item $f$ \omterm{def:g12:deriv:convex}{cembung} pada $I$;
+  \item $f'$ naik pada $I$;
+  \item \omterm{def:g10:functions:graph}{grafik} $f$ terletak di atas setiap \omterm{def:g12:deriv:tangent}{garis singgungnya}.
+\end{enumerate}
+Jika $f$ \omterm{def:g12:deriv:derivative}{dapat diturunkan} dua kali, semua itu juga setara dengan $f'' \geq 0$
+pada $I$.
+\end{theorem}
+
+\begin{proof}[Bukti (2) $\Rightarrow$ (3)]
+Tetapkan $a \in I$ lalu ambil
+$g(x) = f(x) - f(a) - f'(a)(x-a)$, yaitu celah antara kurvanya dan \omterm{def:g12:deriv:tangent}{garis
+singgung} di $a$. Maka $g$ \omterm{def:g12:deriv:derivative}{dapat diturunkan} dan $g'(x) = f'(x) - f'(a)$. Jika
+$f'$ naik, maka $g' \leq 0$ pada $I \cap \intoc{-\infty}{a}$ dan $g' \geq 0$
+pada $I \cap \intco{a}{+\infty}$: jadi $g$ turun sebelum $a$ lalu naik
+sesudahnya, sehingga $g$ mencapai \omterm{def:g10:functions:extrema}{minimumnya} $g(a) = 0$, dan karena itu
+$g \geq 0$. Implikasi selebihnya diterima tanpa bukti pada tingkat ini;
+kesetaraannya dengan $f'' \geq 0$ menyusul dari
+\cref{thm:g12:deriv:variations} yang diterapkan pada $f'$.
+\end{proof}
+
+\begin{definition}[Titik belok]\label{def:g12:deriv:inflection}
+Titik tempat kurva $f$ itu memotong \omterm{def:g12:deriv:tangent}{garis singgungnya} disebut
+\emph{titik belok}\index{titik belok}. Untuk $f$ yang \omterm{def:g12:deriv:derivative}{dapat diturunkan} dua kali, titik
+beloknya adalah titik tempat $f''$ berganti tanda.
+\end{definition}
+
+\begin{example}\label{ex:g12:deriv:cube}
+$f(x) = x^3$ mempunyai $f''(x) = 6x$: jadi $f$ \omterm{def:g12:deriv:convex}{cekung} pada
+$\intoc{-\infty}{0}$, \omterm{def:g12:deriv:convex}{cembung} pada $\intco{0}{+\infty}$, dengan sebuah \omterm{def:g12:deriv:inflection}{titik
+belok} di titik asal, tempat kurvanya memotong \omterm{def:g12:deriv:tangent}{garis singgungnya} (sumbu $x$).
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=7.6cm, height=5.6cm,
+  xmin=-1.7, xmax=1.7, ymin=-2.9, ymax=2.9,
+  xtick={-1,1}, ytick={-1,1}]
+  \addplot[omProp, thick, domain=-1.2:1.2] {0};
+  \addplot[omDef, thick, domain=-1.4:1.4] {x^3};
+  \fill (axis cs:0,0) circle (1.5pt);
+  \node[font=\small, anchor=east] at (axis cs:-0.45,-1.7) {cekung};
+  \node[font=\small, anchor=west] at (axis cs:0.45,1.7) {cembung};
+\end{axis}
+\end{tikzpicture}
+
+{\small \omterm{def:g12:deriv:inflection}{Titik belok} $x \mapsto x^3$ di titik asal: kurvanya
+memotong \omterm{def:g12:deriv:tangent}{garis singgungnya} (jingga), \omterm{def:g12:deriv:convex}{cekung} di kiri, \omterm{def:g12:deriv:convex}{cembung} di kanan.}
+\end{omfigure}
+
+\begin{example}[Ketaksamaan dari kecembungan]\label{ex:g12:deriv:ineq}
+\omterm{def:g11:func:function}{Fungsi} eksponen \omterm{def:g12:deriv:convex}{cembung} pada $\R$ (\omterm{def:g12:deriv:derivative}{turunan} keduanya adalah dirinya sendiri,
+yang positif). \omterm{def:g12:deriv:tangent}{Garis singgungnya} di $0$ adalah $y = 1 + x$, sehingga
+\[
+\eu^x \geq 1 + x \quad \text{untuk semua } x \in \R .
+\]
+Ketaksamaan \emph{\omterm{def:g12:deriv:tangent}{garis singgung}} semacam ini adalah hasil baku \omterm{def:g12:deriv:convex}{kecembungan}.
+\end{example}
+
+\begin{method}[Memakai kecembungan]\label{met:g12:deriv:convexity}
+\begin{itemize}
+  \item Untuk membuktikan ketaksamaan $f(x) \geq ax + b$: kenali garisnya
+        sebagai \omterm{def:g12:deriv:tangent}{garis singgung} sebuah $f$ yang \omterm{def:g12:deriv:convex}{cembung} lalu panggillah
+        \cref{thm:g12:deriv:convexity}(3).
+  \item Untuk menempatkan \omterm{def:g12:deriv:inflection}{titik belok}: selesaikan $f''(x) = 0$ \emph{lalu}
+        periksa bahwa $f''$ berganti tanda di sana.
+  \item Pada sebuah \omterm{def:g10:functions:table}{tabel variasi}, \omterm{def:g12:deriv:convex}{kecembungan} mempertajam sketsa kurvanya
+        (ke arah mana kurvanya melengkung).
+\end{itemize}
+\end{method}
+
+\section{Latihan}
+
+\begin{exercise}[$\star$]\label{exo:g12:deriv:1}
+Turunkan \omterm{def:g11:func:function}{fungsi} berikut pada \omterm{def:g11:func:function}{daerah asalnya}:
+\[
+f(x) = x^3 - 5x + 2, \quad
+g(x) = \frac{x}{x^2+1}, \quad
+h(x) = (2x+1)^5, \quad
+k(x) = \sqrt{x^2 + 1}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:deriv:2}
+Berikan \omterm{def:g10:algebra:equation}{persamaan} \omterm{def:g12:deriv:tangent}{garis singgung} kurva $f(x) = x^2 - 3x + 1$ di
+titik yang berabsis $a = 2$, lalu tentukan kedudukan kurvanya
+terhadap \omterm{def:g12:deriv:tangent}{garis singgung} itu.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:deriv:3}
+Dengan memakai definisi \omterm{def:g12:deriv:derivative}{turunan}, hitunglah
+\[
+\lim_{x \to 0} \frac{(1+x)^{100} - 1}{x}
+\qquad\text{dan}\qquad
+\lim_{h \to 0} \frac{\sqrt{4+h} - 2}{h}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:deriv:4}
+Telaahlah \omterm{def:g11:func:function}{fungsi} $f(x) = \dfrac{x^2 + 3}{x - 1}$ pada \omterm{def:g11:func:function}{daerah asalnya}: limit,
+\omterm{def:g12:deriv:derivative}{turunan}, \omterm{def:g10:functions:table}{tabel variasi}, dan \omterm{def:g12:deriv:extremum}{nilai ekstrem} lokalnya.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:deriv:5}
+Sebuah kotak tanpa tutup dibuat dari lembaran karton persegi bersisi
+$30\,$cm dengan memotong persegi bersisi $x$ yang sama dari pojoknya lalu
+melipat sisinya ke atas. Tentukan $x$ yang memaksimumkan volume kotaknya.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:deriv:6}
+Misalkan $f(x) = x^4 - 4x^3 + 10$.
+\begin{enumerate}
+  \item Hitunglah $f''$ lalu tentukan \omterm{def:g10:numbers:interval}{interval} \omterm{def:g12:deriv:convex}{kecembungan} dan \omterm{def:g12:deriv:inflection}{titik belok}
+        $f$.
+  \item Tunjukkan bahwa \omterm{def:g12:deriv:tangent}{garis singgung} di \omterm{def:g12:deriv:inflection}{titik belok} yang berabsis $2$
+        memotong kurvanya di sana.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:deriv:7}
+Dengan sebuah ketaksamaan \omterm{def:g12:deriv:tangent}{garis singgung}, tunjukkan bahwa untuk semua $x > 0$,
+\[
+\sqrt{x} \leq \frac{x + 1}{2},
+\]
+lalu kenali kapan kesamaannya berlaku. (Petunjuk: akar kuadrat bersifat \omterm{def:g12:deriv:convex}{cekung}.)
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:deriv:8}
+Misalkan $f$ \omterm{def:g12:deriv:convex}{cembung} dan \omterm{def:g12:deriv:derivative}{dapat diturunkan} pada $\R$, dan andaikan $f'$ lenyap
+di suatu titik $a$. Tunjukkan bahwa $f(a)$ adalah \omterm{def:g10:functions:extrema}{minimum} \emph{global} $f$
+pada~$\R$.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:deriv:9}
+Tunjukkan bahwa di antara semua persegi panjang berkeliling tetap $p$, persegi
+mempunyai luas terbesar. Lalu tunjukkan bahwa di antara semua persegi panjang
+berluas tetap $A$, persegi mempunyai keliling terkecil, lalu jelaskan bagaimana
+kedua pernyataan itu berhubungan.
+\end{exercise}
+
+\section{Soal: Perhitungan sang penjaga pantai}
+
+\begin{problem}[{Soal akhir pekan --- jalur penyelamatan tercepat menuruti
+hukum Snell tentang cahaya, kecembungan mengesahkan setiap nilai optimum, dan
+kaleng minuman yang ideal setinggi lebarnya persis}]
+\label{pb:g12:deriv:1}
+Seorang penjaga pantai melihat perenang dalam kesulitan --- menyerong di
+sepanjang pantai, jauh di air. Berlari lebih cepat daripada berenang: jadi
+garis lurus \emph{bukanlah} rute tercepat. Rute yang meminimumkan waktu
+membelok di garis pantai, dan hukum pembelokannya persis sama dengan hukum
+pembiasan cahaya yang memasuki air: alam pun ikut menurunkan. Soal ini
+melatih aturan rantai (\cref{thm:g12:deriv:chain}), menjalankan penyelamatannya,
+memanen ketaksamaan dari \omterm{def:g12:deriv:convex}{kecembungan} (\cref{thm:g12:deriv:convexity}), lalu
+merancang sebuah kaleng.
+
+\medskip
+\noindent\textbf{Bagian I --- Kefasihan dengan aturan rantai.}
+\begin{enumerate}
+  \item Turunkan: $\left(3x^2 + 1\right)^5$; \
+        $\sqrt{x^2 + 9}$; \ $\dfrac{1}{x^2 + 1}$.
+  \item Berikan \omterm{def:g12:deriv:tangent}{garis singgung} $y = \sqrt{x^2 + 9}$ di $x = 4$.
+  \item Susunlah \omterm{def:g10:functions:table}{tabel variasi}
+        $f(x) = \dfrac{x}{x^2 + 1}$ pada $\R$ (lengkap dengan \omterm{def:g12:deriv:extremum}{nilai ekstremnya}).
+  \item Untuk $g(x) = x^3 - 3x^2 + 4$: \omterm{def:g10:functions:table}{tabel variasinya} \emph{dan}
+        tabel \omterm{def:g12:deriv:convex}{kecembungannya} ($g''$), beserta \omterm{def:g12:deriv:inflection}{titik beloknya}
+        (\cref{def:g12:deriv:inflection}).
+  \item Hitunglah \omterm{def:g12:deriv:tangent}{garis singgung} $g$ di \omterm{def:g12:deriv:inflection}{titik beloknya},
+        lalu tunjukkan bahwa $g(x) - (\text{garis singgungnya}) = (x - 1)^3$:
+        apa yang dikatakan pergantian tandanya tentang cara \omterm{def:g12:deriv:tangent}{garis singgung} itu
+        bertemu kurvanya di sebuah \omterm{def:g12:deriv:inflection}{titik belok}?
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian II --- Penyelamatannya.}
+Garis pantainya di sepanjang sumbu $x$; penjaga pantai berdiri di pasir pada
+$A(0, 30)$, perenangnya menunggu di $B(40, -20)$ (dalam meter). Sang
+penjaga berlari $5$ m/s di pasir, berenang $2$ m/s, dan masuk ke
+air di sebuah titik $(x, 0)$ pilihannya.
+\begin{enumerate}[resume]
+  \item Modelnya: nyatakan waktu penyelamatan total $T(x)$, lalu katakan
+        mengapa hanya $x \in \intcc{0}{40}$ yang layak dipertimbangkan.
+  \item Turunkan $T$ (aturan rantai bekerja --- dua kali).
+  \item Misalkan $\theta_1$ sudut kaki lariannya terhadap
+        \emph{garis tegak lurus} pantainya, dan $\theta_2$ sudut
+        kaki renangnya. Tunjukkan bahwa
+        $\sin\theta_1 = \frac{x}{\sqrt{x^2 + 900}}$ dan bahwa
+        syarat $T'(x) = 0$ berbunyi
+        \[
+        \frac{\sin\theta_1}{5} = \frac{\sin\theta_2}{2}
+        \]
+        --- yaitu \emph{hukum Snell}, dengan kedua laju itu sebagai ganti
+        laju cahaya di udara dan di air.
+  \item Ruas garis lurus $[AB]$ memotong pantainya di
+        $x = 24$. Hitunglah $T(24)$, $T(40)$ (berlari sepanjang
+        pantai, lalu berenang lurus ke luar) dan $T(0)$: apakah
+        garis lurus geometris itu yang tercepat? Apakah salah satu strategi
+        ekstremnya yang tercepat?
+  \item Tempatkan titik masuk yang optimum lewat \omterm{thm:g12:limcont:ivt}{dikotomi} pada
+        $T'$ (nilainya $\approx 33.7$ m): berikan $x^*$ sampai satuan meter
+        dan waktu rekornya $T(x^*)$ sampai sepersepuluh detik.
+        Berapa banyak waktu yang dihemat belokan optimum itu dibandingkan
+        garis lurusnya?
+  \item Mengapa titik kritisnya merupakan \omterm{def:g10:functions:extrema}{minimum} \emph{global}?
+        (Setiap suku $T$ \omterm{def:g12:deriv:convex}{cembung} --- terimalah bahwa jumlah \omterm{def:g11:func:function}{fungsi}
+        \omterm{def:g12:deriv:convex}{cembung} bersifat \omterm{def:g12:deriv:convex}{cembung} --- lalu terapkan
+        \cref{exo:g12:deriv:8}.)
+  \item Asas Fermat menyatakan bahwa cahaya selalu menempuh
+        jalur dengan \emph{waktu} terkecil. Simpulkan mengapa seberkas cahaya
+        membelok tepat di permukaan ketika memasuki air
+        (tempat cahaya lebih lambat), lalu sebutkan pengamatan
+        sehari-hari yang dijelaskannya tentang sebatang pensil di dalam gelas
+        berisi air.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian III --- Panen \omterm{def:g12:deriv:convex}{kecembungan}.}
+\begin{enumerate}[resume]
+  \item Tunjukkan bahwa $x \mapsto x^2$ \omterm{def:g12:deriv:convex}{cembung}, lalu buktikan
+        ketaksamaan \omterm{prop:g10:coordgeom:midpoint}{titik tengahnya}
+        $\left(\frac{a + b}{2}\right)^2 \leq
+        \frac{a^2 + b^2}{2}$ dua kali: sekali dari \omterm{def:g12:deriv:convex}{kecembungannya}, sekali
+        dengan \omterm{def:g10:algebra:expand}{menjabarkan} $(a - b)^2 \geq 0$.
+  \item Simpulkan bahwa \emph{rataan kuadratik}
+        $\sqrt{\frac{a^2 + b^2}{2}}$ menguasai rataan
+        aritmetika, lalu rangkailah rantai lengkap seri ini ---
+        harmonik $\leq$ geometri $\leq$ aritmetika $\leq$
+        kuadratik --- sambil memeriksa keempatnya pada $a = 2$, $b = 8$.
+  \item \omterm{def:g12:deriv:tangent}{Garis singgung} di bawah kurvanya: $x \mapsto \frac1x$ \omterm{def:g12:deriv:convex}{cembung}
+        pada $\intoo{0}{+\infty}$; tulislah \omterm{def:g12:deriv:tangent}{garis singgungnya} di $1$ lalu
+        simpulkan ketaksamaan
+        $\frac1x \geq 2 - x$ untuk semua $x > 0$. Di mana ketaksamaan itu
+        menjadi kesamaan?
+  \item \omterm{def:g12:deriv:inflection}{Titik belok} di alam liar: selama sebuah wabah,
+        cacah kasus kumulatifnya mengikuti kurva berbentuk S. Apa
+        yang terjadi di \omterm{def:g12:deriv:inflection}{titik beloknya}, dan mengapa tanggal itulah yang
+        ditunggu para ahli epidemiologi? Kaitkan dengan tanda
+        \omterm{def:g12:deriv:derivative}{turunan} keduanya pada masing-masing sisi.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian IV --- Kaleng yang ideal.}
+Sebuah kaleng berbentuk tabung harus memuat $V = 330$ cm$^3$ dengan logam
+paling sedikit: luas permukaannya $S = 2\pi r^2 + 2\pi r h$, dengan kendala
+$\pi r^2 h = V$.
+\begin{enumerate}[resume]
+  \item Nyatakan $S(r) = 2\pi r^2 + \dfrac{2V}{r}$,
+        turunkan, lalu hitunglah jari-jari dan tinggi yang optimum
+        untuk $V = 330$ (dengan ketelitian milimeter).
+  \item Buktikan hukum umumnya yang anggun: pada nilai optimumnya,
+        $h = 2r$ --- jadi kaleng yang ideal setinggi lebarnya persis.
+  \item Periksalah $S''(r) > 0$ lalu simpulkan (lagi-lagi lewat
+        \cref{exo:g12:deriv:8}) bahwa nilai optimumnya bersifat
+        global. Kaleng minuman yang sesungguhnya jelas lebih tinggi daripada
+        lebarnya: sebutkan satu alasan yang bukan matematis.
+  \item Penutup --- jalur pipa pengoptimuman: memodelkan, bertanya kepada
+        \omterm{def:g12:deriv:derivative}{turunan}, mencari titik kritis, mengesahkannya dengan \omterm{def:g12:deriv:convex}{kecembungan} atau
+        tabel, lalu menafsirkan. Jalankan daftar itu pada penjaga
+        pantai, kaleng, dan balok terkuat tahun sebelumnya
+        (\cref{pb:g11:deriv:1}) --- lalu nyatakan apa kata asas Fermat
+        tentang siapa lagi yang menjalankan jalur pipa ini.
+
+\end{enumerate}
+\end{problem}

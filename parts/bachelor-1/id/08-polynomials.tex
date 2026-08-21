@@ -1,0 +1,821 @@
+\chapter{Polinomial}\label{ch:b1:poly}
+
+\omterm{def:b1:poly:def}{Polinomial} adalah fungsi kesayangan para aljabarwan --- kecuali bahwa
+di sini ia tidak diperlakukan sebagai fungsi, melainkan sebagai ungkapan formal dalam
+sebuah variabel tak tentu $X$, yang dijumlahkan dan dikalikan menurut aturan sebuah
+\omterm{def:b1:structures:ring}{ring} komutatif. Teorinya berjalan sangat sejajar dengan
+\cref{ch:b1:arith}: ada pembagian Euclid, FPB beserta hubungan Bézout,
+unsur tak tereduksikan, dan ketunggalan pemfaktoran. Di sepanjang bab ini, $K$
+menyatakan $\Q$, $\R$ atau $\C$.
+
+\section{Ring $K[X]$}
+
+\begin{definition}[Polinomial, derajat]\label{def:b1:poly:def}
+Sebuah \emph{polinomial}\index{polinomial} berkoefisien di $K$ adalah
+jumlah formal
+\[
+P = a_0 + a_1 X + a_2 X^2 + \dots + a_n X^n
+= \sum_{k} a_k X^k,
+\]
+dengan $a_k \in K$ yang bernilai nol mulai dari suatu indeks. Dengan penjumlahan
+yang wajar dan hasil kali
+\[
+\Bigl(\sum_i a_i X^i\Bigr)\Bigl(\sum_j b_j X^j\Bigr)
+= \sum_k \Bigl(\sum_{i+j=k} a_i b_j\Bigr) X^k,
+\]
+\omterm{def:b1:logic:sets}{himpunan} $K[X]$ menjadi \omterm{def:b1:structures:ring}{ring} komutatif. \emph{Derajat} $\deg P$ dari
+$P \neq 0$ adalah $n$ terbesar dengan $a_n \neq 0$; lalu $a_n$ disebut
+\emph{koefisien utamanya} ($P$ disebut \emph{monik}\index{polinomial
+monik} bila $a_n = 1$), dan menurut kesepakatan $\deg 0 = -\infty$.
+Setiap polinomial mendefinisikan fungsi $x \mapsto P(x)$ pada $K$ lewat
+substitusi.
+\end{definition}
+
+\begin{proposition}[Kaidah derajat; daerah integral]\label{prop:b1:poly:degree}
+Untuk $P, Q \in K[X]$:
+\[
+\deg(P + Q) \leq \max(\deg P, \deg Q),
+\qquad
+\deg(PQ) = \deg P + \deg Q .
+\]
+Akibatnya $K[X]$ adalah \omterm{def:b1:structures:field}{daerah integral}, dan unitnya berupa
+konstanta yang tak nol.
+\end{proposition}
+
+\begin{proof}
+Kaidah jumlahnya jelas (koefisien di atas maksimumnya lenyap). Untuk
+hasil kalinya, misalkan $a_m$ dan $b_n$ koefisien utamanya: maka
+koefisien $X^{m+n}$ pada $PQ$ adalah $a_m b_n \neq 0$ (karena $K$ sebuah
+\omterm{def:b1:structures:field}{lapangan}, sehingga \omterm{def:b1:structures:field}{daerah integral}), dan semua koefisien yang lebih tinggi lenyap.
+Jika $P, Q \neq 0$ maka $\deg PQ = \deg P + \deg Q \geq 0$, sehingga $PQ \neq
+0$: jadi \omterm{def:b1:structures:field}{daerah integral}. Jika $PQ = 1$ maka $\deg P + \deg Q = 0$ memaksa
+$\deg P = \deg Q = 0$: jadi unsur yang terbalikkan adalah konstanta yang
+terbalikkan, yakni seluruh $K^*$.
+\end{proof}
+
+\begin{theorem}[Pembagian Euclid]\label{thm:b1:poly:division}
+Misalkan $A, B \in K[X]$ dengan $B \neq 0$. Ada tepat satu pasangan $(Q,
+R)$ \omterm{def:b1:poly:def}{polinomial} dengan
+\[
+A = BQ + R, \qquad \deg R < \deg B .
+\]
+\end{theorem}
+
+\begin{proof}
+\emph{Keberadaannya}, dengan induksi kuat pada $\deg A$. Jika $\deg A < \deg
+B$, ambil $(Q, R) = (0, A)$. Jika tidak, tulis $A = a X^m + \dots$, $B =
+b X^n + \dots$ dengan $m \geq n$; maka \omterm{def:b1:poly:def}{polinomial} $A_1 = A - \frac ab
+X^{m-n} B$ berderajat $< m$ (karena suku utamanya saling hapus), sehingga menurut
+induksi $A_1 = BQ_1 + R$ dengan $\deg R < \deg B$, dan $A = B(Q_1 +
+\frac ab X^{m-n}) + R$.
+
+\emph{Ketunggalannya}: jika $BQ + R = BQ' + R'$, maka $B(Q - Q') = R' - R$
+dengan $\deg(R' - R) < \deg B$; dan menurut kaidah derajatnya ini memaksa $Q - Q'
+= 0$, lalu $R = R'$.
+\end{proof}
+
+\begin{example}\label{ex:b1:poly:division}
+Bagilah $A = X^4 + X^3 - 2X + 1$ dengan $B = X^2 + 1$:
+\[
+X^4 + X^3 - 2X + 1 = (X^2 + 1)(X^2 + X - 1) + (-3X + 2).
+\]
+(Hitung: kurangkan $X^2 B$, lalu $X B$, lalu $-B$; sisanya
+$-3X + 2$ berderajat $1 < 2$.)
+\end{example}
+
+\begin{method}[Skema Horner]\label{met:b1:poly:horner}
+Untuk menghitung nilai $P = a_nX^n + \dots + a_0$ di $x$, atau untuk \omterm{def:b1:arith:divides}{membagi} $P$ dengan
+$X - x$, hindarilah menghitung pangkatnya: bacalah koefisiennya dari kiri ke
+kanan, lalu iterasikan \emph{kalikan dengan $x$, tambahkan koefisien
+berikutnya}:
+\[
+b_n = a_n, \qquad b_{k} = a_{k} + x\,b_{k+1}
+\quad (k = n-1, \dots, 0) .
+\]
+Maka $b_0 = P(x)$, dan $b_k$ yang sebelumnya adalah koefisien hasil baginya:
+$P = (X - x)(b_nX^{n-1} + \dots + b_1) + b_0$
+(jabarkan lalu bandingkan). Contoh: $P = X^4 - 5X^3 + 6X^2 + 4X - 8$
+di $x = 2$: nilai $b$-nya adalah $1, -3, 0, 4, 0$, jadi $P(2) = 0$ dan $P
+= (X-2)(X^3 - 3X^2 + 4)$ --- satu baris alih-alih pembagian
+panjang, dan $n$ kali perkalian alih-alih $\approx n^2/2$ kali
+pada perhitungan yang naif. Mengiterasikan skema itu pada titik yang sama
+mengekstrak \omterm{def:b1:poly:derivative}{kegandaannya} (bandingkan
+\cref{ex:b1:poly:multexample}).
+\end{method}
+
+\begin{remark}[{Aritmetika $K[X]$}]
+Dengan pembagian Euclid di tangan, seluruh aritmetika
+\cref{ch:b1:arith} berpindah ke $K[X]$, dengan bukti yang sama dan derajat
+memainkan peran nilai mutlak: FPB (yang dinormalkan menjadi \omterm{def:b1:poly:def}{monik}),
+\omterm{met:b1:arith:euclid}{algoritma Euclid} yang diperluas, kesamaan Bézout, lema Gauss,
+\omterm{def:b1:poly:def}{polinomial} tak tereduksikan, dan ketunggalan pemfaktoran. Kita memakai hasil
+pindahan itu dengan bebas, dan \cref{exo:b1:poly:6} melatih salah satunya.
+\end{remark}
+
+\section{Akar}
+
+\begin{theorem}[Teorema faktor]\label{thm:b1:poly:factor}
+Misalkan $P \in K[X]$ dan $a \in K$. Sisa $P$ bila dibagi
+$X - a$ adalah konstanta $P(a)$. Khususnya
+\[
+P(a) = 0 \iff (X - a) \mid P .
+\]
+Lebih umum, akar yang berbeda $a_1, \dots, a_r$ dari $P$ memberikan
+pemfaktoran $P = (X - a_1)\cdots(X - a_r)\, Q$.
+\end{theorem}
+
+\begin{proof}
+Bagilah: $P = (X - a) Q + R$ dengan $\deg R < 1$, jadi $R$ sebuah konstanta
+$c$; lalu mensubstitusikan $X = a$ (substitusi menghormati jumlah dan hasil kali)
+memberikan $P(a) = c$. Kesetaraannya pun menyusul. Untuk beberapa akar,
+berinduksilah pada $r$: kasus $r = 1$ adalah kesetaraan yang baru dibuktikan.
+Andaikan \omterm{def:b1:logic:statement}{pernyataannya} berlaku untuk $r - 1$ akar lalu misalkan $a_1, \dots, a_r$
+akar $P$ yang berbeda. Tulis $P = (X - a_1)Q_1$; lalu untuk masing-masing $i
+\geq 2$, dengan mensubstitusikan $a_i$:
+\[
+0 = P(a_i) = (a_i - a_1)\,Q_1(a_i),
+\qquad a_i - a_1 \neq 0 ,
+\]
+dan karena $K$ tak mempunyai pembagi nol, $Q_1(a_i) = 0$: jadi $r - 1$
+titik berbeda $a_2, \dots, a_r$ merupakan akar $Q_1$. Lalu
+hipotesis induksinya memfaktorkan $Q_1 = (X - a_2)\cdots(X - a_r)\,Q$,
+dan mensubstitusikannya kembali memberikan klaimnya.
+\end{proof}
+
+\begin{corollary}[Polinomial berderajat $n$ mempunyai paling banyak $n$ akar]\label{cor:b1:poly:nroots}
+\omterm{def:b1:poly:def}{Polinomial} tak nol $P \in K[X]$ berderajat $n$ mempunyai paling banyak $n$ akar berbeda
+di $K$. Akibatnya, \omterm{def:b1:poly:def}{polinomial} (berderajat $\leq n$) yang lenyap di
+$n + 1$ titik berbeda adalah \omterm{def:b1:poly:def}{polinomial} nol, dan dua \omterm{def:b1:poly:def}{polinomial}
+berderajat $\leq n$ yang bersesuaian di $n+1$ titik adalah sama.
+\end{corollary}
+
+\begin{proof}
+Jika $a_1, \dots, a_r$ akar yang berbeda, maka \cref{thm:b1:poly:factor}
+memberikan $P = (X-a_1)\cdots(X-a_r) Q$, sehingga $n = \deg P \geq r$. Kedua
+akibatnya menyusul lewat kontradiksi dan lewat selisih.
+\end{proof}
+
+\begin{example}[Kiat polinomial bantu]\label{ex:b1:poly:auxiliary}
+Misalkan $P$ \omterm{def:b1:poly:def}{polinomial} berderajat $\leq n$ dengan
+\[
+P(k) = \frac{k}{k+1} \qquad (k = 0, 1, \dots, n) ;
+\]
+yang ada dan tunggal menurut \omterm{thm:b1:poly:lagrange}{interpolasi Lagrange} di bawah. Berapa
+$P(n+1)$? Hilangkan penyebutnya: \omterm{def:b1:poly:def}{polinomial} $Q = (X+1)P - X$ berderajat
+$\leq n + 1$ dan lenyap di $n + 1$ titik $0, 1,
+\dots, n$, jadi menurut \cref{thm:b1:poly:factor}
+\[
+Q = c\,X(X-1)(X-2)\cdots(X-n)
+\]
+untuk suatu konstanta $c$. Hitung nilainya di tempat $Q$ diketahui secara mandiri:
+di $X = -1$, $Q(-1) = 0 \cdot P(-1) + 1 = 1$, sedangkan hasil kalinya
+sama dengan $(-1)(-2)\cdots(-1-n) = (-1)^{n+1}(n+1)!$; sehingga $c =
+\frac{(-1)^{n+1}}{(n+1)!}$. Sekarang hitung nilainya di $X = n + 1$:
+\[
+(n+2)\,P(n+1) - (n+1) = Q(n+1) = c\,(n+1)! = (-1)^{n+1} ,
+\]
+jadi $P(n+1) = \dfrac{(n+1) + (-1)^{n+1}}{n+2}$: yang sama dengan $1$ untuk
+$n$ ganjil, dan $\frac{n}{n+2}$ untuk $n$ genap --- jadi \omterm{def:b1:poly:def}{polinomial}
+penginterpolasinya \emph{tidak} melanjutkan pola
+$\frac{n+1}{n+2}$. Kiat yang perlu diingat: sandikan datanya sebagai
+akar sebuah \omterm{def:b1:poly:def}{polinomial} bantu, kenali konstanta yang belum diketahui
+pada sebuah titik di luar datanya, lalu panenlah hasilnya.
+\end{example}
+
+\begin{definition}[Turunan, kegandaan]\label{def:b1:poly:derivative}
+\emph{Turunan formal} $P = \sum a_k X^k$ adalah $P' = \sum_{k
+\geq 1} k\,a_k X^{k-1}$; dan ia memenuhi kaidah yang biasa $(P+Q)' = P' +
+Q'$, $(PQ)' = P'Q + PQ'$ (diperiksa pada monomialnya lalu diperluas secara
+linear). Sebuah akar $a$ dari $P$ mempunyai
+\emph{kegandaan}\index{kegandaan akar} $m \geq 1$ bila
+$(X-a)^m \mid P$ tetapi $(X-a)^{m+1} \nmid P$; akarnya disebut \emph{sederhana}
+bila $m = 1$, dan \emph{ganda} bila $m \geq 2$.
+\end{definition}
+
+\begin{proposition}[Kegandaan lewat turunannya]\label{prop:b1:poly:multiplicity}
+Di sini $a$ merupakan akar $P$ berkegandaan $\geq m$ jika dan hanya jika
+\[
+P(a) = P'(a) = \dots = P^{(m-1)}(a) = 0 .
+\]
+Khususnya, $a$ merupakan akar ganda $P$ jika dan hanya jika $P(a) =
+P'(a) = 0$.
+\end{proposition}
+
+\begin{proof}
+Tulis $P = (X - a)^m Q + R$ dengan $R$ sisa pembagiannya
+oleh $(X-a)^m$, $\deg R < m$. Menurunkannya $k \leq m - 1$ kali lalu
+menghitung nilainya di $a$: suku pertamanya menyumbang $0$ (karena setiap turunannya
+menyisakan faktor $(X-a)$), sehingga $P^{(k)}(a) = R^{(k)}(a)$.
+
+Selanjutnya \omterm{def:b1:poly:def}{polinomial} $R$ berderajat $< m$ ditentukan oleh $R(a), R'(a),
+\dots, R^{(m-1)}(a)$: dengan menulis $R = \sum_{k < m} c_k (X - a)^k$
+(yang mungkin: jabarkan pangkat $X = (X - a) + a$), kita peroleh
+$R^{(k)}(a) = k!\, c_k$. Jadi: semua $P^{(k)}(a) = 0$ untuk $k < m$
+$\iff$ semua $c_k = 0$ $\iff$ $R = 0$ $\iff$ $(X-a)^m \mid P$.
+\end{proof}
+
+\begin{example}[Menghitung sebuah kegandaan]\label{ex:b1:poly:multexample}
+Berapa \omterm{def:b1:poly:derivative}{kegandaan akar} $2$ pada $P = X^4 - 5X^3 + 6X^2
++ 4X - 8$? Hitunglah nilai turunan berturutannya di $2$:
+\[
+P(2) = 16 - 40 + 24 + 8 - 8 = 0, \qquad
+P'(2) = 32 - 60 + 24 + 4 = 0,
+\]
+\[
+P''(2) = 48 - 60 + 12 = 0, \qquad
+P'''(2) = 48 - 30 = 18 \neq 0
+\]
+(dengan $P' = 4X^3 - 15X^2 + 12X + 4$, $P'' = 12X^2 - 30X + 12$,
+$P''' = 24X - 30$). Tiga nilai yang lenyap lalu satu yang tak nol:
+jadi \omterm{def:b1:poly:derivative}{kegandaannya} tepat $3$. Dengan \omterm{def:b1:arith:divides}{membaginya}, $P = (X - 2)^3(X + 1)$ ---
+yang kita periksa dengan menjabarkan $(X-2)^3 = X^3 - 6X^2 + 12X - 8$ lalu
+mengalikannya dengan $X + 1$. Inti gagasannya: \omterm{def:b1:poly:derivative}{kegandaan} terbaca dari
+\emph{perhitungan nilai}, tanpa perlu pemfaktoran --- dan justru begitulah
+kita mendeteksinya ketika pemfaktorannya di luar jangkauan.
+\end{example}
+
+\begin{example}[Mendeteksi akar ganda lewat FPB]\label{ex:b1:poly:gcdmultiple}
+Ketika tak ada akar yang diketahui, \cref{prop:b1:poly:multiplicity} tetap
+memberikan pendeteksi akar ganda yang \emph{global}: $a$ merupakan akar
+ganda $P$ jika dan hanya jika ia akar persekutuan $P$ dan $P'$, sehingga $P$ mempunyai
+akar ganda (di $\C$) jika dan hanya jika $\gcd(P, P') \neq 1$ --- yang dapat dihitung dengan
+\omterm{met:b1:arith:euclid}{algoritma Euclid} tanpa menyelesaikan apa pun. Contohnya: $P =
+X^3 - 3X + 2$, $P' = 3X^2 - 3 = 3(X - 1)(X + 1)$. Dengan menguji
+akar $\pm1$ dari $P'$ di dalam $P$: $P(1) = 0$ tetapi $P(-1) = 4$, jadi
+\[
+\gcd(P, P') = X - 1 :
+\]
+jadi akar $1$ bersifat ganda; dan dengan membaginya dua kali, $P = (X - 1)^2(X + 2)$.
+FPB itu bahkan melaporkan seluruh \omterm{def:b1:logic:sets}{himpunan} akar gandanya, masing-masing dengan
+\omterm{def:b1:poly:derivative}{kegandaan} yang berkurang satu --- fakta yang dimanfaatkan setiap sistem aljabar
+komputer untuk ``memfaktorkan bebas kuadrat'' sebelum berburu
+akar, dan ia kembaran \omterm{def:b1:poly:def}{polinomial} bagi
+argumen tanpa akar ganda pada \cref{exo:b1:poly:9}.
+\end{example}
+
+\begin{theorem}[Teorema dasar aljabar]\label{thm:b1:poly:fta}
+Setiap \omterm{def:b1:poly:def}{polinomial} tak konstan pada $\C[X]$ mempunyai akar di
+$\C$.\index{teorema dasar aljabar}
+\end{theorem}
+\admitted
+
+\begin{remark}
+Terlepas dari namanya, teorema itu adalah \omterm{def:b1:logic:statement}{pernyataan} \emph{analisis}:
+setiap bukti yang dikenal memakai kelengkapan $\R$ dalam bentuk tertentu, dan
+tak satu pun murni aljabar --- bukti yang jujur diberikan pada
+jilid Tahun ke-3, begitu pengintegralan kompleks atau argumen
+kekompakan tersedia. Yang sungguh-sungguh dibuktikan bab ini adalah
+\emph{penyusutannya}: bila satu akar diberikan untuk setiap \omterm{def:b1:poly:def}{polinomial}
+tak konstan, maka pemfaktoran penuh atas $\C$ dan $\R$ di bawah
+menyusul lewat aljabar murni.
+\end{remark}
+
+\begin{corollary}[Pemfaktoran atas $\C$ dan atas $\R$]\label{cor:b1:poly:factorization}
+\begin{enumerate}
+  \item Setiap $P \in \C[X]$ yang tak nol terfaktorkan sebagai
+        \[
+        P = c\, (X - a_1)^{m_1} \cdots (X - a_r)^{m_r},
+        \]
+        dengan $c$ koefisien utamanya, $a_i$ akar kompleksnya yang
+        berbeda, dan $\sum m_i = \deg P$: jadi \emph{bila dicacah beserta \omterm{def:b1:poly:derivative}{kegandaannya},
+        \omterm{def:b1:poly:def}{polinomial} berderajat $n$ mempunyai tepat $n$ akar kompleks}.
+  \item Setiap $P \in \R[X]$ yang tak nol terfaktorkan atas $\R$ sebagai
+        \[
+        P = c \prod_i (X - a_i)^{m_i} \prod_j (X^2 + p_j X +
+        q_j)^{n_j},
+        \]
+        dengan faktor kuadratnya berbeda-beda dan $p_j^2 - 4q_j < 0$
+        (jadi tanpa akar real).
+\end{enumerate}
+\end{corollary}
+
+\begin{proof}
+(1) Induksi pada derajatnya, dengan memisahkan satu akar setiap kali lewat
+\cref{thm:b1:poly:factor}; dan cacah derajatnya cocok pada setiap langkah.
+
+(2) Misalkan $P$ berkoefisien real. Jika $z$ akar kompleks
+berkegandaan $m$, maka $\conj z$ juga demikian: mengonjugatkan $P(z) = 0$ memberikan
+$P(\conj z) = \conj{P(z)} = 0$ (karena koefisiennya menjadi \omterm{def:b1:complex:field}{konjugatnya}
+sendiri), dan hal yang sama berlaku bagi turunannya
+(\cref{prop:b1:poly:multiplicity}). Kelompokkan akar yang tak real dalam
+pasangan \omterm{def:b1:complex:field}{konjugat}: masing-masing pasangan menyumbang
+\[
+(X - z)(X - \conj z) = X^2 - 2\Re(z)\, X + \abs z^2 ,
+\]
+yaitu kuadrat real berdiskriminan negatif. Adapun akar realnya menyumbang
+faktor linearnya.
+\end{proof}
+
+\begin{example}\label{ex:b1:poly:factorexample}
+$X^4 + 4$ sudah difaktorkan atas $\R$ pada \cref{exo:b1:complex:5} dengan memasangkan
+keempat akar kompleksnya $\pm 1 \pm \iu$:
+$X^4 + 4 = (X^2 - 2X + 2)(X^2 + 2X + 2)$. Tak satu pun kuadratnya terbelah
+atas $\R$ (karena diskriminannya $-4$). Catatan: \omterm{def:b1:poly:def}{polinomial} real yang
+\emph{tak tereduksikan} berderajat $1$ atau $2$ --- dan itu persis yang dikatakan
+teorema pemfaktorannya. Pemasangan \omterm{def:b1:complex:field}{konjugat} yang sama dijalankan pada
+$X^4 + 1$, yang akarnya $\eu^{\pm\iu\pi/4}$ dan
+$\eu^{\pm3\iu\pi/4}$: masing-masing pasangan menyumbang $X^2 -
+2\cos\theta\,X + 1$, sehingga
+\[
+X^4 + 1 = \bigl(X^2 - \sqrt2\,X + 1\bigr)
+\bigl(X^2 + \sqrt2\,X + 1\bigr) ,
+\]
+yaitu kesamaan yang tak terlihat oleh usaha pemfaktoran yang naif atas $\Q$ ---
+itulah harga yang dibayar karena bersikeras memakai koefisien real (di sini bahkan
+irasional), dan ia masukan baku untuk mengintegralkan $\frac1{x^4 +
+1}$ pada \cref{ch:b1:integration}.
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}[xscale=2.6, yscale=1.35]
+  \draw[->, thin] (-1.15,0) -- (1.2,0) node[below] {$x$};
+  \draw[->, thin] (0,-1.35) -- (0,1.4) node[left] {$y$};
+  \draw[dashed, gray] (-1,1) -- (1,1);
+  \draw[dashed, gray] (-1,-1) -- (1,-1);
+  \draw[gray, thin] (-1,-1.1) -- (-1,1.1) (1,-1.1) -- (1,1.1);
+  \draw[omThm, very thick, domain=-1:1, samples=300, smooth]
+    plot (\x, {16*\x^5 - 20*\x^3 + 5*\x});
+  \node[right, font=\small] at (1.02,1) {$1$};
+  \node[right, font=\small] at (1.02,-1) {$-1$};
+  \fill[omThm] (-1,-1) circle (0.018) (-0.809,1) circle (0.018)
+    (-0.309,-1) circle (0.018) (0.309,1) circle (0.018)
+    (0.809,-1) circle (0.018) (1,1) circle (0.018);
+\end{tikzpicture}
+
+{\small \omterm{pb:b1:poly:1}{Polinomial Chebyshev} $T_5 = 16X^5 - 20X^3 + 5X$ pada
+$\intcc{-1}1$: ia berayun tepat di antara $-1$ dan $1$,
+menyentuh batasnya pada enam titik (yang ditandai). Sifat
+\emph{ekuiosilasi} inilah yang membuat $2^{-4}T_5$ menjadi \omterm{def:b1:poly:def}{polinomial}
+kuintik \omterm{def:b1:poly:def}{monik} dengan norma supremum terkecil pada selang itu
+(\cref{exo:b1:poly:10} dan soal akhir pekan).}
+\end{omfigure}
+
+\begin{remark}[Jebakan yang lazim dengan polinomial]\label{rem:b1:poly:pitfalls}
+\begin{enumerate}
+  \item \emph{\omterm{def:b1:poly:def}{Polinomial} berbanding fungsi.} Atas $K = \Q, \R, \C$
+        kedua gagasannya berimpit (karena fungsi yang sama berkoefisien
+        sama, menurut \cref{cor:b1:poly:nroots} dan
+        ketakhinggaan $K$), tetapi secara gagasan \omterm{def:b1:poly:def}{polinomial} adalah
+        daftar koefisiennya: atas \omterm{def:b1:structures:field}{lapangan} beranggota dua
+        $\Z/2\Z$ pada \cref{ch:b1:structures}, $X^2 + X$ lenyap
+        di kedua titiknya, namun ia bukan \omterm{def:b1:poly:def}{polinomial} nol.
+  \item \emph{Derajat di bawah penjumlahan.} Nilai $\deg(P + Q)$ dapat turun
+        di bawah $\max(\deg P, \deg Q)$ ketika suku utamanya saling hapus;
+        jadi menulis ``$\deg(P + Q) = \max(\dots)$'' hanya aman untuk
+        derajat yang berbeda.
+  \item \emph{Akar yang dicacah dengan benar.} Ungkapan ``$n$ akar'' pada
+        \cref{cor:b1:poly:factorization} berarti \emph{beserta
+        \omterm{def:b1:poly:derivative}{kegandaannya}, di $\C$}: karena $X^2 + 1$ tak mempunyai akar real, dan
+        $(X-1)^2$ mempunyai satu akar berbeda tetapi dua akar dengan
+        \omterm{def:b1:poly:derivative}{kegandaan}. \omterm{def:b1:logic:statement}{Pernyataan} yang mencampur ketiga cacahan itu adalah
+        sumber bukti palsu yang paling lazim.
+  \item \emph{Ketaktereduksian bergantung pada \omterm{def:b1:structures:field}{lapangannya}.} Di sini $X^2 - 2$
+        tak tereduksikan atas $\Q$, tetapi terbelah atas $\R$; sedangkan $X^2 + 1$
+        tak tereduksikan atas $\R$, tetapi terbelah atas $\C$. Kata
+        ``tak tereduksikan'' yang telanjang tak bermakna sampai \omterm{def:b1:structures:field}{lapangan}
+        koefisiennya disebut.
+\end{enumerate}
+\end{remark}
+
+\section{Koefisien dan akar}
+
+\begin{theorem}[Rumus Vieta]\label{thm:b1:poly:vieta}
+Misalkan $P = X^n + c_{n-1} X^{n-1} + \dots + c_0$ \omterm{def:b1:poly:def}{monik} dengan akar
+$a_1, \dots, a_n \in \C$ (beserta \omterm{def:b1:poly:derivative}{kegandaannya}). Maka\index{rumus
+Vieta}
+\[
+\sum_i a_i = -c_{n-1},
+\qquad
+\sum_{i < j} a_i a_j = c_{n-2},
+\qquad \dots, \qquad
+a_1 a_2 \cdots a_n = (-1)^n c_0 ,
+\]
+dengan fungsi simetris ke-$k$ dari akarnya sama dengan $(-1)^k c_{n-k}$.
+\end{theorem}
+
+\begin{proof}
+Menurut \cref{cor:b1:poly:factorization}, $P = (X - a_1)\cdots(X -
+a_n)$ (yang \omterm{def:b1:poly:def}{monik}, dengan semua akarnya terdaftar). Menjabarkan hasil kalinya
+secara distributif menghasilkan satu suku untuk setiap cara memilih, pada masing-masing
+faktornya, entah $X$ atau suku akarnya $-a_i$: memilih akarnya pada
+faktor yang berindeks $i_1 < \dots < i_k$ dan $X$ pada $n - k$
+faktor lainnya menyumbang $(-a_{i_1})\cdots(-a_{i_k})\,X^{n-k}$. Dengan mengelompokkan
+menurut pangkat $X$:
+\[
+P = \sum_{k=0}^{n} (-1)^k
+\Bigl(\sum_{i_1 < \dots < i_k} a_{i_1}\cdots a_{i_k}\Bigr)
+X^{n-k} ,
+\]
+lalu menyamakannya dengan $P = \sum_k c_{n-k}X^{n-k}$ (karena koefisiennya
+tunggal, \cref{def:b1:poly:def}) memberikan $c_{n-k} = (-1)^k
+\sigma_k$, yakni $\sigma_k = (-1)^kc_{n-k}$, dengan $\sigma_k$
+menyatakan fungsi simetris ke-$k$ yang ditampilkan di atas. Ketiga
+kasus yang ditampilkan itu adalah $k = 1$, $k = 2$ dan $k = n$.
+\end{proof}
+
+\begin{example}\label{ex:b1:poly:vieta}
+Untuk persamaan kuadrat $X^2 - sX + p$: jumlah akarnya $s$, hasil kalinya $p$ ---
+yang sudah berulang kali dipakai (\cref{exo:b1:complex:8}). Untuk kubik \omterm{def:b1:poly:def}{monik}
+$X^3 + aX^2 + bX + c$ dengan akar $\alpha, \beta, \gamma$:
+\[
+\alpha + \beta + \gamma = -a,
+\quad
+\alpha\beta + \beta\gamma + \gamma\alpha = b,
+\quad
+\alpha\beta\gamma = -c ,
+\]
+yang memungkinkan kita menghitung besaran simetris seperti $\alpha^2 + \beta^2
++ \gamma^2 = a^2 - 2b$ tanpa menyelesaikannya.
+\end{example}
+
+\begin{example}[Mentransformasikan akarnya tanpa mencarinya]\label{ex:b1:poly:transformroots}
+Misalkan $\alpha, \beta$ akar $X^2 - 3X + 1$. Persamaan kuadrat \omterm{def:b1:poly:def}{monik}
+mana yang berakar $\alpha^2, \beta^2$? Menurut Vieta, $\alpha +
+\beta = 3$ dan $\alpha\beta = 1$, sehingga
+\[
+\alpha^2 + \beta^2 = (\alpha+\beta)^2 - 2\alpha\beta = 7,
+\qquad
+\alpha^2\beta^2 = (\alpha\beta)^2 = 1 :
+\]
+jawabannya adalah $X^2 - 7X + 1$ --- yang diperoleh tanpa menghitung
+$\alpha = \frac{3 + \sqrt5}2$. (Periksa: $\alpha^2 = \frac{7 +
+3\sqrt5}2$ dan memang $\alpha^2 + \beta^2 = 7$.) Strategi yang
+sama menangani kebalikannya (yaitu transformasi bertipe $X^2 - \frac ba X + \frac
+ca$), pergeseran, dan sebarang data yang simetris: jadi Vieta
+mengubah pertanyaan tentang akar yang \emph{belum diketahui} menjadi aljabar atas
+koefisien yang \emph{sudah diketahui}. Ia akan terus melayani ketika
+akarnya berupa nilai eigen (\cref{ch:b1:det}).
+\end{example}
+
+\begin{example}[Persamaan palindromik]\label{ex:b1:poly:palindrome}
+Selesaikan $X^4 + X^3 - 4X^2 + X + 1 = 0$. Koefisiennya terbaca
+sama dari kedua arah, jadi $0$ bukan akarnya dan \omterm{def:b1:arith:divides}{membaginya} dengan
+$X^2$ tidak menghilangkan penyelesaian:
+\[
+X^2 + X - 4 + \frac1X + \frac1{X^2} = 0 .
+\]
+Tulis $y = X + \frac1X$: maka $X^2 + \frac1{X^2} = y^2 - 2$, dan
+persamaannya runtuh menjadi
+\[
+y^2 + y - 6 = 0 \iff (y + 3)(y - 2) = 0 .
+\]
+Uraikan setiap nilainya lewat $X^2 - yX + 1 = 0$: untuk $y = 2$, $X^2 -
+2X + 1 = (X - 1)^2$ memberikan akar ganda $1$; sedangkan untuk $y = -3$,
+$X^2 + 3X + 1 = 0$ memberikan $X = \frac{-3 \pm \sqrt5}2$. Jadi empat akar
+beserta \omterm{def:b1:poly:derivative}{kegandaannya} untuk sebuah kuartik, sesuai tuntutan
+\cref{cor:b1:poly:factorization} --- yang diperoleh dengan menyelesaikan
+dua persamaan kuadrat. Kiat itu mencakup setiap \omterm{def:b1:poly:def}{polinomial}
+\emph{palindromik}: akarnya datang berpasangan kebalikan $\{x, 1/x\}$
+(ganti $X$ dengan $1/X$ lalu hilangkan penyebutnya), dan $y = X +
+\frac1X$ justru merupakan besaran yang konstan pada pasangan semacam itu,
+sehingga derajatnya terparuh.
+\end{example}
+
+\begin{theorem}[Interpolasi Lagrange]\label{thm:b1:poly:lagrange}
+Misalkan $x_0, \dots, x_n$ titik yang berbeda di $K$ dan $y_0, \dots, y_n
+\in K$. Ada tepat satu $P \in K[X]$ berderajat $\leq n$ dengan
+$P(x_i) = y_i$ untuk setiap $i$, yakni\index{interpolasi Lagrange}
+\[
+P = \sum_{i=0}^{n} y_i\, L_i,
+\qquad
+L_i = \prod_{j \neq i} \frac{X - x_j}{x_i - x_j} .
+\]
+\end{theorem}
+
+\begin{proof}
+Masing-masing $L_i$ berderajat $n$ dan memenuhi $L_i(x_i) = 1$, $L_i(x_j) =
+0$ untuk $j \neq i$ (karena setiap faktornya lenyap di $x_j$ yang bersesuaian).
+Jadi $P$ yang ditampilkan itu berderajat $\leq n$ dan menginterpolasi. Ketunggalannya:
+dua \omterm{def:b1:poly:def}{polinomial} penginterpolasi berderajat $\leq n$ bersesuaian di $n+1$
+titik $x_i$, sehingga keduanya sama (\cref{cor:b1:poly:nroots}).
+\end{proof}
+
+\begin{remark}[Selingan: polinomial juga vektor]\label{rem:b1:poly:interlude}
+Sebuah pergantian sudut pandang yang akan diresmikan \cref{ch:b1:vspaces}:
+\omterm{def:b1:poly:def}{polinomial} berderajat $\leq n$ membentuk sebuah ruang yang di dalamnya
+penjumlahan dan penskalaannya berperilaku persis seperti koordinat ---
+jadi sebuah \omterm{def:b1:poly:def}{polinomial} \emph{adalah} daftar $n + 1$ koefisiennya. Tiga
+\omterm{def:b1:logic:statement}{pernyataan} bab ini sesungguhnya aljabar linear.
+\omterm{thm:b1:poly:lagrange}{Interpolasi Lagrange} (\cref{thm:b1:poly:lagrange}) mengatakan bahwa
+data nilai $(P(x_0), \dots, P(x_n))$ menentukan $P$
+secara tunggal: jadi penghitungan nilai di $n + 1$ titik adalah bijeksi linear,
+dan $L_i$ adalah basis yang disesuaikan padanya. Ekspansi $R =
+\sum c_k(X - a)^k$ pada bukti
+\cref{prop:b1:poly:multiplicity} mengatakan bahwa pangkat
+$(X - a)$ membentuk sistem koordinat yang lain, dengan $c_k =
+R^{(k)}(a)/k!$ sebagai koordinatnya. Dan
+\cref{cor:b1:poly:nroots} --- bahwa akar yang lebih banyak daripada derajatnya memaksa
+\omterm{def:b1:poly:def}{polinomial} nol --- adalah mesin bagi semua ketunggalan: ia akan
+menjadi ``\omterm{def:b1:logic:map}{pemetaan} linear yang \omterm{def:b1:logic:inj}{injektif} pada ruang berdimensi $n + 1$''
+pada \cref{ch:b1:findim}. Ketika bab itu tiba, ruang
+$K_n[X]$ akan menjadi contoh kesayangannya; jadi layak tiba
+di sana dengan sudah fasih memakainya.
+\end{remark}
+
+\begin{remark}[Di mana bab ini dipakai]\label{rem:b1:poly:whereused}
+Pemfaktoran atas $\R$ dan $\C$
+(\cref{cor:b1:poly:factorization}) adalah mesin bagi pecahan
+parsial pada \cref{ch:b1:fractions}, sehingga juga bagi sekelas besar
+integral pada \cref{ch:b1:integration}. Ekspansi sebuah
+\omterm{def:b1:poly:def}{polinomial} dalam pangkat $(X - a)$, yang ditemui pada bukti
+\cref{prop:b1:poly:multiplicity}, adalah bayangan aljabar bagi
+rumus Taylor pada \cref{ch:b1:taylor}. \omterm{def:b1:poly:def}{Polinomial} karakteristik
+sudah muncul untuk persamaan diferensial (\cref{ch:b1:diffeq})
+dan kembali untuk matriks pada \cref{ch:b1:det}; adapun \omterm{thm:b1:poly:lagrange}{interpolasi
+Lagrange} adalah teorema keberadaan-dan-ketunggalan pertama pada
+analisis numerik, dan \omterm{pb:b1:poly:1}{polinomial Chebyshev} pada
+\cref{exo:b1:poly:10} --- yang keoptimalannya ditegakkan soal akhir pekan
+di bawah --- memberi tahu disiplin itu \emph{di mana} harus
+menginterpolasi. Akhirnya seluruh aritmetika $K[X]$, yang disalin dari
+\cref{ch:b1:arith}, menyuapi telaah ideal $K[X]$ dan \omterm{def:b1:structures:ring}{ring} hasil
+bagi pada jilid Tahun ke-2.
+\end{remark}
+
+\section{Latihan}
+
+\begin{exercise}[$\star$]\label{exo:b1:poly:1}
+Jalankan pembagian Euclidnya: $X^5 - 1$ oleh $X^2 + X + 1$; lalu
+$2X^4 + X^3 - X + 3$ oleh $X^2 - 2$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:poly:2}
+Untuk $n \in \N$ yang mana $X^2 + X + 1$ \omterm{def:b1:arith:divides}{membagi} $X^{2n} + X^n + 1$?
+\emph{Petunjuk: akar $X^2 + X + 1$ adalah $j$ dan $j^2$ dengan $j =
+\eu^{2\iu\pi/3}$; lalu bahaslah $n$ modulo $3$.}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:poly:3}
+Tentukan $a, b$ real agar $(X-1)^2$ \omterm{def:b1:arith:divides}{membagi} $P = X^4 + aX^3 +
+bX^2 + 1$, lalu faktorkan $P$ atas $\R$ untuk nilai itu.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:poly:4}
+Faktorkan atas $\C$ dan atas $\R$: $X^3 - 1$; $\;X^4 + X^2 + 1$;
+$\;X^6 - 1$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:poly:5}
+Misalkan $P = X^3 - 6X^2 + 11X - 6$.
+\begin{enumerate}
+  \item Carilah akar rasionalnya \emph{(akar rasional $p/q$ dalam
+        bentuk paling sederhana pada \omterm{def:b1:poly:def}{polinomial monik} berkoefisien bulat adalah bilangan bulat
+        yang \omterm{def:b1:arith:divides}{membagi} suku konstantanya --- buktikanlah)}, lalu faktorkan $P$.
+  \item Tanpa menyelesaikannya, hitung jumlah kuadrat dan jumlah
+        kebalikan akarnya lewat Vieta, lalu periksa pada
+        pemfaktorannya.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:poly:6}
+Hitung $\gcd(X^4 - 1,\; X^3 - X^2 + X - 1)$ dengan \omterm{met:b1:arith:euclid}{algoritma
+Euclid}, lalu tuliskan ia sebagai kombinasi $AU + BV$ kedua
+\omterm{def:b1:poly:def}{polinomialnya}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:poly:7}
+Misalkan $P \in \R[X]$ dengan $P(x) \geq 0$ untuk setiap $x \in \R$. Buktikan bahwa
+$P$ merupakan jumlah dua kuadrat \omterm{def:b1:poly:def}{polinomial} real: $P = A^2 + B^2$.
+\emph{Petunjuk: pada pemfaktoran realnya, akar real berkegandaan
+genap; lalu tulis faktor kuadratnya sebagai $(X - z)(X - \conj z)$
+dan pakai $\abs{\,\cdot\,}^2 = (\Re)^2 + (\Im)^2$ pada hasil kali
+$(X - z)$-nya.}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:poly:8}
+Carilah \omterm{def:b1:poly:def}{polinomial} $P$ berderajat $\leq 2$ dengan $P(0) = 1$, $P(1) =
+3$, $P(2) = 2$, mula-mula dengan rumus Lagrange, lalu dengan menyelesaikan
+sistem linear atas koefisiennya. Periksa bahwa kedua jawabannya cocok.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:poly:9}
+Buktikan bahwa $P = X^{2n+1} - 1$ mempunyai tepat satu akar real, dan bahwa untuk
+setiap $n \geq 1$ \omterm{def:b1:poly:def}{polinomial} $1 + X + \frac{X^2}{2!} + \dots +
+\frac{X^n}{n!}$ tak mempunyai akar ganda \emph{(bandingkan $P$ dan
+$P'$)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:poly:10}
+(\omterm{pb:b1:poly:1}{Polinomial Chebyshev}) Definisikan $T_0 = 1$, $T_1 = X$ dan $T_{n+1} =
+2X\,T_n - T_{n-1}$.
+\begin{enumerate}
+  \item Buktikan dengan induksi bahwa $T_n(\cos\theta) = \cos n\theta$ untuk
+        setiap $\theta$.
+  \item Simpulkan $n$ akar $T_n$ beserta koefisien utamanya.
+  \item Buktikan bahwa $\sup_{x \in \intcc{-1}{1}} \abs{T_n(x)} = 1$,
+        yang tercapai pada $n + 1$ titik $\intcc{-1}{1}$.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:poly:11}
+Misalkan $P \in \C[X]$ tak konstan dengan akar berbeda $a_1, \dots,
+a_r$ (dengan \omterm{def:b1:poly:derivative}{kegandaan} $m_1, \dots, m_r$). Buktikan kesamaan antara
+fungsi rasional
+\[
+\frac{P'(X)}{P(X)} = \sum_{i=1}^{r} \frac{m_i}{X - a_i},
+\]
+lalu simpulkan teorema Gauss--Lucas: bahwa setiap akar $P'$ terletak di
+selubung cembung akar $P$ \emph{(hitung nilai kesamaan itu pada sebuah
+akar $w$ dari $P'$ yang bukan akar $P$, ambil \omterm{def:b1:complex:field}{konjugatnya}, lalu
+bacalah hasilnya sebagai $w$ menjadi rata-rata berbobot $a_i$)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:poly:12}
+(Saringan \omterm{def:b1:complex:unity}{akar satuan}) Misalkan $n \in \N^*$ dan $j = \eu^{2\iu\pi/3}$.
+Dengan menghitung nilai $(1 + X)^n$ di $1$, $j$ dan $j^2$, buktikan bahwa
+\[
+\sum_{k \geq 0} \binom{n}{3k}
+= \frac{2^n + 2\cos\frac{n\pi}{3}}{3} ,
+\]
+lalu periksa rumusnya untuk $n = 3$ dan $n = 6$. \emph{Petunjuk: $1 +
+j^m + j^{2m}$ sama dengan $3$ bila $3 \mid m$ dan $0$ bila tidak; dan $1 +
+j = \eu^{\iu\pi/3}$.}
+\end{exercise}
+
+\section{Soal: Polinomial Chebyshev dan polinomial paling datar}
+
+\begin{problem}\label{pb:b1:poly:1}
+Di antara semua \omterm{def:b1:poly:def}{polinomial} \emph{\omterm{def:b1:poly:def}{monik}} berderajat $n$, mana yang paling
+dekat dengan nol pada $\intcc{-1}1$? Jawabannya --- yaitu teorema
+Chebyshev, akta kelahiran teori hampiran --- adalah
+$2^{1-n}T_n$, dengan $T_n$ \omterm{pb:b1:poly:1}{polinomial Chebyshev} pada
+\cref{exo:b1:poly:10}, dan tak ada pesaing \omterm{def:b1:poly:def}{monik} yang dapat mengalahkan
+simpangannya $2^{1-n}$.\index{polinomial Chebyshev} Soal ini
+mengembangkan aljabar keluarga $(T_n)$ (hukum komposisi,
+koefisien eksplisit, keluarga jenis kedua $U_n$, sebuah
+persamaan diferensial), membuktikan teorema keekstremannya beserta kasus
+kesamaannya, lalu mengumpulkan penerapannya: simpul interpolasi yang optimal,
+nilai eksak $\cos 36^\circ$, dan sebuah \omterm{def:b1:arith:congruence}{kekongruenan}
+$T_p \equiv X^p \pmod p$. Di sepanjang soal ini, $T_0 = 1$, $T_1 = X$,
+$T_{n+1} = 2X\,T_n - T_{n-1}$, dan kita memakai dengan bebas
+$T_n(\cos\theta) = \cos n\theta$ dari \cref{exo:b1:poly:10}.
+
+\medskip
+\noindent\textbf{Bagian I --- Keluarga $(T_n)$.}
+\begin{enumerate}
+  \item Hitung $T_2, T_3, T_4, T_5$ dari rekursinya. (Bandingkan
+        $T_3$ dengan kesamaan $\cos3\theta = 4\cos^3\theta -
+        3\cos\theta$ pada \cref{ex:b1:complex:cos3}.)
+  \item Buktikan dengan induksi: $\deg T_n = n$ dengan koefisien
+        utama $2^{n-1}$ untuk $n \geq 1$, dan $T_n$ berparitas
+        sama dengan $n$ (hanya pangkat genap saja atau pangkat ganjil saja yang muncul).
+  \item Buktikan asas ketunggalannya: $T_n$ adalah \emph{satu-satunya}
+        \omterm{def:b1:poly:def}{polinomial} yang memenuhi $P(\cos\theta) = \cos n\theta$ untuk
+        setiap $\theta$. (Dua \omterm{def:b1:poly:def}{polinomial} yang bersesuaian pada $\intcc{-1}1$
+        bersesuaian di mana-mana: \cref{cor:b1:poly:nroots}.)
+  \item Simpulkan hukum komposisi dan hukum hasil kalinya:
+        \[
+        T_m \circ T_n = T_{mn},
+        \qquad
+        2\,T_m T_n = T_{m+n} + T_{\abs{m-n}} .
+        \]
+  \item Ingat kembali dari \cref{exo:b1:poly:10} akarnya $x_k =
+        \cos\frac{(2k+1)\pi}{2n}$ dan titik ekuiosilasinya
+        $y_k = \cos\frac{k\pi}n$ dengan $T_n(y_k) = (-1)^k$. Tuliskan
+        pemfaktoran lengkap $T_n$ atas $\R$, lalu
+        berikan alasan bahwa $y_k$ berselang-seling: $y_n < x_{n-1} < y_{n-1}
+        < \dots < x_0 < y_0$.
+  \item Buktikan bahwa $T_n(\cosh t) = \cosh(nt)$ untuk setiap $t \in \R$
+        (dengan induksi yang sama, memakai
+        \cref{prop:b1:functions:hyprules}), lalu simpulkan untuk $x
+        \geq 1$ bentuk tertutupnya
+        \[
+        T_n(x) = \frac{\bigl(x + \sqrt{x^2 - 1}\bigr)^n +
+        \bigl(x - \sqrt{x^2 - 1}\bigr)^n}{2} ,
+        \]
+        sehingga $T_n(x) > 1$ untuk $x > 1$: jadi di luar $\intcc{-1}1$
+        \omterm{def:b1:poly:def}{polinomialnya} langsung melesat.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian II --- Koefisien, keluarga $U_n$, dan sebuah
+persamaan diferensial.}
+\begin{enumerate}[resume]
+  \item Dari rumus de Moivre
+        (\cref{cor:b1:complex:demoivre}), buktikan ungkapan
+        eksplisitnya
+        \[
+        T_n(x) = \sum_{0 \leq 2j \leq n} \binom{n}{2j}\,
+        x^{\,n-2j}\,(x^2 - 1)^j ,
+        \]
+        lalu periksa ia untuk $n = 3$.
+  \item Hitung $T_n(1)$, $T_n(-1)$ dan $T_n(0)$ untuk setiap $n$.
+  \item Definisikan $U_n$ (\emph{jenis kedua}) oleh $U_0 = 1$, $U_1 =
+        2X$, $U_{n+1} = 2X\,U_n - U_{n-1}$. Buktikan bahwa
+        $U_n(\cos\theta) = \frac{\sin(n+1)\theta}{\sin\theta}$
+        untuk $\theta \notin \pi\Z$, dan bahwa $T_n' = n\,U_{n-1}$
+        untuk $n \geq 1$.
+  \item Buktikan bahwa $\abs{\sin n\theta} \leq n\,\abs{\sin\theta}$
+        untuk setiap $\theta$ (dengan induksi), lalu simpulkan batas
+        bertipe Markov
+        \[
+        \abs{T_n'(x)} \leq n^2
+        \quad\text{pada } \intcc{-1}1,
+        \qquad\text{dengan } T_n'(\pm1) = (\pm1)^{n-1}\,n^2 .
+        \]
+  \item Tunjukkan bahwa $y = T_n$ memenuhi persamaan diferensial
+        \[
+        (1 - x^2)\,y'' - x\,y' + n^2\,y = 0 ,
+        \]
+        dengan menurunkan kesamaan $\sin\theta\,
+        T_n'(\cos\theta) = n\sin n\theta$ terhadap
+        $\theta$; lalu periksa langsung untuk $T_2$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian III --- Teorema keekstreman Chebyshev.}
+Misalkan $\widetilde T_n = 2^{1-n}\,T_n$ (yang \omterm{def:b1:poly:def}{monik} menurut pertanyaan 2) dan
+tulis $\norm{P}_\infty = \sup_{x \in \intcc{-1}1}\abs{P(x)}$.
+\begin{enumerate}[resume]
+  \item Berikan alasan bahwa $\norm{\widetilde T_n}_\infty = 2^{1-n}$, yang tercapai
+        dengan tanda berselang-seling pada $n + 1$ titik $y_n < \dots
+        < y_0$.
+  \item Andaikan ada $P$ \omterm{def:b1:poly:def}{monik} berderajat $n$ dengan
+        $\norm P_\infty < 2^{1-n}$, lalu tulis $D = \widetilde T_n -
+        P$. Tunjukkan $\deg D \leq n - 1$, dan bahwa $D(y_k)$ bertanda
+        sama tegas dengan $(-1)^k$ untuk masing-masing $k = 0, \dots, n$.
+  \item Simpulkan bahwa $D$ mempunyai sekurang-kurangnya $n$ akar real yang berbeda
+        (satu pada setiap celah, menurut sifat nilai antara, yang di sini dipakai
+        pada taraf sekolah menengah dan dibuktikan pada
+        \cref{ch:b1:continuity}), lalu simpulkan \emph{teorema
+        Chebyshev}: bahwa setiap $P$ \omterm{def:b1:poly:def}{monik} berderajat $n$ memenuhi
+        \[
+        \norm{P}_\infty \geq 2^{1-n} .
+        \]
+  \item (Kasus kesamaan, langkah pertama) Andaikan sekarang $\norm P_\infty =
+        2^{1-n}$ persis, dengan $P$ \omterm{def:b1:poly:def}{monik} berderajat $n$, lalu misalkan $D =
+        \widetilde T_n - P$. Tunjukkan bahwa $(-1)^kD(y_k) \geq 0$ untuk
+        setiap $k$, dan bahwa jika $D(y_k) = 0$ pada sebuah titik
+        \emph{dalam} $y_k$ ($0 < k < n$), maka $D'(y_k) = 0$ juga.
+        \emph{(Pada $y_k$ yang di dalam, baik $\widetilde T_n$ maupun
+        $P$ mencapai ekstremum bernilai mutlak $\norm{\cdot}
+        _\infty$; dan fungsi yang dapat diturunkan berturunan nol
+        pada ekstremum di dalam --- yang dipakai pada taraf sekolah menengah,
+        dan dibuktikan pada \cref{ch:b1:derivative}.)}
+  \item (Kasus kesamaan, penutupnya) Cacahlah akar $D$ beserta
+        \omterm{def:b1:poly:derivative}{kegandaannya} untuk menunjukkan $D = 0$: jadi peminimumnya
+        \emph{tunggal}, yakni $P = \widetilde T_n$.
+  \item Pindahkan ke ruas sebarang $\intcc ab$: tunjukkan bahwa
+        norma supremum minimal sebuah \omterm{def:b1:poly:def}{polinomial monik} berderajat $n$ pada
+        $\intcc ab$ adalah $2\bigl(\frac{b-a}4\bigr)^n$, yang tercapai oleh
+        \omterm{pb:b1:poly:1}{polinomial Chebyshev} yang diskalakan ulang. \emph{(Substitusikan $x =
+        \frac{a+b}2 + \frac{b-a}2\,t$ lalu lacak koefisien
+        utamanya.)}
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian IV --- Penerapan.}
+\begin{enumerate}[resume]
+  \item Kerjakan kasus $n = 3$ dengan tangan: tentukan letak ekstremum
+        $\widetilde T_3 = X^3 - \frac34X$ pada $\intcc{-1}1$,
+        periksa ekuiosilasi berlipat empatnya dengan nilai
+        $\frac14$, lalu simpulkan bahwa tak ada kubik \omterm{def:b1:poly:def}{monik} yang lebih baik.
+  \item (Simpul interpolasi yang optimal) Untuk $n + 1$ simpul $x_0,
+        \dots, x_n \in \intcc{-1}1$, galat interpolasinya
+        dikendalikan oleh $\omega(X) = \prod_i (X - x_i)$ (sebagaimana
+        akan dikuantifikasi \cref{ch:b1:taylor}). Buktikan bahwa pilihan
+        yang meminimumkan $\norm\omega_\infty$ adalah \omterm{def:b1:logic:sets}{himpunan} $n + 1$
+        akar $T_{n+1}$, dengan $\norm\omega_\infty = 2^{-n}$:
+        jadi simpul Chebyshev adalah tempat yang tepat untuk menginterpolasi.
+  \item Dengan memakai $T_5$, buktikan bahwa $c = \cos 36^\circ$ memenuhi
+        $16c^5 - 20c^3 + 5c + 1 = 0$, faktorkan \omterm{def:b1:poly:def}{polinomial} ini sebagai
+        $(x + 1)(4x^2 - 2x - 1)^2$, lalu simpulkan
+        \[
+        \cos 36^\circ = \frac{1 + \sqrt5}4 .
+        \]
+        Periksa kesejalanannya dengan $\cos 72^\circ =
+        \frac{\sqrt5 - 1}4$ dari \cref{exo:b1:complex:8}.
+  \item Taksirlah $T_{10}(1.1)$ dengan bentuk tertutup pertanyaan 6
+        (dua angka bermakna sudah cukup), lalu tafsirkan: jadi sebuah
+        \omterm{def:b1:poly:def}{polinomial} yang terbatas oleh $1$ pada $\intcc{-1}1$ sudah dapat
+        melampaui $40$ di $x = 1.1$. (Bahwa $T_n$ tumbuh
+        \emph{paling cepat} di antara \omterm{def:b1:poly:def}{polinomial} semacam itu adalah
+        sifat ekstremal lain keluarga itu, di luar soal ini.)
+  \item Buktikan \omterm{def:b1:arith:congruence}{kekongruenannya}: untuk setiap prima ganjil $p$, semua
+        koefisien $T_p - X^p$ habis dibagi $p$.
+        \emph{(Pakai pertanyaan 7 dan $p \mid \binom p{2j}$ untuk $0 <
+        2j < p$, dari bukti
+        \cref{thm:b1:arith:fermat}.)} Periksa pada $T_3$ dan $T_5$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian V --- Sintesis.}
+\begin{enumerate}[resume]
+  \item Hitung secara eksplisit kuadrat \omterm{def:b1:poly:def}{monik} dengan norma supremum
+        minimal pada $\intcc01$ beserta simpangannya. (Yakni pertanyaan 17
+        dengan $n = 2$.)
+  \item Di mana persisnya soal ini memakai: (i) kekakuan
+        \omterm{def:b1:poly:def}{polinomial} (\cref{cor:b1:poly:nroots}); (ii)
+        trigonometri \cref{ch:b1:complex} dan
+        \cref{ch:b1:functions}; (iii) aritmetika \omterm{def:b1:counting:objects}{koefisien
+        binomial} dari \cref{ch:b1:arith}? Satu kalimat untuk masing-masing.
+  \item Sintesis, dalam satu paragraf pendek: teoremanya mengatakan bahwa
+        \omterm{def:b1:poly:def}{polinomial monik} yang paling datar adalah yang
+        \emph{berekuiosilasi}, dan buktinya mengubah keoptimalan
+        menjadi pencacahan akar. Berilah komentar atas mekanisme ini, atas
+        peran substitusi $x = \cos\theta$ sebagai jembatan
+        antara aljabar dan trigonometri, lalu sebutkan kedua
+        tempat yang di situ soal ini memerlukan fakta analisis (teorema nilai antara dan
+        ekstremum di dalam) yang dibuktikan bab berikutnya.
+
+\end{enumerate}
+\end{problem}

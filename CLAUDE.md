@@ -63,7 +63,7 @@ pushing is the local log.
 - `styles/onemath.sty` — **the only place** packages are loaded and
   macros/environments defined. Chapter files never `\usepackage` or
   `\newcommand`. Language UI strings live in `styles/lang/<lang>.tex`.
-- `styles/lang/en.tex`, `styles/lang/fr.tex`, `styles/lang/nl.tex` —
+- `styles/lang/<lang>.tex` (`en`, `fr`, `nl`, `es`, `pt`, `hi`, `ar`, `id`) —
   theorem titles, solution headers, cover strings, part titles
   (`\omstr{part.grade1}` … `part.grade12`).
 - Language-aware content paths:
@@ -103,6 +103,14 @@ Reference implementations:
 - `one_math_book_4_university_year_2_fr.tex` / `_nl.tex` (+ `book4_{fr,nl}.py`)
 - `one_math_book_5_university_year_3_fr.tex` / `_nl.tex` (+ `book5_{fr,nl}.py`)
 
+All five books also exist in `es`, `pt`, `hi`, `ar` and `id`. **Indonesian
+(`id`) is the reference for adding a LATIN-SCRIPT language**: it needs none of
+the Hindi/Arabic engine, font or bidi work (pdfTeX; `babel-indonesian`
+declares no shorthands and no command redefinitions), but it does need
+`tools/check_indonesian_prose.py` — see the warning under *Verify a
+translation* below. Its edition identity, glossary and traps live in
+`../indonesian_style_card.md`.
+
 PDFs: `build/one_math_book_<N>_<slug>[_<lang>].pdf`.
 
 **Verify a translation** — a clean build proves almost nothing (`\ominput`
@@ -110,6 +118,16 @@ silently falls back to English, `\omstr` to empty). Gate on:
 
 - `bash tools/check_translation.sh <year> <lang>` — completeness + identical
   labels/order + env/figure census vs English + UTF-8 (no `\'e` escapes).
+- **A same-alphabet language needs a prose gate, and it is not optional.**
+  Gates 5–7 assume the target script differs from English, so residual English
+  is visibly foreign. For `id` that inverts: a forgotten sentence, TikZ node,
+  `\text{…}` or environment **optional title** is indistinguishable from
+  correct output, and a tree can pass every structural gate, build with zero
+  errors and still be part English. `tools/check_indonesian_prose.py` (gate 8)
+  keys on a curated list of English words that are *not* Indonesian, plus
+  suffix rules and a comparison of every title against its English twin. Book 3
+  shipped seven untranslated titles through an otherwise green gate before the
+  `title` class existed.
 - **Link-target parity**: the translated `\omterm` *targets* must be the same
   set as English (a term must link to the same definition). Compare
   `grep -rho '\omterm{[^}]*}' <lang>/ | sort -u` against the English tree;
@@ -288,11 +306,26 @@ python3 tools/build_html_toc.py --entry one_math_book_2_high_school.tex \
 - Semantic colors for chapter figures/boxes: `omDef` (blue), `omThm`
   (dark red), `omProp` (orange). The `oc*` palette and
   `\ocRosette`/`\ocQuadLine` are the cover brand (see THEME.md).
+- **This series is schematics-only.** Every figure is drawn in TikZ or
+  pgfplots. Unlike `one-physics-book` and `one-biology-book`, the math
+  books carry **no photographs and no AI-generated illustrations** — see
+  the Visuals section of `../book_style.md`. Do not add either without
+  changing that file first.
 - A `]` inside a theorem's optional title breaks the parse — brace it:
   `\begin{theorem}[{Ideals of $K[X]$}]`.
 
 ## LaTeX gotchas seen in this repo
 
+- **Overlapping text in a figure is invisible to every gate.** Two node
+  labels printed on each other, a label sitting on a line or arrow, an
+  axis tick colliding with its neighbour: no error, no warning, no
+  overfull box. A figure can be unreadable inside a perfectly green
+  build. Render the figure and look at it; fix with `anchor=` /
+  `above`/`below`/`left`/`right`, a small `xshift`/`yshift`, a shorter
+  label, `\small`/`\footnotesize`, or by moving the text into the
+  caption. **Re-check after translation** — a translated label is
+  usually longer than the English one and collides where English did
+  not. See the Visuals section of `../book_style.md`.
 - `\foreach` wrapped around `\addplot` fails in pgfplots; use explicit
   `\draw plot` in plain TikZ instead (chapter figures are plain TikZ).
 - Two side-by-side plots: use two `tikzpicture`s separated by `\qquad`,

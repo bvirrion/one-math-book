@@ -1,0 +1,801 @@
+\chapter{Aritmetika Bilangan Bulat}\label{ch:b1:arith}
+
+Aritmetika --- yaitu telaah \omterm{def:b1:arith:divides}{keterbagian} di $\Z$ --- sudah dimulai pada
+jilid sekolah menengah. Bab ini membangunnya kembali sepenuhnya dari
+pembagian Euclid, dengan bukti lengkap: \omterm{thm:b1:arith:gcd}{faktor persekutuan terbesar} dan
+\omterm{met:b1:arith:euclid}{algoritma Euclid}, kesamaan Bézout dan lema Gauss, \omterm{thm:b1:arith:fta}{pemfaktoran prima},
+serta kalkulus \omterm{def:b1:arith:congruence}{kekongruenan} sampai teorema kecil Fermat. Di luar
+pesonanya sendiri, bahan ini adalah model yang ditiru
+\cref{ch:b1:poly} untuk polinomial.
+
+\section{Keterbagian dan pembagian Euclid}
+
+\begin{definition}[Keterbagian]\label{def:b1:arith:divides}
+Untuk $a, b \in \Z$, dikatakan $b$ \emph{membagi} $a$ (ditulis $b \mid
+a$)\index{keterbagian} bila $a = bq$ untuk suatu $q \in \Z$. Akibat
+dasarnya: jika $b \mid a$ dan $b \mid a'$ maka $b \mid (ua + va')$
+untuk setiap $u, v \in \Z$; jika $b \mid a$ dan $a \neq 0$ maka $\abs b \leq
+\abs a$; dan $a \mid b$ bersama $b \mid a$ memaksa $b = \pm a$.
+\end{definition}
+
+\begin{theorem}[Pembagian Euclid]\label{thm:b1:arith:division}
+Untuk setiap $a \in \Z$ dan $b \in \N^*$, ada tepat satu pasangan $(q, r)
+\in \Z \times \N$ dengan
+\[
+a = bq + r, \qquad 0 \leq r < b .
+\]
+\end{theorem}
+
+\begin{proof}
+\emph{Keberadaan.} \omterm{def:b1:logic:sets}{Himpunan} $A = \{a - bk : k \in \Z\} \cap \N$ adalah
+\omterm{def:b1:logic:sets}{himpunan} bagian tak kosong dari $\N$ (ambil $k = -\abs a$: $a + b\abs a \geq a +
+\abs a \geq 0$). Misalkan $r = a - bq$ unsur terkecilnya. Jika $r \geq b$,
+maka $r - b = a - b(q+1)$ akan menjadi unsur $A$ yang lebih kecil:
+kontradiksi. Jadi $0 \leq r < b$.
+
+\emph{Ketunggalan.} Jika $bq + r = bq' + r'$ dengan $0 \leq r, r' < b$,
+maka $b(q - q') = r' - r$ dan $\abs{r' - r} < b$: kelipatan $b$
+pada ruas kiri itu haruslah $0$, jadi $q = q'$ dan $r = r'$.
+\end{proof}
+
+\begin{example}[Penomoran posisional lewat pembagian berulang]\label{ex:b1:arith:base7}
+Tulis $2026$ dalam basis $7$. Bagilah berulang kali dengan $7$, sambil menyimpan
+sisanya:
+\[
+2026 = 7 \times 289 + 3, \quad
+289 = 7 \times 41 + 2, \quad
+41 = 7 \times 5 + 6, \quad
+5 = 7 \times 0 + 5 .
+\]
+Dengan membaca sisanya dari yang terakhir ke yang pertama: $2026 =
+(5\,6\,2\,3)_7$. Periksa: $5 \times 343 + 6 \times 49 + 2 \times 7
++ 3 = 1715 + 294 + 14 + 3 = 2026$. Ketunggalan pembagian Euclid
+itulah yang membuat setiap angkanya \emph{terpaksa} demikian: pada setiap
+langkah sisanya adalah satu-satunya bilangan bulat di $\intint06$ yang kongruen
+dengan nilai berjalannya modulo $7$, sehingga penulisan basis $7$ bersifat tunggal ---
+fakta yang dipakai diam-diam setiap kali soal akhir pekan mengolah
+``angka $n$ dalam basis $p$''.
+\end{example}
+
+\section{Faktor persekutuan terbesar}
+
+\begin{theorem}[Subgrup $\Z$; keberadaan FPB]\label{thm:b1:arith:gcd}
+\begin{enumerate}
+  \item Setiap subgrup $(\Z, +)$ berbentuk $n\Z = \{nk : k
+        \in \Z\}$ untuk suatu $n \in \N$ yang tunggal.
+  \item Untuk $a, b \in \Z$ yang tak keduanya nol, \omterm{def:b1:logic:sets}{himpunan} $a\Z + b\Z = \{au +
+        bv : u, v \in \Z\}$ adalah subgrup $\Z$, sehingga ia sama dengan
+        $d\,\Z$ untuk suatu $d \in \N^*$ yang tunggal. Bilangan $d$ inilah
+        \emph{faktor persekutuan terbesar}\index{faktor persekutuan terbesar}
+        $\gcd(a, b)$: ia \omterm{def:b1:arith:divides}{membagi} $a$ dan $b$, dan setiap pembagi
+        persekutuan $a$ dan $b$ \omterm{def:b1:arith:divides}{membagi} $d$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) Misalkan $H \subseteq \Z$ sebuah subgrup (tak kosong dan tertutup terhadap
+pengurangan; definisi formalnya ada pada \cref{ch:b1:structures},
+dan hanya kedua sifat itu yang dipakai). Jika $H = \{0\}$, ambil $n = 0$.
+Jika tidak, $H$ memuat sebuah unsur tak nol beserta lawannya, sehingga ia memuat
+unsur positif tegas terkecil $n$. Maka $n\Z \subseteq H$. Untuk $x
+\in H$, tulis $x = nq + r$ dengan $0 \leq r < n$
+(\cref{thm:b1:arith:division}); di sini $r = x - nq \in H$, dan keminimalan
+$n$ memaksa $r = 0$: jadi $x \in n\Z$. Ketunggalannya: $n$ adalah unsur positif
+terkecil pada $n\Z$.
+
+(2) \omterm{def:b1:logic:sets}{Himpunan} $a\Z + b\Z$ memuat $0$ dan tertutup terhadap pengurangan, jadi ia
+$d\Z$ dengan $d \geq 1$ (karena ia memuat $a$ atau $b$ yang tak nol). Karena $a, b
+\in d\Z$, maka $d$ \omterm{def:b1:arith:divides}{membagi} keduanya. Dan jika $c$ \omterm{def:b1:arith:divides}{membagi} $a$ dan $b$, maka $c$
+\omterm{def:b1:arith:divides}{membagi} setiap $au + bv$ --- khususnya $c \mid d$, karena $d \in a\Z
++ b\Z$. Itulah sifat yang dinyatakan tadi (dan ia mengakibatkan $\abs c \leq
+d$, sehingga $d$ pantas menyandang nama pembagi persekutuan \emph{terbesar}).
+\end{proof}
+
+\begin{corollary}[Kesamaan Bézout]\label{cor:b1:arith:bezout}
+Untuk $a, b$ yang tak keduanya nol, ada $u, v \in \Z$ dengan
+\[
+au + bv = \gcd(a, b) .
+\]
+Khususnya (bila $\gcd(a,b) = 1$, yaitu kasus \emph{saling
+prima}\index{saling prima}): $a$ dan $b$ \omterm{cor:b1:arith:bezout}{saling prima} jika dan hanya jika $au + bv = 1$ mempunyai
+penyelesaian.
+\end{corollary}
+
+\begin{proof}
+$\gcd(a,b) = d \in d\Z = a\Z + b\Z$. Untuk kesetaraannya: jika
+$\gcd(a,b) = 1$, Bézout memasok penyelesaiannya; sebaliknya $au + bv =
+1$ memaksa setiap pembagi persekutuan $a, b$ \omterm{def:b1:arith:divides}{membagi} $1$.
+\end{proof}
+
+\begin{method}[Algoritma Euclid yang diperluas]\label{met:b1:arith:euclid}
+Untuk menghitung $\gcd(a, b)$ ($a > b > 0$): bagilah $a = bq + r$; maka
+$\gcd(a, b) = \gcd(b, r)$ (karena pembagi persekutuan $(a,b)$ dan $(b,r)$
+berimpit, sebab $r = a - bq$); iterasikan sampai sisanya $0$; lalu
+sisa tak nol yang terakhir adalah FPB-nya\index{algoritma Euclid}. Menjalankan
+pembagiannya secara mundur (atau memelihara koefisiennya sambil turun)
+menghasilkan sepasang bilangan Bézout $(u, v)$.
+\end{method}
+
+\begin{example}\label{ex:b1:arith:euclid}
+$\gcd(120, 23)$: $120 = 5 \times 23 + 5$; $23 = 4 \times 5 + 3$; $5 =
+1\times 3 + 2$; $3 = 1 \times 2 + 1$; $2 = 2 \times 1 + 0$. Jadi
+$\gcd = 1$. Secara mundur:
+\begin{align*}
+1 &= 3 - 2 = 3 - (5 - 3) = 2\times 3 - 5 = 2(23 - 4\times 5) - 5 \\
+&= 2 \times 23 - 9 \times 5 = 2\times 23 - 9(120 - 5\times 23)
+= 47 \times 23 - 9 \times 120 .
+\end{align*}
+Periksa: $47 \times 23 = 1081$, $9 \times 120 = 1080$.
+\end{example}
+
+\begin{theorem}[Lema Gauss dan akibatnya]\label{thm:b1:arith:gauss}
+Misalkan $a, b, c \in \Z$.
+\begin{enumerate}
+  \item (Lema Gauss\index{lema Gauss}) Jika $a \mid bc$ dan
+        $\gcd(a, b) = 1$, maka $a \mid c$.
+  \item Jika $a \mid c$, $b \mid c$ dan $\gcd(a,b) = 1$, maka $ab \mid
+        c$.
+  \item Jika $\gcd(a, b) = \gcd(a, c) = 1$, maka $\gcd(a, bc) = 1$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) Bézout: $au + bv = 1$. Kalikan dengan $c$: $acu + bcv = c$. Kedua
+sukunya habis dibagi $a$ (yang kedua karena $a \mid bc$), jadi $a
+\mid c$.
+
+(2) Tulis $c = aq$; dari $b \mid aq$ dan $\gcd(a, b) = 1$, butir (1)
+memberikan $b \mid q$, sehingga $ab \mid aq = c$.
+
+(3) Di sini $au + bv = 1$ dan $au' + cv' = 1$. Kalikan kedua
+hubungan itu:
+\[
+1 = (au + bv)(au' + cv')
+= a\,\bigl(auu' + ucv' + u'bv\bigr) + bc\,(vv') ,
+\]
+yaitu hubungan Bézout antara $a$ dan $bc$: jadi menurut
+\cref{cor:b1:arith:bezout}, $\gcd(a, bc) = 1$.
+\end{proof}
+
+\begin{example}[Menyelesaikan persamaan Diophantus linear]\label{ex:b1:arith:diophantine}
+Carilah semua $(x, y) \in \Z^2$ dengan $6x + 10y = 4$. Pertama, \emph{uji
+keberadaannya}: $\gcd(6, 10) = 2$ \omterm{def:b1:arith:divides}{membagi} $4$, jadi penyelesaiannya
+ada (seandainya FPB-nya tidak \omterm{def:b1:arith:divides}{membagi} ruas kanan, ruas kirinya
+akan selalu menjadi kelipatannya dan tak akan ada penyelesaian). Bagilah
+seluruhnya: $3x + 5y = 2$. Sebuah penyelesaian khusus terlihat: $(x_0,
+y_0) = (-1, 1)$. Untuk yang umum, kurangkan: $3(x + 1) = -5(y -
+1)$, jadi $3 \mid 5(y-1)$, dan lema Gauss ($\gcd(3,5) = 1$) memberikan
+$3 \mid y - 1$: sehingga $y = 1 - 3k$, lalu $x = -1 + 5k$. Sebaliknya setiap
+pasangan semacam itu memenuhi:
+\[
+(x, y) = (-1 + 5k,\ 1 - 3k), \qquad k \in \Z .
+\]
+Polanya berlaku umum: satu penyelesaian khusus ditambah kelipatan bulat
+$\bigl(\frac b{\gcd}, -\frac a{\gcd}\bigr)$ --- yaitu struktur
+``khusus ditambah homogen'' yang sama seperti pada
+\cref{ch:b1:diffeq}, dengan lema Gauss memainkan peran
+ketunggalannya.
+\end{example}
+
+\begin{definition}[Kelipatan persekutuan terkecil]\label{def:b1:arith:lcm}
+$\operatorname{lcm}(a, b)$\index{kelipatan persekutuan terkecil} adalah
+pembangkit di $\N$ bagi subgrup $a\Z \cap b\Z$: ia kelipatan
+persekutuan $a$ dan $b$ yang \omterm{def:b1:arith:divides}{membagi} setiap kelipatan persekutuan, dan untuk
+$a, b \in \N^*$,
+\[
+\gcd(a,b) \times \operatorname{lcm}(a,b) = ab
+\qquad (\text{buktinya pada } \cref{exo:b1:arith:5}).
+\]
+\end{definition}
+
+\begin{example}[Masalah pensejajaran adalah masalah KPK]\label{ex:b1:arith:gears}
+Dua roda gigi yang bertautan mempunyai $84$ dan $36$ gigi. Setelah berapa gigi
+gerak bersama keduanya kembali ke kedudukan awalnya bersamaan?
+Konfigurasinya berulang ketika banyaknya gigi yang berlalu merupakan
+kelipatan persekutuan $84$ dan $36$; dan pertama kalinya adalah
+\[
+\operatorname{lcm}(84, 36) = \frac{84 \times 36}{\gcd(84, 36)}
+= \frac{3024}{12} = 252
+\]
+gigi --- yaitu $3$ putaran roda besar dan $7$ putaran roda
+kecil ($252/84$ dan $252/36$). Perhatikan jalur praktisnya:
+\emph{hitung FPB-nya lebih dulu} (Euclid: $84 = 2\times36 + 12$, $36
+= 3\times12$), lalu bagi --- jangan pernah membangun KPK-nya dengan mendaftar
+kelipatannya. Setiap pertanyaan kebetulan berkala (roda gigi, pensejajaran
+planet, desimal berulang yang bertemu) menyusut menjadi satu
+perhitungan ini.
+\end{example}
+
+\section{Bilangan prima}
+
+\begin{definition}\label{def:b1:arith:prime}
+Bilangan bulat $p \geq 2$ disebut \emph{prima}\index{bilangan prima} bila
+pembagi positifnya hanya $1$ dan $p$. Untuk $p$ prima dan $a \in \Z$:
+entah $p \mid a$, atau $\gcd(p, a) = 1$. Akibatnya
+(\cref{thm:b1:arith:gauss}), berlaku \emph{lema Euclid}: jika $p \mid
+ab$ maka $p \mid a$ atau $p \mid b$.
+\end{definition}
+
+\begin{remark}[Menguji keprimaan lewat pembagian coba-coba]\label{rem:b1:arith:trialdivision}
+Jika $n = ab$ dengan $2 \leq a \leq b$, maka $a^2 \leq ab = n$, jadi $a
+\leq \sqrt n$: sebuah $n$ yang komposit selalu mempunyai pembagi \omterm{def:b1:arith:prime}{prima} $\leq
+\sqrt n$. Jadi untuk menguji apakah $n$ \omterm{def:b1:arith:prime}{prima} cukup dicoba
+\omterm{def:b1:arith:prime}{bilangan prima} sampai $\sqrt n$. Untuk $n = 271$: $\sqrt{271} < 17$, dan
+$271$ tak habis dibagi satu pun dari $2, 3, 5, 7, 11, 13$ (ia ganjil, jumlah
+angkanya $10$, tak berakhir dengan $0$ atau $5$, dan $271 = 7\cdot38 + 5 =
+11\cdot24 + 7 = 13\cdot20 + 11$): jadi \omterm{def:b1:arith:prime}{prima}, setelah enam pembagian
+alih-alih dua ratus. Batas $\sqrt n$ itu ambang yang sungguhan:
+melampauinya secara efisien untuk bilangan beratus angka
+menuntut uji keprimaan modern yang tumbuh dari
+\cref{thm:b1:arith:fermat}.
+\end{remark}
+
+\begin{theorem}[Euclid]\label{thm:b1:arith:euclidprimes}
+\omterm{def:b1:arith:prime}{Bilangan prima} ada tak hingga banyaknya.
+\end{theorem}
+
+\begin{proof}
+Setiap bilangan bulat $n \geq 2$ mempunyai pembagi \omterm{def:b1:arith:prime}{prima}: pembagi terkecilnya
+yang $\geq 2$ bersifat \omterm{def:b1:arith:prime}{prima} (karena pemfaktoran sejatinya akan menghasilkan
+pembagi $n$ yang lebih kecil). Sekarang andaikan $p_1, \dots, p_k$ semua
+\omterm{def:b1:arith:prime}{bilangan primanya}, lalu tulis $N = p_1 p_2 \cdots p_k + 1 \geq 2$. Suatu \omterm{def:b1:arith:prime}{prima} $p_i$
+\omterm{def:b1:arith:divides}{membagi} $N$; tetapi $p_i$ juga \omterm{def:b1:arith:divides}{membagi} $N - 1 = p_1\cdots p_k$, sehingga $p_i
+\mid 1$ --- yang mustahil.
+\end{proof}
+
+\begin{theorem}[Teorema dasar aritmetika]\label{thm:b1:arith:fta}
+Setiap bilangan bulat $n \geq 2$ adalah hasil kali \omterm{def:b1:arith:prime}{bilangan prima}, dan pemfaktoran
+\[
+n = p_1^{\alpha_1} p_2^{\alpha_2} \cdots p_k^{\alpha_k}
+\qquad (p_1 < p_2 < \dots < p_k \text{ prima},\ \alpha_i \in \N^*)
+\]
+bersifat tunggal.\index{pemfaktoran prima}
+\end{theorem}
+
+\begin{proof}
+\emph{Keberadaannya} lewat induksi kuat (\cref{thm:b1:logic:induction}):
+$n = 2$ \omterm{def:b1:arith:prime}{prima}; untuk $n > 2$, entah $n$ \omterm{def:b1:arith:prime}{prima}, atau $n = ab$ dengan
+$2 \leq a, b < n$, dan hipotesis induksinya memfaktorkan $a$ dan $b$.
+
+\emph{Ketunggalannya.} Andaikan $p_1 \cdots p_r = q_1 \cdots q_s$
+(dengan \omterm{def:b1:arith:prime}{bilangan prima} didaftar beserta pengulangannya, katakanlah $r \leq s$), lalu berinduksilah pada
+$r$. Jika $r = 0$ ruas kirinya $1$, yang memaksa $s = 0$ (karena hasil kali
+tak kosong \omterm{def:b1:arith:prime}{bilangan prima} melebihi $1$). Untuk $r \geq 1$: \omterm{def:b1:arith:prime}{prima} $p_1$
+\omterm{def:b1:arith:divides}{membagi} $q_1(q_2\cdots q_s)$, jadi menurut lema Euclid entah $p_1
+\mid q_1$ atau $p_1 \mid q_2\cdots q_s$; dengan mengiterasikannya, $p_1$ \omterm{def:b1:arith:divides}{membagi}
+suatu $q_j$. Tetapi $q_j$ \omterm{def:b1:arith:prime}{prima} dan $p_1 \geq 2$: jadi mau tak mau $p_1
+= q_j$. Hapuskan faktor persekutuan itu (yang sah karena
+$\Z$ daerah integral) sehingga diperoleh
+\[
+p_2 \cdots p_r = q_1 \cdots \widehat{q_j} \cdots q_s
+\]
+(dengan topinya menandai penghilangan), yaitu kesamaan antara dua hasil kali yang lebih pendek;
+hipotesis induksinya mengatakan kedua daftar $p_2, \dots, p_r$ dan
+$q_1, \dots, \widehat{q_j}, \dots, q_s$ berimpit sampai urutannya,
+sehingga demikian pula daftar aslinya. Bentuk eksponennya mengelompokkan
+\omterm{def:b1:arith:prime}{bilangan prima} yang sama.
+\end{proof}
+
+\begin{proposition}[Valuasi]\label{prop:b1:arith:valuation}
+Untuk $p$ \omterm{def:b1:arith:prime}{prima} dan $n \in \N^*$, tulis $v_p(n)$\index{valuasi p-adik@valuasi
+$p$-adik} untuk eksponen $p$ pada
+pemfaktoran $n$ (dengan $v_p(n) = 0$ bila $p \nmid n$). Maka
+\[
+v_p(mn) = v_p(m) + v_p(n),
+\qquad
+m \mid n \iff \forall p,\ v_p(m) \leq v_p(n),
+\]
+\[
+v_p\bigl(\gcd(m,n)\bigr) = \min\bigl(v_p(m), v_p(n)\bigr),
+\qquad
+v_p\bigl(\operatorname{lcm}(m,n)\bigr) = \max\bigl(v_p(m),
+v_p(n)\bigr).
+\]
+\end{proposition}
+
+\begin{proof}
+Kesamaan pertamanya berlaku karena pemfaktorannya terkalikan dan
+pemfaktoran $mn$ bersifat tunggal. Jika $m \mid n$, tulis $n = mq$ lalu
+terapkan kesamaan itu. Sebaliknya, jika setiap $v_p(m) \leq v_p(n)$, bilangan bulat $q =
+\prod_p p^{\,v_p(n) - v_p(m)}$ memenuhi $mq = n$. Rumus FPB-nya:
+bilangan $d = \prod p^{\min}$ \omterm{def:b1:arith:divides}{membagi} keduanya menurut kriterianya, dan
+setiap pembagi persekutuan $c$ memenuhi $v_p(c) \leq \min$ untuk setiap $p$, sehingga $c
+\mid d$; penalaran yang sama untuk KPK dengan $\max$.
+\end{proof}
+
+\begin{example}[Kuadrat dan pangkat tiga lewat valuasi]\label{ex:b1:arith:squarecube}
+Bilangan bulat $n \geq 1$ merupakan kuadrat sempurna jika dan hanya jika setiap
+$v_p(n)$ genap (jika $n = m^2$, maka $v_p(n) = 2v_p(m)$;
+sebaliknya paruhkan setiap eksponennya). Demikian pula untuk pangkat tiga dengan
+kelipatan $3$. Jadi $21168 = 2^4 \times 3^3 \times 7^2$ bukan
+kuadrat (karena $v_3 = 3$ ganjil) dan bukan pangkat tiga (karena $v_2 = 4$);
+bilangan bulat positif terkecil $m$ yang membuat $21168\,m$ \emph{menjadi}
+pangkat tiga ditemukan dengan menambah setiap eksponennya sampai kelipatan
+$3$ berikutnya:
+\[
+m = 2^{6-4} \times 3^{3-3} \times 7^{3-2} = 2^2 \times 7 = 28,
+\qquad
+21168 \times 28 = 2^6\,3^3\,7^3 = (2^2 \times 3 \times 7)^3
+= 84^3 .
+\]
+Inti gagasannya: pertanyaan perkalian (kuadrat, pangkat tiga, pembagi,
+FPB, KPK) berubah menjadi pertanyaan \emph{koordinat demi koordinat} pada vektor
+eksponen $(v_2, v_3, v_5, \dots)$ --- dan ketunggalan pemfaktoran adalah
+\omterm{def:b1:logic:statement}{pernyataan} bahwa koordinat itu ada dan terdefinisi dengan baik.
+\end{example}
+
+\section{Kekongruenan}
+
+\begin{definition}\label{def:b1:arith:congruence}
+Untuk $n \in \N^*$: $a \equiv b \pmod n$\index{kekongruenan} bila $n \mid
+a - b$. Ini \omterm{def:b1:logic:equiv}{relasi ekuivalensi} yang serasi dengan penjumlahan dan
+perkalian: jika $a \equiv b$ dan $a' \equiv b'$ (modulo $n$), maka
+$a + a' \equiv b + b'$, $aa' \equiv bb'$, dan $a^k \equiv b^k$ untuk
+$k \in \N$.
+\end{definition}
+
+\begin{example}[Uji buang sembilan]\label{ex:b1:arith:castingnines}
+Keserasiannya dengan $+$ dan $\times$ adalah alat pemeriksa yang setua
+perniagaan. Karena $10 \equiv 1 \pmod 9$, setiap bilangan bulat
+kongruen modulo $9$ dengan jumlah angkanya (dibuktikan pada
+\cref{exo:b1:arith:2}). Untuk memeriksa klaim $1234 \times 567 =
+699\,678$: jumlah angkanya memberikan $1234 \equiv 1$ dan $567 \equiv 18
+\equiv 0 \pmod 9$, jadi hasil kalinya haruslah $\equiv 1 \times 0 =
+0$; dan memang $6 + 9 + 9 + 6 + 7 + 8 = 45 \equiv 0$. Pemeriksaannya
+lolos (dan hasil kalinya memang benar). Seandainya ada yang melaporkan
+$699\,478$, jumlah angkanya $43 \equiv 7 \not\equiv 0$ akan
+menghukumnya seketika. Ujinya bersifat sepihak --- ia menangkap sebuah
+kesalahan kecuali bila kesalahannya sendiri kelipatan $9$ --- dan itu
+persis pelajaran pseudoprima pada
+\cref{ex:b1:arith:pseudoprime} dalam wujud mini: pemeriksaan \omterm{def:b1:arith:congruence}{kekongruenan}
+membantah, tetapi tidak mengesahkan.
+\end{example}
+
+\begin{proposition}[Keterbalikan mod $n$]\label{prop:b1:arith:invmod}
+$a$ disebut \emph{terbalikkan modulo $n$} (yakni $ab \equiv 1 \pmod n$ untuk suatu
+$b$) jika dan hanya jika $\gcd(a, n) = 1$. Inversnya lalu tunggal modulo
+$n$ dan dihitung dengan \omterm{met:b1:arith:euclid}{algoritma Euclid} yang diperluas.
+\end{proposition}
+
+\begin{proof}
+$ab \equiv 1 \pmod n$ berarti $ab + nk = 1$ untuk suatu $k$: yaitu hubungan
+Bézout, yang ada jika dan hanya jika $\gcd(a,n) = 1$
+(\cref{cor:b1:arith:bezout}). Ketunggalannya: jika $ab \equiv ab' \equiv 1$,
+maka $b \equiv b(ab') = (ab)b' \equiv b' \pmod n$.
+\end{proof}
+
+\begin{example}[Membalikkan $7$ modulo $26$]\label{ex:b1:arith:inv7mod26}
+Karena $\gcd(7, 26) = 1$, kelas $7$ terbalikkan modulo $26$.
+Euclid yang diperluas:
+\[
+26 = 3 \times 7 + 5, \qquad
+7 = 1 \times 5 + 2, \qquad
+5 = 2 \times 2 + 1 ,
+\]
+lalu secara mundur:
+\[
+1 = 5 - 2 \times 2 = 5 - 2(7 - 5) = 3 \times 5 - 2 \times 7
+= 3(26 - 3 \times 7) - 2 \times 7 = 3 \times 26 - 11 \times 7 .
+\]
+Jadi $7 \times (-11) \equiv 1 \pmod{26}$, yakni $7^{-1} \equiv
+-11 \equiv 15 \pmod{26}$; periksa: $7 \times 15 = 105 = 4 \times 26
++ 1$. Dengan inversnya di tangan, sebarang \omterm{def:b1:arith:congruence}{kekongruenan} $7x \equiv c
+\pmod{26}$ diselesaikan dalam satu perkalian: $x \equiv 15c$. Pembalikan
+mekanis inilah kuda beban aritmetika modular ---
+dan juga kuda beban protokol kunci publik yang disebut pada
+\cref{rem:b1:arith:whereused}, yang di sana modulusnya beratus
+angka tetapi algoritmanya persis yang ini.
+\end{example}
+
+\begin{example}[Ketika koefisiennya tak terbalikkan]\label{ex:b1:arith:noninvertible}
+Selesaikan $12x \equiv 8 \pmod{20}$. Di sini $\gcd(12, 20) = 4$, jadi $12$
+tak terbalikkan modulo $20$ --- tetapi persamaannya tetap
+tertangani. \omterm{def:b1:arith:congruence}{Kekongruenan} itu mengatakan $20 \mid 12x - 8$; dengan membagi
+seluruh hubungannya dengan $4$ (pembagi ketiga bahannya), ia
+setara dengan $5 \mid 3x - 2$, yakni
+\[
+3x \equiv 2 \pmod 5 .
+\]
+Sekarang $\gcd(3, 5) = 1$ dan $3^{-1} \equiv 2 \pmod 5$ (karena $3 \times 2 =
+6 \equiv 1$), jadi $x \equiv 4 \pmod 5$: penyelesaiannya adalah $x
+\equiv 4, 9, 14, 19 \pmod{20}$ --- \emph{empat} kelas modulo $20$,
+yang cocok dengan FPB-nya. (Seandainya ruas kanannya tak habis dibagi $4$,
+katakanlah $12x \equiv 6 \pmod{20}$, tak akan ada penyelesaian sama sekali:
+karena ruas kirinya selalu $\equiv 0 \pmod 4$.) Bentuk umumnya: $ax
+\equiv b \pmod n$ terselesaikan jika dan hanya jika $\gcd(a, n) \mid b$, dan lalu ia
+mempunyai tepat $\gcd(a, n)$ kelas penyelesaian --- bagi semuanya
+dengan FPB-nya lalu balikkan.
+\end{example}
+
+\begin{theorem}[Teorema kecil Fermat]\label{thm:b1:arith:fermat}
+Misalkan $p$ \omterm{def:b1:arith:prime}{prima}. Untuk setiap $a \in \Z$:
+\[
+a^p \equiv a \pmod p,
+\]
+dan jika $p \nmid a$, maka $a^{p-1} \equiv 1 \pmod
+p$.\index{teorema kecil Fermat}
+\end{theorem}
+
+\begin{proof}
+Pertama, untuk $1 \leq k \leq p - 1$, \omterm{def:b1:counting:objects}{koefisien binomial} $\binom pk
+= \frac{p!}{k!(p-k)!}$ habis dibagi $p$: memang $k!\,(p-k)!\,
+\binom pk = p!$ dan $p$ \omterm{def:b1:arith:divides}{membagi} $p!$ tetapi \omterm{cor:b1:arith:bezout}{saling prima} dengan $k!(p-k)!$
+(karena semua faktornya $< p$), jadi lema Gauss memberikan $p \mid \binom pk$.
+
+Sekarang buktikan $a^p \equiv a$ untuk $a \in \N$ dengan induksi. Benar untuk $a =
+0$. Jika $a^p \equiv a$, maka menurut teorema binomial
+\[
+(a+1)^p = \sum_{k=0}^{p} \binom pk a^k
+\equiv a^p + 1 \equiv a + 1 \pmod p,
+\]
+dengan semua suku tengahnya lenyap modulo $p$. Untuk $a < 0$, terapkan hasilnya pada
+$-a$ lalu pisahkan $p = 2$ (yang di situ $x \equiv -x$) dari $p$ ganjil (yang di situ
+$(-a)^p = -a^p$). Akhirnya, jika $p \nmid a$, kalikan $a^p \equiv a$ dengan
+sebuah invers $a$ modulo $p$ (\cref{prop:b1:arith:invmod}).
+\end{proof}
+
+\begin{example}[Konvers Fermat gugur: $341$]\label{ex:b1:arith:pseudoprime}
+Teorema kecil Fermat memberikan uji \emph{kekompositan} yang murah:
+jika $a^{n-1} \not\equiv 1 \pmod n$ untuk suatu $a$ yang \omterm{cor:b1:arith:bezout}{saling prima} dengan $n$,
+maka $n$ tidak \omterm{def:b1:arith:prime}{prima}. Dapatkah ujinya juga mengesahkan keprimaan? Tidak:
+ambil $n = 341 = 11 \times 31$, yang komposit, dan $a = 2$. Karena
+$2^{10} = 1024 = 3 \times 341 + 1$,
+\[
+2^{10} \equiv 1 \pmod{341}
+\qquad\Longrightarrow\qquad
+2^{340} = \bigl(2^{10}\bigr)^{34} \equiv 1 \pmod{341} :
+\]
+bilangan komposit $341$ lolos uji Fermat untuk basis $2$ (dan ia
+\emph{pseudoprima} terkecil semacam itu). Basis $3$ menyingkap topengnya
+($3^{340} \not\equiv 1$), sehingga uji keprimaan yang praktis
+menjalankan ujinya pada beberapa basis, ditambah penghalusan ---
+versi industri gagasan inilah yang mengesahkan \omterm{def:b1:arith:prime}{bilangan prima}
+besar pada \cref{rem:b1:arith:whereused}. Moralnya: sebuah implikasi
+dan konversnya hidup secara terpisah
+(\cref{rem:b1:logic:pitfalls}), bahkan untuk teorema.
+\end{example}
+
+\begin{example}[Perhitungan kekongruenan yang praktis]\label{ex:b1:arith:congruences}
+Berapa sisa $7^{2026}$ modulo $11$? Menurut Fermat, $7^{10}
+\equiv 1 \pmod{11}$. Karena $2026 = 10 \times 202 + 6$:
+\[
+7^{2026} \equiv 7^6 = (7^2)^3 = 49^3 \equiv 5^3 = 125 \equiv 4
+\pmod{11}.
+\]
+Sisanya adalah $4$. Strateginya: susutkan eksponennya modulo
+orde yang disediakan Fermat, lalu susutkan pangkat antaranya pada setiap
+langkah.
+\end{example}
+
+\begin{remark}[Jebakan yang lazim dalam aritmetika]\label{rem:b1:arith:pitfalls}
+\begin{enumerate}
+  \item \emph{\omterm{def:b1:arith:divides}{Membagi} sebuah \omterm{def:b1:arith:congruence}{kekongruenan}.} Dari $ac \equiv bc \pmod n$
+        kita \emph{tidak} boleh menyimpulkan $a \equiv b$ kecuali bila $\gcd(c,
+        n) = 1$: misalnya $6 \equiv 2 \pmod 4$ tetapi $3 \not\equiv 1 \pmod
+        4$. Kaidah umum yang benar \omterm{def:b1:arith:divides}{membagi} modulusnya juga: $ac
+        \equiv bc \pmod n \iff a \equiv b \pmod{n/\gcd(c,n)}$.
+  \item \emph{Menyalahgunakan lema Euclid.} Bahwa $a \mid bc$ mengakibatkan $a
+        \mid b$ atau $a \mid c$ hanya berlaku untuk $a$ yang \emph{\omterm{def:b1:arith:prime}{prima}} (atau
+        yang \omterm{cor:b1:arith:bezout}{saling prima} dengan salah satu faktornya): $6 \mid 4 \times 9$ padahal $6$
+        tak \omterm{def:b1:arith:divides}{membagi} satu pun faktornya.
+  \item \emph{\omterm{cor:b1:arith:bezout}{Saling prima} itu relasi, bukan sifat.} ``$8$ dan
+        $9$ \omterm{cor:b1:arith:bezout}{saling prima}'' itu benar meskipun tak satu pun \omterm{def:b1:arith:prime}{prima};
+        ``\omterm{cor:b1:arith:bezout}{saling prima} dua-dua'' lebih kuat daripada ``\omterm{cor:b1:arith:bezout}{saling prima}
+        secara menyeluruh'' ($\gcd(6, 10, 15) = 1$ tetapi tak ada pasangan yang
+        \omterm{cor:b1:arith:bezout}{saling prima}).
+  \item \emph{Eksponen tidak hidup modulo $n$.} Pada $a^k \bmod n$,
+        eksponennya hanya boleh disusutkan modulo \emph{orde}
+        $a$ (misalnya $p - 1$ ketika Fermat berlaku), jangan pernah
+        modulo $n$: $2^{10} \bmod 11$ adalah $1$, bukan $2^{10 \bmod
+        11} = 2^{10}$ --- penyusutan yang berhasil adalah yang
+        dilakukan \cref{ex:b1:arith:congruences}.
+\end{enumerate}
+\end{remark}
+
+\begin{remark}[Di mana bab ini dipakai]\label{rem:b1:arith:whereused}
+Bab ini adalah cetakan sekaligus kotak perkakas. Seluruh rantainya
+--- pembagian Euclid, FPB, Bézout, Gauss, ketunggalan pemfaktoran
+--- diputar ulang kata demi kata untuk polinomial pada \cref{ch:b1:poly},
+yang di sana ``derajat'' memainkan peran nilai mutlak; membandingkan
+kedua bab itu berdampingan adalah cara terbaik memahami keduanya.
+Kalkulus \omterm{def:b1:arith:congruence}{kekongruenannya} menjelma menjadi ring $\Z/n\Z$ pada
+\cref{ch:b1:structures}, yang unsur terbalikkannya
+(\cref{prop:b1:arith:invmod}) membentuk contoh tak sepele pertama
+sebuah grup satuan. Valuasi kembali pada soal akhir pekan di bawah
+(rumus Legendre) dan menggerakkan bukti keirasionalan pada
+\cref{ch:b1:reals}. Di luar jilid ini, pembalikan Bézout modulo $n$
+menjadi mesin kriptografi kunci publik, dan teorema kecil Fermat
+adalah kakek moyang uji keprimaan yang mengesahkan \omterm{def:b1:arith:prime}{bilangan prima}
+besar yang dipakai di sana.
+\end{remark}
+
+\begin{remark}[Selingan: $\Z$ sebagai cetakan]\label{rem:b1:arith:interlude}
+Mundurlah dari teorema satu per satu lalu amati
+arsitektur bab ini: satu perkakas (pembagian Euclid)
+menghasilkan sebuah penggolongan (subgrup $n\Z$), yang menghasilkan
+teorema keberadaan (FPB, Bézout), yang menghasilkan kalkulus
+\omterm{def:b1:arith:divides}{keterbagian} (Gauss), yang menghasilkan ketunggalan pemfaktoran --- setiap
+lantainya bersandar hanya pada lantai di bawahnya. Bangunan yang sama akan
+didirikan dua kali lagi dalam jilid ini dengan lantai dasar yang berbeda:
+pada \cref{ch:b1:poly}, yang di sana pembagian menurut derajat menggantikan pembagian
+menurut ukuran dan segala yang di atasnya berulang \emph{kata demi kata}; dan, dalam
+wujud mini, di dalam setiap $\Z/n\Z$ pada \cref{ch:b1:structures},
+yang di sana pertanyaan keterbalikan (yaitu
+\cref{prop:b1:arith:invmod} bab ini) menjadi \omterm{def:b1:logic:statement}{pernyataan} struktural tentang
+ring dan lapangan. Mengenali sebuah argumen sebagai ``argumen $\Z$ yang
+dicangkokkan'' adalah cara tercepat mempelajari bab itu --- dan
+cicipan pertama kebiasaan inti aljabar, yaitu membuktikan teorema tentang
+\emph{aksioma} alih-alih tentang objek.
+\end{remark}
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=0.42]
+  \foreach \n/\k in {0/0, 1/0, 1/1, 2/0, 2/2, 3/0, 3/1, 3/2, 3/3,
+      4/0, 4/4, 5/0, 5/1, 5/4, 5/5, 6/0, 6/2, 6/4, 6/6,
+      7/0, 7/1, 7/2, 7/3, 7/4, 7/5, 7/6, 7/7}
+    \fill[omDef] ({2*\k - \n}, {-\n}) circle (0.32);
+  \foreach \n/\k in {2/1, 4/1, 4/2, 4/3, 5/2, 5/3, 6/1, 6/3, 6/5}
+    \draw[gray] ({2*\k - \n}, {-\n}) circle (0.32);
+\end{tikzpicture}
+
+{\small Baris $0$ sampai $7$ segitiga Pascal dengan entri yang \emph{ganjil}
+diarsir: baris $n$ memuat $2^{s_2(n)}$ di antaranya, dengan
+$s_2(n)$ banyaknya angka satu pada penulisan biner $n$
+(baris $1, 2, 4$: dua entri ganjil; baris $7 = (111)_2$: kedelapannya).
+Pola serupa-dirinya --- setiap ``segitiga entri ganjil'' melahirkan dua
+salinan dirinya --- adalah teorema Kummer dalam wujud gambar, yang dibuktikan
+pada soal akhir pekan di bawah.}
+\end{omfigure}
+
+\section{Latihan}
+
+\begin{exercise}[$\star$]\label{exo:b1:arith:1}
+Hitung $\gcd(1\,001, 777)$ dengan \omterm{met:b1:arith:euclid}{algoritma Euclid}, beserta sepasang bilangan
+Bézout untuknya.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:arith:2}
+Buktikan kaidah \omterm{def:b1:arith:divides}{keterbagian} dalam basis $10$: sebuah bilangan bulat kongruen modulo
+$9$ dengan jumlah angkanya, dan modulo $11$ dengan jumlah berselang-seling
+angkanya. Berapa $123\,456\,789$ modulo $9$ dan modulo $11$?
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:arith:3}
+Selesaikan di $\Z$: $91x \equiv 1 \pmod{237}$ \emph{(Euclid yang diperluas)}.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:arith:4}
+Carilah semua pasangan $(x, y) \in \Z^2$ dengan $17x + 39y = 1$; lalu semua pasangan
+dengan $17 x + 39 y = 5$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:arith:5}
+Buktikan bahwa untuk $a, b \in \N^*$ berlaku $\gcd(a,b) \times
+\operatorname{lcm}(a,b) = ab$. \emph{(Pakai rumus valuasi pada
+\cref{prop:b1:arith:valuation} dan $\min(\alpha,\beta) +
+\max(\alpha,\beta) = \alpha + \beta$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:arith:6}
+Misalkan $a = 2^{10} \times 3^4 \times 5^2$ dan $b = 2^6 \times 3^7 \times
+7$. Hitung $\gcd(a, b)$, $\operatorname{lcm}(a,b)$, dan banyaknya
+pembagi positif $a$. \emph{(Buktikan rumus cacah pembaginya
+$\prod_i (\alpha_i + 1)$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:arith:7}
+Buktikan bahwa $\sqrt p$ irasional untuk setiap \omterm{def:b1:arith:prime}{prima} $p$, dengan memakai
+valuasi: bandingkan $v_p$ kedua ruas $p q^2 = r^2$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:arith:8}
+(Masalah sisa Cina) Carilah semua bilangan bulat $x$ dengan
+\[
+x \equiv 2 \pmod 7, \qquad x \equiv 5 \pmod{11}.
+\]
+Buktikan sepanjang jalan bahwa untuk $m, n$ yang \omterm{cor:b1:arith:bezout}{saling prima}, sepasang \omterm{def:b1:arith:congruence}{kekongruenan}
+$x \equiv a \ (m)$, $x \equiv b\ (n)$ selalu mempunyai penyelesaian yang tunggal
+modulo $mn$.\index{teorema sisa Cina}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:arith:9}
+Hitung $3^{1000}$ modulo $7$, dan dua angka desimal terakhir
+$7^{100}$ \emph{(modulo $100 = 4 \times 25$: pakai
+\cref{exo:b1:arith:8})}.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:arith:10}
+Untuk $m, n \in \N^*$, buktikan bahwa $\gcd(2^m - 1,\, 2^n - 1) =
+2^{\gcd(m,n)} - 1$. \emph{Petunjuk: tunjukkan lebih dulu bahwa sisa $2^m
+- 1$ modulo $2^n - 1$ adalah $2^r - 1$ dengan $r$ sisa $m$ modulo
+$n$; lalu ikuti \omterm{met:b1:arith:euclid}{algoritma Euclid}.}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:arith:11}
+(Teorema Wilson) Misalkan $p$ sebuah \omterm{def:b1:arith:prime}{prima}. Buktikan bahwa
+\[
+(p-1)! \equiv -1 \pmod p ,
+\]
+dengan memasangkan setiap faktor $(p-1)!$ dengan inversnya modulo $p$ lalu
+mengenali faktor yang berpasangan dengan dirinya sendiri (selesaikan $x^2 \equiv 1 \pmod p$
+lebih dulu). Periksa konversnya: jika $n \geq 2$ tidak \omterm{def:b1:arith:prime}{prima}, maka $(n-1)!
+\not\equiv -1 \pmod n$.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:arith:12}
+(Bilangan Fermat) Untuk $n \in \N$, tulis $F_n = 2^{2^n} + 1$.
+\begin{enumerate}
+  \item Buktikan bahwa $F_0 F_1 \cdots F_{n-1} = F_n - 2$ untuk $n \geq
+        1$ (dengan induksi).
+  \item Simpulkan bahwa bilangan Fermat \omterm{cor:b1:arith:bezout}{saling prima} dua-dua.
+  \item Simpulkan bukti kedua, yang tak bergantung pada
+        \cref{thm:b1:arith:euclidprimes}, bahwa \omterm{def:b1:arith:prime}{bilangan prima} ada
+        tak hingga banyaknya.
+\end{enumerate}
+\end{exercise}
+
+\section{Soal: Rumus Legendre dan simpanan Kummer}
+
+\begin{problem}\label{pb:b1:arith:1}
+Berapa banyak nol yang mengakhiri penulisan desimal $1000!$ --- dan, lebih dalam
+lagi, berapa pangkat persis sebuah \omterm{def:b1:arith:prime}{prima} $p$ yang \omterm{def:b1:arith:divides}{membagi} $n!$, atau \omterm{def:b1:arith:divides}{membagi}
+\omterm{def:b1:counting:objects}{koefisien binomial}? Jawaban lengkapnya adalah dua permata
+aritmetika dasar: \emph{rumus Legendre}
+\index{rumus Legendre} $v_p(n!) = \sum_{k\geq1}
+\lfloor n/p^k \rfloor$, beserta jelmaan digitalnya $v_p(n!) = \frac{n
+- s_p(n)}{p-1}$, dan \emph{teorema Kummer}\index{teorema
+Kummer}: bahwa $v_p\binom{m+n}m$ mencacah \emph{simpanan} ketika
+$m$ dan $n$ dijumlahkan dalam basis $p$. Soal ini membuktikan keduanya, mencocokkannya
+satu sama lain secara numerik, lalu memanen akibat
+klasiknya --- nol penutup, keparitasan segitiga Pascal,
+dan sebuah batas pertama ke arah teorema \omterm{def:b1:arith:prime}{bilangan prima}.
+Di sepanjang soal ini, $p$ sebuah \omterm{def:b1:arith:prime}{prima}, $\floor{x}$ bagian bulatnya, dan
+$s_p(n)$ menyatakan jumlah angka $n$ yang ditulis dalam basis $p$.
+
+\medskip
+\noindent\textbf{Bagian I --- Lantai, valuasi, dan rumus
+Legendre.}
+\begin{enumerate}
+  \item Pemanasan: hitung $10!$ lalu bacalah banyaknya nol penutupnya;
+        hitung $v_2(10!)$ dan $v_5(10!)$ langsung dari
+        pemfaktoran setiap faktornya $1, 2, \dots, 10$.
+  \item Buktikan bahwa untuk $x \in \R$ dan $n \in \N^*$ berlaku
+        $\bigl\lfloor \lfloor x \rfloor / n \bigr\rfloor =
+        \lfloor x/n \rfloor$.
+  \item Buktikan bahwa $v_p(a + b) \geq \min\bigl(v_p(a),
+        v_p(b)\bigr)$ untuk setiap $a, b \in \N^*$, dengan kesamaan
+        setiap kali $v_p(a) \neq v_p(b)$.
+  \item Tunjukkan bahwa banyaknya kelipatan $m$ di $\intint1n$ adalah
+        $\lfloor n/m \rfloor$.
+  \item Buktikan \emph{rumus Legendre}: untuk setiap $n \in \N^*$,
+        \[
+        v_p(n!) = \sum_{k=1}^{\infty}
+        \Bigl\lfloor \frac{n}{p^k} \Bigr\rfloor
+        \]
+        (yaitu jumlah yang hingga: sukunya lenyap begitu $p^k > n$).
+        \emph{Cacahlah, untuk setiap $k$, faktor $\intint1n$ yang
+        habis dibagi $p^k$: masing-masing menyumbang tepat satu satuan per
+        aras yang dicapainya.}
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian II --- Bentuk digital dan nol
+penutup.}
+\begin{enumerate}[resume]
+  \item Hitung $v_5(1000!)$ dan $v_2(1000!)$, lalu simpulkan: berapa
+        banyak nol yang mengakhiri $1000!$?
+  \item Buktikan bentuk digital rumus Legendre: dengan menulis $n =
+        \sum_i a_i p^i$ dalam basis $p$,
+        \[
+        v_p(n!) = \frac{n - s_p(n)}{p - 1} .
+        \]
+  \item Dua akibat untuk $p = 2$: tunjukkan bahwa $2^n$ tak pernah
+        \omterm{def:b1:arith:divides}{membagi} $n!$, dan bahwa $2^{n-1}$ \omterm{def:b1:arith:divides}{membagi} $n!$ tepat ketika
+        $n$ merupakan pangkat $2$.
+  \item Batasi cacatnya: tunjukkan $\frac n{p-1} - \log_p(n) - 1 \leq
+        v_p(n!) < \frac n{p-1}$, sehingga $\frac{v_p(n!)}{n} \to
+        \frac1{p-1}$: jadi dalam jangka panjang, sebanyak
+        $\frac1{p-1}$ faktor $p$ terkumpul per satuan.
+  \item Misalkan $Z(n) = v_5(n!)$ banyaknya nol penutup
+        $n!$. Tunjukkan $Z(n) - Z(n-1) = v_5(n)$, simpulkan bahwa $Z$ melompati
+        nilai $5$ sama sekali (hitung $Z(24)$ dan $Z(25)$), lalu
+        buktikan bahwa tak ada faktorial yang berakhir dengan tepat lima nol.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian III --- Teorema Kummer.}
+\begin{enumerate}[resume]
+  \item Buktikan bahwa $\lfloor x + y \rfloor - \lfloor x \rfloor -
+        \lfloor y \rfloor \in \{0, 1\}$ untuk setiap $x, y \in \R$, lalu
+        simpulkan dari rumus Legendre bahwa
+        \[
+        v_p\binom{m+n}m
+        = \sum_{k\geq1}\Bigl(
+        \Bigl\lfloor\frac{m+n}{p^k}\Bigr\rfloor
+        - \Bigl\lfloor\frac{m}{p^k}\Bigr\rfloor
+        - \Bigl\lfloor\frac{n}{p^k}\Bigr\rfloor\Bigr),
+        \]
+        yaitu jumlah suku yang masing-masing sama dengan $0$ atau $1$.
+  \item Buktikan \emph{teorema Kummer}: suku ke-$k$ jumlah itu
+        sama dengan $1$ tepat ketika penjumlahan $m$ dan $n$ dalam
+        basis $p$ menghasilkan simpanan ke posisi $k$; sehingga
+        $v_p\binom{m+n}m$ adalah banyaknya simpanan seluruhnya.
+        \emph{(Tulis $m = p^km_1 + m_0$ dan $n = p^kn_1 + n_0$
+        dengan $0 \leq m_0, n_0 < p^k$ lalu periksa $\lfloor (m_0 +
+        n_0)/p^k \rfloor$.)}
+  \item Simpulkan bahwa untuk $0 < j < p^k$:
+        \[
+        v_p\binom{p^k}{j} = k - v_p(j) ,
+        \]
+        dengan mencacah simpanan pada penjumlahan $j + (p^k - j)$.
+        (Khususnya $p \mid \binom p j$ untuk $0 < j < p$: yaitu
+        langkah kunci \cref{thm:b1:arith:fermat}, yang dipulihkan.)
+  \item Buktikan bahwa $v_2\binom{2n}n = s_2(n)$. Simpulkan bahwa
+        \omterm{def:b1:counting:objects}{koefisien binomial} pusatnya selalu genap, dan bahwa
+        $\binom{2n}n \equiv 2 \pmod 4$ tepat ketika $n$ merupakan pangkat
+        $2$.
+  \item Tunjukkan, dengan memakai kesamaan Vandermonde
+        (\cref{exo:b1:counting:7}) dan pertanyaan 13, bahwa
+        $\binom{2p}p \equiv 2 \pmod p$ untuk setiap \omterm{def:b1:arith:prime}{prima} $p$.
+  \item Hitung $v_3\binom{1000}{500}$ dua kali: sekali dengan Kummer
+        (tulis $500$ dalam basis $3$ lalu cacah simpanan pada $500 +
+        500$), sekali dengan bentuk digital Legendre (hitung $s_3(500)$
+        dan $s_3(1000)$); lalu periksa bahwa keduanya memberikan nilai yang sama.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian IV --- Keparitasan segitiga Pascal, dan
+sebuah batas kerapatan \omterm{def:b1:arith:prime}{bilangan prima}.}
+\begin{enumerate}[resume]
+  \item Buktikan kriteria digitalnya: $\binom nk$ bersifat \emph{ganjil} jika
+        dan hanya jika setiap angka biner $k$ paling besar sama dengan
+        angka $n$ yang bersesuaian. Nyatakan lalu buktikan kriteria yang analog
+        untuk $p \nmid \binom nk$ dalam basis $p$.
+  \item Simpulkan bahwa baris $n$ segitiga Pascal memuat tepat
+        $2^{s_2(n)}$ entri ganjil; lalu periksa pada baris $4$ dan $5$.
+  \item Simpulkan bahwa semua entri bagian dalamnya $\binom nk$ ($0 < k < n$)
+        genap jika dan hanya jika $n$ merupakan pangkat $2$.
+  \item Buktikan bahwa setiap pangkat \omterm{def:b1:arith:prime}{prima} yang \omterm{def:b1:arith:divides}{membagi} $\binom{m+n}m$ paling
+        besar $m + n$: yakni jika $p^a \mid \binom{m+n}m$ maka $p^a \leq
+        m + n$. \emph{(Berapa banyak suku tak nol yang dapat dimiliki jumlah
+        pertanyaan 11?)}
+  \item Simpulkan bahwa $\binom{2n}n$ \omterm{def:b1:arith:divides}{membagi}
+        $\operatorname{lcm}(1, 2, \dots, 2n)$, lalu gabungkan dengan
+        batas bawah $\binom{2n}n \geq \frac{4^n}{2n+1}$
+        (yang akan Anda buktikan: entri pusatnya adalah yang terbesar
+        di antara $2n + 1$ entri baris $2n$) untuk memperoleh
+        \[
+        \operatorname{lcm}(1, \dots, 2n) \geq \frac{4^n}{2n+1} :
+        \]
+        jadi kelipatan persekutuan bilangan bulat pertama tumbuh
+        \emph{secara eksponensial} --- yaitu sekilas kuantitatif pertama tentang
+        limpahnya \omterm{def:b1:arith:prime}{bilangan prima}.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian V --- Sintesis.}
+\begin{enumerate}[resume]
+  \item Carilah $n$ terkecil yang membuat $n!$ berakhir dengan sekurang-kurangnya
+        $2026$ nol. \emph{(Taksir $Z(n) \approx n/4$, lalu
+        sesuaikan memakai rumus eksaknya.)}
+  \item Satu pemeriksaan silang terakhir: tunjukkan bahwa $7$ \emph{tidak} \omterm{def:b1:arith:divides}{membagi}
+        $\binom{100}{50}$, mula-mula dengan menulis $50$ dalam basis $7$ lalu
+        memeriksa bahwa penjumlahan $50 + 50$ bebas simpanan, lalu
+        dengan menghitung $v_7(100!)$ dan $v_7(50!)$ memakai rumus
+        Legendre.
+  \item Di mana persisnya soal ini memakai: (i) ketunggalan
+        pemfaktoran; (ii) penguraian pembagian Euclid
+        $n = p^k n_1 + n_0$; (iii) sebuah argumen pencacahan dari
+        \cref{ch:b1:counting}? Satu kalimat untuk masing-masing.
+  \item Sintesis, dalam satu paragraf pendek: rumus Legendre mengubah
+        pertanyaan \omterm{def:b1:arith:divides}{keterbagian} menjadi aritmetika angka, dan
+        teorema Kummer membaca jawabannya dari simpanan satu
+        penjumlahan --- berilah komentar atas penerjemahan ini, atas pemeriksaan pada
+        pertanyaan 16, dan atas apa yang disiratkan batas pertanyaan 21
+        tentang \omterm{def:b1:arith:prime}{bilangan prima} (\omterm{def:b1:logic:statement}{pernyataan} lengkapnya, yaitu teorema \omterm{def:b1:arith:prime}{bilangan
+        prima}, jauh di luar jilid ini; adapun analog polinomial
+        bagi kotak perkakas bab ini adalah
+        \cref{ch:b1:poly}).
+
+\end{enumerate}
+\end{problem}

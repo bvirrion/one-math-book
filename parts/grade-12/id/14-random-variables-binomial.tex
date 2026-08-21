@@ -1,0 +1,402 @@
+\chapter{Peubah Acak dan Distribusi Binomial}\label{ch:g12:randvar}
+
+\omterm{def:g12:randvar:rv}{Peubah acak} melekatkan sebuah bilangan pada tiap hasil percobaan: sebuah
+keuntungan, sebuah cacah, sebuah lama waktu. Harapannya adalah rata-rata jangka
+panjang nilai yang dihasilkannya, dan \omterm{def:g12:randvar:exp}{ragamnya} mengukur penyebarannya. Bintang bab
+ini adalah \omterm{def:g12:randvar:binomial}{distribusi binomial}, yang mencacah keberhasilan pada ulangan percobaan
+yang \omterm{def:g12:condprob:indep}{saling bebas}. \omterm{def:g12:randvar:rv}{Peubah acak} dan \omterm{def:g12:randvar:binomial}{distribusi binomial} pertama kali
+dijumpai di \cref{ch:g11:prob,ch:g11:binom}; bab ini meninjau kembali dan
+memperdalamnya, dengan perkakas kombinatorika \cref{ch:g12:comb} yang kini
+tersedia.
+
+\section{Peubah acak diskret}
+
+\begin{definition}[Peubah acak, distribusi]\label{def:g12:randvar:rv}
+Suatu \emph{peubah acak}\index{peubah acak} pada \omterm{def:g11:prob:model}{ruang sampel} berhingga
+$\Omega$ adalah \omterm{def:g11:func:function}{fungsi} $X \colon \Omega \to \R$. Yang disebut
+\emph{distribusinya}\index{distribusi} (atau hukumnya) adalah data nilai
+yang mungkin $x_1, \dots, x_k$ beserta peluangnya
+\[
+p_i = \P(X = x_i), \qquad \sum_{i=1}^{k} p_i = 1 .
+\]
+\end{definition}
+
+\begin{definition}[Nilai harapan, ragam, simpangan baku]\label{def:g12:randvar:exp}
+\emph{Nilai harapan}\index{nilai harapan} dari $X$ adalah
+\[
+\E(X) = \sum_{i=1}^{k} p_i\, x_i ,
+\]
+sedangkan \emph{ragamnya}\index{ragam} dan \emph{\omterm{def:g11:stat:variance}{simpangan bakunya}} adalah
+\[
+\V(X) = \E\bigl((X - \E(X))^2\bigr) = \sum_{i=1}^k p_i\bigl(x_i - \E(X)\bigr)^2,
+\qquad
+\sigma(X) = \sqrt{\V(X)} .
+\]
+\end{definition}
+
+\begin{proposition}[Rumus König--Huygens]\label{prop:g12:randvar:konig}
+\index{rumus König--Huygens}
+$\V(X) = \E(X^2) - \E(X)^2$.
+\end{proposition}
+
+\begin{proof}
+Tulislah $m = \E(X)$ lalu jabarkan:
+\[
+\V(X) = \sum_i p_i (x_i^2 - 2m x_i + m^2)
+= \E(X^2) - 2m\sum_i p_i x_i + m^2\sum_i p_i
+= \E(X^2) - 2m^2 + m^2 . \qedhere
+\]
+\end{proof}
+
+\begin{proposition}[Transformasi afin]\label{prop:g12:randvar:affine}
+Untuk $a, b \in \R$:
+\[
+\E(aX + b) = a\,\E(X) + b, \qquad
+\V(aX + b) = a^2\,\V(X) .
+\]
+\end{proposition}
+
+\begin{proof}
+Yang pertama hanyalah penyusunan ulang jumlah pendefinisinya. Untuk yang kedua, $aX + b$
+menyimpang dari rata-ratanya sebesar $a(X - \E(X))$, dan pengkuadratannya mengalikan
+dengan $a^2$.
+\end{proof}
+
+\begin{example}[Permainan yang adil]\label{ex:g12:randvar:game}
+Sebuah permainan berbiaya $2$ euro; sebuah dadu dilempar, dan pemainnya menerima nilai
+yang muncul jika nilainya sekurang-kurangnya $5$, dan tidak menerima apa-apa jika tidak. Keuntungannya $G$ bernilai
+$-2$ (peluangnya $\frac46$), $3$ ($\frac16$), $4$ ($\frac16$):
+\[
+\E(G) = \frac{-8 + 3 + 4}{6} = -\frac{1}{6} < 0 .
+\]
+\omterm{def:g11:stat:mean}{Rata-rata} pemainnya rugi $17$ sen tiap permainan: jadi permainannya merugikan
+(seperti kebanyakan permainan yang nyata).
+\end{example}
+
+\section{Percobaan Bernoulli dan distribusi binomial}
+
+\begin{definition}[Distribusi Bernoulli]\label{def:g12:randvar:bernoulli}
+Suatu \emph{percobaan Bernoulli}\index{percobaan Bernoulli} adalah percobaan dengan dua
+hasil, \emph{berhasil} (peluangnya $p$) dan \emph{gagal}
+($q = 1 - p$). Penunjuk $X$ bagi keberhasilan ($X = 1$ jika berhasil, $0$ jika
+gagal) mengikuti \emph{\omterm{def:g12:randvar:rv}{distribusi} Bernoulli} $\mathcal B(p)$:
+\[
+\E(X) = p, \qquad \V(X) = p(1-p) .
+\]
+(Memang $\E(X) = p$, $\E(X^2) = p$, dan König--Huygens memberi
+$\V(X) = p - p^2$.)
+\end{definition}
+
+\begin{definition}[Distribusi binomial]\label{def:g12:randvar:binomial}
+Ulangilah \omterm{def:g12:randvar:bernoulli}{percobaan Bernoulli} $n$ kali secara \omterm{def:g12:condprob:indep}{saling bebas}, lalu misalkan $X$ cacah
+total keberhasilannya. \omterm{def:g12:randvar:rv}{Distribusi} $X$ itulah yang disebut \emph{distribusi
+binomial}\index{distribusi binomial} $\mathcal B(n, p)$.
+\end{definition}
+
+\begin{omfigure}
+\begin{tikzpicture}[font=\small]
+  \coordinate (root) at (0,0);
+  \node (S) at (1.6,1.6) {B};
+  \node (F) at (1.6,-1.6) {G};
+  \node (SS) at (3.2,2.4) {B};
+  \node (SF) at (3.2,0.8) {G};
+  \node (FS) at (3.2,-0.8) {B};
+  \node (FF) at (3.2,-2.4) {G};
+  \node (SSS) at (4.8,2.8) {B};
+  \node (SSF) at (4.8,2.0) {G};
+  \node (SFS) at (4.8,1.2) {B};
+  \node (SFF) at (4.8,0.4) {G};
+  \node (FSS) at (4.8,-0.4) {B};
+  \node (FSF) at (4.8,-1.2) {G};
+  \node (FFS) at (4.8,-2.0) {B};
+  \node (FFF) at (4.8,-2.8) {G};
+  \draw[omThm, thick] (root) -- (S);
+  \draw[omThm, thick] (S) -- (SS);   \draw[omThm, thick] (SS) -- (SSF);
+  \draw[omThm, thick] (S) -- (SF);   \draw[omThm, thick] (SF) -- (SFS);
+  \draw[omThm, thick] (root) -- (F);
+  \draw[omThm, thick] (F) -- (FS);   \draw[omThm, thick] (FS) -- (FSS);
+  \draw[gray] (SS) -- (SSS);
+  \draw[gray] (SF) -- (SFF);
+  \draw[gray] (FS) -- (FSF);
+  \draw[gray] (F) -- (FF);
+  \draw[gray] (FF) -- (FFS);
+  \draw[gray] (FF) -- (FFF);
+  \node[gray, anchor=west] at (5.3,2.8) {$X=3$};
+  \node[omThm, anchor=west] at (5.3,2.0) {$X=2$};
+  \node[omThm, anchor=west] at (5.3,1.2) {$X=2$};
+  \node[gray, anchor=west] at (5.3,0.4) {$X=1$};
+  \node[omThm, anchor=west] at (5.3,-0.4) {$X=2$};
+  \node[gray, anchor=west] at (5.3,-1.2) {$X=1$};
+  \node[gray, anchor=west] at (5.3,-2.0) {$X=1$};
+  \node[gray, anchor=west] at (5.3,-2.8) {$X=0$};
+\end{tikzpicture}
+
+{\small Tiga \omterm{def:g12:randvar:bernoulli}{percobaan Bernoulli}: tepat $\binom{3}{2} = 3$ dari
+$2^3$ lintasannya memberi dua keberhasilan (merah), masing-masing berpeluang $p^2(1-p)$,
+sehingga $\P(X = 2) = 3p^2(1-p)$.}
+\end{omfigure}
+
+\begin{theorem}\label{thm:g12:randvar:binomial}
+Jika $X \sim \mathcal B(n, p)$, maka untuk $0 \leq k \leq n$:
+\[
+\P(X = k) = \binom{n}{k} p^k (1-p)^{n-k},
+\]
+dan
+\[
+\E(X) = np, \qquad \V(X) = np(1-p) .
+\]
+\end{theorem}
+
+\begin{proof}
+Suatu \omterm{def:g12:seq:sequence}{barisan} hasil tertentu dengan $k$ keberhasilan dan $n-k$ kegagalan
+berpeluang $p^k(1-p)^{n-k}$ menurut \omterm{def:g12:condprob:indep}{kebebasannya}; sedangkan banyaknya \omterm{def:g12:seq:sequence}{barisan} semacam itu
+adalah banyaknya cara menempatkan $k$ keberhasilan di antara $n$ percobaannya,
+yaitu $\binom nk$ (\cref{ch:g12:comb}). Menjumlahkan atas \omterm{def:g12:seq:sequence}{barisannya} memberi
+rumusnya --- dan teorema binomial menegaskan
+$\sum_k \P(X = k) = (p + q)^n = 1$.
+
+Untuk harapannya, dengan memakai $k\binom nk = n\binom{n-1}{k-1}$
+(\cref{exo:g12:comb:7}):
+\[
+\E(X) = \sum_{k=1}^{n} k\binom nk p^k q^{n-k}
+= np\sum_{k=1}^{n} \binom{n-1}{k-1} p^{k-1} q^{(n-1)-(k-1)}
+= np\,(p + q)^{n-1} = np .
+\]
+Rumus \omterm{def:g12:randvar:exp}{ragamnya} dibuktikan serupa dengan identitas
+$k(k-1)\binom nk = n(n-1)\binom{n-2}{k-2}$, yang memberi
+$\E(X(X-1)) = n(n-1)p^2$, sehingga
+$\V(X) = n(n-1)p^2 + np - (np)^2 = np(1-p)$. (Bukti yang lebih berstruktur --- yaitu
+\omterm{def:g12:randvar:exp}{ragam} jumlah peubah yang \omterm{def:g12:condprob:indep}{saling bebas} --- datang bersama
+\cref{thm:g12:sums:variance}.)
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[
+  width=10cm, height=4.8cm,
+  ybar, bar width=4pt,
+  xlabel={$k$}, ylabel={$\P(X = k)$},
+  xmin=-1, xmax=21, ymin=0,
+  ytick={0, 0.1, 0.2},
+  title={$\mathcal B(20,\ 0.3)$}]
+  \addplot[fill=omDef!40, draw=omDef] coordinates {
+    (0,0.000798) (1,0.006839) (2,0.027846) (3,0.071604)
+    (4,0.130421) (5,0.178863) (6,0.191639) (7,0.164262)
+    (8,0.114397) (9,0.065370) (10,0.030817) (11,0.012006)
+    (12,0.003859) (13,0.001018) (14,0.000218) (15,0.000037)
+    (16,0.000005) (17,0.000001) (18,0) (19,0) (20,0)};
+\end{axis}
+\end{tikzpicture}
+
+{\small \omterm{def:g12:randvar:rv}{Distribusi} $\mathcal B(20, 0.3)$: rata-ratanya $np = 6$, \omterm{def:g11:stat:variance}{simpangan
+bakunya} $\sqrt{npq} \approx 2.05$.}
+\end{omfigure}
+
+\begin{method}[Mengenali keadaan binomial]\label{met:g12:randvar:recognize}
+Periksalah ketiga bahannya sebelum menulis $X \sim \mathcal B(n,p)$: yaitu
+\emph{cacah yang tetap} $n$ bagi percobaannya; \emph{dua hasil} tiap percobaannya dengan
+peluang berhasil $p$ yang \emph{sama}; serta \emph{\omterm{def:g12:condprob:indep}{kebebasan}} percobaannya
+(pengambilan contoh \emph{dengan} pengembalian, atau dari populasi yang besar). Lalu pakailah
+\[
+\P(X \geq 1) = 1 - (1-p)^n
+\]
+untuk ``sekurang-kurangnya satu keberhasilan'', dan kalkulator atau tabel kumulatif untuk
+$\P(X \leq k)$ yang umum.
+\end{method}
+
+\begin{example}\label{ex:g12:randvar:atleastone}
+Berapa kali orang harus melempar dadu agar berpeluang sekurang-kurangnya $99\%$
+memperoleh angka enam? Dengan $X \sim \mathcal B\left(n, \frac16\right)$:
+$\P(X \geq 1) = 1 - \left(\frac56\right)^n \geq 0.99$ berarti
+$\left(\frac56\right)^n \leq 0.01$, \emph{yaitu}
+$n \geq \frac{\ln 0.01}{\ln(5/6)} \approx 25.3$: jadi mulai dari $n = 26$ lemparan.
+\end{example}
+
+\section{Latihan}
+
+\begin{exercise}[$\star$]\label{exo:g12:randvar:1}
+Suatu \omterm{def:g12:randvar:rv}{peubah acak} $X$ bernilai $-1, 0, 2, 5$ dengan peluang
+$0.3, 0.2, 0.4, 0.1$. Hitunglah $\E(X)$, $\V(X)$ dan $\sigma(X)$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:randvar:2}
+Sebuah uji pilihan ganda berisi $10$ pertanyaan, masing-masing dengan $4$ pilihan, dan satu
+di antaranya benar. Seorang murid menjawab secara acak seragam dan \omterm{def:g12:condprob:indep}{saling bebas}.
+Misalkan $X$ cacah jawaban yang benar.
+\begin{enumerate}
+  \item Berikan \omterm{def:g12:randvar:rv}{distribusi} $X$, lalu $\E(X)$ dan $\sigma(X)$.
+  \item Hitunglah $\P(X = 0)$, $\P(X = 5)$ dan $\P(X \geq 1)$.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:randvar:3}
+Sebuah perusahaan asuransi menanggung $n = 400$ nasabah; masing-masing mengajukan klaim selama
+setahun dengan peluang $p = 0.05$, secara \omterm{def:g12:condprob:indep}{saling bebas}. Misalkan $X$ cacah
+klaimnya. Kenalilah \omterm{def:g12:randvar:rv}{distribusi} $X$ lalu hitung harapannya dan
+\omterm{def:g11:stat:variance}{simpangan bakunya}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:randvar:4}
+Pada permainan \cref{ex:g12:randvar:game}, penyelenggaranya menginginkan permainan yang adil
+($\E(G) = 0$) dengan mengubah harga masuknya $c$. Carilah $c$. Hitunglah
+\omterm{def:g12:randvar:exp}{ragam} keuntungannya bagi versi yang adil ini; apakah ``adil'' sama dengan
+``tanpa risiko''?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:randvar:5}
+Seorang pemain bola basket mencetak lemparan bebas dengan peluang $0.7$. Ia menembak
+$8$ kali (tembakan yang \omterm{def:g12:condprob:indep}{saling bebas}). Hitunglah peluang bahwa ia mencetak:
+tepat $6$; sekurang-kurangnya $6$; sekurang-kurangnya satu. Berapakah cacah cetakan yang
+paling mungkin?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:randvar:6}
+Sebuah maskapai penerbangan tahu bahwa tiap penumpang yang memesan datang dengan peluang
+$0.9$, secara \omterm{def:g12:condprob:indep}{saling bebas}. Sebuah penerbangan berisi $100$ kursi dan maskapainya menjual $104$
+tiket. Nyatakan, dengan memakai \omterm{def:g12:randvar:binomial}{distribusi binomial}, peluang bahwa penumpang
+yang datang lebih banyak daripada kursinya, lalu batasi secara numeris dengan
+kalkulator (berikan ungkapan eksaknya).
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:randvar:7}
+Misalkan $X \sim \mathcal B(n, p)$. Tunjukkan bahwa
+\[
+\frac{\P(X = k+1)}{\P(X = k)} = \frac{n-k}{k+1}\cdot\frac{p}{1-p},
+\]
+lalu simpulkan bahwa \omterm{def:g12:randvar:rv}{distribusinya} naik sampai
+$k^* = \floor{(n+1)p}$ dan turun sesudahnya (itulah \emph{modus} \omterm{def:g12:randvar:binomial}{distribusi
+binomialnya}).
+binomial).
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:randvar:8}
+\emph{(Saint Petersburg yang dijinakkan.)} Sekeping uang logam yang setimbang dilempar sampai gambar
+muncul, tetapi paling banyak $10$ kali. Misalkan $N$ cacah lemparan yang terpakai, dan
+pemainnya menerima $2^N$ euro jika gambar muncul, dan $0$ jika tidak.
+\begin{enumerate}
+  \item Berikan \omterm{def:g12:randvar:rv}{distribusi} $N$ yang dibatasi pada hasil yang menang:
+        $\P(\text{gambar pertama pada lemparan } k) = 2^{-k}$ untuk
+        $1 \leq k \leq 10$, lalu periksalah peluang total kemenangannya.
+  \item Hitunglah harapan bayarannya. Akan menjadi berapa tanpa batas
+        $10$ lemparan itu?
+\end{enumerate}
+\end{exercise}
+
+\section{Soal: Penerbangan yang kelebihan pesanan}
+
+\begin{problem}[{Soal akhir pekan --- maskapai menjual kursi lebih banyak daripada
+yang dimilikinya, pabrik menerima lot yang nyaris tak diperiksanya, dan
+distribusi binomial mewasiti keduanya}]
+\label{pb:g12:randvar:1}
+Sebuah maskapai berkursi $100$ dengan riang menjual $105$ tiket: kira-kira
+$10\,\%$ penumpangnya tak pernah datang, dan kursi kosong tak menghasilkan
+apa-apa. Seberapa jauh maskapainya dapat mendorong sebelum penumpang yang tergusur
+memakan labanya? \omterm{def:g12:randvar:binomial}{Distribusi binomial}
+(\cref{thm:g12:randvar:binomial}) menjawabnya sampai ke angka desimalnya --- dan
+mesin yang sama memeriksa lot pabrik, menetapkan harga undian, dan
+menjaga penanggung asuransi tetap mampu bayar. Keputusan di bawah pengulangan: inilah
+pekerjaan sehari-hari \omterm{def:g12:randvar:binomial}{distribusi binomial}.
+
+\medskip
+\noindent\textbf{Bagian I --- Kelancaran.}
+\begin{enumerate}
+  \item Berikan tabel \omterm{def:g12:randvar:rv}{distribusi} lengkap bagi cacah $X$ berisi
+        angka enam pada tiga lemparan dadu.
+  \item Hitunglah $\E(X)$ dan $V(X)$
+        (\cref{def:g12:randvar:exp}).
+  \item Sebuah kios memungut $1$ euro untuk tiga lemparan dan membayar $2$
+        euro tiap angka enam yang diperoleh. Hitunglah harapan keuntungannya: adilkah
+        permainannya?
+  \item Latihan daftar periksa (\cref{met:g12:randvar:recognize}):
+        apakah cacah kartu hati pada $5$ kartu yang diambil
+        \emph{tanpa} pengembalian itu binomial? Dan dengan pengembalian?
+        Berilah alasan.
+  \item Untuk $X \sim \mathcal B(20,\ 0.3)$: berikan $\E(X)$ dan
+        $\sigma(X)$, lalu $\E(S)$ dan $\sigma(S)$ bagi skor
+        $S = 5X - 10$ (\cref{prop:g12:randvar:affine}).
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian II --- Penerbangan yang kelebihan pesanan.}
+Kursinya: $100$. Tiket yang terjual: $105$. Tiap pemegang tiket datang
+dengan peluang $0.9$, secara \omterm{def:g12:condprob:indep}{saling bebas}; misalkan $X$ cacah orang yang
+datang.
+\begin{enumerate}[resume]
+  \item Modelnya: berilah alasan bagi $X \sim \mathcal B(105,\ 0.9)$ dengan
+        daftar periksanya --- lalu akuilah titik terlemah modelnya
+        (benarkah ketidakhadirannya \omterm{def:g12:condprob:indep}{saling bebas}? pikirkanlah rombongan dan
+        badai).
+  \item Hitunglah $\E(X)$ dan $\sigma(X)$.
+  \item Penggusuran terjadi ketika $X \geq 101$: tulislah
+        $\P(X \geq 101)$ sebagai jumlah lima suku binomial yang
+        gamblang.
+  \item Hitunglah jumlahnya (dengan kalkulator): berapa bagian penerbangannya
+        yang mengalami sekurang-kurangnya satu penumpang tergusur?
+  \item Uangnya: kelima tiket tambahannya membawa
+        $5 \times 200 = 1\,000$ euro; sedangkan tiap penumpang yang tergusur
+        berbiaya $800$ euro sebagai ganti rugi. Hitunglah harapan
+        cacah penumpang yang tergusur,
+        $\sum_{k=101}^{105} (k - 100)\,\P(X = k)$, lalu harapan
+        ganti ruginya, dan vonis atas kebijakannya.
+  \item Perancangannya: pengaturnya menoleransi
+        $\P(\text{penggusuran}) < 5\,\%$. Dengan menguji
+        $n = 105, 106, 107, \dots$ tiket, carilah $n$ terbesar
+        yang diperbolehkan.
+  \item Jalan pintas loncengnya: untuk $n = 105$, hitunglah \omterm{pb:g11:stat:1}{skor-z}
+        bagi ambang penggusurannya,
+        $z = \frac{100.5 - \E(X)}{\sigma(X)}$, lalu bandingkan
+        taksiran kasar ``kira-kira $2\sigma$, jadi kurang lebih $2$--$3\,\%$ pada
+        ekor atasnya'' dengan jawaban eksakmu. (Kurva
+        di balik jalan pintas ini adalah bintang bab
+        berikutnya.)
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian III --- Gerbang pabriknya.}
+Sebuah lot suku cadang diterima jika contoh berisi $20$ buah memuat paling banyak
+satu suku cadang yang cacat.
+\begin{enumerate}[resume]
+  \item Jika laju cacat yang sebenarnya adalah $2\,\%$ (lot yang jujur),
+        hitunglah peluang penerimaannya.
+  \item Jika lajunya $10\,\%$ (lot yang buruk), hitunglah lagi.
+  \item Sebutkan kedua risiko prosedurnya (lot jujur yang
+        ditolak; lot buruk yang diterima), bacalah nilainya dari
+        pertanyaan 13--14, lalu katakan satu perubahan apa yang memperbaiki
+        keduanya sekaligus --- dan dengan biaya apa.
+  \item Di balik perbaikannya: tunjukkan bahwa \emph{frekuensi} cacat
+        yang teramati, $\frac Xn$, pada contoh berukuran $n$ mempunyai
+        \omterm{def:g11:stat:variance}{simpangan baku} $\sqrt{\frac{p(1-p)}{n}}$, lalu
+        simpulkan bagaimana ketelitiannya berskala dengan ukuran contohnya (seorang
+        kawan lama: $\frac{1}{\sqrt n}$ dari kelas 10).
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian IV --- Permainan, undian, cadangan.}
+\begin{enumerate}[resume]
+  \item Permainan Saint Petersburg yang dibatasi pada
+        \cref{exo:g12:randvar:8} berharapan bayaran $10$
+        euro. Bandingkanlah dalam satu paragraf dengan paradoks tanpa
+        batas yang dijumpai di \cref{pb:g11:prob:1}: apa tepatnya yang
+        dijinakkan batas itu, dan harga berapa yang kini adil?
+  \item Sebuah undian amal menjual $200$ tiket seharga $2$ euro;
+        hadiahnya: satu keranjang $100$ euro dan dua keranjang $50$ euro.
+        Hitunglah harapan keuntungan satu tiket dan marjin undiannya;
+        lalu bandingkan dengan marjin bandar pada rolet Eropa
+        sebesar $\frac{1}{37} \approx 2.7\,\%$. Mengapa undian itu
+        lolos begitu saja?
+  \item Seorang penanggung asuransi memegang $1\,000$ polis yang \omterm{def:g12:condprob:indep}{saling bebas}: peluang
+        klaimnya $0.01$ masing-masing, besar klaimnya $10\,000$ euro, dan
+        preminya $130$ euro. Hitunglah harapan laba tahunannya
+        \emph{beserta} \omterm{def:g11:stat:variance}{simpangan baku} total
+        klaimnya. Bandingkan kedua bilangan itu: apa yang dipaksakan
+        pembandingan itu untuk dipegang penanggung asuransi yang sungguhan?
+  \item Penutup --- \omterm{def:g12:randvar:binomial}{distribusi binomial} sebagai wasit keputusan: yaitu
+        daftar periksa pengenalannya; pedoman $\E \pm \sigma$;
+        peluang ekor sebagai harga risikonya; serta kedua peringatan
+        yang tetap berlaku (\omterm{def:g12:condprob:indep}{kebebasan} itu klaim permodelan, dan
+        ekor yang langka, bukan rata-ratanya, yang menyebabkan kebangkrutan). Masing-masing satu kalimat,
+        dengan penunjuk: hukum bilangan besar dan kurva
+        lonceng, pada bab berikutnya, melengkapi buku aturan sang wasit.
+
+\end{enumerate}
+\end{problem}

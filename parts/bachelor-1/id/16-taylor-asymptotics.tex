@@ -1,0 +1,900 @@
+\chapter{Rumus Taylor dan Ekspansi Asimtotik}\label{ch:b1:taylor}
+
+Di dekat sebuah titik, fungsi yang mulus sama baiknya dengan \omterm{def:b1:poly:def}{polinomial} --- dengan
+galat yang terkendali. Rumus Taylor membuatnya persis dalam tiga
+rasa (yaitu sisa \omterm{thm:b1:integration:def}{integral}, sisa Lagrange, sisa Young),
+dan \emph{ekspansi asimtotik} yang dihasilkannya, bila dimanipulasi
+secara aljabar, menjadi perkakas tertajam analisis elementer:
+yakni limit, kesetaraan, perilaku setempat, dan asimtot.
+
+\section{Notasi perbandingan}
+
+\begin{definition}[Notasi Landau]\label{def:b1:taylor:landau}
+Misalkan $f, g$ terdefinisi di dekat $x_0$ (dengan $x_0 \in \R$ atau $\pm\infty$). Kita
+menulis, ketika $x \to x_0$:\index{notasi Landau}
+\begin{itemize}
+  \item $f = o(g)$ (``o kecil'') bila $f = \varepsilon g$ dengan
+        $\varepsilon(x) \to 0$;
+  \item $f = O(g)$ (``O besar'') bila $f = u g$ dengan $u$ yang terbatas di dekat
+        $x_0$;
+  \item $f \sim g$ (``setara''\index{fungsi yang setara}) bila
+        $f = (1 + \varepsilon) g$ dengan $\varepsilon \to 0$ ---
+        setara dengan itu, $f - g = o(g)$.
+\end{itemize}
+Notasi yang sama berlaku bagi barisan (dengan $n \to \infty$).
+\end{definition}
+
+\begin{proposition}[Aturannya]\label{prop:b1:taylor:landaurules}
+Ketika $x \to x_0$:
+\begin{enumerate}
+  \item $\sim$ merupakan relasi kesetaraan; dan $f \sim g$ mengakibatkan bahwa
+        $f$ dan $g$ berbagi limit, tanda (di dekat $x_0$), serta ketiadaan
+        nol;
+  \item kesetaraan \emph{terkalikan dan terbagi}: karena $f_1 \sim g_1$, $f_2
+        \sim g_2$ mengakibatkan $f_1 f_2 \sim g_1 g_2$ dan $\frac{f_1}{f_2}
+        \sim \frac{g_1}{g_2}$;
+  \item kesetaraan \emph{tak} terjumlahkan: karena $x + 1 \sim x$ dan $-x \sim
+        -x + 2$ di $+\infty$, namun jumlahnya $1$ dan $2$ tak
+        setara. Jadi untuk menjumlahkan, kembalilah ke ekspansi dengan suku
+        $o(\cdot)$ yang eksplisit;
+  \item $o(g) + o(g) = o(g)$, $\;u \cdot o(g) = o(ug)$, $\;o(o(g)) =
+        o(g)$, dan $f \sim g \iff f = g + o(g)$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+Masing-masingnya merupakan manipulasi singkat atas definisinya; misalnya
+$f_1 f_2 = (1+\varepsilon_1)(1+\varepsilon_2) g_1 g_2$ dan $(1 +
+\varepsilon_1)(1+\varepsilon_2) \to 1$. Adapun dua butir pada (4) pantas
+mendapat barisnya sendiri. Untuk $u\cdot o(g) = o(ug)$: jika $f = \varepsilon g$ dengan
+$\varepsilon \to 0$, maka $uf = \varepsilon\,(ug)$ dengan $\varepsilon$ yang
+sama. Untuk $o(o(g)) = o(g)$: jika $f = \varepsilon_1 h$ dan
+$h = \varepsilon_2 g$ dengan kedua $\varepsilon_i \to 0$, maka $f =
+(\varepsilon_1\varepsilon_2) g$ dan hasil kali kedua
+infinitesimalnya juga demikian. Adapun kesetaraan $f \sim g \iff f = g +
+o(g)$ merupakan definisinya yang dibaca dua kali: $f - g = \varepsilon g$.
+Sedangkan contoh penyangkal pada (3) merupakan bukti (3).
+\end{proof}
+
+\begin{example}[Skala perbandingannya]\label{ex:b1:taylor:scale}
+Ketika $x \to +\infty$, skala bakunya berbunyi, dengan urutan
+kekuatan yang menaik:
+\[
+1 \;=\; o(\ln x), \quad
+\ln x = o(x^{0.01}), \quad
+x^{0.01} = o(\sqrt x), \quad
+\sqrt x = o(x^{10}), \quad
+x^{10} = o(\eu^{x}), \quad
+\eu^x = o(\eu^{2x}) ,
+\]
+dengan setiap langkahnya merupakan kejadian \omterm{prop:b1:functions:powerrules}{perbandingan pertumbuhan} pada
+\cref{prop:b1:functions:powerrules} (yaitu pangkat mengalahkan logaritma,
+eksponensial mengalahkan pangkat, dan di dalam satu keluarga eksponennya
+yang memutuskan). Ada dua kebiasaan yang pantas dibentuk: pertama, sebuah $O(\cdot)$ yang mendarat
+di kelas yang lebih kecil naik pangkat diam-diam (karena $O(\ln x)$ juga
+$o(x^{0.01})$); kedua, pada $x \to 0^+$ seluruh tangganya
+berbalik lewat penyulihan $x \mapsto \frac1x$ ---
+karena $\ln x = o(x^{-0.01})$ di sana, sehingga ``$x^\alpha \ln x \to 0$''
+berlaku untuk setiap $\alpha > 0$. Jadi menjaga skalanya tetap lurus adalah
+separuh dari setiap argumen asimtotik pada
+\cref{ch:b1:series}.
+\end{example}
+
+\begin{example}[Ketunggalan ekspansinya, dan dividen keparitasannya]\label{ex:b1:taylor:uniqueness}
+Jika sebuah fungsi mempunyai dua ekspansi di $0$ pada orde yang sama,
+\[
+a_0 + a_1 x + \dots + a_n x^n + o(x^n)
+= b_0 + b_1 x + \dots + b_n x^n + o(x^n),
+\]
+maka $a_k = b_k$ untuk setiap $k$: karena dengan mengurangkannya lalu menetapkan $c_k =
+a_k - b_k$, menilai kesamaan $c_0 + c_1 x + \dots + c_n x^n
+= o(x^n)$ pada $x \to 0$ memberikan $c_0 = 0$; lalu bagilah dengan $x$ dan
+ulangi --- dengan setiap pembagiannya sah karena ungkapan yang tersisa
+kembali menjadi $o(x^{n-k})$. Jadi koefisiennya bersifat
+hakiki, sehingga orang boleh menghitungnya lewat rute \emph{mana pun} (yaitu \omterm{def:b1:derivative:def}{turunan}
+Taylor, aljabar atas ekspansi yang dikenal, atau pengintegralan): dan semua
+rutenya pasti bersesuaian. Adapun dividennya: bahwa fungsi yang \emph{genap} hanya memuat
+pangkat genap pada ekspansinya --- gantilah $x$ dengan $-x$ lalu panggillah
+ketunggalannya; demikian pula fungsi yang ganjil hanya berpangkat ganjil. Itulah sebabnya
+$\cos$ membawa $o(x^{2p+1})$ alih-alih $o(x^{2p})$ pada
+tabel di bawah: karena suku ganjil yang absen itu keterangan yang cuma-cuma, yaitu satu orde
+ketelitian tanpa ongkos.
+\end{example}
+
+\section{Ketiga rumus Taylornya}
+
+\begin{theorem}[Taylor dengan sisa integral]\label{thm:b1:taylor:integral}
+Misalkan $f$ berkelas $C^{n+1}$ pada sebuah \omterm{prop:b1:reals:intervals}{selang} yang memuat $a$ dan $x$.
+Maka\index{rumus Taylor}
+\[
+f(x) = \sum_{k=0}^{n} \frac{f^{(k)}(a)}{k!}\,(x - a)^k
++ \int_a^x \frac{(x - t)^n}{n!}\, f^{(n+1)}(t)\, \dd t .
+\]
+\end{theorem}
+
+\begin{proof}
+Lewat induksi pada $n$. Untuk $n = 0$: $f(x) = f(a) + \int_a^x f'(t)\dd t$ merupakan
+teorema fundamentalnya (\cref{thm:b1:integration:ftc}). Adapun langkahnya:
+integralkanlah sisanya secara parsial,
+\[
+\int_a^x \frac{(x-t)^n}{n!} f^{(n+1)}(t)\,\dd t
+= \Bigl[-\frac{(x-t)^{n+1}}{(n+1)!} f^{(n+1)}(t)\Bigr]_a^x
++ \int_a^x \frac{(x-t)^{n+1}}{(n+1)!} f^{(n+2)}(t)\,\dd t ,
+\]
+dengan kurungnya menyumbangkan suku $\frac{f^{(n+1)}(a)}{(n+1)!}(x -
+a)^{n+1}$.
+\end{proof}
+
+\begin{example}[Sebuah ekspansi yang persis beserta sisanya]\label{ex:b1:taylor:lnexact}
+Untuk $\ln(1 + x)$ sisa \omterm{thm:b1:integration:def}{integralnya} dapat dibuat sepenuhnya
+eksplisit tanpa menurunkan apa pun $n$ kali: integralkanlah
+kesamaan geometri yang hingga $\frac{1}{1+t} =
+\sum_{k=0}^{n-1}(-t)^k + \frac{(-t)^n}{1+t}$ dari $0$ sampai $x$:
+\[
+\ln(1 + x) = \sum_{k=1}^{n} \frac{(-1)^{k-1}x^k}{k}
++ (-1)^n \int_0^x \frac{t^n}{1 + t}\,\dd t ,
+\]
+dan untuk $0 \leq x \leq 1$ sisanya terbatas oleh $\int_0^x
+t^n\,\dd t = \frac{x^{n+1}}{n+1}$. Ini lebih kuat daripada
+Taylor--Young dalam dua hal: karena ia sebuah \emph{kesamaan} yang sah bagi
+$x$ yang tetap (bukan hanya $x \to 0$), dan batas galatnya berupa angka.
+Adapun soal akhir pekan (\cref{pb:b1:taylor:1}) hidup di atas bentuk yang
+persis semacam itu; sedangkan Taylor--Young di bawah adalah perkakas yang lebih ringan bagi limit, yang di situ
+hanya bentuk galatnya yang penting.
+\end{example}
+
+\begin{theorem}[Ketaksamaan Taylor--Lagrange]\label{thm:b1:taylor:lagrange}
+Misalkan $f$ berkelas $C^{n+1}$ dengan $\abs{f^{(n+1)}} \leq M$ di antara $a$ dan
+$x$. Maka
+\[
+\Bigl| f(x) - \sum_{k=0}^{n} \frac{f^{(k)}(a)}{k!}(x-a)^k \Bigr|
+\leq M\, \frac{\abs{x - a}^{n+1}}{(n+1)!} .
+\]
+\end{theorem}
+
+\begin{proof}
+Batasilah sisa \omterm{thm:b1:integration:def}{integralnya}: $\bigl|\int_a^x \frac{(x-t)^n}{n!}
+f^{(n+1)}(t)\,\dd t\bigr| \leq M \bigl|\int_a^x
+\frac{\abs{x-t}^n}{n!}\dd t\bigr| = M\frac{\abs{x-a}^{n+1}}{(n+1)!}$.
+\end{proof}
+
+\begin{example}[Numerik yang bersertifikat]\label{ex:b1:taylor:certified}
+Berapakah $\sqrt{1.02}$? Terapkanlah Taylor--Lagrange pada $f(t) =
+\sqrt{1 + t}$ di $a = 0$, orde $2$, dengan $x = 0.02$:
+\[
+\sqrt{1.02} \approx 1 + \frac{0.02}{2} - \frac{0.02^2}{8}
+= 1.00995 ,
+\qquad
+\abs{f'''(t)} = \frac{3}{8}(1+t)^{-5/2} \leq \frac 38 ,
+\]
+sehingga galatnya paling banyak $\frac38 \cdot \frac{0.02^3}{6} =
+5\cdot10^{-7}$: jadi $\sqrt{1.02} = 1.00995$ dengan enam desimal yang
+bersertifikat (dengan nilai sejatinya $1.0099504938\dots$ --- jadi batasnya hampir
+tajam). Inti gagasan penutupnya: bahwa Taylor--Young hanya mengatakan \emph{seberapa
+cepat} galatnya lenyap; sedangkan Taylor--Lagrange mengubah
+\omterm{def:b1:poly:def}{polinomial} yang sama menjadi sebuah \emph{sertifikat}, yaitu bilangan ditambah palang
+galat yang terbukti. Jadi setiap kali sebuah klaim desimal dibuat dalam buku ini, sebuah
+batas bertipe Lagrange berdiri di belakangnya; dan soal akhir pekannya
+(\cref{pb:b1:taylor:1}) mengindustrikan gagasannya.
+\end{example}
+
+\begin{theorem}[Taylor--Young]\label{thm:b1:taylor:young}
+Misalkan $f$ \omterm{def:b1:derivative:def}{dapat diturunkan} $n$ kali di $a$. Maka, ketika $x \to a$:
+\[
+f(x) = \sum_{k=0}^{n} \frac{f^{(k)}(a)}{k!}\,(x-a)^k
++ o\bigl((x-a)^n\bigr) .
+\]
+\end{theorem}
+
+\begin{proof}
+Lewat induksi pada $n$. Untuk $n = 1$ inilah definisi
+\omterm{def:b1:derivative:def}{turunannya} (\cref{def:b1:derivative:def}). Anggaplah \omterm{def:b1:logic:statement}{pernyataannya} berlaku pada
+orde $n - 1$, lalu misalkan $f$ \omterm{def:b1:derivative:def}{dapat diturunkan} $n$ kali di $a$. Terapkanlah
+hipotesis induksinya pada $f'$ (yang \omterm{def:b1:derivative:def}{dapat diturunkan} $n-1$ kali
+di $a$):
+\[
+f'(t) = \sum_{k=0}^{n-1} \frac{f^{(k+1)}(a)}{k!}(t-a)^k + r(t),
+\qquad r(t) = o\bigl((t-a)^{n-1}\bigr).
+\]
+Misalkan $g(x) = f(x) - \sum_{k=0}^{n} \frac{f^{(k)}(a)}{k!}(x-a)^k$; maka
+$g' = r$ dan $g(a) = 0$. Diberikan $\varepsilon > 0$, pilihlah $\delta$
+dengan $\abs{r(t)} \leq \varepsilon\abs{t - a}^{n-1}$ untuk $\abs{t-a}
+\leq \delta$; lalu ketaksamaan nilai rata-ratanya
+(\cref{thm:b1:derivative:mvt}) yang diterapkan pada ruas dari $a$ ke
+$x$ (yang di situ $\abs{g'} \leq \varepsilon\abs{x-a}^{n-1}$) menghasilkan
+$\abs{g(x)} \leq \varepsilon\abs{x - a}^n$: yakni persis $g(x) =
+o((x-a)^n)$.
+\end{proof}
+
+\begin{remark}[Tiga rumus, tiga harga, tiga produk]
+Hipotesisnya bertingkat persis seiring kesimpulannya.
+Taylor--Young menuntut yang paling sedikit ($n$ \omterm{def:b1:derivative:def}{turunan} \emph{di
+titiknya} saja) dan menghasilkan yang paling sedikit: yaitu $o((x-a)^n)$ yang kualitatif,
+yang sempurna bagi limit tetapi tak berguna bagi angka bersertifikat. Sedangkan ketaksamaan
+Lagrange menuntut $C^{n+1}$ \emph{pada \omterm{prop:b1:reals:intervals}{selangnya}} beserta batas
+$M$ di sana, dan mengembalikan palang galat berupa angka. Adapun bentuk \omterm{thm:b1:integration:def}{integralnya}
+menuntut keteraturan yang sama dan mengembalikan yang paling banyak: yaitu galatnya sebagai
+objek eksplisit yang dapat kita ubah (diintegralkan secara parsial, dibatasi
+sepotong-sepotong, atau diganti variabelnya) --- dan itulah bentuk yang menggerakkan
+mesin keirasionalan pada \cref{pb:b1:integration:1}. Jadi memilih
+rumus terlemah yang menyangga tujuannya bukanlah kecerewetan: karena
+fungsi yang rata pada \cref{pb:b1:taylor:1} memenuhi Taylor--Young
+pada setiap ordenya sedangkan setiap kesimpulan yang lebih kuat tentangnya
+salah jauh dari $0$.
+\end{remark}
+
+\begin{proposition}[Ekspansi baku di $0$]
+Ketika $x \to 0$, untuk setiap orde $n$ yang tetap:
+\index{ekspansi Taylor!yang baku}
+\begin{align*}
+\eu^x &= 1 + x + \frac{x^2}{2!} + \dots + \frac{x^n}{n!} + o(x^n),\\
+\cos x &= 1 - \frac{x^2}{2!} + \frac{x^4}{4!} - \dots
++ \frac{(-1)^p x^{2p}}{(2p)!} + o(x^{2p+1}),\\
+\sin x &= x - \frac{x^3}{3!} + \dots + \frac{(-1)^p
+x^{2p+1}}{(2p+1)!} + o(x^{2p+2}),\\
+\frac{1}{1 - x} &= 1 + x + x^2 + \dots + x^n + o(x^n),\\
+\ln(1 + x) &= x - \frac{x^2}{2} + \frac{x^3}{3} - \dots +
+\frac{(-1)^{n-1} x^n}{n} + o(x^n),\\
+(1 + x)^\alpha &= 1 + \alpha x + \frac{\alpha(\alpha-1)}{2!}x^2 +
+\dots + \binom{\alpha}{n} x^n + o(x^n),
+\end{align*}
+dengan $\binom{\alpha}{n} = \frac{\alpha(\alpha - 1)\cdots(\alpha - n
++ 1)}{n!}$ untuk $\alpha$ yang real. (Adapun $\cosh$ dan $\sinh$: sama seperti $\cos$
+dan $\sin$ tanpa tanda yang berselang-seling.)
+\label{prop:b1:taylor:standard}
+\end{proposition}
+
+\begin{proof}
+Setiap fungsinya mulus di dekat $0$ dengan \omterm{def:b1:derivative:def}{turunan} yang mudah dinilai:
+$(\eu^x)^{(k)} = \eu^x$; \omterm{def:b1:derivative:def}{turunan} $\sin$ dan $\cos$ berdaur
+dengan periode $4$; $\bigl((1+x)^\alpha\bigr)^{(k)} = \alpha(\alpha -
+1)\cdots(\alpha - k + 1)(1+x)^{\alpha - k}$;
+$\bigl(\ln(1+x)\bigr)^{(k)} = \frac{(-1)^{k-1}(k-1)!}{(1+x)^k}$.
+Lalu terapkanlah Taylor--Young di $a = 0$. (Adapun yang geometri bersifat persis:
+$\frac{1}{1-x} - \sum_0^n x^k = \frac{x^{n+1}}{1 - x} = o(x^n)$.)
+\end{proof}
+
+\begin{method}[Menghitung dengan ekspansi]\label{met:b1:taylor:compute}
+\begin{enumerate}
+  \item \emph{Tetapkanlah orde sasarannya} $n$ lebih dulu, lalu penggallah setiap
+        hasil antaranya di situ --- karena membawa suku yang lebih tinggi merupakan
+        kerja yang sia-sia, sedangkan membuang yang lebih rendah merupakan galat.
+  \item \emph{Jumlah dan hasil kali}: ekspansikanlah setiap faktornya sampai orde $n$ lalu
+        kalikan, sambil membuang yang di luar $x^n$.
+  \item \emph{Komposisi} $f(u(x))$ dengan $u(x) \to 0$: sulihkanlah
+        ekspansi $u$ ke dalam ekspansi $f$, orde demi orde.
+  \item \emph{Hasil bagi}: tulislah $\frac{1}{1 + v}$ dengan $v \to 0$ lalu
+        pakailah ekspansi geometrinya.
+  \item \emph{Integralkanlah} sebuah ekspansi suku demi suku (adapun menurunkannya
+        menuntut kehati-hatian yang lebih --- dengan pembenarannya: bahwa \omterm{thm:b1:integration:def}{integral} $o(t^n)$
+        dari $0$ sampai $x$ adalah $o(x^{n+1})$, lewat pembatasan langsung).
+\end{enumerate}
+\end{method}
+
+\begin{example}[Komposisi, dengan pembukuannya diperlihatkan]\label{ex:b1:taylor:esin}
+Ekspansikanlah $\eu^{\sin x}$ sampai orde $3$. Ekspansi dalamnya: $u = \sin x
+= x - \frac{x^3}{6} + o(x^3)$, yang memang menuju $0$. Adapun yang luarnya:
+$\eu^u = 1 + u + \frac{u^2}{2} + \frac{u^3}{6} + o(u^3)$, dan
+$o(u^3) = o(x^3)$ karena $u \sim x$. Pangkat $u$, yang dipenggal di
+$x^3$:
+\[
+u^2 = x^2 + o(x^3), \qquad u^3 = x^3 + o(x^3)
+\]
+(karena suku silangnya $2x\cdot(-\frac{x^3}{6})$ sudah $x^4$).
+Rakitlah:
+\[
+\eu^{\sin x} = 1 + \Bigl(x - \frac{x^3}{6}\Bigr) + \frac{x^2}{2}
++ \frac{x^3}{6} + o(x^3)
+= 1 + x + \frac{x^2}{2} + o(x^3) :
+\]
+sehingga kedua sumbangan $x^3$-nya saling meniadakan dengan persis. Inti gagasan penutupnya:
+bahwa $\eu^{\sin x}$ dan $\eu^x$ bersesuaian sampai orde $3$ --- bukan
+karena $\sin x \approx x$ secara kasar, melainkan karena ketaksesuaian
+pertama eksponennya ($-\frac{x^3}{6}$) masuk
+dikalikan $\eu^0 = 1$ lalu ditemui oleh suku kubik
+eksponensial luarnya; jadi pembukuan orde demi orde mendeteksi persekongkolan
+semacam itu, sedangkan pengamatan sekilas tak pernah demikian. (Adapun suku berikutnya
+$-\frac{x^4}{8}$: jadi gencatan senjatanya berakhir pada orde $4$.)
+\end{example}
+
+\begin{example}\label{ex:b1:taylor:tan}
+Ekspansi $\tan$ pada orde $5$. Tulislah $\tan x =
+\sin x \cdot \frac{1}{\cos x}$:
+\[
+\frac{1}{\cos x} = \frac{1}{1 - \bigl(\frac{x^2}{2} - \frac{x^4}{24}
++ o(x^5)\bigr)}
+= 1 + \Bigl(\frac{x^2}{2} - \frac{x^4}{24}\Bigr)
++ \Bigl(\frac{x^2}{2}\Bigr)^{\!2} + o(x^5)
+= 1 + \frac{x^2}{2} + \frac{5x^4}{24} + o(x^5),
+\]
+lalu
+\[
+\tan x = \Bigl(x - \frac{x^3}{6} + \frac{x^5}{120}\Bigr)
+\Bigl(1 + \frac{x^2}{2} + \frac{5x^4}{24}\Bigr) + o(x^5)
+= x + \frac{x^3}{3} + \frac{2x^5}{15} + o(x^5) .
+\]
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}[x=1.15cm, y=1.05cm]
+  \draw[-Stealth] (-3.5,0) -- (3.6,0) node[below, font=\small]
+    {$x$};
+  \draw[-Stealth] (0,-2.15) -- (0,2.2);
+  \draw (3.1416,-0.05) -- (3.1416,0.05)
+    node[below=3pt, font=\small] {$\pi$};
+  \draw (-3.1416,-0.05) -- (-3.1416,0.05)
+    node[below=3pt, font=\small] {$-\pi$};
+  \draw (-0.05,1) -- (0.05,1) node[above left, font=\small,
+    inner sep=1pt] {$1$};
+  \draw (-0.05,-1) -- (0.05,-1) node[below right, font=\small,
+    inner sep=1pt] {$-1$};
+  \draw[omThm, very thick, smooth]
+    plot[domain=-3.3:3.3, samples=120] (\x, {sin(\x r)});
+  \draw[omDef, thick]
+    plot[domain=-2.0:2.0] (\x, \x)
+    node[right, font=\small] {$T_1$};
+  \draw[omDef, thick, dashed, smooth]
+    plot[domain=-2.7:2.7, samples=80] (\x, {\x - \x^3/6})
+    node[below right, font=\small, inner sep=1pt] {$T_3$};
+  \draw[omDef, thick, dotted, smooth]
+    plot[domain=-3.25:3.25, samples=90]
+    (\x, {\x - \x^3/6 + \x^5/120})
+    node[above right, font=\small, inner sep=1pt] {$T_5$};
+\end{tikzpicture}
+
+{\small Sinusnya (yang gelap) terhadap \omterm{def:b1:poly:def}{polinomial} Taylornya di $0$:
+$T_1 = x$, $T_3 = x - \frac{x^3}{6}$ (yang putus-putus), $T_5 = x -
+\frac{x^3}{6} + \frac{x^5}{120}$ (yang bertitik). Setiap pasang suku barunya
+memeluk kurvanya pada jendela yang tampak makin lebar, tetapi setiap \omterm{def:b1:poly:def}{polinomialnya}
+akhirnya terlepas: jadi ekspansi Taylor merupakan kontrak yang
+\emph{setempat}, yang dipertajam di $0$ dan bungkam jauh dari sana. Adapun
+batas Taylor--Lagrange $\frac{\abs{x}^{n+1}}{(n+1)!}$ mengkuantifikasi
+jendelanya; sedangkan fungsi yang rata pada \cref{pb:b1:taylor:1} menunjukkan bahwa
+kontraknya bahkan boleh kosong di luar titiknya sendiri.}
+\end{omfigure}
+
+\section{Penerapan}
+
+\begin{example}[Limit]\label{ex:b1:taylor:limits}
+\[
+\lim_{x \to 0} \frac{x - \sin x}{x^3}:
+\qquad
+x - \sin x = \frac{x^3}{6} + o(x^3) \sim \frac{x^3}{6},
+\qquad\text{sehingga limitnya } \frac16
+\]
+--- yang menyelesaikan pertanyaan yang diajukan pada \cref{exo:b1:functions:9}.
+Demikian pula $\displaystyle\lim_{x\to0}\Bigl(\frac{\sin
+x}{x}\Bigr)^{1/x^2}$: karena logaritmanya adalah
+\[
+\frac{1}{x^2}\ln\Bigl(1 - \frac{x^2}{6} + o(x^2)\Bigr)
+= \frac{1}{x^2}\Bigl(-\frac{x^2}{6} + o(x^2)\Bigr)
+\longrightarrow -\frac16,
+\qquad\text{sehingga limitnya } \eu^{-1/6}.
+\]
+\end{example}
+
+\begin{remark}[Jebakan yang lazim dengan ekspansi]
+(i) \emph{Jangan pernah menjumlahkan atau mengurangkan kesetaraan}: karena dari $\tan x \sim
+x$ dan $\sin x \sim x$ kita \emph{tak} boleh menyimpulkan $\tan x -
+\sin x \sim 0$ (yang tak bermakna) --- adapun rute yang jujur adalah lewat
+ekspansi:
+\[
+\tan x - \sin x
+= \Bigl(x + \frac{x^3}{3}\Bigr) - \Bigl(x - \frac{x^3}{6}\Bigr)
++ o(x^3) = \frac{x^3}{2} + o(x^3) \sim \frac{x^3}{2} .
+\]
+(ii) \emph{Ekspansikanlah melewati pembantaiannya}: karena pada perhitungan yang sama,
+orde $1$ hanya melihat $x - x = 0$; jadi setiap kali suku utamanya saling meniadakan,
+naikkanlah ordenya sampai sebuah koefisien taknol bertahan, dan barulah
+mengubahnya kembali menjadi kesetaraan. (iii) \emph{Kesetaraan tak
+melewati eksponensial}: karena $n^2 + n \sim n^2$, namun
+$\eu^{n^2+n} = \eu^{n}\,\eu^{n^2}$ \emph{tak} setara dengan
+$\eu^{n^2}$ --- jadi eksponensialkanlah hanya \emph{ekspansi
+eksponennya} yang galatnya menuju $0$, dan jangan pernah kesetaraan
+eksponennya. (Adapun logaritma lebih aman: jika $u_n \sim v_n \to \ell \neq
+1$, $\ell > 0$, maka $\ln u_n \sim \ln v_n$.) (iv) \emph{Kalkulus
+$o(\cdot)$ berarah tunggal}: karena $o(x^2) + o(x^2) =
+o(x^2)$, $5\,o(x^2) = o(x^2)$, $x\cdot o(x^2) = o(x^3)$ --- tetapi
+sebuah $o(x^2)$ bukan fungsi yang tertentu, sehingga jangan pernah meniadakan dua di antaranya
+satu sama lain: karena $o(x^2) - o(x^2)$ adalah $o(x^2)$, bukan
+$0$.
+\end{remark}
+
+\begin{proposition}[Perilaku setempat]\label{prop:b1:taylor:local}
+Andaikan $f(x) = f(a) + c\,(x - a)^p + o\bigl((x-a)^p\bigr)$ dengan $c
+\neq 0$ (yaitu suku taknol pertama setelah konstantanya; dengan $p \geq 2$ di sebuah
+titik kritis).
+\begin{itemize}
+  \item Jika $p$ genap: maka $f$ mempunyai minimum lokal di $a$ bila $c > 0$, dan
+        maksimum lokal bila $c < 0$.
+  \item Jika $p$ ganjil: maka tak ada ekstremumnya (karena $f - f(a)$ berubah tanda);
+        dan jika lebih lanjut ekspansinya bermula setelah suku linear $f'(a)(x
+        - a)$, maka grafiknya memotong garis singgungnya: yaitu sebuah \emph{titik belok}.
+\end{itemize}
+\end{proposition}
+
+\begin{proof}
+Di dekat $a$, $f(x) - f(a) = (x-a)^p\bigl(c + o(1)\bigr)$ bertanda
+sama dengan $c\,(x-a)^p$: yaitu tanda yang tetap bila $p$ genap, dan berubah bila $p$ ganjil.
+\end{proof}
+
+\begin{example}[Eksponen harus diekspansikan sampai $o(1)$]\label{ex:b1:taylor:expdiscipline}
+Carilah kesetaraan bagi $u_n = \bigl(1 + \frac1n\bigr)^{n^2}$.
+Ekspansikanlah \emph{eksponennya} sampai galatnya menuju $0$:
+\[
+n^2 \ln\Bigl(1 + \frac1n\Bigr)
+= n^2\Bigl(\frac1n - \frac{1}{2n^2} +
+O\Bigl(\frac{1}{n^3}\Bigr)\Bigr)
+= n - \frac12 + O\Bigl(\frac1n\Bigr),
+\]
+sehingga $u_n = \eu^{\,n - 1/2}\,\eu^{O(1/n)}$ dengan $\eu^{O(1/n)} \to
+1$:
+\[
+u_n \;\sim\; \eu^{\,n - \frac12} .
+\]
+Perhatikanlah apa yang akan keliru dengan kehati-hatian yang lebih sedikit: menghentikan
+eksponennya pada $n^2\cdot\frac1n = n + O(1)$ menyisakan faktor
+$\eu^{O(1)}$ --- yang terbatas tetapi tak menuju $1$ --- sehingga
+tak ada kesetaraan yang dapat ditegaskan. Adapun aturan
+jebakan di atas, dalam bentuk positifnya: bahwa kesetaraan bagi
+$\eu^{a_n}$ menuntut ekspansi $a_n$ \emph{sampai sebuah suku
+yang menuju nol}, dengan setiap koefisien sebelum itu dijaga
+persis.
+\end{example}
+
+\begin{example}[Menggolongkan titik kritis yang rata]\label{ex:b1:taylor:flatmin}
+Telaahlah $f(x) = \cos x + \frac{x^2}{2}$ di dekat $0$. Karena $f'(0) =
+0$ dan $f''(0) = -\cos 0 + 1 = 0$: maka uji \omterm{def:b1:derivative:def}{turunan} keduanya
+bungkam. Jadi ekspansikanlah saja:
+\[
+f(x) = \Bigl(1 - \frac{x^2}{2} + \frac{x^4}{24} +
+o(x^4)\Bigr) + \frac{x^2}{2}
+= 1 + \frac{x^4}{24} + o(x^4) :
+\]
+sehingga suku taknol pertamanya $c\,x^p$ dengan $p = 4$ yang genap dan $c =
+\frac{1}{24} > 0$: jadi sebuah minimum lokal, dengan kerataan yang tak biasa (karena
+grafiknya meninggalkan nilai minimumnya seperti $x^4$, bukan $x^2$). Inti
+gagasan penutupnya: bahwa ekspansinya melihat dalam satu baris apa yang dikaburkan
+pendiferensialan berulang --- dan \cref{prop:b1:taylor:local} merupakan
+kamus sistematis dari ``suku pertama yang bertahan'' ke
+``bentuk setempatnya''.
+\end{example}
+
+\begin{example}[Ekspansi di tak hingga]\label{ex:b1:taylor:atinfinity}
+Dua perhitungan yang di situ variabelnya berlari ke $+\infty$ dan
+penyulihan $h = \frac1x \to 0^+$ mengimpor seluruh kotak perkakasnya.
+Pertama,
+\[
+x - x^2\ln\Bigl(1 + \frac1x\Bigr)
+= x - x^2\Bigl(\frac1x - \frac{1}{2x^2} +
+O\Bigl(\frac{1}{x^3}\Bigr)\Bigr)
+= \frac12 + O\Bigl(\frac1x\Bigr) \longrightarrow \frac12 .
+\]
+Kedua, \omterm{def:b1:functions:arc}{arkus tangennya} di tak hingga: dari $\arctan x +
+\arctan\frac1x = \frac\pi2$ untuk $x > 0$
+(\cref{prop:b1:functions:arcidentities}) dan ekspansi
+$\arctan$ di $0$ (\cref{exo:b1:taylor:3}),
+\[
+\arctan x = \frac\pi2 - \arctan\frac1x
+= \frac\pi2 - \frac1x + \frac{1}{3x^3} +
+o\Bigl(\frac{1}{x^3}\Bigr) :
+\]
+grafiknya mendekati asimtotnya $y = \frac\pi2$ dari bawah dengan
+kecepatan $\frac1x$. Inti gagasan penutupnya: bahwa tak ada teori
+ekspansi di tak hingga yang tersendiri --- karena satu penyulihan kebalikan
+mereduksinya menjadi ekspansi di $0$, asalkan setiap $O$ dan $o$
+antaranya dibawa dengan jujur.
+\end{example}
+
+\begin{example}[Asimtot lewat ekspansi]\label{ex:b1:taylor:asymptote}
+Ketika $x \to +\infty$,
+\[
+\sqrt{x^2 + x} = x\sqrt{1 + \tfrac1x}
+= x\Bigl(1 + \frac{1}{2x} - \frac{1}{8x^2} + o\bigl(\tfrac{1}{x^2}\bigr)\Bigr)
+= x + \frac12 - \frac{1}{8x} + o\bigl(\tfrac 1x\bigr):
+\]
+garis $y = x + \frac12$ merupakan asimtotnya, yang didekati \emph{dari
+bawah} (karena suku berikutnya $-\frac{1}{8x}$ bernilai negatif).
+\end{example}
+
+\begin{remark}[Di mana ekspansinya bekerja berikutnya]
+Ekspansi asimtotik merupakan bahasa tetap sisa
+buku ini: pada \cref{ch:b1:series} ia memutuskan kekonvergenan
+(karena kesetaraan menyuapi uji perbandingannya, dan telaah $\sum
+\frac{1}{n^\alpha}$ merupakan ekspansi yang menyamar); pada jilid Tahun
+ke-2 ia menjadi \emph{deret pangkat}, yang di situ \omterm{def:b1:poly:def}{polinomial}
+Taylornya memperoleh suku yang tak hingga banyaknya beserta jari-jari
+kekonvergenan; dan setiap pelinearan dalam fisika --- yaitu bandul,
+gangguan orde pertama --- merupakan \omterm{def:b1:logic:statement}{pernyataan} Taylor--Young dengan
+$o(\cdot)$-nya dibuang diam-diam. Adapun satu peringatan yang pantas diukir:
+bahwa sebuah ekspansi memerikan fungsinya hanya \emph{di dekat satu titik} ---
+lihatlah fungsi yang rata pada soal akhir pekannya, yang ekspansinya di
+$0$ identik nol tanpa fungsinya demikian.
+\end{remark}
+
+\begin{remark}[Cakrawala di dalam jilid ini]
+Ekspansi merupakan bahasa kerja sisa analisisnya
+dan geometri yang akan datang. \Cref{ch:b1:series} mengubahnya
+menjadi vonis kekonvergenan: karena kesetaraan suku umumnya merupakan
+ekspansi yang dipenggal pada suku pertamanya, dan uji yang lebih halus
+(yaitu yang berselang-seling dengan kendali galat) memakai suku keduanya juga.
+\Cref{ch:b1:curves} membaca geometri setempat dari ekspansi kedua
+fungsi koordinatnya: karena apakah sebuah kurva berparameter memotong,
+mencium, atau berkatup di sebuah titik diputuskan oleh pangkat $t$ yang mana yang
+bertahan pada $x(t)$ dan $y(t)$ --- yaitu versi bidang bagi
+\cref{prop:b1:taylor:local}. Sedangkan \cref{ch:b1:multivar} berhenti pada
+orde satu dengan sengaja: karena bidang singgungnya merupakan \omterm{def:b1:logic:statement}{pernyataan}
+Taylor--Young dua variabel, dengan teori orde dua yang lengkap
+(yaitu Hessian dan titik pelana) ditunda ke jilid Tahun ke-2. Adapun
+benang merahnya: bahwa setiap pertanyaan ``setempat'' dalam buku ini dijawab
+dengan menuliskan suku pertama sebuah ekspansi yang bertahan.
+\end{remark}
+
+\section{Latihan}
+
+\begin{exercise}[$\star$]\label{exo:b1:taylor:1}
+Berikanlah ekspansinya di $0$: $\eu^{2x}$ sampai orde $3$;
+$\;\ln(1 - x)$ sampai orde $4$; $\;\sqrt{1 + x}$ sampai orde $3$;
+$\;\dfrac{1}{1 + x^2}$ sampai orde $6$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:taylor:2}
+Hitunglah limitnya:
+\[
+\lim_{x\to 0} \frac{\eu^x - 1 - x}{x^2},
+\qquad
+\lim_{x\to 0} \frac{\cos x - \sqrt{1 - x^2}}{x^4},
+\qquad
+\lim_{x\to 0} \frac{\ln(1+x) - \sin x}{x^2}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:taylor:3}
+Ekspansikanlah $\arctan x$ di $0$ sampai orde $5$ dengan mengintegralkan ekspansi
+$\frac{1}{1 + x^2}$, dan $\arcsin x$ sampai orde $5$ dengan mengintegralkan
+ekspansi $(1 - x^2)^{-1/2}$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:taylor:4}
+Dengan memakai Taylor--Lagrange bagi $\exp$ pada $\intcc{0}{1}$, buktikan bahwa
+\[
+\Bigl| \eu - \sum_{k=0}^{n} \frac{1}{k!} \Bigr| \leq
+\frac{3}{(n+1)!},
+\]
+lalu tentukanlah $n$ yang menjamin $6$ desimal $\eu$ yang persis.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:taylor:5}
+Ekspansikanlah sampai orde $2$ dalam $\frac1n$ lalu simpulkanlah limitnya dan
+kecepatan kekonvergenannya:
+\[
+\Bigl(1 + \frac 1n\Bigr)^{\!n}
+= \eu\Bigl(1 - \frac{1}{2n} + \frac{11}{24n^2} +
+o\Bigl(\frac{1}{n^2}\Bigr)\Bigr).
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:taylor:6}
+Telaahlah perilaku setempat di $0$ bagi $f(x) = x^2 - x^4$ dan bagi $g(x) =
+x^3 + x^5$; lalu carilah kedudukan grafik $h(x) = \eu^x$
+terhadap garis singgungnya di $a = 1$, mula-mula setempat lalu menyeluruh.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:taylor:7}
+Tentukanlah asimtot di $\pm\infty$ bagi $f(x) =
+\sqrt[3]{x^3 + x^2}$ beserta kedudukan kurvanya terhadap
+asimtot itu.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:taylor:8}
+Carilah kesetaraannya, ketika $n \to \infty$, bagi
+\[
+u_n = \sqrt{n+1} - \sqrt n, \qquad
+v_n = \ln(n+1) - \ln n, \qquad
+w_n = \sin\frac{1}{n} - \tan\frac{1}{n},
+\]
+yang masing-masingnya berupa pangkat $n$ dikali sebuah konstanta.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:taylor:9}
+Misalkan $f$ berkelas $C^2$ pada $\R$. Buktikan bahwa untuk setiap $x$ dan $h > 0$:
+\[
+\abs{f'(x)} \leq \frac{\abs{f(x+h) - f(x-h)}}{2h} +
+\frac{h}{2}\sup_{\intcc{x-h}{x+h}}\abs{f''} ,
+\]
+lalu simpulkanlah ketaksamaan bertipe Landau--Kolmogorov: bahwa jika $\abs f \leq
+M_0$ dan $\abs{f''} \leq M_2$ pada $\R$, maka $\abs{f'} \leq
+\sqrt{2 M_0 M_2}$ di mana-mana. \emph{(Optimumkanlah atas $h$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:taylor:10}
+Barisan $u_0 \in \intoo{0}{\pi}$, $u_{n+1} = \sin u_n$
+turun ke $0$ (benarkanlah secara singkat). Untuk mencari kecepatannya, tinjaulah $v_n
+= \frac{1}{u_n^2}$:
+\begin{enumerate}
+  \item dengan memakai ekspansi $\sin$, buktikan $v_{n+1} - v_n \to
+        \frac13$;
+  \item dengan Cesàro (\cref{exo:b1:seq:10}), simpulkan $\frac{v_n}{n}
+        \to \frac13$, lalu kesetaraannya $u_n \sim
+        \sqrt{\dfrac{3}{n}}$.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:taylor:11}
+(Selisih tak hingga) Hitunglah
+\[
+\lim_{x \to 0} \Bigl(\frac{1}{x^2} - \frac{1}{\sin^2 x}\Bigr)
+\qquad\text{dan}\qquad
+\lim_{x \to 0^+} \Bigl(\frac 1x - \frac{1}{\ln(1 + x)}\Bigr)
+\]
+dengan mereduksinya ke penyebut bersamanya lalu mengekspansikan pembilang dan
+penyebutnya secara terpisah.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:taylor:12}
+(Asimtotik akar tersirat) Tunjukkan bahwa untuk setiap $k \in
+\N^*$ persamaan $\tan x = x$ mempunyai tepat satu penyelesaian $x_k$
+di $\intoo{k\pi - \frac\pi2}{k\pi + \frac\pi2}$, bahwa $x_k = k\pi
++ \frac\pi2 - \varepsilon_k$ dengan $\varepsilon_k =
+\arctan\frac{1}{x_k}$, lalu simpulkanlah ekspansinya
+\[
+x_k = k\pi + \frac\pi2 - \frac{1}{k\pi} + o\Bigl(\frac
+1k\Bigr) \qquad (k \to \infty).
+\]
+\end{exercise}
+
+\section{Soal: Jumlah berselang-seling, angka bersertifikat, dan
+keirasionalan $\cos 1$}
+
+\begin{problem}[{Soal akhir pekan --- taksiran berselang-seling
+$\abs{S - S_n} \leq a_{n+1}$: $\ln 2$ dan $\pi$ dengan
+desimal yang terbukti, rumus Machin, dan $\cos 1 \notin \Q$}]
+\label{pb:b1:taylor:1}
+Jumlah berselang-seling dengan suku yang menurun merupakan objek yang paling ramah
+dalam analisis numerik: karena galatnya terbatas oleh suku pertama
+yang dihilangkan, \emph{dengan tanda yang diketahui}. Soal ini membuktikan asas itu
+dengan teorema \omterm{thm:b1:seq:adjacent}{barisan berdampingan}, lalu membelanjakannya
+dengan tiga cara: yaitu desimal bersertifikat bagi $\ln 2$ (lewat tiga rute
+yang bersaing) dan bagi $\pi$ (lewat Leibniz, lalu rumus Machin tahun 1706, yang masih
+menjadi gagasan di balik perhitungan rekor selama berabad-abad),
+keirasionalan $\cos 1$, $\sin 1$ dan $\cosh 1$, dan, sebagai
+penyeimbangnya, \emph{kesamaan} Taylor--Lagrange beserta fungsi
+rata yang ekspansi Taylornya berdusta.\index{taksiran deret
+berselang-seling}\index{rumus Machin}\index{keirasionalan!cos 1@$\cos 1$}
+Di sepanjang soal ini, bahasa ``deret'' bersifat tak resmi: karena setiap jumlah
+di sini merupakan \emph{barisan jumlah parsial}, seperti pada
+\cref{ex:b1:seq:e}; adapun teorinya sendiri dibuka pada
+\cref{ch:b1:series}.
+
+\medskip
+\noindent\textbf{Bagian I --- Taksiran berselang-selingnya.} Misalkan
+$(a_k)_{k \geq 0}$ turun ke $0$ dan $S_n = \sum_{k=0}^{n}
+(-1)^k a_k$.
+\begin{enumerate}
+  \item Tunjukkan bahwa $(S_{2n+1})$ tidak turun, $(S_{2n})$
+        tak naik, dan bahwa keduanya berdampingan
+        (\cref{thm:b1:seq:adjacent}): sehingga keduanya konvergen ke $S$
+        yang sama dengan, untuk setiap $n$,
+        \[
+        S_{2n+1} \leq S \leq S_{2n},
+        \qquad
+        \abs{S - S_n} \leq a_{n+1} ,
+        \]
+        dengan galatnya bertanda sama dengan suku pertama yang dihilangkan.
+        Tunjukkan lebih lanjut bahwa jika penurunannya \emph{tegas}, maka semua
+        ketaksamaan itu tegas.
+  \item Dividen pertamanya: untuk $x = 1$ pada deret eksponensialnya,
+        bandingkanlah dengan \cref{thm:b1:taylor:lagrange} di $a = 0$:
+        tunjukkan bahwa $T_n = \sum_{k=0}^{n} \frac{(-1)^k}{k!}$
+        konvergen ke $\eu^{-1}$ dengan $\abs{\eu^{-1} - T_n} <
+        \frac{1}{(n+1)!}$.
+  \item (Leibniz, 1674) Dari kesamaan hingga yang \emph{persis}
+        \[
+        \frac{1}{1 + t^2} = \sum_{k=0}^{n} (-1)^k t^{2k}
+        + \frac{(-1)^{n+1} t^{2n+2}}{1 + t^2} ,
+        \]
+        yang diintegralkan atas $\intcc{0}{1}$, buktikanlah
+        \[
+        \frac\pi4 = \sum_{k=0}^{n} \frac{(-1)^k}{2k+1} + \rho_n,
+        \qquad \abs{\rho_n} \leq \frac{1}{2n+3} .
+        \]
+  \item Kelambanannya: berapa banyak suku Leibniz yang menjamin enam desimal $\pi$
+        yang persis? (Kira-kira dua juta.) Nilailah $4 S_4
+        = 4\bigl(1 - \frac13 + \frac15 - \frac17 +
+        \frac19\bigr)$ beserta jaraknya ke $\pi$, agar terasa
+        pedihnya.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian II --- $\ln 2$ lewat tiga cara.}
+\begin{enumerate}[resume]
+  \item (Cara 1: harmonik berselang-seling) Dari $\frac{1}{1+t} =
+        \sum_{k=0}^{n-1}(-1)^k t^k + \frac{(-1)^n t^n}{1+t}$
+        yang diintegralkan atas $\intcc{0}{1}$:
+        \[
+        \ln 2 = \sum_{k=1}^{n} \frac{(-1)^{k-1}}{k} + (-1)^n
+        R_n, \qquad \frac{1}{2(n+1)} \leq R_n \leq
+        \frac{1}{n+1} :
+        \]
+        jadi galatnya berorde persis $\frac 1n$ --- yakni sejuta
+        suku bagi enam desimal.
+  \item (Cara 2: deret yang cepat) Integralkanlah $\frac{1}{1 - t^2} =
+        \sum_{k=0}^{n} t^{2k} + \frac{t^{2n+2}}{1-t^2}$ dari $0$
+        sampai $x \in \intoo{0}{1}$ lalu nilailah di $x = \frac13$
+        (perhatikan $\frac{1 + 1/3}{1 - 1/3} = 2$):
+        \[
+        \ln 2 = 2\sum_{k=0}^{n} \frac{(1/3)^{2k+1}}{2k+1} +
+        \tilde\rho_n,
+        \qquad
+        0 < \tilde\rho_n \leq \frac{9}{4}\cdot
+        \frac{(1/3)^{2n+3}}{2n+3} :
+        \]
+        jadi kekonvergenan geometri, kira-kira satu angka per suku.
+  \item (Cara 3: \omterm{thm:b1:integration:riemann}{jumlah Riemann} dan sebuah kesamaan yang tersembunyi) Buktikanlah lewat
+        induksi kesamaan
+        \[
+        \sum_{k=1}^{2n} \frac{(-1)^{k-1}}{k} = H_{2n} - H_n =
+        \sum_{k=1}^{n} \frac{1}{n + k} ,
+        \]
+        lalu pulihkanlah $\ln 2$ sebagai limit \omterm{thm:b1:integration:riemann}{jumlah Riemann} pada
+        \cref{ex:b1:integration:riemannexample}: jadi Cara 1 dan 3
+        diam-diam merupakan bilangan yang sama yang terlihat dua kali.
+  \item Adu tembak pada enam suku: bandingkanlah $\sum_{k=1}^{6}
+        \frac{(-1)^{k-1}}{k} = 0.6167$ dengan Cara 2 pada $n = 5$,
+        yang sudah memberikan $\ln 2 = 0.693147$ dengan galat $\leq
+        1.1\cdot10^{-7}$. Jelaskanlah alasan strukturalnya
+        (yaitu titik penilaian yang jauh di dalam \omterm{prop:b1:reals:intervals}{selang}
+        kekonvergenannya lawan yang di \omterm{def:b1:topology:closure}{perbatasannya}).
+  \item Berapa banyak suku Cara 2 yang mensertifikasi \emph{sepuluh} desimal
+        $\ln 2$? Tunjukkan bahwa $n = 10$ mencukupi.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian III --- Rumus Machin.}
+\begin{enumerate}[resume]
+  \item Hitunglah $(5 + \iu)^4$ lalu periksalah kesamaan kompleks
+        \[
+        (5 + \iu)^4 = 2\,(1 + \iu)\,(239 + \iu) .
+        \]
+        Lalu dengan mengambil argumennya (menurut kesepakatan \cref{ch:b1:complex}),
+        simpulkanlah rumus Machin
+        \[
+        \frac\pi4 = 4\arctan\frac15 - \arctan\frac{1}{239} .
+        \]
+        (Periksalah bahwa tak ada argumen yang meninggalkan
+        $\intoo{-\frac\pi2}{\frac\pi2}$.)
+  \item Seperti pada pertanyaan 3, tegakkanlah untuk $0 < x < 1$:
+        \[
+        \arctan x = \sum_{k=0}^{n} \frac{(-1)^k
+        x^{2k+1}}{2k+1} + r_n(x), \qquad \abs{r_n(x)} \leq
+        \frac{x^{2n+3}}{2n+3} .
+        \]
+  \item Sertifikasikanlah $\pi$ sampai tujuh desimal dengan enam suku: batasilah
+        galat totalnya
+        \[
+        \pi \approx 16\sum_{k=0}^{4}
+        \frac{(-1)^k (1/5)^{2k+1}}{2k+1}
+        - 4\Bigl(\frac{1}{239} - \frac{1}{3\cdot239^3}\Bigr)
+        \]
+        oleh $16\,\frac{(1/5)^{11}}{11} +
+        4\,\frac{(1/239)^5}{5} < 5\cdot10^{-8}$, lalu berikanlah
+        nilai yang dihasilkannya $3.1415926\dots$
+  \item Bandingkanlah ketiga rute menuju $\pi$ yang kini tersedia ---
+        yaitu Leibniz (pertanyaan 4), \omterm{thm:b1:integration:def}{integral} Dalzell pada
+        \cref{pb:b1:integration:1} (dengan galat $4^{1-5m}$), dan Machin
+        (dengan galat $\approx 16\cdot 5^{-(2n+3)}$) --- dalam angka per
+        suku, lalu jelaskanlah mengapa mengecilkan titik penilaiannya
+        mengalahkan segalanya.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian IV --- Perangkap bilangan bulat, edisi
+berselang-seling.}
+\begin{enumerate}[resume]
+  \item Andaikan $\cos 1 = \frac pq$. Kalikanlah apitan
+        berselang-seling yang tegas bagi $\sum_{k}
+        \frac{(-1)^k}{(2k)!}$ (pertanyaan 1) dengan $(2n)!$ dengan $2n
+        \geq q$, lalu turunkanlah sebuah pertentangan: sehingga $\cos 1$
+        irasional.
+  \item Sesuaikanlah bagi $\sin 1 = \sum_k \frac{(-1)^k}{(2k+1)!}$
+        (dengan mengalikannya dengan $(2n+1)!$): sehingga $\sin 1 \notin \Q$. Keduanya
+        irasional, namun $\cos^2 1 + \sin^2 1 = 1$: jadi keirasionalan
+        tak stabil di bawah aljabar.
+  \item Adapun sepupunya yang tak berselang-seling: $\cosh 1 = \sum_k
+        \frac{1}{(2k)!}$ (dalam arti jumlah parsialnya, dengan
+        batas ekor dua sisinya $0 < \cosh 1 - \sum_{k \leq n}
+        \frac{1}{(2k)!} < \frac{2}{(2n+2)!}$, yang harus dibuktikan).
+        Simpulkanlah $\cosh 1 \notin \Q$ lewat perangkap yang sama.
+  \item Doronglah ke $\cos\frac 1m$ untuk setiap bilangan bulat $m \geq 1$:
+        kalikanlah dengan $m^{2n}(2n)!$ lalu simpulkanlah $\cos\frac1m
+        \notin \Q$. Di manakah upaya yang sama patah bagi
+        $\cos\frac ab$ dengan $b > 1$ yang umum? (Kenalilah
+        penyebut yang tak lagi terbersihkan.)
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian V --- Yang lebih tajam dan lebih gelap: bentuk
+kesamaannya, dan sebuah fungsi yang menipu Taylor.}
+\begin{enumerate}[resume]
+  \item (Taylor--Lagrange, bentuk kesamaannya) Misalkan $f$ \omterm{def:b1:derivative:def}{dapat diturunkan}
+        $n + 1$ kali di antara $a$ dan $x$. Definisikanlah $g(t) =
+        f(x) - \sum_{k=0}^{n} \frac{f^{(k)}(t)}{k!}(x - t)^k -
+        A\,\frac{(x-t)^{n+1}}{(n+1)!}$ dengan konstanta $A$ yang
+        dipilih sehingga $g(a) = 0$. Hitunglah $g'$ (karena jumlahnya
+        berteleskop), terapkanlah Rolle pada $\intcc{a}{x}$, lalu simpulkanlah
+        bahwa ada $c$ yang tegas di antara $a$ dan $x$ dengan
+        \[
+        f(x) = \sum_{k=0}^{n} \frac{f^{(k)}(a)}{k!}(x-a)^k
+        + \frac{f^{(n+1)}(c)}{(n+1)!}\,(x-a)^{n+1} .
+        \]
+  \item Dividen kesamaannya: untuk $x > 0$ tunjukkanlah
+        \[
+        \eu^x > 1 + x + \frac{x^2}{2!} + \dots +
+        \frac{x^n}{n!}
+        \]
+        (secara tegas, untuk setiap $n$), lalu tunjukkanlah di mana
+        ketaksamaannya berbalik untuk $x < 0$ menurut keparitasan
+        $n$.
+  \item Tolok ukurkanlah sisanya pada $\sin(0.5)$ pada orde $3$:
+        karena Young hanya memberikan $o(x^3)$ (tanpa angka); sedangkan Lagrange memberikan
+        $\abs{\sin 0.5 - (0.5 - \frac{0.5^3}{6})} \leq
+        \frac{0.5^5}{120} = 2.61\cdot10^{-4}$; sementara taksiran
+        berselang-selingnya memberikan batas yang sama \emph{ditambah} keterangan
+        tandanya $\sin 0.5 > 0.5 - \frac{0.5^3}{6}$. Bandingkanlah
+        dengan galat sejatinya $2.59\cdot10^{-4}$: jadi batasnya
+        hampir tercapai. Perkakas mana yang akan kamu raih, dan
+        kapan?
+  \item (Fungsi yang rata) Misalkan $f(x) = \eu^{-1/x^2}$ untuk $x
+        \neq 0$, dan $f(0) = 0$. Tunjukkan bahwa $f$ \omterm{def:b1:continuity:continuous}{kontinu} di $0$, bahwa
+        $f'(0) = 0$, dan secara lebih umum --- dengan membuktikan bahwa
+        setiap \omterm{def:b1:derivative:def}{turunannya} berbentuk $f^{(k)}(x) =
+        P_k\bigl(\frac1x\bigr)\eu^{-1/x^2}$ untuk suatu \omterm{def:b1:poly:def}{polinomial}
+        $P_k$ (lewat induksi) --- bahwa $f^{(k)}(0) = 0$ untuk setiap $k$
+        \emph{(menurut \omterm{prop:b1:functions:powerrules}{perbandingan pertumbuhan}
+        \cref{prop:b1:functions:powerrules})}. Simpulkanlah: bahwa semua
+        \omterm{def:b1:poly:def}{polinomial} Taylor $f$ di $0$ lenyap, namun $f(x) > 0$
+        untuk $x \neq 0$: jadi Taylor--Young berlaku pada setiap ordenya, dan
+        tak mengatakan apa pun tentang $f$ jauh dari $0$. Jadi ekspansi
+        memerikan \emph{perilaku setempat}, bukan fungsinya.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian VI --- Sintesis.}
+\begin{enumerate}[resume]
+  \item Jalankanlah perangkapnya sekali lagi, pada $\eu^{-1} = \sum_k
+        \frac{(-1)^k}{k!}$: kalikanlah apitan berselang-seling
+        yang tegas dengan $n!$ lalu simpulkanlah $\eu^{-1} \notin \Q$,
+        sehingga $\eu \notin \Q$ --- yaitu bukti ketiga bagi fakta ini
+        dalam jilid ini. Daftarkanlah ketiganya (yaitu \omterm{thm:b1:seq:adjacent}{barisan berdampingan},
+        \cref{exo:b1:seq:9}; \omterm{thm:b1:integration:def}{integral},
+        \cref{pb:b1:integration:1}; dan jumlah berselang-seling, di sini) beserta
+        apa yang diperlukan masing-masingnya.
+  \item Adapun catatan halusnya: bahwa kemonotonannya bukan hiasan. Misalkan
+        $b_k = \frac1k$ untuk $k$ yang ganjil dan $b_k = \frac{1}{k^2}$
+        untuk $k$ yang genap: maka $b_k$ bersifat positif dan menuju $0$,
+        namun jumlah parsial $\sum (-1)^k b_k$ divergen ke
+        $-\infty$. Buktikanlah \emph{(pecahlah jumlah parsialnya menjadi
+        bagian genapnya, yang terbatas lewat
+        \cref{ex:b1:seq:basel}, dan bagian ganjilnya, yang
+        mendominasi separuh deret harmoniknya,
+        \cref{exo:b1:seq:5})}, lalu katakanlah langkah mana persisnya pada
+        pertanyaan 1 yang memakai kemonotonannya.
+  \item Periksalah kesamaan Euler yang lebih sederhana $\arctan\frac12 +
+        \arctan\frac13 = \frac\pi4$ lewat $(2 + \iu)(3 + \iu) =
+        5(1 + \iu)$, taksirlah suku yang diperlukan bagi enam desimal
+        $\pi$ lewat rute ini ($n = 10$ mencukupi), lalu tempatkanlah ia
+        di antara Leibniz dan Machin pada peringkat pertanyaan
+        13.
+  \item Sintesis, satu kalimat untuk masing-masing: (i) nyatakanlah taksiran
+        berselang-selingnya beserta kedua keluarannya (yaitu batas dan tanda); (ii) mengapakah
+        kesamaan hingga yang persis dengan sisa yang eksplisit mengalahkan
+        \omterm{def:b1:logic:statement}{pernyataan} limit bagi numerik yang bersertifikat; (iii) daftar isi
+        soal ini ($\pi$ sampai $10^{-7}$ dengan tangan, $\ln 2$ sampai
+        sepuluh desimal, empat bukti keirasionalan, satu teorema
+        kesamaan, dan satu contoh peringatan); (iv) benang mana di antaranya
+        yang akan dipungut \cref{ch:b1:series} (yaitu uji deret
+        berselang-seling, kekonvergenan mutlak lawan bersyarat,
+        dan drama penyusunan ulang pada soal akhir pekannya).
+
+\end{enumerate}
+\end{problem}

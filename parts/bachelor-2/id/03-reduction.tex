@@ -1,0 +1,957 @@
+\chapter{Reduksi Endomorfisma}\label{ch:b2:reduction}
+
+Untuk memahami sebuah endomorfisma, carilah arah yang sekadar
+diregangkannya. Bab ini membangun perkakasnya --- \omterm{def:b2:reduction:eigen}{nilai eigen},
+\omterm{def:b2:reduction:charpoly}{polinomial karakteristik} dan \omterm{def:b2:reduction:polyu}{polinomial minimal}, lema penguraian
+kernel --- beserta ganjarannya: kriteria diagonalisasi dan
+\omterm{def:b2:reduction:diag}{trigonalisasi}, Cayley--Hamilton, \omterm{thm:b2:reduction:dunford}{penguraian Dunford}, serta
+perhitungan pangkat dan eksponensial yang kelak menjadi santapan
+\cref{ch:b2:diffeq}. Di sepanjang bab ini, $E$ adalah ruang vektor
+atas $K$ yang berdimensi hingga ($K = \R$ atau $\C$) dan $u \in
+\mathcal{L}(E)$, $n = \dim E$.
+
+\section{Nilai eigen dan vektor eigen}
+
+\begin{definition}\label{def:b2:reduction:eigen}
+$\lambda \in K$ disebut \emph{nilai eigen}\index{nilai eigen} bagi $u$
+apabila $u(x) = \lambda x$ untuk suatu $x \neq 0$ (vektor semacam itu
+disebut \emph{vektor eigen}); \emph{ruang eigennya} adalah $E_\lambda(u) =
+\ker(u - \lambda\,\mathrm{id})$. Himpunan semua nilai eigen disebut
+\emph{spektrum}\index{spektrum} $\operatorname{Sp}(u)$. Sebuah subruang $F$
+disebut \emph{stabil} apabila $u(F) \subseteq F$; ruang eigen bersifat
+stabil, dan subruang stabil memungkinkan endomorfisma imbasan $u|_F$.
+\end{definition}
+
+\begin{theorem}[Kebebasan ruang eigen]\label{thm:b2:reduction:independence}
+\omterm{def:b2:reduction:eigen}{Vektor eigen} yang berkaitan dengan \omterm{def:b2:reduction:eigen}{nilai eigen} yang berbeda sepasang
+demi sepasang membentuk keluarga bebas; setara dengan itu, jumlah ruang
+eigen $E_{\lambda_1} + \dots + E_{\lambda_r}$ (dengan $\lambda_i$ yang
+berbeda) bersifat langsung. Khususnya $u$ punya paling banyak $n$ \omterm{def:b2:reduction:eigen}{nilai eigen}.
+\end{theorem}
+
+\begin{proof}
+Dengan induksi pada $r$. Andaikan $x_1 + \dots + x_r = 0$ dengan $x_i \in
+E_{\lambda_i}$, sedangkan pernyataannya sudah diketahui untuk $r - 1$.
+Terapkan $u$ lalu kurangkan $\lambda_r$ kali kaitan itu:
+\[
+\sum_{i=1}^{r-1} (\lambda_i - \lambda_r)\, x_i = 0 ,
+\]
+jadi menurut induksi setiap $(\lambda_i - \lambda_r)x_i = 0$, yakni $x_i =
+0$ untuk $i < r$, lalu $x_r = 0$. Jumlah langsung atas ruang tak nol di
+dalam ruang berdimensi $n$ paling banyak punya $n$ suku.
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=0.9, >={Stealth}]
+  \draw[gray!40] (-2.6,-2.2) grid (2.6,2.2);
+  \draw[->] (-2.6,0) -- (2.7,0) node[below, font=\small] {$x$};
+  \draw[->] (0,-2.2) -- (0,2.3) node[left, font=\small] {$y$};
+  \draw[omDef, very thick, ->] (0,0) -- (0.7,0.7)
+    node[above, font=\small] {$v_1$};
+  \draw[omDef, thick, ->, dashed] (0,0) -- (2.1,2.1)
+    node[above right, font=\small] {$Av_1 = 3v_1$};
+  \draw[omThm, very thick, ->] (0,0) -- (0.9,-0.9)
+    node[below, font=\small] {$v_2$};
+  \draw[omThm, thick, ->, dashed] (0,0) -- (0.9,-0.9);
+  \draw[omProp, very thick, ->] (0,0) -- (1,0)
+    node[below right, font=\small] {$e_1$};
+  \draw[omProp, thick, ->, dashed] (0,0) -- (2,1)
+    node[right, font=\small] {$Ae_1$};
+\end{tikzpicture}
+
+{\small Matriks $A = \begin{psmallmatrix}2 & 1\\ 1 &
+2\end{psmallmatrix}$ yang bekerja pada bidang: vektor umum
+$e_1$ terpental dari garisnya, sedangkan arah eigen $v_1 =
+(1,1)$ dan $v_2 = (1,-1)$ sekadar diregangkan --- masing-masing oleh $3$
+dan oleh $1$ (jadi $Av_2 = v_2$: peta putus-putusnya berimpit dengan $v_2$).
+Diagonalisasi tak lain pergantian ke basis $(v_1, v_2)$, tempat
+$A$ menjadi $\operatorname{diag}(3, 1)$.}
+\end{omfigure}
+
+\begin{definition}[Polinomial karakteristik]\label{def:b2:reduction:charpoly}
+$\chi_u(X) = \det(X\,\mathrm{id} - u)$\index{polinomial
+karakteristik} --- yang dihitung pada basis mana pun sebagai $\det(XI_n - A)$,
+sebuah polinomial monik berderajat $n$ yang awet terhadap keserupaan
+(\cref{thm:b2:linalg:detrules}). Akarnya di $K$ persis semua
+\omterm{def:b2:reduction:eigen}{nilai eigen} ($\lambda$ \omterm{def:b2:reduction:eigen}{nilai eigen} $\iff u - \lambda\,\mathrm{id}$
+tidak injektif $\iff \chi_u(\lambda) = 0$), dan
+\[
+\chi_u(X) = X^n - (\operatorname{tr} u)\, X^{n-1} + \dots +
+(-1)^n \det u .
+\]
+\emph{Multiplisitas aljabar}\index{multiplisitas aljabar}
+$m_\lambda$ sebuah \omterm{def:b2:reduction:eigen}{nilai eigen} adalah
+multiplisitasnya sebagai akar $\chi_u$; sedangkan \emph{multiplisitas
+geometrik}\index{multiplisitas geometrik} adalah $\dim E_\lambda$, dan
+$1 \leq \dim E_\lambda \leq m_\lambda$.
+\end{definition}
+
+\begin{proof}[Bukti fakta yang dinyatakan]
+Tentang koefisiennya: uraikan $\det(XI - A)$ dengan rumus
+permutasi; permutasi identitas menyumbang $\prod_i (X - a_{ii})
+= X^n - (\sum a_{ii})X^{n-1} + \dots$, sedangkan setiap permutasi lain
+membiarkan tetap paling banyak $n - 2$ kedudukan diagonal, sehingga
+menyumbang derajat $\leq n - 2$: jadi dua koefisien teratasnya seperti
+dinyatakan; lalu $X = 0$ memberi suku tetap $\det(-A) = (-1)^n\det A$.
+
+Geometrik $\leq$ aljabar: misalkan $d = \dim E_\lambda$ lalu lengkapi
+basis $E_\lambda$ menjadi basis $E$; matriks $u$ menjadi segitiga atas
+berblok dengan blok kiri atas $\lambda I_d$, sehingga $\chi_u(X) =
+(X - \lambda)^d\, \chi_{\text{(blok bawah)}}(X)$: jadi multiplisitas
+$\lambda$ sedikitnya $d$.
+\end{proof}
+
+\begin{example}[$\chi$ yang sama, geometri yang berbeda]\label{ex:b2:reduction:samechi}
+Kedua matriks
+\[
+\begin{pmatrix}2 & 0\\ 0 & 2\end{pmatrix}
+\qquad\text{dan}\qquad
+\begin{pmatrix}2 & 1\\ 0 & 2\end{pmatrix}
+\]
+berbagi \omterm{def:b2:reduction:charpoly}{polinomial karakteristik} $(X - 2)^2$, trace,
+\omterm{def:b2:linalg:det}{determinan}, dan \omterm{def:b2:reduction:eigen}{spektrum} --- namun keduanya tidak serupa: yang pertama
+punya $E_2$ berdimensi $2$ (\omterm{def:b2:reduction:charpoly}{multiplisitas geometrik} $2$), yang kedua
+berdimensi $1$. \omterm{def:b2:reduction:charpoly}{Polinomial karakteristik} hanya melihat
+\omterm{def:b2:reduction:charpoly}{multiplisitas aljabar}; dimensi ruang eigen adalah invarian yang
+lebih halus, dan \omterm{def:b2:reduction:polyu}{polinomial minimal} yang memutuskan ($X - 2$
+lawan $(X - 2)^2$). Pelajaran bagi semua pembahasan tentang
+keterdiagonalan: $\chi$ menyaring calonnya, tetapi kernel yang
+memberikan suara.
+\end{example}
+
+\begin{definition}[Dapat didiagonalkan, dapat ditrigonalkan]\label{def:b2:reduction:diag}
+$u$ disebut \emph{dapat didiagonalkan}\index{dapat didiagonalkan} apabila
+$E$ punya basis berisi \omterm{def:b2:reduction:eigen}{vektor eigen} (untuk matriks: serupa dengan matriks
+diagonal); dan \emph{dapat ditrigonalkan}\index{trigonalisasi} apabila
+matriksnya pada suatu basis berupa segitiga atas.
+\end{definition}
+
+\begin{theorem}[Kriteria keterdiagonalan]\label{thm:b2:reduction:diagcrit}
+Pernyataan berikut setara:
+\begin{enumerate}
+  \item $u$ \omterm{def:b2:reduction:diag}{dapat didiagonalkan};
+  \item $E = \bigoplus_{\lambda \in \operatorname{Sp} u} E_\lambda$;
+  \item $\chi_u$ terurai lengkap atas $K$ dan $\dim E_\lambda = m_\lambda$
+        untuk setiap \omterm{def:b2:reduction:eigen}{nilai eigen};
+  \item (syarat cukup, bukan syarat perlu) $\chi_u$ punya $n$ akar
+        berbeda di $K$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1 $\iff$ 2): sebuah basis berisi \omterm{def:b2:reduction:eigen}{vektor eigen} tersortir menjadi basis
+tiap $E_\lambda$, dan sebaliknya menyambung basis suku-suku jumlah
+langsungnya memberi basis $E$
+(\cref{thm:b2:reduction:independence} membuat jumlahnya langsung;
+kesamaan dimensi membuatnya seluruh ruang).
+
+(2 $\iff$ 3): pada basis diagonalnya, $\chi_u = \prod (X -
+\lambda)^{\dim E_\lambda}$ terurai lengkap dengan multiplisitas yang
+cocok. Sebaliknya, andaikan $\chi_u$ terurai lengkap dengan $\dim
+E_\lambda = m_\lambda$ di mana-mana; maka jumlah langsung \omterm{def:b2:reduction:eigen}{ruang eigennya}
+(langsung menurut \cref{thm:b2:reduction:independence}) berdimensi
+\[
+\sum_{\lambda}\dim E_\lambda = \sum_{\lambda} m_\lambda =
+\deg\chi_u = n ,
+\]
+sebab kesamaan di tengah berlaku karena derajat polinomial yang terurai
+lengkap sama dengan jumlah multiplisitas akarnya: jadi jumlahnya seluruh
+$E$. Perhatikan tempat tiap hipotesis bekerja: keteruraiannya mengisi
+derajatnya, kesamaan multiplisitasnya mengisi dimensinya.
+
+(4 $\Rightarrow$ 1): $n$ \omterm{def:b2:reduction:eigen}{nilai eigen} yang berbeda memberi $n$ \omterm{def:b2:reduction:eigen}{vektor
+eigen} yang bebas (\cref{thm:b2:reduction:independence}), yakni sebuah basis.
+\end{proof}
+
+\begin{method}[Memutuskan keterdiagonalan]\label{met:b2:reduction:decide}
+Dalam praktik, ujilah dengan urutan berikut --- tiap langkahnya bisa
+saja langsung merampungkan pekerjaan. (1) Adakah polinomial
+penganihilasi berakar sederhana dan terurai lengkap yang langsung
+tampak ($u^2 = \mathrm{id}$, $u^2 = u$, $u^k = \mathrm{id}$)? Jika ada:
+\omterm{def:b2:reduction:diag}{dapat didiagonalkan}, tanpa perhitungan
+(\cref{cor:b2:reduction:minpolycrit} di bawah). (2) Hitung
+$\chi_u$; jika ia punya $n$ akar berbeda di $K$: \omterm{def:b2:reduction:diag}{dapat didiagonalkan}
+(\cref{thm:b2:reduction:diagcrit}~(4)). (3) Jika tidak, hanya untuk tiap
+akar berulang $\lambda$, bandingkan $\dim\ker(u -
+\lambda\,\mathrm{id})$ dengan multiplisitas $m_\lambda$: kekurangan
+sekecil apa pun mematikan keterdiagonalannya, sedangkan kesamaan di
+mana-mana membuktikannya. Jangan pernah menghitung ruang eigen akar
+sederhana (dimensinya sudah pasti $1$), dan jangan pernah
+mentrigonalkan hanya untuk memutuskan.
+\end{method}
+
+\begin{example}[Diagonalisasi dalam kerja]\label{ex:b2:reduction:diagwork}
+Ambil $A = I + J = \begin{psmallmatrix}2 & 1 & 1\\ 1 & 2 & 1\\ 1 & 1 &
+2\end{psmallmatrix}$, dengan $J$ matriks yang semua unsurnya satu: dari
+$\operatorname{Sp}(J) = \{3, 0\}$
+(\cref{ex:b2:linalg:onesmatrix}) diperoleh $\operatorname{Sp}(A) = \{4,
+1\}$, dengan ruang eigen $\R(1,1,1)$ dan bidang $\{x + y + z =
+0\}$: dimensinya $1 + 2 = 3$, jadi \omterm{def:b2:reduction:diag}{dapat didiagonalkan}
+(\cref{thm:b2:reduction:diagcrit}~(2)). Pangkatnya pun terhitung tanpa
+matriks pergantian basis: dengan $\Pi = J/3$ sebagai proyektor pada
+$\R(1,1,1)$,
+\[
+A = 4\,\Pi + 1\cdot(I - \Pi)
+\quad\Longrightarrow\quad
+A^k = 4^k\,\Pi + (I - \Pi)
+= \frac{4^k - 1}{3}\,J + I .
+\]
+(Periksa $k = 1$: $\frac{4-1}3 J + I = A$.) Pelajaran penutupnya:
+ketika \omterm{def:b2:reduction:eigen}{ruang eigennya} kasatmata, \emph{proyektor} spektral
+menghitung pangkat lebih cepat daripada $PDP^{-1}$ mana pun --- dan
+rumusnya memperlihatkan dinamikanya: $A^k$ tumbuh seperti $4^k$
+sepanjang $(1,1,1)$ dan diam saja pada bidang ortogonalnya.
+\end{example}
+
+\begin{theorem}[Trigonalisasi]\label{thm:b2:reduction:trigonalization}
+$u$ \omterm{def:b2:reduction:diag}{dapat ditrigonalkan} atas $K$ bila dan hanya bila $\chi_u$ terurai
+lengkap atas $K$. Khususnya setiap endomorfisma ruang vektor atas $\C$
+\omterm{def:b2:reduction:diag}{dapat ditrigonalkan}.\index{trigonalisasi}
+\end{theorem}
+
+\begin{proof}
+($\Rightarrow$) \omterm{def:b2:reduction:charpoly}{Polinomial karakteristik} sebuah matriks segitiga
+adalah $\prod(X - t_{ii})$: terurai lengkap.
+
+($\Leftarrow$) Induksi pada $n$. Karena $\chi_u$ terurai lengkap, ia
+punya akar $\lambda$: pilihlah \omterm{def:b2:reduction:eigen}{vektor eigen} $e_1$. Pada basis yang
+diawali $e_1$, matriksnya menjadi $\begin{pmatrix} \lambda & \ast\\ 0 &
+B\end{pmatrix}$, dan $\chi_u = (X - \lambda)\chi_B$: jadi $\chi_B$ pun
+terurai lengkap. Menurut hipotesis induksi yang diterapkan pada matriks
+berukuran $(n-1) \times (n-1)$, yakni $B$, ada $Q$ berinvers dengan $Q^{-1}BQ$
+segitiga atas; mengonjugasikan seluruh matriks itu dengan $\begin{pmatrix}1 & 0\\
+0 & Q\end{pmatrix}$ membuatnya segitiga.
+\end{proof}
+
+\begin{example}[Mentrigonalkan dengan tangan]\label{ex:b2:reduction:trigwork}
+Ambil $B = \begin{pmatrix}3 & -1\\ 1 & 1\end{pmatrix}$: di sini $\chi_B = X^2 -
+4X + 4 = (X - 2)^2$, dan $\ker(B - 2I) =
+\ker\begin{psmallmatrix}1 & -1\\ 1 & -1\end{psmallmatrix}$ adalah
+garis yang direntang $e_1' = (1, 1)$: satu \omterm{def:b2:reduction:eigen}{nilai eigen} dengan
+ruang eigen berdimensi satu --- jadi tidak \omterm{def:b2:reduction:diag}{dapat didiagonalkan}, tetapi
+\omterm{def:b2:reduction:diag}{dapat ditrigonalkan} (\cref{thm:b2:reduction:trigonalization}).
+Lengkapi basisnya dengan $e_2' = (1, 0)$ lalu hitung:
+\[
+u(e_1') = (2, 2) = 2e_1',
+\qquad
+u(e_2') = (3, 1) = 1\cdot e_1' + 2\, e_2' ,
+\]
+sehingga pada basis $(e_1', e_2')$ matriksnya menjadi $T =
+\begin{psmallmatrix}2 & 1\\ 0 & 2\end{psmallmatrix}$. Pelajaran
+penutupnya: diagonal $T$ sudah terpaksa (kedua unsurnya
+wajib berupa \omterm{def:b2:reduction:eigen}{nilai eigen} ganda $2$); hanya unsur pojoknya yang
+bergantung pada pilihan $e_2'$, dan menskalakan $e_2'$ dapat
+membuatnya bernilai tak nol apa pun --- ``$1$'' yang membandel itu adalah
+bayangan bagian nilpoten yang kelak dipisahkan Dunford.
+\end{example}
+
+\section{Polinomial sebuah endomorfisma}
+
+\begin{definition}\label{def:b2:reduction:polyu}
+Untuk $P = \sum a_k X^k \in K[X]$, tetapkan $P(u) = \sum a_k u^k \in
+\mathcal{L}(E)$. Pemetaan $P \mapsto P(u)$ adalah morfisma aljabar
+$K[X] \to \mathcal{L}(E)$ (\cref{def:b2:structures:algebra});
+kernelnya $\{P : P(u) = 0\}$ merupakan \omterm{def:b2:structures:ideal}{ideal} $K[X]$ yang tak nol (sebab
+keluarga $(\mathrm{id}, u, \dots, u^{n^2})$ saling terkait di dalam ruang
+berdimensi $n^2$, yaitu $\mathcal{L}(E)$), jadi ia \omterm{def:b2:structures:generated}{dibangun} oleh sebuah
+polinomial monik tunggal $\mu_u$: itulah \emph{polinomial
+minimal}\index{polinomial minimal}
+(\cref{thm:b2:structures:principal}).
+\end{definition}
+
+\begin{proposition}\label{prop:b2:reduction:minpoly}
+\begin{enumerate}
+  \item $P(u) = 0 \iff \mu_u \mid P$; \omterm{def:b2:reduction:eigen}{nilai eigen} $u$ adalah akar
+        setiap polinomial penganihilasi, dan akar $\mu_u$
+        \emph{persis} semua \omterm{def:b2:reduction:eigen}{nilai eigen}.
+  \item Jika $F$ stabil, maka $\mu_{u|_F} \mid \mu_u$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(1) Keterbagiannya tak lain definisi sebuah pembangun. Jika $u(x) =
+\lambda x$ dengan $x \neq 0$, maka $0 = P(u)(x) = P(\lambda)x$, jadi
+$P(\lambda) = 0$: \omterm{def:b2:reduction:eigen}{nilai eigen} adalah akar polinomial penganihilasi,
+khususnya akar $\mu_u$. Sebaliknya, jika $\lambda$ sebuah akar, maka
+$\mu_u = (X - \lambda)Q$ dengan $Q(u) \neq 0$ (sebab derajat $\mu_u$
+minimal): pilih $y$ dengan $Q(u)(y) \neq 0$; maka $(u - \lambda)(Q(u)(y))
+= \mu_u(u)(y) = 0$ memperlihatkan \omterm{def:b2:reduction:eigen}{vektor eigen} $Q(u)(y)$.
+
+(2) Kita punya $\mu_u(u|_F) = \mu_u(u)|_F = 0$, lalu terapkan (1) pada $u|_F$.
+\end{proof}
+
+\begin{example}[Polinomial minimal yang dicari dengan tangan]\label{ex:b2:reduction:minpolyhand}
+\omterm{def:b2:reduction:polyu}{Polinomial minimal} dihitung dengan menguji derajat berturut-turut.
+Untuk matriks $J \in \mathcal{M}_3(\R)$ yang semua unsurnya satu:
+$J \neq \lambda I$ (jadi derajat $1$ tersingkir), dan $J^2 = 3J$, sehingga
+\[
+\mu_J = X^2 - 3X = X(X - 3) :
+\]
+derajatnya $2$, terurai lengkap, berakar sederhana --- jadi $J$ \omterm{def:b2:reduction:diag}{dapat
+didiagonalkan} dengan \omterm{def:b2:reduction:eigen}{spektrum} $\{0, 3\}$
+(\cref{cor:b2:reduction:minpolycrit} di bawah), yang menegaskan
+\cref{ex:b2:linalg:onesmatrix} tanpa satu pun \omterm{def:b2:linalg:det}{determinan}. Untuk matriks
+penukar $A$ pada \cref{ex:b2:reduction:projectorswork}: dari $A \neq \pm I$
+dan $A^2 = I$ diperoleh $\mu_A = X^2 - 1$. Pada kedua kasus polanya
+sama: tebaklah kesamaan berderajat rendah dari strukturnya
+(rank satu memaksa $J^2 = (\operatorname{tr}J)\,J$; sebuah involusi
+memaksa $A^2 = I$), lalu periksa bahwa tak ada pembagi sejatinya yang
+menganihilasi. \omterm{def:b2:reduction:polyu}{Polinomial minimal} biasanya \emph{ditemukan}, bukan
+dihitung dari $\chi$.
+\end{example}
+
+\begin{theorem}[Lema penguraian kernel]\label{thm:b2:reduction:kernels}
+Jika $P = P_1 P_2 \cdots P_r$ dengan $P_i$ saling prima sepasang demi
+sepasang, maka\index{lema penguraian kernel}
+\[
+\ker P(u) = \ker P_1(u) \oplus \dots \oplus \ker P_r(u),
+\]
+dan proyeksi pada tiap sukunya berupa polinomial dalam $u$.
+\end{theorem}
+
+\begin{proof}
+Cukuplah menangani $r = 2$ lalu berinduksi. Bézout di $K[X]$
+(\cref{thm:b2:structures:principal}) memberi $U P_1 + V P_2 = 1$,
+sehingga untuk setiap $x$,
+\[
+x = \underbrace{U(u)P_1(u)(x)}_{=:\,x_2}
++ \underbrace{V(u)P_2(u)(x)}_{=:\,x_1}.
+\]
+Jika $x \in \ker P(u)$: maka $P_2(u)(x_2) = U(u)\,P(u)(x) = 0$
+(polinomial dalam $u$ saling komutatif), jadi $x_2 \in \ker P_2(u)$, dan
+setangkup dengan itu $x_1 \in \ker P_1(u)$: jadi jumlahnya mengisi
+$\ker P(u)$; kedua sukunya berada di dalam $\ker P(u)$ (sebab $P_i \mid
+P$). Kelangsungannya: $x \in \ker P_1(u) \cap \ker P_2(u)$ memberi $x =
+U(u)P_1(u)x + V(u)P_2(u)x = 0$. Rumus untuk $x_1, x_2$ tadi
+memperlihatkan proyeksinya sebagai $V(u)P_2(u)$ dan $U(u)P_1(u)$.
+\end{proof}
+
+\begin{example}[Lema kernel dengan proyektor yang gamblang]\label{ex:b2:reduction:projectorswork}
+Misalkan $A = \begin{psmallmatrix}0 & 1 & 0\\ 1 & 0 & 0\\ 0 & 0 &
+1\end{psmallmatrix}$ (yang menukar dua koordinat pertama). Maka $A^2
+= I$: polinomial $X^2 - 1 = (X - 1)(X + 1)$ menganihilasi $A$,
+faktornya saling prima, dan Bézout-nya gamblang:
+\[
+\frac{1}{2}(X + 1) - \frac12(X - 1) = 1 .
+\]
+Dengan mengikuti bukti \cref{thm:b2:reduction:kernels}, proyeksi
+pada $\ker(A - I)$ dan $\ker(A + I)$ adalah polinomial
+dalam $A$ berikut:
+\[
+\pi_+ = \frac{A + I}{2} = \frac12\begin{pmatrix}
+1 & 1 & 0\\ 1 & 1 & 0\\ 0 & 0 & 2\end{pmatrix},
+\qquad
+\pi_- = \frac{I - A}{2} = \frac12\begin{pmatrix}
+1 & -1 & 0\\ -1 & 1 & 0\\ 0 & 0 & 0\end{pmatrix}.
+\]
+Periksa: $\pi_+ + \pi_- = I$, $\pi_+\pi_- = 0$, $\pi_\pm^2 =
+\pi_\pm$, dan petanya adalah bidang $\{x = y\}$ (vektor setangkup,
+bernilai eigen $1$) dan garis $\R(1, -1, 0)$
+(antisetangkup, bernilai eigen $-1$). Lema kernel bukan sekadar
+pernyataan keberadaan: koefisien Bézout \emph{adalah} rumus
+proyektornya.
+\end{example}
+
+\begin{example}[Proyektor menghitung eksponensial juga]\label{ex:b2:reduction:expprojectors}
+Matriks penukar yang sama, satu panen lebih jauh. Karena $A = \pi_+ -
+\pi_-$ dengan proyektor yang ortogonal dalam arti aljabar
+($\pi_+\pi_- = 0$), setiap pangkatnya menuruti $A^k = \pi_+ +
+(-1)^k\pi_-$, dan deret eksponensialnya berkelompok menurut proyektor:
+\[
+\eu^{tA} = \sum_k \frac{t^k}{k!}\bigl(\pi_+ +
+(-1)^k\pi_-\bigr)
+= \eu^{t}\,\pi_+ + \eu^{-t}\,\pi_- =
+\begin{pmatrix}
+\cosh t & \sinh t & 0\\
+\sinh t & \cosh t & 0\\
+0 & 0 & \eu^{t}
+\end{pmatrix}.
+\]
+(Periksa $t = 0$: identitasnya; turunan di $0$: $A$.) Penguraian
+eigen mengubah deret matriks menjadi dua deret skalar --- dan itu persis
+mekanisme yang kelak dijalankan \cref{ch:b2:diffeq} pada setiap sistem
+yang \omterm{def:b2:reduction:diag}{dapat didiagonalkan}, sekaligus alasan mengapa fungsi hiperbolik
+menguasai kopling yang setangkup.
+\end{example}
+
+\begin{corollary}[Keterdiagonalan lewat polinomial minimal]\label{cor:b2:reduction:minpolycrit}
+$u$ \omterm{def:b2:reduction:diag}{dapat didiagonalkan} $\iff$ $\mu_u$ terurai lengkap atas $K$ dengan
+akar \emph{sederhana} $\iff$ ada polinomial penganihilasi $u$ yang
+terurai lengkap dengan akar sederhana.
+\end{corollary}
+
+\begin{proof}
+Jika $P(u) = 0$ dengan $P = \prod_{i}(X - \lambda_i)$ ($\lambda_i$
+berbeda), maka lemanya memberi $E = \ker P(u) = \bigoplus_i \ker(u -
+\lambda_i)$: yakni jumlah langsung ruang eigen, jadi $u$ \omterm{def:b2:reduction:diag}{dapat
+didiagonalkan} (\cref{thm:b2:reduction:diagcrit}). Sebaliknya, $u$ yang
+\omterm{def:b2:reduction:diag}{dapat didiagonalkan} ditolkan oleh $\prod_{\lambda \in \operatorname{Sp}u}(X -
+\lambda)$ (yang menolkan tiap ruang eigen), dan polinomial itu terurai
+lengkap dengan akar sederhana; sedangkan $\mu_u$ membaginya sambil
+berakar sama (\cref{prop:b2:reduction:minpoly}): jadi $\mu_u$ tepat sama
+dengan hasil kali itu.
+\end{proof}
+
+\begin{example}\label{ex:b2:reduction:projections}
+Proyeksi memenuhi $p^2 = p$: ditolkan oleh $X(X-1)$ yang terurai lengkap
+dengan akar sederhana --- jadi \omterm{def:b2:reduction:diag}{dapat didiagonalkan} dengan \omterm{def:b2:reduction:eigen}{spektrum}
+$\subseteq \{0, 1\}$, dan $E = \ker p \oplus \ker(p - \mathrm{id})$:
+itulah telaah geometrik Tahun ke-1, yang dibuktikan ulang dalam satu
+baris. Simetri ($s^2 = \mathrm{id}$, dengan penganihilasi $X^2 - 1$)
+\omterm{def:b2:reduction:diag}{dapat didiagonalkan} bila $\operatorname{char} K \neq 2$, dengan \omterm{def:b2:reduction:eigen}{spektrum}
+$\subseteq \{\pm 1\}$. Adapun endomorfisma dengan $u^3 = u^2$ dan $u^2
+\neq u$ ditolkan oleh $X^2(X - 1)$, dan \emph{tidak} harus \omterm{def:b2:reduction:diag}{dapat
+didiagonalkan} --- kriterianya mendeteksi hal itu (akar ganda $0$ wajib
+diuji: \omterm{def:b2:reduction:diag}{dapat didiagonalkan} bila dan hanya bila lagi-lagi $\ker u^2 = \ker u$).
+\end{example}
+
+\begin{example}[Lapangannya yang memutuskan: sebuah rotasi di $\R^3$]\label{ex:b2:reduction:rotation3d}
+Misalkan $R$ perputaran seperempat mengelilingi sumbu $z$:
+\[
+R = \begin{pmatrix}
+0 & -1 & 0\\
+1 & 0 & 0\\
+0 & 0 & 1
+\end{pmatrix},
+\qquad
+\chi_R = (X - 1)(X^2 + 1).
+\]
+Atas $\R$: satu-satunya \omterm{def:b2:reduction:eigen}{nilai eigennya} $1$, dengan ruang eigen berupa
+sumbu $\R e_3$ --- satu garis vektor tetap, dan tanpa reduksi
+lebih jauh: $R$ tidak \omterm{def:b2:reduction:diag}{dapat didiagonalkan} maupun ditrigonalkan di
+$\mathcal{M}_3(\R)$ (sebab $\chi_R$ tidak terurai lengkap). Atas $\C$:
+ada tiga \omterm{def:b2:reduction:eigen}{nilai eigen} berbeda $1, \iu, -\iu$, jadi $R$ \omterm{def:b2:reduction:diag}{dapat didiagonalkan},
+dengan \omterm{def:b2:reduction:eigen}{vektor eigen} $e_3$ dan $e_1 \mp \iu e_2$. Geometrinya
+terdengar di dalam aljabarnya: rotasi pada bidang tidak punya arah
+invarian yang real, dan \omterm{def:b2:reduction:eigen}{nilai eigen} kompleks $\pm\iu$ yang
+bermodulus $1$ menyimpan sudut ($\pm\frac\pi2$) yang hanya dapat
+diungkapkan matriks realnya lewat pencampuran koordinat.
+\end{example}
+
+\begin{example}[Minimal lawan karakteristik]\label{ex:b2:reduction:minvschar}
+Untuk $D = \operatorname{diag}(2, 2, 3)$: $\chi_D = (X - 2)^2(X -
+3)$ tetapi $\mu_D = (X - 2)(X - 3)$, sebab $(D - 2I)(D - 3I) = 0$
+(periksa pada basis kanoniknya) sementara tak satu pun faktornya sendiri
+menolkan $D$. Untuk blok geser $N = \begin{psmallmatrix}0 & 1\\ 0 &
+0\end{psmallmatrix} \oplus (3)$, yakni $N' =
+\begin{psmallmatrix}0 & 1 & 0\\ 0 & 0 & 0\\ 0 & 0 &
+3\end{psmallmatrix}$: di sini $\chi_{N'} = X^2(X - 3)$ \emph{dan}
+$\mu_{N'} = X^2(X - 3)$ --- akar gandanya sungguh diperlukan
+karena $N'$ tidak \omterm{def:b2:reduction:diag}{dapat didiagonalkan} di sisi $\ker$-nya ($N'e_2 =
+e_1 \neq 0$). Pedoman praktis: $\mu$ dan $\chi$ berakar sama
+(\cref{prop:b2:reduction:minpoly}); multiplisitas pada $\mu$
+menakar besarnya blok nilpoten terbesar, sedangkan yang pada
+$\chi$ menakar dimensi total subruang karakteristiknya.
+\end{example}
+
+\begin{theorem}[Cayley--Hamilton]\label{thm:b2:reduction:cayleyhamilton}
+$\chi_u(u) = 0$; akibatnya $\mu_u \mid \chi_u$, dan $\deg \mu_u
+\leq n$.\index{teorema Cayley--Hamilton}
+\end{theorem}
+
+\begin{proof}
+Tetapkan $x \neq 0$ lalu misalkan $d$ terbesar sehingga $(x, u(x), \dots,
+u^{d-1}(x))$ bebas; tulis
+\[
+u^d(x) = -a_0 x - a_1 u(x) - \dots - a_{d-1}u^{d-1}(x),
+\]
+lalu tetapkan $P_x = X^d + a_{d-1}X^{d-1} + \dots + a_0$, sehingga
+$P_x(u)(x) = 0$. Lengkapi keluarga bebas itu menjadi basis $E$: pada
+basis itu $u$ berbentuk blok $\begin{pmatrix} C & \ast\\ 0 & D\end{pmatrix}$
+dengan $C$ matriks pendamping $P_x$, yang \omterm{def:b2:reduction:charpoly}{polinomial karakteristiknya}
+adalah $P_x$ (uraikan $\det(XI - C)$ sepanjang kolom pertama, dengan
+induksi pada $d$). Karenanya $\chi_u = P_x \cdot \chi_D$, dan
+\[
+\chi_u(u)(x) = \chi_D(u)\bigl(P_x(u)(x)\bigr) = 0 .
+\]
+Hujah itu berlaku untuk setiap $x$: jadi $\chi_u(u) = 0$.
+\end{proof}
+
+\begin{example}[Cayley--Hamilton dalam kerja]\label{ex:b2:reduction:chwork}
+Untuk $A = \begin{pmatrix} 1 & 2\\ 3 & 4\end{pmatrix}$: $\chi_A = X^2 -
+5X - 2$, jadi $A^2 = 5A + 2I$. Setiap pangkat $A$ menyusut menjadi
+kombinasi $I$ dan $A$:
+\[
+A^4 = (5A + 2I)^2 = 25A^2 + 20A + 4I = 145A + 54I =
+\begin{pmatrix} 199 & 290\\ 435 & 634\end{pmatrix},
+\]
+dan inversnya diperoleh cuma-cuma: dari $A(A - 5I) = 2I$,
+\[
+A^{-1} = \tfrac12(A - 5I)
+= \begin{pmatrix} -2 & 1\\ 3/2 & -1/2\end{pmatrix}.
+\]
+Pelajaran penutupnya: Cayley--Hamilton memampatkan seluruh aljabar
+$K[A]$ menjadi $\operatorname{Vect}(I, A, \dots, A^{n-1})$ ---
+$\dim K[A] = \deg\mu_A \leq n$, sebesar apa pun pangkat yang diperlukan.
+\end{example}
+
+\begin{remark}[Jebakan yang sering muncul]\label{rem:b2:reduction:pitfalls}
+(i) \omterm{def:b2:reduction:eigen}{Nilai eigen} tidak menjumlah: $\operatorname{Sp}(A + B)$ bukan
+$\operatorname{Sp}A + \operatorname{Sp}B$, dan jumlah dua matriks yang
+\omterm{def:b2:reduction:diag}{dapat didiagonalkan} belum tentu \omterm{def:b2:reduction:diag}{dapat didiagonalkan} ---
+$\begin{psmallmatrix}1 & 1\\ 0 & 0\end{psmallmatrix} +
+\begin{psmallmatrix}0 & 0\\ 0 & 1\end{psmallmatrix} =
+\begin{psmallmatrix}1 & 1\\ 0 & 1\end{psmallmatrix}$ adalah jumlah
+dua matriks yang \omterm{def:b2:reduction:diag}{dapat didiagonalkan} (masing-masing bernilai eigen
+berbeda) dan hasilnya tidak \omterm{def:b2:reduction:diag}{dapat didiagonalkan}; hanya keluarga yang
+\emph{komutatif} yang berkelakuan baik
+(\cref{exo:b2:reduction:9}). (ii) ``$\chi_u$ terurai lengkap'' adalah
+hipotesis tentang \emph{lapangannya}: rotasi bidang punya $\chi =
+X^2 - 2\cos\theta\,X + 1$, yang terurai lengkap atas $\C$ tetapi tidak
+atas $\R$ --- jadi \omterm{def:b2:reduction:diag}{dapat didiagonalkan} di $\mathcal{M}_2(\C)$, tidak
+\omterm{def:b2:reduction:diag}{dapat ditrigonalkan} di $\mathcal{M}_2(\R)$. (iii) Ketaksamaannya
+berjalan geometrik $\leq$ aljabar, tak pernah sebaliknya; menguji
+$\dim E_\lambda \geq 1$ saja tidak membuktikan apa pun tentang
+keterdiagonalan. (iv) $\mu_u$ bukan $\chi_u$: keduanya sama persis
+ketika tiap \omterm{def:b2:reduction:eigen}{nilai eigen} punya satu rantai blok tunggal (misalnya
+matriks pendamping, lihat soal akhir pekan bab ini); memakai $\chi$ di
+tempat $\mu$ diperlukan hanya menggelembungkan setiap perhitungan
+pangkat. (v) Adapun $d$ dan $\nu$ milik Dunford berupa polinomial dalam
+$u$ --- penguraian $u = d' + \nu'$ yang bersifat benar tetapi
+$d'\nu' \neq \nu'd'$ \emph{bukanlah} Dunford dan tak pernah tunggal.
+\end{remark}
+
+\begin{remark}[Di mana bab ini dipakai]
+Reduksi adalah kuda beban bagi sisa buku ini: pangkat dan
+eksponensial matriks menggerakkan sistem persamaan diferensial linear
+pada \cref{ch:b2:diffeq}; teorema spektral pada \cref{ch:b2:quadratic}
+tak lain diagonalisasi yang dibuat ortogonal; fungsi pembangkit
+(\cref{ch:b2:genfun}) menurunkan ulang asimtotik rekurensi pada soal
+akhir pekan bab ini secara analitis. Pada jilid Tahun ke-3 program yang
+sama berjalan dalam dimensi tak hingga: teori spektral atas
+operator kompak yang swa-adjoin, tempat barisan \omterm{def:b2:reduction:eigen}{nilai eigen} menggantikan
+\omterm{def:b2:reduction:eigen}{spektrum} hingga, dan teori Perron--Frobenius atas matriks positif, yang
+menjelaskan \emph{mengapa} \omterm{def:b2:reduction:eigen}{nilai eigen} dominan pada masalah pencacahan
+selalu positif dan sederhana.
+\end{remark}
+
+\section{Nilpoten dan penguraian Dunford}
+
+\begin{proposition}[Endomorfisma nilpoten]\label{prop:b2:reduction:nilpotent}
+Untuk $u$ yang $\chi_u$-nya terurai lengkap, pernyataan berikut setara:
+$u^n = 0$; $u^k = 0$ untuk suatu $k$; $\operatorname{Sp}(u) = \{0\}$;
+$\chi_u = X^n$; $u$ \omterm{def:b2:reduction:diag}{dapat ditrigonalkan} dengan diagonal nol. \omterm{prop:b2:reduction:nilpotent}{Endomorfisma
+nilpoten} punya $\mu_u = X^{\text{(indeks kenilpotenan)}}$, dengan indeks
+$\leq n$.\index{endomorfisma nilpoten}
+\end{proposition}
+
+\begin{proof}
+Dari $u^k = 0$ setiap \omterm{def:b2:reduction:eigen}{nilai eigen} menjadi akar $X^k$: jadi \omterm{def:b2:reduction:eigen}{spektrumnya}
+$\{0\}$ (tak kosong ketika $\chi$ terurai lengkap --- atas $\C$ selalu
+demikian). Maka $\chi_u = X^n$ (semua akarnya nol) dan Cayley--Hamilton
+memberi $u^n = 0$; sedangkan \omterm{def:b2:reduction:diag}{trigonalisasi}
+(\cref{thm:b2:reduction:trigonalization}) menaruh nol pada diagonalnya
+(sebab diagonal mengusung \omterm{def:b2:reduction:eigen}{nilai eigennya}). Sebaliknya, misalkan $A$
+segitiga atas tegas: $a_{ij} = 0$ untuk $j \leq i$. Kita tunjukkan
+secara induktif bahwa
+\[
+(A^k)_{ij} = 0 \qquad \text{setiap kali } j \leq i + k - 1,
+\]
+yakni tiap pangkatnya mendorong daerah nolnya satu diagonal lebih
+tinggi. Untuk $k = 1$ inilah hipotesisnya. Adapun langkah induksinya,
+\[
+(A^{k+1})_{ij} = \sum_{\ell} (A^k)_{i\ell}\,a_{\ell j} ,
+\]
+dan tiap sukunya lenyap: entah $\ell \leq i + k - 1$ (faktor pertamanya
+$0$ menurut induksi) atau $\ell \geq i + k$, dan dalam hal itu
+$j \leq i + k \leq \ell$ menolkan faktor keduanya. Pada $k = n$ syarat
+$j \leq i + n - 1$ berlaku untuk setiap $i, j \leq n$: jadi $A^n =
+0$. \omterm{def:b2:reduction:polyu}{Polinomial minimalnya} membagi $X^n$ dan penolkannya
+mendefinisikan indeksnya.
+\end{proof}
+
+\begin{theorem}[Penguraian Dunford]\label{thm:b2:reduction:dunford}
+Andaikan $\chi_u$ terurai lengkap atas $K$ (yang otomatis untuk $K =
+\C$). Maka ada tepat satu pasangan $(d, \nu)$ dengan
+\[
+u = d + \nu, \qquad d \text{ dapat didiagonalkan}, \quad \nu
+\text{ nilpoten}, \quad d\nu = \nu d ,
+\]
+dan lebih lanjut $d$ dan $\nu$ berupa polinomial dalam
+$u$.\index{penguraian Dunford}
+\end{theorem}
+
+\begin{proof}
+\emph{Keberadaan.} Tulis $\chi_u = \prod_{i=1}^{r} (X -
+\lambda_i)^{m_i}$ (dengan $\lambda_i$ berbeda) lalu tetapkan $N_i = \ker(u -
+\lambda_i)^{m_i}$, yaitu \emph{subruang karakteristiknya}. Menurut
+Cayley--Hamilton dan lema kernel
+(\cref{thm:b2:reduction:kernels}),
+\[
+E = N_1 \oplus \dots \oplus N_r ,
+\]
+dengan proyeksi $\pi_i$ berupa polinomial dalam $u$; tiap $N_i$ bersifat
+stabil (polinomial dalam $u$ komutatif dengan $u$). Tetapkan $d = \sum_i
+\lambda_i \pi_i$: sebuah polinomial dalam $u$ yang \omterm{def:b2:reduction:diag}{dapat didiagonalkan}
+(ia bekerja sebagai $\lambda_i$ pada $N_i$, jadi $E$ terurai menjadi
+\omterm{def:b2:reduction:eigen}{ruang eigennya}). Maka $\nu = u - d$ juga polinomial dalam $u$ (sehingga
+komutatif dengan $d$), dan pada tiap $N_i$ ia bekerja sebagai $u -
+\lambda_i$ dengan $(u - \lambda_i)^{m_i} = 0$ di sana: jadi
+$\nu^{\max m_i} = 0$ pada tiap suku, sehingga $\nu$ nilpoten.
+
+\emph{Ketunggalan.} Misalkan $u = d' + \nu'$ pasangan lain yang seperti
+itu. Karena $d'$ dan $\nu'$ saling komutatif, keduanya komutatif dengan
+$u = d' + \nu'$, jadi komutatif dengan setiap polinomial dalam $u$ ---
+khususnya dengan $d$ dan $\nu$. Maka $d - d'$ \omterm{def:b2:reduction:diag}{dapat didiagonalkan} (dua
+pemetaan komutatif yang \omterm{def:b2:reduction:diag}{dapat didiagonalkan} \omterm{def:b2:reduction:diag}{dapat didiagonalkan} serentak:
+\cref{exo:b2:reduction:9}) dan sama dengan $\nu' - \nu$, yang
+nilpoten: jika $\nu^k = 0$ dan $\nu'^{k'} = 0$, kekomutatifannya
+mengizinkan penguraian binomial
+\[
+(\nu' - \nu)^{k + k' - 1}
+= \sum_{j=0}^{k+k'-1}\binom{k + k' - 1}{j}
+\,\nu'^{\,j}\,(-\nu)^{k + k' - 1 - j} ,
+\]
+yang di dalamnya setiap suku mati: entah $j \geq k'$ (faktor pertamanya
+nol) atau $k + k' - 1 - j \geq k$ (faktor keduanya nol), dan salah satu
+dari keduanya selalu berlaku. Sedangkan nilpoten yang \omterm{def:b2:reduction:diag}{dapat
+didiagonalkan} pastilah nol (\omterm{def:b2:reduction:eigen}{spektrumnya} $\{0\}$ dan ia diagonal pada
+suatu basis): jadi $d = d'$ dan $\nu = \nu'$.
+\end{proof}
+
+\begin{example}[Pangkat dan eksponensial]\label{ex:b2:reduction:powers}
+Untuk $A = \begin{pmatrix} 3 & 1\\ -1 & 1\end{pmatrix}$: $\chi_A = X^2 -
+4X + 4 = (X-2)^2$, satu \omterm{def:b2:reduction:eigen}{nilai eigen} $2$, dengan ruang eigen berdimensi
+$1$: jadi tidak \omterm{def:b2:reduction:diag}{dapat didiagonalkan}. Dunford: $D = 2I$, $N = A - 2I =
+\begin{pmatrix} 1 & 1\\ -1 & -1\end{pmatrix}$, $N^2 = 0$. Maka
+\[
+A^k = (2I + N)^k = 2^k I + k\,2^{k-1} N ,
+\qquad
+\eu^{tA} = \eu^{2t}(I + tN),
+\]
+berturut-turut menurut teorema binomial untuk unsur komutatif dan menurut
+deret eksponensial (\cref{ch:b2:diffeq}) yang terpecah pada suku
+komutatif. Reduksi mengubah dinamika matriks menjadi dinamika skalar.
+\end{example}
+
+\begin{remark}[Pandangan ke depan di dalam jilid ini]\label{rem:b2:reduction:perspectives}
+Reduksi adalah simpul; berikut empat jari-jari yang perlu disimak. Pada
+\cref{ch:b2:nvs}, norma yang diselaraskan mengubah ``semua \omterm{def:b2:reduction:eigen}{nilai eigen}
+bermodulus $< 1$'' menjadi ``suatu norma operator $< 1$'', sehingga
+\omterm{def:b2:reduction:eigen}{spektrum} menguasai kekonvergenan pangkat dan deret. Pada
+\cref{ch:b2:diffeq}, resep pada
+\cref{ex:b2:reduction:powers} menjadi penyelesaian umum
+$X' = AX$: Dunford memecah $\eu^{tA}$ menjadi blok berupa
+polinomial dikali eksponensial, dan kestabilannya terbaca dari
+bagian real \omterm{def:b2:reduction:eigen}{nilai eigennya}. Pada \cref{ch:b2:quadratic}, sebuah
+hasil kali skalar memaksa apa yang tak sanggup dipaksa aljabar linear
+semata: matriks setangkup menjadi \omterm{def:b2:reduction:diag}{dapat didiagonalkan} secara
+\emph{ortogonal}, tanpa bagian nilpoten sama sekali. Dan pada
+\cref{ch:b2:genfun}, asimtotik \omterm{def:b2:reduction:eigen}{nilai eigen} dominan pada soal akhir
+pekan bab ini muncul kembali secara analitis, sebagai singularitas
+terkecil sebuah fungsi pembangkit --- dua bahasa untuk satu laju tumbuh.
+\end{remark}
+
+\section{Latihan}
+
+\begin{exercise}[$\star$]\label{exo:b2:reduction:1}
+Diagonalkan (\omterm{def:b2:reduction:eigen}{nilai eigen}, basis ruang eigen, matriks berinvers $P$):
+\[
+A = \begin{pmatrix} 1 & 2\\ 2 & 1 \end{pmatrix},
+\qquad
+B = \begin{pmatrix} 0 & 1 & 1\\ 1 & 0 & 1\\ 1 & 1 & 0
+\end{pmatrix}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:reduction:2}
+Tunjukkan bahwa $C = \begin{pmatrix} 1 & 1\\ 0 & 1\end{pmatrix}$ tidak
+\omterm{def:b2:reduction:diag}{dapat didiagonalkan}, dengan dua cara: lewat ruang eigen, dan lewat
+\omterm{def:b2:reduction:polyu}{polinomial minimal}.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:reduction:3}
+Misalkan $u$ memenuhi $u^2 - 5u + 6\,\mathrm{id} = 0$. Buktikan bahwa
+$u$ \omterm{def:b2:reduction:diag}{dapat didiagonalkan}, tentukan \omterm{def:b2:reduction:eigen}{spektrum} yang mungkin, lalu hitung
+$u^k$ sebagai kombinasi $\mathrm{id}$ dan $u$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:4}
+Misalkan $u$ \omterm{def:b2:reduction:diag}{dapat didiagonalkan} dan $F$ subruang yang stabil. Buktikan
+bahwa $u|_F$ \omterm{def:b2:reduction:diag}{dapat didiagonalkan} \emph{(batasi sebuah polinomial
+penganihilasi yang terurai lengkap dengan akar sederhana)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:5}
+(Fibonacci) Misalkan $A = \begin{pmatrix} 1 & 1\\ 1 & 0\end{pmatrix}$.
+Diagonalkan $A$ atas $\R$, lalu turunkan rumus Binet untuk
+barisan Fibonacci ($F_0 = 0$, $F_1 = 1$, $F_{n+1} = F_n +
+F_{n-1}$):
+\[
+F_n = \frac{\varphi^n - \psi^n}{\sqrt 5},
+\qquad \varphi = \frac{1 + \sqrt5}{2},\ \psi = \frac{1 -
+\sqrt5}{2}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:6}
+Misalkan $u \in \mathcal{L}(E)$ dengan $u^2$ \omterm{def:b2:reduction:diag}{dapat didiagonalkan} dan $u$
+punya invers ($K = \C$). Buktikan bahwa $u$ \omterm{def:b2:reduction:diag}{dapat didiagonalkan}. Berilah
+contoh penyangkal ketika $u$ tidak punya invers.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:7}
+Hitung \omterm{thm:b2:reduction:dunford}{penguraian Dunford}, $A^k$, dan $\eu^{tA}$ untuk
+\[
+A = \begin{pmatrix} 2 & 1 & 0\\ 0 & 2 & 1\\ 0 & 0 & 2
+\end{pmatrix}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:8}
+Misalkan $A \in \mathcal{M}_n(\C)$ dengan $A^k = I$ untuk suatu $k \geq 1$.
+Buktikan bahwa $A$ \omterm{def:b2:reduction:diag}{dapat didiagonalkan} dan \omterm{def:b2:reduction:eigen}{nilai eigennya} adalah akar
+ke-$k$ dari satu. Turunkan bahwa matriks kompleks berinvers dan berorde
+hingga yang serupa dengan matriks segitiga berdiagonal satu adalah identitas.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:reduction:9}
+(Diagonalisasi serentak) Misalkan $u, v$ \omterm{def:b2:reduction:diag}{dapat didiagonalkan} dan
+saling komutatif. Buktikan bahwa keduanya \omterm{def:b2:reduction:diag}{dapat didiagonalkan}
+\emph{serentak}: ada basis yang mendiagonalkan keduanya. \emph{(Tiap ruang
+eigen $u$ stabil terhadap $v$; diagonalkan pembatasan $v$ di sana,
+dengan memakai \cref{exo:b2:reduction:4}.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:reduction:10}
+Misalkan $u \in \mathcal{L}(\C^n)$. Buktikan bahwa $u$ \omterm{def:b2:reduction:diag}{dapat
+didiagonalkan} bila dan hanya bila setiap subruang yang stabil terhadap
+$u$ punya subruang pelengkap yang juga stabil terhadap $u$. \emph{(Untuk
+$\Leftarrow$: terapkan sifat itu pada $F = \sum_\lambda E_\lambda(u)$,
+jumlah semua ruang eigen; jika pelengkap stabil $G$ tak nol, mentrigonalkan
+$u|_G$ akan menghasilkan \omterm{def:b2:reduction:eigen}{vektor eigen} $u$ di dalam $G$ --- yang
+bertentangan dengan $G \cap F = \{0\}$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:reduction:11}
+(Jari-jari spektral ala Gelfand ringan, cicipan analisis pada
+$2\times2$) Misalkan $A \in \mathcal{M}_2(\C)$ dengan kedua \omterm{def:b2:reduction:eigen}{nilai
+eigennya} bermodulus $< 1$. Buktikan bahwa $A^k \to 0$ unsur demi unsur
+ketika $k \to \infty$. \emph{(Trigonalkan: $A = P(T)P^{-1}$ dengan $T$
+segitiga atas; hitung $T^k$ secara gamblang --- bedakan \omterm{def:b2:reduction:eigen}{nilai eigen} yang
+sama dan yang berbeda --- lalu batasi.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:12}
+Misalkan $u \in \mathcal{L}(\C^n)$ dengan $\operatorname{rk} u = 1$ ($n
+\geq 2$). Tunjukkan bahwa $\chi_u = X^{n-1}(X - \operatorname{tr} u)$,
+dan bahwa $u$ \omterm{def:b2:reduction:diag}{dapat didiagonalkan} bila dan hanya bila $\operatorname{tr} u
+\neq 0$. \emph{(Ingat kembali dari \cref{exo:b2:linalg:5} bahwa $u^2 =
+(\operatorname{tr} u)\,u$.)}
+\end{exercise}
+
+\section{Soal: Rekurensi Linear dan Matriks Pendamping}
+
+Rekurensi linear $u_{n+k} = a_{k-1}u_{n+k-1} + \dots + a_0 u_n$
+tak lain pangkat matriks yang menyamar, dan reduksi mengubahnya menjadi
+rumus tertutup, laju tumbuh, dan taksiran galat. Soal akhir pekan
+ini mengembangkan kamusnya --- matriks pendamping di satu sisi,
+operator geser pada ruang barisan di sisi lain
+--- membuktikan \emph{teorema dasar rekurensi linear}
+(penyelesaian umumnya $\sum_i Q_i(n)\lambda_i^n$ atas akar
+\omterm{def:b2:reduction:charpoly}{polinomial karakteristiknya}), lalu membelanjakan panennya untuk
+penghampiran Diophantus atas $\sqrt2$, untuk pencacahan jalan
+dan kata, serta untuk sebuah cincin barisan berkopling yang hanya dapat
+diurai oleh diagonalisasi serentak.
+
+\begin{problem}[{Soal akhir pekan --- teorema dasar
+rekurensi linear}]
+\label{pb:b2:reduction:1}
+Tetapkan $k \geq 1$, skalar $a_0, \dots, a_{k-1} \in \C$ dengan $a_0
+\neq 0$, polinomial monik $P = X^k - a_{k-1}X^{k-1} - \dots -
+a_1 X - a_0$, dan rekurensi
+\[
+(\mathcal R)\colon\quad u_{n+k} = a_{k-1}u_{n+k-1} + \dots +
+a_1 u_{n+1} + a_0 u_n \qquad (n \geq 0).
+\]
+\emph{Matriks pendamping} bagi $P$ adalah
+\[
+C =
+\begin{pmatrix}
+0 & 1 & & \\
+ & \ddots & \ddots & \\
+ & & 0 & 1\\
+a_0 & a_1 & \cdots & a_{k-1}
+\end{pmatrix}
+\in \mathcal{M}_k(\C).
+\]
+
+\medskip
+\noindent\textbf{Bagian I --- Kamus pendamping.}
+\begin{enumerate}
+  \item Tunjukkan bahwa sebuah barisan $(u_n)$ memenuhi $(\mathcal R)$
+        bila dan hanya bila vektor $v_n = (u_n, u_{n+1}, \dots,
+        u_{n+k-1})^{\mathsf T}$ memenuhi $v_{n+1} = Cv_n$, sehingga
+        $v_n = C^n v_0$.
+  \item Buktikan bahwa $\chi_C = P$ (uraikan $\det(XI - C)$ sepanjang
+        kolom pertama lalu berinduksi pada $k$), lalu bahwa $\mu_C = P$
+        juga \emph{(beralihlah ke $C^{\mathsf T}$, yang $e_1$-nya
+        \omterm{def:b2:structures:generated}{siklik}, dan perhatikan bahwa sebuah matriks dan transposnya
+        punya \omterm{def:b2:reduction:polyu}{polinomial minimal} yang sama)}.
+  \item Tunjukkan bahwa untuk tiap akar $\lambda$ pada $P$, vektor
+        $(1, \lambda, \dots, \lambda^{k-1})^{\mathsf T}$ merentang
+        ruang eigen $C$ bagi $\lambda$; lalu turunkan bahwa
+        \emph{setiap} ruang eigen $C$ berdimensi $1$, dan
+        bahwa $C$ \omterm{def:b2:reduction:diag}{dapat didiagonalkan} bila dan hanya bila $P$ punya $k$
+        akar yang berbeda.
+  \item Andaikan $P$ punya akar berbeda $\lambda_1, \dots,
+        \lambda_k$. Tunjukkan bahwa barisan geometri
+        $(\lambda_i^n)_n$ membentuk basis ruang penyelesaian
+        $(\mathcal R)$, sehingga setiap penyelesaiannya berbentuk $u_n = \sum_i
+        c_i\lambda_i^n$ untuk konstanta $c_i$ yang tunggal.
+  \item Selesaikan seluruhnya: $u_{n+2} = u_{n+1} + 6u_n$, $u_0 = 1$,
+        $u_1 = 8$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian II --- Operator geser dan teorema
+dasarnya.} Misalkan $\mathcal{S}$ ruang vektor atas $\C$ yang berisi
+semua barisan kompleks dan $S \in
+\mathcal{L}(\mathcal{S})$ operator geser, $S\bigl((u_n)_n\bigr) =
+(u_{n+1})_n$.
+\begin{enumerate}[resume]
+  \item Tunjukkan bahwa himpunan penyelesaian $(\mathcal R)$ adalah $\ker
+        P(S)$, dan bahwa dimensinya tepat $k$ \emph{(petakan sebuah
+        penyelesaian ke nilai awalnya)}.
+  \item Jelaskan mengapa lema penguraian kernel
+        (\cref{thm:b2:reduction:kernels}) berlaku bagi $S$ pada
+        $\mathcal{S}$ yang berdimensi tak hingga tanpa perubahan apa pun,
+        lalu tuliskan penguraian $\ker P(S)$ yang dihasilkannya untuk
+        $P = \prod_{i=1}^{r}(X - \lambda_i)^{m_i}$ (dengan $\lambda_i$
+        berbeda dan semuanya tak nol karena $a_0 \neq 0$).
+  \item Untuk $\lambda \neq 0$ dan $m \geq 1$, tunjukkan bahwa
+        \[
+        \ker\,(S - \lambda\,\mathrm{id})^m
+        = \bigl\{\,\bigl(Q(n)\,\lambda^n\bigr)_n : Q \in
+        \C_{m-1}[X]\,\bigr\},
+        \]
+        yang berdimensi $m$. \emph{(Hitung $(S -
+        \lambda)\bigl(Q(n)\lambda^n\bigr) =
+        \lambda^{n+1}(\Delta Q)(n)$ dengan $\Delta Q = Q(X + 1) -
+        Q(X)$, lalu pakai kenyataan bahwa $\Delta$ menurunkan derajatnya;
+        untuk dimensinya, batasi dengan $m$ lewat nilai awalnya.)}
+  \item (Teorema dasar rekurensi linear) Simpulkan:
+        jika $P = \prod_{i=1}^{r}(X - \lambda_i)^{m_i}$ dengan
+        $\lambda_i$ berbeda dan tak nol, maka penyelesaian
+        $(\mathcal R)$ persis semua barisan
+        \[
+        u_n = \sum_{i=1}^{r} Q_i(n)\,\lambda_i^n,
+        \qquad Q_i \in \C_{m_i - 1}[X],
+        \]
+        dengan polinomial $Q_i$ yang tertentu secara tunggal.
+  \item Selesaikan seluruhnya: $u_{n+2} = 4u_{n+1} - 4u_n$, $u_0 =
+        1$, $u_1 = 0$, lalu periksa jawabannya pada $u_2$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian III --- Akar dominan dan panen
+Diophantus.}
+\begin{enumerate}[resume]
+  \item Andaikan akarnya sederhana dengan $\abs{\lambda_1} >
+        \abs{\lambda_i}$ untuk $i \geq 2$, dan $u_n = \sum_i c_i
+        \lambda_i^n$ dengan $c_1 \neq 0$. Tunjukkan $u_n \sim
+        c_1\lambda_1^n$ dan $u_{n+1}/u_n \to \lambda_1$.
+  \item (Pell) Tetapkan $a_{n+1} = a_n + 2b_n$, $b_{n+1} = a_n +
+        b_n$, $a_0 = b_0 = 1$. Tunjukkan bahwa $q(a, b) = a^2 - 2b^2$
+        memenuhi $q(a_{n+1}, b_{n+1}) = -q(a_n, b_n)$, sehingga
+        $a_n^2 - 2b_n^2 = (-1)^{n+1}$; lalu kaitkan hal itu dengan
+        \omterm{def:b2:linalg:det}{determinan} $M = \begin{psmallmatrix}1 & 2\\ 1 &
+        1\end{psmallmatrix}$.
+  \item Turunkan taksiran galat
+        \[
+        \Bigl|\frac{a_n}{b_n} - \sqrt2\Bigr|
+        = \frac{1}{b_n\,(a_n + \sqrt2\,b_n)}
+        \leq \frac{1}{2b_n^2},
+        \]
+        lalu tunjukkan bahwa galat itu meluruh secara geometri dengan
+        rasio $3 - 2\sqrt2$ \emph{(carilah \omterm{def:b2:reduction:eigen}{nilai eigen} $M$ dan laju
+        tumbuh $b_n$)}.
+  \item (Laju tumbuh umum) Dari pertanyaan 9, buktikan: (a) jika setiap
+        akarnya memenuhi $\abs{\lambda_i} \leq \rho$, maka
+        $\abs{u_n} \leq C\,n^{m-1}\rho^n$ dengan $m = \max_i m_i$;
+        (b) jika ada satu akar tunggal $\lambda_1$ yang modulusnya
+        maksimal dan $Q_1 \neq 0$, maka $u_{n+1}/u_n \to
+        \lambda_1$ --- periksalah hal itu pada penyelesaian pertanyaan 10.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian IV --- Mencacah jalan dan kata.} Untuk
+sebuah graf hingga dengan himpunan simpul $\{1, \dots, N\}$,
+\emph{matriks ketetanggaan} $A$ punya $A_{ij} = 1$ bila $ij$ sebuah rusuk,
+dan $0$ bila bukan.
+\begin{enumerate}[resume]
+  \item Buktikan bahwa $(A^n)_{ij}$ adalah banyaknya jalan berpanjang
+        $n$ dari $i$ ke $j$ (rangkaian $n$ rusuk, tiap langkahnya
+        menyusuri sebuah rusuk).
+  \item (Segitiga) Untuk graf lengkap atas $3$ simpul, berlaku
+        $A = J - I$: dengan memakai \omterm{def:b2:reduction:eigen}{spektrum} $J$
+        (\cref{ex:b2:linalg:onesmatrix}), tunjukkan
+        \[
+        (A^n)_{ii} = \frac{2^n + 2(-1)^n}{3},
+        \qquad
+        (A^n)_{ij} = \frac{2^n - (-1)^n}{3} \quad (i \neq j),
+        \]
+        lalu periksa keduanya pada $n = 2$ dengan mendaftar jalannya.
+  \item (Kata tanpa $11$) Misalkan $w_n$ banyaknya kata biner
+        berpanjang $n$ yang tidak punya dua angka $1$ berurutan.
+        Sandikan katanya menurut huruf terakhirnya untuk memperoleh
+        matriks transfer, tunjukkan $w_{n+2} = w_{n+1} + w_n$, turunkan $w_n =
+        F_{n+2}$ (Fibonacci, \cref{exo:b2:reduction:5}), lalu
+        berikan laju tumbuhnya $\lim w_{n+1}/w_n$.
+  \item (Lintasan) Untuk graf lintasan $1 - 2 - 3$, tunjukkan bahwa
+        \omterm{def:b2:reduction:eigen}{nilai eigen} $A$ adalah $\sqrt2, 0, -\sqrt2$ dengan
+        \omterm{def:b2:reduction:eigen}{vektor eigen} $(1, \pm\sqrt2, 1)$ dan $(1, 0, -1)$, lalu
+        turunkan bahwa banyaknya jalan berpanjang $n$ dari ujung
+        ke ujung adalah $\bigl((\sqrt2)^n + (-\sqrt2)^n\bigr)/4$:
+        nol untuk $n$ ganjil, dan $2^{\,n/2 - 1}$ untuk $n$ genap.
+        Periksalah pada $n = 4$.
+  \item (Rumus trace) Tunjukkan bahwa banyaknya seluruh jalan
+        tertutup berpanjang $n$ (dari semua titik awal) adalah
+        $\operatorname{tr}(A^n) = \sum_i \lambda_i^n$, lalu
+        periksalah pada segitiga.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian V --- Sebuah cincin barisan: diagonalisasi
+serentak.} Tetapkan $k \geq 3$, misalkan $\omega = \eu^{2\iu\pi/k}$,
+dan misalkan $W \in \mathcal{M}_k(\C)$ geseran \omterm{def:b2:structures:generated}{siklik}: $W e_i =
+e_{i+1}$ (indeks modulo $k$, dengan kolom berindeks $0, \dots, k-1$).
+\begin{enumerate}[resume]
+  \item Tunjukkan bahwa $W^{\mathsf T}$ adalah matriks pendamping bagi
+        $X^k - 1$, lalu turunkan $\chi_W = \mu_W = X^k - 1$, dan bahwa $W$
+        \omterm{def:b2:reduction:diag}{dapat didiagonalkan} dengan $k$ \omterm{def:b2:reduction:eigen}{nilai eigen} sederhana
+        $\omega^j$ beserta \omterm{def:b2:reduction:eigen}{vektor eigen} $f_j = (1, \omega^{-j},
+        \omega^{-2j}, \dots, \omega^{-(k-1)j})^{\mathsf T}$.
+  \item Matriks \emph{sirkulan} adalah $C = c_0 I + c_1 W + \dots
+        + c_{k-1}W^{k-1}$. Tunjukkan bahwa semua sirkulan saling
+        komutatif, bahwa basis $(f_0, \dots, f_{k-1})$ mendiagonalkan
+        \emph{semuanya} serentak, dan bahwa
+        \omterm{def:b2:reduction:eigen}{nilai eigen} $C$ adalah $\widehat c(\omega^j) = \sum_m
+        c_m \omega^{jm}$, $j = 0, \dots, k-1$.
+  \item Turunkan $\det C = \prod_{j=0}^{k-1} \widehat
+        c(\omega^j)$, lalu periksa bahwa $k = 3$ memulihkan
+        pemfaktoran pada \cref{exo:b2:linalg:8}.
+  \item (Rata-rata kalung) Misalkan $x^{(n+1)} = Mx^{(n)}$ dengan
+        $M = \frac12(W + W^{-1})$: masing-masing dari $k$ bilangan yang
+        tersusun melingkar diganti dengan rata-rata kedua
+        tetangganya. Tunjukkan bahwa \omterm{def:b2:reduction:eigen}{nilai eigen} $M$ adalah
+        $\cos(2\pi j/k)$, dan bahwa koefisien $x^{(0)}$
+        pada $f_0$ adalah rata-rata $\frac1k\sum_m x^{(0)}_m$
+        \emph{(jumlahkan koordinat tiap $f_j$)}.
+  \item Simpulkan: untuk $k$ ganjil, $x^{(n)}$ konvergen ke
+        vektor konstan yang nilainya rata-rata nilai awalnya;
+        sedangkan untuk $k = 4$, tunjukkan \omterm{def:b2:reduction:eigen}{nilai eigen} yang
+        bertanggung jawab atas ketakkonvergenannya beserta halangannya
+        yang tepat (yaitu koefisien rata-rata berselang-seling yang wajib nol).
+  \item (Rangkuman) Dengan satu kalimat untuk masing-masing: bagaimana
+        matriks pendamping mengubah telaah $(\mathcal R)$ menjadi
+        reduksi; di mana lema penguraian kernel sama sekali
+        tidak memerlukan dimensi hingga; mengapa \omterm{def:b2:reduction:eigen}{nilai eigen} dominan
+        menguasai laju tumbuh dan galat Diophantus; mengapa pangkat
+        matriks ketetanggaan mencacah jalan; dan apa yang dibeli oleh
+        matriks yang saling komutatif. Sebutkan kedua puncaknya: teorema
+        dasar rekurensi linear, dan --- untuk matriks positif
+        pada Bagian IV, di jilid Tahun ke-3 --- teorema Perron--Frobenius.
+
+\end{enumerate}
+\end{problem}

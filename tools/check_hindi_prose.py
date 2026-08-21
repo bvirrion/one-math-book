@@ -101,6 +101,13 @@ TECHNICAL_MACROS = {
 # \href{url}{text} likewise.
 SPLIT_MACROS = {"omterm": (1, 1), "href": (1, 1), "hyperref": (1, 1)}
 
+# The mirror image: \texorpdfstring{<typeset>}{<PDF bookmark>} keeps its FIRST
+# argument and drops its second. The bookmark is a plain-text fallback that no
+# reader sees on the page, and it is deliberately ASCII -- PDF outlines cannot
+# carry math. Reading it as prose makes \texorpdfstring{$SO(3)$}{SO(3)} report
+# "SO" as residual English. Used in 11 chapters, in every language edition.
+KEEP_DROP_MACROS = {"texorpdfstring": (1, 1)}
+
 # Environments whose optional argument is a visible title (so it IS prose).
 TITLED_ENVS = {
     "definition", "theorem", "proposition", "lemma", "corollary", "example",
@@ -330,6 +337,17 @@ def visible_text(text: str, findings: list, path: str, depth: int = 0) -> str:
 
         if name == "end":
             _, j = match_group(text, skip_ws(text, j), "{", "}")
+            i = j
+            continue
+
+        if name in KEEP_DROP_MACROS:
+            keep, drop = KEEP_DROP_MACROS[name]
+            for _ in range(keep):
+                inner, j = match_group(text, skip_ws(text, j), "{", "}")
+                if inner:
+                    out.append(" " + nested_text(inner, depth) + " ")
+            for _ in range(drop):
+                _, j = match_group(text, skip_ws(text, j), "{", "}")
             i = j
             continue
 

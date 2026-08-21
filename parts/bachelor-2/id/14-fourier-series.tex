@@ -1,0 +1,911 @@
+\chapter{Deret Fourier}\label{ch:b2:fourier}
+
+Dapatkah setiap sinyal berkala \omterm{def:b2:structures:generated}{dibangun} ulang dari sinus dan kosinus murni?
+Jawaban ``ya'' Fourier yang berani menciptakan satu abad analisis. Bab
+ini membuktikan dua pilarnya yang terjangkau pada tingkat ini:
+\emph{teorema Dirichlet} (yakni rekonstruksi \omterm{def:b2:funcseq:def}{titik demi titik} untuk fungsi
+$C^1$ sepotong-sepotong, lewat \omterm{lem:b2:fourier:kernel}{kernel Dirichlet}) dan \emph{kesamaan Parseval}
+(yakni energi sebuah sinyal sama dengan jumlah energi harmoniknya), lalu
+memanen deret numerik klasiknya --- dengan Basel $\sum 1/n^2 =
+\pi^2/6$ yang pertama di antaranya.
+
+Di sepanjang bab ini, fungsinya berkala-$2\pi$, \omterm{def:b2:metric:continuity}{kontinu} sepotong-sepotong,
+dan bernilai kompleks; sedangkan $\mathcal{C}$ menyatakan yang \omterm{def:b2:metric:continuity}{kontinu}.
+
+\section{Koefisien Fourier}
+
+\begin{definition}\label{def:b2:fourier:coefficients}
+Adapun \emph{koefisien Fourier}\index{koefisien Fourier} bagi $f$
+adalah
+\[
+c_n(f) = \frac{1}{2\pi}\int_{-\pi}^{\pi} f(t)\,\eu^{-\iu n t}\,\dd
+t \qquad (n \in \Z),
+\]
+dan koefisien bentuk realnya $a_n = c_n + c_{-n}$, $b_n = \iu(c_n
+- c_{-n})$, sehingga \emph{jumlah parsial Fourier}\index{jumlah parsial
+Fourier} berbunyi
+\[
+S_N(f)(t) = \sum_{n=-N}^{N} c_n(f)\,\eu^{\iu nt}
+= \frac{a_0}{2} + \sum_{n=1}^{N}\bigl(a_n\cos nt + b_n \sin
+nt\bigr).
+\]
+Pada $\mathcal{C}$, definisikan \omterm{def:b2:hermitian:def}{hasil kali dalam Hermitian} $\langle f,
+g\rangle = \frac{1}{2\pi}\int_{-\pi}^{\pi}\conj f\,g$: maka
+eksponensial $e_n(t) = \eu^{\iu nt}$ bersifat \emph{ortonormal}
+(sebab $\langle e_m, e_n\rangle = \delta_{mn}$ lewat perhitungan langsung), dan
+$c_n(f) = \langle e_n, f\rangle$: jadi analisis Fourier adalah geometri
+\omterm{def:b2:hermitian:adjoint}{Hermitian} (\cref{ch:b2:hermitian}) dalam dimensi tak hingga.
+\end{definition}
+
+\begin{proposition}[Ketaksamaan Bessel]\label{prop:b2:fourier:bessel}
+Jumlah $S_N(f)$ adalah proyeksi ortogonal $f$ ke ruang
+$\mathcal{T}_N$ berisi polinomial trigonometri berderajat $\leq N$,
+dan\index{ketaksamaan Bessel}
+\[
+\sum_{n=-N}^{N} \abs{c_n(f)}^2 \leq \norm f_2^2 =
+\frac{1}{2\pi}\int_{-\pi}^{\pi} \abs f^2 :
+\]
+jadi deret $\sum \abs{c_n}^2$ konvergen, dan $c_n(f) \to 0$ ketika
+$\abs n \to \infty$ (yakni Riemann--Lebesgue bagi koefisiennya).
+\end{proposition}
+
+\begin{proof}
+Selisih $f - S_N(f)$ ortogonal terhadap tiap $e_k$ dengan $\abs k \leq N$ (sebab $\langle
+e_k, f - S_N f\rangle = c_k - c_k = 0$): jadi $S_Nf$ adalah proyeksi
+ortogonal ke $\mathcal{T}_N = \operatorname{Vect}(e_{-N}, \dots,
+e_N)$ (lewat teorema proyeksi jilid Tahun ke-1, kata demi kata pada
+latar \omterm{def:b2:hermitian:adjoint}{Hermitiannya}). Menurut Pythagoras: $\norm f_2^2 = \norm{S_Nf}_2^2 +
+\norm{f - S_Nf}_2^2 \geq \norm{S_Nf}_2^2 = \sum_{\abs n \leq N}
+\abs{c_n}^2$; lalu lewatkan $N \to \infty$.
+\end{proof}
+
+\begin{example}[Hampiran terbaik, ditakar]\label{ex:b2:fourier:bestapprox}
+Seberapa baik polinomial trigonometri berderajat rendah menghampiri
+gigi gergaji $f(t) = t$ (pada $\intoo{-\pi}{\pi}$) dalam
+rerata kuadratiknya? Menurut \cref{prop:b2:fourier:bessel}, hampiran
+terbaik berderajat $N$ \emph{adalah} $S_N(f)$, dengan galat kuadrat
+\[
+\norm{f - S_Nf}_2^2 = \norm f_2^2 -
+\sum_{\abs n\leq N}\abs{c_n}^2 .
+\]
+Di sini $\norm f_2^2 = \frac{1}{2\pi}\int_{-\pi}^\pi t^2\dd t =
+\frac{\pi^2}{3}$, dan dari $b_n = \frac{2(-1)^{n+1}}{n}$
+(\cref{ex:b2:fourier:basel}) diperoleh $\abs{c_n}^2 + \abs{c_{-n}}^2 =
+\frac{b_n^2}{2} = \frac{2}{n^2}$. Jadi
+\[
+\norm{f - S_Nf}_2^2
+= \frac{\pi^2}{3} - \sum_{n=1}^{N}\frac{2}{n^2}
+\qquad\text{: secara numerik } 1.29,\ 0.79,\ 0.57,\ 0.44
+\]
+untuk $N = 1, 2, 3, 4$ --- yang menurun, tetapi lambat: sebab ekornya
+$\sum_{n>N}\frac2{n^2} \sim \frac2N$ dikendalikan oleh peluruhan
+$\frac1n$ yang lambat pada koefisiennya, dan itu sendiri tanda
+lompatannya (\cref{exo:b2:fourier:6} yang dibaca terbalik). Pelajaran
+penutupnya: Parseval mengubah mutu hampiran menjadi ekor sebuah
+deret numerik --- lalu meramalkan, sebelum sebuah gambar pun, bahwa
+lompatan membuat deret Fourier konvergen dengan enggan.
+\end{example}
+
+\begin{method}[Menghitung koefisien Fourier secara efisien]\label{met:b2:fourier:coefficients}
+Sebelum mengintegralkan apa pun:
+\begin{enumerate}
+  \item \emph{Keparitasan:} $f$ yang genap punya $b_n = 0$, dan $f$ yang ganjil punya
+        $a_n = 0$, dan integral yang bertahan menyusut menjadi $\frac2\pi
+        \int_0^\pi$ --- jadi separuh kerja dengan keandalan dua kali lipat.
+  \item \emph{Polinomial trigonometri sudah selesai:}
+        linearkan hasil kalinya ($\cos^3$, $\sin^2\cos$, \dots) lalu
+        bacalah koefisiennya
+        (\cref{exo:b2:fourier:9}); sebab keortonormalannya membuat
+        pengintegralan lanjutan menjadi mubazir.
+  \item \emph{Eksponensial kompleks untuk eksponensial:} untuk
+        faktor $\eu^{at}$ atau osilasi teredam, hitunglah
+        $c_n$ secara langsung --- sebab satu integral $\eu^{(a - \iu
+        n)t}$ mengalahkan dua kali pengintegralan parsial
+        (\cref{exo:b2:fourier:10}).
+  \item \emph{Turunkan sebuah uraian yang diketahui:} bila $f'$ punya
+        koefisien yang diketahui dan $f$ \omterm{def:b2:metric:continuity}{kontinu}, maka $c_n(f) =
+        \frac{c_n(f')}{\iu n}$ (untuk $n \neq 0$) memulihkan semuanya kecuali
+        $c_0$, yang tak lain rerataannya --- ini kerap rute tercepat,
+        dan sah persis di bawah hipotesis
+        \cref{thm:b2:fourier:parseval}~(1).
+\end{enumerate}
+\end{method}
+
+\section{Teorema Dirichlet}
+
+\begin{lemma}[Kernel Dirichlet]\label{lem:b2:fourier:kernel}
+Berlaku $S_N(f)(x) = \frac{1}{2\pi}\int_{-\pi}^{\pi} f(x + u)\,D_N(u)\,\dd
+u$, dengan\index{kernel Dirichlet}
+\[
+D_N(u) = \sum_{n=-N}^{N} \eu^{\iu nu}
+= \frac{\sin\bigl((N + \frac12)u\bigr)}{\sin\frac u2}
+\quad (u \notin 2\pi\Z),
+\qquad
+\frac{1}{2\pi}\int_{-\pi}^{\pi} D_N = 1 .
+\]
+\end{lemma}
+
+\begin{proof}
+Sisipkan definisi $c_n$ ke dalam $S_N$ lalu tukarkan jumlah dan integralnya
+(yang sah sebab jumlahnya berhingga):
+\[
+S_N(f)(x)
+= \sum_{n=-N}^{N}\Bigl(\frac{1}{2\pi}\int_{-\pi}^{\pi}
+f(t)\,\eu^{-\iu nt}\dd t\Bigr)\eu^{\iu nx}
+= \frac{1}{2\pi}\int_{-\pi}^{\pi} f(t)
+\sum_{n=-N}^{N}\eu^{\iu n(x-t)}\,\dd t ;
+\]
+sulihkan $u = t - x$ lalu geser kembali ruas pengintegralannya
+ke $\intcc{-\pi}{\pi}$ berkat kekalaan-$2\pi$ integrannya;
+sedangkan jangkauan indeksnya yang simetris membuat $\sum_n\eu^{-\iu nu} = D_N(u)$.
+Bentuk tertutupnya: yakni jumlah geometri berasio $\eu^{\iu u}$,
+\[
+D_N(u) = \eu^{-\iu Nu}\,\frac{\eu^{\iu(2N+1)u} - 1}{\eu^{\iu u} -
+1}
+= \frac{\eu^{\iu(N + \frac12)u} - \eu^{-\iu(N+\frac12)u}}
+{\eu^{\iu u/2} - \eu^{-\iu u/2}} ,
+\]
+yang tak lain hasil bagi sinusnya. Rerataannya $1$: sebab hanya $n = 0$
+yang menyumbang.
+\end{proof}
+
+\begin{theorem}[Lema Riemann--Lebesgue]\label{thm:b2:fourier:riemannlebesgue}
+Untuk $g$ yang \omterm{def:b2:metric:continuity}{kontinu} sepotong-sepotong pada sebuah ruas, berlaku
+$\int_a^b g(t)\sin(\lambda t + \varphi)\,\dd t \to 0$ ketika $\lambda
+\to +\infty$.\index{lema Riemann--Lebesgue}
+\end{theorem}
+
+\begin{proof}
+Hampiri $g$ secara \omterm{def:b2:funcseq:def}{seragam} dengan fungsi tangga
+(sebab \cref{thm:b2:funcseq:weierstrass} tak diperlukan --- hampiran
+fungsi tangga yang dasar bagi fungsi \omterm{def:b2:metric:continuity}{kontinu} sepotong-sepotong
+sudah cukup) lalu integralkan tiap tangganya secara gamblang: maka setiap
+kepingnya menyumbang $O\bigl(\frac1\lambda\bigr)$, dan galat
+hampirannya menyumbang $\varepsilon(b - a)$. Hujah ini dikerjakan
+selengkapnya sebagai latihan terakhir bab integrasi pada jilid
+Tahun ke-1; sedangkan untuk keping $C^1$ kita malah dapat mengintegralkan
+secara parsial lalu membatasinya dengan $\frac C\lambda$.
+\end{proof}
+
+\begin{example}[Secepat apa koefisiennya mati?]\label{ex:b2:fourier:decaytable}
+Riemann--Lebesgue mengatakan koefisiennya menuju $0$; sedangkan
+\emph{lajunya} merupakan alat ukur kemulusan. Tiga spesimen dari bab
+ini dan latihannya:
+\[
+\text{gelombang persegi: } b_n = \frac{4}{\pi n}\ (n\ \text{ganjil}),
+\qquad
+\abs t : a_n = \frac{-4}{\pi n^2}\ (n\ \text{ganjil}),
+\qquad
+\abs{\sin t} : a_{2k} = \frac{-4}{\pi(4k^2-1)} .
+\]
+Sebuah lompatan pada $f$ (gelombang persegi, gigi gergaji) meninggalkan
+koefisien berorde $\frac1n$: jadi tanpa \omterm{def:b2:funcseq:series}{kekonvergenan normal}, dan dengan
+lonjakan Gibbs di lompatannya. Sedangkan kekontinuan dengan sebuah sudut ---
+yakni lompatan pada $f'$ belaka --- memperbaiki ordenya menjadi
+$\frac{1}{n^2}$: sehingga \omterm{def:b2:funcseq:series}{kekonvergenan normal} dan rekonstruksi \omterm{def:b2:funcseq:def}{seragam}.
+Secara umum $k$ turunan membeli $c_n =
+O(n^{-k})$ (\cref{exo:b2:fourier:6}), dan sebaliknya \omterm{def:b2:reduction:eigen}{spektrum} yang
+meluruh lebih cepat daripada setiap pangkat memaksa $f$ menjadi $C^\infty$
+(turunkan suku demi suku, kini secara sah). Pelajaran
+penutupnya: keteraturan sinyalnya dan peluruhan \omterm{def:b2:reduction:eigen}{spektrumnya}
+adalah informasi yang sama --- jadi seorang insinyur membaca yang satu dari
+kemiringan yang lain tanpa pernah menggambar fungsinya.
+\end{example}
+
+\begin{theorem}[Dirichlet]\label{thm:b2:fourier:dirichlet}
+Misalkan $f$ berkala-$2\pi$ dan $C^1$ sepotong-sepotong. Maka untuk setiap $x$,
+\[
+S_N(f)(x) \xrightarrow[N \to \infty]{}
+\frac{f(x^+) + f(x^-)}{2}
+\]
+(yakni rerata limit sepihaknya) --- khususnya $S_N(f)(x) \to
+f(x)$ di setiap titik kekontinuannya.\index{teorema Dirichlet}
+\end{theorem}
+
+
+\begin{proof}
+Menurut lema kernelnya dan rerataan satuannya, setelah integralnya dipecah
+menjadi paruh $u > 0$ dan $u < 0$ (yang masing-masing bererata $\frac12$):
+\begin{align*}
+S_N(f)(x) - \frac{f(x^+) + f(x^-)}{2}
+&= \frac{1}{2\pi}\int_{0}^{\pi} \bigl(f(x+u) -
+f(x^+)\bigr)D_N(u)\,\dd u\\
+&\quad+ \frac{1}{2\pi}\int_{-\pi}^{0}\bigl(f(x+u) -
+f(x^-)\bigr)D_N(u)\,\dd u .
+\end{align*}
+Tanganilah yang pertama (sebab yang kedua simetris). Tulislah
+\[
+\bigl(f(x + u) - f(x^+)\bigr)\,D_N(u)
+= \underbrace{\frac{f(x+u) - f(x^+)}{\sin\frac u2}}_{g(u)}\,
+\sin\Bigl(\Bigl(N + \frac12\Bigr)u\Bigr) .
+\]
+Fungsi $g$ \omterm{def:b2:metric:continuity}{kontinu} sepotong-sepotong pada $\intoc{0}{\pi}$ dan
+punya \emph{limit hingga di $0^+$}: sebab dengan menulis
+\[
+g(u) = \frac{f(x+u) - f(x^+)}{u}\cdot\frac{u}{\sin\frac u2} ,
+\]
+faktor pertamanya menuju $f'(x^+)$ (berkat keterdiferensialan
+sepihaknya, dari $C^1$ sepotong-sepotong) dan yang kedua menuju $2$
+(lewat limit baku $\frac{\sin v}{v} \to 1$ di $v = \frac
+u2$): jadi $g(0^+) = 2f'(x^+)$ ada. Karena itu $g$ meluas secara
+\omterm{def:b2:metric:continuity}{kontinu} sepotong-sepotong ke $\intcc{0}{\pi}$, lalu Riemann--Lebesgue
+(\cref{thm:b2:fourier:riemannlebesgue}) mengirim integralnya ke
+$0$. Inilah seluruh maksud hipotesisnya: sebab tanpa
+turunan sepihaknya, faktor $\frac{1}{\sin(u/2)}$ meledak
+di $0$ lebih cepat daripada yang dapat diimbangi Riemann--Lebesgue, dan
+\omterm{def:b2:funcseq:def}{kekonvergenan titik demi titik} sungguh dapat gagal untuk $f$ yang sekadar
+\omterm{def:b2:metric:continuity}{kontinu} --- yakni celah yang ditutup teorema Fejér (soal akhir pekan)
+lewat perata-rataan.
+\end{proof}
+
+\begin{example}[Dirichlet di sebuah lompatan]\label{ex:b2:fourier:jumpvalue}
+Untuk gigi gergaji $f(t) = t$ pada $\intoo{-\pi}{\pi}$
+(\cref{ex:b2:fourier:basel} di bawah), perluasan berkalanya
+melompat di $t = \pi$ dari $f(\pi^-) = \pi$ ke $f(\pi^+) = -\pi$.
+Dirichlet menjanjikan nilai $\frac{\pi + (-\pi)}{2} = 0$
+di sana, dan memang setiap suku $\sum
+\frac{2(-1)^{n+1}}{n}\sin nt$ lenyap di $t = \pi$: jadi
+deretnya konvergen dengan sopan ke titik tengahnya, sambil mengabaikan kedua
+nilai sepihaknya. Sedangkan memindahkan titik penilaiannya ke $t =
+\frac\pi2$ (yakni titik kekontinuan) mengubah deret yang sama
+menjadi $\frac\pi4$ milik Leibniz. Satu deret, dua kelakuan ---
+persis kedua klausa teoremanya.
+\end{example}
+
+\begin{theorem}[Kekonvergenan normal untuk $C^1$; Parseval]\label{thm:b2:fourier:parseval}
+\begin{enumerate}
+  \item Bila $f$ \omterm{def:b2:metric:continuity}{kontinu}, berkala-$2\pi$ dan $C^1$ sepotong-sepotong,
+        maka $c_n(f') = \iu n\,c_n(f)$, deret Fourier $f$
+        konvergen \emph{normal} pada $\R$, dan jumlahnya adalah $f$.
+  \item (Parseval) Untuk setiap fungsi berkala-$2\pi$ yang \omterm{def:b2:metric:continuity}{kontinu}
+        sepotong-sepotong, sebut saja $f$:\index{kesamaan Parseval}
+        \[
+        \frac{1}{2\pi}\int_{-\pi}^{\pi}\abs{f}^2
+        = \sum_{n=-\infty}^{\infty} \abs{c_n(f)}^2
+        = \frac{\abs{a_0}^2}{4} + \frac12\sum_{n\geq1}
+        \bigl(\abs{a_n}^2 + \abs{b_n}^2\bigr).
+        \]
+        \emph{(Dibuktikan di sini untuk $f$ \omterm{def:b2:metric:continuity}{kontinu} yang $C^1$
+        sepotong-sepotong; dan diterima tanpa bukti secara umum.)}
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) Pengintegralan parsial pada tiap keping $C^1$-nya (dengan suku
+perbatasannya saling meniadakan berkat kekontinuan dan kekalaannya) memberi
+$c_n(f') = \iu n c_n(f)$. Lalu, lewat Cauchy--Schwarz pada kedua keluarga
+yang \omterm{def:b2:series:summable}{terjumlahkan} kuadratnya (\cref{prop:b2:fourier:bessel} bagi $f'$):
+\[
+\sum_{n \neq 0} \abs{c_n(f)} = \sum_{n\neq0}
+\frac{\abs{c_n(f')}}{\abs n}
+\leq \Bigl(\sum \abs{c_n(f')}^2\Bigr)^{1/2}
+\Bigl(\sum_{n\neq0}\frac{1}{n^2}\Bigr)^{1/2} < \infty :
+\]
+jadi deret Fouriernya konvergen normal. Jumlahnya \omterm{def:b2:metric:continuity}{kontinu} dan
+berimpit dengan $f$ di setiap titik menurut Dirichlet
+(\cref{thm:b2:fourier:dirichlet}: sebab $f$ \omterm{def:b2:metric:continuity}{kontinu}): jadi deretnya
+konvergen ke $f$ secara \omterm{def:b2:funcseq:def}{seragam}.
+
+(2) Untuk $f$ yang demikian: $S_N f \to f$ secara \omterm{def:b2:funcseq:def}{seragam}, jadi $\norm{f - S_Nf}_2
+\leq \norm{f - S_Nf}_\infty \to 0$, lalu Pythagoras
+(sebab $\norm f_2^2 = \sum_{\abs n \leq N}\abs{c_n}^2 + \norm{f -
+S_Nf}_2^2$) melewatkan limitnya. Adapun bentuk realnya sekadar tata buku dengan
+$a_n, b_n$.
+\end{proof}
+
+\begin{example}[Batas ekor $C^1$, dibuat kuantitatif]\label{ex:b2:fourier:tailbound}
+Bukti \cref{thm:b2:fourier:parseval}~(1) menyembunyikan sebuah taksiran
+yang berguna. Untuk fungsi \omterm{def:b2:metric:continuity}{kontinu} yang $C^1$ sepotong-sepotong, sebut $f$,
+Cauchy--Schwarz yang sama, diterapkan pada ekornya saja, memberi
+\[
+\sum_{\abs n > N}\abs{c_n(f)}
+= \sum_{\abs n > N}\frac{\abs{c_n(f')}}{\abs n}
+\leq \Bigl(\sum_{\abs n > N}\abs{c_n(f')}^2\Bigr)^{\!1/2}
+\Bigl(\sum_{\abs n>N}\frac{1}{n^2}\Bigr)^{\!1/2}
+\leq \norm{f'}_2\,\sqrt{\frac{2}{N}} ,
+\]
+dengan memakai Bessel bagi $f'$ dan $\sum_{n>N}n^{-2} \leq \frac1N$. Jadi
+galat \omterm{def:b2:funcseq:def}{seragam} jumlah parsialnya menaati
+\[
+\norm{f - S_Nf}_\infty
+\leq \sum_{\abs n>N}\abs{c_n(f)}
+\leq \norm{f'}_2\,\sqrt{\frac2N} .
+\]
+Untuk $f(t) = \abs t$: berlaku $\norm{f'}_2 = 1$ (sebab turunannya
+$\pm1$), jadi sepuluh suku saja sudah membangun ulang $\abs t$ secara seragam
+dalam $\sqrt{0.2} \approx 0.45$, dan $N = 10^4$ dalam
+$0.015$. Pelajaran penutupnya: satu turunan membeli laju
+\omterm{def:b2:funcseq:def}{seragam} $\frac{1}{\sqrt N}$; dan bila dibandingkan dengan
+dunia berkoefisien $\frac1n$ milik gelombang persegi (yang sama sekali tak
+konvergen seragam), kamus
+\cref{ex:b2:fourier:decaytable} memperoleh angkanya.
+\end{example}
+
+\begin{example}[Basel dan kawan-kawan]\label{ex:b2:fourier:basel}
+Misalkan $f(t) = t$ pada $\intoo{-\pi}{\pi}$, yang diperluas secara
+berkala-$2\pi$ (yakni gigi gergaji yang $C^1$ sepotong-sepotong). Setelah dihitung, $a_n = 0$ (berkat keganjilannya) dan
+\[
+b_n = \frac{1}{\pi}\int_{-\pi}^{\pi} t\sin nt\,\dd t
+= \frac{2(-1)^{n+1}}{n} .
+\]
+Dirichlet di $t = \frac\pi2$ memulihkan $\frac\pi4 = 1 -
+\frac13 + \frac15 - \dots$ milik Leibniz; sedangkan Parseval memberi
+\[
+\frac{1}{2\pi}\int_{-\pi}^{\pi} t^2\,\dd t = \frac{\pi^2}{3}
+= \frac12\sum_{n\geq1}\frac{4}{n^2}
+\quad\Longrightarrow\quad
+\boxed{\;\sum_{n\geq1}\frac{1}{n^2} = \frac{\pi^2}{6}\;}
+\]
+--- yakni jumlah Basel milik Euler, dalam dua baris. Fungsi $f(t) = t^2$
+serupa itu menghasilkan $\sum \frac1{n^4} = \frac{\pi^4}{90}$
+(\cref{exo:b2:fourier:3}).
+\end{example}
+
+\begin{example}[Sebuah uraian lengkap dengan pemeriksaan bawaan: $\abs{\sin t}$]\label{ex:b2:fourier:abssin}
+Fungsi $f(t) = \abs{\sin t}$ bersifat \omterm{def:b2:metric:continuity}{kontinu}, genap,
+berkala-$\pi$ (sehingga berkala-$2\pi$), dan $C^1$ sepotong-sepotong.
+Kegenapannya membunuh $b_n$; lalu $a_0 = \frac1\pi\int_{-\pi}^{\pi}
+\abs{\sin t}\dd t = \frac4\pi$; dan untuk $n \geq 1$,
+hasil-kali-ke-jumlah memberi
+\[
+a_n = \frac2\pi\int_0^\pi \sin t\cos nt\,\dd t
+= \frac{1}{\pi}\int_0^\pi\bigl(\sin(1+n)t +
+\sin(1-n)t\bigr)\dd t
+= \frac2\pi\cdot\frac{1 + \cos n\pi}{1 - n^2}
+\]
+untuk $n \neq 1$ (dan $a_1 = 0$ secara langsung): jadi nol untuk $n$ ganjil, dan
+$a_{2k} = \frac{-4}{\pi(4k^2-1)}$. Menurut
+\cref{thm:b2:fourier:parseval}~(1) kekonvergenannya normal,
+dan
+\[
+\abs{\sin t} = \frac{2}{\pi} - \frac{4}{\pi}
+\sum_{k\geq1}\frac{\cos(2kt)}{4k^2 - 1}
+\qquad (t \in \R) .
+\]
+Pemeriksaan bawaannya di $t = 0$: kesamaannya menuntut
+$\sum_{k\geq1}\frac{1}{4k^2-1} = \frac12$, yang ditegaskan
+teleskopnya:
+\[
+\sum_{k\geq1}\frac{1}{4k^2-1}
+= \frac12\sum_{k\geq1}\Bigl(\frac{1}{2k-1} -
+\frac{1}{2k+1}\Bigr) = \frac12 . \checkmark
+\]
+Pelajaran penutupnya: \omterm{def:b2:reduction:eigen}{spektrum} $\abs{\sin}$ hidup pada
+frekuensi \emph{genap} belaka --- sebab menyearahkan sebuah sinus melipatduakan
+kandungan frekuensinya, dan itulah sebabnya penyearah gelombang penuh berdengung pada
+$100$ atau $120$ hertz, dua kali frekuensi jala-jalanya.
+\end{example}
+
+\begin{example}[Parseval sebagai alat hitung]\label{ex:b2:fourier:zetafourodd}
+Parseval mengubah tiap uraian yang ada menjadi deret numerik secara borongan.
+Terapkanlah ia pada $f(t) = \abs t$ (\cref{exo:b2:fourier:2}: dengan $a_0 =
+\pi$, $a_n = \frac{-4}{\pi n^2}$ untuk $n$ ganjil, dan sisanya nol):
+\[
+\frac{1}{2\pi}\int_{-\pi}^{\pi}t^2\,\dd t = \frac{\pi^2}{3}
+= \frac{a_0^2}{4} + \frac12\sum_{n \text{ ganjil}} a_n^2
+= \frac{\pi^2}{4} +
+\frac{8}{\pi^2}\sum_{n\text{ ganjil}}\frac{1}{n^4} ,
+\]
+sehingga
+\[
+\sum_{n\text{ ganjil}}\frac{1}{n^4}
+= \frac{\pi^2}{8}\Bigl(\frac{\pi^2}{3} -
+\frac{\pi^2}{4}\Bigr) = \frac{\pi^4}{96} .
+\]
+Periksa silang terhadap \cref{exo:b2:fourier:3}: memecah
+$\sum\frac1{n^4}$ menjadi bagian ganjil dan genap memberi tata buku
+bergaya-$\zeta$ $S = S_{\mathrm{ganjil}} + \frac{S}{16}$, jadi $S =
+\frac{16}{15}\cdot\frac{\pi^4}{96} = \frac{\pi^4}{90}$ ---
+persis nilai yang ditemukan di sana lewat fungsi yang berbeda. Dua
+uraian, satu bilangan: jadi kekonsistenannya adalah isometri Parseval
+yang bekerja. Pelajaran penutupnya: tiap uraian Fourier yang baru adalah
+mesin pembangkit bagi kesamaan deret; dan Bagian II soal akhir
+pekan menjelaskan mengapa mesinnya tak pernah dapat
+membantah dirinya sendiri.
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=9.2cm, height=5.6cm,
+    xmin=-3.6, xmax=3.6, ymin=-1.5, ymax=1.5,
+    xtick={-3.1416, 0, 3.1416},
+    xticklabels={$-\pi$, $0$, $\pi$}, ytick={-1,1}]
+  \addplot[omExo, thick] coordinates {(-3.1416,-1) (0,-1)};
+  \addplot[omExo, thick] coordinates {(0,1) (3.1416,1)};
+  \addplot[omDef, thick, domain=-3.3:3.3, samples=200]
+    {4/pi*sin(deg(x))};
+  \addplot[omThm, very thick, domain=-3.3:3.3, samples=400]
+    {4/pi*(sin(deg(x)) + sin(deg(3*x))/3 + sin(deg(5*x))/5 +
+     sin(deg(7*x))/7 + sin(deg(9*x))/9)};
+\end{axis}
+\end{tikzpicture}
+
+{\small Gelombang persegi (kelabu) beserta \omterm{def:b2:fourier:coefficients}{jumlah parsial Fourier} $S_1$
+(biru) dan $S_9$ (merah): jadi konvergen di setiap titik kekontinuannya, tetapi
+dengan lonjakan $\sim 9\%$ yang bertahan di dekat lompatannya --- yakni
+\emph{gejala Gibbs}\index{gejala Gibbs}. \omterm{def:b2:funcseq:def}{Kekonvergenan seragamnya}
+gagal persis karena limitnya tak \omterm{def:b2:metric:continuity}{kontinu}.}
+\end{omfigure}
+
+\begin{example}[Penggeseran dan pemodulasian]\label{ex:b2:fourier:shiftrules}
+Dua aturan satu baris membangkitkan banyak uraian dari satu. Untuk $a
+\in \R$, setelah menyulihkan $s = t - a$:
+\[
+c_n\bigl(f(\cdot - a)\bigr)
+= \frac{1}{2\pi}\int_{-\pi}^{\pi}f(t - a)\eu^{-\iu nt}\dd t
+= \eu^{-\iu na}\,c_n(f)
+\qquad\text{(penggeseran memodulasi spektrumnya)},
+\]
+lalu langsung dari definisinya,
+\[
+c_n\bigl(\eu^{\iu kt}f\bigr) = c_{n-k}(f)
+\qquad\text{(pemodulasian menggeser spektrumnya)}.
+\]
+Contoh yang dikerjakan: gigi gergaji yang digeser sebesar $\pi$, yakni $g(t) = f(t -
+\pi)$ dengan $f(t) = t$, punya koefisien-$b_n$
+$(-1)^n\cdot\frac{2(-1)^{n+1}}{n} = -\frac2n$: jadi uraiannya
+$g \sim -2\sum\frac{\sin nt}{n}$ bagi gigi gergaji yang melompat di
+$0$ alih-alih di $\pi$ --- tanpa satu integral pun dihitung ulang. Pelajaran
+penutupnya: penggeseran waktu hanya memutar fasanya, tak pernah amplitudonya
+(sebab $\abs{c_n}$ invarian terhadap geseran), dan itulah sebabnya energi
+(Parseval) dan kelas kekonvergenannya merupakan sifat \emph{bentuk}
+sinyalnya, bukan sifat tempat jamnya dimulai.
+\end{example}
+
+\begin{remark}[Jebakan yang sering muncul]
+\emph{(i) Tiga kekonvergenan, tiga mata uang:} \omterm{def:b2:funcseq:def}{titik demi titik}
+(yakni Dirichlet: menuntut $C^1$ sepotong-sepotong, dan membayar \emph{titik tengahnya} di
+tiap lompatan --- tak pernah nilai sepihaknya), \omterm{def:b2:funcseq:def}{seragam} (menuntut
+limit yang \omterm{def:b2:metric:continuity}{kontinu}; jadi mustahil menyeberangi lompatan, dan Gibbs adalah
+gejalanya yang kasatmata), dan rerata kuadratik (yakni Parseval: yang paling
+tegar, dan buta terhadap titik individual). Sebutkanlah selalu yang mana
+yang kauklaim. \emph{(ii) Tak ada penurunan suku demi suku secara
+baku:} menurunkan deret gigi gergaji pada
+\cref{ex:b2:fourier:basel} suku demi suku menghasilkan $\sum
+2(-1)^{n+1}\cos nt$, yang sukunya bahkan tak menuju $0$ ---
+sebab teorema pemindahan pada bab barisan fungsi menuntut
+\omterm{def:b2:funcseq:def}{kekonvergenan seragam} deret \emph{turunannya}, dan lompatannya
+menghancurkannya. Jadi kemulusan dulu, penurunan kemudian
+(\cref{exo:b2:fourier:6} adalah kamusnya). \emph{(iii)
+Jumlah parsial yang simetris:} teorema Dirichlet berbicara tentang $S_N =
+\sum_{-N}^{N}$; jadi menata ulang atau menjumlahkan satu sisinya lebih dulu dapat
+mengubah kedivergenan menjadi kekonvergenan dan sebaliknya. \emph{(iv)
+Pergeseran penormalan:} konvensinya berbeda antarbuku
+(dengan $\frac{1}{2\pi}$ atau $\frac1\pi$ di depan, berkala $2\pi$ atau
+$1$); jadi invarian yang andal adalah hubungan keortonormalannya
+--- maka hitunglah ulang $\langle e_m, e_n\rangle$ dalam konvensi yang
+dipakai sebelum memercayai rumus apa pun.
+\end{remark}
+
+\begin{remark}[Di mana ini dipakai]
+Parseval adalah benih teori $L^2$ bagi deret Fourier: sebab
+jilid Tahun ke-3 merampungkan gambarannya (yakni eksponensialnya menjadi
+basis Hilbert bagi $L^2$, dan pemetaan $f \mapsto (c_n)$ menjadi
+isometri yang bijektif). Di dalam jilid ini, soal akhir pekan
+membuktikan \emph{teorema Fejér} --- yakni rata-rata Cesàro deret
+Fouriernya konvergen \omterm{def:b2:funcseq:def}{seragam} bagi setiap $f$ berkala yang \omterm{def:b2:metric:continuity}{kontinu}
+--- yang meningkatkan Parseval umum yang diterima tanpa bukti menjadi
+teorema, menghasilkan teorema Weierstrass trigonometri, lalu membayar
+dua panen yang spektakuler: teorema pemerataan Weyl dan
+ketaksamaan isoperimetrik. Adapun matematika terapan membaca bab
+ini sehari-hari: \omterm{def:b2:reduction:eigen}{spektrum} sinyal, harmonik sistem yang bergetar,
+dan transformasi Fourier cepat (dengan awatara hingganya tadi
+\cref{exo:b2:hermitian:10}).
+\end{remark}
+
+\begin{remark}[Pandangan ke depan di dalam jilid ini]
+Tiga bab bercakap-cakap dengan bab ini. Ke belakang: bab
+\omterm{def:b2:hermitian:adjoint}{Hermitian} memasok geometrinya (yakni keluarga ortonormal,
+proyeksi, Bessel), dan bab barisan fungsi memasok
+analisisnya (yakni \omterm{def:b2:funcseq:def}{kekonvergenan seragam}, teorema pemindahan, identitas
+hampiran --- sebab kernel Fejér bagi deret Fourier itu seperti
+\omterm{thm:b2:funcseq:weierstrass}{polinomial Bernstein} bagi Weierstrass). Ke samping:
+teori perbatasan bab deret pangkat kembali lewat \omterm{thm:b2:series:abel}{penjumlahan
+Abel}, yang di sini diwujudkan kernel Poisson
+(\cref{exo:b2:fourier:12}) --- dengan jari-jari cakramnya $r$ memainkan
+peran parameter penjumlahannya. Ke depan: bab
+persamaan diferensial menguraikan paksaan berkala
+menjadi harmonik lalu menyuapkan tiap-tiapnya ke tanggapan frekuensi
+osilatornya; dan resonansi terjadi ketika sebuah ragam Fourier masukannya
+cocok dengan frekuensi alaminya, dan itulah sebabnya soal akhir pekannya
+dan soal bab ini merupakan dua paruh satu cerita.
+\end{remark}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=9.2cm, height=5.6cm,
+    xmin=-3.6, xmax=3.6, ymin=-2.5, ymax=9.5,
+    xtick={-3.1416, 0, 3.1416},
+    xticklabels={$-\pi$, $0$, $\pi$}, ytick={8}]
+  \addplot[omDef, thick, domain=0.02:3.3, samples=300]
+    {sin(deg(8.5*x))/sin(deg(0.5*x))};
+  \addplot[omDef, thick, domain=-3.3:-0.02, samples=300]
+    {sin(deg(8.5*x))/sin(deg(0.5*x))};
+  \addplot[omThm, very thick, domain=0.02:3.3, samples=300]
+    {sin(deg(4*x))^2/(8*sin(deg(0.5*x))^2)};
+  \addplot[omThm, very thick, domain=-3.3:-0.02, samples=300]
+    {sin(deg(4*x))^2/(8*sin(deg(0.5*x))^2)};
+  \node[font=\small, omDef] at (axis cs:1.05,5.2) {$D_8$};
+  \node[font=\small, omThm] at (axis cs:-0.75,6.2) {$F_8$};
+\end{axis}
+\end{tikzpicture}
+
+{\small \omterm{lem:b2:fourier:kernel}{Kernel Dirichlet} $D_8$ (biru) berayun dan mengambil
+nilai negatif; sedangkan kernel Fejér $F_8$ (merah) bersifat taknegatif,
+memusat di $0$, dan bererata $1$: yakni sebuah \emph{identitas
+hampiran}. Kepositifan itulah persis yang tak dimiliki \omterm{lem:b2:fourier:kernel}{kernel Dirichlet},
+dan yang membuat teorema Fejér pada soal akhir pekan
+menjadi tanpa syarat.}
+\end{omfigure}
+
+\section{Latihan}
+
+\begin{exercise}[$\star$]\label{exo:b2:fourier:1}
+Hitunglah \omterm{def:b2:fourier:coefficients}{koefisien Fourier} gelombang persegi (dengan $f = -1$ pada
+$\intoo{-\pi}{0}$ dan $+1$ pada $\intoo{0}{\pi}$), nyatakan kesimpulan
+Dirichlet di $t = \frac\pi2$ dan di lompatan $t = 0$, lalu peroleh kembali
+deret Leibniz.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:fourier:2}
+Uraikan $f(t) = \abs t$ (dengan $\abs t \leq \pi$, berkala-$2\pi$) menjadi
+deret Fourier; benarkan kekonvergenan \emph{normal}nya; lalu nilailah di $t =
+0$ untuk memperoleh $\sum_{k\geq0}\frac{1}{(2k+1)^2} = \frac{\pi^2}{8}$,
+kemudian turunkan ulang Basel darinya.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:fourier:3}
+Uraikan $f(t) = t^2$ (dengan $\abs t \leq \pi$) lalu turunkan
+\[
+\sum_{n\geq1}\frac{(-1)^{n+1}}{n^2} = \frac{\pi^2}{12},
+\qquad
+\sum_{n\geq1}\frac{1}{n^4} = \frac{\pi^4}{90}
+\quad\text{(Parseval)}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:fourier:4}
+Misalkan $f$ \omterm{def:b2:metric:continuity}{kontinu} berkala-$2\pi$ dengan $c_n(f) = 0$ untuk setiap
+$n$. Buktikan $f = 0$ \emph{(lewat Parseval --- untuk kelas mana ia dibuktikan
+di sini? benarkanlah bahwa kekontinuan ditambah $C^1$ sepotong-sepotong dapat dilepas
+dengan menerima Parseval umum, atau berikanlah hujah kepadatannya secara garis besar)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:fourier:5}
+Untuk $\alpha \notin \Z$, uraikan $f(t) = \cos(\alpha t)$ (dengan $\abs t
+\leq \pi$) lalu turunkan uraian pecahan parsial bagi
+kotangennya:
+\[
+\pi\cot(\pi\alpha) = \frac{1}{\alpha} + \sum_{n\geq1}
+\frac{2\alpha}{\alpha^2 - n^2} .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:fourier:6}
+Buktikan bahwa bila $f$ berkala-$2\pi$ dan $C^k$ dengan $f^{(k)}$
+\omterm{def:b2:metric:continuity}{kontinu} sepotong-sepotong, maka $c_n(f) = O\bigl(\abs n^{-k}\bigr)$: jadi
+kemulusan sinyalnya $=$ peluruhan \omterm{def:b2:reduction:eigen}{spektrumnya}.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:fourier:7}
+(Ketaksamaan Wirtinger) Misalkan $f$ berkelas $C^1$, berkala-$2\pi$, dengan
+$\int_{-\pi}^{\pi} f = 0$. Buktikan
+\[
+\int_{-\pi}^{\pi} \abs{f}^2 \leq \int_{-\pi}^{\pi} \abs{f'}^2 ,
+\]
+dengan kesamaan bila dan hanya bila $f(t) = a\cos t + b\sin t$. \emph{(Lewat Parseval pada
+kedua ruasnya; lalu bandingkan $\abs{c_n}^2$ dan $n^2\abs{c_n}^2$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:fourier:8}
+(Konstanta Gibbs) Untuk gelombang persegi pada
+\cref{exo:b2:fourier:1}, nilailah jumlah parsialnya di $x_N =
+\frac{\pi}{2N}$: dengan menulis $u_k = \frac{(2k+1)\pi}{2N}$ dan $\Delta u
+= \frac{\pi}{N}$, tunjukkanlah bahwa
+\[
+S_{2N-1}\Bigl(\frac{\pi}{2N}\Bigr)
+= \frac{4}{\pi}\sum_{k=0}^{N-1} \frac{\sin u_k}{2k+1}
+= \frac{2}{\pi}\sum_{k=0}^{N-1} \frac{\sin u_k}{u_k}\,\Delta u
+\xrightarrow[N\to\infty]{}
+\frac{2}{\pi}\int_0^{\pi}\frac{\sin u}{u}\,\dd u \approx 1.179 :
+\]
+yakni sebuah jumlah Riemann bagi $\frac{2}{\pi}\cdot\frac{\sin u}{u}$ pada
+$\intcc{0}{\pi}$ di titik tengahnya. Simpulkan bahwa lonjakan di luar
+nilai lompatannya $1$ tidak lenyap ketika $N \to \infty$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:fourier:9}
+Uraikan $\cos^3 t$ dan $\sin^2 t\,\cos t$ menjadi deret Fourier
+\emph{(linearkan; sebab sebuah polinomial trigonometri adalah deret Fouriernya
+sendiri, berkat ketunggalan koefisiennya)}. Berapakah $c_n$,
+$a_n$, dan $b_n$ untuk masing-masingnya?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:fourier:10}
+Misalkan $a > 0$ dan $f(t) = \eu^{at}$ pada $\intoc{-\pi}{\pi}$, yang
+diperluas secara berkala-$2\pi$. Hitunglah
+\[
+c_n(f) = \frac{(-1)^n\sinh(a\pi)}{\pi(a - \iu n)} ,
+\]
+lalu terapkan teorema Dirichlet di lompatan $t = \pi$, kemudian turunkan
+uraian pecahan parsial bagi kotangen hiperboliknya:
+\[
+\coth(\pi a) = \frac{1}{\pi a} + \sum_{n\geq1}
+\frac{2a}{\pi(a^2 + n^2)} .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:fourier:11}
+(Konvolusi) Untuk $f, g$ yang \omterm{def:b2:metric:continuity}{kontinu} dan berkala-$2\pi$, definisikan
+\[
+(f * g)(x) = \frac{1}{2\pi}\int_{-\pi}^{\pi} f(x - t)\,g(t)\,
+\dd t .
+\]
+Tunjukkan bahwa $f * g = g * f$, bahwa $c_n(f*g) = c_n(f)\,c_n(g)$
+\emph{(untuk menukarkan kedua integral integran yang \omterm{def:b2:metric:continuity}{kontinu},
+bandingkanlah kedua fungsi batas atasnya: sebab keduanya lenyap di
+ujung kirinya dan punya turunan yang sama, berkat kekontinuan dan
+penurunan di bawah tanda integralnya)}, dan bahwa $S_N(f) =
+f * D_N$ untuk \omterm{lem:b2:fourier:kernel}{kernel Dirichletnya}. (Rata-rata Fejér pada soal akhir
+pekan juga berupa konvolusi, yakni $\sigma_N(f) = f *
+F_N$.)
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:fourier:12}
+(Kernel Poisson: rata-rata Abel deret Fourier) Untuk $0 \leq r <
+1$ tetapkan $P_r(t) = \sum_{n\in\Z} r^{\abs n}\eu^{\iu nt}$.
+\begin{enumerate}
+  \item Jumlahkan kedua deret geometrinya lalu tunjukkan
+        \[
+        P_r(t) = \frac{1 - r^2}{1 - 2r\cos t + r^2} > 0,
+        \qquad
+        \frac{1}{2\pi}\int_{-\pi}^{\pi}P_r = 1 .
+        \]
+  \item Tunjukkan bahwa untuk $\delta \leq \abs t \leq \pi$: $P_r(t)
+        \leq \frac{1 - r^2}{1 - 2r\cos\delta + r^2} \to 0$ ketika
+        $r \to 1^-$, secara \omterm{def:b2:funcseq:def}{seragam}.
+  \item Turunkan bahwa untuk setiap fungsi \omterm{def:b2:metric:continuity}{kontinu} berkala-$2\pi$, sebut $f$,
+        \emph{rata-rata Abel}nya $(f * P_r)(x) = \sum_n
+        r^{\abs n}c_n(f)\,\eu^{\iu nx}$ konvergen ke $f$
+        secara \omterm{def:b2:funcseq:def}{seragam} ketika $r \to 1^-$ --- yakni saudara
+        berparameter \omterm{def:b2:metric:continuity}{kontinu} bagi teorema Fejér, sekaligus penjelmaan
+        Fourier bagi \omterm{thm:b2:series:abel}{penjumlahan Abel} dari bab deret
+        pangkat.
+\end{enumerate}
+\end{exercise}
+
+\section{Soal: Teorema Fejér dan panennya}
+
+\begin{problem}\label{pb:b2:fourier:1}
+Teorema Dirichlet menuntut $f$ yang $C^1$ sepotong-sepotong; sedangkan untuk $f$
+yang sekadar \omterm{def:b2:metric:continuity}{kontinu} jumlah parsial $S_N(f)$ dapat berulah. Adapun temuan
+Fejér: \emph{rata-rata Cesàro}nya tak pernah berulah. Mesinnya adalah
+kepositifan kernel Fejér, dan panennya
+melimpah: hampiran trigonometri yang \omterm{def:b2:funcseq:def}{seragam} (Weierstrass),
+ketunggalan \omterm{def:b2:fourier:coefficients}{koefisien Fourier}, Parseval bagi setiap fungsi
+bab ini (sehingga membuang ``yang diterima tanpa bukti'' pada
+\cref{thm:b2:fourier:parseval}), teorema pemerataan Weyl,
+dan --- sebagai mahkota satu abad geometri --- 
+ketaksamaan isoperimetrik.\index{teorema Fejer@teorema Fejér}\index{pemerataan}\index{ketaksamaan isoperimetrik}
+Di sepanjang soal ini, $f$ berkala-$2\pi$ dan \omterm{def:b2:metric:continuity}{kontinu} sepotong-sepotong,
+lalu
+\[
+\sigma_N(f) = \frac{S_0(f) + S_1(f) + \dots +
+S_{N-1}(f)}{N} .
+\]
+
+\medskip
+\noindent\textbf{Bagian I --- Kernel Fejér.}
+\begin{enumerate}
+  \item Tunjukkan bahwa $\sigma_N(f)(x) =
+        \frac{1}{2\pi}\int_{-\pi}^{\pi}f(x+u)\,F_N(u)\,\dd u$
+        dengan $F_N = \frac{D_0 + \dots + D_{N-1}}{N}$, dan
+        bahwa $\frac{1}{2\pi}\int_{-\pi}^{\pi}F_N = 1$.
+  \item Buktikan bentuk tertutupnya, untuk $u \notin 2\pi\Z$:
+        \[
+        F_N(u) = \frac{1}{N}\,
+        \frac{\sin^2\bigl(\frac{Nu}{2}\bigr)}
+        {\sin^2\bigl(\frac u2\bigr)} \;\geq\; 0
+        \]
+        \emph{(jumlahkan $\sin\bigl((n+\frac12)u\bigr)$ sebagai
+        bagian imajiner sebuah deret geometri)}.
+  \item Tunjukkan taksiran pemusatannya: untuk $0 < \delta \leq
+        \abs u \leq \pi$,
+        \[
+        F_N(u) \leq \frac{1}{N\sin^2\frac\delta2}
+        \xrightarrow[N\to\infty]{} 0
+        \quad\text{secara seragam} :
+        \]
+        jadi $(F_N)$ merupakan identitas hampiran yang positif.
+  \item (Teorema Fejér) Buktikan: bila $f$ \omterm{def:b2:metric:continuity}{kontinu} dan
+        berkala-$2\pi$, maka $\sigma_N(f) \to f$
+        \emph{secara \omterm{def:b2:funcseq:def}{seragam}} pada $\R$ \emph{(pecahlah integral
+        $\bigl(f(x+u) - f(x)\bigr)F_N(u)$ di $\abs u =
+        \delta$; lalu pakailah Heine beserta pertanyaan 1--3)}.
+  \item Untuk $f$ yang \omterm{def:b2:metric:continuity}{kontinu} sepotong-sepotong, tunjukkan versi
+        \omterm{def:b2:funcseq:def}{titik demi titiknya} $\sigma_N(f)(x) \to \frac{f(x^+) +
+        f(x^-)}{2}$ di setiap $x$, beserta batas \omterm{def:b2:funcseq:def}{seragamnya}
+        $\norm{\sigma_N(f)}_\infty \leq \norm f_\infty$
+        \emph{(berkat kepositifannya!)}.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian II --- Weierstrass, ketunggalan,
+Parseval.}
+\begin{enumerate}[resume]
+  \item (Weierstrass trigonometri) Turunkan: bahwa setiap fungsi
+        \omterm{def:b2:metric:continuity}{kontinu} berkala-$2\pi$ merupakan limit \omterm{def:b2:funcseq:def}{seragam}
+        polinomial trigonometri.
+  \item (Ketunggalan) Turunkan: bahwa $f$ \omterm{def:b2:metric:continuity}{kontinu} dengan $c_n(f) = 0$
+        untuk setiap $n$ pastilah nol secara identik --- jadi dua fungsi
+        berkala yang \omterm{def:b2:metric:continuity}{kontinu} dengan \omterm{def:b2:fourier:coefficients}{koefisien Fourier} yang sama
+        berimpit (\cref{exo:b2:fourier:4}, kini tanpa
+        penerimaan tanpa bukti).
+  \item (Parseval, kasus \omterm{def:b2:metric:continuity}{kontinu}) Dengan memakai sifat proyeksi
+        milik $S_N$ (\cref{prop:b2:fourier:bessel}) dan
+        $\sigma_Nf \in \mathcal T_{N-1} \subseteq \mathcal
+        T_N$, buktikanlah
+        \[
+        \norm{f - S_Nf}_2 \leq \norm{f - \sigma_Nf}_2
+        \leq \norm{f - \sigma_Nf}_\infty
+        \xrightarrow[N\to\infty]{} 0 ,
+        \]
+        lalu simpulkan kesamaan Parseval bagi setiap fungsi
+        \emph{\omterm{def:b2:metric:continuity}{kontinu}} yang berkala-$2\pi$, sebut $f$.
+  \item (Parseval, kasus \omterm{def:b2:metric:continuity}{kontinu} sepotong-sepotong) Diberikan $f$
+        yang \omterm{def:b2:metric:continuity}{kontinu} sepotong-sepotong dan $\varepsilon > 0$, bangunlah
+        $g$ berkala yang \omterm{def:b2:metric:continuity}{kontinu} dengan $\norm{f - g}_2 \leq
+        \varepsilon$ \emph{(gantilah $f$ dengan interpolasi
+        afin pada interval mungil di sekitar lompatannya)},
+        lalu turunkan $\norm{f - S_Nf}_2 \to 0$
+        \emph{(pakailah Bessel: $\norm{S_Nh}_2 \leq \norm h_2$)}: jadi
+        Parseval berlaku dalam keumuman penuh yang dinyatakan pada
+        \cref{thm:b2:fourier:parseval} --- sehingga ``yang diterima tanpa bukti''
+        telah lenyap.
+  \item (Tak ada Gibbs bagi Fejér) Bandingkan dengan
+        \cref{exo:b2:fourier:8}: tunjukkan bahwa untuk gelombang persegi
+        $f$ berlaku $\abs{\sigma_N(f)} \leq 1$ di mana-mana, untuk setiap
+        $N$ --- jadi perata-rataan Cesàro menghapus lonjakan yang
+        menghantui $S_N$. Jelaskanlah dalam satu kalimat sifat mana
+        milik $F_N$ yang bertanggung jawab.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian III --- Laju.}
+\begin{enumerate}[resume]
+  \item Buktikan kedua batas kernelnya, untuk $0 < \abs u \leq
+        \pi$:
+        \[
+        F_N(u) \leq N,
+        \qquad
+        F_N(u) \leq \frac{\pi^2}{N u^2}
+        \]
+        \emph{(untuk yang pertama, $\abs{\sin N\theta} \leq
+        N\abs{\sin\theta}$ secara induktif; untuk yang kedua,
+        $\sin\frac u2 \geq \frac{u}{\pi}$ pada
+        $\intcc{0}{\pi}$)}.
+  \item Turunkan taksiran momen pertamanya
+        \[
+        \frac{1}{2\pi}\int_{-\pi}^{\pi}\abs u\,F_N(u)\,\dd u
+        \;\leq\; \frac{C\,\ln N}{N}
+        \qquad (N \geq 2)
+        \]
+        untuk sebuah konstanta yang gamblang \emph{(pecahlah di $\abs u =
+        \frac1N$)}.
+  \item Simpulkan: bahwa bila $f$ \omterm{def:b2:metric:continuity}{Lipschitz} berkonstanta $L$ dan berkala-$2\pi$,
+        maka
+        \[
+        \norm{\sigma_N f - f}_\infty \leq \frac{C\,L\ln N}{N} .
+        \]
+  \item (Penjenuhan) Hitunglah $\sigma_N(e_1)$ untuk $e_1(t) =
+        \eu^{\iu t}$ lalu tunjukkan $\norm{\sigma_Ne_1 - e_1}_\infty
+        = \frac1N$: jadi bahkan untuk fungsi termulus sekalipun, Fejér
+        konvergen tak lebih cepat daripada $\frac1N$ --- yakni analogi
+        persis bagi penjenuhan Bernstein pada soal akhir pekan bab
+        barisan fungsi.
+  \item (Pelokalan) Tunjukkan: bahwa bila $f$ (yang \omterm{def:b2:metric:continuity}{kontinu} sepotong-sepotong)
+        lenyap pada $\intoo{x - \delta}{x + \delta}$, maka
+        $\sigma_N(f)(x) \to 0$, sebuas apa pun $f$ di tempat lain
+        --- jadi kekonvergenan rata-ratanya di $x$ hanya melihat $f$ di dekat
+        $x$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian IV --- Teorema pemerataan Weyl.}
+Sebuah barisan $(x_n)_{n\geq1}$ di $\intco{0}{1}$ disebut
+\emph{terdistribusi merata} apabila, untuk setiap interval
+$\intcc{a}{b} \subseteq \intcc{0}{1}$,
+\[
+\frac{\#\{n \leq N : x_n \in \intcc ab\}}{N}
+\xrightarrow[N\to\infty]{} b - a .
+\]
+\begin{enumerate}[resume]
+  \item Tunjukkan bahwa $(x_n)$ terdistribusi merata segera setelah
+        $\frac1N\sum_{n\leq N}f(x_n) \to \int_0^1 f$ untuk setiap fungsi
+        \emph{\omterm{def:b2:metric:continuity}{kontinu}} yang berkala-$1$, sebut $f$ \emph{(jepitlah indikator
+        $\intcc ab$ di antara dua fungsi \omterm{def:b2:metric:continuity}{kontinu} yang
+        afin sepotong-sepotong dan integralnya berselisih
+        $\varepsilon$)}.
+  \item (Kriteria Weyl, kecukupannya) Andaikan
+        \[
+        \frac{1}{N}\sum_{n=1}^{N}\eu^{2\iu\pi kx_n}
+        \xrightarrow[N\to\infty]{} 0
+        \qquad\text{untuk setiap } k \in \Z\setminus\{0\} .
+        \]
+        Tunjukkan $\frac1N\sum f(x_n) \to \int_0^1f$ mula-mula untuk
+        polinomial trigonometri, lalu untuk setiap fungsi \omterm{def:b2:metric:continuity}{kontinu}
+        berkala-$1$, sebut $f$, lewat pertanyaan 6 (yang diangkut ke kala
+        $1$): jadi bersama pertanyaan 16, $(x_n)$ terdistribusi merata.
+  \item Misalkan $\alpha$ irasional dan $x_n = \{n\alpha\}$
+        (yakni bagian pecahannya). Batasilah jumlah geometrinya
+        \[
+        \Bigl|\sum_{n=1}^{N}\eu^{2\iu\pi kn\alpha}\Bigr|
+        \leq \frac{2}{\abs{1 - \eu^{2\iu\pi k\alpha}}}
+        \qquad (k \neq 0),
+        \]
+        lalu simpulkan \emph{teorema Weyl}: bahwa $(\{n\alpha\})$
+        terdistribusi merata di $\intco{0}{1}$.
+  \item Turunkan bahwa $(\{n\alpha\})$ padat di
+        $\intcc{0}{1}$ untuk $\alpha$ yang irasional, lalu jelaskanlah dalam
+        satu kalimat mengapa pemerataan tegas lebih kuat
+        daripada kepadatan.
+  \item (Digit terdepan) Buktikan bahwa proporsi bilangan bulat
+        $n \leq N$ yang membuat $2^n$ berdigit desimal terdepan
+        $1$ menuju $\log_{10}2 \approx 0.301$ \emph{(sebab digit
+        terdepannya $1$ berarti $\{n\log_{10}2\} \in
+        \intco{0}{\log_{10}2}$; lalu tunjukkan $\log_{10}2$
+        irasional)}.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian V --- Ketaksamaan isoperimetrik.} Misalkan
+$\Gamma$ kurva $C^1$ tertutup sederhana berpanjang $L$ yang melingkupi
+luas bertanda $A$, yang diparameterkan lewat panjang busur terskala: $z(t) =
+x(t) + \iu y(t)$, berkala-$2\pi$, dengan $\abs{z'(t)} =
+\frac{L}{2\pi}$ yang tetap; lalu luas yang dilingkupinya adalah
+\[
+A = \frac12\int_0^{2\pi}\bigl(x\,y' - y\,x'\bigr)\dd t
+= \frac{1}{2}\,\Im\int_0^{2\pi}\conj{z}\,z'\,\dd t
+\]
+(yang di sini diambil sebagai definisi luas bertandanya; sedangkan bab
+integral lipat membuktikan bahwa ia sepakat dengan yang intuitif,
+lewat rumus Green).
+\begin{enumerate}[resume]
+  \item Uraikan $z(t) = \sum_{n\in\Z}c_n\eu^{\iu nt}$ (yakni
+        deret sebuah fungsi $C^1$, yang konvergen normal) lalu
+        buktikan, lewat Parseval yang diterapkan pada $z'$:
+        \[
+        \frac{L^2}{2\pi} = \int_0^{2\pi}\abs{z'}^2\dd t
+        = 2\pi\sum_{n\in\Z}n^2\abs{c_n}^2 .
+        \]
+  \item Buktikan pula $A = \pi\sum_{n\in\Z}
+        n\,\abs{c_n}^2$ \emph{(lewat Parseval dalam bentuk terpolarisasinya:
+        $\frac{1}{2\pi}\int\conj f g = \sum
+        \conj{c_n(f)}c_n(g)$, yang diterapkan pada $f = z$ dan $g = z'$)}.
+  \item (Hurwitz) Simpulkan:
+  \item (Hurwitz) Conclude:
+        \[
+        L^2 - 4\pi A = 4\pi^2\sum_{n\in\Z}
+        (n^2 - n)\abs{c_n}^2 \;\geq\; 0 ,
+        \]
+        dengan kesamaan bila dan hanya bila $z(t) = c_0 +
+        c_1\eu^{\iu t}$ --- yakni sebuah lingkaran. Itulah ketaksamaan
+        isoperimetrik: di antara kurva tertutup berpanjang $L$, hanya
+        lingkaran yang melingkupi luas $\frac{L^2}{4\pi}$.
+  \item Pemeriksaan kewarasannya: periksalah kesamaannya bagi lingkaran
+        berjari-jari $R$ dan ketaksamaan tegasnya bagi bujur sangkar
+        bersisi $a$; lalu jelaskan mengapa $n^2 - n \geq 0$ untuk setiap
+        bilangan bulat $n$, termasuk yang negatif, dan di mana
+        kelajuan tetap parameterisasinya dipakai.
+  \item Rangkuman. Satu kalimat untuk masing-masing: (i) satu
+        sifat $F_N$ yang darinya Bagian I--III mengalir, dan
+        yang tak dimiliki $D_N$; (ii) bagaimana penjumlahan Cesàro di sini
+        berkaitan dengan soal akhir pekan bab deret pangkat
+        (yakni Frobenius); (iii) panen mana yang hanya memakai
+        Weierstrass (pertanyaan 6) dan mana yang menuntut
+        Parseval penuh; (iv) satu kalimat tentang apa yang ditambahkan jilid
+        Tahun ke-3 (yakni kelengkapan $L^2$: deret Fourier sebagai basis
+        Hilbert).
+
+\end{enumerate}
+\end{problem}

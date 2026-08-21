@@ -1,0 +1,892 @@
+\chapter{Barisan dan Deret Fungsi}\label{ch:b2:funcseq}
+
+Ketika fungsi konvergen ke sebuah fungsi, sifat mana yang selamat dari
+pelewatan ke limitnya? \omterm{def:b2:funcseq:def}{Kekonvergenan titik demi titik} nyaris tidak
+memelihara apa pun; sedangkan kekonvergenan \emph{\omterm{def:b2:funcseq:def}{seragam}} --- yakni
+kekonvergenan dalam \omterm{def:b2:nvs:norm}{norma} supremum --- memelihara kekontinuan, integral
+pada ruas, dan, dengan satu pelintir, turunannya. Bab ini membuktikan
+ketiga teorema pemindahannya, versi deretnya, lalu memahkotainya dengan
+teorema hampiran Weierstrass, yang dibuktikan lewat \omterm{thm:b2:funcseq:weierstrass}{polinomial Bernstein}
+yang indah dan bercorak peluang.
+
+\section{Kekonvergenan titik demi titik dan seragam}
+
+\begin{definition}\label{def:b2:funcseq:def}
+Misalkan $f_n, f \colon X \to \R$ (atau $\C$, atau sebuah ruang
+bernorma), dengan $X$ himpunan apa pun. Barisan $(f_n)$ konvergen ke $f$
+\emph{titik demi titik}\index{kekonvergenan titik demi titik}
+apabila $f_n(x) \to f(x)$ untuk setiap $x$; dan konvergen
+\emph{seragam}\index{kekonvergenan seragam} apabila
+\[
+\norm{f_n - f}_\infty = \sup_{x \in X}\, \abs{f_n(x) - f(x)}
+\xrightarrow[n \to \infty]{} 0 .
+\]
+Seragam mengakibatkan titik demi titik; sedangkan pada
+$C(\intcc{a}{b})$, kekonvergenan seragam persis sama dengan kekonvergenan
+di \omterm{def:b2:nvs:banach}{ruang Banach} $\bigl(C(\intcc{a}{b}), \norm\cdot_\infty\bigr)$ pada
+\cref{ch:b2:nvs}.
+\end{definition}
+
+\begin{example}\label{ex:b2:funcseq:xn}
+Pada $\intcc{0}{1}$, $f_n(x) = x^n$ konvergen \omterm{def:b2:funcseq:def}{titik demi titik} ke limit
+yang \emph{tak \omterm{def:b2:metric:continuity}{kontinu}} $f = \mathbf{1}_{\{1\}}$; kekonvergenannya
+tidak \omterm{def:b2:funcseq:def}{seragam}: sebab $\norm{f_n - f}_\infty \geq f_n\bigl(1 -
+\tfrac1n\bigr) = (1 - \tfrac1n)^n \to \eu^{-1} \neq 0$. Namun pada
+$\intcc{0}{a}$ dengan $a < 1$ ia \emph{memang} \omterm{def:b2:funcseq:def}{seragam} (sebab $\sup = a^n
+\to 0$): jadi keseragaman adalah sifat daerahnya, sama seperti sifat barisannya.
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=8.2cm, height=5.6cm,
+    xmin=0, xmax=1.08, ymin=0, ymax=1.15,
+    xtick={0,1}, ytick={1}]
+  \addplot[omDef!40, thick, domain=0:1, samples=80] {x^2};
+  \addplot[omDef!60, thick, domain=0:1, samples=80] {x^5};
+  \addplot[omDef, thick, domain=0:1, samples=120] {x^15};
+  \addplot[omThm, very thick, domain=0:1, samples=160] {x^40};
+  \node[font=\small, omDef] at (axis cs:0.62,0.5) {$x^2$};
+  \node[font=\small, omDef] at (axis cs:0.83,0.48) {$x^5$};
+  \node[font=\small, omThm] at (axis cs:0.987,0.5) {$x^{40}$};
+\end{axis}
+\end{tikzpicture}
+
+{\small Barisan $x^n$ pada $\intcc{0}{1}$: grafiknya melorot ke
+$0$ tetapi semuanya wajib memanjat ke $1$ di $x = 1$ --- jadi jarak
+supremumnya ke limit \omterm{def:b2:funcseq:def}{titik demi titik} yang tak \omterm{def:b2:metric:continuity}{kontinu} itu tak pernah
+menyusut di bawah sebuah konstanta.}
+\end{omfigure}
+
+\begin{example}[Dua limit yang menolak bertukar]\label{ex:b2:funcseq:doublelimit}
+Seluruh bab ini tentang menukar limit, jadi inilah kegagalan
+sekecil mungkin. Misalkan $a_{n,m} = \dfrac{n}{n+m}$ untuk
+$n, m \geq 1$. Maka
+\[
+\lim_{m\to\infty}\Bigl(\lim_{n\to\infty}a_{n,m}\Bigr)
+= \lim_{m\to\infty} 1 = 1,
+\qquad
+\lim_{n\to\infty}\Bigl(\lim_{m\to\infty}a_{n,m}\Bigr)
+= \lim_{n\to\infty} 0 = 0 :
+\]
+kedua limit beriterasinya ada dan keduanya berbeda. Setiap teorema
+pemindahan pada bab ini adalah izin untuk menukar dua limit ---
+$\lim_n$ dengan $\lim_{x\to a}$ (kekontinuan), dengan $\int$
+(pengintegralan), dengan $\frac{\dd}{\dd x}$ (penurunan) ---
+dan \omterm{def:b2:funcseq:def}{kekonvergenan seragam} persis menjadi bayaran yang membuat
+penukaran itu sah. Pelajaran penutupnya: setiap kali sebuah ``bukti''
+diam-diam menukar dua operasi limit, maka larik dua baris inilah
+contoh penyangkal yang perlu diacungkan; sedangkan bonggol meluncur pada
+\cref{exo:b2:funcseq:2} adalah gejala yang sama dengan busana
+tanda integral.
+\end{example}
+
+\section{Ketiga teorema pemindahan}
+
+\begin{theorem}[Kekontinuan]\label{thm:b2:funcseq:continuity}
+Jika tiap $f_n$ \omterm{def:b2:metric:continuity}{kontinu} di $a$ dan $f_n \to f$ secara \omterm{def:b2:funcseq:def}{seragam} pada
+sebuah persekitaran $a$, maka $f$ \omterm{def:b2:metric:continuity}{kontinu} di $a$. Jadi limit \omterm{def:b2:funcseq:def}{seragam}
+fungsi \omterm{def:b2:metric:continuity}{kontinu} bersifat \omterm{def:b2:metric:continuity}{kontinu}.
+\end{theorem}
+
+\begin{proof}
+Hujah $3\varepsilon$ yang sudah dipakai pada
+\cref{thm:b2:metric:rncomplete}: pilih $n$ dengan $\norm{f_n -
+f}_\infty \leq \varepsilon$, lalu $\delta$ dari kekontinuan
+$f_n$ di $a$; maka untuk $\abs{x - a} \leq \delta$,
+\[
+\abs{f(x) - f(a)} \leq \abs{f(x) - f_n(x)} + \abs{f_n(x) - f_n(a)}
++ \abs{f_n(a) - f(a)} \leq 3\varepsilon . \qedhere
+\]
+\end{proof}
+
+\begin{example}[Keseragaman gagal persis di tempat limitnya patah]\label{ex:b2:funcseq:threshold}
+Pada $\intcc{0}{2}$, misalkan $f_n(x) = \dfrac{x^n}{1 + x^n}$. Limit
+\omterm{def:b2:funcseq:def}{titik demi titiknya} adalah fungsi tiga potong:
+\[
+f(x) = \begin{cases} 0 & 0 \leq x < 1,\\[2pt]
+\tfrac12 & x = 1,\\[2pt]
+1 & 1 < x \leq 2, \end{cases}
+\]
+yang tak \omterm{def:b2:metric:continuity}{kontinu} di $1$, jadi menurut \cref{thm:b2:funcseq:continuity}
+kekonvergenannya tak mungkin seragam pada $\intcc{0}{2}$. Namun pada
+potongan tertutup yang menghindari ambangnya ia \omterm{def:b2:funcseq:def}{seragam}: untuk $0 \leq x
+\leq a < 1$,
+\[
+\sup_{\intcc{0}{a}}\abs{f_n - 0}
+= \frac{a^n}{1 + a^n} \leq a^n \to 0 ,
+\]
+sedangkan untuk $1 < b \leq x \leq 2$,
+\[
+\sup_{\intcc{b}{2}}\abs{f_n - 1}
+= \frac{1}{1 + b^n} \leq b^{-n} \to 0 ,
+\]
+dengan kedua supremumnya terhitung lewat kemonotonan $u \mapsto
+\frac{u}{1+u}$ dan $x \mapsto x^n$. Pelajaran penutupnya: kegagalan
+keseragamannya terpusat di ketakkontinuan limitnya --- yakni geometri
+yang sama seperti \cref{ex:b2:funcseq:xn}, sekaligus alasan mengapa
+disiplin ``\omterm{def:b2:funcseq:def}{seragam} pada tiap ruas di dalamnya'' berulang sepanjang bab ini.
+\end{example}
+
+\begin{theorem}[Pengintegralan pada sebuah ruas]\label{thm:b2:funcseq:integration}
+Jika $f_n \to f$ secara \omterm{def:b2:funcseq:def}{seragam} pada $\intcc{a}{b}$, dengan $f_n$
+\omterm{def:b2:metric:continuity}{kontinu} sepotong-sepotong (demikian pula $f$), maka
+\[
+\int_a^b f_n \longrightarrow \int_a^b f .
+\]
+\end{theorem}
+
+\begin{proof}
+Kelinearan dan ketaksamaan segitiga untuk integral memberi
+\[
+\Bigl|\int_a^b f_n - \int_a^b f\Bigr|
+= \Bigl|\int_a^b (f_n - f)\Bigr|
+\leq \int_a^b\abs{f_n - f}
+\leq (b - a)\,\norm{f_n - f}_\infty \longrightarrow 0 .
+\]
+Faktor panjang $(b - a)$ itulah tempat kekompakan ruasnya
+masuk: sebab pada interval yang tidak \omterm{def:b2:metric:compact}{kompak}, taksiran yang sama
+menghasilkan batas $\infty\cdot0$ yang tak berguna, dan kesimpulannya
+sungguh gagal tanpa dominasi --- bonggol datar $f_n =
+\frac1n\mathbf 1_{\intcc{0}{n}}$ konvergen \omterm{def:b2:funcseq:def}{seragam} ke $0$ pada
+$\intco{0}{\infty}$ namun mempertahankan $\int f_n = 1$ (lihat catatan
+jebakan di bawah), dan bonggol meluncur pada catatan
+\cref{ch:b2:integration} berbuat sama dengan \omterm{def:b2:funcseq:def}{kekonvergenan titik demi
+titik}; jadi \omterm{def:b2:funcseq:def}{kekonvergenan seragam} mengendalikan tinggi, tak pernah lebar.
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=8.6cm, height=5.4cm,
+    xmin=0, xmax=1.05, ymin=0, ymax=1.9,
+    xtick={0,1}, ytick={1}]
+  \addplot[omDef!45, thick, domain=0:1.05, samples=120]
+    {2*x*exp(-2*x^2)};
+  \addplot[omDef!70, thick, domain=0:1.05, samples=120]
+    {5*x*exp(-5*x^2)};
+  \addplot[omDef, thick, domain=0:1.05, samples=160]
+    {15*x*exp(-15*x^2)};
+  \node[font=\small, omDef] at (axis cs:0.62,0.42) {$n=2$};
+  \node[font=\small, omDef] at (axis cs:0.40,0.80) {$n=5$};
+  \node[font=\small, omDef] at (axis cs:0.24,1.55) {$n=15$};
+\end{axis}
+\end{tikzpicture}
+
+{\small Bonggol $g_n(x) = nx\,\eu^{-nx^2}$ pada
+\cref{exo:b2:funcseq:1}: mereka konvergen ke $0$ di setiap titik,
+tetapi puncaknya (setinggi $\sim\sqrt{n/(2\eu)}$, yang hanyut ke
+$0$) tumbuh tanpa batas --- yakni \omterm{def:b2:funcseq:def}{kekonvergenan titik demi titik} dengan
+$\norm{g_n}_\infty \to \infty$, dan $\int_0^1 g_n \to \frac12
+\neq 0$: massanya bersembunyi di bawah puncak yang bergerak.}
+\end{omfigure}
+
+\begin{theorem}[Penurunan]\label{thm:b2:funcseq:differentiation}
+Misalkan $f_n$ berkelas $C^1$ pada sebuah interval $I$, dengan: $(f_n')$
+konvergen \emph{\omterm{def:b2:funcseq:def}{seragam}} pada $I$ (atau pada tiap ruas $I$) ke suatu
+$g$, dan $(f_n(x_0))$ konvergen di satu titik $x_0$. Maka $(f_n)$
+konvergen (\omterm{def:b2:funcseq:def}{seragam} pada tiap ruas) ke sebuah fungsi berkelas $C^1$,
+sebut $f$, dan $f' = g$: jadi limitnya boleh diturunkan.
+\end{theorem}
+
+\begin{proof}
+Tetapkan $f(x) = \lim f_n(x_0) + \int_{x_0}^x g$: ini sah, sebab $g$
+\omterm{def:b2:metric:continuity}{kontinu} --- memang $g$ adalah limit \emph{\omterm{def:b2:funcseq:def}{seragam}} pada ruas atas $f_n'$
+yang \omterm{def:b2:metric:continuity}{kontinu}, jadi \cref{thm:b2:funcseq:continuity} berlaku, dan
+integral sebuah fungsi \omterm{def:b2:metric:continuity}{kontinu} terdefinisi dengan baik dengan, menurut
+teorema dasar kalkulus,
+\[
+f'(x) = g(x) \qquad (x \in I) :
+\]
+jadi calon limitnya berkelas $C^1$ dengan turunan yang benar
+\emph{menurut konstruksinya}, sebelum kekonvergenan apa pun dibuktikan.
+Menurut teorema dasar itu lagi, $f_n(x) = f_n(x_0) + \int_{x_0}^x
+f_n'$; setelah dikurangkan,
+\[
+\abs{f_n(x) - f(x)} \leq \abs{f_n(x_0) - \lim f_n(x_0)}
++ \abs{x - x_0}\,\norm{f_n' - g}_{\infty} ,
+\]
+yang menuju $0$ secara \omterm{def:b2:funcseq:def}{seragam} pada tiap ruas. Dan $f$ berkelas $C^1$
+dengan $f' = g$ menurut konstruksinya.
+\end{proof}
+
+\begin{example}[Mengapa hipotesisnya duduk pada turunannya]\label{ex:b2:funcseq:sqrtabs}
+Misalkan $F_n(x) = \sqrt{x^2 + \frac1n}$ pada $\R$. Tiap $F_n$ berkelas
+$C^1$ (bahkan $C^\infty$), dan kekonvergenannya ke $\abs x$ bersifat
+\omterm{def:b2:funcseq:def}{seragam} pada seluruh $\R$:
+\[
+0 \leq F_n(x) - \abs x
+= \frac{(x^2 + \frac1n) - x^2}{\sqrt{x^2+\frac1n} + \abs x}
+= \frac{1/n}{\sqrt{x^2 + \frac1n} + \abs x}
+\leq \frac{1/n}{1/\sqrt n} = \frac{1}{\sqrt n} .
+\]
+Namun limitnya $\abs x$ tak dapat diturunkan di $0$: jadi \omterm{def:b2:funcseq:def}{kekonvergenan
+seragam} \emph{fungsinya}, secepat apa pun, tidak memindahkan
+keterdiferensialan. Kegagalannya kasatmata pada turunannya:
+\[
+F_n'(x) = \frac{x}{\sqrt{x^2 + \frac1n}}
+\longrightarrow \begin{cases} 1 & x > 0,\\ 0 & x = 0,\\
+-1 & x < 0, \end{cases}
+\]
+yakni limit \omterm{def:b2:funcseq:def}{titik demi titik} yang tak \omterm{def:b2:metric:continuity}{kontinu}, sehingga $(F_n')$ tak
+mungkin konvergen \omterm{def:b2:funcseq:def}{seragam} di dekat $0$ (lagi-lagi
+\cref{thm:b2:funcseq:continuity}). Pelajaran penutupnya:
+\cref{thm:b2:funcseq:differentiation} dengan sengaja mengandaikan
+\omterm{def:b2:funcseq:def}{kekonvergenan seragam} pada $f_n'$, bukan pada $f_n$ ---
+dan contoh inilah alasannya.
+\end{example}
+
+\section{Deret fungsi}
+
+\begin{definition}\label{def:b2:funcseq:series}
+Sebuah deret fungsi $\sum u_n$ konvergen \omterm{def:b2:funcseq:def}{titik demi titik} atau \omterm{def:b2:funcseq:def}{seragam}
+apabila jumlah parsialnya demikian. Ia konvergen
+\emph{normal}\index{kekonvergenan normal} (pada $X$) apabila $\sum
+\norm{u_n}_\infty < \infty$. Kekonvergenan normal mengakibatkan
+\omterm{def:b2:funcseq:def}{kekonvergenan seragam} (di \omterm{def:b2:nvs:banach}{ruang Banach} berisi fungsi terbatas:
+\cref{thm:b2:nvs:absoluteconvergence}), yang mengakibatkan \omterm{def:b2:funcseq:def}{kekonvergenan
+titik demi titik}; dan kedua implikasinya tegas.
+\end{definition}
+
+\begin{example}[Satu deret, tiga vonis]\label{ex:b2:funcseq:threemodes}
+Ambil $u_n(x) = \frac{x^n}{n}$ pada $\intco{0}{1}$. \emph{\omterm{def:b2:funcseq:def}{Titik demi
+titik}:} ia konvergen untuk setiap $x \in \intco01$ (lewat pembandingan
+dengan deret geometri). \emph{\omterm{def:b2:funcseq:series}{Normal} pada $\intcc{0}{a}$ dengan $a < 1$:}
+sebab $\norm{u_n}_{\infty,\intcc0a} = \frac{a^n}{n}$, yang \omterm{def:b2:series:summable}{terjumlahkan}.
+\emph{Tidak \omterm{def:b2:funcseq:series}{normal} pada $\intco{0}{1}$:} sebab
+$\norm{u_n}_{\infty,\intco01} = \frac1n$, dan $\sum\frac1n$
+divergen. \emph{Bahkan tidak \omterm{def:b2:funcseq:def}{seragam} pada $\intco{0}{1}$:} sebab
+sisanya membandel di dekat $1$,
+\[
+R_N(x) = \sum_{n>N}\frac{x^n}{n}
+\geq \sum_{n=N+1}^{2N}\frac{x^n}{n}
+\geq \frac{N\,x^{2N}}{2N} = \frac{x^{2N}}{2}
+\xrightarrow[x\to1^-]{} \frac12 ,
+\]
+jadi $\sup_{\intco01}\abs{R_N} \geq \frac12$ untuk setiap $N$.
+Pelajaran penutupnya: keempat vonis itu hidup rukun --- sebab
+jumlahnya $-\ln(1-x)$ \omterm{def:b2:metric:continuity}{kontinu} pada $\intco{0}{1}$ karena
+kekontinuan hanya memerlukan keseragaman \emph{di dekat tiap titik},
+yakni pada ruas $\intcc0a$; sedangkan meledak di tepinya adalah
+hak jumlah itu sendiri.
+\end{example}
+
+\begin{theorem}[Pemindahan untuk deret]\label{thm:b2:funcseq:seriestransfer}
+Jika $\sum u_n$ konvergen \omterm{def:b2:funcseq:def}{seragam} (misalnya \omterm{def:b2:funcseq:series}{normal}) pada himpunan yang
+bersangkutan: maka kekontinuan semua $u_n$ di $a$ berpindah ke jumlahnya;
+pengintegralan pada sebuah ruas dapat dilakukan suku demi suku; dan jika
+$\sum u_n(x_0)$ konvergen sedangkan $\sum u_n'$ konvergen \omterm{def:b2:funcseq:def}{seragam} pada
+tiap ruas, maka jumlahnya berkelas $C^1$ dengan turunan $\sum u_n'$.
+\end{theorem}
+
+\begin{proof}
+Semuanya tak lain teorema yang bersesuaian yang diterapkan pada jumlah
+parsial $S_N = \sum_{n\leq N}u_n$, yang merupakan jumlah hingga atas
+fungsi dengan keteraturan yang bersangkutan. Kekontinuan: tiap $S_N$
+\omterm{def:b2:metric:continuity}{kontinu} di $a$ dan $S_N \to \sum u_n$ secara \omterm{def:b2:funcseq:def}{seragam}, jadi
+\cref{thm:b2:funcseq:continuity}. Pengintegralan: pada ruas itu,
+\[
+\int_a^b \sum_{n\geq0} u_n
+= \lim_N \int_a^b S_N
+= \lim_N \sum_{n=0}^{N}\int_a^b u_n
+= \sum_{n\geq0}\int_a^b u_n
+\]
+menurut \cref{thm:b2:funcseq:integration} (kesamaan pertamanya) dan
+kelinearan integralnya (kesamaan keduanya). Penurunan: tiap
+$S_N$ berkelas $C^1$, $S_N(x_0)$ konvergen, dan $S_N' =
+\sum_{n\leq N}u_n'$ konvergen \omterm{def:b2:funcseq:def}{seragam} pada tiap ruas, jadi
+\cref{thm:b2:funcseq:differentiation} memberi bahwa jumlahnya berkelas
+$C^1$ dengan turunan $\lim S_N' = \sum u_n'$.
+\end{proof}
+
+\begin{remark}[Jebakan yang sering muncul]
+Ada empat jebakan, semuanya terlihat di lembar ujian. \emph{(i)
+Supremum yang diperiksa separuh:} menilai $f_n$ sepanjang barisan
+$x_n$ yang dipilih baik-baik hanya membatasi $\norm{f_n - f}_\infty$
+dari \emph{bawah} --- cukup untuk menyangkal keseragamannya (seperti pada
+\cref{ex:b2:funcseq:xn}), tak pernah untuk membuktikannya; dan untuk
+membuktikannya, batasilah supremumnya lewat perhitungan yang sahih untuk
+\emph{setiap} $x$. \emph{(ii) Keseragaman pada himpunan yang salah:}
+\omterm{def:b2:funcseq:series}{kekonvergenan normal} atau \omterm{def:b2:funcseq:def}{seragam} sering berlaku pada tiap
+$\intcc{-a}{a}$ atau $\intco\delta\infty$ tetapi gagal pada gabungan
+\omterm{def:b2:metric:topology}{terbukanya}; hal itu bukan halangan --- sebab kekontinuan dan
+keterdiferensialan bersifat lokal, jadi disiplin ruas demi ruas pada
+\cref{ex:b2:funcseq:zeta} memberikannya pada seluruh himpunan \omterm{def:b2:metric:topology}{terbuka}
+itu. \emph{(iii) Mengintegralkan pada yang bukan ruas:}
+\cref{thm:b2:funcseq:integration} adalah pernyataan tentang
+ruas; sedangkan pada $\intco0\infty$, \omterm{def:b2:funcseq:def}{kekonvergenan seragam} tidak
+mencegah massanya lolos ke tak hingga (sebab $f_n =
+\frac1n\mathbf 1_{\intcc{0}{n}}$ konvergen \omterm{def:b2:funcseq:def}{seragam} ke $0$
+dengan $\int f_n = 1$) --- jadi pakailah kekonvergenan terdominasi di
+sana. \emph{(iv) Menurunkan limitnya:}
+\cref{ex:b2:funcseq:sqrtabs}; hipotesis turunannya ada pada
+$(f_n')$, dan laju kekonvergenan $(f_n)$ mana pun tak dapat
+menggantikannya.
+\end{remark}
+
+\begin{example}[Fungsi $\zeta$ Riemann]\label{ex:b2:funcseq:zeta}
+Deret $\zeta(s) = \sum_{n\geq1} n^{-s}$ konvergen \omterm{def:b2:funcseq:series}{normal} pada tiap
+setengah-garis $\intco{a}{+\infty}$ dengan $a > 1$ (sebab
+$\norm{n^{-s}}_\infty = n^{-a}$, yang \omterm{def:b2:series:summable}{terjumlahkan}): jadi $\zeta$
+\omterm{def:b2:metric:continuity}{kontinu} pada $\intoo{1}{+\infty}$; lalu setelah diturunkan suku demi
+suku (sebab deret turunannya $\sum -\ln n\; n^{-s}$ juga konvergen
+\omterm{def:b2:funcseq:series}{normal} pada $\intco{a}{\infty}$), $\zeta$ berkelas $C^1$ --- dan, setelah
+diiterasikan, $C^\infty$ --- dengan $\zeta'(s) = -\sum \frac{\ln
+n}{n^s}$. Perhatikan disiplinnya: \omterm{def:b2:funcseq:series}{kekonvergenan normalnya} diperiksa pada
+\emph{sub}-setengah-garis, tak pernah pada $\intoo{1}{\infty}$ yang
+\omterm{def:b2:metric:topology}{terbuka}, tempat ia gagal.
+\end{example}
+
+\begin{example}[Sebuah deret logaritmik, dikerjakan sampai tuntas]\label{ex:b2:funcseq:logseries}
+Misalkan $F(x) = \sum_{n\geq1} \frac{\eu^{-nx}}{n}$ pada
+$\intoo{0}{\infty}$. Tiap sukunya terbatas pada $\intco{\delta}\infty$
+oleh $\frac{\eu^{-n\delta}}{n} \leq \eu^{-n\delta}$, yakni deret
+geometri yang konvergen: jadi kekonvergenannya \omterm{def:b2:funcseq:series}{normal} pada tiap
+$\intco\delta\infty$, sehingga $F$ \omterm{def:b2:metric:continuity}{kontinu} pada
+$\intoo{0}{\infty}$. Deret turunannya $\sum -\eu^{-nx}$ juga
+konvergen \omterm{def:b2:funcseq:series}{normal} pada $\intco\delta\infty$ (sebab
+$\norm{\eu^{-nx}}_{\infty,\intco\delta\infty} = \eu^{-n\delta}$), jadi
+$F$ berkelas $C^1$ dengan turunan yang geometri:
+\[
+F'(x) = -\sum_{n\geq1}\eu^{-nx}
+= \frac{-\eu^{-x}}{1 - \eu^{-x}}
+= \frac{-1}{\eu^{x} - 1} .
+\]
+Setelah diiterasikan, $F$ berkelas $C^\infty$. Dengan mengintegralkan
+$F'$ (sebab baik $F$ maupun $x \mapsto -\ln(1 - \eu^{-x})$ bernilai nol
+di $+\infty$ dan punya turunan yang sama pada $\intoo0\infty$):
+\[
+F(x) = -\ln\bigl(1 - \eu^{-x}\bigr),
+\]
+yakni deret logaritmik di $t = \eu^{-x}$. Pelajaran penutupnya: ketika $x
+\to 0^+$, $F(x) = -\ln(x + O(x^2)) = \ln\frac1x + O(x)$ --- jadi
+deretnya divergen secara logaritmik di perbatasannya, persis seperti
+deret harmonik yang menjadi wujudnya di $x = 0$; dan \omterm{def:b2:funcseq:series}{kekonvergenan
+normal} pada $\intco\delta\infty$ tetapi tidak pada $\intoo0\infty$
+adalah gejalanya.
+\end{example}
+
+\begin{method}[Membuktikan atau menyangkal kekonvergenan seragam]\label{met:b2:funcseq:uniform}
+Untuk $f_n \to f$ \omterm{def:b2:funcseq:def}{titik demi titik} pada $X$:
+\begin{enumerate}
+  \item Hitung atau batasi $\norm{f_n - f}_\infty$: telaahlah
+        fungsi $x \mapsto \abs{f_n(x) - f(x)}$ (lewat turunan atau
+        kemonotonan) untuk menemukan maksimumnya; sebab batas yang
+        sahih untuk setiap $x$ dan menuju $0$ membuktikan keseragamannya.
+  \item Untuk \emph{menyangkalnya}: tunjukkan titik $x_n$ dengan
+        $\abs{f_n(x_n) - f(x_n)} \not\to 0$ (sering $x_n$ mengikuti
+        bonggol yang bergerak, seperti pada \cref{exo:b2:funcseq:1});
+        atau panggillah sebuah teorema pemindahan secara kontrapositif
+        --- yakni limit tak \omterm{def:b2:metric:continuity}{kontinu} dari fungsi \omterm{def:b2:metric:continuity}{kontinu}
+        (\cref{ex:b2:funcseq:threshold}), atau $\int f_n
+        \not\to \int f$ pada sebuah ruas.
+  \item Untuk deret, cobalah \omterm{def:b2:funcseq:series}{kekonvergenan normal} lebih dulu
+        (yakni $\sum\sup\abs{u_n} < \infty$); jika gagal secara global,
+        ujilah pada subruas yang penting
+        (\cref{ex:b2:funcseq:threemodes}); dan jika gagal
+        di mana-mana, \omterm{def:b2:funcseq:def}{kekonvergenan seragamnya} masih mungkin berlaku
+        lewat batas sisa berselang-seling
+        (\cref{exo:b2:funcseq:4}) atau lewat penjumlahan parsial.
+\end{enumerate}
+\end{method}
+
+\section{Teorema hampiran Weierstrass}
+
+\begin{theorem}[Weierstrass, lewat Bernstein]\label{thm:b2:funcseq:weierstrass}
+Setiap $f \colon \intcc{0}{1} \to \R$ yang \omterm{def:b2:metric:continuity}{kontinu} merupakan limit
+\omterm{def:b2:funcseq:def}{seragam} polinomial --- lebih tepatnya, limit \emph{polinomial
+Bernstein}\index{polinomial Bernstein}\index{teorema hampiran
+Weierstrass} miliknya sendiri
+\[
+B_n(f)(x) = \sum_{k=0}^{n} f\Bigl(\frac kn\Bigr)\binom nk x^k
+(1-x)^{n-k} .
+\]
+\end{theorem}
+
+\begin{proof}
+Tetapkan $x \in \intcc{0}{1}$ lalu tetapkan $p_k(x) = \binom nk x^k(1 -
+x)^{n-k}$. Ada tiga kesamaan binomial, yang diperoleh dengan menilai
+$(x + y)^n$ beserta dua turunannya terhadap $x$ di $y = 1 - x$:
+\[
+\sum_k p_k = 1,
+\qquad
+\sum_k k\,p_k = nx,
+\qquad
+\sum_k k(k-1) p_k = n(n-1)x^2 .
+\]
+Secara rinci: $(x+y)^n = \sum_k\binom nk x^ky^{n-k}$ di $y = 1-x$
+adalah yang pertama; lalu menurunkannya terhadap $x$,
+\[
+n(x+y)^{n-1} = \sum_k k\binom nk x^{k-1}y^{n-k} ,
+\]
+lalu mengalikannya dengan $x$ dan mengambil $y = 1 - x$ memberi
+yang kedua; sedangkan menurunkannya dua kali lalu mengalikan dengan
+$x^2$ memberi yang ketiga. Setelah $(k - nx)^2 = k(k-1) + k(1 - 2nx) +
+n^2x^2$ diuraikan lalu ketiganya dipadukan:
+\[
+\sum_k (k - nx)^2 p_k
+= n(n-1)x^2 + nx(1 - 2nx) + n^2x^2
+= nx(1 - x) \leq \frac n4 ,
+\]
+yakni \emph{kesamaan ragam}.
+
+Kini taksirlah, dengan memakai $\sum p_k = 1$:
+\[
+\abs{B_n(f)(x) - f(x)}
+\leq \sum_{k} \Bigl| f\Bigl(\frac kn\Bigr) - f(x)\Bigr|\, p_k(x)
+= \Sigma_{\text{dekat}} + \Sigma_{\text{jauh}} ,
+\]
+dengan pemecahannya menurut $\abs{\frac kn - x} \leq \delta$ atau tidak.
+Diberikan $\varepsilon > 0$, kekontinuan seragam $f$ (lewat Heine)
+menyediakan $\delta$ dengan $\Sigma_{\text{dekat}} \leq \varepsilon$.
+Untuk jumlah yang jauh, dengan $M = \norm f_\infty$: menurut kesamaan
+ragam dan siasat pencacahan Chebyshev,
+\[
+\Sigma_{\text{jauh}} \leq 2M \sum_{\abs{k - nx} > n\delta} p_k
+\leq 2M\,\frac{\sum_k (k - nx)^2 p_k}{n^2\delta^2}
+\leq \frac{2M}{4 n \delta^2} \cdot 1
+= \frac{M}{2n\delta^2}
+\xrightarrow[n\to\infty]{} 0 ,
+\]
+secara \omterm{def:b2:funcseq:def}{seragam} pada $x$. Jadi $\norm{B_n(f) - f}_\infty \leq \varepsilon +
+\frac{M}{2n\delta^2} \leq 2\varepsilon$ untuk $n$ yang besar.
+\end{proof}
+
+\begin{remark}
+Lewat penyulihan afin, teoremanya berlaku pada ruas $\intcc{a}{b}$ mana
+pun. Ia gagal pada $\R$ (sebab limit \omterm{def:b2:funcseq:def}{seragam} polinomial pada
+$\R$ tetaplah polinomial: \cref{exo:b2:funcseq:8}). Adapun pembacaan
+bercorak peluangnya --- yakni $B_n(f)(x)$ merupakan nilai harapan $f$ di
+sebuah rata-rata binomial, dan batas ragamnya adalah ketaksamaan
+Chebyshev --- dijujurkan pada \cref{ch:b2:genfun}.
+\end{remark}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=8.6cm, height=6.0cm,
+    xmin=0, xmax=1.05, ymin=0, ymax=1.08,
+    xtick={0,1}, ytick={1}]
+  \addplot[omThm, very thick, domain=0:1, samples=80] {x^2};
+  \addplot[omDef!45, thick, domain=0:1, samples=2] {x};
+  \addplot[omDef!70, thick, domain=0:1, samples=80]
+    {x^2 + x*(1-x)/2};
+  \addplot[omDef, thick, domain=0:1, samples=80]
+    {x^2 + x*(1-x)/6};
+  \node[font=\small, omDef] at (axis cs:0.30,0.37) {$B_1f$};
+  \node[font=\small, omDef] at (axis cs:0.52,0.46) {$B_2f$};
+  \node[font=\small, omDef] at (axis cs:0.76,0.56) {$B_6f$};
+  \node[font=\small, omThm] at (axis cs:0.88,0.68) {$f$};
+\end{axis}
+\end{tikzpicture}
+
+{\small Hampiran Bernstein bagi $f(x) = x^2$ (merah), dengan memakai
+rumus eksak $B_nf = x^2 + \frac{x(1-x)}{n}$ pada
+\cref{exo:b2:funcseq:7}: $B_1f$ adalah tali busurnya, dan tiap kali $n$
+dilipatduakan jurangnya terparuh. Andal tetapi lamban --- yakni
+penjenuhan $\frac1n$ yang dieksakkan teorema Voronovskaya (soal akhir pekan).}
+\end{omfigure}
+
+\begin{remark}[Di mana ini dipakai]
+Hampiran Weierstrass adalah teorema kepadatan bagi analisis
+klasik: ia membuat $C(\intcc ab)$ terpisahkan, membiarkan kita memeriksa
+kesamaan integral pada polinomial saja (yakni masalah momen), dan
+melandasi versi trigonometrinya yang dibuktikan pada bab Fourier lewat
+kernel Fejér. Soal akhir pekan bab ini menyarikan
+isi kuantitatif bukti Bernstein --- yakni laju kekonvergenan yang
+dikuasai modulus kekontinuannya --- lalu memisahkan apa yang sebenarnya
+membuatnya berhasil, di dalam teorema Korovkin: yakni kepositifan
+ditambah tiga fungsi uji. Jilid Tahun ke-3 menyeluruhkan pernyataan
+kepadatannya ke subaljabar sembarang (Stone--Weierstrass) dan ke ruang \omterm{def:b2:metric:compact}{kompak}.
+\end{remark}
+
+\begin{example}[Hampiran poligonal, beserta lajunya]\label{ex:b2:funcseq:polygonal}
+Untuk $L$ sebagai konstanta \omterm{def:b2:metric:continuity}{Lipschitz} bagi $f$ pada $\intcc{0}{1}$, misalkan $I_nf$
+penginterpolasi afin sepotong-sepotong pada simpul $\frac kn$. Pada
+sebuah sel $\intcc{\frac kn}{\frac{k+1}n}$, baik $f(x)$ maupun
+$I_nf(x)$ berada di antara nilai ekstrem yang dapat diambil fungsi
+Lipschitz-$L$ dengan kedua nilai simpulnya, jadi untuk $x$ di
+sel itu, dengan menulis $x_k = \frac kn$:
+\[
+\abs{I_nf(x) - f(x)}
+\leq \abs{I_nf(x) - f(x_k)} + \abs{f(x_k) - f(x)}
+\leq L\,\abs{x - x_k} + L\,\abs{x - x_k}
+\leq \frac{2L}{n}
+\]
+(sebab penginterpolasinya sendiri Lipschitz-$L$ pada sel itu: sebab
+kemiringannya adalah hasil bagi selisih $f$). Karenanya $\norm{I_nf -
+f}_\infty \leq \frac{2L}{n}$: jadi hampiran poligonal bagi fungsi
+\omterm{def:b2:metric:continuity}{Lipschitz} konvergen dengan laju $\frac1n$ ---
+\emph{lebih cepat} daripada $\frac{1}{\sqrt n}$ milik Bernstein untuk
+kelas yang sama (soal akhir pekan, Bagian II). Pelajaran penutupnya:
+poligonnya menginterpolasi tetapi tidak mulus, Bernstein mulus
+tetapi lamban; jadi tak ada makan siang gratis antara keteraturan
+penghampirnya dan lajunya --- yakni pertukaran yang dicermatkan
+hasil penjenuhan pada soal akhir pekan.
+\end{example}
+
+\begin{remark}[Pandangan ke depan di dalam jilid ini]
+\omterm{def:b2:funcseq:def}{Kekonvergenan seragam} menjadi kuda beban buku ini mulai sekarang. Bab
+deret pangkat seluruhnya berjalan pada \omterm{def:b2:funcseq:series}{kekonvergenan normal} pada
+subcakram \omterm{def:b2:metric:compact}{kompak} --- setiap teorema suku demi suku di sana adalah
+kasus khusus teorema pemindahan bab ini. Bab Fourier
+hidup satu lantai di atasnya: jumlah parsialnya $S_N$ gagal
+persis di tempat bab ini memperingatkan (yakni \omterm{def:b2:funcseq:def}{titik demi titik} tetapi
+tidak \omterm{def:b2:funcseq:def}{seragam} di lompatannya), dan rata-rata Fejér-nya berhasil lewat
+mekanika $3\varepsilon$ yang sama seperti yang membuktikan
+\cref{thm:b2:funcseq:continuity}. Bab persamaan diferensial
+menetapkan $\eu^{tA}$ lewat deret yang konvergen \omterm{def:b2:funcseq:series}{normal} lalu
+menurunkannya suku demi suku --- yakni harfiah
+\cref{thm:b2:funcseq:seriestransfer} yang diterapkan pada unsur
+matriksnya. Bila kelak muncul keraguan di dalam buku ini tentang
+``mengapa kita boleh melakukan ini'', jawabannya biasanya sebuah
+teorema bab ini.
+\end{remark}
+
+\section{Latihan}
+
+\begin{exercise}[$\star$]\label{exo:b2:funcseq:1}
+Telaahlah \omterm{def:b2:funcseq:def}{kekonvergenan titik demi titik} dan \omterm{def:b2:funcseq:def}{kekonvergenan seragamnya}
+pada $\intcc{0}{1}$, lalu pada $\intcc{0}{a}$ ($a < 1$) atau
+$\intco{\delta}{1}$ sesuai keperluan, bagi:
+\[
+f_n(x) = \frac{x}{1 + nx},
+\qquad
+g_n(x) = n x\,\eu^{-n x^2},
+\qquad
+h_n(x) = x^n(1 - x^n).
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:funcseq:2}
+Buktikan bahwa $\displaystyle\int_0^1 g_n \not\to \int_0^1 \lim g_n$
+bagi $g_n$ pada \cref{exo:b2:funcseq:1}, lalu damaikan dengan
+\cref{thm:b2:funcseq:integration}.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:funcseq:3}
+Buktikan bahwa $S(x) = \sum_{n\geq1} \dfrac{x^n}{n^2}$ \omterm{def:b2:metric:continuity}{kontinu} pada
+$\intcc{-1}{1}$, dan bahwa $S$ berkelas $C^1$ pada $\intoo{-1}{1}$ dengan
+$S'(x) = -\frac{\ln(1-x)}{x}$ untuk $0 < \abs x < 1$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:4}
+Misalkan $F(x) = \sum_{n \geq 0} \dfrac{(-1)^n}{n + x}$ pada
+$\intoo{0}{+\infty}$. Buktikan \omterm{def:b2:funcseq:def}{kekonvergenan seragamnya} (tetapi tidak
+\omterm{def:b2:funcseq:series}{normal}) pada $\intco{\delta}{\infty}$ lewat batas sisa deret
+berselang-seling, lalu kekontinuannya, dan persamaan fungsionalnya $F(x)
++ F(x + 1) = \frac1x$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:5}
+(Dini) Misalkan $f_n \colon K \to \R$ \omterm{def:b2:metric:continuity}{kontinu} pada \omterm{def:b2:metric:def}{ruang metrik} yang
+\emph{\omterm{def:b2:metric:compact}{kompak}}, dengan $f_n \to f$ \emph{\omterm{def:b2:funcseq:def}{titik demi titik}}, $f$ \omterm{def:b2:metric:continuity}{kontinu},
+dan $(f_n(x))$ \emph{turun} terhadap $n$ untuk tiap $x$. Buktikan bahwa
+kekonvergenannya \omterm{def:b2:funcseq:def}{seragam}. \emph{(Diberikan $\varepsilon$, himpunan
+\omterm{def:b2:metric:topology}{terbuka} $U_n = \{x : f_n(x) - f(x) < \varepsilon\}$ naik dan menyelimuti
+$K$; lalu sarikan subselimut hingganya ---
+\cref{thm:b2:metric:borellebesgue}.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:6}
+Buktikan bahwa $\displaystyle\lim_{n\to\infty} \int_0^1
+\frac{n\,f(x)}{1 + n^2x^2}\,\dd x = \frac{\pi}{2} f(0)$ untuk setiap
+$f$ yang \omterm{def:b2:metric:continuity}{kontinu} pada $\intcc{0}{1}$. \emph{(Sulihkan $u = nx$; pisahkan
+$f(0)$; lalu dominasilah.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:7}
+Hitunglah \omterm{thm:b2:funcseq:weierstrass}{polinomial Bernstein} bagi $f(x) = x^2$ secara gamblang lalu
+periksalah galat \omterm{def:b2:funcseq:def}{seragamnya} $\norm{B_n f - f}_\infty =
+O\bigl(\frac1n\bigr)$ yang diramalkan bukti
+\cref{thm:b2:funcseq:weierstrass} --- yang di sini tepat $\frac{x(1 -
+x)}{n}$ di tiap titiknya.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:8}
+Buktikan bahwa jika polinomial $P_n$ konvergen \omterm{def:b2:funcseq:def}{seragam} \emph{pada
+seluruh $\R$} ke $f$, maka $f$ sebuah polinomial. \emph{(Untuk $m, n$
+yang besar, $P_n - P_m$ merupakan polinomial terbatas pada $\R$, jadi
+konstan; sehingga barisannya mapan kecuali konstanta.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:funcseq:9}
+(Sebuah fungsi \omterm{def:b2:metric:continuity}{kontinu} yang tak dapat diturunkan di mana pun ---
+berpandu) Misalkan $\varphi$ jarak ke bilangan bulat terdekat (yang
+berperiode $1$, dengan $\norm{\varphi}_\infty = \frac12$, dan
+Lipschitz-$1$) dan
+\[
+W(x) = \sum_{n=0}^{\infty} \Bigl(\frac{3}{4}\Bigr)^{\!n}
+\varphi(4^n x) .
+\]
+Buktikan: (a) $W$ \omterm{def:b2:metric:continuity}{kontinu} pada $\R$ (lewat \omterm{def:b2:funcseq:series}{kekonvergenan normal}); (b)
+untuk setiap $x$ dan setiap $m$, dengan memilih $h_m = \pm\frac12\cdot
+4^{-m}$ bertanda yang membuat $\varphi$ afin pada ruas dari $4^m x$
+sampai $4^m(x + h_m)$, hasil bagi selisihnya memenuhi
+\[
+\Bigl|\frac{W(x + h_m) - W(x)}{h_m}\Bigr| \geq 3^m -
+\sum_{n<m} 3^n \geq \frac{3^m + 1}{2} \xrightarrow[m\to\infty]{}
+\infty
+\]
+(sebab suku $n > m$ lenyap berkat keperiodikannya; suku $n = m$
+menyumbang tepat $3^m$; dan suku $n < m$ terbatas berkat sifat
+\omterm{def:b2:metric:continuity}{Lipschitznya}). Simpulkan bahwa $W$ tak dapat diturunkan di mana pun.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:funcseq:10}
+Misalkan $u_n(x) = (-1)^n x^n(1 - x)$ pada $\intcc{0}{1}$. Tunjukkan
+bahwa $\sum u_n$ konvergen \omterm{def:b2:funcseq:def}{titik demi titik} pada $\intcc{0}{1}$ lalu
+hitung jumlahnya; tunjukkan bahwa kekonvergenannya \omterm{def:b2:funcseq:def}{seragam} pada
+$\intcc{0}{1}$ \emph{(batasi sisanya $R_N(x) = \sum_{n > N} u_n(x)$,
+yakni ekor geometri, oleh suku pertamanya lalu maksimumkan
+$x^{N+1}(1-x)$)} tetapi \emph{tidak} \omterm{def:b2:funcseq:series}{normal} \emph{(hitung
+$\norm{u_n}_\infty$)}: jadi \omterm{def:b2:funcseq:def}{kekonvergenan seragam} tegas lebih lemah
+daripada \omterm{def:b2:funcseq:series}{kekonvergenan normal}. Bandingkan dengan $\sum x^n(1-x)$, yang
+jumlahnya tak \omterm{def:b2:metric:continuity}{kontinu} di $1$: di sana keseragamannya pun gagal.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:11}
+Misalkan $f_n \to f$ secara \omterm{def:b2:funcseq:def}{seragam} pada sebuah \omterm{def:b2:metric:def}{ruang metrik} $X$, dengan
+tiap $f_n$ \omterm{def:b2:metric:continuity}{kontinu}, dan misalkan $x_n \to x$ di $X$. Buktikan $f_n(x_n)
+\to f(x)$. Tunjukkan lewat sebuah contoh pada $X = \intcc{0}{1}$ bahwa
+\omterm{def:b2:funcseq:def}{kekonvergenan titik demi titik} tidak cukup, bahkan dengan $f$ yang
+\omterm{def:b2:metric:continuity}{kontinu} \emph{(pakailah bonggol $g_n$ pada \cref{exo:b2:funcseq:1} dan
+$x_n = \frac{1}{\sqrt{2n}}$)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:funcseq:12}
+(Sebuah persamaan integral Volterra lewat deret) Untuk $f \in
+C(\intcc{0}{1})$ tetapkan $Tf(x) = \int_0^x f(t)\,\dd t$.
+\begin{enumerate}
+  \item Tunjukkan secara induktif bahwa untuk $n \geq 1$:
+        \[
+        T^n f(x) = \int_0^x \frac{(x -
+        t)^{n-1}}{(n-1)!}\,f(t)\,\dd t,
+        \qquad
+        \norm{T^n f}_\infty \leq \frac{\norm f_\infty}{n!} .
+        \]
+  \item Turunkan bahwa $S = \sum_{n\geq0} T^n f$ konvergen \omterm{def:b2:funcseq:series}{normal}
+        pada $\intcc{0}{1}$ dan menyelesaikan persamaan integral $S = f
+        + TS$.
+  \item Periksalah bahwa $S(x) = f(x) + \int_0^x \eu^{x-t}f(t)\,\dd
+        t$ menyelesaikan persamaan yang sama, lalu buktikan ketunggalan
+        penyelesaian yang \omterm{def:b2:metric:continuity}{kontinu} \emph{(sebab jika $S = TS$ maka
+        $\norm{S}_\infty \leq \norm{T^nS}_\infty \to 0$)}:
+        lalu simpulkan bentuk tertutup jumlahnya.
+\end{enumerate}
+\end{exercise}
+
+\section{Soal: Laju hampiran dan teorema Korovkin}
+
+\begin{problem}\label{pb:b2:funcseq:1}
+Bukti Bernstein bagi \cref{thm:b2:funcseq:weierstrass} menyembunyikan
+dua harta. Pertama, ia bersifat \emph{kuantitatif}: seberapa cepat $B_nf
+\to f$ dikuasai modulus kekontinuan $f$, dengan laju tajamnya
+tercapai oleh $\abs{x - \frac12}$. Kedua, ia bersifat
+\emph{struktural}: yang penting hanyalah bahwa $B_n$ merupakan
+operator linear positif yang berkelakuan baik pada $1$, $x$, $x^2$ ---
+dan pengamatan itu, setelah dipisahkan, adalah \emph{teorema
+Korovkin}\index{teorema Korovkin}. Soal ini membuktikan keduanya,
+lalu ditutup dengan asimtotik eksak Voronovskaya. Di sepanjang soal ini,
+$f \in C(\intcc{0}{1})$, $M = \norm f_\infty$, $p_k(x) = \binom
+nk x^k(1-x)^{n-k}$, dan $e_j$ menyatakan $x \mapsto x^j$.
+
+\medskip
+\noindent\textbf{Bagian I --- Operator Bernstein.}
+\begin{enumerate}
+  \item Tunjukkan bahwa $B_n$ bersifat linear, \emph{positif} (yakni $f
+        \geq 0 \Rightarrow B_nf \geq 0$), jadi monoton ($f \leq g
+        \Rightarrow B_nf \leq B_ng$), dengan
+        $\norm{B_nf}_\infty \leq \norm f_\infty$, dan bahwa
+        $B_nf$ menginterpolasi $f$ di kedua ujungnya.
+  \item Turunkan kembali kesamaan $B_n e_0 = e_0$, $B_n e_1 =
+        e_1$ dan $B_n e_2 = e_2 + \frac{e_1 - e_2}{n}$
+        \emph{(turunkan $(x + y)^n$ dua kali lalu ambil $y = 1 - x$)}.
+  \item Turunkan kesamaan ragamnya $\sum_k \bigl(\frac kn -
+        x\bigr)^2 p_k(x) = \frac{x(1-x)}{n}$ lalu, lewat
+        Cauchy--Schwarz, batas momen pertamanya
+        \[
+        \sum_{k=0}^{n}\Bigl|\frac kn - x\Bigr|\,p_k(x)
+        \leq \sqrt{\frac{x(1-x)}{n}} \leq \frac{1}{2\sqrt n} .
+        \]
+  \item Tunjukkan bahwa jika $f$ cembung maka $B_nf \geq f$ pada
+        $\intcc{0}{1}$ \emph{(lewat ketaksamaan Jensen hingga untuk
+        bobot $p_k(x)$)}.
+  \item (Batas pencacahan Chebyshev, dinyatakan ulang) Untuk $\delta > 0$
+        tunjukkan
+        \[
+        \sum_{\abs{k/n - x} > \delta} p_k(x)
+        \leq \frac{x(1-x)}{n\delta^2}
+        \leq \frac{1}{4n\delta^2} ,
+        \]
+        lalu berikan pembacaan bercorak peluangnya: $B_nf(x)$
+        merata-ratakan $f$ atas rata-rata sampel binomial yang memusat di $x$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian II --- Laju: modulus kekontinuan.}
+Untuk $\delta > 0$ tetapkan $\omega(\delta) = \sup\{\abs{f(s) - f(t)}
+: s, t \in \intcc{0}{1},\ \abs{s - t} \leq \delta\}$.
+\begin{enumerate}[resume]
+  \item Tunjukkan: $\omega$ hingga, tidak turun,
+        $\omega(\delta) \to 0$ ketika $\delta \to 0^+$ (lewat Heine),
+        subaditif ($\omega(\delta_1 + \delta_2) \leq
+        \omega(\delta_1) + \omega(\delta_2)$), dan
+        $\omega(\lambda\delta) \leq (1 +
+        \lambda)\,\omega(\delta)$ untuk setiap $\lambda > 0$.
+  \item Buktikan taksiran induknya, untuk setiap $\delta > 0$:
+        \[
+        \abs{B_nf(x) - f(x)}
+        \leq \sum_k \omega\Bigl(\Bigl|\frac kn -
+        x\Bigr|\Bigr)p_k(x)
+        \leq \Bigl(1 + \frac1\delta\sum_k\Bigl|\frac kn -
+        x\Bigr|p_k(x)\Bigr)\,\omega(\delta) .
+        \]
+  \item Ambil $\delta = n^{-1/2}$ lalu simpulkan
+        \emph{teorema Weierstrass yang kuantitatif}:
+        \[
+        \norm{B_nf - f}_\infty \leq
+        \frac32\,\omega\Bigl(\frac{1}{\sqrt n}\Bigr)
+        \xrightarrow[n\to\infty]{} 0 .
+        \]
+  \item Turunkan lajunya: $\norm{B_nf - f}_\infty \leq
+        \frac{3L}{2\sqrt n}$ bila $L$ konstanta \omterm{def:b2:metric:continuity}{Lipschitz} bagi $f$, dan $\leq
+        \frac32 C n^{-\alpha/2}$ bila $\alpha$ eksponen Hölder bagi $f$
+        (yakni $\abs{f(s) - f(t)} \leq C\abs{s-t}^\alpha$).
+  \item (Contoh yang tajam --- sebuah kesamaan binomial) Untuk $m
+        \geq 1$ buktikan
+        \[
+        \sum_{k=m+1}^{2m} (k - m)\binom{2m}{k}
+        = \frac{m}{2}\binom{2m}{m},
+        \qquad\text{sehingga}\qquad
+        \sum_{k=0}^{2m}\abs{k - m}\binom{2m}{k}
+        = m\binom{2m}{m}
+        \]
+        \emph{(pakailah $k\binom{2m}k = 2m\binom{2m-1}{k-1}$ dan
+        kesetangkupan baris binomialnya, yang memberi
+        $\sum_{j=m}^{2m-1}\binom{2m-1}{j} = 2^{2m-2}$)}.
+  \item Untuk $f(t) = \abs{t - \frac12}$ turunkan nilai eksaknya
+        beserta asimtotiknya (lewat binomial pusat,
+        \cref{ex:b2:comparison:centralbinomial}):
+        \[
+        B_{2m}f\Bigl(\frac12\Bigr) - f\Bigl(\frac12\Bigr)
+        = \frac{\binom{2m}{m}}{2\cdot4^{m}}
+        \;\sim\; \frac{1}{2\sqrt{\pi m}} :
+        \]
+        jadi laju $\omega(n^{-1/2})$ pada pertanyaan 8 tercapai
+        (kecuali sebuah konstanta) --- untuk $f$ yang sekadar \omterm{def:b2:metric:continuity}{kontinu},
+        $n^{-1/2}$ milik Bernstein memang jujur.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian III --- Teorema Korovkin.} Misalkan $(L_n)$
+sebuah barisan operator \emph{linear positif} dari
+$C(\intcc{0}{1})$ ke dirinya sendiri sehingga $L_ne_j \to e_j$
+secara \omterm{def:b2:funcseq:def}{seragam} untuk $j = 0, 1, 2$.
+\begin{enumerate}[resume]
+  \item Tunjukkan bahwa $L$ yang linear positif bersifat monoton dan
+        memenuhi $\abs{Lf} \leq L\abs f$ \omterm{def:b2:funcseq:def}{titik demi titik}.
+  \item Tunjukkan: untuk setiap $\varepsilon > 0$ ada $\delta > 0$
+        sehingga untuk \emph{setiap} $s, x \in \intcc{0}{1}$:
+        \[
+        \abs{f(s) - f(x)} \leq \varepsilon +
+        \frac{2M}{\delta^2}(s - x)^2
+        \]
+        \emph{(tangani $\abs{s - x} \leq \delta$ lewat Heine dan
+        $\abs{s-x} > \delta$ lewat batas kasar $2M$)}.
+  \item Tetapkan $x$, terapkan $L_n$ pada ketaksamaan pertanyaan 13
+        dalam peubah $s$, lalu turunkan
+        \[
+        \abs{L_nf(x) - f(x)\,L_ne_0(x)}
+        \leq \varepsilon\,L_ne_0(x) + \frac{2M}{\delta^2}
+        \bigl(L_ne_2(x) - 2x\,L_ne_1(x) + x^2 L_ne_0(x)\bigr).
+        \]
+  \item Tunjukkan bahwa $\sup_x \bigl(L_ne_2(x) - 2x\,L_ne_1(x) + x^2
+        L_ne_0(x)\bigr) \to 0$, lalu rakitlah
+        \emph{teorema Korovkin}: yakni $L_nf \to f$ secara \omterm{def:b2:funcseq:def}{seragam} untuk
+        \emph{setiap} $f \in C(\intcc{0}{1})$.
+  \item Periksalah bahwa $(B_n)$ memenuhi hipotesis Korovkin:
+        jadi Weierstrass untuk ketiga kalinya, dari tiga monomial.
+  \item Misalkan $I_n$ operator interpolasi afin
+        sepotong-sepotong pada simpul $\frac kn$. Tunjukkan bahwa $I_n$
+        bersifat linear positif, $I_ne_0 = e_0$, $I_ne_1 = e_1$, dan
+        $\norm{I_ne_2 - e_2}_\infty = \frac{1}{4n^2}$
+        \emph{(sebab pada tiap sel, galat interpolasi afin
+        bagi $t^2$ adalah $(t - a)(b - t)$)}. Lalu simpulkan lewat
+        Korovkin: penginterpolasi poligonal konvergen \omterm{def:b2:funcseq:def}{seragam} untuk
+        setiap $f$ yang \omterm{def:b2:metric:continuity}{kontinu}.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian IV --- Panennya: kepadatan, momen, dan
+turunan.}
+\begin{enumerate}[resume]
+  \item Tunjukkan bahwa polinomial berkoefisien \emph{rasional}
+        bersifat padat di $\bigl(C(\intcc{0}{1}),
+        \norm\cdot_\infty\bigr)$: jadi \omterm{def:b2:nvs:banach}{ruang Banach} ini
+        terpisahkan.
+  \item (Momen menentukan fungsinya) Misalkan $f \in
+        C(\intcc{0}{1})$ dengan $\int_0^1 f(t)\,t^n \dd t = 0$
+        untuk setiap $n \in \N$. Tunjukkan $\int_0^1 f P = 0$ untuk
+        setiap polinomial, lalu $\int_0^1 f^2 = 0$, lalu $f = 0$.
+  \item Buktikan kesamaan turunannya
+        \[
+        (B_nf)'(x) = n\sum_{k=0}^{n-1}\Bigl(
+        f\Bigl(\frac{k+1}{n}\Bigr) -
+        f\Bigl(\frac kn\Bigr)\Bigr)\,
+        \binom{n-1}{k}x^k(1-x)^{n-1-k}
+        \]
+        \emph{(turunkan $p_k$ lalu indeks ulang --- yakni sebuah
+        \omterm{thm:b2:series:abel}{penjumlahan Abel})}.
+  \item Andaikan $f$ berkelas $C^1$. Dengan memakai teorema nilai
+        rata-rata pada tiap pertambahannya lalu membandingkannya dengan
+        $B_{n-1}(f')$, tunjukkan bahwa $(B_nf)' \to f'$ secara \omterm{def:b2:funcseq:def}{seragam}
+        pada $\intcc{0}{1}$. Turunkan: untuk $f \in C^1$ ada polinomial
+        yang konvergen ke $f$ \emph{beserta} turunannya.
+  \item Andaikan $f$ berkelas $C^2$. Lewat Taylor--Lagrange di $x$
+        tunjukkan
+        \[
+        \abs{B_nf(x) - f(x)} \leq
+        \frac{\norm{f''}_\infty}{2}\cdot\frac{x(1-x)}{n}
+        \leq \frac{\norm{f''}_\infty}{8n} :
+        \]
+        jadi kemulusannya meningkatkan lajunya dari $n^{-1/2}$ menjadi
+        $n^{-1}$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian V --- Penjenuhan: teorema
+Voronovskaya.}
+\begin{enumerate}[resume]
+  \item Buktikan kesamaan momen keempatnya
+        \[
+        \sum_k (k - nx)^4 p_k(x)
+        = nx(1-x)\bigl(1 + 3(n-2)x(1-x)\bigr) \leq n^2
+        \quad (n \geq 1)
+        \]
+        \emph{(uraikan $k^4$ atas faktorial turun $k(k-1)\cdots$
+        lalu pakai siasat penurunan pertanyaan 2 dua kali
+        lagi)}.
+  \item (Voronovskaya) Misalkan $f$ berkelas $C^2$ dan $x \in
+        \intcc{0}{1}$. Dengan menulis $f(t) = f(x) + f'(x)(t-x) +
+        \frac{f''(x)}2(t-x)^2 + \eta(t)(t-x)^2$ dengan $\eta$
+        terbatas dan $\eta(t) \to 0$ ketika $t \to x$, buktikan
+        \[
+        n\bigl(B_nf(x) - f(x)\bigr)
+        \xrightarrow[n\to\infty]{}
+        \frac{x(1-x)}{2}\,f''(x)
+        \]
+        \emph{(pecahlah jumlah $\eta$-nya di $\abs{t - x} \leq
+        \delta$; lalu kendalikan bagian jauhnya dengan pertanyaan 23)}.
+        Jadi galat pertanyaan 22 eksak baik ordenya \emph{maupun}
+        konstantanya: $B_n$ \emph{menjenuh} pada $\frac1n$, semulus apa
+        pun $f$ --- bandingkan dengan
+        \cref{exo:b2:funcseq:7}.
+  \item Rangkuman. Satu kalimat untuk masing-masing: (i) apa yang
+        dibeli kepositifan semata (Bagian I dan III); (ii) di mana
+        kekompakan $\intcc{0}{1}$ masuk pada tiap bagiannya; (iii)
+        mengapa tiga fungsi uji sudah cukup pada teorema Korovkin; (iv)
+        pertukaran yang dilakukan Bernstein (yakni $n^{-1/2}$ yang
+        tangguh untuk $f$ yang kasar, tetapi langit-langit $\frac1n$
+        untuk $f$ yang mulus), dan bab mana pada buku ini yang akan
+        memainkan permainan sama dengan polinomial trigonometri.
+
+\end{enumerate}
+\end{problem}

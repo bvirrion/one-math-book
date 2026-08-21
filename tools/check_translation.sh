@@ -112,6 +112,14 @@ check_year_lang() {
     python3 tools/check_arabic_prose.py --quiet "$tdir" "$tsdir" \
       || bad "Arabic prose hygiene" "$year/$lang"
   fi
+  # ---- 8. Indonesian prose hygiene. The opposite problem to gates 5-7:
+  #         Indonesian is written in the SAME alphabet as the English source,
+  #         so a forgotten sentence, TikZ node or \text{...} is invisible to
+  #         every gate above. See tools/check_indonesian_prose.py.
+  if [ "$lang" = "id" ]; then
+    python3 tools/check_indonesian_prose.py --quiet "$tdir" "$tsdir" \
+      || bad "Indonesian prose hygiene" "$year/$lang"
+  fi
 }
 
 if [ $# -eq 2 ]; then
@@ -120,7 +128,7 @@ else
   for year in grade-1 grade-2 grade-3 grade-4 grade-5 grade-6 grade-7 \
               grade-8 grade-9 grade-10 grade-11 grade-12 \
               bachelor-1 bachelor-2 bachelor-3; do
-    for lang in fr nl es pt hi ar; do
+    for lang in fr nl es pt hi ar id; do
       # Skip years that have no translation directory yet.
       [ -d "parts/$year/$lang" ] || continue
       check_year_lang "$year" "$lang"

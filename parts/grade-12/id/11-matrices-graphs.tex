@@ -1,0 +1,398 @@
+\chapter{Matriks dan Graf}\label{ch:g12:matrix}
+
+\omterm{def:g12:matrix:matrix}{Matriks} adalah larik bilangan berbentuk persegi panjang, yang dijumlahkan dan
+dikalikan menurut kaidah yang dirancang agar aljabar matriksnya mewakili komposisi
+transformasi linear. \omterm{def:g12:matrix:matrix}{Matriks} menyelesaikan sistem linear, menggerakkan \omterm{def:g12:seq:sequence}{barisan}
+rekurensi yang berpasangan, dan mencacah jalan pada jaringan --- yaitu matematika
+di balik mesin pencari dan algoritme lintasan terpendek.
+
+\section{Aljabar matriks}
+
+\begin{definition}[Matriks]\label{def:g12:matrix:matrix}
+Suatu \emph{matriks $m \times n$}\index{matriks} adalah tabel \omterm{def:g10:numbers:sets}{bilangan real} dengan
+$m$ baris dan $n$ kolom:
+$A = (a_{ij})$, dengan $a_{ij}$ isian pada baris $i$, kolom $j$.
+Dua matriks yang berukuran sama dijumlahkan isian demi isian, dan
+$\lambda A = (\lambda a_{ij})$.
+\end{definition}
+
+\begin{definition}[Hasil kali matriks]\label{def:g12:matrix:product}
+Misalkan $A$ berukuran $m \times n$ dan $B$ berukuran $n \times p$. Hasil kali $AB$
+adalah \omterm{def:g12:matrix:matrix}{matriks} $m \times p$ yang isian $(i,j)$-nya
+\[
+(AB)_{ij} = \sum_{k=1}^{n} a_{ik} b_{kj}
+\]
+(yaitu kaidah ``baris $i$ dari $A$ kali kolom $j$ dari $B$'').
+\end{definition}
+
+\begin{example}
+$\begin{pmatrix} 1 & 2\\ 3 & 4\end{pmatrix}
+\begin{pmatrix} 0 & 1\\ 1 & 1\end{pmatrix}
+= \begin{pmatrix} 2 & 3\\ 4 & 7\end{pmatrix}$,
+\quad sedangkan \quad
+$\begin{pmatrix} 0 & 1\\ 1 & 1\end{pmatrix}
+\begin{pmatrix} 1 & 2\\ 3 & 4\end{pmatrix}
+= \begin{pmatrix} 3 & 4\\ 4 & 6\end{pmatrix}$:
+\emph{perkalian \omterm{def:g12:matrix:matrix}{matriks} tidak komutatif}.
+\end{example}
+
+\begin{proposition}[Kaidah aljabar matriks]\label{prop:g12:matrix:rules}
+Setiap kali ukurannya membuat hasil kalinya bermakna:
+\[
+(AB)C = A(BC), \qquad A(B + C) = AB + AC, \qquad (A+B)C = AC + BC,
+\]
+dan \emph{\omterm{def:g12:matrix:matrix}{matriks} satuan} $I_n$ (berisi satu pada diagonalnya, nol di tempat lain)
+memenuhi $I_m A = A I_n = A$ untuk $A$ berukuran $m \times n$.
+\end{proposition}
+
+\begin{proof}
+Semuanya pemeriksaan isian demi isian dari
+\cref{def:g12:matrix:product}; keasosiatifannya, satu-satunya yang tak sepele,
+sama saja dengan menukar dua jumlah berhingga:
+$\bigl((AB)C\bigr)_{ij} = \sum_l \left(\sum_k a_{ik}b_{kl}\right) c_{lj}
+= \sum_k a_{ik} \left(\sum_l b_{kl} c_{lj}\right)
+= \bigl(A(BC)\bigr)_{ij}$.
+\end{proof}
+
+\begin{definition}[Balikan]\label{def:g12:matrix:inverse}
+\omterm{def:g12:matrix:matrix}{Matriks} persegi $A$ berukuran $n$ disebut \emph{dapat dibalik}\index{matriks!balikan}
+jika ada \omterm{def:g12:matrix:matrix}{matriks} $B$ dengan $AB = BA = I_n$; \omterm{def:g12:matrix:matrix}{matriks} $B$ itu lalu tunggal dan ditulis
+$A^{-1}$.
+\end{definition}
+
+\begin{proposition}[Balikan matriks $2\times2$]\label{prop:g12:matrix:inverse2x2}
+Misalkan $A = \begin{pmatrix} a & b\\ c & d\end{pmatrix}$ dan
+$\det A = ad - bc$ (yaitu \emph{determinan}\index{determinan} \omterm{def:g12:matrix:matrix}{matriks} itu). Maka $A$
+\omterm{def:g12:matrix:inverse}{dapat dibalik} jika dan hanya jika $\det A \neq 0$, dan dalam hal itu
+\[
+A^{-1} = \frac{1}{ad - bc}\begin{pmatrix} d & -b\\ -c & a\end{pmatrix}.
+\]
+\end{proposition}
+
+\begin{proof}
+Perhitungan memberi
+$A \begin{pmatrix} d & -b\\ -c & a\end{pmatrix}
+= \begin{pmatrix} d & -b\\ -c & a\end{pmatrix} A = (ad - bc) I_2$; jika
+$ad - bc \neq 0$, bagilah. Sebaliknya, jika $ad - bc = 0$, kolom $A$
+sebanding, dan begitu pula kolom $AB$ untuk sebarang $B$; padahal
+kolom $I_2$ tidak sebanding, jadi tak ada $B$ yang memenuhi $AB = I_2$.
+\end{proof}
+
+\begin{method}[Sistem linear]\label{met:g12:matrix:systems}
+Sistem
+$\begin{cases} ax + by = e\\ cx + dy = f \end{cases}$
+adalah \omterm{def:g10:algebra:equation}{persamaan} \omterm{def:g12:matrix:matrix}{matriks} $AX = Y$ dengan
+$X = \begin{pmatrix} x \\ y\end{pmatrix}$,
+$Y = \begin{pmatrix} e \\ f\end{pmatrix}$. Jika $\det A \neq 0$, penyelesaian
+tunggalnya adalah $X = A^{-1}Y$. Formalisme yang sama mengurus $n$ \omterm{def:g10:algebra:equation}{persamaan} dengan
+$n$ bilangan tak diketahui.
+\end{method}
+
+\section{Pangkat matriks dan barisan rekurensi}
+
+\begin{definition}\label{def:g12:matrix:power}
+Untuk \omterm{def:g12:matrix:matrix}{matriks} persegi $A$ dan $k \in \N$, $A^k = A \times \dots \times A$
+($k$ faktor), dengan $A^0 = I$.
+\end{definition}
+
+\begin{method}[Kasus diagonal-tambah-nilpoten dan kasus terdiagonalkan]\label{met:g12:matrix:powers}
+Dua cara baku untuk menghitung $A^k$:
+\begin{itemize}
+  \item Jika $A = \lambda I + N$ dengan $N^2 = 0$, maka teorema binomial
+        (yang berlaku di sini sebab $I$ dan $N$ komutatif) runtuh menjadi dua suku:
+        $A^k = \lambda^k I + k \lambda^{k-1} N$.
+  \item Jika orang menemukan $P$ yang \omterm{def:g12:matrix:inverse}{dapat dibalik} dengan $A = PDP^{-1}$ dan $D$
+        diagonal, maka $A^k = P D^k P^{-1}$, dan $D^k$ dihitung isian demi isian.
+        (Menemukan $P$ semacam itu secara sistematis adalah teori
+        \emph{pendiagonalan}, yang dikembangkan di universitas; pada tingkat ini $P$
+        sudah diberikan.)
+\end{itemize}
+\end{method}
+
+\begin{example}[Barisan berpasangan]\label{ex:g12:matrix:coupled}
+Misalkan $u_{n+1} = 3u_n + v_n$ dan $v_{n+1} = u_n + 3v_n$. Dengan mengambil
+$X_n = \begin{pmatrix} u_n\\ v_n \end{pmatrix}$ dan
+$A = \begin{pmatrix} 3 & 1\\ 1 & 3\end{pmatrix}$, kita peroleh
+$X_{n+1} = AX_n$, sehingga $X_n = A^n X_0$. \omterm{def:g12:seq:sequence}{Barisan} bantunya
+$s_n = u_n + v_n$ dan $d_n = u_n - v_n$ memenuhi $s_{n+1} = 4s_n$ dan
+$d_{n+1} = 2d_n$, jadi $s_n = 4^n s_0$, $d_n = 2^n d_0$ dan
+\[
+u_n = \frac{4^n(u_0+v_0) + 2^n(u_0-v_0)}{2}, \qquad
+v_n = \frac{4^n(u_0+v_0) - 2^n(u_0-v_0)}{2}.
+\]
+(Di balik layarnya: $(1,1)$ dan $(1,-1)$ adalah arah \omterm{def:g11:vect:vector}{vektor} eigen $A$.)
+\end{example}
+
+\section{Graf dan jalan}
+
+\begin{definition}[Graf, matriks ketetanggaan]\label{def:g12:matrix:graph}
+Suatu \emph{graf}\index{graf} terdiri atas simpul $1, 2, \dots, n$ dan sisi
+yang menghubungkan pasangan simpul tertentu (pasangan terurut bagi graf
+\emph{berarah}). \emph{Matriks ketetanggaan}\index{matriks ketetanggaan} dari graf itu
+adalah \omterm{def:g12:matrix:matrix}{matriks} $n \times n$ bernama $M$ dengan $m_{ij} = 1$ jika ada sisi dari $i$ ke
+$j$, dan $0$ jika tidak. Suatu \emph{jalan} sepanjang $k$ dari $i$ ke $j$ adalah
+\omterm{def:g12:seq:sequence}{barisan} $k$ sisi berturut-turut yang membawa dari $i$ ke $j$.
+\end{definition}
+
+\begin{omfigure}
+\begin{tikzpicture}[baseline=(current bounding box.center)]
+  \node[circle, draw, inner sep=2.5pt] (v1) at (0,0) {$1$};
+  \node[circle, draw, inner sep=2.5pt] (v2) at (2.6,1.2) {$2$};
+  \node[circle, draw, inner sep=2.5pt] (v3) at (2.6,-1.2) {$3$};
+  \draw[-Stealth, omDef, thick] (v1) -- (v2);
+  \draw[-Stealth, omDef, thick] (v2) -- (v3);
+  \draw[-Stealth, omDef, thick] (v1) to[bend right=18] (v3);
+  \draw[-Stealth, omDef, thick] (v3) to[bend right=18] (v1);
+\end{tikzpicture}
+\qquad\qquad
+$M = \begin{pmatrix} 0 & 1 & 1\\ 0 & 0 & 1\\ 1 & 0 & 0 \end{pmatrix}$
+
+{\small Sebuah \omterm{def:g12:matrix:graph}{graf} berarah dan \omterm{def:g12:matrix:graph}{matriks ketetanggaannya}
+(\cref{exo:g12:matrix:6}): $m_{ij} = 1$ tepat ketika ada sisi
+dari $i$ ke $j$.}
+\end{omfigure}
+
+\begin{theorem}[Mencacah jalan]\label{thm:g12:matrix:walks}
+Banyaknya jalan sepanjang $k$ dari simpul $i$ ke simpul $j$ adalah
+isian $(i,j)$ pada $M^k$.
+\end{theorem}
+
+\begin{proof}
+Induksi pada $k$. Untuk $k = 1$ inilah definisi $M$. Andaikan
+pernyataannya benar untuk $k$. Jalan sepanjang $k+1$ dari $i$ ke $j$ adalah jalan
+sepanjang $k$ dari $i$ ke suatu simpul $l$, lalu diikuti sisi dari $l$ ke $j$; menurut
+asas penjumlahan dan asas perkalian, banyaknya adalah
+\[
+\sum_{l=1}^{n} \bigl(M^k\bigr)_{il}\, m_{lj} = \bigl(M^{k+1}\bigr)_{ij}.
+\qedhere
+\]
+\end{proof}
+
+\begin{example}
+Untuk \omterm{def:g12:matrix:graph}{graf} segitiga ($3$ simpul, semua pasangannya terhubung),
+$M = \begin{pmatrix} 0&1&1\\ 1&0&1\\ 1&1&0\end{pmatrix}$ dan
+$M^2 = \begin{pmatrix} 2&1&1\\ 1&2&1\\ 1&1&2\end{pmatrix}$: jadi dari tiap simpulnya
+ada $2$ jalan sepanjang $2$ yang kembali ke dirinya (lewat salah satu tetangganya) dan
+$1$ jalan ke tiap simpul lainnya.
+\end{example}
+
+\section{Latihan}
+
+\begin{exercise}[$\star$]\label{exo:g12:matrix:1}
+Misalkan $A = \begin{pmatrix} 1 & 2\\ 0 & 1 \end{pmatrix}$ dan
+$B = \begin{pmatrix} 2 & 0\\ 1 & 1 \end{pmatrix}$. Hitunglah $A + B$, $AB$,
+$BA$ dan $A^2$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:matrix:2}
+Tentukan apakah \omterm{def:g12:matrix:matrix}{matriks} berikut \omterm{def:g12:matrix:inverse}{dapat dibalik}, lalu hitunglah
+balikannya jika ada:
+\[
+A = \begin{pmatrix} 2 & 5\\ 1 & 3\end{pmatrix}, \qquad
+B = \begin{pmatrix} 3 & 6\\ 2 & 4\end{pmatrix}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:matrix:3}
+Selesaikan lewat pembalikan \omterm{def:g12:matrix:matrix}{matriks} sistem
+$\begin{cases} 2x + 5y = 1\\ x + 3y = 2 . \end{cases}$
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:matrix:4}
+Misalkan $A = \begin{pmatrix} 2 & 1\\ 0 & 2\end{pmatrix} = 2I + N$ dengan
+$N = \begin{pmatrix} 0 & 1\\ 0 & 0 \end{pmatrix}$.
+\begin{enumerate}
+  \item Periksalah bahwa $N^2 = 0$ dan bahwa $I$ dan $N$ komutatif.
+  \item Simpulkan $A^k$ untuk semua $k \in \N$ lalu periksalah rumusnya untuk $k=2$
+        lewat perhitungan langsung.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:matrix:5}
+Misalkan $A = \begin{pmatrix} 0 & 1\\ 1 & 1\end{pmatrix}$ dan $F_n$ \omterm{def:g12:seq:sequence}{barisan}
+Fibonacci ($F_0 = 0$, $F_1 = 1$, $F_{n+2} = F_{n+1} + F_n$). Tunjukkan lewat
+induksi bahwa untuk $n \geq 1$,
+\[
+A^n = \begin{pmatrix} F_{n-1} & F_n\\ F_n & F_{n+1}\end{pmatrix},
+\]
+lalu simpulkan identitas $F_{n+1}F_{n-1} - F_n^2 = (-1)^n$.
+(Petunjuk: \omterm{def:g11:vect:det}{determinan} saling mengalikan: $\det(MN) = \det M \det N$, dan itu boleh
+kamu periksa untuk \omterm{def:g12:matrix:matrix}{matriks} $2\times2$.)
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:matrix:6}
+Sebuah \omterm{def:g12:matrix:graph}{graf} berarah pada simpul $\{1, 2, 3\}$ mempunyai sisi
+$1\to2$, $2\to3$, $3\to1$ dan $1\to3$.
+\begin{enumerate}
+  \item Tulislah \omterm{def:g12:matrix:graph}{matriks ketetanggaannya} $M$ lalu hitung $M^2$ dan $M^3$.
+  \item Ada berapa jalan sepanjang $3$ dari $1$ ke $1$? Daftarkanlah.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:matrix:7}
+Sebuah perusahaan berbagi mobil memindahkan kendaraan antara dua kota $A$ dan $B$.
+Tiap pekan, $80\%$ mobil di $A$ tinggal di $A$ dan $20\%$ pindah ke $B$; lalu $30\%$
+mobil di $B$ pindah ke $A$ dan $70\%$ tinggal. Misalkan $a_n, b_n$ adalah
+bagian armadanya di tiap kota.
+\begin{omfigure}
+\begin{tikzpicture}
+  \node[circle, draw, inner sep=3pt] (A) at (0,0) {$A$};
+  \node[circle, draw, inner sep=3pt] (B) at (3.2,0) {$B$};
+  \draw[-Stealth, omDef, thick] (A) to[bend left=25]
+    node[above, font=\small] {$0.2$} (B);
+  \draw[-Stealth, omDef, thick] (B) to[bend left=25]
+    node[below, font=\small] {$0.3$} (A);
+  \draw[-Stealth, omDef, thick] (A) to[loop left]
+    node[left, font=\small] {$0.8$} (A);
+  \draw[-Stealth, omDef, thick] (B) to[loop right]
+    node[right, font=\small] {$0.7$} (B);
+\end{tikzpicture}
+\end{omfigure}
+\begin{enumerate}
+  \item Tulislah $X_{n+1} = MX_n$ dengan
+        $X_n = \begin{pmatrix} a_n\\ b_n\end{pmatrix}$ lalu kenalilah $M$.
+  \item Carilah bagian yang setimbang (selesaikan $MX = X$ dengan
+        $a + b = 1$).
+  \item Tunjukkan bahwa $c_n = a_n - 0.6$ memenuhi $c_{n+1} = 0.5\,c_n$, lalu
+        simpulkan bahwa \omterm{def:g11:prob:rv}{distribusi} armadanya menuju kesetimbangan itu.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:matrix:8}
+Misalkan $A = \begin{pmatrix} 3 & 1\\ 1 & 3 \end{pmatrix}$,
+$P = \begin{pmatrix} 1 & 1\\ 1 & -1 \end{pmatrix}$.
+\begin{enumerate}
+  \item Hitunglah $P^{-1}$, lalu $D = P^{-1}AP$, dan periksalah bahwa $D$
+        diagonal.
+  \item Simpulkan rumus tertutup bagi $A^n$ lalu bandingkan dengan
+        \cref{ex:g12:matrix:coupled}.
+\end{enumerate}
+\end{exercise}
+
+\section{Soal: Matriks yang hafal Fibonacci (dan
+cuaca)}
+
+\begin{problem}[{Soal akhir pekan --- satu matriks $2 \times 2$
+memikul seluruh Fibonacci, sebuah matriks Markov meramal cuaca jangka
+panjang, dan sebuah vektor eigen bernilai semiliar dolar}]
+\label{pb:g12:matrix:1}
+\omterm{def:g12:matrix:matrix}{Matriks} adalah mesin yang memakan sebuah keadaan lalu mengembalikan keadaan
+berikutnya --- dan \emph{pangkatnya} karena itu menyimpan seluruh masa depan. Soal
+ini dibuka dengan \omterm{def:g12:matrix:matrix}{matriks} mencengangkan yang pangkatnya mendaftar
+bilangan Fibonacci (dan membuktikan identitasnya masing-masing satu baris),
+lalu menjalankan cuaca sebagai rantai Markov sampai keadaan mapannya, dan
+ditutup dengan \omterm{def:g11:vect:vector}{vektor} eigen yang di atasnya sebuah mesin pencari dibangun
+(\cref{thm:g12:matrix:walks},
+\cref{met:g12:matrix:powers}).
+
+\medskip
+\noindent\textbf{Bagian I --- Kelancaran.}
+\begin{enumerate}
+  \item Dengan $A = \begin{pmatrix} 1 & 2\\ 3 & 4\end{pmatrix}$
+        dan $B = \begin{pmatrix} 0 & 1\\ 1 & 0\end{pmatrix}$:
+        hitunglah $AB$ dan $BA$. Vonis atas kekomutatifannya?
+  \item Baliklah $\begin{pmatrix} 2 & 1\\ 5 & 3\end{pmatrix}$
+        (\cref{prop:g12:matrix:inverse2x2}) lalu pakailah balikannya
+        untuk menyelesaikan $2x + y = 4$, $5x + 3y = 7$.
+  \item Misalkan $N = \begin{pmatrix} 0 & 1\\ 0 & 0\end{pmatrix}$:
+        hitunglah $N^2$, lalu simpulkan
+        $(I + N)^n = I + nN$ untuk setiap $n$.
+  \item \omterm{def:g12:matrix:graph}{Graf} segitiga (tiga simpul, semua pasangannya terhubung):
+        tulislah \omterm{def:g12:matrix:graph}{matriks ketetanggaannya} $A$, hitunglah $A^3$, lalu
+        tafsirkan isian diagonalnya
+        (\cref{thm:g12:matrix:walks}).
+  \item Untuk $D = \begin{pmatrix} 2 & 0\\ 0 & \frac12
+        \end{pmatrix}$: berikan $D^n$ dan perilakunya ketika
+        $n \to \infty$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian II --- \omterm{def:g12:matrix:matrix}{Matriks} Fibonacci.}
+Misalkan $F = \begin{pmatrix} 1 & 1\\ 1 & 0\end{pmatrix}$ dan misalkan
+$F_1 = F_2 = 1, F_3 = 2, \dots$ adalah bilangan Fibonacci pada
+\cref{pb:g11:seq:1}.
+\begin{enumerate}[resume]
+  \item Hitunglah $F^2$, $F^3$, $F^4$ lalu terkalah bentuk umum
+        $F^n$ dengan bilangan Fibonacci.
+  \item Buktikan terkaan
+        $F^n = \begin{pmatrix} F_{n+1} & F_n\\ F_n & F_{n-1}
+        \end{pmatrix}$ itu lewat induksi.
+  \item Ambillah \omterm{def:g11:vect:det}{determinan} kedua ruasnya (\omterm{def:g11:vect:det}{determinan} hasil
+        kali adalah hasil kali \omterm{def:g11:vect:det}{determinannya} --- periksalah
+        pada \omterm{def:g12:matrix:matrix}{matriks} $2 \times 2$ jika kamu belum pernah melihatnya):
+        lalu simpulkan \emph{identitas Cassini}
+        $F_{n+1}F_{n-1} - F_n^2 = (-1)^n$ --- yaitu mesin
+        kuadrat yang lenyap itu, yang terbukti dalam satu baris.
+  \item Dari $F^{m+n} = F^m F^n$, bacalah isian
+        kanan atasnya lalu turunkan \emph{rumus penjumlahannya}
+        \[
+        F_{m+n} = F_{m+1} F_n + F_m F_{n-1} .
+        \]
+        Periksalah untuk $m = n = 3$.
+  \item Simpulkan dari rumus penjumlahan itu (lewat induksi pada $k$)
+        bahwa $F_n$ \omterm{def:g12:arith:divides}{membagi} $F_{kn}$, lalu periksalah pada
+        $F_3 \mid F_6$ dan $F_3 \mid F_9$.
+  \item Untuk menghitung $F_{100}$, orang tak perlu mengalikan $100$
+        \omterm{def:g12:matrix:matrix}{matriks}: kuadratkanlah berulang kali ($F^2, F^4, F^8, \dots$)
+        lalu gabungkan. Berapa kali perkalian \omterm{def:g12:matrix:matrix}{matriks} yang cukup,
+        dan muslihat perkalian kuno mana dari jilid sekolah
+        menengah pertama yang ini, yang kini naik pangkat ke \omterm{def:g12:matrix:matrix}{matriks}?
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian III --- Mesin cuaca.}
+Di sebuah kota: sesudah hari yang cerah, hari berikutnya cerah dengan
+peluang $0.8$; sesudah hari yang hujan, cerah dengan peluang
+$0.4$. Sandikan \omterm{def:g11:prob:rv}{distribusi} harinya sebagai satu kolom
+$\binom{p_{\text{cerah}}}{p_{\text{hujan}}}$ dan perubahannya oleh
+\[
+M = \begin{pmatrix} 0.8 & 0.4\\ 0.2 & 0.6 \end{pmatrix}.
+\]
+\begin{enumerate}[resume]
+  \item Periksalah bahwa tiap kolom $M$ berjumlah $1$, lalu katakan mengapa
+        setiap mesin cuaca harus punya sifat itu.
+  \item Hari ini cerah. Hitunglah ramalan untuk besok dan
+        untuk lusa.
+  \item Carilah \emph{keadaan mapannya}: yaitu \omterm{def:g11:prob:rv}{distribusi} $v$ dengan
+        $Mv = v$ (dan isiannya berjumlah $1$). Berapa bagian
+        harinya yang cerah dalam jangka panjang?
+  \item Mulailah dari hari hujan, $\binom01$, lalu terapkan $M$ empat
+        kali, sambil melacak jaraknya ke keadaan mapan pada
+        tiap langkahnya. Dengan faktor berapa jurangnya menyusut tiap langkah
+        --- dan kekonvergenan macam apa ini?
+  \item PageRank dalam ukuran mini: tiga halaman, dengan tautan
+        $A \to B$, $A \to C$, $B \to C$, $C \to A$. Seorang peselancar
+        acak mengikuti tautan keluar secara acak seragam.
+        Tulislah \omterm{def:g12:matrix:matrix}{matriks} peralihannya, carilah keadaan mapannya, lalu
+        peringkatkan halamannya.
+  \item Tafsirkan peringkatnya: mengapa $C$ bernilai setinggi
+        $A$ padahal menerima tautan dari lebih sedikit halaman --- apa
+        yang sebenarnya diukur keadaan mapan itu? (PageRank yang sungguhan
+        menambahkan faktor peredam untuk jalan buntu dan lompatan; gagasan
+        \omterm{def:g11:vect:vector}{vektor} eigennya tepat yang ini.)
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian IV --- Untung dari diagonalnya.}
+\begin{enumerate}[resume]
+  \item Dua besaran yang berpasangan menuruti
+        $u_{n+1} = 3u_n + v_n$, $v_{n+1} = u_n + 3v_n$, yaitu
+        \omterm{def:g12:matrix:matrix}{matriks} $A$ pada \cref{exo:g12:matrix:8}. Dengan memakai
+        pendiagonalan latihan itu
+        ($D = \operatorname{diag}(4, 2)$), berikan rumus
+        tertutup bagi $u_n$ ketika $u_0 = 1$, $v_0 = 0$, lalu periksalah
+        terhadap perhitungan langsung untuk $n = 1, 2, 3$.
+  \item Dalam satu atau dua kalimat: apa yang \emph{dilakukan} pendiagonalan
+        terhadap sistem yang berpasangan --- dan dalam arti apa
+        keadaan mapan Markov pada pertanyaan 14 juga sebuah kisah \omterm{def:g11:vect:vector}{vektor}
+        eigen?
+  \item Penutup --- tiga wajah \omterm{def:g12:matrix:matrix}{matriks} pada akhir pekan ini:
+        pembukuan (sistem dan balikan), kombinatorika
+        (jalan dan tautan yang tercacah oleh pangkatnya), dan perubahan
+        (Fibonacci, cuaca, jejaring --- masa depan yang terbaca dari
+        arah eigennya). Masing-masing satu kalimat, ditambah
+        penunjuk ke depan: aljabar linear di jilid universitas
+        menjadikan tiap wajah itu sebuah teori.
+
+\end{enumerate}
+\end{problem}

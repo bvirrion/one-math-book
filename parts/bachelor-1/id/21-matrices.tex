@@ -1,0 +1,769 @@
+\chapter{Matriks}\label{ch:b1:matrices}
+
+Sebuah matriks adalah \omterm{def:b1:linmaps:def}{pemetaan linear} yang ditulis dalam \omterm{prop:b1:vspaces:coordinates}{koordinat}. Bab ini
+menyiapkan kamusnya --- komposisi menjadi hasil kali matriks, kebijektifan
+menjadi keterbalikan, dan \omterm{def:b1:matrices:changeofbasis}{perubahan basis} menjadi konjugasi --- beserta
+sisi algoritmisnya: yaitu \omterm{met:b1:matrices:gauss}{operasi baris}, perhitungan rank dan
+invers. Setelah pertama kali ditemui pada jilid Sekolah Menengah, matriks kini
+berpijak pada teori
+\cref{ch:b1:vspaces,ch:b1:findim,ch:b1:linmaps}.
+
+\section{Matriks dan pemetaan linear}
+
+\begin{definition}\label{def:b1:matrices:def}
+\omterm{def:b1:logic:sets}{Himpunan} $\mathcal{M}_{n,p}(K)$ adalah \omterm{def:b1:vspaces:def}{ruang vektor} berisi larik $n \times p$ yaitu $A
+= (a_{ij})$ berisi skalar ($i$: barisnya, $j$: kolomnya), yang berdimensi $np$
+(dengan basisnya: matriks $E_{ij}$ yang bernilai $1$ tunggal). Diberikan \omterm{def:b1:vspaces:free}{basis}
+$\mathcal{B} = (e_1, \dots, e_p)$ pada $E$ dan $\mathcal{C}$ pada $F$
+(dengan $\dim F = n$), \emph{matriks $u \in \mathcal{L}(E, F)$} adalah
+larik yang kolom ke-$j$-nya mendaftar \omterm{prop:b1:vspaces:coordinates}{koordinat} $u(e_j)$ pada
+$\mathcal{C}$:
+\[
+\operatorname{Mat}_{\mathcal{B},\mathcal{C}}(u) = (a_{ij}),
+\qquad u(e_j) = \sum_{i=1}^{n} a_{ij}\, f_i .
+\]
+Adapun \omterm{def:b1:logic:map}{pemetaan} $u \mapsto \operatorname{Mat}_{\mathcal{B},\mathcal{C}}(u)$
+merupakan isomorfisma dari $\mathcal{L}(E, F)$ pada
+$\mathcal{M}_{n,p}(K)$ (\cref{prop:b1:linmaps:basis}: karena \omterm{def:b1:linmaps:def}{pemetaan linear}
+tepat merupakan pemilihan peta $e_j$-nya).
+\end{definition}
+
+\begin{example}[Turunan, sebagai sebuah matriks]
+\label{ex:b1:matrices:derivative}
+Misalkan $D(P) = P'$ pada $\R_3[X]$. Pada \omterm{def:b1:vspaces:free}{basis} monomialnya $(1, X, X^2,
+X^3)$: $D(1) = 0$, $D(X) = 1$, $D(X^2) = 2X$, $D(X^3) = 3X^2$, sehingga
+\[
+\operatorname{Mat}(D) =
+\begin{pmatrix}
+0 & 1 & 0 & 0\\
+0 & 0 & 2 & 0\\
+0 & 0 & 0 & 3\\
+0 & 0 & 0 & 0
+\end{pmatrix}.
+\]
+Sedangkan pada \omterm{def:b1:vspaces:free}{basis} yang \emph{terbagi} $\bigl(1,\ X,\ \frac{X^2}2,\
+\frac{X^3}6\bigr)$, setiap vektor basisnya terpetakan ke yang sebelumnya
+(karena $D\bigl(\frac{X^k}{k!}\bigr) = \frac{X^{k-1}}{(k-1)!}$), dan
+matriksnya menjadi geseran murni: yaitu satuan pada superdiagonalnya, dan nol
+di tempat lain. Ada dua moralnya: bahwa matriksnya milik \emph{pasangan}
+(\omterm{def:b1:logic:map}{pemetaan}, \omterm{def:b1:vspaces:free}{basis}), bukan \omterm{def:b1:logic:map}{pemetaannya} belaka; dan bahwa \omterm{def:b1:vspaces:free}{basis} yang baik membuat
+strukturnya kasatmata sekali pandang --- karena bentuk geserannya seketika menunjukkan
+bahwa $D^4 = 0$ pada $\R_3[X]$, dengan setiap pangkat matriksnya mendorong
+diagonal satuannya satu langkah lebih jauh ke luar.
+\end{example}
+
+\begin{definition}[Hasil kali]\label{def:b1:matrices:product}
+Untuk $A \in \mathcal{M}_{n,p}$ dan $B \in \mathcal{M}_{p,q}$:
+\[
+(AB)_{ik} = \sum_{j=1}^{p} a_{ij}\, b_{jk}
+\qquad (1 \leq i \leq n,\ 1 \leq k \leq q).
+\]
+Dan inilah persis matriks komposisinya:
+$\operatorname{Mat}(v \circ u) = \operatorname{Mat}(v)\,
+\operatorname{Mat}(u)$ (dengan basisnya cocok di tengah). Demikian pula,
+jika $X$ kolom \omterm{prop:b1:vspaces:coordinates}{koordinat} $x$, maka kolom $u(x)$ adalah
+$AX$.
+\end{definition}
+
+\begin{proof}[Bukti rumus komposisinya]
+\[
+v(u(e_k)) = v\Bigl(\sum_j b_{jk} f_j\Bigr) = \sum_j b_{jk}\, v(f_j)
+= \sum_j b_{jk} \sum_i a_{ij}\, g_i
+= \sum_i \Bigl(\sum_j a_{ij} b_{jk}\Bigr) g_i . \qedhere
+\]
+\end{proof}
+
+\begin{proposition}[Aljabar $\mathcal{M}_n(K)$]\label{prop:b1:matrices:ring}
+Matriks persegi $\mathcal{M}_n(K)$ membentuk \omterm{def:b1:structures:ring}{ring} (yang takkomutatif untuk $n
+\geq 2$), dengan identitasnya $I_n$; dan \omterm{def:b1:structures:group}{grup} satuannya adalah
+\emph{grup linear umum}\index{grup linear umum}
+$GL_n(K)$, yang bersesuaian dengan endomorfisma yang \omterm{def:b1:logic:inj}{bijektif}. Untuk $A, B \in
+\mathcal{M}_n(K)$:
+\[
+AB = I_n \implies A \in GL_n(K) \text{ dan } B = A^{-1}
+\]
+(karena invers sepihaknya menjadi dua sisi, menurut
+\cref{cor:b1:linmaps:samedim}).
+\end{proposition}
+
+\begin{proof}
+Aksioma \omterm{def:b1:structures:ring}{ringnya} terangkut dari $\mathcal{L}(E)$ lewat
+isomorfisma pada \cref{def:b1:matrices:def}: karena ia mengubah
+komposisi menjadi hasil kali dan jumlah menjadi jumlah, sehingga keasosiatifan,
+kedistributifan dan peran $I_n$ terwarisi dari fakta yang
+bersesuaian tentang \omterm{def:b1:logic:map}{pemetaannya}, tanpa pemeriksaan entri demi entri.
+Adapun ketakkomutatifannya: $E_{12}E_{21} = E_{11} \neq E_{22}
+= E_{21}E_{12}$. Jika $AB = I_n$: maka endomorfisma $a$ milik $A$
+memenuhi $a \circ b = \mathrm{id}$, sehingga $a$ bersifat \omterm{def:b1:logic:inj}{surjektif} (karena $x =
+a(b(x))$ menunjukkan sebuah \omterm{def:b1:logic:map}{prapeta} bagi setiap $x$), jadi \omterm{def:b1:logic:inj}{bijektif} dalam
+\omterm{def:b1:findim:def}{dimensi hingga} (\cref{cor:b1:linmaps:samedim}); lalu menyusun $a
+\circ b = \mathrm{id}$ dengan $a^{-1}$ di kiri memberikan $b =
+a^{-1}$, dan lalu $b\circ a = \mathrm{id}$ pula: sehingga invers sepihaknya
+sejak awal dua sisi --- yaitu bantuan yang tegas
+\omterm{def:b1:findim:def}{berdimensi hingga}.
+\end{proof}
+
+\begin{definition}[Transpos; trace]\label{def:b1:matrices:transpose}
+\emph{Transpos} $A = (a_{ij}) \in \mathcal{M}_{n,p}$ adalah $A^{\mathsf T}
+= (a_{ji}) \in \mathcal{M}_{p,n}$; yang memenuhi $(AB)^{\mathsf T} = B^{\mathsf T}
+A^{\mathsf T}$ dan $(A^{\mathsf T})^{\mathsf T} = A$. Sedangkan
+\emph{trace}\index{trace} sebuah matriks persegi adalah $\operatorname{tr} A
+= \sum_i a_{ii}$; yang bersifat \omterm{def:b1:linmaps:def}{linear}, dan
+\[
+\operatorname{tr}(AB) = \operatorname{tr}(BA)
+\qquad (A \in \mathcal{M}_{n,p},\ B \in \mathcal{M}_{p,n}).
+\]
+\end{definition}
+
+\begin{proof}[Bukti kesamaan tracenya]
+$\operatorname{tr}(AB) = \sum_i \sum_j a_{ij} b_{ji}$ dan
+$\operatorname{tr}(BA) = \sum_j \sum_i b_{ji} a_{ij}$: yaitu jumlah
+rangkap yang sama.
+\end{proof}
+
+\begin{example}[Trace dalam kerja]
+\label{ex:b1:matrices:tracework}
+\omterm{def:b1:linmaps:projection}{Proyeksi} pada \cref{ch:b1:linmaps} ke
+$\operatorname{Vect}(1,1)$ sepanjang $\operatorname{Vect}(0,1)$,
+yaitu $p(x, y) = (x, x)$, bermatriks $A = \begin{pmatrix} 1 & 0\\ 1 &
+0\end{pmatrix}$ pada \omterm{def:b1:vspaces:free}{basis} kanoniknya: memang $A^2 = A$, dan
+\[
+\operatorname{tr} A = 1 = \operatorname{rk} A ,
+\]
+yang memperlihatkan \cref{exo:b1:matrices:8}: bahwa bagi yang idempoten \omterm{def:b1:matrices:transpose}{tracenya}
+\emph{mencacah} dimensi petanya, pada \omterm{def:b1:vspaces:free}{basis} semiring apa pun
+matriksnya ditulis. Adapun mekanisme kekekalannya adalah
+kesamaan $\operatorname{tr}(AB) = \operatorname{tr}(BA)$:
+\[
+\operatorname{tr}\bigl(P^{-1}(AP)\bigr) =
+\operatorname{tr}\bigl((AP)P^{-1}\bigr) = \operatorname{tr} A ,
+\]
+sehingga semua matriks yang serupa dengan $A$ berbagi \omterm{def:b1:matrices:transpose}{tracenya} --- yaitu
+\emph{invarian numerik} yang pertama bagi sebuah endomorfisma, yang akan disusul
+oleh determinan pada \cref{ch:b1:det} (yakni pasangan $(s, p)$ pada
+soal akhir pekan di bawah).
+\end{example}
+
+\begin{example}[Setangkup tambah antisetangkup]
+\label{ex:b1:matrices:symsplit}
+Sebutlah $A$ \emph{setangkup} bila $A^{\mathsf T} = A$, dan
+\emph{antisetangkup} bila $A^{\mathsf T} = -A$. Maka setiap matriks
+persegi terbelah secara tunggal menjadi yang satu tambah yang lain:
+\[
+A = \underbrace{\frac{A + A^{\mathsf T}}{2}}_{\text{setangkup}}
++ \underbrace{\frac{A - A^{\mathsf T}}{2}}_{\text{antisetangkup}},
+\]
+dan matriks yang sekaligus keduanya bernilai nol (karena $A = -A$): sehingga kedua \omterm{def:b1:logic:sets}{himpunannya}
+merupakan \omterm{def:b1:vspaces:sum}{subruang yang saling melengkapi} pada $\mathcal{M}_n(K)$ --- yaitu
+padanan yang persis bagi pembelahan genap/ganjil fungsi
+(\cref{ex:b1:vspaces:evenodd}), dengan transposisi memainkan
+peran $x \mapsto -x$. Adapun dimensinya: matriks setangkup bersifat \omterm{def:b1:vspaces:free}{bebas}
+pada dan di atas diagonalnya, sedangkan yang antisetangkup tegas di atasnya
+(karena diagonalnya nol):
+\[
+\frac{n(n+1)}{2} + \frac{n(n-1)}{2} = n^2 ,
+\]
+dan cacah yang berimbang itu merupakan penegasan Grassmann atas
+kelangsungannya. Untuk $n = 2$: $\begin{pmatrix} 1 & 5\\ 1 &
+2\end{pmatrix} = \begin{pmatrix} 1 & 3\\ 3 & 2\end{pmatrix} +
+\begin{pmatrix} 0 & 2\\ -2 & 0\end{pmatrix}$. Adapun matriks
+setangkup kembali sebagai data \omterm{def:b1:derivative:def}{turunan} kedua pada
+\cref{ch:b1:multivar} (yaitu tripel Monge $r, s, t$), sedangkan
+yang setangkup sekaligus ortogonal digolongkan pada
+\cref{exo:b1:euclid:12}.
+\end{example}
+
+\section{Perubahan basis}
+
+\begin{definition}\label{def:b1:matrices:changeofbasis}
+Misalkan $\mathcal{B}, \mathcal{B}'$ \omterm{def:b1:vspaces:free}{basis} pada $E$. Maka \emph{matriks
+perubahan basis}\index{perubahan basis} $P =
+P_{\mathcal{B}\to\mathcal{B}'}$ berkolomkan \omterm{prop:b1:vspaces:coordinates}{koordinat}
+vektor \omterm{def:b1:vspaces:free}{basis} yang \emph{baru} pada \omterm{def:b1:vspaces:free}{basis} yang \emph{lama}. Ia
+dapat dibalik, $P^{-1} = P_{\mathcal{B}'\to\mathcal{B}}$, dan
+\omterm{prop:b1:vspaces:coordinates}{koordinatnya} berubah lewat $X = PX'$ (yaitu lama $=$ $P\,\cdot$ baru).
+\end{definition}
+
+\begin{example}[Membaca matriks perubahan basisnya]
+\label{ex:b1:matrices:changerun}
+Di dalam $\R^2$, dari $\mathcal B$ yang kanonik ke $\mathcal B' =
+\bigl((1,1), (1,-1)\bigr)$:
+\[
+P = P_{\mathcal B\to\mathcal B'} =
+\begin{pmatrix} 1 & 1\\ 1 & -1 \end{pmatrix}
+\]
+(dengan vektor barunya ditulis dalam \omterm{prop:b1:vspaces:coordinates}{koordinat} lamanya, kolom demi kolom). Maka
+vektor berkoordinat lama $X = (3, 1)^{\mathsf T}$ berkoordinat
+baru $X' = P^{-1}X = \frac12(3 + 1,\ 3 - 1)^{\mathsf T} =
+(2, 1)^{\mathsf T}$: memang $2(1,1) + 1(1,-1) = (3,1)$. Awas arahnya
+--- karena matriks $P$ dibangun dari \omterm{def:b1:vspaces:free}{basis} yang \emph{baru}
+tetapi mengubah \omterm{prop:b1:vspaces:coordinates}{koordinat} \emph{baru menjadi lama} ($X = PX'$); sedangkan beralih
+dari lama ke baru berongkos inversnya. Jadi menuliskan periksa kewarasannya
+$2(1,1) + (1,-1) = (3,1)$ setelah setiap pengalihan menangkap
+galat $P$ yang terbalik, yang merupakan kesalahan paling lazim pada
+bab ini.
+\end{example}
+
+\begin{theorem}[Perubahan basis bagi sebuah pemetaan]\label{thm:b1:matrices:conjugation}
+Misalkan $u \in \mathcal{L}(E)$ bermatriks $A$ pada $\mathcal{B}$ dan $A'$
+pada $\mathcal{B}'$, dan $P = P_{\mathcal{B}\to\mathcal{B}'}$. Maka
+\[
+A' = P^{-1} A\, P .
+\]
+Dua matriks yang berkaitan dengan cara ini disebut \emph{serupa}\index{matriks
+yang serupa}. (Adapun untuk $u \colon E \to F$ dengan dua pasang \omterm{def:b1:vspaces:free}{basis},
+rumusnya adalah $A' = Q^{-1} A P$ --- yaitu matriks yang \emph{setara}
+satu sama lain\index{matriks yang setara}.)
+\end{theorem}
+
+\begin{proof}
+Untuk sebarang $x$: $X = PX'$ dan petanya memenuhi $Y = AX$, $Y = PY'$.
+Sehingga $PY' = APX'$, yakni $Y' = (P^{-1}AP)X'$ untuk setiap $X'$: jadi matriks
+$u$ pada \omterm{def:b1:vspaces:free}{basis} barunya adalah $P^{-1}AP$ (ambillah kolom kanoniknya
+bagi $X'$).
+\end{proof}
+
+\begin{example}[Basis yang baik membuat sebuah pemetaan bening]
+\label{ex:b1:matrices:conjugationrun}
+Misalkan $u(x, y) = (y, x)$ (yaitu penukaran), yang bermatriks $A = \begin{pmatrix} 0
+& 1\\ 1 & 0\end{pmatrix}$ pada \omterm{def:b1:vspaces:free}{basis} kanoniknya. Adapun pada \omterm{def:b1:vspaces:free}{basis}
+$\mathcal B' = \bigl((1,1), (1,-1)\bigr)$:
+\[
+P = \begin{pmatrix} 1 & 1\\ 1 & -1 \end{pmatrix},
+\qquad
+P^{-1} = \frac12\begin{pmatrix} 1 & 1\\ 1 & -1 \end{pmatrix},
+\qquad
+P^{-1} A P = \begin{pmatrix} 1 & 0\\ 0 & -1 \end{pmatrix}.
+\]
+Sesungguhnya tak ada hasil kali matriks yang diperlukan: karena $u$ menetapkan $(1,1)$ dan
+membalikkan $(1,-1)$, sehingga pada $\mathcal B'$ matriksnya \emph{pasti}
+$\operatorname{diag}(1, -1)$ --- jadi penukarannya adalah pencerminan
+terhadap garis $y = x$. Adapun mencari, bagi sebuah endomorfisma yang diberikan, sebuah
+\omterm{def:b1:vspaces:free}{basis} yang di situ matriksnya menjadi diagonal merupakan masalah pusat
+jilid Tahun~2 (yaitu teori reduksinya); sedangkan soal akhir pekan
+di bawah menunjukkan sejauh apa kesamaan \omterm{def:b1:poly:def}{polinomial} belaka sudah melangkah.
+\end{example}
+
+\begin{example}[Perubahan basis, yang dijalankan terbalik]
+\label{ex:b1:matrices:reverserun}
+\omterm{def:b1:linmaps:projection}{Proyeksi} pada $F = \operatorname{Vect}(1,1)$ sepanjang $G =
+\operatorname{Vect}(1,-1)$ mempunyai, pada \omterm{def:b1:vspaces:free}{basis} yang disesuaikan $\mathcal
+B' = \bigl((1,1),(1,-1)\bigr)$, matriks yang bening $A' =
+\operatorname{diag}(1, 0)$. Untuk memperoleh matriks \omterm{def:b1:vspaces:free}{basis} kanoniknya,
+jalankanlah \cref{thm:b1:matrices:conjugation} mundur, $A = P A'
+P^{-1}$:
+\[
+P = \begin{pmatrix} 1 & 1\\ 1 & -1\end{pmatrix},
+\quad
+P^{-1} = \frac12\begin{pmatrix} 1 & 1\\ 1 & -1\end{pmatrix},
+\quad
+A = P\begin{pmatrix} 1 & 0\\ 0 & 0\end{pmatrix}P^{-1}
+= \frac12\begin{pmatrix} 1 & 1\\ 1 & 1\end{pmatrix}.
+\]
+Periksa: $A^2 = A$ (jadi idempoten), $\operatorname{tr} A = 1 =
+\operatorname{rk} A$, dan $A\binom{1}{1} = \binom11$,
+$A\binom{1}{-1} = 0$, sebagaimana ditetapkan. Adapun arah terbalik ini ---
+rancanglah matriksnya pada \omterm{def:b1:vspaces:free}{basis} yang baik, lalu konjugasikan kembali --- itulah
+cara matriks rotasi, pencerminan dan \omterm{def:b1:linmaps:projection}{proyeksi} sesungguhnya
+diproduksi dalam praktik.
+\end{example}
+
+\begin{theorem}[Bentuk normal rank]\label{thm:b1:matrices:rank}
+\emph{Rank} sebuah matriks (yaitu rank kolomnya, setara dengan itu
+rank \omterm{def:b1:linmaps:def}{pemetaan linear} yang berkaitan) merupakan satu-satunya invarian kesetaraannya:
+karena setiap $A \in \mathcal{M}_{n,p}$ yang ber-rank $r$ setara dengan
+\[
+J_r = \begin{pmatrix} I_r & 0 \\ 0 & 0 \end{pmatrix},
+\]
+dan $\operatorname{rk}(A^{\mathsf T}) = \operatorname{rk}(A)$: jadi rank barisnya
+sama dengan rank kolomnya.
+\end{theorem}
+
+\begin{proof}
+Misalkan $u \colon E \to F$ ber-rank $r$. Pilihlah sebuah \omterm{def:b1:vspaces:sum}{pelengkap} $S$ bagi
+$\ker u$ (dengan $\dim S = r$, \cref{thm:b1:linmaps:ranknullity}) berbasis
+$(e_1, \dots, e_r)$, yang dilengkapi oleh \omterm{def:b1:vspaces:free}{basis} $\ker u$ menjadi
+\omterm{def:b1:vspaces:free}{basis} $E$; maka peta $f_i = u(e_i)$, dengan $i \leq r$, membentuk \omterm{def:b1:vspaces:free}{basis}
+$\operatorname{im} u$ (karena pembatasannya sebuah isomorfisma), yang dilengkapi
+menjadi \omterm{def:b1:vspaces:free}{basis} $F$. Pada \omterm{def:b1:vspaces:free}{basis} inilah matriks $u$ tepat menjadi
+$J_r$. Sehingga $A = Q J_r P^{-1}$ untuk $P, Q$ yang dapat dibalik.
+
+Lalu mentransposkannya: $A^{\mathsf T} = (P^{-1})^{\mathsf T} J_r^{\mathsf T} Q^{\mathsf T}$
+dengan $J_r^{\mathsf T}$ yang berbentuk sama (ber-rank $r$) dan faktor
+luarnya yang dapat dibalik (karena transpos yang dapat dibalik pun dapat dibalik, dari
+$(AB)^{\mathsf T} = B^{\mathsf T}A^{\mathsf T}$ yang diterapkan pada $AA^{-1} = I$):
+sehingga $\operatorname{rk} A^{\mathsf T} = r$.
+\end{proof}
+
+\section{Operasi baris}
+
+\begin{method}[Penghapusan Gauss pada matriks]\label{met:b1:matrices:gauss}
+Ketiga \emph{operasi baris elementer}\index{operasi baris}nya ---
+menukar dua baris, mengalikan sebuah baris dengan $\lambda \neq 0$, dan menambahkan kelipatan
+sebuah baris pada baris lain --- tak mengubah ranknya (karena masing-masingnya berupa
+perkalian kiri dengan matriks yang dapat dibalik). Adapun algoritmanya: ciptakanlah sebuah poros
+(yaitu entri taknol yang paling kiri), bersihkanlah kolomnya di bawahnya, lalu berpindahlah ke baris
+dan kolom berikutnya; dan cacah poros bentuk eselon yang dihasilkannya
+adalah ranknya.
+
+\emph{Perhitungan inversnya:} jalankanlah algoritmanya pada blok $(A \mid
+I_n)$ sampai blok kirinya menjadi $I_n$ (yang mungkin jika dan hanya jika $A$
+dapat dibalik); maka blok kanannya lalu menjadi $A^{-1}$ --- memang hasil kali
+matriks elementer yang dipakai sama dengan $A^{-1}$.
+\end{method}
+
+\begin{example}\label{ex:b1:matrices:inverse}
+$A = \begin{pmatrix} 1 & 2 \\ 3 & 4 \end{pmatrix}$: reduksikanlah $(A \mid
+I_2)$:
+\[
+\begin{pmatrix} 1 & 2 & 1 & 0\\ 3 & 4 & 0 & 1 \end{pmatrix}
+\to
+\begin{pmatrix} 1 & 2 & 1 & 0\\ 0 & -2 & -3 & 1 \end{pmatrix}
+\to
+\begin{pmatrix} 1 & 0 & -2 & 1\\ 0 & 1 & \tfrac32 & -\tfrac12
+\end{pmatrix},
+\]
+(dengan operasinya: $L_2 \leftarrow L_2 - 3L_1$; lalu $L_1 \leftarrow L_1
++ L_2$, $L_2 \leftarrow -\frac12 L_2$). Sehingga $A^{-1} =
+\begin{pmatrix} -2 & 1 \\ \tfrac32 & -\tfrac12\end{pmatrix}$.
+\emph{Periksa:} $AA^{-1} = I_2$.
+\end{example}
+
+\begin{example}[Rank dengan sebuah parameter, lewat baris belaka]
+\label{ex:b1:matrices:rankparameter}
+Untuk $m \in \R$, carilah rank
+$M_m = \begin{pmatrix} 1 & 1 & m\\ 1 & m & 1\\ m & 1 &
+1\end{pmatrix}$. Reduksikanlah: $L_2 \leftarrow L_2 - L_1$ dan $L_3
+\leftarrow L_3 - mL_1$ memberikan baris
+\[
+(1,\ 1,\ m), \qquad (0,\ m - 1,\ 1 - m), \qquad
+(0,\ 1 - m,\ 1 - m^2).
+\]
+\emph{Kasus $m = 1$}: kedua baris terakhirnya lenyap --- jadi satu poros,
+sehingga $\operatorname{rk} M_1 = 1$ (karena ketiga baris aslinya
+sama). \emph{Kasus $m \neq 1$}: skalakanlah $L_2$ dengan $\frac1{m-1}$ dan
+$L_3$ dengan $\frac1{1-m}$ untuk memperoleh $(0, 1, -1)$ dan $(0, 1, 1 + m)$,
+lalu $L_3 \leftarrow L_3 - L_2 = (0, 0, m + 2)$. Jika $m = -2$: maka
+dua poros, jadi ber-rank $2$; kalau tidak tiga poros, jadi ber-rank $3$. Ringkasnya:
+\[
+\operatorname{rk} M_m =
+\begin{cases}
+1 & m = 1,\\
+2 & m = -2,\\
+3 & \text{jika tidak}.
+\end{cases}
+\]
+Ambang yang sama akan jatuh dari satu perhitungan determinan
+pada \cref{ch:b1:det} (yaitu \omterm{def:b1:poly:def}{polinomial} $-(m+2)(m-1)^2$ pada
+\cref{exo:b1:det:7}) --- tetapi perhatikanlah apa yang diberikan penghapusannya yang
+tak diberikan determinannya: yaitu \emph{nilai} ranknya pada
+kasus yang merosot, bukan sekadar fakta bahwa ia turun.
+\end{example}
+
+\begin{example}[Menghitung pangkat]\label{ex:b1:matrices:powers}
+$A = \begin{pmatrix} 1 & 1 \\ 0 & 1\end{pmatrix} = I + N$ dengan $N =
+E_{12}$, $N^2 = 0$. Dan karena $I$ dan $N$ berkomutasi, teorema binomialnya
+(\cref{prop:b1:structures:binomial}) terpenggal:
+\[
+A^k = I + kN = \begin{pmatrix} 1 & k \\ 0 & 1 \end{pmatrix}
+\qquad (k \in \N, \text{ dan } k \in \Z \text{ dengan memakai } A^{-1} = I -
+N).
+\]
+\end{example}
+
+\begin{method}[Menghitung $A^n$: ketiga rutenya]
+\label{met:b1:matrices:powers}
+\begin{enumerate}
+  \item \emph{Rute binomial}: jika $A = \lambda I + N$ dengan $N$ yang
+        nilpoten, maka teorema binomialnya terpenggal
+        (\cref{ex:b1:matrices:powers}, \cref{exo:b1:matrices:5});
+        dan ia berlaku karena $\lambda I$ berkomutasi dengan segalanya.
+  \item \emph{Rute \omterm{def:b1:poly:def}{polinomial}}: carilah sebuah kesamaan \omterm{def:b1:poly:def}{polinomial}
+        yang dipenuhi $A$ (pada dimensi $2$, selalu $A^2 = sA -
+        pI$) lalu reduksikanlah $X^n$ modulo ia; adapun soal akhir pekan
+        di bawah membangun rute ini sepenuhnya.
+  \item \emph{Rute keserupaan}: carilah $P$ yang dapat dibalik dengan
+        $P^{-1}AP = D$ yang sederhana (yaitu diagonal, atau geseran), hitunglah
+        $D^n$, lalu balikkanlah: $A^n = P D^n P^{-1}$
+        (\cref{thm:b1:matrices:conjugation},
+        \cref{ex:b1:matrices:conjugationrun}); adapun pencarian sistematis
+        atas $P$ yang demikian adalah teori reduksi Tahun~2.
+\end{enumerate}
+Rute mana pun yang dipakai, periksalah hasilnya pada $n = 0, 1, 2$: yaitu tiga
+uji yang murah yang menangkap hampir setiap keteledoran.
+\end{method}
+
+\begin{remark}[Jebakan yang lazim: harga ketakkomutatifannya]
+\label{rem:b1:matrices:pitfalls}
+Setiap kesamaan aljabar skalar yang buktinya mengurutkan ulang faktornya
+mati di $\mathcal{M}_n(K)$, dengan $n \geq 2$.
+\emph{Kuadratnya}: $(A + B)^2 = A^2 + AB + BA + B^2$, dan
+bagian tengahnya runtuh menjadi $2AB$ hanya bila $AB = BA$
+(\cref{exo:b1:matrices:1}).
+\emph{Pangkat hasil kalinya}: $(AB)^k$ adalah $ABAB\cdots$, bukan
+$A^kB^k$.
+\emph{Pembagi nolnya}: $E_{12}E_{12} = 0$ dengan $E_{12} \neq 0$;
+sehingga \emph{tak ada pencoretan}: karena $AB = AC$ mengakibatkan $B = C$
+hanya ketika $A$ dapat dibalik (kalikanlah dengan $A^{-1}$ --- pada
+sisi yang benar).
+\emph{\omterm{def:b1:matrices:transpose}{Tracenya}}: $\operatorname{tr}(AB) = \operatorname{tr}(BA)$
+selalu, tetapi $\operatorname{tr}(AB) \neq
+\operatorname{tr}A\operatorname{tr}B$ pada umumnya (ambillah $A = B =
+I_2$: $2 \neq 4$), dan $\operatorname{tr}(ABC) =
+\operatorname{tr}(BCA)$ (secara berdaur) sedangkan $\operatorname{tr}(ACB)$
+boleh berbeda.
+\emph{Transposnya membalikkan}: $(AB)^{\mathsf T} = B^{\mathsf
+T}A^{\mathsf T}$ --- adapun melupakan pembalikannya merupakan galat yang paling lazim
+pada perhitungan keortogonalan (\cref{ch:b1:euclid}).
+Jadi bila ragu, ujilah sebarang kesamaan yang diklaim pada $E_{12}$ dan
+$E_{21}$: karena pasangan takkomutatif yang terkecil membantah kebanyakan rumus
+yang salah dalam satu baris.
+\end{remark}
+
+\begin{remark}[Ke mana kamusnya pergi]
+\label{rem:b1:matrices:whereused}
+Kamus matriksnya dipakai pada setiap halaman sisa jilid
+ini: \cref{ch:b1:det} melekatkan pada setiap matriks persegi satu
+bilangan yang memutuskan keterbalikannya, lalu memecahkan $AX = B$
+secara sistematis; \cref{ch:b1:euclid} memilih matriks
+yang mengawetkan panjangnya (yaitu matriks ortogonal); sedangkan pada
+\cref{ch:b1:multivar}, perilaku orde dua sebuah fungsi dua
+variabel berupa matriks setangkup $2 \times 2$. Adapun \omterm{def:b1:matrices:transpose}{tracenya},
+yang diperkenalkan di atas nyaris sambil lalu, menjadi invarian yang ampuh:
+\cref{exo:b1:matrices:6,exo:b1:matrices:8} memberikan cicipan pertamanya,
+dan jilid Tahun~2 membangun teori nilai eigen di atasnya. Sedangkan soal
+akhir pekannya mengembangkan kuda beban yang lain: yaitu kesamaan \omterm{def:b1:poly:def}{polinomial}
+yang dipenuhi sebuah matriks, yang mengubah perhitungan $A^n$ menjadi
+\omterm{pb:b1:matrices:1}{rekurensi linear} bersuku dua.
+\end{remark}
+
+\begin{remark}[Cakrawala di dalam Buku 3]
+\label{rem:b1:matrices:perspectives}
+Tiga keluarga matriks yang diperkenalkan di sini mempunyai janji nanti dalam
+jilid ini. \emph{Matriks setangkup}
+(\cref{ex:b1:matrices:symsplit}) membawa data orde dua bagi
+fungsi dua variabel: karena uji Monge pada
+\cref{ch:b1:multivar} merupakan \omterm{def:b1:logic:statement}{pernyataan} tentang perilaku tanda
+sebuah matriks setangkup $2\times2$, dan determinannya $rt - s^2$
+dihitung oleh mesin \cref{ch:b1:det}. \emph{Matriks
+ortogonal} ($A^{\mathsf T}A = I$) merupakan isometri
+\cref{ch:b1:euclid}, yang di situ transposnya akhirnya memperoleh makna
+geometrinya: yaitu bayangan aljabar hasil kali
+dalamnya. \emph{Matriks yang dapat dibalik} bertemu uji praktisnya
+pada \cref{ch:b1:det} --- yaitu satu bilangan, $\det A \neq 0$ --- yang menutup
+pencarian yang dimulai bab ini dengan reduksi baris. Lalu \omterm{def:b1:matrices:transpose}{trace} dan
+determinannya berjalan sebagai pasangan invarian $(s, p)$ pada
+soal akhir pekannya, sampai ke teori nilai eigen
+Tahun~2.
+\end{remark}
+
+\section{Latihan}
+
+\begin{exercise}[$\star$]\label{exo:b1:matrices:1}
+Misalkan $A = \begin{pmatrix} 1 & 2 \\ 0 & 1 \end{pmatrix}$ dan $B =
+\begin{pmatrix} 0 & 1 \\ 1 & 0\end{pmatrix}$. Hitunglah $AB$, $BA$,
+$A^2 - B^2$ dan $(A+B)(A-B)$; lalu jelaskanlah mengapa dua yang terakhir berbeda.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:matrices:2}
+Hitunglah rank
+\[
+M = \begin{pmatrix}
+1 & 2 & 3\\
+2 & 4 & 6\\
+1 & 1 & 1
+\end{pmatrix},
+\qquad
+N = \begin{pmatrix}
+1 & 1 & 0 & 2\\
+0 & 1 & 1 & 1\\
+1 & 2 & 1 & 3
+\end{pmatrix}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:matrices:3}
+Balikkanlah, lewat reduksi baris, $A = \begin{pmatrix} 1 & 0 & 1\\ 2 & 1 &
+1\\ 1 & 1 & 1 \end{pmatrix}$, lalu periksalah pada satu hasil kali.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:matrices:4}
+Tulislah matriks, pada \omterm{def:b1:vspaces:free}{basis} kanonik $\R_2[X]$, bagi
+endomorfisma $u(P) = P(X + 1)$. Jelaskanlah, tanpa perhitungan, mengapa
+ia dapat dibalik, lalu berikanlah matriks $u^{-1}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:matrices:5}
+Misalkan $A = \begin{pmatrix} 2 & 1 \\ 0 & 2\end{pmatrix}$. Tulislah $A =
+2I + N$, hitunglah $N^2$, lalu simpulkanlah $A^k$ untuk setiap $k \in \N$ lewat
+teorema binomialnya.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:matrices:6}
+Buktikan bahwa tak ada matriks $A, B \in \mathcal{M}_n(K)$ (dengan
+$K = \R$ atau $\C$) sedemikian sehingga $AB - BA = I_n$. \emph{(Ambillah \omterm{def:b1:matrices:transpose}{tracenya}.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:matrices:7}
+Sebuah matriks $A$ disebut \emph{nilpoten} bila $A^m = 0$ untuk suatu $m$. Buktikan
+bahwa $I - A$ lalu dapat dibalik, dengan
+\[
+(I - A)^{-1} = I + A + A^2 + \dots + A^{m-1} .
+\]
+Penerapannya: balikkanlah $\begin{pmatrix} 1 & 2 & 3\\ 0 & 1 & 2\\ 0 & 0 &
+1\end{pmatrix}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:matrices:8}
+Misalkan $A \in \mathcal{M}_n(\R)$ memenuhi $A^2 = A$ (yaitu idempoten). Buktikan
+bahwa $\operatorname{tr} A = \operatorname{rk} A$. \emph{(Tafsirkanlah
+$A$ sebagai sebuah \omterm{def:b1:linmaps:projection}{proyeksi} lalu pilihlah \omterm{def:b1:vspaces:free}{basis} yang disesuaikan;
+adapun \cref{thm:b1:matrices:conjugation} mengatakan bahwa \omterm{def:b1:matrices:transpose}{tracenya}
+tak bergantung pada basisnya karena $\operatorname{tr}(P^{-1}MP) =
+\operatorname{tr} M$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:matrices:9}
+Misalkan $J \in \mathcal{M}_n(\R)$ matriks serba satu. Hitunglah $J^2$,
+lalu simpulkanlah, untuk $a, b \in \R$, syarat keterbalikan $M
+= aI + bJ$ beserta $M^{-1}$ \emph{(carilah invers yang
+berbentuk sama $\alpha I + \beta J$)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:matrices:10}
+(Ketaksamaan rank) Untuk $A, B \in \mathcal{M}_n(K)$, buktikanlah
+\[
+\operatorname{rk}(A + B) \leq \operatorname{rk} A +
+\operatorname{rk} B,
+\qquad
+\operatorname{rk}(AB) \geq \operatorname{rk} A + \operatorname{rk}
+B - n .
+\]
+\emph{(Untuk yang kedua --- yaitu ketaksamaan Sylvester --- terapkanlah
+rank--nulitas pada pembatasan \omterm{def:b1:logic:map}{pemetaan} $A$ ke
+$\operatorname{im} B$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:matrices:11}
+Misalkan $D = \operatorname{diag}(d_1, \dots, d_n)$ dengan $d_i$ yang
+\emph{berbeda berpasangan}.
+\begin{enumerate}
+  \item Buktikan bahwa sebuah matriks $A$ berkomutasi dengan $D$ jika dan hanya jika
+        $A$ diagonal. \emph{(Bandingkanlah entri $(i,j)$
+        $AD$ dan $DA$.)}
+  \item Simpulkanlah \emph{pusat} $\mathcal{M}_n(K)$: bahwa
+        matriks yang berkomutasi dengan \emph{setiap} matriks tepat berupa
+        matriks skalar $\lambda I_n$. \emph{(Ujilah terhadap
+        $D$, lalu terhadap matriks $E_{ij}$.)}
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:matrices:12}
+(Matriks ber-rank satu) Misalkan $A \in \mathcal{M}_n(K)$, $A \neq 0$.
+\begin{enumerate}
+  \item Buktikan bahwa $\operatorname{rk} A = 1$ jika dan hanya jika $A =
+        CL$ untuk suatu kolom taknol $C \in \mathcal{M}_{n,1}$ dan
+        baris taknol $L \in \mathcal{M}_{1,n}$.
+  \item Untuk $A$ yang demikian, buktikanlah $A^2 = (\operatorname{tr} A)\,A$;
+        lalu simpulkanlah bahwa matriks ber-rank satu bersifat nilpoten jika dan hanya jika
+        \omterm{def:b1:matrices:transpose}{tracenya} nol.
+  \item Jika $\operatorname{tr} A \neq -1$, buktikanlah bahwa $I_n + A$
+        dapat dibalik dengan
+        \[
+        (I_n + A)^{-1} = I_n - \frac{1}{1 + \operatorname{tr}
+        A}\,A ,
+        \]
+        dan bahwa $I_n + A$ \emph{tak} dapat dibalik ketika
+        $\operatorname{tr} A = -1$. \emph{(Carilah sebuah vektor yang dibunuh
+        oleh $I_n + A$.)}
+\end{enumerate}
+\end{exercise}
+
+\section{Soal: pangkat sebuah matriks lewat pembagian polinomial}
+
+\begin{problem}\label{pb:b1:matrices:1}
+Menghitung $A^{100}$ entri demi entri tanpa harapan; sedangkan menghitungnya
+lewat sebuah kesamaan \omterm{def:b1:poly:def}{polinomial} yang dipenuhi $A$ memakan tiga baris.
+Soal ini membangun metodenya dari nol: yaitu pembagian Euclid
+atas $X^n$, kesamaan $A^2 - sA + pI = 0$ yang dipenuhi setiap matriks $2
+\times 2$ (yakni teorema Cayley--Hamilton dalam dimensi
+$2$), dan kamus antara pangkat matriks dan \omterm{pb:b1:matrices:1}{rekurensi
+linear} --- dengan \omterm{pb:b1:matrices:1}{bilangan Fibonacci} sebagai contoh yang berjalan.
+\index{teorema Cayley--Hamilton (dimensi 2)}
+\index{bilangan Fibonacci}\index{rekurensi linear}
+
+\medskip
+\noindent\textbf{Bagian I --- Kalkulus sisanya.} Tetapkanlah $s, p
+\in K$ dan $D = X^2 - sX + p$.
+\begin{enumerate}
+  \item Benarkanlah bahwa untuk setiap $n \in \N$ ada $Q_n
+        \in K[X]$ dan $(a_n, b_n) \in K^2$ yang tunggal dengan
+        \[
+        X^n = Q_n\,D + a_n X + b_n ,
+        \]
+        lalu hitunglah $(a_0, b_0)$ dan $(a_1, b_1)$.
+  \item Dengan mengalikannya dengan $X$ lalu \omterm{def:b1:arith:divides}{membaginya} lagi, tegakkanlah
+        rekurensinya
+        \[
+        a_{n+1} = s\,a_n + b_n,
+        \qquad
+        b_{n+1} = -p\,a_n ,
+        \]
+        lalu simpulkanlah $a_{n+2} = s\,a_{n+1} - p\,a_n$: sehingga
+        barisan koefisiennya menuruti \omterm{pb:b1:matrices:1}{rekurensi linear} yang melekat
+        pada $D$.
+  \item Andaikan $D$ berakar dua yang berbeda $\lambda \neq \mu$.
+        Dengan menilai kesamaan pembagiannya, buktikanlah
+        \[
+        a_n = \frac{\lambda^n - \mu^n}{\lambda - \mu},
+        \qquad
+        b_n = \frac{\lambda\mu^n - \mu\lambda^n}{\lambda - \mu} .
+        \]
+  \item Andaikan $D = (X - \lambda)^2$. Dengan memakai \omterm{def:b1:derivative:def}{turunan}
+        kesamaan pembagiannya, buktikanlah $a_n = n\lambda^{n-1}$ dan
+        $b_n = (1 - n)\lambda^{n}$.
+  \item Tunjukkan bahwa menyulihkan sebuah matriks tetap $M \in
+        \mathcal{M}_k(K)$ ke dalam \omterm{def:b1:poly:def}{polinomial} menghormati jumlah dan
+        hasil kalinya: $(PQ)(M) = P(M)\,Q(M)$. Lalu simpulkanlah bahwa jika $D(M) =
+        0$, maka
+        \[
+        M^n = a_n\,M + b_n\,I \qquad (n \in \N).
+        \]
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian II --- Dimensi 2: \omterm{def:b1:matrices:transpose}{trace}, bilangan
+determinan, Cayley--Hamilton.} Untuk $A = \begin{pmatrix} a & b\\ c &
+d\end{pmatrix}$ tetapkanlah $s = a + d = \operatorname{tr} A$ dan $p = ad
+- bc$ (yaitu bilangan yang akan dinamai \cref{ch:b1:det} sebagai
+determinan).
+\begin{enumerate}[resume]
+  \item Periksalah lewat perhitungan langsung \emph{kesamaan
+        Cayley--Hamilton dalam dimensi $2$}:
+        \[
+        A^2 - s\,A + p\,I_2 = 0 .
+        \]
+  \item Buktikan lewat penjabaran langsung bahwa $p$ bersifat perkalian:
+        yakni, dengan notasi yang kasatmata, $p(AB) = p(A)\,p(B)$. Lalu tunjukkan:
+        bahwa $A$ dapat dibalik jika dan hanya jika $p \neq 0$, dan pada
+        kasus itu
+        \[
+        A^{-1} = \frac1p\,\bigl(s\,I_2 - A\bigr).
+        \]
+  \item Misalkan $A = \begin{pmatrix} 1 & 1\\ 0 & 2\end{pmatrix}$.
+        Hitunglah $s$, $p$, akar $D$, lalu simpulkanlah rumus
+        \omterm{def:b1:topology:closed}{tertutup} bagi $A^n$; lalu periksalah terhadap perhitungan langsung
+        atas $A^2$.
+  \item Misalkan $A = \begin{pmatrix} 3 & 1\\ -1 & 1\end{pmatrix}$.
+        Tunjukkan bahwa $D$ berakar rangkap lalu hitunglah $A^n$; lalu periksalah
+        di $n = 2$.
+  \item Misalkan $F = \begin{pmatrix} 1 & 1\\ 1 & 0\end{pmatrix}$ lalu
+        definisikanlah \omterm{pb:b1:matrices:1}{bilangan Fibonacci} lewat $F_0 = 0$, $F_1 = 1$,
+        $F_{n+2} = F_{n+1} + F_n$. Buktikanlah
+        \[
+        F^n = \begin{pmatrix} F_{n+1} & F_n\\ F_n &
+        F_{n-1}\end{pmatrix} \quad (n \geq 1),
+        \]
+        lalu simpulkanlah rumus Binet $F_n = \dfrac{\varphi^n -
+        \psi^n}{\sqrt5}$ dengan $\varphi = \frac{1 + \sqrt5}2$,
+        $\psi = \frac{1 - \sqrt5}2$, dan, dengan memakai pertanyaan 7,
+        kesamaan Cassini $F_{n+1}F_{n-1} - F_n^2 = (-1)^n$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian III --- \omterm{pb:b1:matrices:1}{Rekurensi linear}, secara struktural.}
+Tetapkanlah $s, p \in K$ dengan $p \neq 0$, lalu misalkan $E_D$ \omterm{def:b1:logic:sets}{himpunan}
+barisan dengan $u_{n+2} = s\,u_{n+1} - p\,u_n$ untuk setiap $n$.
+\begin{enumerate}[resume]
+  \item Tunjukkan bahwa $E_D$ merupakan \omterm{def:b1:vspaces:def}{ruang vektor} berdimensi $2$
+        (sesuaikanlah \cref{exo:b1:findim:10}).
+  \item Tunjukkan bahwa barisan $(a_n)$ pada Bagian I merupakan unsur
+        $E_D$ dengan nilai awalnya $0, 1$, dan bahwa setiap $u
+        \in E_D$ memenuhi
+        \[
+        u_n = u_1\,a_n + u_0\,b_n \qquad (n \in \N),
+        \]
+        dengan $(b_n)$ seperti pada Bagian I: sehingga sisa pembagiannya memecahkan
+        \emph{semua} rekurensinya sekaligus.
+  \item Jika $\lambda \neq \mu$ akar $D$, tunjukkanlah bahwa
+        $\bigl((\lambda^n), (\mu^n)\bigr)$ merupakan \omterm{def:b1:vspaces:free}{basis} $E_D$;
+        sedangkan jika $D = (X-\lambda)^2$ dengan $\lambda \neq 0$, tunjukkanlah bahwa
+        $\bigl((\lambda^n), (n\lambda^n)\bigr)$ merupakan satu.
+  \item Pecahkanlah selengkapnya: $u_{n+2} = u_{n+1} + 6u_n$, $u_0 = 1$,
+        $u_1 = 8$; lalu periksalah jawabannya pada $u_2$ dan $u_3$.
+  \item Misalkan $C = \begin{pmatrix} 0 & 1\\ -p & s\end{pmatrix}$
+        (yaitu \emph{matriks pendamping} $D$). Tunjukkan bahwa
+        \[
+        \begin{pmatrix} u_{n}\\ u_{n+1}\end{pmatrix}
+        = C^n \begin{pmatrix} u_0\\ u_1\end{pmatrix}
+        \quad (u \in E_D),
+        \]
+        dan bahwa $\operatorname{tr} C = s$ serta $p(C) = p$: sehingga
+        rekurensi dan matriksnya membawa \omterm{def:b1:poly:def}{polinomial} $D$ yang sama.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian IV --- Derajat tiga.} Misalkan $D_3 = X^3 -
+\alpha X^2 - \beta X - \gamma$ dan
+\[
+C_3 = \begin{pmatrix} 0 & 1 & 0\\ 0 & 0 & 1\\ \gamma & \beta &
+\alpha \end{pmatrix}.
+\]
+\begin{enumerate}[resume]
+  \item Tunjukkan bahwa $D_3(C_3) = 0$. \emph{(Hitunglah peta
+        vektor \omterm{def:b1:vspaces:free}{basis} kanoniknya di bawah pangkat $C_3$: karena
+        \omterm{def:b1:logic:map}{pemetaan} $C_3$ mengirim $e_1 \mapsto \dots \mapsto$ sebuah
+        kombinasi yang dipaksa oleh baris terakhirnya.)}
+  \item Tunjukkan bahwa jika $D_3$ berakar tiga yang berbeda $\lambda_1,
+        \lambda_2, \lambda_3$, maka sisa $R_n$ atas $X^n$
+        yang dibagi $D_3$ merupakan \emph{interpolan Lagrange} atas
+        nilai $\lambda_i^n$ pada simpul $\lambda_i$
+        (\cref{thm:b1:poly:lagrange}); lalu simpulkanlah bahwa setiap entri
+        $C_3^{\,n}$ merupakan kombinasi \omterm{def:b1:linmaps:def}{linear} yang tetap atas
+        $\lambda_1^n, \lambda_2^n, \lambda_3^n$.
+  \item Pecahkanlah: $u_{n+3} = 2u_{n+2} + u_{n+1} - 2u_n$ dengan $u_0 =
+        0$, $u_1 = 1$, $u_2 = 1$. \emph{(Faktorkanlah $D_3 = (X - 1)(X
+        + 1)(X - 2)$.)} Lalu periksalah pada $u_3$.
+  \item Hitunglah sisa $X^n$ modulo $(X -
+        \lambda)^3$ \emph{(lewat ekspansi Taylor $X^n$ di
+        $\lambda$)}, lalu simpulkanlah sebuah rumus bagi $(\lambda I +
+        N)^n$ ketika $N^3 = 0$ dan $N$ berkomutasi dengan segalanya yang
+        terlibat; lalu periksalah ia terhadap teorema binomialnya.
+  \item Tunjukkan bahwa untuk $D_3$ yang berakar berbeda, penyelesaian umum
+        rekurensi berorde $3$-nya adalah $u_n = c_1
+        \lambda_1^n + c_2\lambda_2^n + c_3\lambda_3^n$: yaitu buktikanlah
+        bahwa ketiga barisan geometrinya membentuk \omterm{def:b1:vspaces:free}{basis}
+        ruang penyelesaiannya. \emph{(Untuk kebebasannya, nilailah sebuah
+        kombinasi nol di $n = 0, 1, 2$ lalu kenalilah sebuah
+        sistem interpolasi pada simpul yang berbeda
+        $\lambda_i$.)}
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian V --- Dividen Fibonacci, dan sintesisnya.}
+\begin{enumerate}[resume]
+  \item Buktikan $F_1 + F_2 + \dots + F_n = F_{n+2} - 1$.
+  \item Dari $F^{m+n} = F^m F^n$, turunkanlah rumus penjumlahannya
+        \[
+        F_{m+n} = F_{m+1}F_n + F_m F_{n-1},
+        \]
+        lalu simpulkanlah $F_{2n} = F_n(F_{n+1} + F_{n-1})$.
+  \item Buktikan bahwa $F_n$ merupakan bilangan bulat terdekat dengan
+        $\varphi^n/\sqrt5$ untuk setiap $n \geq 0$.
+  \item Misalkan $t_n = \operatorname{tr}(F^n) = F_{n+1} + F_{n-1}$
+        (yaitu \emph{bilangan Lucas} $L_n$). Tunjukkan $t_{n+2} =
+        t_{n+1} + t_n$, $t_1 = 1$, $t_2 = 3$, bahwa $L_n =
+        \varphi^n + \psi^n$, lalu pulihkanlah $F_{2n} = F_n L_n$.
+  \item Sintesis, dalam empat kalimat: mengapakah pangkat matriks $2
+        \times 2$ hidup di bidang
+        $\operatorname{Vect}(I, A)$ pada $\mathcal{M}_2(K)$ (yaitu argumen
+        dimensi yang mana yang menjamin sebuah kesamaan kuadrat, dan
+        kesamaan eksplisit yang mana yang dihasilkan Bagian II); bagaimanakah pembagian
+        Euclid mengubah pemangkatan menjadi rekurensi
+        bersuku dua; \omterm{def:b1:logic:statement}{pernyataan} yang mana pada soal ini yang merupakan kasus $n =
+        2$ sebuah teorema yang sah pada segala dimensi (namailah ia,
+        lalu katakanlah di mana ia dibuktikan pada seri ini); dan apa yang
+        ditambahkan konstruksi matriks pendampingnya pada gambarannya.
+
+\end{enumerate}
+\end{problem}

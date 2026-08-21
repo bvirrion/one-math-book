@@ -1,0 +1,454 @@
+\chapter{Distribusi Binomial}\label{ch:g11:binom}
+
+Ulangilah percobaan ya/tidak yang sama beberapa kali, secara saling bebas, lalu
+bilanglah keberhasilannya: \omterm{def:g11:prob:rv}{distribusi} yang muncul --- yaitu \emph{binomial} ---
+adalah \omterm{def:g11:prob:rv}{distribusi} diskret yang paling penting di antara semuanya. Bab ini
+membangunnya dengan \omterm{met:g10:proba:tree}{pohon} dan pembilangan jalur; rumus tertutup bagi cacah
+jalurnya (dengan faktorial) datang bersama perkakas pembilangan pada
+\cref{ch:g12:comb}, dan \omterm{def:g11:prob:rv}{distribusinya} ditinjau ulang pada \cref{ch:g12:randvar}.
+
+\section{Percobaan Bernoulli}
+
+\begin{definition}[Percobaan Bernoulli]\label{def:g11:binom:bernoulli}
+Sebuah \emph{percobaan Bernoulli}\index{percobaan Bernoulli} adalah percobaan
+dengan tepat dua hasil: \emph{berhasil}, dengan peluang $p$, dan
+\emph{gagal}, dengan peluang $1 - p$. \omterm{def:g11:prob:rv}{Peubah acak} $X$ yang bernilai
+$1$ pada keberhasilan dan $0$ pada kegagalan dikatakan mengikuti
+\emph{\omterm{def:g11:prob:rv}{distribusi} Bernoulli} $\mathcal B(p)$; lalu
+\[
+\E(X) = p,
+\qquad
+\V(X) = p(1 - p).
+\]
+\end{definition}
+
+\begin{proof}[Bukti kedua rumusnya]
+$\E(X) = p \times 1 + (1-p) \times 0 = p$; dan karena $X^2 = X$ (baik $0$
+maupun $1$ adalah kuadrat dirinya sendiri), $\E(X^2) = p$, sehingga menurut
+\cref{prop:g11:prob:konig}, $\V(X) = p - p^2 = p(1-p)$.
+\end{proof}
+
+\begin{definition}[Percobaan berulang yang saling bebas]\label{def:g11:binom:repeated}
+Mengulang sebuah \omterm{def:g11:binom:bernoulli}{percobaan Bernoulli} sebanyak $n$ kali \emph{secara saling
+bebas} berarti: hasil setiap percobaannya tidak berpengaruh pada yang lain, dan
+peluang sebarang runtunan hasil yang lengkap adalah \emph{hasil kali}
+peluang sepanjang jalur \omterm{met:g10:proba:tree}{pohon} yang bersesuaian --- $p$ untuk setiap
+keberhasilan, $1 - p$ untuk setiap kegagalan.
+\end{definition}
+
+\begin{example}\label{ex:g11:binom:threetrials}
+Tiga percobaan saling bebas dengan peluang berhasil $p$. Runtunan BGB
+(berhasil, gagal, berhasil) berpeluang $p(1-p)p = p^2(1-p)$ --- dan
+demikian pula \emph{setiap} runtunan dengan tepat dua keberhasilan, tanpa
+memandang letaknya: hanya \emph{banyaknya} B dan G yang berpengaruh.
+\end{example}
+
+\section{Cacah jalur dan koefisien binomial}
+
+\begin{definition}[Koefisien binomial]\label{def:g11:binom:coefficient}
+Pada \omterm{met:g10:proba:tree}{pohon} $n$ percobaan saling bebas, \emph{koefisien
+binomial}\index{koefisien binomial} $\binom{n}{k}$ (dibaca ``$n$
+pilih $k$'') adalah banyaknya jalur yang memuat tepat $k$ keberhasilan.
+\end{definition}
+
+\begin{example}
+$\binom{3}{2} = 3$: yaitu jalur BBG, BGB, GBB. Demikian pula $\binom{3}{0} = 1$
+(jalur GGG), $\binom{3}{1} = 3$ dan $\binom{3}{3} = 1$. Menurut
+kelaziman dan menurut \omterm{met:g10:proba:tree}{pohonnya}, $\binom n0 = \binom nn = 1$ untuk setiap $n$.
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}[font=\small]
+  \coordinate (root) at (0,0);
+  \node (S) at (1.5,1.5) {B};
+  \node (F) at (1.5,-1.5) {G};
+  \node (SS) at (3.0,2.25) {B};
+  \node (SF) at (3.0,0.75) {G};
+  \node (FS) at (3.0,-0.75) {B};
+  \node (FF) at (3.0,-2.25) {G};
+  \node (SSS) at (4.5,2.6) {B};
+  \node (SSF) at (4.5,1.85) {G};
+  \node (SFS) at (4.5,1.1) {B};
+  \node (SFF) at (4.5,0.35) {G};
+  \node (FSS) at (4.5,-0.35) {B};
+  \node (FSF) at (4.5,-1.1) {G};
+  \node (FFS) at (4.5,-1.85) {B};
+  \node (FFF) at (4.5,-2.6) {G};
+  \draw[omThm, thick] (root) -- (S);
+  \draw[omThm, thick] (S) -- (SS);   \draw[omThm, thick] (SS) -- (SSF);
+  \draw[omThm, thick] (S) -- (SF);   \draw[omThm, thick] (SF) -- (SFS);
+  \draw[omThm, thick] (root) -- (F);
+  \draw[omThm, thick] (F) -- (FS);   \draw[omThm, thick] (FS) -- (FSS);
+  \draw[gray] (SS) -- (SSS);
+  \draw[gray] (SF) -- (SFF);
+  \draw[gray] (FS) -- (FSF);
+  \draw[gray] (F) -- (FF);
+  \draw[gray] (FF) -- (FFS);
+  \draw[gray] (FF) -- (FFF);
+  \node[gray, anchor=west] at (5.0,2.6) {$3$ keberhasilan};
+  \node[omThm, anchor=west] at (5.0,1.85) {$2$ keberhasilan};
+  \node[omThm, anchor=west] at (5.0,1.1) {$2$ keberhasilan};
+  \node[gray, anchor=west] at (5.0,0.35) {$1$ keberhasilan};
+  \node[omThm, anchor=west] at (5.0,-0.35) {$2$ keberhasilan};
+  \node[gray, anchor=west] at (5.0,-1.1) {$1$ keberhasilan};
+  \node[gray, anchor=west] at (5.0,-1.85) {$1$ keberhasilan};
+  \node[gray, anchor=west] at (5.0,-2.6) {$0$ keberhasilan};
+\end{tikzpicture}
+
+{\small \omterm{met:g10:proba:tree}{Pohon} $n = 3$ percobaan: $\binom{3}{2} = 3$ jalur (merah) membawa
+tepat dua keberhasilan, masing-masing berpeluang $p^2(1-p)$.}
+\end{omfigure}
+
+\begin{proposition}[Aturan Pascal]\label{prop:g11:binom:pascal}
+\index{segitiga Pascal}
+Untuk $1 \leq k \leq n - 1$:
+\[
+\binom{n}{k} = \binom{n-1}{k-1} + \binom{n-1}{k}.
+\]
+\end{proposition}
+
+\begin{proof}
+Kelompokkan jalur pada \omterm{met:g10:proba:tree}{pohon} $n$ percobaan yang mempunyai $k$ keberhasilan
+menurut percobaan \emph{terakhirnya}. Jalur yang berakhir pada keberhasilan
+diperoleh dari jalur $n-1$ percobaan pertama dengan $k - 1$ keberhasilan: ada
+$\binom{n-1}{k-1}$ jalur semacam itu. Jalur yang berakhir pada kegagalan
+memperpanjang jalur dengan $k$ keberhasilan di antara $n-1$ percobaan pertama:
+ada $\binom{n-1}{k}$ jalur. Setiap jalurnya termasuk tepat satu di antara kedua jenis itu.
+\end{proof}
+
+Aturan Pascal membangkitkan koefisiennya baris demi baris --- setiap entrinya
+adalah jumlah dua entri di atasnya:
+\[
+\begin{array}{ccccccccccc}
+&&&&&1&&&&&\\
+&&&&1&&1&&&&\\
+&&&1&&2&&1&&&\\
+&&1&&3&&3&&1&&\\
+&1&&4&&6&&4&&1&\\
+1&&5&&10&&10&&5&&1
+\end{array}
+\]
+
+\begin{remark}
+Rumus tertutupnya, $\binom nk = \frac{n!}{k!(n-k)!}$, beserta teori
+pembilangan yang sistematis, ditetapkan pada \cref{ch:g12:comb}. Pada
+tingkat ini, \omterm{prop:g11:binom:pascal}{segitiga Pascal} menghitung setiap koefisien yang kita perlukan.
+\end{remark}
+
+\section{Distribusi binomial}
+
+\begin{theorem}[Distribusi binomial]\label{thm:g11:binom:binomial}
+Misalkan $X$ membilang keberhasilan pada $n$ \omterm{def:g11:binom:bernoulli}{percobaan Bernoulli} saling bebas
+berparameter $p$. Maka $X$ mengikuti \emph{distribusi
+binomial}\index{distribusi binomial} $\mathcal B(n, p)$:
+\[
+\P(X = k) = \binom{n}{k}\, p^k (1-p)^{n-k},
+\qquad k = 0, 1, \dots, n .
+\]
+\end{theorem}
+
+\begin{proof}
+\omterm{def:g11:prob:model}{Kejadian} $X = k$ adalah kumpulan semua jalur dengan tepat $k$
+keberhasilan. Setiap jalur semacam itu berpeluang $p^k(1-p)^{n-k}$: hasil kali
+sepanjang jalurnya memuat $k$ faktor $p$ dan $n - k$ faktor $1-p$, dalam
+urutan tertentu (\cref{def:g11:binom:repeated}). Ada $\binom nk$ jalur semacam
+itu (\cref{def:g11:binom:coefficient}), dan peluangnya dijumlahkan.
+\end{proof}
+
+\begin{example}\label{ex:g11:binom:quiz}
+Sebuah kuis mempunyai $5$ soal saling bebas, masing-masing dengan $4$ pilihan;
+seorang siswa menjawab secara acak, sehingga setiap soal berhasil dengan
+$p = \frac14$. Banyaknya jawaban benar $X$ mengikuti
+$\mathcal B\left(5, \frac14\right)$, dan, dengan baris $5$ \omterm{prop:g11:binom:pascal}{segitiga Pascal}:
+\[
+\P(X = 2) = \binom52 \left(\frac14\right)^2\left(\frac34\right)^3
+= 10 \times \frac{1}{16} \times \frac{27}{64}
+= \frac{270}{1024} \approx 0.26 .
+\]
+Peluang memperoleh paling sedikit satu jawaban benar dihitung dengan \omterm{def:g10:proba:operations}{komplemennya}:
+$\P(X \geq 1) = 1 - \P(X = 0) = 1 - \left(\frac34\right)^5 \approx
+0.76$.
+\end{example}
+
+\begin{proposition}[Nilai harapan dan ragam]\label{prop:g11:binom:expectation}
+Jika $X \sim \mathcal B(n, p)$:
+\[
+\E(X) = np,
+\qquad
+\V(X) = np(1-p).
+\]
+\end{proposition}
+
+\begin{proof}[Penjelasan]
+Tulislah $X = X_1 + X_2 + \dots + X_n$, dengan $X_i$ bernilai $1$ bila
+percobaan ke-$i$ berhasil: setiap $X_i$ adalah peubah Bernoulli dengan \omterm{def:g11:prob:expectation}{nilai
+harapan} $p$ (\cref{def:g11:binom:bernoulli}). \omterm{def:g11:stat:mean}{Rata-rata} dapat dijumlahkan ---
+menjumlahkan $n$ sumbangannya memberi $\E(X) = np$. Bahwa \emph{\omterm{def:g11:prob:variance}{ragam}} juga
+dapat dijumlahkan untuk peubah yang saling bebas memang benar tetapi lebih
+peka: rumus \omterm{def:g11:prob:variance}{ragamnya} \emph{diterima tanpa bukti pada tingkat ini} dan
+dibuktikan pada \cref{ch:g12:sums}.
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[
+  width=10cm, height=5cm,
+  ybar, bar width=9pt,
+  xlabel={$k$}, ylabel={$\P(X = k)$},
+  xmin=-0.8, xmax=10.8, ymin=0, ymax=0.3,
+  xtick={0,1,2,3,4,5,6,7,8,9,10},
+  ytick={0.1, 0.2},
+  tick label style={font=\small},
+  label style={font=\small},
+  title={$\mathcal B(10,\ 0.5)$}]
+  \addplot[fill=omDef!40, draw=omDef] coordinates {
+    (0,0.00098) (1,0.00977) (2,0.04395) (3,0.11719) (4,0.20508)
+    (5,0.24609) (6,0.20508) (7,0.11719) (8,0.04395) (9,0.00977)
+    (10,0.00098)};
+\end{axis}
+\end{tikzpicture}
+
+{\small \omterm{def:g11:prob:rv}{Distribusi} $\mathcal B(10, 0.5)$ (sepuluh lemparan koin setimbang):
+berpusat di $\E(X) = np = 5$, setangkup, dengan hampir seluruh peluangnya
+berada antara $2$ dan $8$.}
+\end{omfigure}
+
+\begin{method}[Mengenali situasi binomial]\label{met:g11:binom:recognize}
+Sebelum menulis $X \sim \mathcal B(n, p)$, periksalah tiga bahannya: sebuah
+\emph{banyaknya percobaan yang tetap} $n$, yang ditetapkan lebih dahulu; setiap
+percobaan mempunyai \emph{dua hasil} dengan peluang berhasil $p$ yang
+\emph{sama}; dan percobaannya \emph{saling bebas} (dengan pengembalian, atau
+dengan alat yang terpisah). Pengambilan tanpa pengembalian dari populasi kecil
+\emph{bukan} binomial --- peluangnya berubah pada setiap pengambilan
+(\cref{exo:g11:prob:6}).
+\end{method}
+
+\section{Penyampelan: apakah pengamatannya mengejutkan?}
+
+\omterm{def:g11:prob:rv}{Distribusi} binomial menjawab sebuah pertanyaan yang sangat praktis:
+\emph{jika peluang berhasilnya sungguh $p$, cacah keberhasilan mana saja yang
+masuk akal?}
+
+\begin{example}\label{ex:g11:binom:decision}
+Sebuah mesin seharusnya menghasilkan paling banyak $10\%$ barang cacat. Pada
+sebuah kumpulan berisi $10$ barang, $4$ di antaranya cacat. Nasib buruk atau
+mesin rusak? Jika mesinnya baik-baik saja, banyaknya barang cacat mengikuti
+$\mathcal B(10, 0.1)$, dan
+\[
+\P(X \geq 4) = 1 - \P(X \leq 3) \approx 1 - 0.987 = 0.013 :
+\]
+yaitu sekitar satu peluang dari $80$. Mengamati \omterm{def:g11:prob:model}{kejadian} setidak mungkin ini
+adalah isyarat yang kuat --- kita \emph{menolak} hipotesis bahwa mesinnya masih
+bekerja pada $10\%$, sambil mengingat bahwa keputusan itu dapat keliru dengan
+peluang sekitar $0.013$.
+\end{example}
+
+\begin{method}[Aturan keputusan dari model binomial]\label{met:g11:binom:decision}
+Untuk menilai cacah keberhasilan $k$ yang teramati terhadap hipotesis
+$X \sim \mathcal B(n, p)$: hitunglah peluang, di bawah hipotesis itu,
+munculnya hasil yang \emph{paling sedikit seekstrem} $k$. Jika peluang itu
+sangat kecil (kelaziman yang umum: di bawah $5\%$), tolaklah hipotesisnya;
+bila tidak, pengamatannya sesuai dengan hipotesis itu. Ambangnya adalah sebuah
+pilihan, bukan sebuah teorema --- statistika mengukur risikonya, dan pemakainya
+menerima risiko itu.
+\end{method}
+
+\section{Latihan}
+
+\begin{exercise}[$\star$]\label{exo:g11:binom:1}
+Perluaslah \omterm{prop:g11:binom:pascal}{segitiga Pascal} sampai baris $7$, lalu berikan nilai
+$\binom62$, $\binom{7}{3}$ dan $\binom74$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g11:binom:2}
+Sebuah dadu setimbang dilempar $4$ kali; $X$ membilang munculnya enam. Berikan
+alasan bahwa $X \sim \mathcal B\left(4, \frac16\right)$ lalu hitunglah
+$\P(X = 0)$, $\P(X = 1)$ dan $\P(X \geq 2)$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g11:binom:3}
+Manakah di antara berikut yang binomial? Berikan alasannya.
+\begin{enumerate}
+  \item Banyaknya gambar pada $20$ lemparan koin setimbang.
+  \item Banyaknya kartu hati pada $5$ kartu yang dibagikan dari satu set kartu.
+  \item Banyaknya hari hujan pekan depan, bila setiap harinya hujan dengan
+        peluang $0.3$ secara saling bebas.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g11:binom:4}
+$X \sim \mathcal B(50, 0.2)$. Berikan $\E(X)$, $\V(X)$ dan $\sigma(X)$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:binom:5}
+Seorang pemanah mengenai sasaran dengan peluang $0.7$ pada setiap tembakan,
+secara saling bebas. Pada $6$ tembakan, hitunglah peluang tepat $4$ kali kena,
+dan peluang paling sedikit $5$ kali kena.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:binom:6}
+Sebuah tes benar/salah mempunyai $8$ soal; seorang siswa menerka setiap
+jawabannya. Berapa peluang ia lulus (paling sedikit $6$ jawaban benar)?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:binom:7}
+Setiap kotak sereal yang dibeli berisi figur A atau figur B, masing-masing
+dengan peluang $\frac12$, secara saling bebas. Seorang pengumpul membeli $5$
+kotak. Hitunglah peluang bahwa pengumpul itu memperoleh paling sedikit satu
+figur dari setiap jenis. (\omterm{def:g10:proba:operations}{Komplemennya}: semuanya A atau semuanya B.)
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:binom:8}
+Seorang pebasket memasukkan lemparan bebas dengan peluang $p$,
+secara saling bebas. Misalkan $X \sim \mathcal B(3, p)$ banyaknya lemparan yang
+masuk dari tiga lemparan. Nyatakan $\P(X = 3)$ dan $\P(X \geq 1)$ sebagai \omterm{def:g11:func:function}{fungsi}
+$p$, lalu carilah untuk $p$ yang mana peluang ketiganya masuk sama dengan
+$\frac{27}{64}$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:binom:9}
+Berapa kali sebuah koin setimbang harus dilempar agar peluang memperoleh
+paling sedikit satu gambar melampaui $0.99$? (Pakailah \omterm{def:g10:proba:operations}{komplemennya}, lalu
+cobalah nilai $n$ berturut-turut.)
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:binom:10}
+Dengan aturan Pascal (\cref{prop:g11:binom:pascal}) dan
+$\binom n0 = \binom nn = 1$, buktikan bahwa entri setiap baris
+\omterm{prop:g11:binom:pascal}{segitiga Pascal} berjumlah $2^n$: tafsirkan kedua ruasnya sebagai membilang
+semua jalur pada \omterm{met:g10:proba:tree}{pohonnya}.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g11:binom:11}
+Seorang politikus mengaku memperoleh dukungan $60\%$. Pada \omterm{def:g10:proba:sample}{sampel} acak berisi
+$10$ orang, hanya $3$ yang mendukung.
+\begin{enumerate}
+  \item Di bawah pengakuan itu, \omterm{def:g11:prob:rv}{distribusi} apa yang diikuti banyaknya
+        pendukung $X$ pada \omterm{def:g10:proba:sample}{sampelnya}? Hitunglah $\P(X \leq 3)$.
+  \item Dengan aturan keputusan \cref{met:g11:binom:decision} pada ambang
+        $5\%$, apakah pengamatannya sesuai dengan pengakuan itu?
+\end{enumerate}
+\end{exercise}
+
+\section{Soal: Papan Galton}
+
+\begin{problem}[{Soal akhir pekan --- bola, pasak dan segitiga
+Pascal: bagaimana bentuk lonceng itu lahir, mengapa rangkaian laga pamungkas
+menguntungkan tim yang lebih kuat, dan kapan harus berteriak curang}]
+\label{pb:g11:binom:1}
+Jatuhkanlah seribu bola melalui kisi pasak, setiap pantulannya sebuah
+lemparan koin kiri-atau-kanan yang setimbang, dan kotak di bawahnya terisi
+menjadi lonceng yang mulus dan setangkup --- setiap kali. Mesin itu disebut
+papan Galton, dan matematikanya tepat sama dengan \omterm{def:g11:prob:rv}{distribusi} binomial bab ini
+(\cref{thm:g11:binom:binomial}). Soal ini
+membangun segitiganya, menjalankan papannya, mewasiti rangkaian
+tujuh laga, lalu berakhir di tempat binomialnya memperoleh
+upah: memutuskan kapan sebuah pengamatan seharusnya membuat kita meragukan
+sebuah pengakuan.
+
+\medskip
+\noindent\textbf{Bagian I --- Segitiganya.}
+\begin{enumerate}
+  \item Bangunlah \omterm{prop:g11:binom:pascal}{segitiga Pascal} sampai baris $6$
+        (\cref{prop:g11:binom:pascal}). Nyatakan lalu jelaskan
+        kesimetrian $\binom nk = \binom{n}{n-k}$ dalam satu kalimat
+        (memilih $k$ objek sama saja dengan\,\dots).
+  \item Periksalah pada baris $4$ dan $5$ bahwa setiap barisnya berjumlah
+        $2^n$, lalu buktikan: apa yang dibilang oleh semua $\binom nk$
+        bersama-sama?
+  \item Turunkan ulang aturan Pascal
+        $\binom{n+1}{k} = \binom nk + \binom{n}{k-1}$ lewat
+        alasan panitia: tetapkan satu orang istimewa lalu
+        belahlah panitianya menurut nasib orang itu.
+  \item Hitunglah $\binom73$ dua kali: dari segitiganya, dan dari
+        rumus faktorialnya.
+  \item Periksalah identitas tangga
+        $\binom22 + \binom32 + \binom42 + \binom52 =
+        \binom63$, lalu jelaskan lewat penerapan berjenjang aturan Pascal
+        dari $\binom63$ ke bawah.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian II --- Papannya.}
+Sebuah bola jatuh melalui $n$ baris pasak; pada setiap pasak bola itu memantul
+ke kiri atau ke kanan dengan peluang $\frac12$, secara saling bebas. Nomorilah
+kotaknya $0$ sampai $n$ menurut cacah pantulan ke kanan.
+\begin{enumerate}[resume]
+  \item Jelaskan, dengan daftar periksa
+        \cref{met:g11:binom:recognize}, mengapa nomor kotaknya
+        mengikuti \omterm{def:g11:prob:rv}{distribusi} binomial
+        $\mathcal B\!\left(n, \frac12\right)$.
+  \item Untuk papan kecil ($n = 4$): berikan kelima peluang
+        kotaknya. Kotak mana yang paling padat?
+  \item Kini $n = 10$ dan $1\,024$ bola: berapa \emph{harapan}
+        cacah bola pada kotak tengah, pada kotak
+        $7$, dan pada setiap kotak tepinya? Perikan bentuk tumpukannya.
+  \item Untuk $X \sim \mathcal B\!\left(10, \frac12\right)$:
+        hitunglah $\E(X)$, $V(X)$ dan $\sigma$
+        (\cref{prop:g11:binom:expectation}); lalu hitunglah
+        bagian bola yang diharapkan berada dalam $2\sigma$ dari
+        pusatnya (kotak $2$ sampai $8$) lalu bandingkan dengan jaminan
+        Chebyshev pada \cref{pb:g11:stat:1}.
+  \item Sebuah papan yang dimiringkan memantul ke kanan dengan peluang $0.6$:
+        berikan $\E$, $V$ dan $\sigma$ untuk $n = 10$, lalu perikan
+        apa yang terjadi pada tumpukannya.
+  \item Dalam satu atau dua kalimat: apa, dalam rancangan papan itu,
+        yang membuat bentuk loncengnya --- dan mengapa begitu banyak
+        besaran di dunia nyata (tinggi badan, galat pengukuran)
+        menumpuk dengan cara yang sama? (Teorema mendalam di balik keduanya
+        adalah teorema limit pusat, puncak kuliah peluang pada jilid
+        universitas.)
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian III --- Tujuh laga pamungkas.}
+Dua tim memainkan sebuah rangkaian: yang lebih dahulu mencapai $4$ kemenangan
+merebut gelarnya; setiap laganya saling bebas.
+\begin{enumerate}[resume]
+  \item Tim yang sepadan ($p = \frac12$): hitunglah peluang
+        bahwa rangkaiannya berakhir dengan sapu bersih (tepat $4$ laga).
+  \item Hitunglah peluang bahwa rangkaiannya berlangsung penuh
+        $7$ laga (kedudukannya setelah $6$ laga harus berapa?).
+  \item Lengkapkan \omterm{def:g11:prob:rv}{distribusi} panjang rangkaiannya
+        ($4$, $5$, $6$ atau $7$ laga) untuk tim yang sepadan, lalu
+        hitunglah harapan panjangnya. Panjang mana yang paling mungkin?
+  \item Kini satu tim memenangkan setiap laga dengan $p = 0.6$. Hitunglah
+        peluangnya merebut rangkaian itu (menang dalam $4$, $5$, $6$
+        atau $7$ laga: pada setiap kasusnya tim itu memenangkan laga terakhir
+        dan $3$ dari laga sebelumnya). Apa yang dilakukan rangkaian itu
+        terhadap keunggulan per laganya?
+  \item Bandingkan dengan satu laga final tunggal ($60\,\%$) dan sistem
+        tiga laga (hitunglah). Nyatakan pengaruh umum panjang rangkaian
+        terhadap keterampilan melawan keberuntungan --- dan mengapa liga
+        lebih menyukai final yang panjang.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Bagian IV --- Kapan harus berteriak curang.}
+\begin{enumerate}[resume]
+  \item Sebuah koin dilempar $100$ kali dan menunjukkan $62$ gambar. Untuk
+        koin yang setimbang, berikan $\E$, $\sigma$, dan \omterm{pb:g11:stat:1}{skor-z}
+        (\cref{pb:g11:stat:1}) pengamatannya. Bagaimana putusannya
+        di bawah kelaziman $2\sigma$?
+  \item Seorang pemasok mengaku bahwa $2\,\%$ suku cadangnya cacat. Pada
+        sebuah kumpulan berisi $50$ kamu menemukan $3$ yang cacat. Hitunglah
+        $\P(X \geq 3)$ di bawah pengakuan itu
+        ($X \sim \mathcal B(50, 0.02)$; lewatilah
+        $\P(X = 0), \P(X = 1), \P(X = 2)$). Mengkhawatirkan pada
+        ambang $5\,\%$ (\cref{met:g11:binom:decision},
+        \cref{exo:g11:binom:11})?
+  \item Kegigihan pengundi: setiap karcis memenangkan (sesuatu) dengan
+        peluang $\frac{1}{1000}$. Hitunglah peluang
+        paling sedikit satu kemenangan dengan $1\,000$ karcis. Jawabannya
+        ($\approx 63\,\%$, bukan $100\,\%$!) menyembunyikan sebuah tetapan
+        termasyhur: hitunglah $0.999^{1000}$ lalu simpanlah bilangan
+        $0.368$ dalam ingatan untuk tahun berikutnya.
+  \item Penutup --- potret binomialnya: daftar periksa pengenalannya
+        ($n$ yang tetap, kebebasan, $p$ yang tetap);
+        \omterm{prop:g11:binom:pascal}{segitiga Pascal} sebagai tabelnya; lonceng sebagai bentuknya;
+        $np$ dan $np(1-p)$ sebagai kompasnya; serta kedua pewarisnya yang
+        menanti pada tahun berikutnya --- kurva lonceng yang mulus dan
+        hukum bilangan besar. Masing-masing satu kalimat.
+
+\end{enumerate}
+\end{problem}
