@@ -89,32 +89,35 @@ class LangStrings:
         # in LaTeX); extend here when a new language is added
         self.and_word = {"en": "and", "fr": "et", "nl": "en",
                          "es": "y", "pt": "e", "hi": "और",
-                         "ar": "و"}[lang]
+                         "ar": "و", "id": "dan"}[lang]
         # figure cref names come from babel in print, not the lang files
         self.names["figure"] = {"en": "Figure", "fr": "Figure",
                                 "nl": "Figuur", "es": "Figura",
                                 "pt": "Figura", "hi": "आकृति",
-                                "ar": "شكل"}[lang]
+                                "ar": "شكل", "id": "Gambar"}[lang]
         self.plurals["figure"] = {"en": "Figures", "fr": "Figures",
                                   "nl": "Figuren", "es": "Figuras",
                                   "pt": "Figuras", "hi": "आकृतियाँ",
-                                  "ar": "أشكال"}[lang]
+                                  "ar": "أشكال", "id": "Gambar"}[lang]
         self.names["equation"] = {"en": "Equation", "fr": "Équation",
                                   "nl": "Vergelijking",
                                   "es": "Ecuación", "pt": "Equação",
-                                  "hi": "समीकरण", "ar": "معادلة"}[lang]
+                                  "hi": "समीकरण", "ar": "معادلة",
+                                  "id": "Persamaan"}[lang]
         self.names["section"] = {"en": "Section", "fr": "Section",
                                  "nl": "Sectie", "es": "Sección",
                                  "pt": "Seção", "hi": "अनुभाग",
-                                 "ar": "قسم"}[lang]
+                                 "ar": "قسم", "id": "Bagian"}[lang]
         self.plurals["section"] = {"en": "Sections", "fr": "Sections",
                                    "nl": "Secties",
                                    "es": "Secciones", "pt": "Seções",
-                                   "hi": "अनुभाग", "ar": "أقسام"}[lang]
+                                   "hi": "अनुभाग", "ar": "أقسام",
+                                   "id": "Bagian"}[lang]
         self.plurals["equation"] = {"en": "Equations", "fr": "Équations",
                                     "nl": "Vergelijkingen",
                                     "es": "Ecuaciones", "pt": "Equações",
-                                    "hi": "समीकरण", "ar": "معادلات"}[lang]
+                                    "hi": "समीकरण", "ar": "معادلات",
+                                    "id": "Persamaan"}[lang]
         # Back-reference (\cref) names: same as the headings except in
         # Arabic, where cleveref prints the definite forms. The list
         # separators mirror cleveref's conjunctions: Arabic و is a bound

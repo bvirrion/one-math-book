@@ -55,7 +55,7 @@ def plaintext(inlines, refs=None):
             out.append(node["s"])
         elif t == "math":
             out.append(tex_to_alt(node["tex"]))
-        elif t in ("emph", "bold", "sup"):
+        elif t in ("emph", "bold", "sup", "code", "span", "u"):
             out.append(plaintext(node["inl"], refs))
         elif t == "term":
             out.append(plaintext(node["inl"], refs))
@@ -162,6 +162,13 @@ class Emitter:
                 out.append(f"<em{attr}>{self.inlines(node['inl'])}</em>")
             elif t == "bold":
                 out.append(f"<strong>{self.inlines(node['inl'])}</strong>")
+            elif t == "code":
+                out.append(f"<code>{self.inlines(node['inl'])}</code>")
+            elif t == "u":
+                out.append(f"<u>{self.inlines(node['inl'])}</u>")
+            elif t == "span":
+                # a \\multicolumn outside a table cell: just its text
+                out.append(self.inlines(node["inl"]))
             elif t == "sup":
                 out.append(f"<sup>{self.inlines(node['inl'])}</sup>")
             elif t == "sc":
@@ -282,6 +289,8 @@ class Emitter:
                 out.append(self.figure(node))
             elif t == "table":
                 out.append(self.table(node))
+            elif t == "centered":
+                out.append(f'<p class="om-center">{self.inlines(node["inl"])}</p>')
             elif t == "tables":
                 inner = "\n".join(self.table_inner(tbl)
                                   for tbl in node["tables"])
@@ -400,16 +409,28 @@ class Emitter:
         caption = self.inlines(node["caption"])
         alt = plaintext(node["caption"]).strip()
         sublabels = node.get("sublabels") or {}
+        widths = node.get("widths") or {}
         parts = []
         for i, src in enumerate(node["tikzs"]):
-            img = self.img_tag(self.figures[src], alt)
-            if i in sublabels:
-                # a photo with its own sub-caption (leading picture of a grid)
+            fig = self.figures[src]
+            if i in widths:
+                # minipage sub-figure: its share of the row, no phone floor
+                fig = dict(fig, rel_width=widths[i], sub=True)
+            img = self.img_tag(fig, alt)
+            if i in sublabels or i in widths:
+                # a picture with its own sub-caption (leading picture of a
+                # grid, or a minipage sub-figure)
+                sub = self.inlines(sublabels[i]) if i in sublabels else ""
                 img = (f'<figure class="om-subfig">{img}'
-                       f'<figcaption>{self.inlines(sublabels[i])}'
-                       "</figcaption></figure>")
+                       + (f"<figcaption>{sub}</figcaption>" if sub else "")
+                       + "</figure>")
             parts.append(img)
         imgs = "\n".join(parts)
+        if node.get("table") is not None:
+            tbl = node["table"]
+            inner = (self.table_inner(tbl) if tbl["t"] == "table"
+                     else "\n".join(self.table_inner(x) for x in tbl["tables"]))
+            imgs = f'<div class="om-table-wrap">{inner}</div>'
         grid = ""
         if node.get("grid"):
             rows = []
@@ -439,7 +460,11 @@ class Emitter:
         the printed page); SVG figures size themselves from their
         intrinsic width."""
         style = ""
-        if fig.get("rel_width"):
+        if fig.get("rel_width") and fig.get("sub"):
+            # side-by-side sub-figures share the row as in print; the
+            # phone media query stacks them at full width
+            style = f' style="width:{round(fig["rel_width"] * 100)}%"'
+        elif fig.get("rel_width"):
             style = f' style="width:{max(50, round(fig["rel_width"] * 100))}%"'
         elif fig.get("height_cm"):
             style = (f' style="height:{round(fig["height_cm"] * 1.5, 2)}cm;'
@@ -456,17 +481,22 @@ class Emitter:
     def table_inner(self, node):
         rows = []
         if node["header"]:
-            cells = "".join(f"<th>{self.inlines(c)}</th>"
-                            for c in node["header"])
+            cells = "".join(self.cell("th", c) for c in node["header"])
             rows.append(f"<thead><tr>{cells}</tr></thead>")
         body_rows = []
         for row in node["rows"]:
-            cells = "".join(f"<td>{self.inlines(c)}</td>"
-                            for c in row["cells"])
+            cells = "".join(self.cell("td", c) for c in row["cells"])
             attr = ' class="om-rule"' if row["rule"] else ""
             body_rows.append(f"<tr{attr}>{cells}</tr>")
         rows.append("<tbody>" + "".join(body_rows) + "</tbody>")
         return '<table class="om-table">' + "".join(rows) + "</table>"
+
+    def cell(self, tag, inl):
+        """One table cell; a lone span node (\\multicolumn) → colspan."""
+        if len(inl) == 1 and inl[0]["t"] == "span":
+            return (f'<{tag} colspan="{inl[0]["cols"]}">'
+                    f"{self.inlines(inl[0]['inl'])}</{tag}>")
+        return f"<{tag}>{self.inlines(inl)}</{tag}>"
 
 
 def footnotes_html(emitter):

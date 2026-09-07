@@ -16,6 +16,17 @@ jobs:
         with:
           fetch-depth: 0            # need the tag's metadata for its date
 
+      - name: Free runner disk space
+        run: |
+          # The texlive image plus 40 PDFs (twice named) can fill the runner's
+          # ~14 GB: the biology series died with "No space left on device"
+          # (2026-09-06). Drop toolchains this job never uses (~20 GB) and log
+          # the headroom so the next disk problem is visible.
+          df -h /
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \
+                      /opt/hostedtoolcache/CodeQL /usr/local/.ghcup
+          df -h /
+
       - name: Generate version info
         run: |
           DATE=$(git for-each-ref --format='%(creatordate:short)' "refs/tags/${GITHUB_REF_NAME}")
@@ -83,12 +94,19 @@ jobs:
           # Each PDF is attached twice: once versioned, once under its plain
           # slug — the plain name is what makes the README's
           # releases/latest/download/<slug>.pdf links permanent.
+          # Move + hard link, never copy: copying tripled the disk footprint
+          # of the series and filled the runner.
+          # The LaTeX step runs in a container as root, so build/ comes back
+          # root-owned: mv out of it (and ln, under protected_hardlinks) are
+          # "Permission denied" for the runner user until we own the files.
+          sudo chown -R "$(id -u):$(id -g)" build
           for pdf in build/one_math_book_*.pdf
           do
             slug="$(basename "$pdf" .pdf)"
-            cp "$pdf" "${slug}_${GITHUB_REF_NAME}.pdf"
-            cp "$pdf" "${slug}.pdf"
+            mv "$pdf" "${slug}_${GITHUB_REF_NAME}.pdf"
+            ln "${slug}_${GITHUB_REF_NAME}.pdf" "${slug}.pdf"
           done
+          df -h /
 
       - name: Create release and attach PDFs
         uses: softprops/action-gh-release@v2

@@ -367,6 +367,7 @@ class Parser:
                         "eqref": 1, "emph": 1, "textbf": 1, "index": 1,
                         "label": 1, "textsuperscript": 1, "footnote": 1,
                         "texorpdfstring": 2, "hspace": 1, "rule": 2,
+                        "texttt": 1, "rotatebox": 2, "multicolumn": 3, "underline": 1,
                         "H": 1, "c": 1, "v": 1, "textsc": 1}.get(name, 0)
             if name in ("H", "c", "v") \
                     and (cur.i >= len(s) or s[cur.i] != "{"):
@@ -480,8 +481,11 @@ class Parser:
         tabular whose rows alternate \\includegraphics cells and
         {\\footnotesize label} cells (physics-1 solar system) — parsed into
         "grid" = [[{"src", "label"}, ...], ...]."""
-        tikzs = []
+        tikzs, widths, sublabels = [], {}, {}
         rest = body
+        if "\\begin{minipage}" in rest:
+            # side-by-side sub-figures, each in a minipage (biology)
+            tikzs, widths, sublabels, rest = self.parse_minipage_figure(rest)
         while True:
             m = re.search(r"\\begin\{(tikzpicture|circuitikz)\}", rest)
             if not m:
@@ -493,13 +497,17 @@ class Parser:
                     f"{self.filename}: missing {end_pat}")
             tikzs.append(rest[m.start():e + len(end_pat)])
             rest = rest[:m.start()] + rest[e + len(end_pat):]
-        grid, sublabels = None, {}
+        grid = None
         if not tikzs:
             tikzs, grid, sublabels, rest = self.parse_raster_figure(rest)
-        if not tikzs:
+        table = None
+        if not tikzs and re.search(r"\\begin\{(center|tabular)\}", rest):
+            # a table set as a figure (the genetic-code table)
+            table, rest = self.parse_table_figure(rest)
+        if not tikzs and table is None:
             raise ParseError(
-                f"{self.filename}: omfigure without tikzpicture or "
-                "\\includegraphics")
+                f"{self.filename}: omfigure without tikzpicture, "
+                "\\includegraphics or tabular")
         if floated:
             # floats: \caption{...} + optional \label, \centering etc.
             label = None
@@ -524,7 +532,8 @@ class Parser:
             return {"t": "figure", "tikzs": tikzs, "label": label,
                     "caption": self.parse_inlines(caption_text)}
         # what remains is the caption (plus separators like \qquad)
-        caption = re.sub(r"\\qquad|\\quad|\\hfill", " ", rest).strip()
+        caption = re.sub(r"\\qquad|\\quad|\\hfill|\\medskip|\\smallskip"
+                         r"|\\bigskip", " ", rest).strip()
         m2 = re.fullmatch(r"\{\\small\s+(.*)\}", caption, re.S)
         if m2:
             caption = m2.group(1)
@@ -534,7 +543,88 @@ class Parser:
             node["grid"] = grid
         if sublabels:
             node["sublabels"] = sublabels
+        if widths:
+            node["widths"] = widths
+        if table is not None:
+            node["table"] = table
         return node
+
+    # The books' text width (a4paper, inner/outer 2.2cm): minipage widths
+    # are fractions of it, and figures inside a minipage size their
+    # \\linewidth-relative pictures from it.
+    TEXT_WIDTH_PT = 472
+
+    MINIPAGE = re.compile(
+        r"\\begin\{minipage\}(?:\[[a-z]\])?\{([\d.]+)\\(?:line|text|column)width\}")
+
+    def parse_minipage_figure(self, body):
+        """Sub-figures in `\\begin{minipage}[b]{0.48\\linewidth}` blocks
+        (\\hfill-separated): each holds one tikzpicture or one
+        \\includegraphics plus an optional {\\small ...} sub-caption.
+        Returns (sources, widths, sublabels, rest) — `widths` maps a
+        picture index to its fraction of the text width; a tikz source
+        gets a matching \\linewidth prefix so `width=0.9\\linewidth`
+        pictures inside it keep their print proportion."""
+        tikzs, widths, sublabels = [], {}, {}
+        rest = body
+        while True:
+            m = self.MINIPAGE.search(rest)
+            if not m:
+                break
+            cur = Cursor(rest, self.filename)
+            cur.i = m.end()
+            inner = find_env_end(cur, "minipage")
+            rest = rest[:m.start()] + rest[cur.i:]
+            width = float(m.group(1))
+            pm = re.search(r"\\begin\{(tikzpicture|circuitikz)\}", inner)
+            if pm:
+                end_pat = f"\\end{{{pm.group(1)}}}"
+                e = inner.find(end_pat, pm.start())
+                if e < 0:
+                    raise ParseError(f"{self.filename}: missing {end_pat}")
+                e += len(end_pat)
+                src = (f"\\setlength{{\\linewidth}}"
+                       f"{{{round(width * self.TEXT_WIDTH_PT)}pt}}%\n"
+                       + inner[pm.start():e])
+                inner = inner[:pm.start()] + inner[e:]
+            else:
+                im = self.INCLUDEGRAPHICS.search(inner)
+                if not im:
+                    raise ParseError(
+                        f"{self.filename}: minipage without a picture")
+                src = im.group(0)
+                inner = inner[:im.start()] + inner[im.end():]
+            idx = len(tikzs)
+            tikzs.append(src)
+            widths[idx] = width
+            sub = re.sub(r"\\centering|\\par\b|\\smallskip|\\medskip"
+                         r"|\\bigskip|\\vspace\*?\{[^{}]*\}|\\\\", " ",
+                         inner).strip()
+            m2 = re.fullmatch(r"\{\\(?:small|footnotesize|scriptsize)\s+(.*)\}",
+                              sub, re.S)
+            if m2:
+                sub = m2.group(1)
+            if sub:
+                sublabels[idx] = self.parse_inlines(sub)
+        return tikzs, widths, sublabels, rest
+
+    def parse_table_figure(self, body):
+        """An omfigure whose picture is a tabular (in a center block or
+        bare): returns (table node, rest) — `rest` is the caption."""
+        m = re.search(r"\\begin\{center\}", body)
+        if m:
+            cur = Cursor(body, self.filename)
+            cur.i = m.end()
+            inner = find_env_end(cur, "center")
+            table = self.parse_center(inner)
+            return table, body[:m.start()] + body[cur.i:]
+        m = re.search(r"\\begin\{tabular\}", body)
+        cur = Cursor(body, self.filename)
+        cur.i = m.end()
+        read_group(cur)   # colspec; parse_center re-reads it
+        find_env_end(cur, "tabular")
+        table = self.parse_center(body[m.start():cur.i])
+        return table, body[:m.start()] + body[cur.i:]
 
     INCLUDEGRAPHICS = re.compile(
         r"\\includegraphics(?:\[((?:[^\[\]{}]|\{[^{}]*\})*)\])?\s*\{([^{}]*)\}")
@@ -552,6 +642,8 @@ class Parser:
                       body)
         grid = None
         mt = re.search(r"\\begin\{tabular\}", rest)
+        if mt and not self.INCLUDEGRAPHICS.search(rest[mt.start():]):
+            return [], None, {}, body   # a table figure (parse_table_figure)
         if mt:
             cur = Cursor(rest, self.filename)
             cur.i = mt.start() + len("\\begin")
@@ -660,11 +752,17 @@ class Parser:
         body = re.sub(r"^\\renewcommand\{\\arraystretch\}\{[\d.]+\}\s*",
                       "", body)
         body = re.sub(r"^\\small\s+", "", body)  # print-only sizing
+        if "\\begin{tabular}" not in body:
+            # a centred line of text (a displayed DNA sequence)
+            return {"t": "centered", "inl": self.parse_inlines(body)}
         tables = []
         cur = Cursor(body, self.filename)
         while True:
             rest = cur.s[cur.i:]
-            stripped = re.match(r"(\s|\\qquad\b|\\quad\b)*", rest).end()
+            stripped = re.match(
+                r"(\s|\\qquad\b|\\quad\b|\\small\b|\\footnotesize\b"
+                r"|\\scriptsize\b|\\setlength\{[^{}]*\}\{[^{}]*\})*",
+                rest).end()
             cur.i += stripped
             if cur.i >= len(cur.s):
                 break
@@ -723,14 +821,24 @@ class Parser:
             elif c == "}" and not in_math:
                 depth -= 1
             elif c == "&" and not in_math and depth == 0:
-                cells.append(self.parse_inlines("".join(buf).strip()))
+                cells.append(self.parse_cell("".join(buf).strip()))
                 buf = []
                 i += 1
                 continue
             buf.append(c)
             i += 1
-        cells.append(self.parse_inlines("".join(buf).strip()))
+        cells.append(self.parse_cell("".join(buf).strip()))
         return cells
+
+    def parse_cell(self, raw):
+        """A table cell; \\multicolumn{n}{spec}{...} becomes one spanning
+        node (the emitter turns it into colspan)."""
+        m = re.fullmatch(r"\\multicolumn\{(\d+)\}\{[^{}]*\}\{(.*)\}", raw,
+                         re.S)
+        if m:
+            return [{"t": "span", "cols": int(m.group(1)),
+                     "inl": self.parse_inlines(m.group(2))}]
+        return self.parse_inlines(raw)
 
     def accented_letter(self, cur, combining):
         """Accent argument: a {X} group or a bare next letter (\\v S)."""
@@ -858,11 +966,30 @@ class Parser:
                     emit_text()
                     inner = read_group(cur)
                     out.append({"t": "bold", "inl": self.parse_inlines(inner)})
+                elif name == "texttt":
+                    # monospace runs (DNA/RNA sequences)
+                    emit_text()
+                    inner = read_group(cur)
+                    out.append({"t": "code", "inl": self.parse_inlines(inner)})
+                elif name == "underline":
+                    emit_text()
+                    inner = read_group(cur)
+                    out.append({"t": "u", "inl": self.parse_inlines(inner)})
+                elif name == "rotatebox":
+                    # print-only rotation (tall table headers): keep the text
+                    read_group(cur)
+                    inner = read_group(cur)
+                    emit_text()
+                    out.extend(self.parse_inlines(inner))
+                elif name in ("O", "o"):
+                    text.append("\u00d8" if name == "O" else "\u00f8")
                 elif name == "index":
                     # standalone index entry: metadata only, no visible text
                     read_group(cur)
                 elif name in ("dots", "ldots"):
                     text.append("…")
+                elif name == "texteuro":
+                    text.append("€")
                 elif name == "quad":
                     text.append(" ")
                 elif name == "qquad":
