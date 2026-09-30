@@ -9,3 +9,4 @@
 - [ ] Every new/changed exercise or problem still has exactly one solution keyed by its label.
 - [ ] New terms are introduced as `\emph{...}\index{...}` inside a `definition`, and term links were regenerated if definitions changed.
 - [ ] Translated editions touched by this change keep identical labels, order and structure.
+- [ ] My commits are signed off (`git commit -s`) and I agree to the [Licensing of contributions](https://github.com/bvirrion/one-math-book/blob/main/CONTRIBUTING.md#licensing-of-contributions) section of CONTRIBUTING.md, including the relicensing grant.

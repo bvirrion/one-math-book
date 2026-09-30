@@ -23,6 +23,53 @@ ALT_MAP = {
 }
 
 
+MONTHS = ("January", "February", "March", "April", "May", "June", "July",
+          "August", "September", "October", "November", "December")
+
+# \omcode listings: Pygments lexer per file extension (onequant.sty picks the
+# listings language the same way; .s is Intel-syntax x86).
+LISTING_LEXERS = {
+    ".py": "python", ".hpp": "cpp", ".cpp": "cpp", ".h": "cpp",
+    ".rs": "rust", ".s": "nasm", ".sql": "sql", ".sv": "systemverilog",
+    ".v": "systemverilog", ".xml": "xml", ".xhtml": "html", ".sh": "bash",
+    ".json": "json", ".toml": "toml", ".txt": "text", ".csv": "text",
+}
+# Pygments short token classes kept in the HTML, coarsened to what the
+# reader CSS colours (keywords, strings, comments, numbers, a few names).
+KEEP_TOKEN_CLASSES = ("nf", "nc", "nb", "nd", "bp")
+
+
+def _token_class(ttype):
+    from pygments.token import STANDARD_TYPES
+    while ttype not in STANDARD_TYPES:
+        ttype = ttype.parent
+    short = STANDARD_TYPES[ttype]
+    if short in KEEP_TOKEN_CLASSES:
+        return short
+    return short[:1] if short[:1] in ("k", "s", "c", "m") else ""
+
+
+def highlight_lines(code, ext):
+    """Syntax-highlighted HTML, one string per source line (a token that
+    spans lines is split so every line is a self-contained span run)."""
+    from pygments.lexers import get_lexer_by_name
+    if ext not in LISTING_LEXERS:
+        raise ParseError(f"no listing lexer for {ext!r} files")
+    lexer = get_lexer_by_name(LISTING_LEXERS[ext], stripnl=False,
+                              ensurenl=False)
+    lines = [[]]
+    for ttype, value in lexer.get_tokens(code):
+        cls = _token_class(ttype)
+        for k, part in enumerate(value.split("\n")):
+            if k:
+                lines.append([])
+            if part:
+                esc = html.escape(part, quote=False)
+                lines[-1].append(f'<span class="{cls}">{esc}</span>'
+                                 if cls else esc)
+    return ["".join(parts) for parts in lines]
+
+
 def tex_to_alt(tex):
     """Rough plaintext for a formula, for alt/description use."""
     s = tex
@@ -55,11 +102,13 @@ def plaintext(inlines, refs=None):
             out.append(node["s"])
         elif t == "math":
             out.append(tex_to_alt(node["tex"]))
-        elif t in ("emph", "bold", "sup", "code", "span", "u"):
+        elif t in ("emph", "bold", "sup", "sub", "code", "span", "u"):
             out.append(plaintext(node["inl"], refs))
         elif t == "term":
             out.append(plaintext(node["inl"], refs))
-        elif t in ("cref", "eqref") and refs is not None:
+        elif t == "field":
+            out.append(plaintext(node["inl"], refs) + ".")
+        elif t in ("cref", "eqref", "ref") and refs is not None:
             out.append(refs(node))
     return "".join(out)
 
@@ -115,6 +164,8 @@ class Emitter:
         if node["t"] == "eqref":
             info = self.resolve(node["label"], "\\eqref")
             return f"({info['number']})"
+        if node["t"] == "ref":
+            return self.resolve(node["label"], "\\ref")["number"]
         labels = [re.sub(r"\s+", "", part) for part in node["label"].split(",")]
         infos = [self.resolve(lbl, "\\cref") for lbl in labels]
         if len(infos) == 1:
@@ -171,6 +222,8 @@ class Emitter:
                 out.append(self.inlines(node["inl"]))
             elif t == "sup":
                 out.append(f"<sup>{self.inlines(node['inl'])}</sup>")
+            elif t == "sub":
+                out.append(f"<sub>{self.inlines(node['inl'])}</sub>")
             elif t == "sc":
                 out.append(f'<span class="om-sc">'
                            f"{self.inlines(node['inl'])}</span>")
@@ -197,6 +250,15 @@ class Emitter:
                 info = self.resolve(node["label"], "\\eqref")
                 out.append(f'<a class="om-cref" href="{info["href"]}">'
                            f"({info['number']})</a>")
+            elif t == "ref":
+                # bare \ref: the number alone, linked
+                info = self.resolve(node["label"], "\\ref")
+                out.append(f'<a class="om-cref" href="{info["href"]}">'
+                           f"{info['number']}</a>")
+            elif t == "field":
+                # \sfield / \bfield lead-in
+                out.append(f'<strong class="om-field">'
+                           f"{self.inlines(node['inl'])}.</strong>")
             elif t == "cref":
                 # labels may be line-wrapped in the source
                 labels = [re.sub(r"\s+", "", part)
@@ -296,6 +358,14 @@ class Emitter:
                                   for tbl in node["tables"])
                 out.append(f'<div class="om-table-wrap om-table-row">'
                            f"{inner}</div>")
+            elif t == "tablefloat":
+                out.append(self.table_float(node))
+            elif t == "listing":
+                out.append(self.listing(node))
+            elif t == "lookfor":
+                out.append(f'<p class="om-iq-lookfor"><em>'
+                           f"{self.lang.iq_lookfor} "
+                           f"{self.inlines(node['inl'])}</em></p>")
             else:
                 raise ParseError(f"emitter: unknown block {t!r}")
         return "\n".join(out)
@@ -310,7 +380,77 @@ class Emitter:
             return self.exercise(node)
         if kind == "problem":
             return self.problem(node)
+        if kind == "interviewq":
+            return self.exercise(node, css="om-exercise om-iq")
+        if kind in ("dated", "strategyfile", "predictorcard",
+                    "tutorial", "build"):
+            return self.quant_box(node)
         raise ParseError(f"emitter: unexpected environment {kind!r}")
+
+    def quant_box(self, node):
+        """Titled boxes of the quant books: "As of September 2026 — …",
+        "Strategy file 23.1 — …", "Predictor card 4.2 — …"; tutorial and
+        build boxes carry no title bar."""
+        kind = node["kind"]
+        anchor = f' id="{anchor_for(node["label"])}"' if node["label"] else ""
+        body = self.blocks(node["body"])
+        if kind in ("tutorial", "build"):
+            return (f'<div class="om-box om-{kind}"{anchor}>\n{body}\n'
+                    f"</div>")
+        if kind == "dated":
+            year, month = node["asof"].split("-")
+            lead = f"{self.lang.as_of} {MONTHS[int(month) - 1]} {year}"
+        else:
+            lead = f"{self.lang.names[kind]} {node['number']}"
+        head = (f'<p class="om-box-head"><span class="om-box-kind">{lead}'
+                f'</span> <span class="om-box-note">— '
+                f"{self.inlines(node['title'])}</span></p>")
+        return (f'<section class="om-box om-{kind}"{anchor}>\n{head}\n'
+                f"{body}\n</section>")
+
+    def listing(self, node):
+        """\\omcode: lines first..last of a tested source file, highlighted,
+        numbered from `first` as in print, caption below."""
+        from pathlib import Path
+        path = Path(node["path"])     # relative to the book repo root
+        if not path.exists():
+            raise ParseError(f"listing source not found: {path}")
+        lines = path.read_text(encoding="utf-8").split("\n")
+        first, last = node["first"], node["last"]
+        if not 1 <= first <= last <= len(lines):
+            raise ParseError(f"listing range {first}..{last} outside "
+                             f"{path} ({len(lines)} lines)")
+        code = "\n".join(lines[first - 1:last])
+        hl = highlight_lines(code, path.suffix)
+        body = "\n".join(f'<span class="om-line" data-n="{first + k}">'
+                         f"{line}</span>" for k, line in enumerate(hl))
+        lang = LISTING_LEXERS[path.suffix]
+        anchor = f' id="{anchor_for(node["label"])}"' if node["label"] else ""
+        # listings in solutions are unnumbered here (print runs one counter
+        # across the whole solutions appendix; nothing references them)
+        num = (f'<strong>{self.lang.names["listing"]} '
+               f"{node['number']}.</strong> " if "number" in node else "")
+        caption = (f"{num}{self.inlines(node['caption'])} "
+                   f'<span class="om-listing-path">'
+                   f"{html.escape(str(path), quote=False)}</span>")
+        return (f'<figure class="om-listing"{anchor}>\n'
+                f'<pre class="om-code" data-lang="{lang}"><code>{body}'
+                f"</code></pre>\n<figcaption>{caption}</figcaption>\n"
+                f"</figure>")
+
+    def table_float(self, node):
+        tbl = node["table"]
+        inner = (self.table_inner(tbl) if tbl["t"] == "table"
+                 else "\n".join(self.table_inner(x) for x in tbl["tables"]))
+        anchor = f' id="{anchor_for(node["label"])}"' if node["label"] else ""
+        caption = self.inlines(node["caption"])
+        if node["numbered"]:
+            caption = (f'<strong>{self.lang.names["table"]} '
+                       f"{node['number']}.</strong> {caption}")
+        cap = f"\n<figcaption>{caption}</figcaption>" if caption else ""
+        return (f'<figure class="om-figure om-table-float"{anchor}>\n'
+                f'<div class="om-table-wrap">{inner}</div>{cap}\n'
+                f"</figure>")
 
     def head(self, node, css_kind):
         num = node["number"]
@@ -360,6 +500,12 @@ class Emitter:
         if node["title"]:
             note = (f'<p class="om-box-note om-problem-title">'
                     f"{self.inlines(node['title'])}</p>")
+        tags = [self.inlines(node[k]) for k in ("roles", "firm")
+                if node.get(k)]
+        if tags:
+            # interview questions: "trader, researcher • market maker"
+            diff += (' <span class="om-iq-roles">'
+                     + " • ".join(tags) + "</span>")
         parts.append(f'<p class="om-box-head"><span class="om-box-kind">'
                      f"{name} {num}</span>{diff}</p>")
         if note:
@@ -391,6 +537,9 @@ class Emitter:
     def list_env(self, node):
         if node["kind"] == "itemize":
             tag_open, tag_close = "<ul>", "</ul>"
+        elif node["kind"] == "steps":
+            # tutorial steps: "Step N." markers come from the CSS
+            tag_open, tag_close = '<ol class="om-steps">', "</ol>"
         else:
             start = node.get("start", 1)
             attr = f' start="{start}"' if start != 1 else ""
@@ -403,7 +552,11 @@ class Emitter:
                     and body.count("<p>") == 1:
                 body = body[len("<p>"):-len("</p>")]
             items.append(f"<li>{body}</li>")
-        return tag_open + "\n" + "\n".join(items) + "\n" + tag_close
+        out = tag_open + "\n" + "\n".join(items) + "\n" + tag_close
+        if node.get("sources"):
+            out = (f'<div class="om-sources">\n<p class="om-sources-head">'
+                   f"{self.lang.sources_head}</p>\n{out}\n</div>")
+        return out
 
     def figure(self, node):
         caption = self.inlines(node["caption"])
@@ -447,6 +600,7 @@ class Emitter:
         anchor = ""
         if node.get("label"):
             anchor = f' id="{anchor_for(node["label"])}"'
+        if node.get("number"):
             caption = (f'<strong>{self.lang.names["figure"]} '
                        f"{node['number']}.</strong> {caption}")
         return (f'<figure class="om-figure"{anchor}>\n'
@@ -479,24 +633,40 @@ class Emitter:
                 + "</div>")
 
     def table_inner(self, node):
+        align = node.get("align")   # booktabs tables only
         rows = []
         if node["header"]:
-            cells = "".join(self.cell("th", c) for c in node["header"])
+            cells = self.row_cells("th", node["header"], align)
             rows.append(f"<thead><tr>{cells}</tr></thead>")
         body_rows = []
         for row in node["rows"]:
-            cells = "".join(self.cell("td", c) for c in row["cells"])
+            cells = self.row_cells("td", row["cells"], align)
             attr = ' class="om-rule"' if row["rule"] else ""
             body_rows.append(f"<tr{attr}>{cells}</tr>")
         rows.append("<tbody>" + "".join(body_rows) + "</tbody>")
-        return '<table class="om-table">' + "".join(rows) + "</table>"
+        css = "om-table om-booktabs" if node.get("booktabs") else "om-table"
+        return f'<table class="{css}">' + "".join(rows) + "</table>"
 
-    def cell(self, tag, inl):
+    def row_cells(self, tag, cells, align):
+        if not align:
+            return "".join(self.cell(tag, c) for c in cells)
+        out, col = [], 0
+        for c in cells:
+            # booktabs text tables: the colspec's alignment per column
+            # (om-l / om-c / om-r); a \multicolumn spans several columns
+            span = c[0]["cols"] if len(c) == 1 and c[0]["t"] == "span" else 1
+            out.append(self.cell(tag, c, align[col] if col < len(align)
+                                 else None))
+            col += span
+        return "".join(out)
+
+    def cell(self, tag, inl, align=None):
         """One table cell; a lone span node (\\multicolumn) → colspan."""
+        cls = f' class="om-{align}"' if align else ""
         if len(inl) == 1 and inl[0]["t"] == "span":
-            return (f'<{tag} colspan="{inl[0]["cols"]}">'
+            return (f'<{tag}{cls} colspan="{inl[0]["cols"]}">'
                     f"{self.inlines(inl[0]['inl'])}</{tag}>")
-        return f"<{tag}>{self.inlines(inl)}</{tag}>"
+        return f"<{tag}{cls}>{self.inlines(inl)}</{tag}>"
 
 
 def footnotes_html(emitter):

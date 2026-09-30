@@ -50,6 +50,16 @@ AR_CREF_PLURALS = {
 }
 
 
+QUANT_NAMES = {
+    "interviewq": ("Interview question", "Interview questions"),
+    "listing": ("Listing", "Listings"),
+    "table": ("Table", "Tables"),
+    "dated": ("Box", "Boxes"),
+    "strategyfile": ("Strategy file", "Strategy files"),
+    "predictorcard": ("Predictor card", "Predictor cards"),
+}
+
+
 def _newcommands(text):
     out = {}
     for m in re.finditer(
@@ -85,6 +95,22 @@ class LangStrings:
             plural = cmds.get(f"omname{macro}s")
             if plural:
                 self.plurals[kind] = _typo(plural)
+        # siunitx range/list words (\sisetup in the lang file; English
+        # has none and keeps the siunitx defaults)
+        self.si_phrases = {"range": " to ", "pair": " and ",
+                           "final": " and "}
+        for key, option in (("range", "range-phrase"),
+                            ("pair", "list-pair-separator"),
+                            ("final", "list-final-separator")):
+            m = re.search(option + r"\s*=\s*\{\\text\{([^{}]*)\}\}", text)
+            if m:
+                word = m.group(1)
+                if re.search("[\u0590-\u08ff]", word):
+                    # RTL word inside the LTR math island: isolate it
+                    # (RLI … PDI), else the bidi algorithm reorders the
+                    # numbers around it — print sets "20 إلى 60" LTR
+                    word = re.sub(r"(\S(?:.*\S)?)", "\u2067\\1\u2069", word)
+                self.si_phrases[key] = word
         # list conjunction — not in the lang files (cleveref supplies it
         # in LaTeX); extend here when a new language is added
         self.and_word = {"en": "and", "fr": "et", "nl": "en",
@@ -118,6 +144,14 @@ class LangStrings:
                                     "es": "Ecuaciones", "pt": "Equações",
                                     "hi": "समीकरण", "ar": "معادلات",
                                     "id": "Persamaan"}[lang]
+        # Quant-book kinds: styles/onequant.sty hard-codes their English
+        # names (\crefname, tcolorbox titles) whatever the book language.
+        for kind, (name, plural) in QUANT_NAMES.items():
+            self.names[kind] = name
+            self.plurals[kind] = plural
+        self.iq_lookfor = "What the interviewer is looking for:"
+        self.sources_head = "Sources and further reading"
+        self.as_of = "As of"
         # Back-reference (\cref) names: same as the headings except in
         # Arabic, where cleveref prints the definite forms. The list
         # separators mirror cleveref's conjunctions: Arabic و is a bound

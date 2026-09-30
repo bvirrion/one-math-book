@@ -77,4 +77,11 @@ else
     echo "notice: build/${ENTRY%.tex}.aux missing — run latexmk first;" \
          "page maps NOT updated"
 fi
+# The saas reader serves a runtime index derived from the manifest
+# (resources/onecourse/chapters/index/): refresh it, so the site never
+# shows stale book data. Unchanged books keep their files (and lastmod).
+if ! (cd "$SAAS" && php artisan onecourse:chapters:index); then
+    echo "notice: saas chapter index NOT refreshed — run" \
+         "'php artisan onecourse:chapters:index' in $SAAS"
+fi
 echo "ALL DONE: $n chapters"

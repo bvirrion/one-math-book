@@ -9,6 +9,11 @@ standard chapter.section numbering.
 
 from .lexer import STATEMENT_KINDS, ParseError
 
+# Kinds numbered N.M by their own per-chapter counter (the quant books'
+# \refstepcounter'd boxes, listings and table floats).
+OWN_COUNTER_KINDS = ("listing", "table", "dated", "strategyfile",
+                     "predictorcard", "interviewq")
+
 
 def anchor_for(label):
     """LaTeX label -> HTML id (colons are invalid in CSS selectors)."""
@@ -29,14 +34,22 @@ def number_chapter(blocks, chapter_number):
     subsection = 0
     figure = 0
     equation = 0
+    # quant books: one per-chapter counter per kind (listings, table floats,
+    # dated boxes, strategy files, predictor cards, interview questions)
+    own = {kind: 0 for kind in OWN_COUNTER_KINDS}
 
-    def record(label, kind, number):
+    def record(label, kind, number, anchor=None):
         if label is None:
             return
         if label in labels:
             raise ParseError(f"duplicate label {label}")
         labels[label] = {"kind": kind, "number": number,
-                         "anchor": anchor_for(label)}
+                         "anchor": anchor or anchor_for(label)}
+
+    def count(node, kind):
+        own[kind] += 1
+        node["number"] = f"{chapter_number}.{own[kind]}"
+        record(node.get("label"), kind, node["number"])
 
     def walk(nodes):
         nonlocal shared, exercise, problem, section, subsection, figure, \
@@ -67,13 +80,30 @@ def number_chapter(blocks, chapter_number):
                 node["number"] = f"{chapter_number}.{equation}"
                 record(node["label"], "equation", node["number"])
                 continue
-            if t == "figure" and node.get("label"):
+            if t == "figure" and (node.get("label") or node.get("numbered")):
+                # \omcaption numbers every quant figure, labelled or not
                 figure += 1
                 node["number"] = f"{chapter_number}.{figure}"
-                record(node["label"], "figure", node["number"])
+                record(node.get("label"), "figure", node["number"])
+                for alias in node.get("aliases", []):
+                    record(alias, "figure", node["number"],
+                           anchor=anchor_for(node["label"]))
+                continue
+            if t == "listing":
+                count(node, "listing")
+                continue
+            if t == "tablefloat":
+                # a \caption'ed table float steps LaTeX's table counter;
+                # a caption line under a centred tabular does not
+                if node["numbered"]:
+                    count(node, "table")
                 continue
             if t == "env":
                 kind = node["kind"]
+                if kind in OWN_COUNTER_KINDS:
+                    count(node, kind)
+                    walk(node["body"])
+                    continue
                 if kind in STATEMENT_KINDS:
                     shared += 1
                     node["number"] = f"{chapter_number}.{shared}"

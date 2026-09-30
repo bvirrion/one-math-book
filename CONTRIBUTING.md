@@ -136,3 +136,26 @@ Cross-reference with `\cref{...}` (cleveref), never with bare `\ref`.
 2. Write or edit chapter + solutions files.
 3. `make` and check the log for errors and undefined references.
 4. Open a pull request; CI builds the PDF and attaches it as an artifact.
+
+## Licensing of contributions
+
+One Math Book is free for everyone under the licences in the [README](README.md#license). Contributing
+means agreeing to the following.
+
+1. **Same licence in as out.** Your contribution is licensed under the same terms as the part of the
+   repository it changes: CC BY-NC-SA 4.0 for book content ([`LICENSE`](LICENSE)), MIT for the
+   software — `tools/`, `.github/`, the `Makefile` and the build scripts ([`LICENSE-CODE`](LICENSE-CODE)).
+2. **Sign off every commit** with `git commit -s`, which adds a line such as
+   `Signed-off-by: Your Name <you@example.com>`. It certifies the
+   [Developer Certificate of Origin 1.1](https://developercertificate.org): you wrote the change or
+   have the right to submit it. For this project, "the open source license indicated in the file"
+   in the certificate means the licences named in point 1.
+3. **Relicensing grant.** You grant Benjamin Virrion a perpetual, worldwide, non-exclusive,
+   royalty-free and irrevocable right to use, modify and relicense your contribution under other
+   terms, including commercial ones (print editions, licences for schools, publishers or companies,
+   paid app versions). You keep the copyright in your contribution and may use it as you wish.
+
+**By signing off your commits you certify the DCO and agree to this whole section, including the
+relicensing grant in point 3.** Why the grant exists: the books stay free under CC BY-NC-SA for
+every reader; the grant only lets the author fund the project through commercial editions without
+having to trace and ask every past contributor. Commits without a sign-off cannot be merged.

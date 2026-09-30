@@ -7,10 +7,12 @@ pictures across language editions build once.
 """
 
 import hashlib
+import os
 import re
 import shutil
 import subprocess
 import tempfile
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from .lexer import ParseError
@@ -141,7 +143,27 @@ def tikz_hash(tikz):
         path = Path(m.group(2).strip())
         if path.exists():
             normalized += hashlib.sha1(path.read_bytes()).hexdigest()
+    # so are the data files a pgfplots \addplot table reads (the quant
+    # books' figdata/…csv): regenerated data rebuilds the figure
+    for m in DATA_FILE_RE.finditer(tikz):
+        path = Path(m.group(1))
+        if path.exists():
+            normalized += hashlib.sha1(path.read_bytes()).hexdigest()
     return hashlib.sha1(normalized.encode("utf-8")).hexdigest()[:12]
+
+
+# Data files read by pgfplots tables, relative to the book repo root.
+DATA_FILE_RE = re.compile(r"\{(figdata/[^{}]+)\}")
+
+
+def absolute_data_paths(tikz):
+    """The compile runs in a temp dir: point figdata/… at the repo copy."""
+    def repl(m):
+        path = Path(m.group(1)).resolve()
+        if not path.exists():
+            raise ParseError(f"figure data file not found: {m.group(1)}")
+        return "{" + str(path) + "}"
+    return DATA_FILE_RE.sub(repl, tikz)
 
 
 def stage_rasters(tikz, tmp):
@@ -181,6 +203,8 @@ def build_svg(tikz):
         has_raster = bool(RASTER_RE.search(tikz))
         if has_raster:
             tikz = stage_rasters(tikz, tmp)
+        if DATA_FILE_RE.search(tikz):
+            tikz = absolute_data_paths(tikz)
         (tmp / "fig.tex").write_text(
             preamble + tikz + "\n\\end{document}\n", encoding="utf-8")
         res = _run([engine, "-interaction=nonstopmode", "fig.tex"], tmp)
@@ -320,6 +344,26 @@ class FigureBuilder:
         self.svg_dir = Path(svg_dir)
         self.url_prefix = url_prefix.rstrip("/")
         self.cache = {}    # tikz source -> figure info dict
+        self.built = {}    # tikz hash -> build_svg() result (prebuild)
+
+    def prebuild(self, tikzs, jobs=None):
+        """Compile a chapter's pictures in parallel (each build_svg runs in
+        its own temp dir, so the output is byte-identical to a serial run);
+        figure_info() then only writes the files. OM_FIG_JOBS overrides
+        the worker count."""
+        jobs = jobs or int(os.environ.get("OM_FIG_JOBS", "0")) \
+            or min(8, os.cpu_count() or 1)
+        todo = {}
+        for tikz in tikzs:
+            # Arabic pictures (lualatex) stay serial: under concurrent
+            # load luaotfload shapes their labels differently run to run
+            if not is_raster(tikz) and not ARABIC.search(tikz):
+                todo.setdefault(tikz_hash(tikz), tikz)
+        if jobs < 2 or len(todo) < 2:
+            return
+        with ThreadPoolExecutor(max_workers=jobs) as pool:
+            for h, result in zip(todo, pool.map(build_svg, todo.values())):
+                self.built[h] = result
 
     def figure_info(self, tikz):
         if tikz in self.cache:
@@ -332,7 +376,7 @@ class FigureBuilder:
             if info["hash"] == h:
                 self.cache[tikz] = info
                 return info
-        svg, width, height = build_svg(tikz)
+        svg, width, height = self.built.pop(h, None) or build_svg(tikz)
         self.svg_dir.mkdir(parents=True, exist_ok=True)
         filename = f"fig-{h}.svg"
         (self.svg_dir / filename).write_text(svg, encoding="utf-8")

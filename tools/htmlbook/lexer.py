@@ -37,8 +37,13 @@ STATEMENT_KINDS = (
     "method", "example", "notation", "remark",
 )
 # Environments whose bodies are parsed recursively as blocks.
-BLOCK_ENVS = STATEMENT_KINDS + ("proof", "exercise", "problem", "solution")
+BLOCK_ENVS = STATEMENT_KINDS + ("proof", "exercise", "problem", "solution",
+                                 "interviewq")
 LIST_ENVS = ("itemize", "enumerate")
+# Quant-book boxes (styles/onequant.sty) -> number of mandatory arguments:
+# dated{YYYY-MM}{title}, strategyfile{title}, predictorcard{title}.
+QUANT_BOXES = {"dated": 2, "strategyfile": 1, "predictorcard": 1,
+               "tutorial": 0, "build": 0}
 
 
 class ParseError(Exception):
@@ -133,6 +138,17 @@ def read_optional(cur):
 
 CMD_RE = re.compile(r"\\([a-zA-Z]+)\s*")
 
+# Text symbols of the quant books (textcomp / onequant.sty).
+QUANT_SYMBOLS = {
+    "pounds": "£", "textyen": "¥", "textdegree": "°", "textmu": "µ",
+    "textquotedbl": '"', "textvisiblespace": "␣",
+}
+# An italic aside group: {\small\itshape\color{omIq} ...}
+ITSHAPE_GROUP = re.compile(r"\{\s*(?:\\(?:small|footnotesize)\s*)?\\itshape\b")
+ITSHAPE_SWITCHES = re.compile(
+    r"^\s*(?:\\(?:small|footnotesize)\s*)?\\itshape\b\s*"
+    r"(?:\\color\{[^{}]*\}\s*)?")
+
 
 def find_inline_math_end(s, start):
     """Index of the `$` closing the inline math opened at s[start] — the
@@ -223,6 +239,25 @@ def split_top_level(body, sep_cmd, filename):
     return chunks
 
 
+def column_alignments(colspec, filename):
+    """tabular colspec -> one of "l"/"c"/"r" per column: p{}/m{}/b{}/X
+    columns are left-aligned text; @{} >{} <{} and | are layout only;
+    *{n}{spec} repeats."""
+    spec = colspec
+    while True:
+        m = re.search(r"\*\{(\d+)\}\{([^{}]*)\}", spec)
+        if not m:
+            break
+        spec = spec[:m.start()] + m.group(2) * int(m.group(1)) + spec[m.end():]
+    spec = re.sub(r"[@<>!]\{(?:[^{}]|\{[^{}]*\})*\}|\|", "", spec)
+    spec = re.sub(r"[pmb]\{(?:[^{}]|\{[^{}]*\})*\}|X", "l", spec)
+    spec = re.sub(r"\s+", "", spec)
+    if not re.fullmatch(r"[lcr]+", spec):
+        raise ParseError(f"{filename}: unsupported tabular colspec "
+                         f"{colspec!r}")
+    return list(spec)
+
+
 def count_stars(opt):
     """Difficulty option like `$\\star$` / `$\\star\\star\\star$` -> 1..3."""
     return opt.count("\\star")
@@ -308,11 +343,45 @@ class Parser:
                                    "inl": self.parse_inlines(title),
                                    "star": bool(m.group(2))})
                     continue
+                m = re.match(r"\\(sfield|bfield|paragraph)\s*\{", s[cur.i:])
+                if m:
+                    # \sfield{Name} / \bfield{Name} (quant strategy files and
+                    # build boxes): a new paragraph led by "Name." in bold;
+                    # \paragraph{Title.} is the same run-in heading
+                    flush()
+                    cur.i += m.end() - 1
+                    name = read_group(cur)
+                    if m.group(1) == "paragraph":
+                        parbuf.append("\\textbf{" + name + "}\\ ")
+                    else:
+                        parbuf.append("\\omfieldlead{" + name + "}\\ ")
+                    continue
+                m = re.match(r"\\iqlookfor\s*\{", s[cur.i:])
+                if m:
+                    # interview-question solutions: "What the interviewer is
+                    # looking for: …" (its own paragraph in print)
+                    flush()
+                    cur.i += m.end() - 1
+                    blocks.append({"t": "lookfor",
+                                   "inl": self.parse_inlines(read_group(cur))})
+                    continue
+                m = re.match(r"\\omcode\s*\{", s[cur.i:])
+                if m:
+                    flush()
+                    cur.i += m.end() - 1
+                    blocks.append(self.parse_listing(cur))
+                    continue
                 m = re.match(r"\\admitted\b", s[cur.i:])
                 if m:
                     # zero-arg macro: a whole "Admitted at this level" proof
                     flush()
                     blocks.append({"t": "admitted"})
+                    cur.i += m.end()
+                    continue
+                m = re.match(r"\\(footnotesize|small)\b\s*", s[cur.i:])
+                if m:
+                    # size switch (a quant table in a box): CSS owns sizing;
+                    # trailing space consumed as a command's would be
                     cur.i += m.end()
                     continue
                 m = re.match(r"\\(medskip|smallskip|bigskip|noindent|par)\b",
@@ -368,7 +437,11 @@ class Parser:
                         "label": 1, "textsuperscript": 1, "footnote": 1,
                         "texorpdfstring": 2, "hspace": 1, "rule": 2,
                         "texttt": 1, "rotatebox": 2, "multicolumn": 3, "underline": 1,
-                        "H": 1, "c": 1, "v": 1, "textsc": 1}.get(name, 0)
+                        "textit": 1, "ensuremath": 1, "numrange": 2,
+                        "textsubscript": 1,
+                        "H": 1, "c": 1, "v": 1, "textsc": 1,
+                        "path": 1, "si": 1, "money": 2,
+                        "omfieldlead": 1}.get(name, 0)
             if name in ("H", "c", "v") \
                     and (cur.i >= len(s) or s[cur.i] != "{"):
                 n_groups = 0  # bare-letter accent form (\v S)
@@ -382,6 +455,25 @@ class Parser:
         out = s[cur.i:cur.i + 2]
         cur.i += 2
         return out
+
+    def parse_listing(self, cur):
+        """\\omcode{path}{first}{last}{caption}, optionally followed by
+        \\label{lst:...}: lines first..last of a tested source file (quant
+        books), read and highlighted by the emitter."""
+        path = read_group(cur).strip()
+        first = read_group(cur).strip()
+        last = read_group(cur).strip()
+        caption = read_group(cur)
+        if not (first.isdigit() and last.isdigit()):
+            cur.err(f"\\omcode line range {first!r}..{last!r} is not numeric")
+        label = None
+        m = re.match(r"[ \t]*\n?[ \t]*\\label\{", cur.s[cur.i:])
+        if m:
+            cur.i += m.end() - 1
+            label = read_group(cur)
+        return {"t": "listing", "path": path, "first": int(first),
+                "last": int(last), "caption": self.parse_inlines(caption),
+                "label": label}
 
     # ------------------------------------------------------------------ envs
 
@@ -416,6 +508,44 @@ class Parser:
         if name == "center":
             body = find_env_end(cur, "center")
             return self.parse_center(body)
+        if name == "table":
+            read_optional(cur)  # float placement: print-only
+            return self.parse_table_float(find_env_end(cur, "table"))
+        if name == "tabular":
+            # a bare tabular (inside a quant box, after a size switch)
+            start = cur.i - len("\\begin{tabular}")
+            find_env_end(cur, "tabular")
+            return self.parse_center(s[start:cur.i])
+        if name in ("omsources", "tutsteps"):
+            # quant lists: "Sources and further reading" (an itemize under
+            # its heading) and tutorial steps ("Step N." labels)
+            body = find_env_end(cur, name)
+            chunks = split_top_level(body, "item", self.filename)
+            if chunks[0].strip():
+                raise ParseError(
+                    f"{self.filename}: text before first \\item in {name}")
+            return {"t": "list",
+                    "kind": "itemize" if name == "omsources" else "steps",
+                    "resume": False, "sources": name == "omsources",
+                    "items": [self.parse_blocks(c) for c in chunks[1:]]}
+        if name in QUANT_BOXES:
+            args = [read_group(cur) for _ in range(QUANT_BOXES[name])]
+            title, asof = None, None
+            if name == "dated":
+                asof = args[0].strip()
+                if not re.fullmatch(r"\d{4}-\d{2}", asof):
+                    cur.err(f"dated box date {asof!r} is not YYYY-MM")
+            if args:
+                title = self.parse_inlines(args[-1])
+            label = None
+            m = re.match(r"\s*\\label\{", s[cur.i:])
+            if m:
+                cur.i += m.end() - 1
+                label = read_group(cur)
+            body_blocks = self.parse_blocks(find_env_end(cur, name))
+            return {"t": "env", "kind": name, "title": title, "label": label,
+                    "difficulty": None, "sol_key": None, "asof": asof,
+                    "body": body_blocks}
         if name in LIST_ENVS:
             opt = read_optional(cur)
             resume = bool(opt) and "resume" in opt
@@ -432,12 +562,26 @@ class Parser:
                     "items": items}
         if name in BLOCK_ENVS:
             title, sol_key, difficulty = None, None, None
+            roles = firm = None
             if name == "solution":
                 sol_key = read_group(cur)
             else:
                 opt = read_optional(cur)
                 if opt is not None:
-                    if name == "exercise":
+                    if name == "interviewq":
+                        # [$\star\star$ \iqroles{trader} \iqfirm{market maker}]
+                        difficulty = count_stars(opt)
+                        rest = re.sub(r"\$(\\star)*\$", "", opt)
+                        mr = re.search(r"\\iqroles\{([^{}]*)\}", rest)
+                        mf = re.search(r"\\iqfirm\{([^{}]*)\}", rest)
+                        roles = self.parse_inlines(mr.group(1)) if mr else None
+                        firm = self.parse_inlines(mf.group(1)) if mf else None
+                        rest = re.sub(r"\\iq(roles|firm)\{[^{}]*\}", "", rest)
+                        if difficulty == 0 or rest.strip():
+                            raise ParseError(
+                                f"{self.filename}: unsupported interviewq "
+                                f"option {opt!r}")
+                    elif name == "exercise":
                         difficulty = count_stars(opt)
                         if difficulty == 0:
                             raise ParseError(
@@ -464,10 +608,37 @@ class Parser:
                     if label is None:
                         label = node["name"]
                     body_blocks.remove(node)
-            return {"t": "env", "kind": name, "title": title, "label": label,
+            node = {"t": "env", "kind": name, "title": title, "label": label,
                     "difficulty": difficulty, "sol_key": sol_key,
                     "body": body_blocks}
+            if name == "interviewq":
+                node["roles"], node["firm"] = roles, firm
+            return node
         cur.err(f"unknown environment {name!r}")
+
+    def parse_table_float(self, body):
+        """A `table` float (quant books): one tabular plus \\caption and
+        \\label, numbered "Table N.M" with LaTeX's table counter."""
+        caption, label = [], None
+        mcap = re.search(r"\\caption\{", body)
+        if mcap:
+            gcur = Cursor(body, self.filename)
+            gcur.i = mcap.end() - 1
+            caption = self.parse_inlines(read_group(gcur))
+            body = body[:mcap.start()] + body[gcur.i:]
+        mlab = re.search(r"\\label\{([^{}]*)\}", body)
+        if mlab:
+            label = mlab.group(1)
+            body = body[:mlab.start()] + body[mlab.end():]
+        body = re.sub(r"\\centering|\\small\b|\\footnotesize\b"
+                      r"|\\setlength\{\\tabcolsep\}\{[^{}]*\}"
+                      r"|\\renewcommand\{\\arraystretch\}\{[\d.]+\}",
+                      " ", body)
+        table = self.parse_center(body)
+        if table["t"] not in ("table", "tables"):
+            raise ParseError(f"{self.filename}: table float without tabular")
+        return {"t": "tablefloat", "table": table, "caption": caption,
+                "label": label, "numbered": mcap is not None}
 
     def parse_figure(self, body, floated=False):
         """An omfigure holds one or more pictures — tikzpictures, or raster
@@ -497,6 +668,9 @@ class Parser:
                     f"{self.filename}: missing {end_pat}")
             tikzs.append(rest[m.start():e + len(end_pat)])
             rest = rest[:m.start()] + rest[e + len(end_pat):]
+        # \resizebox{\linewidth}{!}{<picture>}: print-only fit to the text
+        # width — the SVG scales to its column by itself
+        rest = re.sub(r"\\resizebox\{[^{}]*\}\{[^{}]*\}\{\s*\}", "", rest)
         grid = None
         if not tikzs:
             tikzs, grid, sublabels, rest = self.parse_raster_figure(rest)
@@ -534,11 +708,36 @@ class Parser:
         # what remains is the caption (plus separators like \qquad)
         caption = re.sub(r"\\qquad|\\quad|\\hfill|\\medskip|\\smallskip"
                          r"|\\bigskip", " ", rest).strip()
+        label, numbered, aliases = None, False, []
+        bare = re.sub(r"\\centering|\\hspace\*?\{[^{}]*\}", " ",
+                      caption).strip()
+        if bare.startswith("\\omcaption"):
+            # print layout around quant pictures (\centering, \hspace
+            # between side-by-side pictures)
+            caption = bare
+        if caption.startswith("\\omcaption"):
+            # quant books: \omcaption{text}\label{fig:...} steps the figure
+            # counter ("Figure N.M.") whether or not a label follows
+            gcur = Cursor(caption, self.filename)
+            gcur.i = len("\\omcaption")
+            text = read_group(gcur)
+            after = caption[gcur.i:].strip()
+            labels = re.findall(r"\\label\{([^{}]*)\}", after)
+            if re.sub(r"\\label\{[^{}]*\}", "", after).strip():
+                raise ParseError(f"{self.filename}: unsupported text after "
+                                 f"\\omcaption: {after[:60]!r}")
+            caption, numbered = text, True
+            # a second \label names the same figure (an alias anchor)
+            label, aliases = (labels[0], labels[1:]) if labels else (None, [])
         m2 = re.fullmatch(r"\{\\small\s+(.*)\}", caption, re.S)
         if m2:
             caption = m2.group(1)
-        node = {"t": "figure", "tikzs": tikzs, "label": None,
+        node = {"t": "figure", "tikzs": tikzs, "label": label,
                 "caption": self.parse_inlines(caption)}
+        if numbered:
+            node["numbered"] = True
+        if aliases:
+            node["aliases"] = aliases
         if grid is not None:
             node["grid"] = grid
         if sublabels:
@@ -766,6 +965,21 @@ class Parser:
             cur.i += stripped
             if cur.i >= len(cur.s):
                 break
+            if tables and not cur.s.startswith("\\begin{tabular}", cur.i):
+                # quant books: an unnumbered caption paragraph under the
+                # table(s), still inside the center block
+                caption = re.sub(r"^(\s|\\(par|smallskip|medskip|small"
+                                 r"|footnotesize)\b)*", "",
+                                 cur.s[cur.i:]).strip()
+                m2 = re.fullmatch(r"\{\\(?:small|footnotesize)\s+(.*)\}",
+                                  caption, re.S)
+                if m2:
+                    caption = m2.group(1)
+                table = tables[0] if len(tables) == 1 \
+                    else {"t": "tables", "tables": tables}
+                return {"t": "tablefloat", "table": table, "label": None,
+                        "numbered": False,
+                        "caption": self.parse_inlines(caption)}
             if not cur.s.startswith("\\begin{tabular}", cur.i):
                 raise ParseError(
                     f"{self.filename}: only tabular is supported inside "
@@ -788,7 +1002,14 @@ class Parser:
         rows_raw = split_top_level(body, "\\", self.filename)
         header, rows = None, []
         pending_rule = False
+        booktabs = bool(re.search(r"\\(toprule|midrule|bottomrule)\b", body))
         for raw in rows_raw:
+            # booktabs (quant books): \midrule separates like \hline (after
+            # the first row it marks the header); the outer \toprule /
+            # \bottomrule and partial \cmidrule are print-only
+            raw = re.sub(r"\\(toprule|bottomrule)\b|\\cmidrule(\([a-z]*\))?"
+                         r"\{[^{}]*\}", "", raw)
+            raw = re.sub(r"\\midrule\b", "\\\\hline", raw)
             had_hline = "\\hline" in raw
             raw = raw.replace("\\hline", "").strip()
             if had_hline and len(rows) == 1 and header is None:
@@ -801,8 +1022,14 @@ class Parser:
             rows.append({"cells": self.split_cells(raw),
                          "rule": had_hline or pending_rule})
             pending_rule = False
-        return {"t": "table", "colspec": colspec, "header": header,
+        node = {"t": "table", "colspec": colspec, "header": header,
                 "rows": rows}
+        if booktabs:
+            # booktabs tables (quant books) are text tables: keep the
+            # colspec's column alignment (l/c/r, p{} = left)
+            node["booktabs"] = True
+            node["align"] = column_alignments(colspec, self.filename)
+        return node
 
     def split_cells(self, raw):
         cells, buf = [], []
@@ -833,8 +1060,8 @@ class Parser:
     def parse_cell(self, raw):
         """A table cell; \\multicolumn{n}{spec}{...} becomes one spanning
         node (the emitter turns it into colspan)."""
-        m = re.fullmatch(r"\\multicolumn\{(\d+)\}\{[^{}]*\}\{(.*)\}", raw,
-                         re.S)
+        m = re.fullmatch(r"\\multicolumn\{(\d+)\}\{(?:[^{}]|\{[^{}]*\})*\}"
+                         r"\{(.*)\}", raw, re.S)
         if m:
             return [{"t": "span", "cols": int(m.group(1)),
                      "inl": self.parse_inlines(m.group(2))}]
@@ -951,7 +1178,8 @@ class Parser:
                     # amsmath: "(N.M)" linked, no kind name
                     emit_text()
                     out.append({"t": "eqref", "label": read_group(cur)})
-                elif name == "emph":
+                elif name in ("emph", "textit"):
+                    # \textit (foreign words in some translations) = \emph
                     emit_text()
                     inner = read_group(cur)
                     node = {"t": "emph", "inl": self.parse_inlines(inner),
@@ -990,6 +1218,39 @@ class Parser:
                     text.append("…")
                 elif name == "texteuro":
                     text.append("€")
+                elif name == "euro":
+                    # onequant.sty: \texteuro\, (thin space before the amount)
+                    text.append("€ ")
+                elif name in QUANT_SYMBOLS:
+                    text.append(QUANT_SYMBOLS[name])
+                elif name == "allowbreak":
+                    pass  # line-break hint only
+                elif name == "path":
+                    # url.sty \path{...}: a verbatim file path
+                    emit_text()
+                    out.append({"t": "code",
+                                "inl": [{"t": "text", "s": read_group(cur)}]})
+                elif name == "si":
+                    # siunitx v2 name of \unit
+                    emit_text()
+                    out.append({"t": "math",
+                                "tex": "\\unit{" + read_group(cur) + "}"})
+                elif name == "money":
+                    # \money{USD}{2400000} -> USD 2 400 000
+                    currency = read_group(cur)
+                    text.append(currency + " ")
+                    emit_text()
+                    out.append({"t": "math",
+                                "tex": "\\num{" + read_group(cur) + "}"})
+                elif name == "omfieldlead":
+                    # lead-in of \sfield / \bfield (see parse_blocks)
+                    emit_text()
+                    out.append({"t": "field",
+                                "inl": self.parse_inlines(read_group(cur))})
+                elif name == "ref":
+                    # bare number reference ("chapter~\ref{ch:...}")
+                    emit_text()
+                    out.append({"t": "ref", "label": read_group(cur)})
                 elif name == "quad":
                     text.append(" ")
                 elif name == "qquad":
@@ -998,6 +1259,11 @@ class Parser:
                     emit_text()
                     inner = read_group(cur)
                     out.append({"t": "sup", "inl": self.parse_inlines(inner)})
+                elif name == "textsubscript":
+                    # vitamin B\textsubscript{12}
+                    emit_text()
+                    inner = read_group(cur)
+                    out.append({"t": "sub", "inl": self.parse_inlines(inner)})
                 elif name == "footnote":
                     emit_text()
                     inner = read_group(cur)
@@ -1011,8 +1277,13 @@ class Parser:
                     out.extend(self.parse_inlines(tex_arg))
                 elif name == "checkmark":
                     text.append("✓")
-                elif name in ("hfill", "leavevmode", "centering"):
+                elif name in ("hfill", "leavevmode", "centering",
+                              "begingroup", "endgroup", "sloppy"):
                     pass  # print-layout commands: no HTML equivalent
+                elif name == "ensuremath":
+                    # \ensuremath{\mathrm{CO_2}} in prose = inline math
+                    emit_text()
+                    out.append({"t": "math", "tex": read_group(cur)})
                 elif name == "hspace":
                     read_group(cur)
                     text.append(" ")
@@ -1074,6 +1345,15 @@ class Parser:
             if c == "'":
                 text.append("’")
                 cur.i += 1
+                continue
+            m = ITSHAPE_GROUP.match(s, cur.i) if c == "{" else None
+            if m:
+                # {\small\itshape\color{omIq} Assessor: …} (quant mock
+                # interviews): an italic aside; size and colour are print-only
+                emit_text()
+                inner = ITSHAPE_SWITCHES.sub("", read_group(cur), count=1)
+                out.append({"t": "emph", "inl": self.parse_inlines(inner),
+                            "index": None})
                 continue
             if c in "{}":
                 # bare group braces: transparent (e.g. {27} in prose)

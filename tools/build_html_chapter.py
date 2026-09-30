@@ -75,6 +75,12 @@ KATEX_MACROS = {
     # tombstone, so the marker vanishes from the formula itself
     "\\qedhere": "",
     "\\qed": "",
+    # styles/onequant.sty
+    "\\Var": "\\operatorname{Var}",
+    "\\Cov": "\\operatorname{Cov}",
+    "\\sign": "\\operatorname{sign}",
+    "\\pnl": "\\mathrm{P\\&L}",
+    "\\euro": "\\text{€}\\,",
 }
 
 
@@ -100,6 +106,8 @@ def _clean_math(t):
     """\index{} is print-only metadata; psmallmatrix (mathtools) is
     rewritten to KaTeX-native smallmatrix in parentheses."""
     t = re.sub(r"\\index\{[^{}]*\}", "", t)
+    # \ensuremath{X} inside math is a no-op KaTeX does not know: keep {X}
+    t = t.replace("\\ensuremath", "")
     t = t.replace("\\begin{psmallmatrix}",
                   "\\left(\\begin{smallmatrix}")
     t = t.replace("\\end{psmallmatrix}",
@@ -154,6 +162,24 @@ def collect_figures(blocks, out):
         elif b["t"] == "list":
             for item in b["items"]:
                 collect_figures(item, out)
+
+
+TIKZ_REF_RE = re.compile(r"\\[cC]ref\{([^{}]*)\}")
+
+
+def resolve_tikz_refs(blocks, text_for):
+    """A \\cref in figure text (a pgfplots legend entry of the quant
+    books) cannot resolve in the standalone figure compile: substitute the
+    printed reference text ("Proposition 10.2") into the picture source."""
+    for b in blocks:
+        if b["t"] == "figure":
+            b["tikzs"] = [TIKZ_REF_RE.sub(lambda m: text_for(m.group(1)), src)
+                          for src in b["tikzs"]]
+        elif b["t"] == "env":
+            resolve_tikz_refs(b["body"], text_for)
+        elif b["t"] == "list":
+            for item in b["items"]:
+                resolve_tikz_refs(item, text_for)
 
 
 def main():
@@ -309,15 +335,25 @@ def main():
         return
 
     # ---- figures (deduped by content hash across languages) ------------
+    for lang in langs:
+        e, ext = editions[lang], externals_for(lang)
+
+        def text_for(label, e=e, ext=ext):
+            info = e["labels"].get(label) or ext.get(label)
+            if info is None:
+                sys.exit(f"error: unresolvable \\cref{{{label}}} in a figure")
+            return e["strings"].cref_text(info["kind"], info["number"])
+        resolve_tikz_refs(e["blocks"], text_for)
     svg_dir = Path(args.svg_out) / args.book / ch_key
     builder = FigureBuilder(svg_dir, f"{args.svg_url_prefix}/{args.book}/"
                                      f"{ch_key}")
     figures = {}
+    tikzs = []
     for lang in langs:
-        tikzs = []
         collect_figures(editions[lang]["blocks"], tikzs)
-        for tikz in tikzs:
-            figures[tikz] = builder.figure_info(tikz)
+    builder.prebuild(tikzs)
+    for tikz in tikzs:
+        figures[tikz] = builder.figure_info(tikz)
     print(f"figures: {len(set(f['file'] for f in figures.values()))} file(s) "
           f"for {len(figures)} picture(s)")
 

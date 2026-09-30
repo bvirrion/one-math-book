@@ -103,6 +103,7 @@ def detex(text, where):
     text = re.sub(r"\\textsuperscript\{([A-Za-z]+)\}", superscript, text)
     text = text.replace("\\oe{}", "œ").replace("\\oe ", "œ")
     text = text.replace("\\,", " ")  # thin space, as the chapter parser
+    text = text.replace("\\&", "&")  # P\&L, as the chapter parser
     text = text.replace("---", "—").replace("--", "–").replace("~", " ")
     # same typographic quotes the chapter converter produces
     text = text.replace("``", "“").replace("''", "”")
@@ -121,22 +122,34 @@ def part_dirs(entry_path):
     return dirs
 
 
+PART_RE = re.compile(r"\\part\{\\omstr\{(part\.[a-z0-9.]+)\}\}")
+
+
 def part_of(part_path):
-    """Returns (part_string_key, [chapter file slugs])."""
+    """Returns [(part_string_key, [chapter file slugs]), ...] — one entry
+    per \\part in the file (the quant books group a directory's chapters
+    under several parts, with dotted keys like part.dv.foundations)."""
     text = part_path.read_text(encoding="utf-8")
-    m = re.search(r"\\part\{\\omstr\{(part\.[a-z0-9]+)\}\}", text)
-    if not m:
+    heads = list(PART_RE.finditer(text))
+    if not heads:
         fail(f"{part_path}: no \\part{{\\omstr{{...}}}} line")
-    inputs = re.findall(r"\\ominput\{([a-z0-9-]+)\}\{([0-9]{2}-[a-z0-9-]+)\}",
-                        text)
-    if not inputs:
-        fail(f"{part_path}: no \\ominput lines")
+    if text[:heads[0].start()].count("\\ominput"):
+        fail(f"{part_path}: \\ominput before the first \\part")
     expected_dir = part_path.parent.name
-    for grade_dir, _ in inputs:
-        if grade_dir != expected_dir:
-            fail(f"{part_path}: \\ominput dir {grade_dir!r} does not match "
-                 f"the part directory {expected_dir!r}")
-    return m.group(1), [slug for _, slug in inputs]
+    groups = []
+    for k, head in enumerate(heads):
+        end = heads[k + 1].start() if k + 1 < len(heads) else len(text)
+        inputs = re.findall(
+            r"\\ominput\{([a-z0-9-]+)\}\{([0-9]{2}-[a-z0-9-]+)\}",
+            text[head.end():end])
+        if not inputs:
+            fail(f"{part_path}: no \\ominput lines under {head.group(1)}")
+        for grade_dir, _ in inputs:
+            if grade_dir != expected_dir:
+                fail(f"{part_path}: \\ominput dir {grade_dir!r} does not "
+                     f"match the part directory {expected_dir!r}")
+        groups.append((head.group(1), [slug for _, slug in inputs]))
+    return groups
 
 
 def part_titles(langs):
@@ -148,7 +161,7 @@ def part_titles(langs):
         path = REPO_ROOT / "styles" / "lang" / f"{lang}.tex"
         text = path.read_text(encoding="utf-8")
         for m in re.finditer(
-                r"\\@namedef\{omstr@(part\.[a-z0-9]+)\}\{(.*)\}", text):
+                r"\\@namedef\{omstr@(part\.[a-z0-9.]+)\}\{(.*)\}", text):
             titles.setdefault(m.group(1), {})[lang] = m.group(2)
     return titles
 
@@ -192,33 +205,40 @@ def main():
 
     for part_dir in part_dirs(REPO_ROOT / args.entry):
         part_path = REPO_ROOT / part_dir / "part.tex"
-        string_key, slugs = part_of(part_path)
-        raw_titles = lang_part_titles.get(string_key)
-        if not raw_titles or any(lang not in raw_titles for lang in langs):
-            fail(f"part title {string_key!r} missing for some of {langs}")
-        titles = {lang: detex(raw, f"styles/lang/{lang}.tex {string_key}")
-                  for lang, raw in raw_titles.items() if lang in langs}
-        part_key = part_dir.split("/")[-1]
+        dir_key = part_dir.split("/")[-1]
+        groups = part_of(part_path)
+        for string_key, slugs in groups:
+            raw_titles = lang_part_titles.get(string_key)
+            if not raw_titles or any(lang not in raw_titles for lang in langs):
+                fail(f"part title {string_key!r} missing for some of {langs}")
+            titles = {lang: detex(raw, f"styles/lang/{lang}.tex {string_key}")
+                      for lang, raw in raw_titles.items() if lang in langs}
+            # one part per directory keeps the directory name as its key;
+            # several get dir-<last key segment> (derivatives-foundations)
+            part_key = dir_key if len(groups) == 1 \
+                else f"{dir_key}-{string_key.rsplit('.', 1)[-1]}"
 
-        chapters = []
-        for slug in slugs:
-            number += 1
-            ch_titles, labels = {}, set()
-            for lang in langs:
-                title, label = chapter_title_and_label(part_key, slug, lang)
-                ch_titles[lang] = title
-                labels.add(label)
-            if len(labels) != 1:
-                fail(f"{part_key}/{slug}: \\label differs across languages: "
-                     f"{sorted(labels)}")
-            key = labels.pop().split(":", 1)[1].replace(":", "-")
-            if key in seen_keys:
-                fail(f"duplicate chapter key {key!r}")
-            seen_keys.add(key)
-            chapters.append({"key": key, "number": number,
-                             "titles": ch_titles})
+            chapters = []
+            for slug in slugs:
+                number += 1
+                ch_titles, labels = {}, set()
+                for lang in langs:
+                    title, label = chapter_title_and_label(dir_key, slug,
+                                                           lang)
+                    ch_titles[lang] = title
+                    labels.add(label)
+                if len(labels) != 1:
+                    fail(f"{dir_key}/{slug}: \\label differs across "
+                         f"languages: {sorted(labels)}")
+                key = labels.pop().split(":", 1)[1].replace(":", "-")
+                if key in seen_keys:
+                    fail(f"duplicate chapter key {key!r}")
+                seen_keys.add(key)
+                chapters.append({"key": key, "number": number,
+                                 "titles": ch_titles})
 
-        toc.append({"key": part_key, "titles": titles, "chapters": chapters})
+            toc.append({"key": part_key, "titles": titles,
+                        "chapters": chapters})
 
     # ---- consistency with the published chapters -----------------------
     by_key = {c["key"]: c for part in toc for c in part["chapters"]}
