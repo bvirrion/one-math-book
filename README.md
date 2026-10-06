@@ -18,8 +18,10 @@
 > **One Math Book** is part of the **One Course** project — one coherent
 > course covering each subject from kindergarten to the end of the
 > bachelor's degree. Discover the whole project at
-> **[www.one-course.com](https://www.one-course.com)**, and see the sibling
-> [One Physics Book](https://github.com/bvirrion/one-physics-book).
+> **[www.one-course.com](https://www.one-course.com)**, and see the siblings
+> [One Physics Book](https://github.com/bvirrion/one-physics-book),
+> [One Biology Book](https://github.com/bvirrion/one-biology-book) and
+> [One Quant Book](https://github.com/bvirrion/one-quant-book).
 
 A series of five **free mathematics textbooks** forming a single coherent
 course **from Grade 1 to the end of the bachelor's degree** — one
@@ -54,15 +56,14 @@ solution.
 
 | Book | Read online | Download PDF |
 |------|-------------|--------------|
-| **1. Primary & Middle School** (Grades 1–9) | [EN](https://www.one-course.com/books/math/1/en) · [ES](https://www.one-course.com/books/math/1/es) · [FR](https://www.one-course.com/books/math/1/fr) · [NL](https://www.one-course.com/books/math/1/nl) | [EN](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_1_primary_middle_school.pdf) · [ES](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_1_primary_middle_school_es.pdf) · [FR](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_1_primary_middle_school_fr.pdf) · [HI](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_1_primary_middle_school_hi.pdf) · [AR](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_1_primary_middle_school_ar.pdf) · [ID](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_1_primary_middle_school_id.pdf) · [NL](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_1_primary_middle_school_nl.pdf) · [PT](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_1_primary_middle_school_pt.pdf) |
-| **2. High School** (Grades 10–12) | [EN](https://www.one-course.com/books/math/2/en) · [ES](https://www.one-course.com/books/math/2/es) · [FR](https://www.one-course.com/books/math/2/fr) · [NL](https://www.one-course.com/books/math/2/nl) | [EN](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_2_high_school.pdf) · [ES](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_2_high_school_es.pdf) · [FR](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_2_high_school_fr.pdf) · [HI](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_2_high_school_hi.pdf) · [AR](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_2_high_school_ar.pdf) · [ID](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_2_high_school_id.pdf) · [NL](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_2_high_school_nl.pdf) · [PT](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_2_high_school_pt.pdf) |
-| **3. University — Year 1** | [EN](https://www.one-course.com/books/math/3/en) · [ES](https://www.one-course.com/books/math/3/es) · [FR](https://www.one-course.com/books/math/3/fr) · [NL](https://www.one-course.com/books/math/3/nl) | [EN](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_3_university_year_1.pdf) · [ES](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_3_university_year_1_es.pdf) · [FR](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_3_university_year_1_fr.pdf) · [HI](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_3_university_year_1_hi.pdf) · [AR](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_3_university_year_1_ar.pdf) · [ID](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_3_university_year_1_id.pdf) · [NL](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_3_university_year_1_nl.pdf) · [PT](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_3_university_year_1_pt.pdf) |
-| **4. University — Year 2** | [EN](https://www.one-course.com/books/math/4/en) · [ES](https://www.one-course.com/books/math/4/es) · [FR](https://www.one-course.com/books/math/4/fr) · [NL](https://www.one-course.com/books/math/4/nl) | [EN](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_4_university_year_2.pdf) · [ES](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_4_university_year_2_es.pdf) · [FR](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_4_university_year_2_fr.pdf) · [HI](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_4_university_year_2_hi.pdf) · [AR](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_4_university_year_2_ar.pdf) · [ID](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_4_university_year_2_id.pdf) · [NL](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_4_university_year_2_nl.pdf) · [PT](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_4_university_year_2_pt.pdf) |
-| **5. University — Year 3** | [EN](https://www.one-course.com/books/math/5/en) · [ES](https://www.one-course.com/books/math/5/es) · [FR](https://www.one-course.com/books/math/5/fr) · [NL](https://www.one-course.com/books/math/5/nl) | [EN](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_5_university_year_3.pdf) · [ES](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_5_university_year_3_es.pdf) · [FR](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_5_university_year_3_fr.pdf) · [HI](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_5_university_year_3_hi.pdf) · [AR](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_5_university_year_3_ar.pdf) · [ID](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_5_university_year_3_id.pdf) · [NL](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_5_university_year_3_nl.pdf) · [PT](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_5_university_year_3_pt.pdf) |
+| **1. Primary & Middle School** (Grades 1–9) | [EN](https://www.one-course.com/books/math/1/en) · [ES](https://www.one-course.com/books/math/1/es) · [FR](https://www.one-course.com/books/math/1/fr) · [HI](https://www.one-course.com/books/math/1/hi) · [AR](https://www.one-course.com/books/math/1/ar) · [ID](https://www.one-course.com/books/math/1/id) · [NL](https://www.one-course.com/books/math/1/nl) · [PT](https://www.one-course.com/books/math/1/pt) | [EN](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_1_primary_middle_school.pdf) · [ES](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_1_primary_middle_school_es.pdf) · [FR](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_1_primary_middle_school_fr.pdf) · [HI](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_1_primary_middle_school_hi.pdf) · [AR](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_1_primary_middle_school_ar.pdf) · [ID](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_1_primary_middle_school_id.pdf) · [NL](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_1_primary_middle_school_nl.pdf) · [PT](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_1_primary_middle_school_pt.pdf) |
+| **2. High School** (Grades 10–12) | [EN](https://www.one-course.com/books/math/2/en) · [ES](https://www.one-course.com/books/math/2/es) · [FR](https://www.one-course.com/books/math/2/fr) · [HI](https://www.one-course.com/books/math/2/hi) · [AR](https://www.one-course.com/books/math/2/ar) · [ID](https://www.one-course.com/books/math/2/id) · [NL](https://www.one-course.com/books/math/2/nl) · [PT](https://www.one-course.com/books/math/2/pt) | [EN](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_2_high_school.pdf) · [ES](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_2_high_school_es.pdf) · [FR](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_2_high_school_fr.pdf) · [HI](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_2_high_school_hi.pdf) · [AR](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_2_high_school_ar.pdf) · [ID](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_2_high_school_id.pdf) · [NL](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_2_high_school_nl.pdf) · [PT](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_2_high_school_pt.pdf) |
+| **3. University — Year 1** | [EN](https://www.one-course.com/books/math/3/en) · [ES](https://www.one-course.com/books/math/3/es) · [FR](https://www.one-course.com/books/math/3/fr) · [HI](https://www.one-course.com/books/math/3/hi) · [AR](https://www.one-course.com/books/math/3/ar) · [ID](https://www.one-course.com/books/math/3/id) · [NL](https://www.one-course.com/books/math/3/nl) · [PT](https://www.one-course.com/books/math/3/pt) | [EN](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_3_university_year_1.pdf) · [ES](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_3_university_year_1_es.pdf) · [FR](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_3_university_year_1_fr.pdf) · [HI](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_3_university_year_1_hi.pdf) · [AR](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_3_university_year_1_ar.pdf) · [ID](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_3_university_year_1_id.pdf) · [NL](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_3_university_year_1_nl.pdf) · [PT](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_3_university_year_1_pt.pdf) |
+| **4. University — Year 2** | [EN](https://www.one-course.com/books/math/4/en) · [ES](https://www.one-course.com/books/math/4/es) · [FR](https://www.one-course.com/books/math/4/fr) · [HI](https://www.one-course.com/books/math/4/hi) · [AR](https://www.one-course.com/books/math/4/ar) · [ID](https://www.one-course.com/books/math/4/id) · [NL](https://www.one-course.com/books/math/4/nl) · [PT](https://www.one-course.com/books/math/4/pt) | [EN](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_4_university_year_2.pdf) · [ES](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_4_university_year_2_es.pdf) · [FR](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_4_university_year_2_fr.pdf) · [HI](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_4_university_year_2_hi.pdf) · [AR](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_4_university_year_2_ar.pdf) · [ID](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_4_university_year_2_id.pdf) · [NL](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_4_university_year_2_nl.pdf) · [PT](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_4_university_year_2_pt.pdf) |
+| **5. University — Year 3** | [EN](https://www.one-course.com/books/math/5/en) · [ES](https://www.one-course.com/books/math/5/es) · [FR](https://www.one-course.com/books/math/5/fr) · [HI](https://www.one-course.com/books/math/5/hi) · [AR](https://www.one-course.com/books/math/5/ar) · [ID](https://www.one-course.com/books/math/5/id) · [NL](https://www.one-course.com/books/math/5/nl) · [PT](https://www.one-course.com/books/math/5/pt) | [EN](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_5_university_year_3.pdf) · [ES](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_5_university_year_3_es.pdf) · [FR](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_5_university_year_3_fr.pdf) · [HI](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_5_university_year_3_hi.pdf) · [AR](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_5_university_year_3_ar.pdf) · [ID](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_5_university_year_3_id.pdf) · [NL](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_5_university_year_3_nl.pdf) · [PT](https://github.com/bvirrion/one-math-book/releases/latest/download/one_math_book_5_university_year_3_pt.pdf) |
 
-The PDF links always point at the newest release; the Indonesian PDFs join it
-at the next tagged release, and the Arabic, Hindi, Indonesian and Portuguese
-online editions are coming to the reader soon. Spotted a
+All eight editions of every book can be read online, chapter by chapter, and
+the PDF links always point at the newest release. Spotted a
 mistake in any book? Please
 [report an erratum](https://github.com/bvirrion/one-math-book/issues/new?template=errata.yml) —
 fixes usually ship within days.
@@ -85,12 +86,12 @@ fixes usually ship within days.
 | High School | Grade 12 (age 17–18) | Final year of secondary school, advanced track | ✅ 16 chapters, exercises + solutions |
 | University — Year 1 | Bachelor Year 1 (age 18–19) | First post-secondary year (old French MPSI program) | ✅ 25 chapters, exercises + solutions |
 | University — Year 2 | Bachelor Year 2 (age 19–20) | Second post-secondary year (French MP* program) | ✅ 23 chapters, exercises + solutions |
-| University — Year 3 | Bachelor Year 3 (age 20–21) | Third post-secondary year (French math L3 program) | ✅ 21 chapters, exercises + weekend problems + solutions |
+| University — Year 3 | Bachelor Year 3 (age 20–21) | Third post-secondary year (French math L3 program) | ✅ 23 chapters, exercises + weekend problems + solutions |
 | Other | Kindergarten | | 🚧 planned |
 
 **Translations** — all five books exist as complete editions (same
 chapter sets, same labels, same figures) in **French, Dutch, Spanish,
-Portuguese, Hindi and Arabic**, alongside the canonical English.
+Portuguese, Hindi, Arabic and Indonesian**, alongside the canonical English.
 
 The lower the grade, the younger the reader it is written for: earlier
 parts use more figures, more detailed worked steps, and gentler
@@ -113,7 +114,7 @@ build/one_math_book_<N>_<slug>[_<lang>].pdf
 
 with `N` = 1–5, `slug` ∈ {`primary_middle_school`, `high_school`,
 `university_year_1`, `university_year_2`, `university_year_3`} and
-`lang` ∈ {`fr`, `nl`, `es`, `pt`, `hi`, `ar`} (no suffix for English) — 35
+`lang` ∈ {`fr`, `nl`, `es`, `pt`, `hi`, `ar`, `id`} (no suffix for English) — 40
 PDFs in total. The Hindi editions compile with XeLaTeX (Devanagari) and
 the Arabic editions with LuaLaTeX (right-to-left,
 fonts bundled under `assets/fonts/`); everything else is pdflatex.
@@ -132,7 +133,7 @@ UI strings come from `styles/lang/<lang>.tex`.
 ```
 one_math_book_<N>_*.tex      entry file per book / language (N = series number)
 styles/onemath.sty           packages, theorem environments, macros
-styles/lang/<lang>.tex       UI strings (en, fr, nl, es, pt, hi)
+styles/lang/<lang>.tex       UI strings (en, fr, nl, es, pt, hi, ar, id)
 frontmatter/                 title page, preface (shared layout)
 parts/<year>/part.tex        shared structure for a school year
 parts/<year>/NN-*.tex        English chapter
@@ -156,8 +157,7 @@ when you spot a mistake.
 
 ## License
 
-© 2026 Benjamin Virrion.
-
+- **How to credit**: One Math Book, One Course (one-course.com).
 - **Book content** — the LaTeX sources, figures, and the PDF and HTML editions — is licensed under
   [Creative Commons Attribution-NonCommercial-ShareAlike 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
   (CC BY-NC-SA 4.0): you may share and adapt it, including translating it, with credit to
@@ -166,7 +166,7 @@ when you spot a mistake.
 - **Third-party material** (photographs, public-domain images, bundled fonts) keeps its own licence, as listed in
   the books' image-credit pages.
 - **Names and logos**: "One Course" and "One Math Book" are not covered by these licences.
-- **Commercial use** (print editions, licences for schools, publishers or companies): contact the author.
+- **Commercial use** (print editions, licences for schools, publishers or companies): contact One Course via [one-course.com/contact](https://one-course.com/contact).
 
 Contributions are accepted under these licences with a signed-off commit — see
 [`CONTRIBUTING.md`](CONTRIBUTING.md#licensing-of-contributions).
