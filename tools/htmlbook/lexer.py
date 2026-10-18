@@ -44,6 +44,16 @@ LIST_ENVS = ("itemize", "enumerate")
 # dated{YYYY-MM}{title}, strategyfile{title}, predictorcard{title}.
 QUANT_BOXES = {"dated": 2, "strategyfile": 1, "predictorcard": 1,
                "tutorial": 0, "build": 0}
+# Chemistry-book asides (styles/onechemistry.sty), unnumbered: recall (no
+# argument), inthelab/history ([optional title]), safety ({GHS pictograms}).
+ASIDE_BOXES = ("recall", "inthelab", "history", "safety")
+# Pictures that are not tikzpicture environments (chemistry books): a
+# chemfig reaction scheme, a molecular-orbital diagram, the periodic table,
+# a lone structure. Compiled like a tikzpicture, from their raw source.
+CHEM_PICTURE = re.compile(
+    r"\\begin\{(tikzpicture|circuitikz|MOdiagram)\}"
+    r"|\\(schemestart|omperiodictable|chemfig|setchemfig"
+    r"|tdplotsetmaincoords)(?![a-zA-Z])")
 
 
 class ParseError(Exception):
@@ -142,6 +152,8 @@ CMD_RE = re.compile(r"\\([a-zA-Z]+)\s*")
 QUANT_SYMBOLS = {
     "pounds": "£", "textyen": "¥", "textdegree": "°", "textmu": "µ",
     "textquotedbl": '"', "textvisiblespace": "␣",
+    # chemistry books
+    "AA": "\u00c5", "textperthousand": "\u2030",
 }
 # An italic aside group: {\small\itshape\color{omIq} ...}
 ITSHAPE_GROUP = re.compile(r"\{\s*(?:\\(?:small|footnotesize)\s*)?\\itshape\b")
@@ -268,6 +280,9 @@ class Parser:
         self.filename = filename
         self.chapter_title = None      # inline list
         self.chapter_label = None
+        # \setchemfig{...} in force (chemistry books): prefixed to the
+        # source of every chemfig picture that follows it
+        self.chem_setup = ""
         text = strip_comments(text)
         self.cur = Cursor(text, filename)
 
@@ -371,6 +386,16 @@ class Parser:
                     cur.i += m.end() - 1
                     blocks.append(self.parse_listing(cur))
                     continue
+                m = re.match(r"\\(setchemfig|tdplotsetmaincoords)\s*\{",
+                             s[cur.i:])
+                if m:
+                    # chemfig settings / tikz-3dplot view: they apply to
+                    # the pictures that follow
+                    cur.i += m.end() - 1
+                    self.chem_setup += f"\\{m.group(1)}" + "".join(
+                        "{" + read_group(cur) + "}"
+                        for _ in range(2 if m.group(1)[0] == "t" else 1))
+                    continue
                 m = re.match(r"\\admitted\b", s[cur.i:])
                 if m:
                     # zero-arg macro: a whole "Admitted at this level" proof
@@ -384,7 +409,8 @@ class Parser:
                     # trailing space consumed as a command's would be
                     cur.i += m.end()
                     continue
-                m = re.match(r"\\(medskip|smallskip|bigskip|noindent|par)\b",
+                m = re.match(r"\\(medskip|smallskip|bigskip|noindent|par"
+                             r"|clearpage)\b",
                              s[cur.i:])
                 if m:
                     # purely presentational in print; paragraph flow in HTML
@@ -441,7 +467,11 @@ class Parser:
                         "textsubscript": 1,
                         "H": 1, "c": 1, "v": 1, "textsc": 1,
                         "path": 1, "si": 1, "money": 2,
-                        "omfieldlead": 1}.get(name, 0)
+                        "omfieldlead": 1,
+                        "ce": 1, "pu": 1, "cip": 1, "termsym": 3, "kv": 3,
+                        "chemfig": 1, "omorbs": 1, "babelsublr": 1,
+                        "url": 1, "enlargethispage": 1,
+                        "foreignlanguage": 2, "mbox": 1}.get(name, 0)
             if name in ("H", "c", "v") \
                     and (cur.i >= len(s) or s[cur.i] != "{"):
                 n_groups = 0  # bare-letter accent form (\v S)
@@ -492,6 +522,8 @@ class Parser:
                 label = m.group(1)
                 body = body[:m.start()] + body[m.end():]
             return {"t": "dmath", "tex": body.strip(), "label": label}
+        if name == "equation*":
+            return {"t": "dmath", "tex": find_env_end(cur, name).strip()}
         if name in ("align*", "gather*"):
             # display-math blocks; KaTeX renders them natively in display
             # mode, so keep the whole environment verbatim
@@ -507,6 +539,17 @@ class Parser:
             return self.parse_figure(body, floated=True)
         if name == "center":
             body = find_env_end(cur, "center")
+            if "\\begin{tabular}" not in body and CHEM_PICTURE.search(body):
+                # a picture centred in the text (chemistry exercises): a
+                # figure without caption
+                pictures, rest = self.take_pictures(body)
+                if self.FIGURE_SPACING.sub("", rest).strip():
+                    # structures with their names set under them: one
+                    # picture, as composed in print
+                    pictures = ["\\centering\n" + self.chem_setup
+                                + body.strip()]
+                return {"t": "figure", "tikzs": pictures, "label": None,
+                        "caption": []}
             return self.parse_center(body)
         if name == "table":
             read_optional(cur)  # float placement: print-only
@@ -546,12 +589,59 @@ class Parser:
             return {"t": "env", "kind": name, "title": title, "label": label,
                     "difficulty": None, "sol_key": None, "asof": asof,
                     "body": body_blocks}
+        if name in ASIDE_BOXES:
+            title, pics = None, []
+            if name == "safety":
+                arg = read_group(cur)
+                gcur = Cursor(arg, self.filename)
+                while gcur.i < len(arg):
+                    m = re.match(r"(\s|\\q?quad\b|\\,)*\\ghs\b\s*",
+                                 arg[gcur.i:])
+                    if not m:
+                        if arg[gcur.i:].strip():
+                            gcur.err("safety pictograms: only \\ghs allowed")
+                        break
+                    gcur.i += m.end()
+                    pics.append({"t": "pic", "src": self.chem_setup
+                                 + self.picture_command(gcur, "ghs")})
+            elif name != "recall":
+                opt = read_optional(cur)
+                if opt and opt.strip():
+                    title = self.parse_inlines(opt.strip())
+            body = find_env_end(cur, name)
+            widths, side = None, "start"
+            if self.MINIPAGE.search(body):
+                # a portrait beside the text: photo minipage(s), then (or
+                # before) one text minipage
+                pics, widths, side, body = self.parse_aside_minipages(body)
+            body_blocks = self.parse_blocks(body)
+            return {"t": "env", "kind": name, "title": title, "label": None,
+                    "difficulty": None, "sol_key": None, "pics": pics,
+                    "pic_widths": widths, "pics_side": side,
+                    "body": body_blocks}
+        if name == "MOdiagram":
+            # a molecular-orbital diagram outside an omfigure
+            start = cur.i - len("\\begin{MOdiagram}")
+            find_env_end(cur, name)
+            return {"t": "figure", "label": None, "caption": [],
+                    "tikzs": [self.chem_setup + s[start:cur.i]]}
+        if name == "omchartable":
+            # {group}{class colspec}{class headers}: a math array (the
+            # style file sets it in $…$ inside a center block)
+            group, colspec, heads = [read_group(cur) for _ in range(3)]
+            rows = find_env_end(cur, name)
+            return {"t": "dmath", "tex": (
+                f"\\begin{{array}}{{l|{colspec}|l|l}}\\hline {group} & "
+                f"{heads} & & \\\\ \\hline {rows} \\hline\\end{{array}}")}
         if name in LIST_ENVS:
             opt = read_optional(cur)
             resume = bool(opt) and "resume" in opt
-            if opt and opt.strip() not in ("resume",):
-                raise ParseError(
-                    f"{self.filename}: unsupported list option [{opt}]")
+            for o in (opt or "").split(","):
+                # beginpenalty (chemistry): a print page-break hint
+                if o.strip() and o.strip() != "resume" \
+                        and not re.fullmatch(r"beginpenalty=\d+", o.strip()):
+                    raise ParseError(
+                        f"{self.filename}: unsupported list option [{opt}]")
             body = find_env_end(cur, name)
             chunks = split_top_level(body, "item", self.filename)
             if chunks[0].strip():
@@ -640,7 +730,43 @@ class Parser:
         return {"t": "tablefloat", "table": table, "caption": caption,
                 "label": label, "numbered": mcap is not None}
 
+    FIGURE_SETUP = re.compile(
+        r"\\(setchemfig|tdplotsetmaincoords|pgfplotsset)\s*\{")
+
     def parse_figure(self, body, floated=False):
+        """Figure-level settings before the pictures (chemistry books:
+        \\pgfplotsset styles, \\setchemfig, the tikz-3dplot view) are
+        prefixed to every picture of the figure, minipages included."""
+        saved = self.chem_setup
+        pictures = [(m.start(), m.end()) for m in re.finditer(
+            r"\\begin\{(tikzpicture|circuitikz)\}.*?\\end\{\1\}", body,
+            re.S)]
+        pos = 0
+        while True:
+            m = self.FIGURE_SETUP.search(body, pos)
+            if not m:
+                break
+            if any(a <= m.start() < b for a, b in pictures):
+                pos = m.end()
+                continue
+            cur = Cursor(body, self.filename)
+            cur.i = m.end() - 1
+            groups = 2 if m.group(1) == "tdplotsetmaincoords" else 1
+            setup = f"\\{m.group(1)}" + "".join(
+                "{" + read_group(cur) + "}" for _ in range(groups))
+            self.chem_setup += setup
+            body = body[:m.start()] + body[cur.i:]
+            shift = cur.i - m.start()
+            pictures = [(a - shift if a > m.start() else a,
+                         b - shift if b > m.start() else b)
+                        for a, b in pictures]
+            pos = m.start()
+        try:
+            return self.parse_figure_body(body, floated)
+        finally:
+            self.chem_setup = saved
+
+    def parse_figure_body(self, body, floated=False):
         """An omfigure holds one or more pictures — tikzpictures, or raster
         photos via \\includegraphics (side-by-side pictures are separated by
         \\qquad/\\quad) — plus a {\\small ...} caption.
@@ -653,32 +779,41 @@ class Parser:
         {\\footnotesize label} cells (physics-1 solar system) — parsed into
         "grid" = [[{"src", "label"}, ...], ...]."""
         tikzs, widths, sublabels = [], {}, {}
+        table = None
         rest = body
-        if "\\begin{minipage}" in rest:
+        composed = self.composed_picture(rest)
+        if composed:
+            tikzs, rest = [composed[0]], composed[1]
+        elif "\\begin{minipage}" in rest:
             # side-by-side sub-figures, each in a minipage (biology)
-            tikzs, widths, sublabels, rest = self.parse_minipage_figure(rest)
-        while True:
-            m = re.search(r"\\begin\{(tikzpicture|circuitikz)\}", rest)
-            if not m:
-                break
-            end_pat = f"\\end{{{m.group(1)}}}"
-            e = rest.find(end_pat, m.start())
-            if e < 0:
-                raise ParseError(
-                    f"{self.filename}: missing {end_pat}")
-            tikzs.append(rest[m.start():e + len(end_pat)])
-            rest = rest[:m.start()] + rest[e + len(end_pat):]
+            tikzs, widths, sublabels, table, rest = \
+                self.parse_minipage_figure(rest)
+        pictures, rest = self.take_pictures(rest)
+        tikzs += pictures
         # \resizebox{\linewidth}{!}{<picture>}: print-only fit to the text
         # width — the SVG scales to its column by itself
         rest = re.sub(r"\\resizebox\{[^{}]*\}\{[^{}]*\}\{\s*\}", "", rest)
         grid = None
         if not tikzs:
             tikzs, grid, sublabels, rest = self.parse_raster_figure(rest)
-        table = None
         if not tikzs and re.search(r"\\begin\{(center|tabular)\}", rest):
             # a table set as a figure (the genetic-code table)
             table, rest = self.parse_table_figure(rest)
+        math = None
         if not tikzs and table is None:
+            mm = re.search(r"\\begin\{(align\*|equation\*|gather\*)\}", rest)
+            if mm:
+                end_pat = f"\\end{{{mm.group(1)}}}"
+                e = rest.find(end_pat, mm.start())
+                if e < 0:
+                    raise ParseError(f"{self.filename}: missing {end_pat}")
+                e += len(end_pat)
+                math = rest[mm.start():e]
+                if mm.group(1) == "equation*":
+                    math = math[len("\\begin{equation*}"):
+                                -len("\\end{equation*}")].strip()
+                rest = rest[:mm.start()] + rest[e:]
+        if not tikzs and table is None and math is None:
             raise ParseError(
                 f"{self.filename}: omfigure without tikzpicture, "
                 "\\includegraphics or tabular")
@@ -707,7 +842,11 @@ class Parser:
                     "caption": self.parse_inlines(caption_text)}
         # what remains is the caption (plus separators like \qquad)
         caption = re.sub(r"\\qquad|\\quad|\\hfill|\\medskip|\\smallskip"
-                         r"|\\bigskip", " ", rest).strip()
+                         r"|\\bigskip|\\par\b|\\footnotesize\b"
+                         r"|\\vspace\*?\{[^{}]*\}"
+                         r"|\\setlength\{\\tabcolsep\}\{[^{}]*\}"
+                         r"|\\renewcommand\{\\arraystretch\}\{[\d.]+\}",
+                         " ", rest).strip()
         label, numbered, aliases = None, False, []
         bare = re.sub(r"\\centering|\\hspace\*?\{[^{}]*\}", " ",
                       caption).strip()
@@ -746,6 +885,8 @@ class Parser:
             node["widths"] = widths
         if table is not None:
             node["table"] = table
+        if math is not None:
+            node["math"] = math
         return node
 
     # The books' text width (a4paper, inner/outer 2.2cm): minipage widths
@@ -765,6 +906,7 @@ class Parser:
         gets a matching \\linewidth prefix so `width=0.9\\linewidth`
         pictures inside it keep their print proportion."""
         tikzs, widths, sublabels = [], {}, {}
+        table = None
         rest = body
         while True:
             m = self.MINIPAGE.search(rest)
@@ -775,22 +917,32 @@ class Parser:
             inner = find_env_end(cur, "minipage")
             rest = rest[:m.start()] + rest[cur.i:]
             width = float(m.group(1))
-            pm = re.search(r"\\begin\{(tikzpicture|circuitikz)\}", inner)
-            if pm:
-                end_pat = f"\\end{{{pm.group(1)}}}"
-                e = inner.find(end_pat, pm.start())
-                if e < 0:
-                    raise ParseError(f"{self.filename}: missing {end_pat}")
-                e += len(end_pat)
+            pics, after = self.take_pictures(inner)
+            if len(pics) > 1:
+                # pictures stacked in one column (chemistry spectra): one
+                # picture, set in a minipage of the printed width
+                src = (f"\\begin{{minipage}}{{{width}\\linewidth}}"
+                       "\\centering\n" + "\\par\n".join(pics)
+                       + "\n\\end{minipage}")
+                inner = after
+            elif pics:
                 src = (f"\\setlength{{\\linewidth}}"
                        f"{{{round(width * self.TEXT_WIDTH_PT)}pt}}%\n"
-                       + inner[pm.start():e])
-                inner = inner[:pm.start()] + inner[e:]
+                       + pics[0])
+                inner = after
             else:
                 im = self.INCLUDEGRAPHICS.search(inner)
+                if not im and "\\begin{tabular}" in inner and table is None:
+                    # a table beside the picture (chemistry statistics)
+                    table = self.parse_center(re.sub(
+                        r"\\centering|\\vspace\{0pt\}", " ", inner))
+                    continue
                 if not im:
-                    raise ParseError(
-                        f"{self.filename}: minipage without a picture")
+                    # the text beside a picture (a portrait's legend):
+                    # it is the figure's caption
+                    rest = rest[:m.start()] + re.sub(
+                        r"^\s*\\vspace\{0pt\}", "", inner) + rest[m.start():]
+                    continue
                 src = im.group(0)
                 inner = inner[:im.start()] + inner[im.end():]
             idx = len(tikzs)
@@ -805,7 +957,46 @@ class Parser:
                 sub = m2.group(1)
             if sub:
                 sublabels[idx] = self.parse_inlines(sub)
-        return tikzs, widths, sublabels, rest
+        return tikzs, widths, sublabels, table, rest
+
+    def parse_aside_minipages(self, body):
+        """A box body made of side-by-side minipages: picture ones (one
+        \\includegraphics each) and exactly one text minipage. Returns
+        (pic nodes, their widths, "start"|"end" = side of the pictures,
+        the text)."""
+        pics, widths, texts, first = [], [], [], None
+        rest = body
+        while True:
+            m = self.MINIPAGE.search(rest)
+            if not m:
+                break
+            cur = Cursor(rest, self.filename)
+            cur.i = m.end()
+            inner = find_env_end(cur, "minipage")
+            rest = rest[:m.start()] + rest[cur.i:]
+            inner = re.sub(r"^\s*\\vspace\{0pt\}", "", inner)
+            im = self.INCLUDEGRAPHICS.search(inner)
+            if im:
+                # the photo, with an optional {\footnotesize legend}
+                legend = re.sub(r"\\par\b|\\centering|\\smallskip", " ",
+                                inner[:im.start()] + inner[im.end():]).strip()
+                m2 = re.fullmatch(r"\{\\(?:footnotesize|small|scriptsize)"
+                                  r"\s+(.*)\}", legend, re.S)
+                if m2:
+                    legend = m2.group(1)
+                pics.append({"t": "pic", "src": im.group(0),
+                             "caption": self.parse_inlines(legend)
+                             if legend else None})
+                widths.append(float(m.group(1)))
+                first = first or "pics"
+            else:
+                texts.append(inner)
+                first = first or "text"
+        leftover = re.sub(r"\\hfill|\\hspace\{[^{}]*\}|\\par\b", "", rest)
+        if len(texts) != 1 or not pics or leftover.strip():
+            raise ParseError(f"{self.filename}: unsupported minipage layout "
+                             "in a box")
+        return pics, widths, "start" if first == "pics" else "end", texts[0]
 
     def parse_table_figure(self, body):
         """An omfigure whose picture is a tabular (in a center block or
@@ -948,9 +1139,14 @@ class Parser:
         are separated by \\qquad), optionally after an \\arraystretch
         row-height tweak (print-only; CSS handles it in HTML)."""
         body = body.strip()
-        body = re.sub(r"^\\renewcommand\{\\arraystretch\}\{[\d.]+\}\s*",
-                      "", body)
-        body = re.sub(r"^\\small\s+", "", body)  # print-only sizing
+        while True:
+            # print-only row height and sizing, in either order
+            stripped = re.sub(r"^\\renewcommand\{\\arraystretch\}"
+                              r"\{[\d.]+\}\s*", "", body)
+            stripped = re.sub(r"^\\small\s+", "", stripped)
+            if stripped == body:
+                break
+            body = stripped
         if "\\begin{tabular}" not in body:
             # a centred line of text (a displayed DNA sequence)
             return {"t": "centered", "inl": self.parse_inlines(body)}
@@ -1004,6 +1200,8 @@ class Parser:
         pending_rule = False
         booktabs = bool(re.search(r"\\(toprule|midrule|bottomrule)\b", body))
         for raw in rows_raw:
+            # \\[8pt] row spacing leaves its [length] on the next row
+            raw = re.sub(r"^\s*\[-?[\d.]+\s*(?:pt|ex|em|mm|cm)\]", "", raw)
             # booktabs (quant books): \midrule separates like \hline (after
             # the first row it marks the header); the outer \toprule /
             # \bottomrule and partial \cmidrule are print-only
@@ -1082,6 +1280,114 @@ class Parser:
             cur.err(f"unsupported accent argument {inner!r}")
         return unicodedata.normalize("NFC", inner + combining)
 
+    def picture_command(self, cur, name):
+        """Raw source of an inline picture command, cursor past its name:
+        \\chemfig{…}, \\omorbs{…}, \\ghs[size]{GHSnn}, or \\tikz followed by
+        a {…} group or one path up to its `;`."""
+        opt = read_optional(cur)
+        src = f"\\{name}" + (f"[{opt}]" if opt is not None else "")
+        if name != "tikz" or cur.s[cur.i:cur.i + 1] == "{":
+            return src + "{" + read_group(cur) + "}"
+        start, depth = cur.i, 0
+        while cur.i < len(cur.s):
+            c = cur.s[cur.i]
+            if c == "\\":
+                cur.i += 2
+                continue
+            depth += {"{": 1, "}": -1}.get(c, 0)
+            cur.i += 1
+            if c == ";" and depth == 0:
+                return src + cur.s[start:cur.i]
+        cur.err("\\tikz path without a closing ';'")
+
+    FIGURE_SPACING = re.compile(
+        r"\\(?:qquad|quad|hfill|medskip|smallskip|bigskip|par|centering)\b"
+        r"|\\[hv]space\*?\{[^{}]*\}")
+
+    def composed_picture(self, body):
+        """A chemistry figure composed by hand — structures, math arrows,
+        "+" signs and \\chemmove arrows joining them — is one picture: its
+        whole source up to the closing {\\small caption} compiles at once.
+        Returns (source, caption) or None for every other figure."""
+        bare = re.sub(r"\\begin\{(tikzpicture|circuitikz)\}.*?\\end\{\1\}",
+                      "", body, flags=re.S)
+        if not re.search(r"\\(chemfig|schemestart|chemmove|newcommand)\b",
+                         bare) \
+                or ("\\begin{minipage}" in body
+                    and "\\newcommand" not in body):
+            return None
+        pic, caption = body.rstrip(), ""
+        for m in re.finditer(r"\{\\small\b", pic):
+            cur = Cursor(pic, self.filename)
+            cur.i = m.start()
+            read_group(cur)
+            if not pic[cur.i:].strip():
+                # the closing {\small …} group is the caption
+                pic, caption = pic[:m.start()], pic[m.start():]
+                break
+        _, leftover = self.take_pictures(pic)
+        if not self.FIGURE_SPACING.sub("", leftover).strip() \
+                and "\\chemmove" not in bare:
+            # pictures side by side: the usual path (but \chemmove arrows
+            # may join nodes of neighbouring structures: one picture)
+            return None
+        return "\\centering\n" + self.chem_setup + pic.strip(), caption
+
+    def take_pictures(self, body):
+        """Split the pictures out of a figure body, in document order:
+        tikzpicture/circuitikz environments as they are, and the chemistry
+        books' MOdiagram, reaction scheme (\\schemestart…\\schemestop, with
+        the \\chemmove arrows drawn on it), \\omperiodictable and lone
+        \\chemfig structures; a \\setchemfig before them is prefixed to the
+        source of each. Returns (sources, rest)."""
+        sources, setup, rest = [], self.chem_setup, body
+        pos = 0
+        while True:
+            m = CHEM_PICTURE.search(rest, pos)
+            if not m:
+                break
+            env, cmd = m.group(1), m.group(2)
+            cur = Cursor(rest, self.filename)
+            cur.i = m.end()
+            if env:
+                end_pat = f"\\end{{{env}}}"
+                e = rest.find(end_pat, m.start())
+                if e < 0:
+                    raise ParseError(f"{self.filename}: missing {end_pat}")
+                cur.i = e + len(end_pat)
+            elif cmd in ("setchemfig", "tdplotsetmaincoords"):
+                # settings for the pictures that follow (chemfig sizes,
+                # the 3-D view of tikz-3dplot crystal cells)
+                setup += f"\\{cmd}" + "".join(
+                    "{" + read_group(cur) + "}"
+                    for _ in range(2 if cmd == "tdplotsetmaincoords" else 1))
+                rest = rest[:m.start()] + rest[cur.i:]
+                pos = m.start()
+                continue
+            elif cmd == "schemestart":
+                e = rest.find("\\schemestop", m.start())
+                if e < 0:
+                    raise ParseError(f"{self.filename}: missing \\schemestop")
+                cur.i = e + len("\\schemestop")
+            elif cmd == "omperiodictable":
+                read_optional(cur)
+            else:
+                read_group(cur)
+            # curved arrows drawn over the structure just set
+            while True:
+                mm = re.match(r"\s*\\chemmove\b\s*", rest[cur.i:])
+                if not mm:
+                    break
+                cur.i += mm.end()
+                read_optional(cur)
+                read_group(cur)
+            src = rest[m.start():cur.i]
+            sources.append(src if env in ("tikzpicture", "circuitikz")
+                           and not setup else setup + src)
+            rest = rest[:m.start()] + rest[cur.i:]
+            pos = m.start()
+        return sources, rest
+
     # --------------------------------------------------------------- inlines
 
     def parse_inlines(self, raw):
@@ -1145,6 +1451,16 @@ class Parser:
                             cur.i += 3
                         text.append(unicodedata.normalize(
                             "NFC", letter + combining))
+                        continue
+                    if nxt == "(":
+                        # \( … \) inline math
+                        end = s.find("\\)", cur.i + 2)
+                        if end < 0:
+                            cur.err("missing \\)")
+                        emit_text()
+                        out.append({"t": "math",
+                                    "tex": s[cur.i + 2:end].strip()})
+                        cur.i = end + 2
                         continue
                     if nxt in (" ", "\n", ""):    # "\ " explicit space
                         # ("" = trailing "\<newline>" whose newline was
@@ -1315,6 +1631,91 @@ class Parser:
                 elif name == "H":
                     # Hungarian umlaut accent (Erd\H{o}s)
                     text.append(self.accented_letter(cur, "̋"))
+                elif name in ("ce", "pu"):
+                    # mhchem (chemistry books): one formula rendered by
+                    # KaTeX's mhchem extension — an LTR island, as print's
+                    # \babelsublr keeps it in the Arabic editions
+                    emit_text()
+                    out.append({"t": "math",
+                                "tex": f"\\{name}{{{read_group(cur)}}}"})
+                elif name == "cip":
+                    # CIP descriptor: (R) with the italic letter
+                    text.append("(")
+                    emit_text()
+                    out.append({"t": "emph", "index": None,
+                                "inl": self.parse_inlines(read_group(cur))})
+                    text.append(")")
+                elif name in ("termsym", "kv"):
+                    # term symbol ^3P_2 / Kröger-Vink V_O^{••}
+                    a, b, c = [read_group(cur) for _ in range(3)]
+                    emit_text()
+                    tex = (f"{{}}^{{{a}}}\\mathrm{{{b}}}_{{{c}}}"
+                           if name == "termsym" else
+                           f"\\mathrm{{{a}}}_{{\\mathrm{{{b}}}}}^{{{c}}}")
+                    out.append({"t": "math", "tex": tex})
+                elif name in ("chemfig", "omorbs", "ghs", "tikz"):
+                    # a small picture in the running text (a structure,
+                    # orbital boxes, a hazard pictogram, an atom model)
+                    emit_text()
+                    out.append({"t": "pic", "src": self.chem_setup
+                                + self.picture_command(cur, name)})
+                elif name == "setchemfig":
+                    self.chem_setup += "\\setchemfig{" + read_group(cur) + "}"
+                elif name == "babelsublr":
+                    # Arabic editions: a left-to-right run (the HTML's math
+                    # islands are LTR already) — keep its content
+                    emit_text()
+                    out.extend(self.parse_inlines(read_group(cur)))
+                elif name == "protect":
+                    pass
+                elif name == "enlargethispage":
+                    read_group(cur)      # page-fitting hint (print-only)
+                elif name == "foreignlanguage":
+                    read_group(cur)      # the language: hyphenation only
+                    emit_text()
+                    out.extend(self.parse_inlines(read_group(cur)))
+                elif name == "vspace":
+                    # vertical spacing / a conditional page break (print)
+                    if s.startswith("*", cur.i):
+                        cur.i += 1
+                    read_group(cur)
+                elif name == "penalty":
+                    m2 = re.match(r"\s*-?\d+\s*", s[cur.i:])
+                    if not m2:
+                        cur.err("unsupported \\penalty value")
+                    cur.i += m2.end()
+                elif name == "mbox":
+                    # an unbreakable run: its text
+                    emit_text()
+                    out.extend(self.parse_inlines(read_group(cur)))
+                elif name == "textminus":
+                    text.append("\u2212")
+                elif name in ("footnotesize", "scriptsize"):
+                    pass  # size switch inside a group; CSS owns sizing
+                elif name == "begin" and s.startswith("{tabular}", cur.i):
+                    # a one-column tabular inside a table cell (a hazard
+                    # pictogram over its label): its rows, line-broken
+                    cur.i += len("{tabular}")
+                    read_optional(cur)
+                    read_group(cur)          # colspec: layout only
+                    rows = split_top_level(find_env_end(cur, "tabular"),
+                                           "\\", self.filename)
+                    emit_text()
+                    for k, row in enumerate(rows):
+                        row = re.sub(r"^\s*\[[^\]]*\]", "", row).strip()
+                        if k and row:
+                            out.append({"t": "br"})
+                        out.extend(self.parse_inlines(row))
+                elif name == "emergencystretch":
+                    # paragraph-breaking tolerance (print-only)
+                    m2 = re.match(r"\s*=?\s*[\d.]+\s*(em|pt)\s*", s[cur.i:])
+                    if not m2:
+                        cur.err("unsupported \\emergencystretch value")
+                    cur.i += m2.end()
+                elif name == "url":
+                    emit_text()
+                    out.append({"t": "code",
+                                "inl": [{"t": "text", "s": read_group(cur)}]})
                 else:
                     cur.err(f"unsupported command \\{name}")
                 continue

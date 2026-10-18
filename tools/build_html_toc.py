@@ -101,6 +101,14 @@ def detex(text, where):
         return "".join(sup[ch] for ch in letters)
 
     text = re.sub(r"\\textsuperscript\{([A-Za-z]+)\}", superscript, text)
+    # Arabic chemistry titles: \babelsublr{(1)} is an LTR run (its text),
+    # a defined-term link keeps its text, \protect is a no-op
+    text = re.sub(r"\\omterm\{[^{}]*\}\{([^{}]*)\}", r"\1", text)
+    text = re.sub(r"\\protect\b\s*", "", text)
+    text = re.sub(r"\\babelsublr\{([^{}]*)\}", r"\1", text)
+    # \texorpdfstring{TeX}{PDF}: the TeX branch is what the book prints
+    # (chemistry fr: Licence 1\texorpdfstring{ʳᵉ}{re} année)
+    text = re.sub(r"\\texorpdfstring\{([^{}]*)\}\{[^{}]*\}", r"\1", text)
     text = text.replace("\\oe{}", "œ").replace("\\oe ", "œ")
     text = text.replace("\\,", " ")  # thin space, as the chapter parser
     text = text.replace("\\&", "&")  # P\&L, as the chapter parser

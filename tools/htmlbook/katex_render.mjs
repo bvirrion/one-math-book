@@ -3,6 +3,8 @@
 // throwOnError stays true: a formula KaTeX cannot render must fail the build,
 // never degrade silently (the HTML must follow the book exactly).
 import katex from "katex";
+// \ce / \pu (mhchem, chemistry books): registers the macros on this katex
+import "katex/contrib/mhchem";
 import { readFileSync } from "fs";
 
 const { macros, segments } = JSON.parse(readFileSync(0, "utf8"));

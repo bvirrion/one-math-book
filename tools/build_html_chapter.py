@@ -81,6 +81,8 @@ KATEX_MACROS = {
     "\\sign": "\\operatorname{sign}",
     "\\pnl": "\\mathrm{P\\&L}",
     "\\euro": "\\text{€}\\,",
+    # styles/onechemistry.sty: the dispersity symbol Đ (\\text{\\DH})
+    "\\DH": "\u0110",
 }
 
 
@@ -108,6 +110,14 @@ def _clean_math(t):
     t = re.sub(r"\\index\{[^{}]*\}", "", t)
     # \ensuremath{X} inside math is a no-op KaTeX does not know: keep {X}
     t = t.replace("\\ensuremath", "")
+    # array column glue @{…} (chemistry half-equations): KaTeX has no
+    # @-expressions; its own column spacing stands in
+    while re.search(r"\\begin\{array\}\{[^{}]*@\{", t):
+        t = re.sub(r"(\\begin\{array\}\{[^{}]*)@\{[^{}]*\}", r"\1", t,
+                   count=1)
+    # mhchem: a triple bond right after a charge (\ce{R-N+#N}) trips
+    # KaTeX's port; a space keeps the same reading
+    t = re.sub(r"(?<=\+)#", " #", t)
     t = t.replace("\\begin{psmallmatrix}",
                   "\\left(\\begin{smallmatrix}")
     t = t.replace("\\end{psmallmatrix}",
@@ -151,17 +161,23 @@ def first_paragraph_text(blocks, limit=160, refs=None):
     return ""
 
 
-def collect_figures(blocks, out):
-    for b in blocks:
-        if b["t"] == "figure":
-            out.extend(b["tikzs"])
-            for row in b.get("grid") or []:
+def collect_figures(node, out):
+    """Every picture source in a node tree: figure blocks (and their photo
+    grids) and the pictures set inside text (chemistry books: inline
+    structures, table cells, the safety boxes' pictograms)."""
+    if isinstance(node, list):
+        for child in node:
+            collect_figures(child, out)
+    elif isinstance(node, dict):
+        if node.get("t") == "figure":
+            out.extend(node["tikzs"])
+            for row in node.get("grid") or []:
                 out.extend(cell["src"] for cell in row)
-        elif b["t"] == "env":
-            collect_figures(b["body"], out)
-        elif b["t"] == "list":
-            for item in b["items"]:
-                collect_figures(item, out)
+        elif node.get("t") == "pic":
+            out.append(node["src"])
+        for value in node.values():
+            if isinstance(value, (list, dict)):
+                collect_figures(value, out)
 
 
 TIKZ_REF_RE = re.compile(r"\\[cC]ref\{([^{}]*)\}")
@@ -351,6 +367,7 @@ def main():
     tikzs = []
     for lang in langs:
         collect_figures(editions[lang]["blocks"], tikzs)
+        collect_figures(editions[lang]["solutions"], tikzs)
     builder.prebuild(tikzs)
     for tikz in tikzs:
         figures[tikz] = builder.figure_info(tikz)

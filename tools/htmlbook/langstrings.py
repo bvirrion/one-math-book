@@ -149,6 +149,14 @@ class LangStrings:
         for kind, (name, plural) in QUANT_NAMES.items():
             self.names[kind] = name
             self.plurals[kind] = plural
+        # Chemistry-book aside titles (only those lang files define them)
+        self.aside_names = {
+            kind: _typo(cmds[f"omname{macro}"])
+            for kind, macro in (("recall", "Recall"),
+                                ("inthelab", "InTheLab"),
+                                ("history", "History"),
+                                ("safety", "Safety"))
+            if f"omname{macro}" in cmds}
         self.iq_lookfor = "What the interviewer is looking for:"
         self.sources_head = "Sources and further reading"
         self.as_of = "As of"

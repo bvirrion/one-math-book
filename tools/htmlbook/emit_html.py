@@ -9,7 +9,7 @@ substitute the results afterwards.
 import html
 import re
 
-from .lexer import STATEMENT_KINDS, ParseError
+from .lexer import ASIDE_BOXES, STATEMENT_KINDS, ParseError
 from .model import anchor_for
 
 # A small TeX -> Unicode map for alt texts and meta descriptions only
@@ -250,6 +250,10 @@ class Emitter:
                 info = self.resolve(node["label"], "\\eqref")
                 out.append(f'<a class="om-cref" href="{info["href"]}">'
                            f"({info['number']})</a>")
+            elif t == "pic":
+                out.append(self.inline_pic(node))
+            elif t == "br":
+                out.append("<br>")
             elif t == "ref":
                 # bare \ref: the number alone, linked
                 info = self.resolve(node["label"], "\\ref")
@@ -385,7 +389,50 @@ class Emitter:
         if kind in ("dated", "strategyfile", "predictorcard",
                     "tutorial", "build"):
             return self.quant_box(node)
+        if kind in ASIDE_BOXES:
+            return self.aside(node)
         raise ParseError(f"emitter: unexpected environment {kind!r}")
+
+    def aside(self, node):
+        """Unnumbered chemistry asides: "You already know", "In the lab —
+        title", "History — title", and "Safety" with its hazard
+        pictograms in a column beside the text."""
+        kind = node["kind"]
+        head = (f'<p class="om-box-head"><span class="om-box-kind">'
+                f"{self.lang.aside_names[kind]}</span>")
+        if node["title"]:
+            head += (f' <span class="om-box-note">— '
+                     f"{self.inlines(node['title'])}</span>")
+        head += "</p>"
+        body = self.blocks(node["body"])
+        if node["pics"]:
+            # hazard pictograms (safety) or a portrait (history): a column
+            # of pictures beside the text, on the side print puts them
+            pics, widths = [], node.get("pic_widths")
+            for p in node["pics"]:
+                img = self.inline_pic(p)
+                if p.get("caption"):
+                    img = (f'<figure class="om-subfig">{img}<figcaption>'
+                           f"{self.inlines(p['caption'])}</figcaption>"
+                           "</figure>")
+                pics.append(img)
+            style = (f' style="--om-aside-pics:{round(sum(widths) * 100)}%"'
+                     if widths else "")
+            side = " om-aside-row--end" if node.get("pics_side") == "end" \
+                else ""
+            body = (f'<div class="om-aside-row{side}">\n'
+                    f'<div class="om-aside-pics"{style}>{"".join(pics)}</div>\n'
+                    f'<div class="om-aside-text">\n{body}\n</div>\n</div>')
+        return (f'<section class="om-box om-aside om-{kind}">\n{head}\n'
+                f"{body}\n</section>")
+
+    def inline_pic(self, node):
+        """A picture inside the text (chemfig structure, orbital boxes,
+        hazard pictogram): an SVG image at its printed size."""
+        fig = self.figures[node["src"]]
+        return (f'<img class="om-inline-pic" src="{fig["url"]}" alt="" '
+                f'width="{fig["width"]}" height="{fig["height"]}" '
+                f'loading="lazy">')
 
     def quant_box(self, node):
         """Titled boxes of the quant books: "As of September 2026 — …",
@@ -583,7 +630,12 @@ class Emitter:
             tbl = node["table"]
             inner = (self.table_inner(tbl) if tbl["t"] == "table"
                      else "\n".join(self.table_inner(x) for x in tbl["tables"]))
-            imgs = f'<div class="om-table-wrap">{inner}</div>'
+            # (beside a picture in the chemistry books: both, in a row)
+            imgs = (imgs + "\n" if imgs else "") \
+                + f'<div class="om-table-wrap">{inner}</div>'
+        if node.get("math") is not None:
+            # a figure that is a display formula (a reaction mechanism)
+            imgs = self.math_ph(node["math"], display=True)
         grid = ""
         if node.get("grid"):
             rows = []
