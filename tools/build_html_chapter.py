@@ -30,7 +30,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from htmlbook import lexer, model  # noqa: E402
-from htmlbook.emit_html import Emitter, footnotes_html, plaintext, slugify, substitute_math  # noqa: E402
+from htmlbook.emit_html import Emitter, footnotes_html, plaintext, slugify, substitute_math, tex_to_text  # noqa: E402
 from htmlbook.model import anchor_for  # noqa: E402
 from htmlbook.langstrings import LangStrings  # noqa: E402
 from htmlbook.tikz2svg import FigureBuilder  # noqa: E402
@@ -98,9 +98,15 @@ def chapter_paths(chapter, lang):
     else:
         body = year_dir / lang / name
         sols = year_dir / "solutions" / lang / name
-    for p in (body, sols):
-        if not p.exists():
-            sys.exit(f"error: missing source file {p}")
+    if not body.exists():
+        sys.exit(f"error: missing source file {body}")
+    if not sols.exists():
+        # a chapter with nothing to solve has no solutions file (interview
+        # book 18, "How to Train"); anything else is a missing translation
+        if re.search(r"\\begin\{(exercise|problem|interviewq|question)\}",
+                     body.read_text(encoding="utf-8")):
+            sys.exit(f"error: missing source file {sols}")
+        sols = None
     return body, sols
 
 
@@ -153,7 +159,7 @@ def katex_version():
 def first_paragraph_text(blocks, limit=160, refs=None):
     for b in blocks:
         if b["t"] == "para":
-            text = plaintext(b["inl"], refs).strip()
+            text = plaintext(b["inl"], refs, tex_to_text).strip()
             if len(text) <= limit:
                 return text
             cut = text[:limit].rsplit(" ", 1)[0]
@@ -230,14 +236,19 @@ def main():
     editions = {}
     for lang in langs:
         body_path, sols_path = chapter_paths(args.chapter, lang)
-        title, ch_label, blocks = lexer.parse_chapter(body_path)
-        solutions = lexer.parse_solutions(sols_path)
-        labels = model.number_chapter(blocks, args.chapter_number)
+        strings = LangStrings(REPO_ROOT, lang)
+        title, ch_label, blocks = lexer.parse_chapter(
+            body_path, strings.iv_strings)
+        solutions = lexer.parse_solutions(sols_path, strings.iv_strings) \
+            if sols_path else {}
+        labels = model.number_chapter(
+            blocks, args.chapter_number,
+            solutions=solutions if model.has_questions(blocks) else None)
         model.resume_list_starts(blocks)
         editions[lang] = {
             "title": title, "label": ch_label, "blocks": blocks,
             "solutions": solutions, "labels": labels,
-            "strings": LangStrings(REPO_ROOT, lang),
+            "strings": strings,
         }
         print(f"[{lang}] parsed {body_path.name}: "
               f"{len(labels)} labels, {len(solutions)} solutions")
@@ -324,7 +335,8 @@ def main():
             },
             "labels": {label: {"kind": info["kind"],
                                "number": info["number"]}
-                       for label, info in editions[langs[0]]["labels"].items()},
+                       for label, info in editions[langs[0]]["labels"].items()
+                       if not info.get("in_solutions")},
         }
         book = manifest["books"].setdefault(args.book, {"chapters": []})
         existing = next((c for c in book["chapters"]
@@ -421,7 +433,8 @@ def main():
         # language-independent label map (numbers match across editions),
         # used to resolve cross-chapter \cref/\omterm on later runs
         "labels": {label: {"kind": info["kind"], "number": info["number"]}
-                   for label, info in editions[langs[0]]["labels"].items()},
+                   for label, info in editions[langs[0]]["labels"].items()
+                   if not info.get("in_solutions")},
     }
     book = manifest["books"].setdefault(args.book, {"chapters": []})
     # merge languages with any existing entry — a partial --languages run

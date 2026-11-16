@@ -8,6 +8,7 @@ substitute the results afterwards.
 
 import html
 import re
+from pathlib import Path
 
 from .lexer import ASIDE_BOXES, STATEMENT_KINDS, ParseError
 from .model import anchor_for
@@ -23,9 +24,6 @@ ALT_MAP = {
 }
 
 
-MONTHS = ("January", "February", "March", "April", "May", "June", "July",
-          "August", "September", "October", "November", "December")
-
 # \omcode listings: Pygments lexer per file extension (onequant.sty picks the
 # listings language the same way; .s is Intel-syntax x86).
 LISTING_LEXERS = {
@@ -33,6 +31,7 @@ LISTING_LEXERS = {
     ".rs": "rust", ".s": "nasm", ".sql": "sql", ".sv": "systemverilog",
     ".v": "systemverilog", ".xml": "xml", ".xhtml": "html", ".sh": "bash",
     ".json": "json", ".toml": "toml", ".txt": "text", ".csv": "text",
+    ".cs": "csharp", ".java": "java", ".sol": "solidity",
 }
 # Pygments short token classes kept in the HTML, coarsened to what the
 # reader CSS colours (keywords, strings, comments, numbers, a few names).
@@ -87,30 +86,136 @@ def tex_to_alt(tex):
     return re.sub(r"\s+", " ", s).strip()
 
 
-def plaintext(inlines, refs=None):
+TEXT_COMMANDS = {
+    "N": "ℕ", "Z": "ℤ", "Q": "ℚ", "R": "ℝ", "C": "ℂ",
+    "alpha": "α", "beta": "β", "gamma": "γ", "delta": "δ", "epsilon": "ε",
+    "varepsilon": "ε", "zeta": "ζ", "eta": "η", "theta": "θ", "vartheta": "θ",
+    "iota": "ι", "kappa": "κ", "lambda": "λ", "mu": "μ", "nu": "ν", "xi": "ξ",
+    "pi": "π", "rho": "ρ", "sigma": "σ", "tau": "τ", "upsilon": "υ",
+    "phi": "φ", "varphi": "φ", "chi": "χ", "psi": "ψ", "omega": "ω",
+    "Gamma": "Γ", "Delta": "Δ", "Theta": "Θ", "Lambda": "Λ", "Xi": "Ξ",
+    "Pi": "Π", "Sigma": "Σ", "Phi": "Φ", "Psi": "Ψ", "Omega": "Ω",
+    "subset": "⊂", "subseteq": "⊆", "supset": "⊃", "in": "∈", "notin": "∉",
+    "cap": "∩", "cup": "∪", "setminus": "∖", "emptyset": "∅", "varnothing": "∅",
+    "leq": "≤", "le": "≤", "geq": "≥", "ge": "≥", "neq": "≠", "ne": "≠",
+    "approx": "≈", "sim": "∼", "simeq": "≃", "equiv": "≡", "ll": "≪", "gg": "≫",
+    "infty": "∞", "times": "×", "cdot": "·", "div": "÷", "pm": "±", "mp": "∓",
+    "dots": "…", "ldots": "…", "cdots": "⋯", "to": "→", "rightarrow": "→",
+    "longrightarrow": "→", "leftarrow": "←", "mapsto": "↦", "Rightarrow": "⇒",
+    "implies": "⇒", "Leftrightarrow": "⇔", "iff": "⇔", "forall": "∀",
+    "exists": "∃", "neg": "¬", "land": "∧", "wedge": "∧", "lor": "∨", "vee": "∨",
+    "sum": "∑", "prod": "∏", "int": "∫", "partial": "∂", "nabla": "∇",
+    "sqrt": "√", "angle": "∠", "perp": "⊥", "parallel": "∥", "ell": "ℓ",
+    "hbar": "ℏ", "mid": "|", "degree": "°", "circ": "∘", "ohm": "Ω",
+    "propto": "∝", "colon": ":", "iu": "i", "eu": "e", "dd": "d", "P": "P",
+}
+TEXT_FUNCTIONS = frozenset(
+    "sin cos tan cot sec csc arcsin arccos arctan sinh cosh tanh ln log exp lim "
+    "max min sup inf gcd det dim ker deg arg mod Pr".split())
+SUPERSCRIPTS = dict(zip("0123456789+-−=()ni", "⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁻⁼⁽⁾ⁿⁱ"))
+SUBSCRIPTS = dict(zip("0123456789+-−=()", "₀₁₂₃₄₅₆₇₈₉₊₋₋₌₍₎"))
+# one level of nested braces: ^{\mathrm{th}}
+_SCRIPT_GROUP = r"\{((?:[^{}]|\{[^{}]*\})*)\}"
+
+
+def _script(text, table, mark):
+    """An exponent or an index: Unicode when every character has a form."""
+    text = text.replace("{", "").replace("}", "").strip()
+    if text and all(c in table for c in text):
+        return "".join(table[c] for c in text)
+    simple = len(text) < 2 or (mark == "_" and text.isalnum())
+    return f"{mark}{text}" if simple else f"{mark}({text})"
+
+
+def tex_to_text(tex):
+    """A formula as readable text, for a meta description: keeps what
+    tex_to_alt loses (exponents, \\sin, Greek letters, spacing commands).
+    tex_to_alt stays as it is, because published slugs and alt text depend
+    on it."""
+    def over(a, b):
+        wrap = lambda x: f"({x})" if re.search(r"[-+ ]", x.strip()) else x.strip()
+        return f"{wrap(a)}/{wrap(b)}"
+
+    def command(m):
+        name = m.group(1)
+        if name in TEXT_FUNCTIONS:
+            after = m.string[m.end():m.end() + 1]
+            return name + (" " if after == "\\" or after.isalpha() else "")
+        return TEXT_COMMANDS.get(name, "")
+
+    s = tex.replace("\\{", "\x01").replace("\\}", "\x02")
+    s = re.sub(r"\^\s*\{?\s*\\circ\s*\}?", "°", s)
+    s = re.sub(r"\\[,;:> ]|~|\\q?quad\b", " ", s).replace("\\!", "")
+    s = re.sub(r"\\([%$#&_])", r"\1", s)
+    s = re.sub(r"\\mathbb\{([NZQRC])\}",
+               lambda m: "ℕℤℚℝℂ"["NZQRC".index(m.group(1))], s)
+    s = re.sub(r"\\(intcc|intco|intoc|intoo)\{([^{}]*)\}\{([^{}]*)\}",
+               lambda m: {"intcc": "[%s, %s]", "intco": "[%s, %s)",
+                          "intoc": "(%s, %s]", "intoo": "(%s, %s)"}
+               [m.group(1)] % (m.group(2), m.group(3)), s)
+    s = re.sub(r"\\abs\{([^{}]*)\}", r"|\1|", s)
+    s = re.sub(r"\\[dt]?frac\{([^{}]*)\}\{([^{}]*)\}",
+               lambda m: over(m.group(1), m.group(2)), s)
+    s = re.sub(r"\\[dt]?frac(\d)(\d)", r"\1/\2", s)
+    s = re.sub(r"\\sqrt\{([^{}]{2,})\}", r"√(\1)", s)
+    s = re.sub(r"\\([a-zA-Z]+)", command, s)
+    s = re.sub(r"\^" + _SCRIPT_GROUP + r"|\^(\S)",
+               lambda m: _script(m.group(1) or m.group(2), SUPERSCRIPTS, "^"), s)
+    s = re.sub(r"_" + _SCRIPT_GROUP + r"|_(\S)",
+               lambda m: _script(m.group(1) or m.group(2), SUBSCRIPTS, "_"), s)
+    s = s.replace("{", "").replace("}", "")
+    s = s.replace("\x01", "{").replace("\x02", "}")
+    return re.sub(r"\s+", " ", s).strip()
+
+
+def plaintext(inlines, refs=None, math=tex_to_alt):
     """Visible text of an inline run (titles, headings, meta descriptions).
 
     `refs` is an optional callable node -> str that spells out \cref /
     \eqref nodes ("Chapter 3", "(2.1)"); the Emitter provides one via
     plain_ref(). Without it references vanish, which leaves residues like
     "appeared in ;" in a meta description — pass it whenever labels are
-    resolvable."""
+    resolvable. `math` turns a formula into text."""
     out = []
     for node in inlines:
         t = node["t"]
         if t == "text":
             out.append(node["s"])
         elif t == "math":
-            out.append(tex_to_alt(node["tex"]))
-        elif t in ("emph", "bold", "sup", "sub", "code", "span", "u"):
-            out.append(plaintext(node["inl"], refs))
+            out.append(math(node["tex"]))
+        elif t in ("emph", "bold", "sup", "sub", "code", "span", "u", "ltr"):
+            out.append(plaintext(node["inl"], refs, math))
         elif t == "term":
-            out.append(plaintext(node["inl"], refs))
+            out.append(plaintext(node["inl"], refs, math))
         elif t == "field":
-            out.append(plaintext(node["inl"], refs) + ".")
-        elif t in ("cref", "eqref", "ref") and refs is not None:
+            out.append(plaintext(node["inl"], refs, math) + ".")
+        elif t in ("cref", "eqref", "ref", "pageref") and refs is not None:
             out.append(refs(node))
     return "".join(out)
+
+
+PRINTED_PAGES = {}
+
+
+def printed_page(label, lang):
+    """\\pageref: the label's page in this edition's PDF (build/*.aux of the
+    book repo; `latexmk` first, as for the page maps)."""
+    if lang not in PRINTED_PAGES:
+        pages = {}
+        root = Path(__file__).resolve().parents[2]
+        for aux in (root / "build").glob("*.aux"):
+            m = re.search(r"_(fr|nl|es|pt|hi|ar|id)$", aux.stem)
+            if (m.group(1) if m else "en") != lang:
+                continue
+            text = aux.read_text(encoding="utf-8", errors="replace")
+            pages.update(re.findall(
+                r"\\newlabel\{([^{}]*)\}\{\{(?:[^{}]|\{[^{}]*\})*\}"
+                r"\{([^{}]+)\}", text))
+        PRINTED_PAGES[lang] = pages
+    if label not in PRINTED_PAGES[lang]:
+        raise ParseError(f"\\pageref{{{label}}}: not in the {lang} build/*.aux "
+                         "— build the PDF first")
+    return PRINTED_PAGES[lang][label]
 
 
 def slugify(text):
@@ -166,6 +271,8 @@ class Emitter:
             return f"({info['number']})"
         if node["t"] == "ref":
             return self.resolve(node["label"], "\\ref")["number"]
+        if node["t"] == "pageref":
+            return printed_page(node["label"], self.lang.lang)
         labels = [re.sub(r"\s+", "", part) for part in node["label"].split(",")]
         infos = [self.resolve(lbl, "\\cref") for lbl in labels]
         if len(infos) == 1:
@@ -220,6 +327,9 @@ class Emitter:
             elif t == "span":
                 # a \\multicolumn outside a table cell: just its text
                 out.append(self.inlines(node["inl"]))
+            elif t == "ltr":
+                out.append(f'<span dir="ltr">{self.inlines(node["inl"])}'
+                           "</span>")
             elif t == "sup":
                 out.append(f"<sup>{self.inlines(node['inl'])}</sup>")
             elif t == "sub":
@@ -252,6 +362,15 @@ class Emitter:
                            f"({info['number']})</a>")
             elif t == "pic":
                 out.append(self.inline_pic(node))
+            elif t == "pageref":
+                # the edition's printed page, the reader's own page markers
+                out.append(f'<a class="om-cref" '
+                           f'href="#{anchor_for(node["label"])}">'
+                           f'{printed_page(node["label"], self.lang.lang)}'
+                           "</a>")
+            elif t == "omve":
+                out.append(f'<em class="om-ve">{self.lang.vertical_exaggeration}'
+                           f" {self.math_ph(node['tex'], display=False)}</em>")
             elif t == "br":
                 out.append("<br>")
             elif t == "ref":
@@ -311,7 +430,8 @@ class Emitter:
         for node in nodes:
             t = node["t"]
             if t == "para":
-                out.append(f"<p>{self.inlines(node['inl'])}</p>")
+                css = f' class="{node["css"]}"' if node.get("css") else ""
+                out.append(f"<p{css}>{self.inlines(node['inl'])}</p>")
             elif t == "dmath":
                 tex = node["tex"]
                 anchor = ""
@@ -351,6 +471,8 @@ class Emitter:
                 out.append(self.env(node))
             elif t == "list":
                 out.append(self.list_env(node))
+            elif t == "anchor":
+                out.append(f'<span id="{anchor_for(node["label"])}"></span>')
             elif t == "figure":
                 out.append(self.figure(node))
             elif t == "table":
@@ -370,6 +492,19 @@ class Emitter:
                 out.append(f'<p class="om-iq-lookfor"><em>'
                            f"{self.lang.iq_lookfor} "
                            f"{self.inlines(node['inl'])}</em></p>")
+            elif t == "ivrunin":
+                out.append(self.iv_runin(node))
+            elif t == "ivstop":
+                out.append(f'<p class="om-iv-stop"><span>{self.lang.iv_stop}'
+                           "</span></p>")
+            elif t == "ivlookup":
+                cells = "".join(
+                    f"<span>{self.inlines(a)} "
+                    f"<strong>{self.inlines(b)}</strong></span>"
+                    for a, b in node["cells"])
+                out.append(f'<p class="om-iv-lookup">{cells}</p>')
+            elif t == "ivdrills":
+                out.append(self.iv_drills(node))
             else:
                 raise ParseError(f"emitter: unknown block {t!r}")
         return "\n".join(out)
@@ -384,7 +519,7 @@ class Emitter:
             return self.exercise(node)
         if kind == "problem":
             return self.problem(node)
-        if kind == "interviewq":
+        if kind in ("interviewq", "question"):
             return self.exercise(node, css="om-exercise om-iq")
         if kind in ("dated", "strategyfile", "predictorcard",
                     "tutorial", "build"):
@@ -420,8 +555,10 @@ class Emitter:
                      if widths else "")
             side = " om-aside-row--end" if node.get("pics_side") == "end" \
                 else ""
+            stack = " om-aside-pics--stack" if widths and 0.0 in widths else ""
             body = (f'<div class="om-aside-row{side}">\n'
-                    f'<div class="om-aside-pics"{style}>{"".join(pics)}</div>\n'
+                    f'<div class="om-aside-pics{stack}"{style}>'
+                    f'{"".join(pics)}</div>\n'
                     f'<div class="om-aside-text">\n{body}\n</div>\n</div>')
         return (f'<section class="om-box om-aside om-{kind}">\n{head}\n'
                 f"{body}\n</section>")
@@ -444,14 +581,20 @@ class Emitter:
         if kind in ("tutorial", "build"):
             return (f'<div class="om-box om-{kind}"{anchor}>\n{body}\n'
                     f"</div>")
-        if kind == "dated":
+        if kind == "dated" and "-" not in node["asof"]:
+            # Earth books: "Figures as of 2026", no title
+            lead = f"{self.lang.dated_name} {node['asof']}"
+        elif kind == "dated":
             year, month = node["asof"].split("-")
-            lead = f"{self.lang.as_of} {MONTHS[int(month) - 1]} {year}"
+            lead = self.lang.dated_lead(int(month), year)
         else:
             lead = f"{self.lang.names[kind]} {node['number']}"
+        note = ""
+        if node["title"]:
+            note = (f' <span class="om-box-note">— '
+                    f"{self.inlines(node['title'])}</span>")
         head = (f'<p class="om-box-head"><span class="om-box-kind">{lead}'
-                f'</span> <span class="om-box-note">— '
-                f"{self.inlines(node['title'])}</span></p>")
+                f"</span>{note}</p>")
         return (f'<section class="om-box om-{kind}"{anchor}>\n{head}\n'
                 f"{body}\n</section>")
 
@@ -474,7 +617,8 @@ class Emitter:
         lang = LISTING_LEXERS[path.suffix]
         anchor = f' id="{anchor_for(node["label"])}"' if node["label"] else ""
         # listings in solutions are unnumbered here (print runs one counter
-        # across the whole solutions appendix; nothing references them)
+        # across the whole solutions appendix; nothing references them),
+        # except in the interview books (see model.number_chapter)
         num = (f'<strong>{self.lang.names["listing"]} '
                f"{node['number']}.</strong> " if "number" in node else "")
         caption = (f"{num}{self.inlines(node['caption'])} "
@@ -541,13 +685,15 @@ class Emitter:
         diff = ""
         if node.get("difficulty"):
             stars = "★" * node["difficulty"]
+            # interview-book stars go up to four (the time a question takes)
+            scale = 4 if node["kind"] == "question" else 3
             diff = (f' <span class="om-difficulty" aria-label='
-                    f'"{node["difficulty"]}/3">{stars}</span>')
+                    f'"{node["difficulty"]}/{scale}">{stars}</span>')
         note = ""
         if node["title"]:
             note = (f'<p class="om-box-note om-problem-title">'
                     f"{self.inlines(node['title'])}</p>")
-        tags = [self.inlines(node[k]) for k in ("roles", "firm")
+        tags = [self.inlines(node[k]) for k in ("roles", "firm", "level")
                 if node.get(k)]
         if tags:
             # interview questions: "trader, researcher • market maker"
@@ -574,12 +720,48 @@ class Emitter:
         cref = self.lang.cref_text(kind, num)
         # "Solution" / "Oplossing": first word of the localized "Solution of"
         summary = self.lang.solution_of.split()[0]
+        solution_of = self.lang.solution_of
+        if kind == "question":
+            summary, solution_of = self.lang.iv_answer, self.lang.iv_answer_of
         body = self.blocks(self.solutions[label])
         opening = (f'<p class="om-solution-of"><strong>'
-                   f"{self.lang.solution_of} {cref}.</strong></p>")
+                   f"{solution_of} {cref}.</strong></p>")
         return (f'<details class="om-solution" id="sol-{anchor_for(label)}">'
                 f"\n<summary>{summary}</summary>\n{opening}\n{body}\n"
                 f"</details>")
+
+    def iv_runin(self, node):
+        """An answer's "Classic wrong answer." / "Follow-up." lead, run into
+        the first paragraph of what follows."""
+        # the lead is a word of styles/ivbook.sty: typographic apostrophe,
+        # as running text gets (Pourquoi c’est important)
+        lead = "<strong>" + node["lead"].replace("'", "’") \
+            + ".</strong> "
+        if node["ask"]:
+            lead += f"<em>{self.inlines(node['ask'])}</em> "
+        body = self.blocks(node["body"])
+        if body.startswith("<p>"):
+            body = "<p>" + lead + body[len("<p>"):]
+        else:
+            body = f"<p>{lead.rstrip()}</p>\n{body}"
+        return f'<div class="om-iv-runin">\n{body}\n</div>'
+
+    def iv_drills(self, node):
+        """A drill sheet ("19 × 99 =", with options on a multiple-choice
+        sheet) or its key, as one list in item order."""
+        items = []
+        for item in node["items"]:
+            text = self.inlines(item["inl"])
+            if not node["key"]:
+                text += " " + self.math_ph("=", display=False)
+            if item["options"]:
+                options = "".join(
+                    f"<span><strong>{letter}</strong> {self.inlines(o)}</span>"
+                    for letter, o in zip("ABCD", item["options"]))
+                text += f'<span class="om-iv-options">{options}</span>'
+            items.append(f'<li value="{item["n"]}">{text}</li>')
+        css = "om-iv-drills om-iv-key" if node["key"] else "om-iv-drills"
+        return f'<ol class="{css}">' + "".join(items) + "</ol>"
 
     def list_env(self, node):
         if node["kind"] == "itemize":
@@ -590,6 +772,8 @@ class Emitter:
         else:
             start = node.get("start", 1)
             attr = f' start="{start}"' if start != 1 else ""
+            if node.get("alpha"):
+                attr += ' class="om-alpha"'
             tag_open, tag_close = f"<ol{attr}>", "</ol>"
         items = []
         for item in node["items"]:
@@ -650,13 +834,14 @@ class Emitter:
             grid = '\n<div class="om-figure-grid">\n' + "\n".join(rows) \
                 + "\n</div>"
         anchor = ""
-        if node.get("label"):
-            anchor = f' id="{anchor_for(node["label"])}"'
+        if node.get("label") or node.get("anchor"):
+            anchor = f' id="{anchor_for(node.get("label") or node["anchor"])}"'
         if node.get("number"):
             caption = (f'<strong>{self.lang.names["figure"]} '
                        f"{node['number']}.</strong> {caption}")
+        row = f'<div class="om-figure-row">\n{imgs}\n</div>' if imgs else ""
         return (f'<figure class="om-figure"{anchor}>\n'
-                f'<div class="om-figure-row">\n{imgs}\n</div>{grid}\n'
+                f"{row}{grid}\n"
                 f"<figcaption>{caption}</figcaption>\n</figure>")
 
     def img_tag(self, fig, alt):

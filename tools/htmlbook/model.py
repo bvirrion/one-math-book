@@ -12,7 +12,7 @@ from .lexer import STATEMENT_KINDS, ParseError
 # Kinds numbered N.M by their own per-chapter counter (the quant books'
 # \refstepcounter'd boxes, listings and table floats).
 OWN_COUNTER_KINDS = ("listing", "table", "dated", "strategyfile",
-                     "predictorcard", "interviewq")
+                     "predictorcard", "interviewq", "question")
 
 
 def anchor_for(label):
@@ -20,12 +20,26 @@ def anchor_for(label):
     return label.replace(":", "-")
 
 
-def number_chapter(blocks, chapter_number):
+def has_questions(blocks):
+    """Does this chapter hold interview-book questions (env `question`)?"""
+    return any(node["t"] == "env" and node["kind"] == "question"
+               for node in blocks)
+
+
+def number_chapter(blocks, chapter_number, solutions=None):
     """Walk the tree, assign numbers in place, return the label map.
 
     Adds to each numbered node:  node["number"] = "1.4"
     Returns  {label: {"kind": ..., "number": ..., "anchor": ...}}
+
+    `solutions` (sol_key -> blocks) is numbered after the chapter on the same
+    counters: the interview books print figures and listings in their answers
+    and refer to them. Other books leave it out: their solutions' listings stay
+    unnumbered, as nothing references them. Those labels carry
+    "in_solutions": True and stay out of the manifest (they print in the
+    appendix, outside the chapter's page range).
     """
+    in_solutions = False
     labels = {}
     shared = 0     # definition-family counter
     exercise = 0
@@ -45,6 +59,8 @@ def number_chapter(blocks, chapter_number):
             raise ParseError(f"duplicate label {label}")
         labels[label] = {"kind": kind, "number": number,
                          "anchor": anchor or anchor_for(label)}
+        if in_solutions:
+            labels[label]["in_solutions"] = True
 
     def count(node, kind):
         own[kind] += 1
@@ -74,6 +90,9 @@ def number_chapter(blocks, chapter_number):
                 if not node["star"]:
                     subsection += 1
                     node["number"] = f"{chapter_number}.{section}.{subsection}"
+                continue
+            if t == "anchor":
+                record(node["label"], "anchor", None)
                 continue
             if t == "dmath" and node.get("label"):
                 equation += 1
@@ -118,7 +137,12 @@ def number_chapter(blocks, chapter_number):
             elif t == "list":
                 for item in node["items"]:
                     walk(item)
+            elif t == "ivrunin":
+                walk(node["body"])
     walk(blocks)
+    in_solutions = True
+    for body in (solutions or {}).values():
+        walk(body)
     return labels
 
 

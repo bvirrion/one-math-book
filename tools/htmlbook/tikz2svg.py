@@ -227,6 +227,9 @@ def build_svg(tikz):
                     "both dvisvgm and pdftocairo failed to convert a "
                     f"figure:\n{res.stderr[-2000:]}")
         svg = svg_path.read_text(encoding="utf-8")
+        if "<g id='page1'/>" in svg:
+            # dvisvgm wrote an empty page (0pt x 0pt): never publish it
+            raise ParseError("a figure converted to an empty SVG")
         return svg, *_svg_size(svg)
 
 

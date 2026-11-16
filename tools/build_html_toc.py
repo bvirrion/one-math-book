@@ -40,7 +40,10 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 def read_chapter_line(text, where):
     """(raw_title, label) from \\chapter{...}\\label{ch:...} — balanced
     braces, so titles like \\texorpdfstring{$L^p$}{Lp} work; the label may
-    sit on the following line."""
+    sit on the following line. \\chapter[short]{title}: the optional short
+    title (toc line and running head in print) is skipped."""
+    text = re.sub(r"\\chapter\[(?:[^\[\]{}]|\{(?:[^{}]|\{[^{}]*\})*\})*\]",
+                  r"\\chapter", text, count=1)
     i = text.find("\\chapter{")
     if i < 0:
         fail(f"{where}: no \\chapter{{...}} found")
@@ -130,13 +133,15 @@ def part_dirs(entry_path):
     return dirs
 
 
-PART_RE = re.compile(r"\\part\{\\omstr\{(part\.[a-z0-9.]+)\}\}")
+PART_RE = re.compile(r"\\part\{(?:\\omstr\{(part\.[a-z0-9.]+)\}|([^{}\\]+))\}")
 
 
 def part_of(part_path):
-    """Returns [(part_string_key, [chapter file slugs]), ...] — one entry
-    per \\part in the file (the quant books group a directory's chapters
-    under several parts, with dotted keys like part.dv.foundations)."""
+    """Returns [(part_string_key, literal_title, [chapter file slugs]), ...]
+    — one entry per \\part in the file (the quant books group a directory's
+    chapters under several parts, with dotted keys like part.dv.foundations).
+    The English-only interview books write \\part{Title}: no key, a literal
+    title."""
     text = part_path.read_text(encoding="utf-8")
     heads = list(PART_RE.finditer(text))
     if not heads:
@@ -151,12 +156,13 @@ def part_of(part_path):
             r"\\ominput\{([a-z0-9-]+)\}\{([0-9]{2}-[a-z0-9-]+)\}",
             text[head.end():end])
         if not inputs:
-            fail(f"{part_path}: no \\ominput lines under {head.group(1)}")
+            fail(f"{part_path}: no \\ominput lines under {head.group(0)}")
         for grade_dir, _ in inputs:
             if grade_dir != expected_dir:
                 fail(f"{part_path}: \\ominput dir {grade_dir!r} does not "
                      f"match the part directory {expected_dir!r}")
-        groups.append((head.group(1), [slug for _, slug in inputs]))
+        groups.append((head.group(1), head.group(2),
+                       [slug for _, slug in inputs]))
     return groups
 
 
@@ -215,16 +221,27 @@ def main():
         part_path = REPO_ROOT / part_dir / "part.tex"
         dir_key = part_dir.split("/")[-1]
         groups = part_of(part_path)
-        for string_key, slugs in groups:
-            raw_titles = lang_part_titles.get(string_key)
-            if not raw_titles or any(lang not in raw_titles for lang in langs):
-                fail(f"part title {string_key!r} missing for some of {langs}")
-            titles = {lang: detex(raw, f"styles/lang/{lang}.tex {string_key}")
-                      for lang, raw in raw_titles.items() if lang in langs}
+        for string_key, literal, slugs in groups:
+            if literal:
+                # a literal title cannot be translated: English-only books
+                if langs != ["en"]:
+                    fail(f"{part_path}: \\part{{{literal}}} has no string key, "
+                         f"so it has no title for {langs}")
+                titles = {"en": detex(literal, str(part_path))}
+                segment = re.sub(r"[^a-z0-9]+", "-", literal.lower()).strip("-")
+            else:
+                raw_titles = lang_part_titles.get(string_key)
+                if not raw_titles \
+                        or any(lang not in raw_titles for lang in langs):
+                    fail(f"part title {string_key!r} missing for some of "
+                         f"{langs}")
+                titles = {lang: detex(raw,
+                                      f"styles/lang/{lang}.tex {string_key}")
+                          for lang, raw in raw_titles.items() if lang in langs}
+                segment = string_key.rsplit(".", 1)[-1]
             # one part per directory keeps the directory name as its key;
             # several get dir-<last key segment> (derivatives-foundations)
-            part_key = dir_key if len(groups) == 1 \
-                else f"{dir_key}-{string_key.rsplit('.', 1)[-1]}"
+            part_key = dir_key if len(groups) == 1 else f"{dir_key}-{segment}"
 
             chapters = []
             for slug in slugs:

@@ -31,6 +31,7 @@ Inlines:
 """
 
 import re
+from pathlib import Path
 
 STATEMENT_KINDS = (
     "definition", "theorem", "proposition", "lemma", "corollary",
@@ -38,15 +39,21 @@ STATEMENT_KINDS = (
 )
 # Environments whose bodies are parsed recursively as blocks.
 BLOCK_ENVS = STATEMENT_KINDS + ("proof", "exercise", "problem", "solution",
-                                 "interviewq")
+                                 "interviewq", "question")
+# Interview books (styles/ivbook.sty, quant 18-20): run-in leads of an answer
+# -> (lead text, is there a first argument in italics?).
+IV_RUNINS = {"iqwrong": ("Classic wrong answer", False),
+             "iqwhy": ("Why it matters", False),
+             "iqfollow": ("Follow-up", True)}
 LIST_ENVS = ("itemize", "enumerate")
 # Quant-book boxes (styles/onequant.sty) -> number of mandatory arguments:
 # dated{YYYY-MM}{title}, strategyfile{title}, predictorcard{title}.
 QUANT_BOXES = {"dated": 2, "strategyfile": 1, "predictorcard": 1,
                "tutorial": 0, "build": 0}
-# Chemistry-book asides (styles/onechemistry.sty), unnumbered: recall (no
-# argument), inthelab/history ([optional title]), safety ({GHS pictograms}).
-ASIDE_BOXES = ("recall", "inthelab", "history", "safety")
+# Chemistry- and Earth-book asides (styles/onechemistry.sty, oneearth.sty),
+# unnumbered: recall (no argument), inthefield/inthelab/history ([optional
+# title]), safety ({GHS pictograms} in chemistry, no argument in Earth).
+ASIDE_BOXES = ("recall", "inthefield", "inthelab", "history", "safety")
 # Pictures that are not tikzpicture environments (chemistry books): a
 # chemfig reaction scheme, a molecular-orbital diagram, the periodic table,
 # a lone structure. Compiled like a tikzpicture, from their raw source.
@@ -75,7 +82,12 @@ class Cursor:
 
 
 def strip_comments(text):
-    """Remove unescaped %-comments (keep the newline)."""
+    """Remove unescaped %-comments (keep the newline). A comment-only line
+    inside a picture goes whole: TeX reads no blank line there, while a \\par
+    breaks \\addplot and the option lists."""
+    text = re.sub(r"\\begin\{tikzpicture\}.*?\\end\{tikzpicture\}",
+                  lambda m: re.sub(r"^[ \t]*%.*\n", "", m.group(0), flags=re.M),
+                  text, flags=re.S)
     out = []
     i, n = 0, len(text)
     while i < n:
@@ -90,6 +102,25 @@ def strip_comments(text):
             out.append(c)
             i += 1
     return "".join(out)
+
+
+def drop_print_tweaks(text):
+    """Line-breaking and range tweaks the translations add for print, and
+    the \\qty{3} slip: LaTeX takes the next token as the unit and prints
+    the same thing, so only a number is meant. An unbraced \\foreach runs to
+    the next `;`, past its \\edef…\\temp: brace it, or the next \\addplot (the
+    2,176-point cyclone scatter) is drawn once per value."""
+    text = re.sub(r"(\\foreach\s*\\\w+\s+in\s*\{[^{}]*\}\s*)"
+                  r"(\\edef\\(\w+)\{(?:[^{}]|\{[^{}]*\})*\}\\\3\b)",
+                  r"\1{\2}", text)
+    text = re.sub(r"\\begingroup\\emergencystretch=[\d.]+em\\relax\s*"
+                  r"(.*?)\\par\\endgroup", r"\1" + "\n\n", text, flags=re.S)
+    # (\tabcolsep: a tighter table for the print page)
+    text = re.sub(r"\\setlength\{\\(?:emergencystretch|tabcolsep)\}"
+                  r"\{[^{}]*\}%?", "", text)
+    text = re.sub(r"\{\\sisetup\{range-phrase=\{\\text\{--\}\}\}"
+                  r"(\\\[.*?\\\])\}", r"\1", text, flags=re.S)
+    return re.sub(r"\\qty\{([^{}]*)\}(?!\s*\{)", r"\1", text)
 
 
 def read_group(cur):
@@ -154,6 +185,9 @@ QUANT_SYMBOLS = {
     "textquotedbl": '"', "textvisiblespace": "␣",
     # chemistry books
     "AA": "\u00c5", "textperthousand": "\u2030",
+    # Earth books
+    "textquoteleft": "\u2018", "textquoteright": "\u2019",
+    "textcopyright": "\u00a9", "textbackslash": "\\",
 }
 # An italic aside group: {\small\itshape\color{omIq} ...}
 ITSHAPE_GROUP = re.compile(r"\{\s*(?:\\(?:small|footnotesize)\s*)?\\itshape\b")
@@ -276,14 +310,17 @@ def count_stars(opt):
 
 
 class Parser:
-    def __init__(self, filename, text):
+    def __init__(self, filename, text, iv=None):
         self.filename = filename
+        # interview books: English UI word -> the edition's word
+        # (LangStrings.iv_strings; empty for English)
+        self.iv = iv or {}
         self.chapter_title = None      # inline list
         self.chapter_label = None
         # \setchemfig{...} in force (chemistry books): prefixed to the
         # source of every chemfig picture that follows it
         self.chem_setup = ""
-        text = strip_comments(text)
+        text = drop_print_tweaks(strip_comments(text))
         self.cur = Cursor(text, filename)
 
     # ---------------------------------------------------------------- blocks
@@ -343,9 +380,10 @@ class Parser:
                         {"t": "dmath", "tex": s[cur.i + 2:end].strip()})
                     cur.i = end + 2
                     continue
-                if s.startswith("\\chapter{", cur.i):
+                if s.startswith(("\\chapter{", "\\chapter["), cur.i):
                     flush()
                     cur.i += len("\\chapter")
+                    read_optional(cur)   # [short title]: toc and running head
                     self.chapter_title = self.parse_inlines(read_group(cur))
                     continue
                 m = re.match(r"\\(sub)?section(\*?)\{", s[cur.i:])
@@ -379,6 +417,67 @@ class Parser:
                     cur.i += m.end() - 1
                     blocks.append({"t": "lookfor",
                                    "inl": self.parse_inlines(read_group(cur))})
+                    continue
+                m = re.match(r"\\(iqwrong|iqwhy|iqfollow)\s*\{", s[cur.i:])
+                if m:
+                    # interview books: "Classic wrong answer. …" and friends,
+                    # each its own paragraph in print
+                    flush()
+                    cur.i += m.end() - 1
+                    lead, has_ask = IV_RUNINS[m.group(1)]
+                    lead = self.iv.get(lead, lead)
+                    ask = self.parse_inlines(read_group(cur)) if has_ask \
+                        else None
+                    blocks.append({"t": "ivrunin", "lead": lead, "ask": ask,
+                                   "body": self.parse_blocks(read_group(cur))})
+                    continue
+                m = re.match(r"\\ivtestsection\s*\{", s[cur.i:])
+                if m:
+                    # interview books, timed tests: an unnumbered section
+                    flush()
+                    cur.i += m.end() - 1
+                    name, count, minutes = [read_group(cur) for _ in range(3)]
+                    blocks.append({"t": "section", "star": True,
+                                   "inl": self.parse_inlines(
+                                       f"Section {name} --- {count} questions, "
+                                       f"{minutes} minutes")})
+                    continue
+                m = re.match(r"\\ivfamily\s*\{", s[cur.i:])
+                if m:
+                    # drill keys: "Family (items 3, 8). How to do them."
+                    flush()
+                    cur.i += m.end() - 1
+                    name, items, how = [read_group(cur) for _ in range(3)]
+                    parbuf.append(f"\\textbf{{{name}}} (items {items}). {how}")
+                    flush()
+                    continue
+                m = re.match(r"\\ivround\s*\{", s[cur.i:])
+                if m:
+                    # played games: "Round 1." leads what the interviewer says
+                    flush()
+                    cur.i += m.end() - 1
+                    parbuf.append(f"\\textbf{{{self.iv.get('Round', 'Round')} "
+                                  f"{read_group(cur)}.}}\\ ")
+                    continue
+                m = re.match(r"\\ivsays\s*\{", s[cur.i:])
+                if m:
+                    cur.i += m.end() - 1
+                    says = "\\textit{Interviewer:} ``#1''"
+                    parbuf.append(self.iv.get(says, says)
+                                  .replace("#1", read_group(cur)))
+                    flush()
+                    continue
+                m = re.match(r"\\ivstop\b", s[cur.i:])
+                if m:
+                    flush()
+                    cur.i += m.end()
+                    blocks.append({"t": "ivstop"})
+                    continue
+                m = re.match(r"\\ivlookup\s*\{", s[cur.i:])
+                if m:
+                    flush()
+                    cur.i += m.end() - 1
+                    blocks.append(self.parse_iv_lookup(read_group(cur)))
                     continue
                 m = re.match(r"\\omcode\s*\{", s[cur.i:])
                 if m:
@@ -416,6 +515,15 @@ class Parser:
                     # purely presentational in print; paragraph flow in HTML
                     if m.group(1) != "noindent":
                         flush()
+                    cur.i += m.end()
+                    continue
+                m = re.match(r"\\phantomsection\s*\\label\{([^{}]*)\}",
+                             s[cur.i:cur.i + 200])
+                if m:
+                    # Earth books: a term defined in the running text, the
+                    # target of its \omterm links
+                    flush()
+                    blocks.append({"t": "anchor", "label": m.group(1)})
                     cur.i += m.end()
                     continue
                 if s.startswith("\\label{", cur.i):
@@ -461,21 +569,29 @@ class Parser:
             n_groups = {"omterm": 2, "cref": 1, "Cref": 1, "ref": 1,
                         "eqref": 1, "emph": 1, "textbf": 1, "index": 1,
                         "label": 1, "textsuperscript": 1, "footnote": 1,
+                        "up": 1, "chaptermark": 1,
                         "texorpdfstring": 2, "hspace": 1, "rule": 2,
                         "texttt": 1, "rotatebox": 2, "multicolumn": 3, "underline": 1,
                         "textit": 1, "ensuremath": 1, "numrange": 2,
                         "textsubscript": 1,
                         "H": 1, "c": 1, "v": 1, "textsc": 1,
+                        "text": 1, "textcolor": 2, "pageref": 1, "omve": 1,
+                        "omlith": 1, "omwx": 1,
                         "path": 1, "si": 1, "money": 2,
                         "omfieldlead": 1,
                         "ce": 1, "pu": 1, "cip": 1, "termsym": 3, "kv": 3,
                         "chemfig": 1, "omorbs": 1, "babelsublr": 1,
-                        "url": 1, "enlargethispage": 1,
-                        "foreignlanguage": 2, "mbox": 1}.get(name, 0)
+                        "url": 1, "enlargethispage": 1, "markboth": 2,
+                        "foreignlanguage": 2, "mbox": 1,
+                        "shortstack": 1}.get(name, 0)
             if name in ("H", "c", "v") \
                     and (cur.i >= len(s) or s[cur.i] != "{"):
                 n_groups = 0  # bare-letter accent form (\v S)
             out = [s[start:cur.i]]
+            if name in ("omwx", "shortstack") \
+                    and s[cur.i:cur.i + 1] == "[":
+                # an optional argument kept with the command
+                out.append("[" + read_optional(cur) + "]")
             for _ in range(n_groups):
                 while cur.i < len(s) and s[cur.i] in " \n":
                     cur.i += 1
@@ -530,6 +646,38 @@ class Parser:
             body = find_env_end(cur, name)
             return {"t": "dmath",
                     "tex": f"\\begin{{{name}}}" + body + f"\\end{{{name}}}"}
+        if name == "multline*":
+            # KaTeX has no multline: the same lines, centred
+            body = find_env_end(cur, name)
+            return {"t": "dmath",
+                    "tex": "\\begin{gather*}" + body + "\\end{gather*}"}
+        if name == "description":
+            # \item[Label.] text -> a bullet with a bold lead-in
+            chunks = split_top_level(find_env_end(cur, name), "item",
+                                     self.filename)
+            if chunks[0].strip():
+                raise ParseError(
+                    f"{self.filename}: text before first \\item in {name}")
+            items = []
+            for chunk in chunks[1:]:
+                icur = Cursor(chunk, self.filename)
+                lead = read_optional(icur)
+                if lead is None:
+                    icur.err("description \\item without a [label]")
+                items.append(self.parse_blocks(
+                    "\\textbf{" + lead + "} " + chunk[icur.i:].lstrip()))
+            return {"t": "list", "kind": "itemize", "resume": False,
+                    "items": items}
+        if name == "ivtrains":
+            # interview books: what a chapter trains, under its title; a
+            # plain paragraph, so it also feeds the page description
+            blocks = self.parse_blocks(find_env_end(cur, name))
+            if len(blocks) != 1 or blocks[0]["t"] != "para":
+                raise ParseError(
+                    f"{self.filename}: ivtrains must be one paragraph")
+            return {**blocks[0], "css": "om-iv-trains"}
+        if name in ("ivdrillsheet", "ivdrillkey"):
+            return self.parse_iv_drills(name, find_env_end(cur, name))
         if name == "omfigure":
             body = find_env_end(cur, "omfigure")
             return self.parse_figure(body)
@@ -550,6 +698,18 @@ class Parser:
                                 + body.strip()]
                 return {"t": "figure", "tikzs": pictures, "label": None,
                         "caption": []}
+            if re.match(r"\s*\\begin\{tikzpicture\}", body):
+                # a picture and, under it, its table (Earth books)
+                pictures, rest = self.take_pictures(body)
+                if "\\begin{tabular}" in rest:
+                    table = self.parse_center(
+                        re.sub(r"^(\s|\\smallskip\b|\\medskip\b)*", "", rest))
+                    return {"t": "figure", "tikzs": pictures, "label": None,
+                            "caption": [], "table": table}
+            if "\\begin{tabular}" not in body \
+                    and self.INCLUDEGRAPHICS.search(body):
+                # a photo centred in a box (Earth books), caption optional
+                return self.parse_figure(body)
             return self.parse_center(body)
         if name == "table":
             read_optional(cur)  # float placement: print-only
@@ -564,7 +724,7 @@ class Parser:
             # its heading) and tutorial steps ("Step N." labels)
             body = find_env_end(cur, name)
             chunks = split_top_level(body, "item", self.filename)
-            if chunks[0].strip():
+            if chunks[0].replace("\\sloppy", "").strip():
                 raise ParseError(
                     f"{self.filename}: text before first \\item in {name}")
             return {"t": "list",
@@ -572,13 +732,17 @@ class Parser:
                     "resume": False, "sources": name == "omsources",
                     "items": [self.parse_blocks(c) for c in chunks[1:]]}
         if name in QUANT_BOXES:
-            args = [read_group(cur) for _ in range(QUANT_BOXES[name])]
+            # Earth books: \begin{dated}{2026}, the year alone and no title
+            year_only = name == "dated" \
+                and re.match(r"\s*\{\d{4}\}", s[cur.i:]) is not None
+            n_args = 1 if year_only else QUANT_BOXES[name]
+            args = [read_group(cur) for _ in range(n_args)]
             title, asof = None, None
             if name == "dated":
                 asof = args[0].strip()
-                if not re.fullmatch(r"\d{4}-\d{2}", asof):
+                if not year_only and not re.fullmatch(r"\d{4}-\d{2}", asof):
                     cur.err(f"dated box date {asof!r} is not YYYY-MM")
-            if args:
+            if args and not year_only:
                 title = self.parse_inlines(args[-1])
             label = None
             m = re.match(r"\s*\\label\{", s[cur.i:])
@@ -591,7 +755,9 @@ class Parser:
                     "body": body_blocks}
         if name in ASIDE_BOXES:
             title, pics = None, []
-            if name == "safety":
+            if name == "safety" and s[cur.i:cur.i + 1] != "{":
+                pass    # Earth books: no pictogram argument
+            elif name == "safety":
                 arg = read_group(cur)
                 gcur = Cursor(arg, self.filename)
                 while gcur.i < len(arg):
@@ -610,11 +776,14 @@ class Parser:
                     title = self.parse_inlines(opt.strip())
             body = find_env_end(cur, name)
             widths, side = None, "start"
+            photo, body = self.leading_photo(body)
             if self.MINIPAGE.search(body):
                 # a portrait beside the text: photo minipage(s), then (or
                 # before) one text minipage
                 pics, widths, side, body = self.parse_aside_minipages(body)
             body_blocks = self.parse_blocks(body)
+            if photo:
+                body_blocks.insert(0, photo)
             return {"t": "env", "kind": name, "title": title, "label": None,
                     "difficulty": None, "sol_key": None, "pics": pics,
                     "pic_widths": widths, "pics_side": side,
@@ -636,29 +805,38 @@ class Parser:
         if name in LIST_ENVS:
             opt = read_optional(cur)
             resume = bool(opt) and "resume" in opt
+            alpha = False
             for o in (opt or "").split(","):
+                if o.strip() == "label=(\\alph*)":
+                    alpha = True    # Earth books: (a), (b)…
                 # beginpenalty (chemistry): a print page-break hint
-                if o.strip() and o.strip() != "resume" \
-                        and not re.fullmatch(r"beginpenalty=\d+", o.strip()):
+                elif o.strip() and o.strip() != "resume" \
+                        and not re.fullmatch(r"beginpenalty=\d+|leftmargin=\*"
+                                             r"|(itemsep|topsep)=[\d.]+pt",
+                                             o.strip()):
                     raise ParseError(
                         f"{self.filename}: unsupported list option [{opt}]")
             body = find_env_end(cur, name)
             chunks = split_top_level(body, "item", self.filename)
-            if chunks[0].strip():
+            # \sloppy before the first \item: a print line-breaking hint
+            if chunks[0].replace("\\sloppy", "").strip():
                 raise ParseError(
                     f"{self.filename}: text before first \\item in {name}")
             items = [self.parse_blocks(cchunk) for cchunk in chunks[1:]]
-            return {"t": "list", "kind": name, "resume": resume,
+            node = {"t": "list", "kind": name, "resume": resume,
                     "items": items}
+            if alpha:
+                node["alpha"] = True
+            return node
         if name in BLOCK_ENVS:
             title, sol_key, difficulty = None, None, None
-            roles = firm = None
+            roles = firm = level = None
             if name == "solution":
                 sol_key = read_group(cur)
             else:
                 opt = read_optional(cur)
                 if opt is not None:
-                    if name == "interviewq":
+                    if name in ("interviewq", "question"):
                         # [$\star\star$ \iqroles{trader} \iqfirm{market maker}]
                         difficulty = count_stars(opt)
                         rest = re.sub(r"\$(\\star)*\$", "", opt)
@@ -666,7 +844,10 @@ class Parser:
                         mf = re.search(r"\\iqfirm\{([^{}]*)\}", rest)
                         roles = self.parse_inlines(mr.group(1)) if mr else None
                         firm = self.parse_inlines(mf.group(1)) if mf else None
-                        rest = re.sub(r"\\iq(roles|firm)\{[^{}]*\}", "", rest)
+                        ml = re.search(r"\\iqlevel\{([^{}]*)\}", rest)
+                        level = self.parse_inlines(ml.group(1)) if ml else None
+                        rest = re.sub(r"\\iq(roles|firm|level)\{[^{}]*\}", "",
+                                      rest)
                         if difficulty == 0 or rest.strip():
                             raise ParseError(
                                 f"{self.filename}: unsupported interviewq "
@@ -701,10 +882,57 @@ class Parser:
             node = {"t": "env", "kind": name, "title": title, "label": label,
                     "difficulty": difficulty, "sol_key": sol_key,
                     "body": body_blocks}
-            if name == "interviewq":
+            if name in ("interviewq", "question"):
                 node["roles"], node["firm"] = roles, firm
+                node["level"] = level
             return node
         cur.err(f"unknown environment {name!r}")
+
+    def parse_iv_drills(self, name, body):
+        """Interview-book drill sheet or key: a print table of \\ivdrill /
+        \\ivkey cells filled column by column. On the web it is one list in
+        item order, which reflows on a phone."""
+        macro = "\\ivdrill" if name == "ivdrillsheet" else "\\ivkey"
+        items = []
+        for row in split_top_level(body, "\\", self.filename):
+            row = re.sub(r"^\s*\[[^\]]*\]", "", row).replace("\\hline", "")
+            for cell in re.split(r"(?<!\\)&", row):
+                # a strut for a tall fraction (print-only)
+                cell = re.sub(r"\\rule\[[^\]]*\]\{[^{}]*\}\{[^{}]*\}", "",
+                              cell).strip()
+                if not cell:
+                    continue
+                cur = Cursor(cell, self.filename)
+                if not cell.startswith(macro + "{"):
+                    cur.err(f"unsupported cell in {name}: {cell[:60]!r}")
+                cur.i = len(macro)
+                number, tex = read_group(cur), read_group(cur)
+                options = None
+                if cell.startswith("\\ivoptions{", cur.i):
+                    cur.i += len("\\ivoptions")
+                    options = [read_group(cur) for _ in range(4)]
+                if cell[cur.i:].strip():
+                    cur.err(f"unsupported cell in {name}: {cell[:60]!r}")
+                inl = self.parse_inlines(tex)
+                for node in inl:
+                    if node["t"] == "math":  # print's \everymath{\displaystyle}
+                        node["tex"] = "\\displaystyle " + node["tex"]
+                items.append({"n": int(number), "inl": inl, "options": [
+                    self.parse_inlines(f"${o}$") for o in options
+                ] if options else None})
+        items.sort(key=lambda item: item["n"])
+        return {"t": "ivdrills", "key": name == "ivdrillkey", "items": items}
+
+    def parse_iv_lookup(self, body):
+        """Played games: a scrambled table of results (\\ivcell{4.5}{L} …)."""
+        pattern = r"\\ivcell\{([^{}]*)\}\{([^{}]*)\}"
+        rest = re.sub(pattern, "", body)
+        if re.sub(r"\\quad\b|\s", "", rest):
+            raise ParseError(f"{self.filename}: unsupported \\ivlookup "
+                             f"content {rest.strip()[:60]!r}")
+        return {"t": "ivlookup", "cells": [
+            (self.parse_inlines(a), self.parse_inlines(b))
+            for a, b in re.findall(pattern, body)]}
 
     def parse_table_float(self, body):
         """A `table` float (quant books): one tabular plus \\caption and
@@ -725,19 +953,51 @@ class Parser:
                       r"|\\renewcommand\{\\arraystretch\}\{[\d.]+\}",
                       " ", body)
         table = self.parse_center(body)
+        numbered = mcap is not None
+        if table["t"] == "tablefloat" and label:
+            # a legend in place of \caption (one Arabic table): the label
+            # is still cited, so it stays numbered like the other editions
+            caption, table, numbered = table["caption"], table["table"], True
         if table["t"] not in ("table", "tables"):
             raise ParseError(f"{self.filename}: table float without tabular")
         return {"t": "tablefloat", "table": table, "caption": caption,
-                "label": label, "numbered": mcap is not None}
+                "label": label, "numbered": numbered}
 
     FIGURE_SETUP = re.compile(
-        r"\\(setchemfig|tdplotsetmaincoords|pgfplotsset)\s*\{")
+        r"\\(setchemfig|tdplotsetmaincoords|pgfplotsset|tikzset|colorlet"
+        r"|pgfplotstableread|pgfplotstablegetelem)\s*\{")
+
+    def expand_photo_macro(self, body):
+        """A photo-grid macro defined inside the figure (Earth books):
+        expand its calls, the photo's file name is `images/…/#1` until then."""
+        m = re.search(r"\\newcommand\{(\\[a-zA-Z]+)\}\[(\d)\]\{", body)
+        if not m:
+            return body
+        cur = Cursor(body, self.filename)
+        cur.i = m.end() - 1
+        definition = read_group(cur)
+        if "\\includegraphics" not in definition:
+            return body
+        rest = body[:m.start()] + body[cur.i:]
+        call = re.compile(re.escape(m.group(1)) + r"(?![a-zA-Z])")
+        out, pos = [], 0
+        for found in iter(lambda: call.search(rest, pos), None):
+            out.append(rest[pos:found.start()])
+            cur = Cursor(rest, self.filename)
+            cur.i = found.end()
+            text = definition
+            for n in range(1, int(m.group(2)) + 1):
+                text = text.replace(f"#{n}", read_group(cur))
+            out.append(text)
+            pos = cur.i
+        return "".join(out) + rest[pos:]
 
     def parse_figure(self, body, floated=False):
         """Figure-level settings before the pictures (chemistry books:
         \\pgfplotsset styles, \\setchemfig, the tikz-3dplot view) are
         prefixed to every picture of the figure, minipages included."""
         saved = self.chem_setup
+        body = self.expand_photo_macro(body)
         pictures = [(m.start(), m.end()) for m in re.finditer(
             r"\\begin\{(tikzpicture|circuitikz)\}.*?\\end\{\1\}", body,
             re.S)]
@@ -751,9 +1011,24 @@ class Parser:
                 continue
             cur = Cursor(body, self.filename)
             cur.i = m.end() - 1
-            groups = 2 if m.group(1) == "tdplotsetmaincoords" else 1
+            groups = 2 if m.group(1) in ("tdplotsetmaincoords", "colorlet",
+                                         "pgfplotstablegetelem") else 1
             setup = f"\\{m.group(1)}" + "".join(
                 "{" + read_group(cur) + "}" for _ in range(groups))
+            trailer = {
+                # \pgfplotstableread{file}\macro
+                "pgfplotstableread": r"\s*\\[a-zA-Z]+",
+                # \pgfplotstablegetelem{0}{col}\of{\tab}\let\x\pgfplotsretval
+                "pgfplotstablegetelem":
+                    r"\s*\\of\s*(\{[^{}]*\}|\\[a-zA-Z]+)\s*"
+                    r"\\let\\[a-zA-Z]+\\pgfplotsretval",
+            }.get(m.group(1))
+            if trailer:
+                tail = re.match(trailer, body[cur.i:])
+                if not tail:
+                    cur.err(f"unsupported \\{m.group(1)} form")
+                setup += tail.group(0).strip() + "\n"
+                cur.i += tail.end()
             self.chem_setup += setup
             body = body[:m.start()] + body[cur.i:]
             shift = cur.i - m.start()
@@ -780,7 +1055,9 @@ class Parser:
         "grid" = [[{"src", "label"}, ...], ...]."""
         tikzs, widths, sublabels = [], {}, {}
         table = None
-        rest = body
+        # \makebox[0.32\linewidth]{\includegraphics…}: print-only cell width
+        rest = re.sub(r"\\makebox\[[^\]]*\]\{(\\includegraphics"
+                      r"(?:\[[^\]]*\])?\{[^{}]*\})\}", r"\1", body)
         composed = self.composed_picture(rest)
         if composed:
             tikzs, rest = [composed[0]], composed[1]
@@ -790,13 +1067,18 @@ class Parser:
                 self.parse_minipage_figure(rest)
         pictures, rest = self.take_pictures(rest)
         tikzs += pictures
+        if tikzs and table is None and self.INCLUDEGRAPHICS.search(rest):
+            # photos in the same figure as a chart (Earth books)
+            tikzs += [m.group(0) for m in self.INCLUDEGRAPHICS.finditer(rest)]
+            rest = self.INCLUDEGRAPHICS.sub("", rest)
         # \resizebox{\linewidth}{!}{<picture>}: print-only fit to the text
         # width — the SVG scales to its column by itself
         rest = re.sub(r"\\resizebox\{[^{}]*\}\{[^{}]*\}\{\s*\}", "", rest)
         grid = None
         if not tikzs:
             tikzs, grid, sublabels, rest = self.parse_raster_figure(rest)
-        if not tikzs and re.search(r"\\begin\{(center|tabular)\}", rest):
+        if not tikzs and grid is None \
+                and re.search(r"\\begin\{(center|tabular)\}", rest):
             # a table set as a figure (the genetic-code table)
             table, rest = self.parse_table_figure(rest)
         math = None
@@ -813,7 +1095,7 @@ class Parser:
                     math = math[len("\\begin{equation*}"):
                                 -len("\\end{equation*}")].strip()
                 rest = rest[:mm.start()] + rest[e:]
-        if not tikzs and table is None and math is None:
+        if not tikzs and table is None and math is None and grid is None:
             raise ParseError(
                 f"{self.filename}: omfigure without tikzpicture, "
                 "\\includegraphics or tabular")
@@ -868,11 +1150,20 @@ class Parser:
             caption, numbered = text, True
             # a second \label names the same figure (an alias anchor)
             label, aliases = (labels[0], labels[1:]) if labels else (None, [])
+        # Earth books: a \label after the caption of a figure print leaves
+        # unnumbered. It only serves \pageref: an anchor, not a number.
+        anchor = None
+        m3 = re.search(r"\s*\\label\{(fig:[^{}]*)\}\s*$", caption)
+        if m3:
+            anchor = m3.group(1)
+            caption = caption[:m3.start()]
         m2 = re.fullmatch(r"\{\\small\s+(.*)\}", caption, re.S)
         if m2:
             caption = m2.group(1)
         node = {"t": "figure", "tikzs": tikzs, "label": label,
                 "caption": self.parse_inlines(caption)}
+        if anchor:
+            node["anchor"] = anchor
         if numbered:
             node["numbered"] = True
         if aliases:
@@ -949,8 +1240,8 @@ class Parser:
             tikzs.append(src)
             widths[idx] = width
             sub = re.sub(r"\\centering|\\par\b|\\smallskip|\\medskip"
-                         r"|\\bigskip|\\vspace\*?\{[^{}]*\}|\\\\", " ",
-                         inner).strip()
+                         r"|\\bigskip|\\vspace\*?\{[^{}]*\}"
+                         r"|\\\\(?:\[[^\]]*\])?", " ", inner).strip()
             m2 = re.fullmatch(r"\{\\(?:small|footnotesize|scriptsize)\s+(.*)\}",
                               sub, re.S)
             if m2:
@@ -959,6 +1250,25 @@ class Parser:
                 sublabels[idx] = self.parse_inlines(sub)
         return tikzs, widths, sublabels, table, rest
 
+    def leading_photo(self, body):
+        """A box opening on a centred photo and its {\\small caption}, above
+        the text (Earth books). Returns (figure node or None, the rest)."""
+        m = re.match(r"\s*\\centering\s*(\\includegraphics"
+                     r"(?:\[[^\]]*\])?\{[^{}]*\})", body)
+        if not m:
+            return None, body
+        rest = re.sub(r"^(\s|\\par\b|\\smallskip\b)*", "", body[m.end():])
+        caption = []
+        if rest.startswith("{\\small"):
+            cur = Cursor(rest, self.filename)
+            group = read_group(cur)
+            caption = self.parse_inlines(re.sub(r"^\\small\s+", "", group))
+            rest = rest[cur.i:]
+        rest = re.sub(r"^(\s|\\par\b|\\medskip\b|\\smallskip\b"
+                      r"|\\raggedright\b)*", "", rest)
+        return ({"t": "figure", "tikzs": [m.group(1)], "label": None,
+                 "caption": caption}, rest)
+
     def parse_aside_minipages(self, body):
         """A box body made of side-by-side minipages: picture ones (one
         \\includegraphics each) and exactly one text minipage. Returns
@@ -966,6 +1276,25 @@ class Parser:
         the text)."""
         pics, widths, texts, first = [], [], [], None
         rest = body
+        # Earth books: a bare \includegraphics beside the text minipage, and
+        # the photo's {\small caption} under them
+        bare = self.INCLUDEGRAPHICS.search(body)
+        first_minipage = self.MINIPAGE.search(body)
+        if bare and bare.start() < first_minipage.start():
+            width = re.search(r"width=([\d.]+)\\linewidth", bare.group(0))
+            if not width:
+                raise ParseError(f"{self.filename}: a picture beside a "
+                                 "minipage needs width=N\\linewidth")
+            rest = body[:bare.start()] + body[bare.end():]
+            legend = re.search(r"\{\\small\s+(.*)\}\s*$", rest, re.S)
+            caption = None
+            if legend:
+                caption = self.parse_inlines(legend.group(1))
+                rest = rest[:legend.start()]
+            pics.append({"t": "pic", "src": bare.group(0),
+                         "caption": caption})
+            widths.append(float(width.group(1)))
+            first = "pics"
         while True:
             m = self.MINIPAGE.search(rest)
             if not m:
@@ -975,16 +1304,43 @@ class Parser:
             inner = find_env_end(cur, "minipage")
             rest = rest[:m.start()] + rest[cur.i:]
             inner = re.sub(r"^\s*\\vspace\{0pt\}", "", inner)
-            im = self.INCLUDEGRAPHICS.search(inner)
+            stacked = list(self.INCLUDEGRAPHICS.finditer(inner))
+            if len(stacked) > 1 and "\\begin{tikzpicture}" not in inner:
+                # photos stacked in one column, each with its legend (Earth
+                # books): the column's width once, a 0 for each further photo
+                for i, pic in enumerate(stacked):
+                    end = stacked[i + 1].start() if i + 1 < len(stacked) \
+                        else len(inner)
+                    legend = re.sub(r"\\par\b|\\centering|\\smallskip", " ",
+                                    inner[pic.end():end]).strip()
+                    m2 = re.fullmatch(r"\{\\(?:footnotesize|small|scriptsize)"
+                                      r"\s+(.*)\}", legend, re.S)
+                    if m2:
+                        legend = m2.group(1)
+                    pics.append({"t": "pic", "src": pic.group(0),
+                                 "caption": self.parse_inlines(legend)
+                                 if legend else None})
+                    widths.append(float(m.group(1)) if i == 0 else 0.0)
+                first = first or "pics"
+                continue
+            # a tikzpicture drawing over the photo (Earth books) is the
+            # picture itself, at the minipage's width
+            im = re.search(r"\\begin\{tikzpicture\}.*?\\end\{tikzpicture\}",
+                           inner, re.S) or self.INCLUDEGRAPHICS.search(inner)
             if im:
                 # the photo, with an optional {\footnotesize legend}
-                legend = re.sub(r"\\par\b|\\centering|\\smallskip", " ",
+                legend = re.sub(r"\\par\b|\\centering|\\smallskip"
+                                r"|\\\\(\[[^\]]*\])?", " ",
                                 inner[:im.start()] + inner[im.end():]).strip()
                 m2 = re.fullmatch(r"\{\\(?:footnotesize|small|scriptsize)"
                                   r"\s+(.*)\}", legend, re.S)
                 if m2:
                     legend = m2.group(1)
-                pics.append({"t": "pic", "src": im.group(0),
+                src = im.group(0)
+                if src.startswith("\\begin{tikzpicture}"):
+                    width_pt = float(m.group(1)) * self.TEXT_WIDTH_PT
+                    src = f"\\setlength{{\\linewidth}}{{{width_pt:g}pt}}{src}"
+                pics.append({"t": "pic", "src": src,
                              "caption": self.parse_inlines(legend)
                              if legend else None})
                 widths.append(float(m.group(1)))
@@ -992,7 +1348,8 @@ class Parser:
             else:
                 texts.append(inner)
                 first = first or "text"
-        leftover = re.sub(r"\\hfill|\\hspace\{[^{}]*\}|\\par\b", "", rest)
+        leftover = re.sub(r"\\hfill|\\hspace\{[^{}]*\}|\\par\b|\\smallskip\b",
+                          "", rest)
         if len(texts) != 1 or not pics or leftover.strip():
             raise ParseError(f"{self.filename}: unsupported minipage layout "
                              "in a box")
@@ -1058,7 +1415,9 @@ class Parser:
         if grid is not None:
             # text left before the tabular is the leading picture's
             # sub-caption; the real caption follows the tabular
-            sub = re.sub(r"\\qquad|\\quad|\\hfill", " ", before).strip()
+            sub = re.sub(r"\\qquad|\\quad|\\hfill"
+                         r"|\\setlength\{\\tabcolsep\}\{[^{}]*\}", " ",
+                         before).strip()
             m2 = re.fullmatch(r"\{\\small\s+(.*)\}", sub, re.S)
             if m2:
                 sub = m2.group(1)
@@ -1144,6 +1503,12 @@ class Parser:
             stripped = re.sub(r"^\\renewcommand\{\\arraystretch\}"
                               r"\{[\d.]+\}\s*", "", body)
             stripped = re.sub(r"^\\small\s+", "", stripped)
+            # {\small \begin{tabular}…} as one group (Earth books)
+            group = re.fullmatch(r"(?:\{\s*(?:\\small\s+)?|\\babelsublr\{\s*)"
+                                 r"(\\begin\{tabular\}.*)\}",
+                                 stripped, re.S)
+            if group:
+                stripped = group.group(1).strip()
             if stripped == body:
                 break
             body = stripped
@@ -1156,7 +1521,8 @@ class Parser:
             rest = cur.s[cur.i:]
             stripped = re.match(
                 r"(\s|\\qquad\b|\\quad\b|\\small\b|\\footnotesize\b"
-                r"|\\scriptsize\b|\\setlength\{[^{}]*\}\{[^{}]*\})*",
+                r"|\\scriptsize\b|\\smallskip\b|\\medskip\b"
+                r"|\\setlength\{[^{}]*\}\{[^{}]*\})*",
                 rest).end()
             cur.i += stripped
             if cur.i >= len(cur.s):
@@ -1311,10 +1677,14 @@ class Parser:
         Returns (source, caption) or None for every other figure."""
         bare = re.sub(r"\\begin\{(tikzpicture|circuitikz)\}.*?\\end\{\1\}",
                       "", body, flags=re.S)
-        if not re.search(r"\\(chemfig|schemestart|chemmove|newcommand)\b",
-                         bare) \
+        # a tabular of tikzpictures and their labels (Earth books) as well
+        grid = re.search(r"\\begin\{tabular\}.*\\begin\{tikzpicture\}"
+                         r".*\\end\{tabular\}", body, re.S)
+        if not grid and (
+                not re.search(
+                    r"\\(chemfig|schemestart|chemmove|newcommand|def)\b", bare)
                 or ("\\begin{minipage}" in body
-                    and "\\newcommand" not in body):
+                    and "\\newcommand" not in body and "\\def" not in body)):
             return None
         pic, caption = body.rstrip(), ""
         for m in re.finditer(r"\{\\small\b", pic):
@@ -1433,16 +1803,20 @@ class Parser:
                 if not m:
                     nxt = s[cur.i + 1:cur.i + 2]
                     following = s[cur.i + 2:cur.i + 3]
-                    if nxt in ("'", "`", "^", '"', "~") \
+                    if nxt in ("'", "`", "^", '"', "~", "=") \
                             and (following.isalpha() or following == "{"):
                         # accents in prose, bare (\'e) or braced (\'{e})
                         import unicodedata
                         combining = {"'": "\u0301", "`": "\u0300",
                                      "^": "\u0302", '"': "\u0308",
-                                     "~": "\u0303"}[nxt]
+                                     "~": "\u0303", "=": "\u0304"}[nxt]
                         if following == "{":
                             cur.i += 2
                             letter = read_group(cur)
+                            if not letter:
+                                # \^{} and \~{}: the plain character
+                                text.append(nxt)
+                                continue
                             if len(letter) != 1 or not letter.isalpha():
                                 cur.err(f"unsupported accent argument "
                                         f"{letter!r}")
@@ -1567,11 +1941,34 @@ class Parser:
                     # bare number reference ("chapter~\ref{ch:...}")
                     emit_text()
                     out.append({"t": "ref", "label": read_group(cur)})
+                elif name == "newline":
+                    # a line break in a p{} table cell
+                    emit_text()
+                    out.append({"t": "br"})
+                elif name == "pageref":
+                    # "on page~\pageref{fig:…}": the edition's printed page
+                    emit_text()
+                    out.append({"t": "pageref", "label": read_group(cur)})
+                elif name == "omve":
+                    # "vertical exaggeration ×2.5" (oneearth.sty)
+                    emit_text()
+                    out.append({"t": "omve",
+                                "tex": f"\\times {read_group(cur)}"})
+                elif name == "text":
+                    # \text in prose (amstext accepts it): its content
+                    emit_text()
+                    out.extend(self.parse_inlines(read_group(cur)))
+                elif name == "textcolor":
+                    # a coloured row of a table: print emphasis only
+                    read_group(cur)
+                    emit_text()
+                    out.extend(self.parse_inlines(read_group(cur)))
                 elif name == "quad":
                     text.append(" ")
                 elif name == "qquad":
                     text.append("  ")
-                elif name == "textsuperscript":
+                elif name in ("textsuperscript", "up"):
+                    # \up{e}: babel-french's superscript (99\up{e} centile)
                     emit_text()
                     inner = read_group(cur)
                     out.append({"t": "sup", "inl": self.parse_inlines(inner)})
@@ -1593,8 +1990,17 @@ class Parser:
                     out.extend(self.parse_inlines(tex_arg))
                 elif name == "checkmark":
                     text.append("✓")
+                elif name == "markboth":
+                    read_group(cur)      # running heads (print-only)
+                    read_group(cur)
+                elif name == "chaptermark":
+                    read_group(cur)      # a shorter running head (print-only)
+                elif name == "slash":
+                    text.append("/")     # a breakable slash in print
                 elif name in ("hfill", "leavevmode", "centering",
-                              "begingroup", "endgroup", "sloppy"):
+                              "begingroup", "endgroup", "sloppy",
+                              "vfill", "newpage", "nopagebreak",
+                              "hfil", "break", "raggedright"):
                     pass  # print-layout commands: no HTML equivalent
                 elif name == "ensuremath":
                     # \ensuremath{\mathrm{CO_2}} in prose = inline math
@@ -1653,9 +2059,11 @@ class Parser:
                            if name == "termsym" else
                            f"\\mathrm{{{a}}}_{{\\mathrm{{{b}}}}}^{{{c}}}")
                     out.append({"t": "math", "tex": tex})
-                elif name in ("chemfig", "omorbs", "ghs", "tikz"):
+                elif name in ("chemfig", "omorbs", "ghs", "tikz", "omlith",
+                              "omwx"):
                     # a small picture in the running text (a structure,
-                    # orbital boxes, a hazard pictogram, an atom model)
+                    # orbital boxes, a hazard pictogram, an atom model; a
+                    # lithology swatch, a weather symbol)
                     emit_text()
                     out.append({"t": "pic", "src": self.chem_setup
                                 + self.picture_command(cur, name)})
@@ -1685,11 +2093,32 @@ class Parser:
                         cur.err("unsupported \\penalty value")
                     cur.i += m2.end()
                 elif name == "mbox":
-                    # an unbreakable run: its text
+                    # an unbreakable run: its text. \textdir TLT (Arabic
+                    # editions) keeps a range or unit left to right, which
+                    # the HTML must say too: "3–5" would flip otherwise
                     emit_text()
-                    out.extend(self.parse_inlines(read_group(cur)))
+                    inner = read_group(cur)
+                    m2 = re.match(r"\s*\\textdir\s*TLT\s*", inner)
+                    if m2:
+                        out.append({"t": "ltr", "inl": self.parse_inlines(
+                            inner[m2.end():])})
+                    else:
+                        out.extend(self.parse_inlines(inner))
+                elif name == "shortstack":
+                    # stacked lines in a table head (Earth books)
+                    if s.startswith("[", cur.i):
+                        read_optional(cur)
+                    emit_text()
+                    out.extend(self.parse_inlines(
+                        read_group(cur).replace("\\\\", "\\newline ")))
                 elif name == "textminus":
                     text.append("\u2212")
+                elif name == "textquotesingle":
+                    text.append("'")     # straight, as in code
+                elif name == "textasciitilde":
+                    text.append("~")
+                elif name == "textsterling":
+                    text.append("\u00a3")
                 elif name in ("footnotesize", "scriptsize"):
                     pass  # size switch inside a group; CSS owns sizing
                 elif name == "begin" and s.startswith("{tabular}", cur.i):
@@ -1766,21 +2195,44 @@ class Parser:
         return out
 
 
-def parse_chapter(path):
-    """Parse a chapter file; returns (title_inlines, chapter_label, blocks)."""
+def expand_generated(text, path):
+    """Interview books: inline the script-written files of a chapter
+    (\\input{parts/<dir>/generated/<name>}) and expand \\ivscoreline, a macro
+    for a whole table row. Any other \\input stays an error."""
+    root = next((d.parent for d in Path(path).resolve().parents
+                 if d.name == "parts"), None)
+
+    def inline(m):
+        target = root / (m.group(1) + ".tex")
+        if not target.exists():
+            raise ParseError(f"{path}: missing generated file {target}")
+        return target.read_text(encoding="utf-8")
+    if root is not None:
+        text = re.sub(r"\\input\{(parts/[a-z0-9-]+/generated/[^{}]+)\}",
+                      inline, text)
+    # sloppypar: a paragraph with looser line breaking in print; it starts
+    # and ends a paragraph, as blank lines do
+    text = re.sub(r"\\(?:begin|end)\{sloppypar\}", "\n\n", text)
+    return re.sub(r"\\ivscoreline\{([^{}]*)\}",
+                  lambda m: m.group(1) + " & & & & & \\\\[8pt]\\hline", text)
+
+
+def parse_chapter(path, iv=None):
+    """Parse a chapter file; returns (title_inlines, chapter_label, blocks).
+    `iv`: the interview books' localized run-in words (LangStrings)."""
     with open(path, encoding="utf-8") as f:
-        text = f.read()
-    p = Parser(str(path), text)
+        text = expand_generated(f.read(), path)
+    p = Parser(str(path), text, iv)
     blocks = p.parse()
     if p.chapter_title is None or p.chapter_label is None:
         raise ParseError(f"{path}: missing \\chapter{{...}}\\label{{...}}")
     return p.chapter_title, p.chapter_label, blocks
 
 
-def parse_solutions(path):
+def parse_solutions(path, iv=None):
     """Parse a solutions file; returns dict sol_key -> body blocks."""
     with open(path, encoding="utf-8") as f:
-        text = f.read()
+        text = expand_generated(f.read(), path)
     # Drop the \section*{Chapter \ref{...} --- ...} header (it repeats the
     # chapter title and its \ref cannot be resolved standalone). The title
     # may span lines, so strip the balanced group, not a single line.
@@ -1790,10 +2242,12 @@ def parse_solutions(path):
         cur.i = m.end()
         read_group(cur)
         text = text[cur.i:]
-    p = Parser(str(path), text)
+    p = Parser(str(path), text, iv)
     blocks = p.parse()
     solutions = {}
     for b in blocks:
+        if b["t"] == "subsection" and b["star"]:
+            continue    # a print heading of the solutions appendix
         if b["t"] != "env" or b["kind"] != "solution":
             raise ParseError(
                 f"{path}: unexpected top-level content in solutions file")
