@@ -1,0 +1,800 @@
+\chapter{行列式与线性方程组}\label{ch:b1:det}
+
+行列式把“这
+$n$ 个向量是否构成基？”的答案浓缩为一个标量——从几何上看，它度量的是这些向量
+所张成的体积。我们以其性质（多重线性、
+交错性、规范化）刻画它，在 $2$ 维与 $3$ 维中计算它，
+一般情形则用\omterm{thm:b1:det:cofactor}{余子式展开}计算，并将其用于\omterm{def:b1:det:system}{线性方程组}，
+并与通用算法\omterm{met:b1:det:gauss}{高斯消元}法一同讨论。
+
+\section{行列式}
+
+\begin{theorem}[刻画]\label{thm:b1:det:def}
+存在唯一的\omterm{def:b1:logic:map}{映射} $\det \colon \mathcal{M}_n(K) \to K$，
+将其视为 $n$ 列的函数，即满足：
+\begin{enumerate}
+  \item \emph{对每一列线性}（其余列固定）；
+  \item \emph{交错性}：交换两列会改变符号
+        （因此两列相等时行列式为 $0$）；
+  \item \emph{规范化}：$\det I_n = 1$。
+\end{enumerate}
+当 $n = 2$ 与 $3$ 时：\index{行列式}
+\[
+\begin{vmatrix} a & b\\ c & d\end{vmatrix} = ad - bc,
+\qquad
+\begin{vmatrix} a & b & c\\ d & e & f\\ g & h & i\end{vmatrix}
+= aei + bfg + cdh - ceg - bdi - afh
+\]
+（$3 \times 3$ 的萨吕法则：自左上至右下的对角线之积
+减去自右上至左下的对角线之积）。
+\end{theorem}
+\admitted
+
+\begin{remark}
+对 $n = 2$：在标准列上按双线性展开即得
+该公式，反过来它也满足公理——这就是一个完整的
+证明；$n = 3$ 的情形与之完全相同，只是项数更多。一般情形
+（存在性由对\omterm{def:b1:counting:objects}{置换}求和给出，唯一性由同样的
+展开得到）需要\omterm{def:b1:counting:objects}{置换}的符号，将留待二年级讨论；
+此处我们自由使用公理及下面的
+结论。
+
+完整写出 $n = 2$ 的展开，因其为范本，取
+列 $C_1 = a\,e_1 + c\,e_2$ 与 $C_2 = b\,e_1 + d\,e_2$，
+由双线性可得
+\[
+\det(C_1, C_2) = ab\det(e_1, e_1) + ad\det(e_1, e_2)
++ cb\det(e_2, e_1) + cd\det(e_2, e_2),
+\]
+交错性使重复的项为零，同时使
+$\det(e_2, e_1) = -\det(e_1, e_2)$ 变号，于是整个\omterm{def:b1:logic:map}{映射}化为
+$(ad - bc)\det(e_1, e_2) = ad - bc$，由规范化即得。唯一性
+在计算本身中即可看出——公理在每一步都
+未留下任何选择——这正是下面乘积法则证明中
+所用的数乘形式的唯一性事实。
+\end{remark}
+
+\begin{theorem}[性质]\label{thm:b1:det:props}
+设 $A, B \in \mathcal{M}_n(K)$，则：
+\begin{enumerate}
+  \item 将一列加上另一列的倍数，行列式
+        不变；将一列乘以 $\lambda$，行列式乘以
+        $\lambda$（于是 $\det(\lambda A) = \lambda^n \det A$）；
+  \item $\det(AB) = \det A\, \det B$;
+  \item $A$ 可逆 $\iff$ $\det A \neq 0$ $\iff$ 各列
+        构成 $K^n$ 的基；并且此时 $\det(A^{-1}) = (\det
+        A)^{-1}$；
+  \item $\det(A^{\mathsf T}) = \det A$——因此每条关于列的规则
+        也是关于行的规则；
+  \item 三角矩阵的行列式等于其
+        对角元素之积。
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+（1）由多重线性，$\det(\dots, C_i + \lambda C_j, \dots) = \det A +
+\lambda\det(\dots, C_j, \dots)$，其中第二个行列式有两列
+相等，故为零。
+
+（2）固定 $A$，将 $\varphi(B) = \det(AB)$ 视为
+$B$ 的列的函数。由于 $AB$ 的列为 $AB_j$，故 $\varphi$
+关于 $B_j$ 是多重线性且交错的。我们承认，结合
+\cref{thm:b1:det:def}，其唯一性结论的数乘形式：
+\emph{每一个}关于各列的多重线性交错\omterm{def:b1:logic:map}{映射} $\varphi$
+都等于 $\varphi(I_n) \cdot \det$。此处 $\varphi(I_n) = \det A$，故
+$\det(AB) = \det A \cdot \det B$。
+
+（3）若 $A$ 可逆，则 $\det A\,\det A^{-1} = \det I = 1$，于是
+$\det A \neq 0$，且逆矩阵公式成立。若 $A$ 不可逆，
+则其列线性相关（见\cref{cor:b1:linmaps:samedim}
+及\cref{prop:b1:linmaps:basis}）；将某一列用其余列线性表出，
+再由线性展开，得到的行列式中有两列
+相等，故 $\det A = 0$。基的结论即为
+\cref{prop:b1:findim:twoofthree}。
+
+（4）在一般构造下承认（它在\omterm{def:b1:counting:objects}{置换}公式上直接可得）；
+我们记下此结论，以便使用行变换。
+
+（5）若某个对角元为零，则对某个 $k$，前 $k$ 列
+线性相关（由秩的考虑），故 $\det = 0 =$ 乘积。
+否则，借助 (1) 型运算，对每一列消去其
+左下方的元素（三角形结构使这一点可行），化为对角矩阵，
+其行列式等于各元素之积，由
+$I_n$ 出发的多重线性得到。
+\end{proof}
+
+\begin{example}[在数值上验证法则]
+\label{ex:b1:det:rulescheck}
+取 $A = \begin{pmatrix} 1 & 2\\ 3 & 4\end{pmatrix}$（$\det A =
+-2$）与 $B = \begin{pmatrix} 0 & 1\\ 1 & 1\end{pmatrix}$（$\det
+B = -1$），则
+\[
+AB = \begin{pmatrix} 2 & 3\\ 4 & 7\end{pmatrix},
+\quad \det(AB) = 14 - 12 = 2 = (-2)(-1) ;
+\qquad
+\det(A^{\mathsf T}) = \begin{vmatrix} 1 & 3\\ 2 & 4
+\end{vmatrix} = -2 = \det A .
+\]
+乘法性与\omterm{def:b1:matrices:transpose}{转置}不变性已得验证——而
+\emph{虚假的}可加性在同一对矩阵上失效：
+\[
+\det(A + B) = \begin{vmatrix} 1 & 3\\ 4 & 5\end{vmatrix} = -7
+\neq \det A + \det B = -3 .
+\]
+在引用任何行列式恒等式之后，
+花三十秒做此类算术，是最廉价的防错保险。
+\end{example}
+
+\begin{example}[行列式作为面积]
+\label{ex:b1:det:area}
+由 $u = (2, 0)$ 与 $v = (1, 3)$ 张成的平行四边形
+底为 $2$，高为 $3$，面积为 $6$，又有
+\[
+\begin{vmatrix} 2 & 1\\ 0 & 3\end{vmatrix} = 6 :
+\]
+$2\times2$ 行列式\emph{是}其各列所张平行四边形的
+有向面积。公理重述了这一几何图像：
+把一列的若干倍加到另一列上，是一种\emph{剪切}，
+使平行四边形沿某一边平行滑动，而不改变
+底与高（\cref{thm:b1:det:props} 中的运算~(1)）；
+数乘一列时面积按此倍数变化；交换两列则
+定向随之翻转，符号由此而来，$\det(v, u) = -6$。在 $\R^3$
+中，同样的理解给出有向体积，$\abs{\det}$ 成为
+\omterm{def:b1:linmaps:def}{线性映射}普适的体积缩放因子——这一事实
+是多重\omterm{thm:b1:integration:def}{积分}换元公式背后的依据，
+此公式见本科二年级分册。
+\end{example}
+
+\begin{theorem}[余子式展开]\label{thm:b1:det:cofactor}
+设 $A \in \mathcal{M}_n(K)$，$\Delta_{ij}$ 为
+$A$ 划去第 $i$ 行与第 $j$ 列后所得的行列式。则对任意固定的列
+$j$（或行，由\omterm{def:b1:matrices:transpose}{转置}得到）：\index{余子式展开}
+\[
+\det A = \sum_{i=1}^{n} (-1)^{i+j}\, a_{ij}\, \Delta_{ij} .
+\]
+\end{theorem}
+\admitted
+
+\begin{example}\label{ex:b1:det:cofactor}
+沿第一列展开：
+\[
+\begin{vmatrix}
+2 & 1 & 0\\
+1 & 2 & 1\\
+0 & 1 & 2
+\end{vmatrix}
+= 2\begin{vmatrix} 2 & 1\\ 1 & 2\end{vmatrix}
+- 1\begin{vmatrix} 1 & 0\\ 1 & 2\end{vmatrix}
+= 2 \times 3 - 2 = 4 .
+\]
+策略：先通过行（列）变换造出尽可能多的零，
+再沿零元素最多的一行（或一列）展开。
+\end{example}
+
+\begin{example}[手算一次余子式求逆]
+\label{ex:b1:det:cofactorinverse}
+设 $A = \begin{pmatrix} 1 & 1 & 0\\ 0 & 1 & 1\\ 1 & 0 &
+1\end{pmatrix}$：$\det A = 1(1) - 1(-1) + 0 = 2$。九个
+余子式 $(-1)^{i+j}\Delta_{ij}$ 组成
+\[
+\operatorname{Com}(A) = \begin{pmatrix}
+1 & 1 & -1\\
+-1 & 1 & 1\\
+1 & -1 & 1
+\end{pmatrix},
+\qquad
+A^{-1} = \frac{1}{\det A}\operatorname{Com}(A)^{\mathsf T}
+= \frac12\begin{pmatrix}
+1 & -1 & 1\\
+1 & 1 & -1\\
+-1 & 1 & 1
+\end{pmatrix},
+\]
+即 \cref{exo:b1:det:8} 中所引的公式。验证一组行与列：
+（第 $1$ 行取自 $A$）（第 $1$ 列取自 $A^{-1}$）$= \frac12(1 + 1
++ 0) = 1$，同理与第 $2$ 列相乘得 $\frac12(-1 + 1 + 0) = 0$。
+由九个 $2\times2$ 行列式求一个 $3\times3$ 矩阵的逆，
+即便在这一阶数下，行化简（\cref{exo:b1:det:3}）更省事——
+余子式公式的价值是理论上的（整性见
+\cref{exo:b1:det:8}，逆矩阵的可微性见后续
+分册），而非计算上的。
+\end{example}
+
+\begin{example}[分块三角法则（$4$ 阶）]
+\label{ex:b1:det:blocktriangular}
+断言：$\det\begin{pmatrix} M & N\\ 0 & P\end{pmatrix} = \det
+M\,\det P$（子块均为 $2\times2$）。通过列变换消去 $N$ 块，
+即对第 $3, 4$ 列加上第 $1, 2$ 列的适当组合，
+可消去 $N$，\emph{前提是 $M$ 可逆}（解
+$M\Lambda = -N$ 得组合系数 $\Lambda$），
+剩下 $\det\begin{pmatrix} M & 0\\ 0 & P\end{pmatrix}$；再
+\omterm{def:b1:continuity:continuous}{连续}两次沿第一列做\omterm{thm:b1:det:cofactor}{余子式展开}，得 $\det
+M\det P$，此即该分块对角形的结果。若 $M$ 不可逆，
+则其列线性相关，于是大矩阵的前两列
+也线性相关（它们的下半部分为零）：两边均
+为零。此法则对任意子块大小均成立，依据
+同样的两种情形论证——它正是
+\cref{exo:b1:det:10} 的核心。
+\end{example}
+
+\begin{example}[一个 $4 \times 4$ 行列式的巧算]
+\label{ex:b1:det:fourbyfour}
+\[
+\Delta = \begin{vmatrix}
+1 & 2 & 3 & 4\\
+2 & 3 & 4 & 1\\
+3 & 4 & 1 & 2\\
+4 & 1 & 2 & 3
+\end{vmatrix}.
+\]
+每行元素之和都是 $10$：运算 $C_1 \leftarrow C_1 + C_2 +
+C_3 + C_4$ 使第一列为常数列，提出 $10$
+后第一列只剩 1。再作 $L_i \leftarrow L_i - L_1$（$i \geq 2$）
+以消去第一列：
+\[
+\Delta = 10\begin{vmatrix}
+1 & 2 & 3 & 4\\
+0 & 1 & 1 & -3\\
+0 & 2 & -2 & -2\\
+0 & -1 & -1 & -1
+\end{vmatrix}
+= 10\begin{vmatrix}
+1 & 1 & -3\\
+2 & -2 & -2\\
+-1 & -1 & -1
+\end{vmatrix}
+= 10 \times 16 = 160,
+\]
+最后这个 $3\times3$ 行列式沿其第一行展开：
+$1(2 - 2) - 1(-2 - 2) + (-3)(-2 - 2) = 0 + 4 + 12 = 16$。启示：
+一次恰当的运算（看出行和为常数）
+胜过十六个余子式。
+\end{example}
+
+\begin{method}[选择行列式的计算策略]
+\label{met:b1:det:strategy}
+动手计算之前，先观察一下这个矩阵。
+\begin{enumerate}
+  \item \emph{行和或列和为常数}：把各项全部加到
+        同一行上，再提出公共值
+        （\cref{ex:b1:det:fourbyfour}、\cref{exo:b1:det:7}）。
+  \item \emph{重复结构}：将相邻的行或
+        列相减，制造出零元素；阶梯形结构会
+        化为三角形，其行列式可以
+        由对角线上的元素直接读出。
+  \item \emph{孤立的零}：沿零元素最多的一行展开
+        （\cref{ex:b1:det:cofactor}）；递归的矩阵族
+        （三对角型，\cref{exo:b1:det:6}）以此法
+        可得递推关系。
+  \item \emph{含一个参数}：行列式是关于该参数的
+        \omterm{def:b1:poly:def}{多项式}。先找出退化的取值
+        （相等的行、成比例的列）求其根，再
+        由次数和首项系数确定该\omterm{def:b1:poly:def}{多项式}。对于
+        \cref{exo:b1:det:7}中的矩阵：$m = 1$ 时三行相等
+        （秩为 $1$，二重根），$m = -2$ 时使各行
+        之和为零（又一个根）；行列式
+        的次数为 $3$（关于 $m$），首项为 $-m^3$
+        （反对角线之积 $m\cdot m\cdot m$，其萨吕斯符号
+        为 $-1$），因此必为 $-(m+2)(m-1)^2$——无需展开，
+        两种方法可以互相检验。
+\end{enumerate}
+\end{method}
+
+\begin{example}[范德蒙德行列式]\label{ex:b1:det:vandermonde}
+设 $x_1, \dots, x_n$ 为数：\index{范德蒙德行列式}
+\[
+V(x_1, \dots, x_n) =
+\begin{vmatrix}
+1 & x_1 & x_1^2 & \cdots & x_1^{n-1}\\
+1 & x_2 & x_2^2 & \cdots & x_2^{n-1}\\
+\vdots & & & & \vdots\\
+1 & x_n & x_n^2 & \cdots & x_n^{n-1}
+\end{vmatrix}
+= \prod_{1 \leq i < j \leq n} (x_j - x_i) .
+\]
+证明概要（详见\cref{exo:b1:det:5}）：列变换
+$C_k \leftarrow C_k - x_1 C_{k-1}$，自右向左施行，可将第一
+行除首元素外化为零；其余各行提出公因子后，化为
+$V(x_2, \dots, x_n)$。其值非零当且仅当 $x_i$ 两两互异
+——这正是\omterm{thm:b1:poly:lagrange}{拉格朗日插值}背后的行列式
+（\cref{ex:b1:linmaps:interpolation}）。
+\end{example}
+
+\section{线性方程组}
+
+\begin{definition}\label{def:b1:det:system}
+$n$ 个方程、$p$ 个未知量的线性方程组\index{线性方程组}
+是 $AX = B$，其中 $A \in \mathcal{M}_{n,p}(K)$，$B \in
+K^n$；当 $B = 0$ 时，称其为\emph{齐次的}。其解集
+非空时为 $X_0 + \ker A$：即一个特解加上齐次方程组的
+通解——是一个仿射\omterm{def:b1:vspaces:subspace}{子空间}，其维数为 $p -
+\operatorname{rk} A$（秩--零化度定理）。
+\end{definition}
+
+\begin{example}[仿射结构的直观展示]
+\label{ex:b1:det:affinestructure}
+求解
+\[
+\begin{cases}
+x + y + z = 3\\
+x - y + 2z = 2 .
+\end{cases}
+\]
+两式相减得 $2y - z = 1$，故 $z = 2y - 1$，且 $x =
+3 - y - z = 4 - 3y$。解集构成直线
+\[
+(x, y, z) = (4,\ 0,\ -1) + y\,(-3,\ 1,\ 2)
+\qquad (y \in \R):
+\]
+特解 $X_0 = (4, 0, -1)$（取 $y = 0$）
+加上相伴齐次方程组的核直线 $\ker A = \operatorname{Vect}(-3, 1, 2)$
+——验证：$(-3) + 1 + 2 = 0$，
+且 $(-3) - 1 + 4 = 0$。几何上，两个不平行的平面
+$\R^3$ 中相交于一条直线，维数公式 $p -
+\operatorname{rk} A = 3 - 2 = 1$，在求解之前即已预知这一点。
+改取另一个特解（如 $y = 1$：$X_0' =
+(1, 1, 1)$）只改变描述，不改变直线：仿射\omterm{def:b1:vspaces:subspace}{子空间}
+有许多个“原点”，却只有一个方向。
+\end{example}
+
+\begin{theorem}[方阵的克拉默方程组]\label{thm:b1:det:cramer}
+若 $A \in GL_n(K)$，则方程组 $AX = B$ 有唯一解 $X =
+A^{-1}B$，其\omterm{prop:b1:vspaces:coordinates}{坐标}为\index{克拉默法则}
+\[
+x_j = \frac{\det A_j}{\det A},
+\qquad A_j = A \text{ 中第 } j \text{ 列换成 } B .
+\]
+\end{theorem}
+
+\begin{proof}
+唯一性与存在性均来自可逆性。关于公式：
+记 $B = \sum_k x_k C_k$（$A$ 的列），则由
+多重线性与交错性，
+\[
+\det A_j = \det\Bigl(C_1, \dots, \sum_k x_k C_k, \dots, C_n\Bigr)
+= \sum_k x_k \det(C_1, \dots, C_k, \dots, C_n)
+= x_j \det A ,
+\]
+除 $k = j$ 外，其余各项都含有重复的列。
+\end{proof}
+
+\begin{example}[含参数的克拉默法则完整示例]
+\label{ex:b1:det:cramerparameter}
+对 $m \in \R$，求解
+\[
+\begin{cases}
+x + m y = 1\\
+m x + y = 2 .
+\end{cases}
+\]
+行列式为 $1 - m^2$。\emph{一般情形} $m \neq \pm1$：
+由克拉默法则得
+\[
+x = \frac{\begin{vmatrix} 1 & m\\ 2 & 1\end{vmatrix}}{1 - m^2}
+= \frac{1 - 2m}{1 - m^2},
+\qquad
+y = \frac{\begin{vmatrix} 1 & 1\\ m & 2\end{vmatrix}}{1 - m^2}
+= \frac{2 - m}{1 - m^2},
+\]
+对每个允许的 $m$，都有唯一而简洁的解（取 $m = 0$ 检验：
+$(1, 2)$，显然正确）。\emph{退化情形}：当 $m = 1$ 时
+方程为 $x + y = 1$ 与 $x + y = 2$，互相矛盾；
+当 $m = -1$ 时，方程为 $x - y = 1$ 与 $-x + y = 2$，即 $x - y =
+1$ 与 $x - y = -2$，同样矛盾。行列式
+为零预示着\emph{某种}退化发生，却
+从不说明具体是哪一种——是无解还是无穷多解，须
+通过观察右端项来判定。注意公式本身如何显示
+其自身的极限行为：当 $m \to 1^{-}$ 时，$x = \frac{1 - 2m}{1 - m^2} \to
+-\infty$；解点随两直线趋于
+平行而远去。
+\end{example}
+
+\begin{method}[用高斯消元法解方程组]\label{met:b1:det:gauss}
+将增广矩阵 $(A \mid B)$ 化为
+阶梯形。\index{高斯消元法}
+\begin{enumerate}
+  \item 若最后一列出现主元（对应 $0 = 1$ 的方程）：
+        无解。
+  \item 否则，未知量分为\emph{主元未知量}和
+        \emph{自由未知量}（参数）；回代法将前者用后者表示，
+        解集是一个仿射\omterm{def:b1:vspaces:subspace}{子空间}，
+        其维数 $=$ 自由未知量的个数。
+\end{enumerate}
+克莱姆公式适用于理论推导与小型方程组；消元法
+才是实用的算法。
+\end{method}
+
+\begin{example}[含参数的讨论]\label{ex:b1:det:parameter}
+设 $m \in \R$，考虑
+\[
+\begin{cases}
+x + y + mz = 1\\
+x + my + z = 1\\
+mx + y + z = 1 .
+\end{cases}
+\]
+该矩阵的行列式为 $-(m+2)(m-1)^2$（在
+\cref{exo:b1:det:7}中，将所有列加到第一列计算得到）。当 $m
+\neq 1, -2$时：
+唯一解 $x = y = z = \frac{1}{m+2}$（由对称性）。当 $m =
+1$时：三个方程为同一方程，解集为一个平面。当 $m =
+-2$时：三式相加得 $0 = 3$，无解。
+\end{example}
+
+\begin{remark}[常见误区]
+\label{rem:b1:det:pitfalls}
+\emph{行列式关于矩阵不是线性的}：$\det(A + B)
+\neq \det A + \det B$（甚至 $\det(I_2 + I_2) = 4 \neq 2$）；它
+是对每一\emph{列}分别线性的，这与
+完全是另一回事。
+\emph{数乘}：$\det(\lambda A) = \lambda^n\det A$，而非
+$\lambda\det A$——每一列都被放大，共 $n$ 列。
+\emph{行变换并非都能随意施行}：$L_i \leftarrow L_i +
+\lambda L_j$ 保持行列式不变，而交换两行会改变
+符号，$L_i \leftarrow \lambda L_i$ 则使其乘以 $\lambda$
+——这类记账错误正是消元法计算中
+符号出错的经典原因。
+\emph{行列式为零只是开始，而非结束}：它说明
+“秩 $< n$”，但不说明秩为何值；唯有进一步的工作（化为阶梯形
+，或借助 \cref{exo:b1:det:12} 中的子式）方能定位——参见
+\cref{ex:b1:det:parameter}中 $m = 1$ 与 $m = -2$ 的情形。
+\emph{克莱姆法则需要可逆性}：当 $\det A = 0$ 时
+公式 $x_j = \det A_j/\det A$ 毫无意义，而方程组
+完全可能有（无穷多个）解。
+\emph{只有方阵才有行列式}：对于非方阵所对应的
+方程组，消元法是唯一可用的工具。
+\end{remark}
+
+\begin{remark}[行列式的用途]
+\label{rem:b1:det:whereused}
+这一标量有三重用途。\emph{几何意义}：$\abs{\det}$ 是
+相应\omterm{def:b1:logic:map}{映射}的面积或体积伸缩因子——对平面情形，
+在\cref{ch:b1:euclid}中作了精确阐述；作为变量替换的雅可比
+行列式，则出现在本科二年级分册的重\omterm{thm:b1:integration:def}{积分}中。
+\emph{代数方面}：$\det(A - \lambda I)$，即
+特征\omterm{def:b1:poly:def}{多项式}，开启了本科二年级分册中的特征值理论——
+恒等式 $A^2 - (\operatorname{tr} A)A + (\det A)I = 0$ 在
+\cref{ch:b1:matrices}中的周末问题里就已初露端倪。
+\emph{分析方面}：一些特殊矩阵的行列式（范德蒙德、
+柯西、格拉姆型）决定了插值、分解与\omterm{def:b1:linmaps:projection}{投影}
+问题何时适定；下面的周末问题
+完整计算了前两族矩阵的行列式。
+\end{remark}
+
+\begin{remark}[第 3 册内的展望]
+\label{rem:b1:det:perspectives}
+本章结束了本册的线性代数主线，
+其后两章将收获其成果。在
+\cref{ch:b1:euclid}中：格拉姆矩阵
+$\bigl(\langle v_i, v_j\rangle\bigr)$ 借助行列式
+检验\omterm{def:b1:vspaces:free}{线性无关}性（见\cref{exo:b1:euclid:11}），而平面上的等距变换
+依其行列式的符号分为旋转与反射——
+那里周末问题中的分类即依赖于此。在
+\cref{ch:b1:multivar}中：蒙日量 $rt -
+s^2$ 是二阶偏导数构成的对称矩阵的行列式，
+而最小二乘法的正规方程是一个克莱姆方程组，
+其系数矩阵是格拉姆（亦即矩）矩阵——
+其可逆性恰由此处建立的
+范德蒙德型准则所保证。当那些章节断言“可逆”或
+“正定”时，依据都在本章。
+\end{remark}
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:b1:det:1}
+计算：
+\[
+\begin{vmatrix} 3 & 1\\ 5 & 2 \end{vmatrix},
+\qquad
+\begin{vmatrix} 1 & 2 & 3\\ 4 & 5 & 6\\ 7 & 8 & 9\end{vmatrix},
+\qquad
+\begin{vmatrix} 1 & 1 & 1\\ 1 & 2 & 4\\ 1 & 3 & 9\end{vmatrix}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:det:2}
+对哪些 $\lambda \in \R$，向量族 $\bigl((1, 1, \lambda),
+(1, \lambda, 1), (\lambda, 1, 1)\bigr)$ 是 $\R^3$ 的基？
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:det:3}
+用克莱姆法则解下列方程组：
+\[
+\begin{cases}
+2x + y = 5\\
+3x - 2y = 4 ,
+\end{cases}
+\qquad\text{再解}\qquad
+\begin{cases}
+x + y + z = 6\\
+x - y + z = 2\\
+2x + y - z = 1 .
+\end{cases}
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:det:4}
+用\omterm{met:b1:det:gauss}{高斯消元}法求解，并描述解集：
+\[
+\begin{cases}
+x + 2y - z + t = 1\\
+2x + 4y + z - t = 5\\
+x + 2y + 2z - 2t = 4 .
+\end{cases}
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:det:5}
+用归纳法证明\cref{ex:b1:det:vandermonde}中的范德蒙德公式，
+对 $n$ 归纳，列变换 $C_k \leftarrow C_k -
+x_1 C_{k-1}$ 自 $k = n$ 递减至 $k = 2$ 进行。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:det:6}
+（三对角）设 $D_n$ 为 $n \times n$ 行列式，主对角线上元素为 $2$，
+与之相邻的两条对角线上元素为 $1$，其余元素为 $0$。
+按第一行展开，证明 $D_n = 2D_{n-1} - D_{n-2}$，并
+求 $D_n$（$D_1 = 2$，$D_2 = 3$）。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:det:7}
+完成\cref{ex:b1:det:parameter}中的讨论，计算行列式
+$\begin{vmatrix} 1 & 1 & m\\ 1 & m & 1\\ m & 1 & 1\end{vmatrix}$
+以列变换 $C_1 \leftarrow C_1 + C_2 + C_3$ 求值，并
+对方程组进行完整的讨论。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:det:8}
+设 $A \in \mathcal{M}_n(\R)$ 的元素均为\emph{整数}，证明
+$A$ 存在元素为整数的逆矩阵，当且仅当 $\det A
+= \pm 1$。\emph{（正向取行列式；逆向
+承认——或对 $n \leq 3$ 借助代数余子式证明——下式：
+$A^{-1} = \frac{1}{\det A}\,\operatorname{Com}(A)^{\mathsf T}$，其中
+代数余子式矩阵为整数矩阵。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:det:9}
+计算 $n \times n$ 矩阵 $aI + bJ$ 的行列式
+（见\cref{exo:b1:matrices:9}），即对角线上元素为 $a + b$，
+其余元素为 $b$。\emph{（将所有列加到第一列，提出公因子，再
+消元。）}由此得出可逆条件 $a \neq 0$，$a + nb
+\neq 0$。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:det:10}
+设 $A, B \in \mathcal{M}_n(\R)$，证明
+\[
+\det\begin{pmatrix} A & B\\ B & A \end{pmatrix}
+= \det(A + B)\,\det(A - B),
+\]
+利用分块的列变换与行变换（$C_1 \leftarrow C_1 + C_2$，再
+$L_2 \leftarrow L_2 - L_1$，均以分块形式进行），并假设
+自然的分块三角规则 $\det\begin{pmatrix} M & N\\ 0 &
+P\end{pmatrix} = \det M \det P$——对 $2 \times 2$
+分块，已在\cref{ex:b1:det:blocktriangular}中证明。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:det:11}
+（$3$ 阶循环行列式）设 $a, b, c \in \C$，且
+\[
+\Delta = \begin{vmatrix}
+a & b & c\\
+c & a & b\\
+b & c & a
+\end{vmatrix}.
+\]
+证明 $\Delta = (a + b + c)(a^2 + b^2 + c^2 - ab - bc -
+ca)$，并在 $\C$ 上借助 $j =
+\eu^{2\iu\pi/3}$ 完全分解：
+\[
+\Delta = (a + b + c)(a + jb + j^2c)(a + j^2b + jc) .
+\]
+\emph{（先作 $C_1 \leftarrow C_1 + C_2 + C_3$；对于
+复数形式，注意列向量 $(1, j, j^2)^{\mathsf T}$
+几乎起到特征向量的作用。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:det:12}
+（秩与子式）设 $A \in \mathcal{M}_{n,p}(K)$，证明
+$\operatorname{rk} A$ 等于可逆子矩阵的最大阶数 $r$，
+即可逆 $r \times r$ 子矩阵（子矩阵保留 $A$ 中
+位于所选 $r$ 行与所选 $r$
+列交叉处的元素）。\emph{（若 $\operatorname{rk} A = r$，先选取 $r$ 个\omterm{def:b1:vspaces:free}{线性无关}的
+列，再取 $r$ 个\omterm{def:b1:vspaces:free}{线性无关}的行（在所得的 $n \times r$ 块中）；
+反之，可逆子矩阵使对应的
+$A$ 的相应列须\omterm{def:b1:vspaces:free}{线性无关}。）}
+\end{exercise}
+
+\section{问题：柯西双交错式}
+
+\begin{problem}\label{pb:b1:det:1}
+本章的应用主要由两个行列式主导：
+\omterm{ex:b1:det:vandermonde}{范德蒙德行列式}（在\cref{exo:b1:det:5}中求值）以及
+\emph{\omterm{pb:b1:det:1}{柯西行列式}} $\det\bigl(\frac{1}{a_i +
+b_j}\bigr)$，在此求值。本题围绕这两个行列式
+整理交错式的工具：\omterm{def:b1:poly:def}{多项式}列变换技巧、插值
+借克莱姆法则求解、\omterm{pb:b1:det:1}{希尔伯特矩阵}、三次\omterm{def:b1:poly:def}{多项式}的判别式，以及
+交错\omterm{def:b1:poly:def}{多项式}方法。全文中，$V(x_1,
+\dots, x_n) = \prod_{i < j}(x_j - x_i)$ 表示范德蒙德
+值。\index{柯西行列式}\index{希尔伯特矩阵}
+\index{判别式}
+
+\medskip
+\noindent\textbf{第一部分——范德蒙德工具箱。}
+\begin{enumerate}
+  \item 计算 $V(1, 2, 3, 4)$，并回顾为何在
+        $n$ 个两两不同的节点处插值构成克莱姆系统。
+  \item （\omterm{def:b1:poly:def}{多项式}交错式）设 $P_0, \dots, P_{n-1}$ 为
+        \emph{\omterm{def:b1:poly:def}{首一}}\omterm{def:b1:poly:def}{多项式}，且 $\deg P_k = k$。证明
+        \[
+        \det\bigl(P_{j-1}(x_i)\bigr)_{1 \leq i, j \leq n}
+        = V(x_1, \dots, x_n) :
+        \]
+        列变换可将每个幂次列替换为任一\omterm{def:b1:poly:def}{首一}
+        阶梯型列，行列式的值保持不变。
+  \item 将第 2 小题应用于二项式\omterm{def:b1:poly:def}{多项式} $B_k =
+        \frac{X(X-1)\cdots(X-k+1)}{k!}$：证明
+        对于\emph{整数} $m_1 < m_2 < \dots < m_n$，
+        \[
+        \frac{V(m_1, \dots, m_n)}{0!\,1!\,2!\cdots(n-1)!}
+        \in \N :
+        \]
+        这 $n$ 个整数的所有两两之差的乘积
+        可被超阶乘 $0!\,1!\cdots(n-1)!$ \omterm{def:b1:arith:divides}{整除}。
+  \item 证明 $\det\bigl(x_i^{\,j}\bigr)_{1 \leq i, j \leq n} =
+        x_1 x_2 \cdots x_n\, V(x_1, \dots, x_n)$（幂次改从
+        $1$ 开始）。
+  \item （矩量矩阵）设 $S = \bigl(p_{i+j-2}\bigr)_{1 \leq
+        i, j \leq n}$，其中 $p_k = x_1^k + \dots + x_n^k$。证明
+        $S = W^{\mathsf T} W$，其中矩阵 $W =
+        (x_i^{\,j-1})_{ij}$，并推出
+        \[
+        \det S = V(x_1, \dots, x_n)^2 ,
+        \]
+        得出结论：$n$ 个\emph{实}数两两不同，
+        当且仅当它们的矩量矩阵
+        可逆，且 $\det S \geq 0$ 恒成立。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第二部分——再论插值。} 节点
+$x_1 < \dots < x_n$，取值 $y_1, \dots, y_n$。
+\begin{enumerate}[resume]
+  \item 将条件“$P = c_0 + c_1X + \dots +
+        c_{n-1}X^{n-1}$ 插值”化为关于 $c_k$ 的\omterm{def:b1:det:system}{线性方程组}，
+        其系数矩阵为 $W$，由 $\det W = V \neq
+        0$ 推出插值\omterm{def:b1:poly:def}{多项式}的存在性与唯一性
+        （比较此前的两个证明，即
+        \cref{thm:b1:poly:lagrange} 与
+        \cref{ex:b1:linmaps:interpolation}）。
+  \item 由克拉默法则，并将相关行列式按最后一列
+        作代数\omterm{thm:b1:det:cofactor}{余子式展开}，证明
+        插值\omterm{def:b1:poly:def}{多项式}的首项系数为
+        \[
+        c_{n-1} = \sum_{i=1}^{n}
+        \frac{y_i}{\prod_{j \neq i}(x_i - x_j)} .
+        \]
+  \item （合流\omterm{ex:b1:det:vandermonde}{范德蒙德行列式}）计算
+        \[
+        \begin{vmatrix}
+        1 & x_1 & x_1^2\\
+        0 & 1 & 2x_1\\
+        1 & x_2 & x_2^2
+        \end{vmatrix}
+        = (x_2 - x_1)^2 ,
+        \]
+        并作解释：数据 $\bigl(P(x_1), P'(x_1),
+        P(x_2)\bigr)$ 唯一确定一个 $P \in \R_2[X]$，前提是 $x_1 \neq x_2$
+        （埃尔米特插值）。
+  \item 求唯一的 $P \in \R_2[X]$，使 $P(0) = 1$，$P'(0)
+        = 0$，$P(1) = 2$，并与
+        第 8 题的结果比较。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第三部分——\omterm{pb:b1:det:1}{柯西行列式}。} 设 $a_1,
+\dots, a_n$ 与 $b_1, \dots, b_n$ 为标量，且 $a_i + b_j
+\neq 0$ 对一切 $i, j$ 成立，并记
+\[
+C_n = \det\Bigl(\frac{1}{a_i + b_j}\Bigr)_{1 \leq i, j \leq n} .
+\]
+\begin{enumerate}[resume]
+  \item 手算 $C_2$，并将其化为
+        “差之积除以和之积”的形式。
+  \item 当 $n \geq 2$ 时，作 $L_i \leftarrow L_i - L_n$（$i <
+        n$），并提取各行、各列中的公因子，证明
+        \[
+        C_n = \frac{\prod_{i<n}(a_n - a_i)}{\prod_{j}(a_n +
+        b_j)}\;\det M,
+        \]
+        其中 $M$ 在第 $i < n$ 行上与柯西矩阵一致，
+        其末行为 $(1, 1, \dots, 1)$。
+  \item 作 $C_j \leftarrow C_j - C_n$（$j < n$），作用于 $M$，
+        再次提取公因子，并用归纳法得出
+        \emph{柯西双交错式}：
+        \[
+        C_n = \frac{\prod_{1 \leq i < j \leq n}(a_j - a_i)(b_j -
+        b_i)}{\prod_{i, j}(a_i + b_j)} .
+        \]
+  \item 由此推出可逆性判别准则（$a_i$ 两两不同，且
+        $b_j$ 两两不同）。对
+        \emph{\omterm{pb:b1:det:1}{希尔伯特矩阵}} $H_n = \bigl(\frac{1}{i + j -
+        1}\bigr)$：由公式计算 $\det H_2$ 与 $\det H_3$，
+        并验证 $H_2^{-1}$ 的元素均为整数。
+  \item 证明：当 $b_j$ 两两不同时，对任意右端项
+        方程组 $\sum_j \frac{c_j}{a_i + b_j} = y_i$
+        （$i = 1, \dots, n$）有唯一解，并将此与
+        有单\omterm{def:b1:fractions:field}{极点}的部分分式分解的存在唯一性
+        联系起来
+        （见\cref{thm:b1:fractions:complex}）。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第四部分——三次方程的判别式。}
+设 $\lambda_1, \lambda_2, \lambda_3$ 为 $\C$ 中 $X^3
++ pX + q$ 的根，且 $p_k = \lambda_1^k + \lambda_2^k + \lambda_3^k$。
+\begin{enumerate}[resume]
+  \item 在每个根处利用 $\lambda^3 = -p\lambda - q$ 及韦达定理
+        （$p_1 = 0$），计算 $p_2 = -2p$，$p_3 = -3q$，且
+        $p_4 = 2p^2$。
+  \item 利用第 5 题（在 $\C$ 上，并保持 $\det S = V^2$），
+        计算
+        \[
+        \operatorname{disc} = V(\lambda_1, \lambda_2,
+        \lambda_3)^2 = \begin{vmatrix}
+        3 & 0 & -2p\\
+        0 & -2p & -3q\\
+        -2p & -3q & 2p^2
+        \end{vmatrix}
+        = -4p^3 - 27q^2 .
+        \]
+  \item 由此推出：$X^3 + pX + q$ 有重根，当且仅当
+        $4p^3 + 27q^2 = 0$；并以 $X^3 - 3X + 2 = (X -
+        1)^2(X + 2)$ 为例检验。
+  \item 设 $p, q$ 为实数。证明：该三次\omterm{def:b1:poly:def}{多项式}有三个
+        互异实根，当且仅当 $\operatorname{disc}
+        > 0$；有一个实根与两个非实的共轭根，当且仅当
+        $\operatorname{disc} < 0$。\emph{（若
+        $\lambda_3 = \conj{\lambda_2} \neq \lambda_2$ 且
+        $\lambda_1 \in \R$，证明 $V$ 为纯虚数。）}
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第五部分——被除式与
+交错方法。}
+\begin{enumerate}[resume]
+  \item 对 $0 < a_1 < a_2 < \dots < a_n$，证明
+        $\det\bigl(\frac{1}{a_i + a_j}\bigr) > 0$。
+  \item 计算 $\det\bigl(\binom{m_i}{j-1}\bigr)_{1 \leq i, j
+        \leq 3}$，其中 $(m_1, m_2, m_3) = (2, 4, 7)$，先用
+        第 2--3 题的结果，再直接展开计算。
+  \item 设 $\lambda_1, \dots, \lambda_n$ 两两不同，
+        且均非零。利用可逆的范德蒙德矩阵，
+        再次证明几何数列
+        $\bigl((\lambda_i^{\,k})_{k \geq 0}\bigr)_{1 \leq i \leq
+        n}$ 构成数列空间的一个\omterm{def:b1:vspaces:free}{线性无关}族。
+  \item 利用双交错式计算 $\det\bigl(\frac{1}{i + j}\bigr)_{1 \leq i, j
+        \leq 3}$ 的值。
+  \item （交错\omterm{def:b1:poly:def}{多项式}）称 $F$ 为 $x_1,
+        \dots, x_n$ 的\omterm{def:b1:poly:def}{多项式}，若任意交换两个变量时该\omterm{def:b1:poly:def}{多项式}变号，则称其为\emph{交错的}。
+        证明交错的 $F$
+        在 $x_i = x_j$（$i \neq j$）时为零，
+        并——每次处理一个变量，利用因式定理——推出 $F$
+        可被 $\prod_{i<j}(x_j - x_i)$ \omterm{def:b1:arith:divides}{整除}。
+  \item 利用第 23 题，不用归纳法重新证明范德蒙德公式：
+        行列式 $\det(x_i^{\,j-1})$ 是
+        总次数为 $\binom n2$ 的交错\omterm{def:b1:poly:def}{多项式}，
+        因而是 $\prod_{i<j}(x_j -
+        x_i)$ 的\emph{常数}倍；比较一个单项式即可确定该常数。
+  \item 综合题（四句话）：行列式的哪一条（哪个公理）性质
+        生成了本题的全部因式分解；为何第 5 题的矩量矩阵恒等式
+        能把关于\emph{复}数两两不同的命题
+        化为可计算的\emph{实}符号判别；
+        本题中完整计算了哪两个经典矩阵，
+        它们支配着哪些线性问题；
+        第 23--24 题的交错方法如何一步解释
+        为何 $\prod_{i<j}(x_j -
+        x_i)$ 始终反复出现。
+        并点出第三部分所用定理的名称。
+\end{enumerate}
+\end{problem}

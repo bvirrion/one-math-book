@@ -1,0 +1,422 @@
+\chapter{概率与抽样}\label{ch:g10:proba}
+
+\omterm{def:g10:proba:distribution}{概率}为偶然性赋予数值。从
+具有等可能结果的试验（掷骰子、掷硬币、抽扑克牌）出发，本章建立
+计算\omterm{def:g10:proba:events}{事件}\omterm{def:g10:proba:distribution}{概率}的基本法则，引入两步试验的\omterm{met:g10:proba:tree}{树状图}，
+并以\omterm{def:g10:proba:distribution}{概率}与观测\omterm{def:g10:stats:series}{频率}之间的联系收尾。
+本章理论后续将在
+\cref{ch:g11:prob}中\omterm{def:g10:algebra:expand}{展开}。
+
+\section{随机试验与事件}
+
+\begin{definition}[结果与事件]\label{def:g10:proba:events}
+称\emph{随机试验}\index{随机试验}为结果无法预先确定的试验
+（如掷一颗骰子）。所有可能结果组成的集合称为
+\emph{样本空间}\index{样本空间}
+$\Omega = \{\omega_1, \dots, \omega_n\}$；其元素称为
+\emph{结果}。称\emph{事件}\index{事件}为由若干结果组成的集合；
+当试验结果属于该集合时，事件\emph{发生}。
+\end{definition}
+
+\begin{definition}[概率分布]\label{def:g10:proba:distribution}
+对每个结果 $\omega_i$ 赋予一个数 $p_i \geq 0$，使得
+$p_1 + \dots + p_n = 1$，即定义了一个\emph{概率}\index{概率}：
+$\P(A)$ 即\omterm{def:g10:proba:events}{事件} $A$ 的概率，等于各 $p_i$ 之和，
+其中 $A$ 中的结果。特别地，$\P(\Omega) = 1$，不可能\omterm{def:g10:proba:events}{事件}
+$\varnothing$ 的概率为 $0$。
+\end{definition}
+
+\begin{proposition}[等可能结果]\label{prop:g10:proba:uniform}
+若 $n$ 个结果等可能（每个 $p_i = \frac1n$），则对任一
+\omterm{def:g10:proba:events}{事件} $A$，有：
+\[
+\P(A) = \frac{\text{ 结果数 } A}{n}
+= \frac{\text{ 有利情形数 }}{\text{ 可能情形总数 }} .
+\]
+\end{proposition}
+
+\begin{proof}
+$A$ 含有 $k$ 个结果，每个结果的\omterm{def:g10:proba:distribution}{概率}均为 $\frac1n$，
+故 $\P(A) = \frac kn$。
+\end{proof}
+
+\begin{example}\label{ex:g10:proba:die}
+掷一枚均匀骰子：$\Omega = \{1, 2, 3, 4, 5, 6\}$，每个结果的
+\omterm{def:g10:proba:distribution}{概率}均为 $\frac16$。\omterm{def:g10:proba:events}{事件} $A$：“点数为偶数”，则
+$A = \{2, 4, 6\}$，于是 $\P(A) = \frac36 = \frac12$。\omterm{def:g10:proba:events}{事件} $B$：“点数
+不小于 $5$”，则 $B = \{5, 6\}$，于是 $\P(B) = \frac26 =
+\frac13$。
+\end{example}
+
+\section{事件的运算}
+
+\begin{definition}[交集、并集、对立事件]\label{def:g10:proba:operations}
+设 $A$、$B$ 为\omterm{def:g10:proba:events}{事件}。
+\begin{itemize}
+  \item $A \cap B$（“$A$ 且 $B$”）表示两者同时发生；
+  \item $A \cup B$（“$A$ 或 $B$”）表示二者至少有一个发生；
+  \item \emph{对立事件}\index{对立事件} $\bar A$（“非 $A$”），
+        当且仅当 $A$ 不发生时发生；
+  \item $A$ 与 $B$ 称为\emph{互斥}\index{互斥}，
+        即二者不能同时发生：$A \cap B = \varnothing$。
+\end{itemize}
+\end{definition}
+
+\begin{theorem}[加法公式]\label{thm:g10:proba:addition}
+对任意\omterm{def:g10:proba:events}{事件} $A$、$B$，有：
+\[
+\P(A \cup B) = \P(A) + \P(B) - \P(A \cap B),
+\qquad
+\P(\bar A) = 1 - \P(A) .
+\]
+若\omterm{def:g10:proba:events}{事件}\omterm{def:g10:proba:operations}{互斥}，则第一式化简为
+$\P(A \cup B) = \P(A) + \P(B)$。
+\end{theorem}
+
+\begin{proof}
+将 $\P(A) + \P(B)$ 相加时，$A \cup B$ 中每个结果的\omterm{def:g10:proba:distribution}{概率}
+恰被计入一次，\emph{除} $A \cap B$ 中的结果外
+这些结果被计入两次——一次计入 $A$，一次计入 $B$。减去 $\P(A \cap B)$ 即可消除重复计数。
+对于\omterm{def:g10:proba:operations}{对立事件}，$A$ 与 $\bar A$ \omterm{def:g10:proba:operations}{互斥}，
+且 $A \cup \bar A = \Omega$，故 $\P(A) + \P(\bar A) = \P(\Omega) = 1$。
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=0.9]
+  \draw[omExo, thick, rounded corners] (-3.1,-1.7) rectangle (3.4,1.7);
+  \node[omExo, font=\small] at (3.0,1.45) {$\Omega$};
+  \begin{scope}
+    \clip (-0.8,0) circle (1.25);
+    \fill[omProp!25] (0.8,0) circle (1.25);
+  \end{scope}
+  \draw[omDef, thick] (-0.8,0) circle (1.25);
+  \draw[omThm, thick] (0.8,0) circle (1.25);
+  \node[omDef, font=\small] at (-1.6,0.9) {$A$};
+  \node[omThm, font=\small] at (1.7,0.9) {$B$};
+  \node[font=\small] at (0,0) {$A \cap B$};
+\end{tikzpicture}
+
+{\small 两个相交\omterm{def:g10:proba:events}{事件}：在 $\P(A) + \P(B)$ 中，阴影所示的
+\omterm{def:g10:numbers:interunion}{交集} $A \cap B$ 被计入两次，这
+正是加法公式中要减去它的原因。}
+\end{omfigure}
+
+\begin{example}\label{ex:g10:proba:cards}
+从一副标准的 $52$ 张扑克牌中抽取一张。设 $A$：“抽到的牌是
+红心”（$13$ 张），$B$：“抽到的牌是国王”（$4$ 张）。则
+$A \cap B$ 为“红心国王”（$1$ 张），且
+\[
+\P(A \cup B) = \frac{13}{52} + \frac{4}{52} - \frac{1}{52} = \frac{16}{52}
+= \frac{4}{13}.
+\]
+用\omterm{def:g10:proba:operations}{对立事件}公式往往最快：抽到的牌
+\emph{不是}红心的\omterm{def:g10:proba:distribution}{概率}为 $1 - \frac{13}{52} = \frac34$。
+\end{example}
+
+\section{树状图}
+
+\begin{method}[两步实验]\label{met:g10:proba:tree}
+对于分两步进行的实验：
+\begin{enumerate}
+  \item 画一个\emph{树状图}\index{树状图}：第一步的每个可能结果对应一条分支，
+        然后从每个结果出发，第二步的每个可能结果各对应一条分支，
+        并在每条分支上标明\omterm{def:g10:proba:distribution}{概率}
+        （从任一节点发出的各分支\omterm{def:g10:proba:distribution}{概率}之和为 $1$）；
+  \item \emph{路径}（\omterm{met:g10:proba:tree}{树状图}的叶节点）的\omterm{def:g10:proba:distribution}{概率}，
+        等于沿其各分支\omterm{def:g10:proba:distribution}{概率}的乘积；
+  \item \omterm{def:g10:proba:events}{事件}的\omterm{def:g10:proba:distribution}{概率}等于使其发生的各条
+        路径的\omterm{def:g10:proba:distribution}{概率}之和。
+\end{enumerate}
+\end{method}
+
+\begin{example}\label{ex:g10:proba:tree}
+一个罐子中装有 $3$ 个红球和 $2$ 个蓝球。取出一球后将其放回，
+再取一次。每次取到红球（R）的\omterm{def:g10:proba:distribution}{概率}为 $\frac35$，
+取到蓝球（B）的\omterm{def:g10:proba:distribution}{概率}为 $\frac25$。
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=1.0]
+  \coordinate (root) at (0,0);
+  \coordinate (R) at (2.3,1.1);
+  \coordinate (B) at (2.3,-1.1);
+  \coordinate (RR) at (5.0,1.7);
+  \coordinate (RB) at (5.0,0.5);
+  \coordinate (BR) at (5.0,-0.5);
+  \coordinate (BB) at (5.0,-1.7);
+  \draw (root) -- (R) node[midway, above, font=\small, sloped] {$\frac35$};
+  \draw (root) -- (B) node[midway, below, font=\small, sloped] {$\frac25$};
+  \draw (R) -- (RR) node[midway, above, font=\small, sloped] {$\frac35$};
+  \draw (R) -- (RB) node[midway, below, font=\small, sloped] {$\frac25$};
+  \draw (B) -- (BR) node[midway, above, font=\small, sloped] {$\frac35$};
+  \draw (B) -- (BB) node[midway, below, font=\small, sloped] {$\frac25$};
+  \node[omThm, font=\small] at (R) [above left=-2pt] {R};
+  \node[omDef, font=\small] at (B) [below left=-2pt] {B};
+  \node[right, font=\small] at (RR)
+    {RR:\ $\frac35 \times \frac35 = \frac{9}{25}$};
+  \node[right, font=\small] at (RB)
+    {RB:\ $\frac35 \times \frac25 = \frac{6}{25}$};
+  \node[right, font=\small] at (BR)
+    {BR:\ $\frac25 \times \frac35 = \frac{6}{25}$};
+  \node[right, font=\small] at (BB)
+    {BB:\ $\frac25 \times \frac25 = \frac{4}{25}$};
+\end{tikzpicture}
+
+{\small 有放回取两次的\omterm{met:g10:proba:tree}{树状图}。四条路径
+\omterm{def:g10:proba:distribution}{概率}之和为 $1$。}
+\end{omfigure}
+
+两球颜色相同的\omterm{def:g10:proba:distribution}{概率}为
+$\P(\text{RR}) + \P(\text{BB}) = \frac{9}{25} + \frac{4}{25} =
+\frac{13}{25}$；至少有一个蓝球的\omterm{def:g10:proba:distribution}{概率}为
+$1 - \P(\text{RR}) = 1 - \frac{9}{25} = \frac{16}{25}$（\omterm{def:g10:proba:operations}{对立事件}公式）。
+\end{example}
+
+\begin{remark}
+不放回取球时，第二次取球的\omterm{def:g10:proba:distribution}{概率}依赖于第一次的结果：
+在上述罐子中，若第一次取到红球，则只剩 $2$ 个红球和 $2$ 个
+蓝球，因此第二层分支上的两个\omterm{def:g10:proba:distribution}{概率}分别为 $\frac24$ 和 $\frac24$。
+\omterm{met:g10:proba:tree}{树状图}方法仍然适用，只是第二层分支上的数值
+发生变化。
+\end{remark}
+
+\section{频率与抽样}
+
+在\omterm{def:g10:proba:events}{随机试验}重复进行多次时，某\omterm{def:g10:proba:events}{事件}的\omterm{def:g10:stats:series}{频率}
+趋近于该\omterm{def:g10:proba:events}{事件}的\omterm{def:g10:proba:distribution}{概率}——这正是\omterm{def:g10:proba:distribution}{概率}能够
+描述现实世界的原因。
+
+\begin{definition}[样本]\label{def:g10:proba:sample}
+容量为 $n$ 的\emph{样本}\index{样本}是指将同一试验
+独立重复进行 $n$ 次所得的结果。样本中某\omterm{def:g10:proba:events}{事件}的\emph{\omterm{def:g10:stats:series}{频率}}
+是该\omterm{def:g10:proba:events}{事件}出现的次数除以 $n$。
+\end{definition}
+
+\begin{example}\label{ex:g10:proba:sampling}
+一枚均匀硬币正面朝上的\omterm{def:g10:proba:distribution}{概率}为 $0.5$。将它掷 $100$ 次，
+很少恰好得到 $50$ 次正面：\omterm{def:g10:proba:sample}{样本}会\emph{波动}。典型的
+$100$ 次掷币得到的\omterm{def:g10:stats:series}{频率}如 $0.46$、$0.53$、$0.49$——接近
+$0.5$，但并不相等。\omterm{def:g10:proba:sample}{样本}越大，波动越小：掷 $10\,000$ 次时，
+观察\omterm{def:g10:stats:series}{频率}通常以 $0.01$ 以内的偏差落在 $0.5$ 附近。
+\end{example}
+
+\begin{remark}[波动区间]
+一条实用的经验法则（在\cref{ch:g11:binom}中证明）：
+对于容量为 $n$ 的\omterm{def:g10:proba:sample}{样本}，\omterm{def:g10:proba:distribution}{概率}为 $p$ 的\omterm{def:g10:proba:events}{事件}（$n$ 较大时），
+观察\omterm{def:g10:stats:series}{频率}落在下列\omterm{def:g10:numbers:interval}{区间}内
+\[
+\intcc{p - \frac{1}{\sqrt n}}{\,p + \frac{1}{\sqrt n}}
+\]
+约占 $95\%$ 的\omterm{def:g10:proba:sample}{样本}。若某个观察\omterm{def:g10:stats:series}{频率}远远落在
+该\omterm{def:g10:numbers:interval}{区间}之外，则应怀疑 $p$ 的取值，这正是
+统计检验的出发点。
+\end{remark}
+
+\begin{example}\label{ex:g10:proba:test}
+某工厂声称其零件中只有 $10\%$ 为次品
+（$p = 0.1$）。在容量 $n = 400$ 的\omterm{def:g10:proba:sample}{样本}中，有 $64$ 件次品，
+观察\omterm{def:g10:stats:series}{频率}为 $\frac{64}{400} = 0.16$。波动\omterm{def:g10:numbers:interval}{区间}为
+$\intcc{0.1 - \frac{1}{20}}{0.1 + \frac{1}{20}} = \intcc{0.05}{0.15}$,
+$0.16$ 落在该\omterm{def:g10:numbers:interval}{区间}之外，该\omterm{def:g10:proba:sample}{样本}对这一说法提出了严重质疑。
+\end{example}
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:g10:proba:1}
+掷一枚均匀的骰子。求下列各\omterm{def:g10:proba:events}{事件}的\omterm{def:g10:proba:distribution}{概率}：“掷出
+$6$”；“掷出奇数”；“点数不超过 $4$”；“掷出
+$7$”。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g10:proba:2}
+袋中装有 $5$ 颗绿色、$3$ 颗黄色和 $2$ 颗黑色的弹珠，随机取出一颗。
+求取出的一颗弹珠是绿色的\omterm{def:g10:proba:distribution}{概率}、不是黑色的\omterm{def:g10:proba:distribution}{概率}，
+以及是绿色或黄色的\omterm{def:g10:proba:distribution}{概率}。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g10:proba:3}
+某班有 $30$ 名学生，其中 $18$ 人学习西班牙语，$10$ 人学习德语，
+$4$ 人两门都学。随机抽取一名学生，利用加法公式，
+求该学生至少学习两门语言中的一门的\omterm{def:g10:proba:distribution}{概率}，
+再求该学生两门语言都不学的\omterm{def:g10:proba:distribution}{概率}。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g10:proba:4}
+掷一枚均匀的硬币两次。画出该试验的\omterm{met:g10:proba:tree}{树状图}，并求
+两次都掷出正面的\omterm{def:g10:proba:distribution}{概率}；恰有一次正面的\omterm{def:g10:proba:distribution}{概率}；
+至少有一次正面的\omterm{def:g10:proba:distribution}{概率}。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g10:proba:5}
+袋中有 $4$ 个红球和 $6$ 个白球。依次取出两个球，
+且每次取出后\emph{不放回}。画出\omterm{met:g10:proba:tree}{树状图}，在第二层标出正确的\omterm{def:g10:proba:distribution}{概率}，
+并求取出两个红球的\omterm{def:g10:proba:distribution}{概率}，
+以及取出两个颜色不同的球的\omterm{def:g10:proba:distribution}{概率}。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g10:proba:6}
+掷两枚均匀的骰子，并记录两个点数之和。
+\begin{enumerate}
+  \item 说明为何\omterm{def:g10:proba:events}{样本空间}可取为 $36$ 个等可能的
+        数对 $(1,1), (1,2), \dots, (6,6)$。
+  \item 求点数之和为 $7$ 的\omterm{def:g10:proba:distribution}{概率}；为 $12$ 的\omterm{def:g10:proba:distribution}{概率}；
+        不超过 $4$ 的\omterm{def:g10:proba:distribution}{概率}。
+  \item 哪一个点数之和最有可能出现？
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g10:proba:7}
+某道选择题给出 $4$ 个选项，其中只有一个正确。某学生
+完全随机地作答 $2$ 道这样的独立选择题。求两题全部答对、
+恰答对一题、两题全部答错的\omterm{def:g10:proba:distribution}{概率}；
+并验证这三个\omterm{def:g10:proba:distribution}{概率}之和为 $1$。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g10:proba:8}
+某政客宣称支持率为 $50\%$。在对 $n = 900$ 名随机选取的选民所做的民意调查中，
+有 $396$ 人表示支持。
+\begin{enumerate}
+  \item 求观测\omterm{def:g10:stats:series}{频率}，以及
+        围绕 $p = 0.5$，在 $n = 900$ 时的波动\omterm{def:g10:numbers:interval}{区间}。
+  \item 该民意调查是否对上述宣称提出了质疑？
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g10:proba:9}
+玩一次游戏需付 $2$：掷一枚均匀的骰子，
+赢得 $6$ 需掷出 $6$，赢得 $3$ 需掷出 $5$，否则一无所得。
+\begin{enumerate}
+  \item 求各赢得金额（$6$、$3$、$0$）的\omterm{def:g10:proba:distribution}{概率}。
+  \item 进行 $600$ 次游戏，你预计每种结果大约各出现多少次？
+        求总的期望收益与损失：该游戏
+        是否值得参加？
+\end{enumerate}
+\end{exercise}
+
+\section{周末问题：骗过一千位数学家的
+三扇门}
+
+\begin{problem}[{周末问题——蒙提霍尔悖论及其同类：信息如何改变概率，
+以及样本如何
+将主张与一厢情愿的想法区分开来}]
+\label{pb:g10:proba:1}
+1990 年，专栏作家玛丽莲·沃斯·莎凡特发表了一道谜题，内容涉及
+一位游戏节目主持人、三扇门、一辆汽车和两只山羊——她给出了正确答案。
+一万名读者（其中包括数百位数学博士）纷纷来信，
+坚称她的答案是错的。本题将借助\omterm{met:g10:proba:tree}{树状图}
+（\cref{met:g10:proba:tree}）、\omterm{def:g10:proba:operations}{对立事件}及加法公式
+（\cref{thm:g10:proba:addition}），
+让你亲自判定这场争论，
+并以实践中裁决此类争议的工具作结：
+波动的\omterm{def:g10:proba:sample}{样本}。
+
+\medskip
+\noindent\textbf{第一部分——规则热身。}
+\begin{enumerate}
+  \item 从一副标准的 $52$ 张扑克牌中抽取一张，求
+        $P(\text{国王或红心})$——用加法公式计算，
+        并说明为何仅凭 $\frac{4}{52} + \frac{13}{52}$
+        是错误的。
+  \item 抛掷三次均匀的硬币，利用\omterm{def:g10:proba:operations}{对立事件}求
+        $P(\text{至少出现一次正面})$。
+  \item 袋中有 $3$ 颗红色弹珠和 $2$ 颗蓝色弹珠，从中
+        不放回地取出两颗。借助\omterm{met:g10:proba:tree}{树状图}，求
+        $P(\text{两颗红色})$ 和 $P(\text{一红一蓝})$。
+  \item 补全第 3 题的\omterm{def:g10:proba:distribution}{概率}分布，
+        求 $P(\text{两颗蓝色})$，并验证三个\omterm{def:g10:proba:distribution}{概率}
+        之和为 $1$。
+  \item 有人报告，对于两个\emph{\omterm{def:g10:proba:operations}{互斥}}\omterm{def:g10:proba:events}{事件}，
+        $P(A) = 0.6$，$P(B) = 0.5$。
+        试用一行运算指出其结论有误。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第二部分——三扇门。}
+游戏规则：汽车藏在三扇门之一的后面，山羊藏在
+另外两扇门后。你选定一扇门（不妨设为 1 号门）。主持人——他
+\emph{知道}汽车的位置——打开其余两扇门中的一扇，
+门后总是露出一只山羊，并给你机会
+换选剩下的那扇未打开的门。
+\begin{enumerate}[resume]
+  \item 在任何计算之前：换选有利、有害，还是
+        无关紧要？写下你的直觉答案——请诚实作答。
+  \item 现在画出\omterm{met:g10:proba:tree}{树状图}，按汽车的真实位置分类讨论
+        （各情况的\omterm{def:g10:proba:distribution}{概率}均为 $\frac13$）：若汽车在你所选的门后，
+        换选会输；若汽车在另外两扇门中的任一扇后，
+        主持人须怎样做？此时换选能否获胜？
+        求 $P(\text{换选获胜})$。
+  \item 一句话概括：换选恰好在你第一次的选择
+        有误时获胜。请再次得出结论。
+  \item 现在看关键的变体——“蒙提失误”：主持人
+        并\emph{不}知道汽车的位置，随机打开另外两扇门中的一扇，
+        碰巧露出一只山羊。列出六种等可能的情形
+        （汽车位置 $\times$ 打开的门），
+        剔除汽车被露出的情形，
+        并求在\emph{剩余的情形中}换选获胜的\omterm{def:g10:proba:distribution}{概率}。
+        什么发生了改变，
+        以及主持人的知情与否为何重要？
+  \item 直觉启发：一百扇门，你选定其中一扇，知情的
+        主持人打开 $98$ 扇有山羊的门。是否换选？换选
+        获胜的\omterm{def:g10:proba:distribution}{概率}是多少？
+  \item 你面对一位怀疑者，他与那一千位写信者一样，
+        坚持认为是“五五开”。请描述一个基于纸牌的模拟
+        （三张牌、多轮、由一位朋友担任主持人），并说明
+        换选获胜的比例预计为多少，
+        在 $300$ 轮之后——以本章的波动\omterm{def:g10:numbers:interval}{区间}作为
+        你的误差范围。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第三部分——悖论的近亲。}
+\begin{enumerate}[resume]
+  \item 某家庭有两个孩子，已知\emph{至少有
+        一个是男孩}。列出与该信息相容的等可能两孩情形，
+        并计算
+        $P(\text{两个男孩})$。
+  \item 同一家庭，但现在已知：\emph{年长的孩子
+        是男孩}。重新计算。两个答案为何不同？它们与
+        两个蒙蒂有何共同之处？
+  \item 三枚均匀硬币：计算 $P(\text{三枚结果全相同})$。
+        数学家达朗贝尔于 1754 年主张另一个
+        答案：“要么三枚全相同，要么不全相同——
+        两种情形中居其一。”请指出确切的错误，并结合
+        \cref{prop:g10:proba:uniform} 加以说明。
+  \item 一次游戏收费 $2$ 欧元：掷一枚骰子，掷出六点赢 $6$ 欧元，
+        掷出五点赢 $3$ 欧元，其余情形一无所得。
+        （见\cref{exo:g10:proba:9}）。若进行 $600$ 局游戏，
+        计数预测的每局平均收益是多少？一位保险
+        精算师用的也是同样的数学：每年发生\omterm{def:g10:proba:distribution}{概率}为 $1\,\%$ 的
+        一笔 $10\,000$ 欧元理赔。其
+        \emph{公平}保费为多少？实际保费为何
+        高于它？
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第四部分——以\omterm{def:g10:proba:sample}{样本}为裁判。}
+\begin{enumerate}[resume]
+  \item 掷一枚硬币 $100$ 次。利用波动\omterm{def:g10:numbers:interval}{区间}
+        $p \pm \frac{1}{\sqrt n}$，判断下列结果中哪些
+        值得怀疑：$55$ 次正面朝上；$70$
+        次正面朝上。
+  \item 一项对 $1\,000$ 名选民的民调显示，某候选人得票率为 $52\,\%$。
+        计算以 $50\,\%$ 为中心的波动\omterm{def:g10:numbers:interval}{区间}，并
+        说明该民调是否\emph{证明}该候选人
+        领先。
+  \item 某工厂声称其零件次品率为 $4\,\%$。抽取一个
+        容量为 $400$ 的\omterm{def:g10:proba:sample}{样本}，其中有 $28$ 件次品（$7\,\%$）；之后
+        又抽取容量为 $2\,500$ 的\omterm{def:g10:proba:sample}{样本}，其中有 $175$ 件（仍为 $7\,\%$）。分别用两个\omterm{def:g10:proba:sample}{样本}检验该
+        说法。两次结论为何不同？
+  \item 每项调查都受两类误差困扰：抽样
+        \emph{偏差}（初中分册中的周末问题“数据如何说谎”）和抽样
+        \emph{波动}（本章内容）。随着
+        $n$ 增大，哪一种误差会缩小？哪一种
+        无论\omterm{def:g10:proba:sample}{样本}多大都不会消失？各用一句话回答。
+  \item 总结——\omterm{def:g10:proba:distribution}{概率}学者的检查清单，每项一行：
+        计数之前，先确认结果等可能（第 15 题）；
+        多步骤问题与“至少”类问题，用\omterm{met:g10:proba:tree}{树状图}与\omterm{def:g10:proba:operations}{对立事件}
+        （第 2--3 题）；\emph{信息改变\omterm{def:g10:proba:distribution}{概率}，获得
+        信息的方式至关重要}（第 7--14 题）；
+        \omterm{def:g10:proba:sample}{样本}的波动大约为
+        $\frac{1}{\sqrt n}$，由模拟来裁决
+        （第 11、16--18 题）。
+\end{enumerate}
+\end{problem}

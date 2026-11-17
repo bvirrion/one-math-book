@@ -1,0 +1,1043 @@
+\chapter{概率母函数}\label{ch:b2:genfun}
+
+\cref{ch:b2:powerseries}中的幂级数再次登场，
+带着概率论的任务：对一个 $\N$ 值\omterm{def:b2:randomvar:law}{随机变量}，
+配以系数为 $\P(X = n)$ 的幂级数。这一
+\emph{\omterm{ex:b2:powerseries:fibonacci}{母函数}}把独立\omterm{def:b2:randomvar:law}{随机变量}之和
+化为乘积，矩变为 $1$ 处的导数，而困难的
+组合恒等式化为一行乘法。本章以两个
+压轴例子收束全书：稀有\omterm{def:b2:proba:space}{事件}的泊松近似，
+以及\omterm{pb:b2:genfun:1}{分支过程}的灭绝判据——
+一个真正无穷的概率计算，完全由一条凸曲线的
+几何来解决。
+
+\section{定义与基本性质}
+
+\begin{definition}[概率母函数]\label{def:b2:genfun:pgf}
+设 $X$ 为 $\N$ 值\omterm{def:b2:randomvar:law}{随机变量}，$p_n = \P(X = n)$。
+称 $X$ 的\emph{概率母函数}\index{概率母函数}
+为下列
+幂级数之和：
+\[
+G_X(t) = \E\bigl(t^X\bigr) = \sum_{n=0}^{\infty} p_n\,t^n .
+\]
+\end{definition}
+
+\begin{example}[基本手法]\label{ex:b2:genfun:firstreflexes}
+常值\omterm{def:b2:randomvar:law}{随机变量} $X = c$ 的\omterm{ex:b2:powerseries:fibonacci}{母函数}为 $G_X(t) = t^c$；平移
+满足 $G_{X+c}(t) = t^c\,G_X(t)$；在特殊点求值，
+无需展开即可读出信息：$G_X(0) = \P(X
+= 0)$，$G_X(1) = 1$，以及 $G_X(-1) = \P(X\text{ 为偶数}) -
+\P(X\text{ 为奇数})$，这一宇称平衡被用于
+\cref{exo:b2:genfun:10}。这些一行式结论
+在下文中处处默认使用——而求值 $G_X(0)$ 恰好
+正是本章末尾从迭代\omterm{ex:b2:powerseries:fibonacci}{母函数}中提取灭绝概率的
+途径。
+\end{example}
+
+\begin{proposition}[收敛半径与基本性质]\label{prop:b2:genfun:radius}
+定义 $G_X$ 的级数，其\omterm{def:b2:powerseries:radius}{收敛半径} $\geq 1$；
+$G_X$ 在 $\intcc{-1}{1}$ 上有定义且\omterm{def:b2:metric:continuity}{连续}，
+为 $\mathcal{C}^\infty$ 函数（在开区间 $\intoo{-1}{1}$ 上），且 $G_X(1) = 1$，
+在该区间上 $\abs{G_X(t)} \leq 1$。此外，$G_X$ 决定
+了 $X$ 的\omterm{def:b2:randomvar:law}{分布}：
+\[
+p_n = \frac{G_X^{(n)}(0)}{n!} .
+\]
+\end{proposition}
+
+\begin{proof}
+由 $\sum p_n = 1$ 收敛可知，项 $p_n\,1^n$ 有界，
+故\omterm{def:b2:powerseries:radius}{收敛半径} $\geq 1$（阿贝尔引理，
+见\cref{ch:b2:powerseries}）；在 $t = \pm1$ 处级数\omterm{def:b2:series:def}{绝对收敛}
+（$\sum p_n = 1$ 占优）；更进一步，在整个
+区间 $\intcc{-1}1$ 上，
+\[
+\sup_{\abs t\leq1}\,\abs{p_nt^n} = p_n
+\quad\text{其中}\quad \sum_np_n < \infty :
+\]
+级数在 $\intcc{-1}1$ 上\emph{\omterm{def:b2:funcseq:series}{正规收敛}}，故
+其和在该区间上\omterm{def:b2:metric:continuity}{连续}，
+（由\cref{thm:b2:funcseq:weierstrass,thm:b2:funcseq:continuity}可知）。区间内部的光滑性与
+系数公式都属于幂级数的一般理论；系数
+可以恢复，故\omterm{ex:b2:powerseries:fibonacci}{母函数}相同的两个\omterm{def:b2:randomvar:law}{随机变量}
+具有相同的\omterm{def:b2:randomvar:law}{分布}。
+\end{proof}
+
+\begin{example}[经典分布]\label{ex:b2:genfun:classical}
+\leavevmode
+\begin{itemize}
+\item 伯努利\omterm{def:b2:randomvar:law}{分布} $\mathcal{B}(p)$：$G(t) = 1 - p + pt$。
+\item 二项\omterm{def:b2:randomvar:law}{分布} $\mathcal{B}(n, p)$：$G(t) = \sum_k \binom nk
+(pt)^k(1-p)^{n-k} = (1 - p + pt)^n$（二项式定理）。
+\item 几何\omterm{def:b2:randomvar:law}{分布} $\mathcal{G}(p)$：$G(t) =
+\sum_{k\geq1}(1-p)^{k-1}p\,t^k = \dfrac{pt}{1 - (1-p)t}$（\omterm{def:b2:powerseries:radius}{收敛半径}
+$\frac{1}{1-p} > 1$）。
+\item 泊松\omterm{def:b2:randomvar:law}{分布} $\mathcal{P}(\lambda)$：$G(t) =
+\sum_k e^{-\lambda}\frac{(\lambda t)^k}{k!} = e^{\lambda(t - 1)}$
+（\omterm{def:b2:powerseries:radius}{收敛半径} $\infty$）。
+\end{itemize}
+\end{example}
+
+\begin{example}[母函数的
+积分]\label{ex:b2:genfun:integraltrick}
+$G_X$ 在 $1$ 处的导数给出正矩；而
+\emph{积分}给出一个负矩。由 $\int_0^1t^k\dd t
+= \frac1{k+1}$，并逐项积分（
+$\intcc01$ 上的\omterm{def:b2:funcseq:series}{正规收敛}）：
+\[
+\int_0^1G_X(t)\,\dd t = \sum_{k\geq0}\frac{\P(X =
+k)}{k+1} = \E\Bigl(\frac1{1+X}\Bigr).
+\]
+当 $X \sim \mathcal P(\lambda)$ 时：
+\[
+\E\Bigl(\frac1{1+X}\Bigr) =
+\int_0^1\eu^{\lambda(t-1)}\,\dd t = \frac{1 -
+\eu^{-\lambda}}{\lambda},
+\]
+一行即可重新得出
+\cref{ex:b2:randomvar:transferex}中的级数计算。\omterm{ex:b2:powerseries:fibonacci}{母函数}
+是一件双向工具：在 $1$ 处求导以得
+矩 $\E(X)$、$\E(X(X-1))$，在 $\intcc01$ 上积分，
+以求 $\E\bigl(\frac1{1+X}\bigr)$——同一个\omterm{def:b2:powerseries:analytic}{解析}对象，
+随问题所需，从任一方向加以考察。
+\end{example}
+
+\begin{example}[收敛半径恰为
+1 的分布]\label{ex:b2:genfun:heavytail}
+设 $\P(X = k) = \dfrac{6}{\pi^2k^2}$，$k \geq 1$——这
+是一个概率\omterm{def:b2:randomvar:law}{分布}，依据巴塞尔恒等式
+（见\cref{ex:b2:fourier:basel}）。其\omterm{ex:b2:powerseries:fibonacci}{母函数}
+$G(t) = \frac6{\pi^2}\sum_{k\geq1}\frac{t^k}{k^2}$ 的\omterm{def:b2:powerseries:radius}{收敛半径}
+恰为 $1$：一般的界“\omterm{def:b2:powerseries:radius}{收敛半径} $\geq
+1$”（见\cref{prop:b2:genfun:radius}）不能再改进。
+其\omterm{def:b2:randomvar:expectation}{期望}为
+\[
+\sum_{k\geq1}k\,\P(X = k) =
+\frac6{\pi^2}\sum_{k\geq1}\frac1k = \infty :
+\]
+$G$ 在 $\intcc{-1}1$ 上\omterm{def:b2:metric:continuity}{连续}，内部光滑，但其
+导数在 $1^-$ 处发散——图像
+以竖直\omterm{def:b2:curves:arc}{切线}抵达点 $(1, 1)$。重尾
+在\omterm{ex:b2:powerseries:fibonacci}{母函数}上可以\emph{几何地}看出，且只在
+单点 $t = 1$ 处；下文的矩定理使这一对应
+精确成立。
+\end{example}
+
+\begin{theorem}[由母函数
+求矩]\label{thm:b2:genfun:moments}
+$X$ 有\omterm{def:b2:randomvar:expectation}{期望}，当且仅当 $G_X$ 在 $1^-$
+处\omterm{def:b2:diffcalc:differential}{可微}（左导数有限），且此时 $\E(X) = G_X'(1)$。
+类似地，$X$ 有二阶矩，当且仅当 $G_X$
+在 $1^-$ 处二阶\omterm{def:b2:diffcalc:differential}{可微}，且此时
+\[
+\E\bigl(X(X - 1)\bigr) = G_X''(1),
+\qquad
+V(X) = G_X''(1) + G_X'(1) - G_X'(1)^2 .
+\]
+\end{theorem}
+
+\begin{proof}
+对 $t \in \intoo{0}{1}$，在收敛圆盘内逐项求导，
+得 $G_X'(t) = \sum_{n\geq1} np_n t^{n-1}$，这是一个
+系数非负的级数：$t \mapsto G_X'(t)$ 单调不减，
+在 $\intoo{0}{1}$ 上，由部分和的单调收敛（或
+非负系数情形的阿贝尔定理，
+见\cref{ch:b2:powerseries}），得
+\[
+\lim_{t \to 1^-} G_X'(t)
+= \sum_{n\geq1} n\,p_n \in \intcc{0}{+\infty} ,
+\]
+两边有限当且仅当另一边有限。有限时，由中值
+定理夹逼差商 $\frac{G_X(1) -
+G_X(t)}{1 - t}$ 介于 $G_X'$ 的值之间，于是 $G_X$
+在 $1^-$ 处\omterm{def:b2:diffcalc:differential}{可微}，且 $G_X'(1) = \sum np_n = \E(X)$（由
+转移公式）。二阶情形的论断把上述论证
+再推进一层：$G''_X(t) = \sum_{n\geq2}n(n-1)p_nt^{n-2}$ 在
+$\intoo01$ 上单调不减，单调极限为
+$\sum_nn(n-1)p_n = \E(X(X-1))$，当且仅当 $X$ 有
+二阶矩时有限。\omterm{def:b2:randomvar:variance}{方差}公式由
+柯尼希–惠更斯公式得：
+\[
+V(X) = \E(X^2) - \E(X)^2 = \E\bigl(X(X-1)\bigr) + \E(X) -
+\E(X)^2 = G''_X(1) + G'_X(1) - G'_X(1)^2 .
+\]
+\end{proof}
+
+\begin{example}
+对泊松\omterm{def:b2:randomvar:law}{分布}，$G'(t) = \lambda e^{\lambda(t-1)}$，故 $\E(X) = \lambda$；
+$G''(1) = \lambda^2$，故 $V(X) = \lambda^2 + \lambda - \lambda^2 =
+\lambda$——即在\cref{ch:b2:randomvar}中的
+计算，每个只需一行。
+\end{example}
+
+\begin{example}[泊松分布的众数]
+\label{ex:b2:genfun:poissonmode}
+$\P(X = k)$ 在何处最大？设 $X \sim \mathcal
+P(\lambda)$，相邻权重可通过比值比较：
+\[
+\frac{\P(X = k+1)}{\P(X = k)} = \frac{\lambda}{k + 1} ,
+\]
+该比值大于 $1$，当 $k < \lambda - 1$ 时，
+而小于 $1$（当 $k > \lambda - 1$ 时），故权重先升后降，
+众数为 $\floor\lambda$（$\lambda - 1$ 与
+$\lambda$ 并列为众数（$\lambda$ 为整数时）：对 $\lambda = 3$，
+$\P(X = 2) = \P(X = 3) = \frac92\eu^{-3} \approx 0.224$）。
+对系数作比值判别，往往是得到离散\omterm{def:b2:randomvar:law}{分布}的
+定性性质的最快途径，无需\omterm{ex:b2:powerseries:fibonacci}{母函数}——
+但系数\emph{本身即是}\omterm{ex:b2:powerseries:fibonacci}{母函数}，
+逐项读出即可。
+\end{example}
+
+\section{独立变量之和}
+
+\begin{theorem}[乘性]\label{thm:b2:genfun:product}
+设 $X$ 与 $Y$ 为独立的 $\N$ 值\omterm{def:b2:randomvar:law}{随机变量}，则
+\[
+G_{X + Y}(t) = G_X(t)\,G_Y(t)
+\qquad (\abs t \leq 1),
+\]
+由归纳法，$G_{X_1 + \dots + X_n} = \prod_i G_{X_i}$
+对独立的 $X_1, \dots, X_n$ 成立。
+\end{theorem}
+
+\begin{proof}
+两种证明都很有启发性。\emph{利用\omterm{def:b2:randomvar:expectation}{期望}：}$t^X$ 与
+$t^Y$ 是独立的有界变量，
+由\cref{thm:b2:randomvar:product}可知
+\[
+G_{X+Y}(t) = \E\bigl(t^{X+Y}\bigr)
+= \E\bigl(t^X t^Y\bigr)
+= \E\bigl(t^X\bigr)\E\bigl(t^Y\bigr) .
+\]
+\emph{利用\omterm{thm:b2:series:fubini}{柯西乘积}：}$X + Y$ 的\omterm{def:b2:randomvar:law}{分布}即为卷积
+$\P(X + Y = n) = \sum_{k=0}^n \P(X = k)\P(Y = n - k)$，
+而对\omterm{def:b2:series:def}{绝对收敛}级数的\omterm{thm:b2:series:fubini}{柯西乘积}定理
+（见\cref{ch:b2:series}）使两个幂级数
+沿此卷积精确相乘。
+\end{proof}
+
+\begin{example}[经典分布的稳定性]\label{ex:b2:genfun:stability}
+具有相同 $p$ 的独立二项\omterm{def:b2:randomvar:law}{分布}可以相加：$(1 - p + pt)^m(1 -
+p + pt)^n = (1 - p + pt)^{m+n}$，故 $\mathcal{B}(m, p) +
+\mathcal{B}(n, p) = \mathcal{B}(m + n, p)$——特别地，$n$ 个独立
+伯努利变量之和服从二项\omterm{def:b2:randomvar:law}{分布}，重新证明了
+成功次数的\omterm{def:b2:randomvar:law}{分布}。独立的泊松变量可以相加：
+$e^{\lambda(t-1)}e^{\mu(t-1)} = e^{(\lambda + \mu)(t-1)}$，故
+$\mathcal{P}(\lambda) + \mathcal{P}(\mu) = \mathcal{P}(\lambda +
+\mu)$——正是
+\cref{exo:b2:randomvar:2}中的卷积计算，此处无需再算。
+\end{example}
+
+\begin{example}[两颗骰子，一个多项式
+的平方]\label{ex:b2:genfun:twodice}
+对一颗均匀骰子，$G(t) = \frac{t + t^2 + \dots + t^6}{6}$；
+对两颗骰子之和，
+\[
+G(t)^2 = \frac{1}{36}\bigl(t^2 + 2t^3 + 3t^4 + 4t^5 + 5t^6 +
+6t^7 + 5t^8 + 4t^9 + 3t^{10} + 2t^{11} + t^{12}\bigr) :
+\]
+骰子点数和的三角形\omterm{def:b2:randomvar:law}{分布}（$7$ 为众数，
+概率 $\frac6{36} = \frac16$），由一个多项式的平方
+直接读出，这种平方一生只需展开一次。
+卷积公式需要十一个
+独立的计数论证，而\omterm{ex:b2:powerseries:fibonacci}{母函数}
+同时完成所有计数，因为多项式相乘
+\emph{即是}系数的卷积。这种机械的转换——
+\omterm{def:b2:randomvar:law}{分布}化为系数，和化为积——
+正是本章的全部核心思想，而
+\cref{exo:b2:genfun:11}将其推向出人意料的
+西彻曼骰子。
+\end{example}
+
+\begin{example}[三个骰子与
+系数提取]\label{ex:b2:genfun:threedice}
+设 $S$ 为三个均匀骰子的点数之和，则 $\P(S = 10)$ 为
+$t^{10}$ 在 $\bigl(\frac{t + \dots +
+t^6}6\bigr)^3$ 中的系数。分解因式，借助二项式与
+几何级数展开：
+\[
+\Bigl(\frac{t(1 - t^6)}{6(1 - t)}\Bigr)^{\!3}
+= \frac{t^3}{216}\,\bigl(1 - 3t^6 + 3t^{12} -
+t^{18}\bigr)\sum_{j\geq0}\binom{j+2}2t^j .
+\]
+要得 $t^{10}$ 的系数，需从乘积中取出 $t^7$：
+即 $j = 7$ 时取 $1$，$j = 1$ 时取
+$-3t^6$：
+\[
+\P(S = 10) = \frac{1}{216}\Bigl(\binom92 -
+3\binom32\Bigr) = \frac{36 - 9}{216} = \frac{27}{216} =
+\frac18 .
+\]
+直接逐一枚举 $27$ 个三元组易出错，而
+代数运算是机械的，可推广到任意多个骰子——
+$(1 - t^6)^3$ 中显现的容斥原理正在
+自动完成分情形的讨论。
+\end{example}
+
+\begin{example}[由母函数读出
+分布]\label{ex:b2:genfun:identify}
+哪一个\omterm{def:b2:randomvar:law}{分布}的\omterm{ex:b2:powerseries:fibonacci}{母函数}为 $G(t) = \dfrac1{2 - t}$？展开为幂
+级数：
+\[
+\frac{1}{2 - t} = \frac12\cdot\frac1{1 - t/2}
+= \sum_{k\geq0}\frac{t^k}{2^{k+1}} :
+\]
+系数非负且和为 $G(1) = 1$，故这是一个真正的
+\omterm{def:b2:randomvar:law}{分布}，$\P(X = k) = 2^{-(k+1)}$，取值于 $\N$——
+即从 $0$ 开始的几何\omterm{def:b2:randomvar:law}{分布}。由唯一性
+（见\cref{prop:b2:genfun:radius}），没有别的\omterm{def:b2:randomvar:law}{分布}具有相同的
+$G$。由\omterm{ex:b2:powerseries:fibonacci}{母函数}识别\omterm{def:b2:randomvar:law}{分布}是一项
+值得反复练习的技能，正是它揭示了临界分支
+迭代 $G_n(t) = \frac{n - (n-1)t}{n+1 - nt}$ 在
+周末问题中，实为一个
+以存活为条件的几何\omterm{def:b2:randomvar:law}{分布}。
+\end{example}
+
+\begin{remark}
+稳定性只朝一个方向成立：独立的泊松\omterm{def:b2:randomvar:law}{随机变量}之和
+仍为泊松\omterm{def:b2:randomvar:law}{分布}，而差则不然——$X - Y$ 取
+负值，故其根本没有\omterm{ex:b2:powerseries:fibonacci}{母函数}，其\omterm{def:b2:randomvar:law}{分布}
+（即斯凯拉姆\omterm{def:b2:randomvar:law}{分布}）超出本章的
+工具范围。同样，$\mathcal B(m, p) + \mathcal B(n, p')$ 在
+$p \neq p'$ 时，\emph{并非}二项\omterm{def:b2:randomvar:law}{分布}：乘积 $(1 - p +
+pt)^m(1 - p' + p't)^n$ 有两个不同的根位置，而
+每个二项\omterm{def:b2:randomvar:law}{分布}的\omterm{def:b2:genfun:pgf}{概率母函数}都只有一个重根。
+由根的模式读出稳定性，只是一个小小的预览，
+展示多项式所蕴含的结构之丰富。
+\end{remark}
+
+\begin{remark}[单位根滤波]
+在 $-1$ 处求值可区分偶数与奇数；在所有
+$m$ 次单位根处求值则可分离每一剩余类：令
+$\omega = \eu^{2\iu\pi/m}$,
+\[
+\P(X \equiv r \bmod m)
+= \frac1m\sum_{j=0}^{m-1}\omega^{-jr}\,G_X(\omega^j),
+\]
+由于对 $\omega^{j(k-r)}$ 按 $j$ 求平均，得 $1$ 当 $k
+\equiv r$ 时，否则为 $0$。例：设 $S$ 为
+两个均匀骰子的点数之和，则每个 $G(\omega^j) = \frac16\sum_{k=1}^6
+\omega^{jk} = -\frac16$，当 $j \neq 0$ 时（七个七次
+单位根之和为零），故
+\[
+\P(7 \mid S) = \frac17\Bigl(1 +
+6\cdot\frac1{36}\Bigr) = \frac16 ,
+\]
+与\cref{ex:b2:genfun:twodice}中的计数相吻合——
+且该方法可推广到直接计数难以处理的
+问题。
+\end{remark}
+
+\begin{theorem}[随机和：母函数形式的瓦尔德
+恒等式]\label{thm:b2:genfun:compound}
+设 $(X_k)_{k\geq1}$ 为相互独立、取值于 $\N$ 的\omterm{def:b2:randomvar:law}{随机变量}，它们
+具有相同的\omterm{def:b2:randomvar:law}{分布}与\omterm{ex:b2:powerseries:fibonacci}{母函数} $G_X$，又设 $N$ 为
+取值于 $\N$ 且与所有 $X_k$ 独立的\omterm{def:b2:randomvar:law}{随机变量}，其
+\omterm{ex:b2:powerseries:fibonacci}{母函数}为 $G_N$。则随机和 $S = X_1 + \dots + X_N$（约定
+$S = 0$，当 $N = 0$ 时）的\omterm{ex:b2:powerseries:fibonacci}{母函数}为
+\[
+G_S = G_N \circ G_X .
+\]
+特别地，若 $N$ 与 $X_1$ 存在\omterm{def:b2:randomvar:expectation}{期望}，则 $\E(S) =
+\E(N)\,\E(X_1)$.
+\end{theorem}
+
+\begin{proof}
+以 $N$ 为条件（全概率公式，
+见\cref{thm:b2:proba:bayes}）：对 $\abs t \leq 1$，
+\[
+G_S(t) = \sum_{n=0}^\infty \P(N = n)\,
+\E\bigl(t^{X_1 + \dots + X_n}\bigr)
+= \sum_{n=0}^\infty \P(N = n)\,G_X(t)^n
+= G_N\bigl(G_X(t)\bigr),
+\]
+对每个固定的 $n$ 利用乘性，以及
+整个二重族的可和性（$\abs{G_X(t)} \leq 1$）。求和次序的交换
+即为\omterm{def:b2:series:summable}{可和族}的富比尼定理（
+\cref{ch:b2:series}）。在 $1^-$ 处求导，由链式法则及
+\cref{thm:b2:genfun:moments}，得 $\E(S) = G_N'(G_X(1))\,G_X'(1)
+= G_N'(1)G_X'(1) = \E(N)\E(X_1)$.
+\end{proof}
+
+\begin{example}[复合泊松：年度保险
+损失]\label{ex:b2:genfun:compoundpoisson}
+一家保险公司一年内收到 $N \sim \mathcal P(\lambda)$ 次
+理赔，每次理赔费用为 $X_k$（以整数为单位，独立同\omterm{def:b2:randomvar:law}{分布}，
+\omterm{def:b2:genfun:pgf}{概率母函数}为 $G_X$，均值为 $\mu$，且与 $N$ 独立）。由
+\cref{thm:b2:genfun:compound}，总损失 $S$ 满足
+\[
+G_S(t) = \eu^{\lambda(G_X(t) - 1)},
+\qquad
+\E(S) = \lambda\mu ,
+\]
+并在 $1^-$ 处两次求导：
+\[
+V(S) = \lambda\,G_X''(1) + \lambda^2\mu^2 + \lambda\mu -
+(\lambda\mu)^2 = \lambda\,\E(X^2) .
+\]
+\omterm{def:b2:randomvar:variance}{方差}涉及单次理赔的\emph{二阶}矩，而不是\omterm{def:b2:randomvar:variance}{方差}本身：复合泊松和
+会对偶发的大额理赔“计入两次”——一次在次数上，
+一次在金额上。
+取 $\lambda = 10$，理赔金额服从几何\omterm{def:b2:randomvar:law}{分布}，
+均值为 $2$（$\E X^2 = 6$），则 $\E S = 20$，$V(S) = 60$，
+而切比雪夫不等式（\cref{ch:b2:randomvar}）已足以给出可用的
+偿付能力边际。“随机停止和”的这一模式，
+也将推动
+\cref{prop:b2:genfun:branching}中的分支递推：\omterm{ex:b2:powerseries:fibonacci}{母函数}的复合
+正是随机种群的代数。
+\end{example}
+
+\begin{remark}
+$N$ 与各求和项的独立性并非可有可无。
+取 $X_k \in \{0, 2\}$ 且两值等概率，令 $N =
+X_1$（显然依赖）：则 $S = X_1 + \dots + X_N$ 为
+$0$（当 $X_1 = 0$ 时），$2 + X_2$（当 $X_1 = 2$ 时），故 $\E(S) =
+\frac12(2 + 1) = \frac32$，而 $\E(N)\E(X_1) = 1\cdot1 =
+1$，瓦尔德恒等式不成立。当项数被允许
+对各项本身\emph{作出反应}时，干净的乘积结构便
+不复存在——此类“停止”规则的完整理论
+是本科三年级分册中的鞅论
+一章。
+\end{remark}
+
+\section{泊松逼近}
+
+\begin{theorem}[稀有事件律]\label{thm:b2:genfun:rareevents}
+设 $X_n \sim \mathcal{B}(n, p_n)$，且 $n\,p_n \to \lambda > 0$。
+则对每个 $k \in \N$，有
+\[
+\P(X_n = k)
+\xrightarrow[n\to\infty]{}
+e^{-\lambda}\frac{\lambda^k}{k!} :
+\]
+即许多稀有\omterm{def:b2:proba:independence}{独立事件}的二项\omterm{def:b2:randomvar:law}{分布}收敛于
+参数为 $\lambda$ 的泊松\omterm{def:b2:randomvar:law}{分布}。
+\end{theorem}
+
+\begin{proof}
+直接计算：取 $p_n = \frac{\lambda_n}{n}$，$\lambda_n
+\to \lambda$:
+\[
+\P(X_n = k)
+= \binom nk p_n^k(1 - p_n)^{n-k}
+= \frac{n(n-1)\cdots(n-k+1)}{n^k}\cdot
+\frac{\lambda_n^k}{k!}\,
+\bigl(1 - \tfrac{\lambda_n}{n}\bigr)^{n-k} .
+\]
+当 $n \to \infty$ 而 $k$ 固定时：第一个因子趋于 $1$
+（$k$ 个因子之积 $\to 1$）；$\lambda_n^k \to \lambda^k$；
+而 $\bigl(1 - \frac{\lambda_n}{n}\bigr)^{n-k} =
+\exp\bigl((n-k)\ln(1 - \frac{\lambda_n}{n})\bigr) \to
+e^{-\lambda}$，这是因为 $(n - k)\ln\bigl(1 - \frac{\lambda_n}{n}\bigr)
+\sim -\lambda_n \to -\lambda$
+（见\cref{ch:b2:comparison}）。另一种做法是
+在\omterm{ex:b2:powerseries:fibonacci}{母函数}层面：$G_{X_n}(t) = \bigl(1 +
+\frac{\lambda_n(t-1)}{n}\bigr)^n \to e^{\lambda(t - 1)} =
+G_{\mathcal{P}(\lambda)}(t)$，对每个固定的 $t \in [0, 1]$——
+即\omterm{ex:b2:powerseries:fibonacci}{母函数}的收敛（对 $\N$ 值\omterm{def:b2:randomvar:law}{随机变量}），
+而后者等价于每个 $\P(X_n = k)$ 的收敛；
+见\cref{exo:b2:genfun:9}。
+\end{proof}
+
+\begin{remark}
+这正是泊松\omterm{def:b2:randomvar:law}{分布}刻画稀有\omterm{def:b2:proba:space}{事件}计数的原因——例如每页的错字数、
+每秒的放射性衰变数、每天在某路口的事故数：
+每个机会几乎可以忽略，机会数量却很多，
+而极限中只有平均速率 $\lambda$ 保留下来。
+\end{remark}
+
+\begin{example}[观察泊松极限
+的收敛]\label{ex:b2:genfun:poissonnumerics}
+取 $\lambda = 2$，令 $X_n \sim \mathcal B(n, 2/n)$。
+无\omterm{def:b2:proba:space}{事件}概率恰为 $\P(X_n = 0) = (1 - 2/n)^n$：
+\[
+n = 10:\ 0.107, \qquad
+n = 20:\ 0.122, \qquad
+n = 50:\ 0.130, \qquad
+n = 100:\ 0.133,
+\]
+与极限 $\eu^{-2} \approx 0.135$ 相比。收敛
+是单调的，速度为 $O(1/n)$——展开后 $(1 -
+2/n)^n = \eu^{-2}\bigl(1 - \tfrac2n + O(n^{-2})\bigr)$——
+因此当 $n$ 为数百时，泊松模型已
+精确到小数点后第三位。这正是
+稀有\omterm{def:b2:proba:space}{事件}律的实际内涵：建模者从不单独知道 $n$ 与
+$p$（一页纸上可能出错的微小机会有多少个？），
+只知道它们的乘积 $\lambda$；而极限律幸运地
+不依赖于其他任何量。
+\end{example}
+
+\section{分支过程}
+
+考虑从一个祖先出发的种群；每个个体
+独立地，子代数为\omterm{def:b2:randomvar:law}{随机变量}，其\omterm{def:b2:randomvar:law}{分布}律为 $(p_k)_{k
+\in \N}$，\omterm{ex:b2:powerseries:fibonacci}{母函数}为 $G$（\emph{子代
+\omterm{def:b2:randomvar:law}{分布}}）。设 $Z_n$ 为第 $n$ 代的大小（$Z_0 =
+1$），令 $m = G'(1) = \E(Z_1)$ 为平均子代数。
+
+\begin{proposition}\label{prop:b2:genfun:branching}
+$Z_n$ 的\omterm{ex:b2:powerseries:fibonacci}{母函数}是第 $n$ 次迭代
+$G_{Z_n} = G \circ G \circ \dots \circ G$（$n$ 次复合），且
+灭绝概率 $q_n = \P(Z_n = 0)$ 满足
+\[
+q_0 = 0, \qquad q_{n+1} = G(q_n),
+\]
+并单调递增趋于最终灭绝的概率 $q$，它
+是 $G$ 的不动点。
+\end{proposition}
+
+\begin{proof}
+第 $n + 1$ 代是 $Z_n$ 个第 $n$ 代成员的子代数之随机和，
+各计数彼此独立，且与 $Z_n$ 独立：
+由\cref{thm:b2:genfun:compound}可得 $G_{Z_{n+1}} =
+G_{Z_n} \circ G$，并由 $G_{Z_0}(t) = t$ 归纳得到
+$n$ 重迭代——由复合运算的结合律，它也
+可写作 $G_{Z_{n+1}} = G \circ G_{Z_n}$。对后一形式在
+$0$ 处求值：$q_{n+1} = G_{Z_{n+1}}(0) =
+G\bigl(G_{Z_n}(0)\bigr) = G(q_n)$。\omterm{def:b2:proba:space}{事件} $\{Z_n = 0\}$ 单调递增（已灭绝的种群保持灭绝），
+因此 $q_n \uparrow q = \P\bigl(\bigcup_n\{Z_n = 0\}\bigr)$
+由单调\omterm{def:b2:metric:continuity}{连续}性（见\cref{thm:b2:proba:continuity}），
+又 $G$ 在 $[0, 1]$ 上的\omterm{def:b2:metric:continuity}{连续}性使 $q_{n+1} = G(q_n)$ 在极限下化为 $q =
+G(q)$。
+\end{proof}
+
+\begin{example}[观察灭绝概率的收敛]
+\label{ex:b2:genfun:cobwebnumerics}
+对子代\omterm{def:b2:randomvar:law}{分布} $(p_0, p_1, p_2) = (\tfrac14,
+\tfrac14, \tfrac12)$（见\cref{ex:b2:genfun:branchingexample}），
+$G(t) = \tfrac14 + \tfrac14t + \tfrac12t^2$，且迭代
+$q_{n+1} = G(q_n)$ 给出
+\[
+q_1 = 0.25, \quad q_2 = 0.34375, \quad q_3 \approx 0.39502,
+\quad q_4 \approx 0.42678, \quad q_5 \approx 0.44776,
+\]
+逐步逼近灭绝概率 $q = \tfrac12$。
+差距 $q - q_n$ 依次为 $0.25$、$0.156$、$0.105$、$0.073$、
+$0.052$：每一项约为前一项的 $\tfrac34$，且
+事实上由中值定理可得 $q - q_{n+1} = G'(c_n)(q
+- q_n)$，其中 $G'(q) = \tfrac14 + q = \tfrac34$。由此有两点启示：
+一支仍存活于第 $n$ 代的家系，在同一计算中
+内含其此后注定灭绝的概率 $q - q_n$；
+另一方面，下图中阶梯的收敛速率
+恰为不动点处的导数——
+周末问题将这两点观察化为定理。
+\end{example}
+
+\begin{theorem}[灭绝判别准则]\label{thm:b2:genfun:extinction}
+设 $p_1 \neq 1$。灭绝概率 $q$ 为 $G$ 在 $\intcc{0}{1}$ 中的
+\emph{最小}不动点，且：
+\begin{itemize}
+\item 若 $m \leq 1$（次临界或临界），则 $q = 1$：灭绝
+必然发生；
+\item 若 $m > 1$（超临界），则 $q < 1$：种群以正概率
+$1 - q$ 永久存续。
+\end{itemize}
+\end{theorem}
+
+\begin{proof}
+$G$ 在 $\intcc{0}{1}$ 上为凸函数（系数非负的幂级数：$G'' \geq 0$），
+单调不减，且 $G(1) = 1$。
+
+\emph{最小不动点：}设 $r \in \intcc{0}{1}$ 为任一
+不动点。于是 $q_0 = 0 \leq r$，且归纳地 $q_{n+1} = G(q_n)
+\leq G(r) = r$（由单调性）；故 $q = \lim q_n \leq r$。
+
+\emph{情形 $m \leq 1$：}假设 $r < 1$ 为一不动点。由
+$[r, 1]$ 上的中值定理，存在 $c \in \intoo{r}{1}$，使得
+$G'(c) = \frac{G(1) - G(r)}{1 - r} = \frac{1 - r}{1 - r} = 1$。但
+$G'$ 单调不减（凸性），且 $\lim_{t\to1^-}G'(t) = m
+\leq 1$，故 $G' \leq 1$ 在 $\intoo{0}{1}$ 上；等式 $G'(c) =
+1$，于是迫使 $G'$ 恒等于 $1$，从而
+在 $\intco{c}{1}$ 上 $G'' = \sum n(n-1)p_nt^{n-2} \equiv 0$。
+系数非负的幂级数若在某区间上恒为零，则这些系数全为零：
+$p_n = 0$（$n \geq 2$），故 $G(t) = p_0
++ p_1t$，且 $1 = G'(c) = p_1$——与假设
+$p_1 \neq 1$ 矛盾。故 $1$ 为唯一不动点，$q = 1$。
+
+\emph{情形 $m > 1$：}在 $1$ 附近，$G(t) - t$ 的导数为 $G'(t) -
+1 \to m - 1 > 0$（$t \to 1^-$），于是 $G(t) - t < G(1) - 1 = 0$ 在
+某区间 $\intoo{1 - \delta}{1}$ 上：\omterm{def:b2:metric:continuity}{连续}函数
+$G(t) - t$ 为 $\geq 0$（$t = 0$ 时，$G(0) = p_0 \geq 0$），而 $< 0$
+于 $1$ 略小处，由介值定理知它在某 $r < 1$ 处为零。
+因此最小不动点满足 $q \leq r < 1$。
+\end{proof}
+
+\begin{figure}[ht]
+\centering
+% Subcritical: G(t) = 0.5 + 0.1 t + 0.4 t^2 => m = 0.9 <= 1
+\begin{tikzpicture}[scale=2.9]
+  \draw[->] (0,0) -- (1.15,0) node[below] {$t$};
+  \draw[->] (0,0) -- (0,1.15);
+  \draw[dashed] (0,0) -- (1,1);
+  \draw[thick, ocBlue, domain=0:1, smooth, samples=40]
+    plot (\x, {0.5 + 0.1*\x + 0.4*\x*\x});
+  \fill (1,1) circle (0.02);
+  \node[below, font=\small] at (0.55,-0.06)
+    {$m \leq 1$：$q = 1$};
+  % cobweb from 0
+  \draw[ocRed, ->] (0,0) -- (0,0.5);
+  \draw[ocRed, ->] (0,0.5) -- (0.5,0.5);
+  \draw[ocRed, ->] (0.5,0.5) -- (0.5,0.65);
+  \draw[ocRed, ->] (0.5,0.65) -- (0.65,0.65);
+  \draw[ocRed, ->] (0.65,0.65) -- (0.65,0.734);
+  \draw[ocRed, ->] (0.65,0.734) -- (0.734,0.734);
+  \node[font=\small, ocBlue] at (0.32,0.75) {$G$};
+\end{tikzpicture}
+\qquad
+% Supercritical: G(t) = 0.25 + 0.15 t + 0.6 t^2 => m = 1.35 > 1
+\begin{tikzpicture}[scale=2.9]
+  \draw[->] (0,0) -- (1.15,0) node[below] {$t$};
+  \draw[->] (0,0) -- (0,1.15);
+  \draw[dashed] (0,0) -- (1,1);
+  \draw[thick, ocBlue, domain=0:1, smooth, samples=40]
+    plot (\x, {0.25 + 0.15*\x + 0.6*\x*\x});
+  \fill (1,1) circle (0.02);
+  % fixed point q: 0.6q^2 - 0.85q + 0.25 = 0 -> q = 5/12 ~ 0.4167
+  \fill[ocRed] (0.4167,0.4167) circle (0.02)
+    node[below right, font=\small] {$q$};
+  \node[below, font=\small] at (0.55,-0.06)
+    {$m > 1$：$q < 1$};
+  % cobweb from 0
+  \draw[ocRed, ->] (0,0) -- (0,0.25);
+  \draw[ocRed, ->] (0,0.25) -- (0.25,0.25);
+  \draw[ocRed, ->] (0.25,0.25) -- (0.25,0.325);
+  \draw[ocRed, ->] (0.25,0.325) -- (0.325,0.325);
+  \draw[ocRed, ->] (0.325,0.325) -- (0.325,0.3623);
+  \draw[ocRed, ->] (0.325,0.3623) -- (0.3623,0.3623);
+  \node[font=\small, ocBlue] at (0.28,0.72) {$G$};
+\end{tikzpicture}
+\caption{灭绝概率作为不动点迭代，
+$q_{n+1} = G(q_n)$，自 $q_0 = 0$ 出发（红色阶梯）。左图为
+次临界子代\omterm{def:b2:randomvar:law}{分布}——凸曲线位于对角线上方，
+迭代爬升至唯一不动点 $1$。右图为超临界\omterm{def:b2:randomvar:law}{分布}——曲线在
+与对角线相交于
+$q < 1$ 处，迭代于此停止：存活概率为 $1 -
+q > 0$。}
+\label{fig:b2:genfun:branching}
+\end{figure}
+
+\begin{remark}[如何读懂蛛网图]
+图中，竖直移动施用 $G$（由 $(q_n, q_n)$
+竖直上升至 $(q_n, G(q_n))$），水平移动至对角线，
+把输出转化为输入：阶梯折线\emph{正是}
+递推式 $q_{n+1} = G(q_n)$。$G$ 的凸性与 $G(1) = 1$
+只留下两种几何情形。一种是曲线在
+$\intco01$ 上始终位于对角线上方（均值 $m \leq 1$）：
+阶梯折线在 $1$ 之前无处停止。另一种情形是曲线在某处 $q <
+1$ 与对角线相交（$m > 1$）：阶梯折线被困于交点之下，
+并收敛到该交点，收敛速率为 $G'(q) < 1$
+（见\cref{ex:b2:genfun:cobwebnumerics}）。绝灭定理的全部分析
+都在这一幅图中一目了然——
+这正是值得先画图的原因，
+再做计算。
+\end{remark}
+
+\begin{example}\label{ex:b2:genfun:branchingexample}
+后代\omterm{def:b2:randomvar:law}{分布}：无子女、一个子女、两个子女，概率分别为
+$\frac14, \frac14, \frac12$。于是 $m = \frac14 + 1 =
+\frac54 > 1$，且 $G(t) = \frac14 + \frac14 t + \frac12 t^2$。不动点
+满足 $\frac12 t^2 - \frac34 t + \frac14 = 0$，即\ $2t^2 - 3t
++ 1 = (2t - 1)(t - 1) = 0$：$q = \frac12$。该家系
+以概率 $\frac12$ 绝灭——而以概率 $\frac12$
+它永远存续。
+\end{example}
+
+\begin{remark}[本卷中的视角]
+本章是全书的交汇点，各要素分别来自
+具名之处：级数代数取自
+\cref{ch:b2:series}与\cref{ch:b2:powerseries}，概率论取自
+\cref{ch:b2:proba}（由单调\omterm{def:b2:metric:continuity}{连续}性
+证明 $q_n \uparrow q$），以及\cref{ch:b2:randomvar}（$G_X =
+\E(t^X)$ 为\omterm{def:b2:randomvar:expectation}{期望}，乘性即乘积定理），
+凸性则来自\cref{ch:b2:realfun}至
+\cref{ch:b2:affine}。甚至重尾的反常情形也彼此相连：
+前一章的圣彼得堡\omterm{def:b2:randomvar:law}{随机变量}满足
+$G(t) = \sum_k2^{-k}t^{2^k}$，是一个完全收敛的级数
+在 $\intcc01$ 上，其在 $1^-$ 处的导数发散——
+\omterm{def:b2:randomvar:expectation}{期望}无穷，一望即知。一个对象，集本年全部工具于一身：
+堪称恰当的末章。
+\end{remark}
+
+\begin{remark}[常见误区]
+(i) \omterm{ex:b2:powerseries:fibonacci}{母函数}仅适用于取值于 $\N$ 的变量：
+对于带符号或非整数的变量，对象 $\E(t^X)$
+失去其幂级数结构（本科三年级分册将用
+适用于 $\R$ 的变换取代它）。(ii) 对所算的 $G$ 的首要检验是
+$G(1) = 1$；第二项检验是系数
+须非负——出现负系数说明是代数失误，
+而非新的定律。(iii) 在随机和中，
+复合顺序很关键：$G_S = G_N \circ G_X$，
+\emph{外层}函数负责计数各项，
+反过来复合则毫无意义（$G_X \circ G_N$ 将计数
+项的项）。(iv) 乘性要求独立，且随机性来源不同：
+$G_{2X}(t) = G_X(t^2)$，而非
+$G_X(t)^2$。(v) 在 $1$ 处求导是一种边界
+运算：当\omterm{def:b2:powerseries:radius}{收敛半径}恰为 $1$ 时，如
+\cref{ex:b2:genfun:heavytail}，$G'(1^-)$ 可能为无穷，
+而矩定理的单调极限表述并非
+咬文嚼字的细节，而是诚实的陈述。
+\end{remark}
+
+\section*{全卷结语}
+
+\omterm{ex:b2:powerseries:fibonacci}{母函数}是本书一个恰当的收尾对象：
+它同时是幂级数（\cref{ch:b2:powerseries}），一种
+\omterm{def:b2:series:summable}{可和族}的工具（\cref{ch:b2:series}），一种\omterm{def:b2:randomvar:expectation}{期望}
+（\cref{ch:b2:randomvar}），一个凸函数，其几何决定
+绝灭（\cref{ch:b2:realfun}），以及不动点迭代
+（\cref{ch:b2:metric}）。本科二年级的数学本是一门学科。
+本科三年级分册将开启此处有意关闭的
+大门：勒贝格积分（补足
+\cref{ch:b2:integration}中的控制收敛定理），测度论框架下的
+不可数空间概率，以及反函数
+定理的完整证明（\cref{ch:b2:diffcalc}），置于
+\omterm{def:b2:diffcalc:differential}{微分}几何的框架之中。
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:b2:genfun:1}
+求 $\{1, 2,
+\dots, 6\}$ 上均匀\omterm{def:b2:randomvar:law}{分布}（一颗均匀骰子）的\omterm{ex:b2:powerseries:fibonacci}{母函数}。证明两颗均匀骰子之和
+\emph{不可能}在 $\{2, \dots, 12\}$ 上均匀\omterm{def:b2:randomvar:law}{分布}：分解 $G_{X+Y}$
+并数根。\emph{（若和均匀，则须有 $G_X(t)G_Y(t) =
+\frac{t^2}{11}\sum_{k=0}^{10}t^k$，其非零根为
+$11$ 次单位根，除 $1$ 外，无一为实数——
+而 $G_X/t$ 与 $G_Y/t$ 均为次数为 $5$ 的实系数多项式，
+各自至少有一个实根。）}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:genfun:2}
+利用\omterm{ex:b2:powerseries:fibonacci}{母函数}，求二项\omterm{def:b2:randomvar:law}{分布}与
+几何\omterm{def:b2:randomvar:law}{分布}的 $\E$ 与 $V$（见\cref{thm:b2:genfun:moments}）。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:genfun:3}
+两颗灌铅骰子：能否将两颗骰子（独立地，
+同样或不同地）灌铅，使其和在 $\{2, \dots,
+12\}$ 上均匀？\emph{（与\cref{exo:b2:genfun:1}中相同的分解障碍：
+即使灌铅不同，答案仍是否定的，
+因为每个因子 $G_X(t)/t$ 次数为奇数 $5$，
+从而有实根，而目标\omterm{def:b2:randomvar:law}{分布}无实根。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:genfun:4}
+设 $X_1, X_2, \dots$ 为独立的伯努利变量 $\mathcal{B}(p)$
+且 $N \sim \mathcal{P}(\lambda)$ 与它们独立。
+利用\cref{thm:b2:genfun:compound}，证明 $S = X_1 + \dots + X_N
+\sim \mathcal{P}(\lambda p)$：泊松个数的项，每项
+以概率 $p$ 保留，则仍得泊松个数——\emph{稀疏化}。
+另求被舍弃项数的\omterm{def:b2:randomvar:law}{分布}，并为之赞叹：
+它是 $\mathcal{P}(\lambda(1-p))$，并可证明它
+与 $S$ 独立。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:genfun:5}
+（负二项\omterm{def:b2:randomvar:law}{分布}）设 $T_r$ 为获得
+$r$ 次正面（正面概率为 $p$）所需的抛掷次数。将 $T_r$ 写成 $r$ 个
+独立几何变量之和，并由此推出
+\[
+G_{T_r}(t) = \Bigl(\frac{pt}{1 - (1-p)t}\Bigr)^{r},
+\qquad
+\E(T_r) = \frac rp,
+\qquad
+V(T_r) = \frac{r(1-p)}{p^2},
+\]
+并展开 $G_{T_r}$ 以求 $\P(T_r = n) = \binom{n-1}{r-1}
+p^r(1-p)^{n-r}$。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:genfun:6}
+对后代\omterm{def:b2:randomvar:law}{分布} $p_0 = \frac18$，$p_1 = \frac38$，$p_2 =
+\frac38$，$p_3 = \frac18$：求 $m$，判断
+是否超临界，并求灭绝概率 $q$
+精确地求出。\emph{（分解出 $t = 1$ 这一根，即 $G(t) - t$ 的因式。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:genfun:7}
+（总后代）在次临界\omterm{pb:b2:genfun:1}{分支过程}（$m < 1$）中，设
+$Y = \sum_{n\geq0} Z_n$ 为曾经出生的
+个体总数。证明 $\E(Y) = \sum_n m^n = \frac{1}{1 - m}$（论证
+求和交换的合理性），并证明\omterm{def:b2:genfun:pgf}{概率母函数} $H = G_Y$ 满足函数方程
+$H(t) = t\,G(H(t))$。
+\emph{（祖先，加上其每个子代的
+总后代，它们是 $Y$ 的独立副本。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:genfun:8}
+设 $X$ 的\omterm{def:b2:genfun:pgf}{概率母函数}为 $G$，其\omterm{def:b2:powerseries:radius}{收敛半径} $>
+1$。证明\emph{指数尾界}：存在 $C > 0$ 与
+$\rho \in \intoo{0}{1}$，使得 $\P(X \geq n) \leq C\rho^n$。
+\emph{（将马尔可夫
+不等式用于 $t^X$，$t > 1$ 为收敛圆内某固定值。）}反之，证明若 $\P(X \geq n) \leq C\rho^n$ 且
+$\rho < 1$，则 $G$ 的\omterm{def:b2:powerseries:radius}{收敛半径} $\geq 1/\rho > 1$。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:genfun:9}
+（\omterm{def:b2:metric:continuity}{连续}性定理，初等情形）设 $X, X_1, X_2, \dots$ 为
+$\N$ 值的\omterm{def:b2:randomvar:law}{随机变量}，且 $G_{X_n}(t) \to G_X(t)$ 对每个 $t \in
+\intco{0}{1}$ 成立。证明 $\P(X_n = k) \to \P(X = k)$ 对每个
+$k$ 成立。\emph{（对 $k$ 归纳：当 $k = 0$ 时取 $t \to 0$——
+注意：固定较小的 $t$，利用 $\abs{\P(X_n = 0) - G_{X_n}(t)}
+\leq \frac{t}{1-t}$，这是因为尾部 $\sum_{j \geq 1}p_jt^j
+\leq \frac{t}{1 - t}$ 成立；再用对角线法。归纳步骤中，
+考虑 $\frac{G(t) - \P(X = 0)}{t}$，它是平移后
+\omterm{def:b2:randomvar:law}{分布}的\omterm{def:b2:genfun:pgf}{概率母函数}。）}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:genfun:10}
+（奇偶技巧）对取值于 $\N$ 的\omterm{def:b2:randomvar:law}{随机变量} $X$，证明
+\[
+\P(X \text{ 为偶数}) = \frac{1 + G_X(-1)}{2} ,
+\]
+并对 $X \sim \mathcal P(\lambda)$ 与
+$X \sim \mathcal B(n, p)$ 两种情形计算此概率。$G_X(-1) \to 0$ 从概率上
+意味着什么？
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:genfun:11}
+（西彻曼骰子）验证公平骰子的
+\omterm{def:b2:genfun:pgf}{概率母函数}的分解式为
+\[
+\frac{t + t^2 + \dots + t^6}{6}
+= \frac{t\,(1 + t)(1 + t + t^2)(1 - t + t^2)}{6},
+\]
+并证明面为 $\{1, 2, 2, 3, 3, 4\}$
+与 $\{1, 3, 4, 5, 6, 8\}$ 的两颗骰子，其\omterm{def:b2:genfun:pgf}{概率母函数}分别为
+$\frac{t(1+t)(1+t+t^2)}6$ 和
+$\frac{t(1+t)(1+t+t^2)(1-t+t^2)^2}6$，二者之积
+与两颗标准骰子之积相同：这些奇异骰子产生每个点数和 $2,
+\dots, 12$ 的概率与标准骰子完全相同。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:genfun:12}
+（等待\omterm{def:b2:metric:continuity}{连续}两次正面）一枚正面概率为
+$p$ 的硬币反复抛掷，直到\omterm{def:b2:metric:continuity}{连续}出现两次正面为止；设 $T$ 为
+抛掷次数（即\cref{exo:b2:proba:6}中的游戏）。
+以前几次抛掷的结果为条件，建立
+由状态“当前无正面”与“当前有一个正面”出发的\omterm{ex:b2:powerseries:fibonacci}{母函数}所满足的线性方程组，
+并得出
+\[
+G_T(t) = \frac{p^2t^2}{1 - qt - pqt^2}
+\qquad (q = 1 - p);
+\]
+验证 $G_T(1) = 1$ 及 $\E(T) = \dfrac{1 + p}{p^2}$（对公平硬币
+$= 6$）。
+\end{exercise}
+
+\section{问题：高尔顿–沃森过程的求解}
+
+\begin{problem}[{周末问题——增长速率、精确
+解、总后代与柯尔莫哥洛夫的临界估计
+}]\label{pb:b2:genfun:1}
+灭绝准则（见\cref{thm:b2:genfun:extinction}）
+将\omterm{pb:b2:genfun:1}{分支过程}\index{分支过程}划分为
+次临界、临界与超临界——但它
+没有涉及\emph{速率}：注定灭绝的分支以多快的速度消亡，
+幸存的分支又能增长到多大。本题计算这些速率。沿用本章记号：
+后代\omterm{def:b2:randomvar:law}{分布} $(p_k)$，其\omterm{def:b2:genfun:pgf}{概率母函数}为 $G$，
+均值 $m = G'(1)$，各代规模 $Z_n$（$Z_0 = 1$），迭代
+$G_n = G_{Z_n}$，灭绝概率 $q_n = \P(Z_n = 0)
+\uparrow q$；始终假定 $p_1 \neq 1$；若出现二阶矩，
+则假定 $G''(1) < \infty$，并记 $\sigma^2 =
+V(Z_1)$。
+
+\medskip
+\noindent\textbf{第一部分——各代的矩。}
+\begin{enumerate}
+  \item 证明 $\E(Z_n) = m^n$ \emph{（对 $G_n = G
+        \circ G_{n-1}$ 在 $1^-$ 处应用链式法则，利用 $G_{n-1}(1) = 1$ 及
+        \cref{thm:b2:genfun:moments}）}。
+  \item 建立递推式 $G_n''(1) =
+        G''(1)\,m^{2(n-1)} + m\,G_{n-1}''(1)$，并解之：
+        $G_n''(1) = G''(1)\,m^{n-1}\dfrac{m^n - 1}{m - 1}$
+        当 $m \neq 1$ 时为上式，又 $G_n''(1) = n\,G''(1)$ 对 $m =
+        1$ 时成立。
+  \item 推出
+        \[
+        V(Z_n) = \sigma^2m^{n-1}\,\frac{m^n - 1}{m - 1}
+        \quad (m \neq 1),
+        \qquad
+        V(Z_n) = n\,\sigma^2 \quad (m = 1).
+        \]
+  \item （次临界速率，上界）对 $m < 1$，证明
+        $\P(Z_n > 0) \leq m^n$ \emph{（对取整数值的
+        $Z_n$ 用马尔可夫不等式）}：灭绝必然发生，
+        且以几何速率进行——是对本章判别准则的
+        定量加强。
+  \item （次临界速率，下界）利用
+        柯西--施瓦茨不等式作用于 $Z_n\mathbf 1_{Z_n > 0}$，证明
+        \[
+        \P(Z_n > 0) \geq \frac{\E(Z_n)^2}{\E(Z_n^2)}
+        \geq c\,m^{n}
+        \quad\text{其中}\quad
+        c = \Bigl(\frac{\sigma^2}{m(1-m)} + 1\Bigr)^{-1} :
+        \]
+        几何速率 $m^n$ 精确到常数因子为止。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第二部分——几何族，
+精确求解。} 设后代\omterm{def:b2:randomvar:law}{分布}为 $\N$ 上的几何\omterm{def:b2:randomvar:law}{分布}：$p_k =
+qp^k$（$k \geq 0$），其中 $0 < p < 1$，$q = 1 - p$。
+\begin{enumerate}[resume]
+  \item 计算 $G(t) = \dfrac{q}{1 - pt}$ 与 $m = \dfrac
+        pq$，并用 $p$ 刻画三种情形。
+  \item 解方程 $G(t) = t$，证明不动点为 $1$ 与
+        $q/p = 1/m$，并求得灭绝概率
+        $q_{\mathrm{ext}} = \min(1, 1/m)$。
+  \item 用归纳法证明下列闭式：
+        \[
+        q_n = \frac{m^n - 1}{m^{n+1} - 1} \quad (m \neq 1),
+        \qquad
+        q_n = \frac{n}{n+1} \quad (m = 1).
+        \]
+  \item 由此得精确速率：次临界情形下 $1 - q_n \sim (1 - m)\,m^n$，
+        超临界情形下 $q_{\mathrm{ext}} - q_n
+        \sim \dfrac{m - 1}{m^{2}}\cdot m^{-n}$，
+        并验证超临界情形的收缩比
+        为 $G'(q_{\mathrm{ext}}) = 1/m$。
+  \item 临界情形（$p = \tfrac12$）：计算 $\sigma^2 =
+        2$，并注意到 $1 - q_n = \frac1{n+1}$：生存概率
+        按 $\frac1n$ 的量级衰减——既不是几何型，也不可和。
+  \item 仍为临界情形：用归纳法证明完整的迭代式
+        \[
+        G_n(t) = \frac{n - (n-1)t}{n + 1 - nt},
+        \]
+        由此推出：在生存条件下，$Z_n$ 为
+        $\N^*$ 上参数为 $\frac1{n+1}$ 的几何\omterm{def:b2:randomvar:law}{分布}：
+        \[
+        \P(Z_n = k \mid Z_n > 0) = \frac1{n+1}
+        \Bigl(\frac{n}{n+1}\Bigr)^{k-1},
+        \qquad
+        \E(Z_n \mid Z_n > 0) = n + 1 .
+        \]
+        平均谱系趋于消亡，但存活的谱系
+        规模为 $n$ 量级。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第三部分——总后代数。}设 $Y =
+\sum_{n\geq0}Z_n \in \N^* \cup \{\infty\}$ 为历史上出生的
+个体总数，并记 $H(t) =
+\sum_{k\geq1}\P(Y = k)t^k$。
+\begin{enumerate}[resume]
+  \item 证明 $\P(Y < \infty) = q_{\mathrm{ext}}$，并
+        回顾\cref{exo:b2:genfun:7}中的函数方程
+        $H(t) = t\,G(H(t))$（其推导未用到
+        $m < 1$）。
+  \item （二元分支）对 $p_0 = p_2 = \frac12$
+        （临界情形），解函数方程：
+        \[
+        H(t) = \frac{1 - \sqrt{1 - t^2}}{t},
+        \]
+        并利用\cref{ex:b2:powerseries:catalan}展开，
+        得到
+        \[
+        \P(Y = 2k + 1) = \frac{C_k}{2^{2k+1}},
+        \qquad C_k = \frac1{k+1}\binom{2k}k ;
+        \]
+        验证 $\P(Y = 1) = \frac12$ 与 $\P(Y = 3)
+        = \frac18$，两者均可直接计数检验。
+  \item 在 $1^-$ 处对函数方程求导，
+        证明 $\E(Y) = \frac{1}{1-m}$（$m < 1$），而
+        临界性则迫使 $\E(Y) = \infty$：临界总后代
+        几乎必然有限，但具有无穷
+        均值。
+  \item 利用中心二项式的渐近式
+        （\cref{ex:b2:comparison:centralbinomial}），证明
+        \[
+        \P(Y = 2k+1) \sim \frac{1}{2\sqrt\pi\,k^{3/2}},
+        \]
+        即 $k^{-3/2}$ 型的重尾，并推出 $\P(Y > n)
+        \asymp n^{-1/2}$（只需该阶的上、下界
+        即可）。
+  \item 与公平随机游走作比较（周末问题，见
+        \cref{ch:b2:proba}）：那里返回必然发生，但
+        返回时间均值无穷，这里的总后代数几乎必然有限，
+        但均值无穷，两者都带有
+        $n^{-3/2}$ 型的局部律。请用一段话说明
+        临界性为何产生这一特征。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第四部分——临界情形下的柯尔莫哥洛夫
+估计。}设 $m = 1$，$0 < \sigma^2 = G''(1) <
+\infty$。
+\begin{enumerate}[resume]
+  \item 证明 $G''$ 可\omterm{def:b2:metric:continuity}{连续}延拓至 $\intcc01$
+        \emph{（非负递增，且极限有限）}，并
+        由此推出 $1$ 处的泰勒展开：
+        \[
+        G(t) = t + b\,(1-t)^2 + o\bigl((1-t)^2\bigr),
+        \qquad b = \frac{G''(1)}2 = \frac{\sigma^2}2 .
+        \]
+  \item 对 $t \in \intco01$，记 $h(t) = \dfrac1{1 - G(t)} -
+        \dfrac1{1 - t}$。证明
+        \[
+        h(t) = \frac{G(t) - t}{(1 - G(t))(1 - t)}
+        \xrightarrow[t\to1^-]{} b .
+        \]
+  \item 沿迭代序列 $q_{j+1} = G(q_j)$ 裂项求和：
+        \[
+        \frac1{1 - q_n} = 1 + \sum_{j=0}^{n-1}h(q_j),
+        \]
+        并用切萨罗平均法得出
+        \[
+        \P(Z_n > 0) = 1 - q_n \sim \frac{2}{\sigma^2\,n}
+        \]
+——\emph{柯尔莫哥洛夫估计}：每个临界\omterm{pb:b2:genfun:1}{分支过程}
+        都以普适速率 $1/n$ 消亡，
+        仅常数与后代\omterm{def:b2:randomvar:law}{分布}有关。
+  \item 用第 10 题中的临界几何情形
+        检验该估计。
+  \item 推出 $\E(Z_n \mid Z_n > 0) = \dfrac{1}{1 - q_n}
+        \sim \dfrac{\sigma^2 n}{2}$ \emph{（注意 $\E(Z_n
+        \mathbf 1_{Z_n>0}) = \E(Z_n) = 1$）}，并
+        与第 11 题核对：在存活条件下，
+        种群以\emph{线性}方式增长——
+        正走在死亡与爆炸之间的临界钢丝上。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第五部分——应用与综合。}
+\begin{enumerate}[resume]
+  \item （传染病、链式反应）对泊松后代\omterm{def:b2:randomvar:law}{分布}
+        $\mathcal P(\lambda)$——每个病例感染
+        $\mathcal P(\lambda)$ 个新病例——写出
+        灭绝方程 $q = \eu^{\lambda(q-1)}$，并
+        数值求解 $\lambda = 1.5$（$q \approx
+        0.417$）和 $\lambda = 2$（$q \approx 0.203$）：
+        从一个病例出发，大规模爆发
+        即使 $\lambda > 1$ 时也\emph{并非}必然发生。说明
+        为何迭代 $q_{n+1} = \eu^{\lambda(q_n - 1)}$
+        从 $q_0 = 0$ 出发会收敛到正确的根。
+  \item 若从 $k$ 个祖先而非一个出发，证明
+        灭绝概率为 $q^k$。应用：
+        取 $\lambda = 1.5$，问至少需要多少个初始病例，
+        才能使爆发的概率至少为 $99\%$？
+  \item （以灭绝为条件的超临界过程）
+        设 $m > 1$，灭绝概率为 $q \in
+        \intoo01$。先由凸性证明在最小不动点处 $G'(q) < 1$，
+        并推出
+        $q_{\mathrm{ext}} - q_n = O\bigl(G'(q)^n\bigr)$
+        （几何收敛，如第 9 题所示）。
+        再证明 $\widehat G(t) = G(qt)/q$ 为某个合法后代\omterm{def:b2:randomvar:law}{分布}的\omterm{def:b2:genfun:pgf}{概率母函数}，
+        其均值为 $\widehat m =
+        G'(q) < 1$，是一个次临界的伴随过程。
+        在几何\omterm{def:b2:randomvar:law}{分布}族上验证：以灭绝为条件的超临界
+        $(p, q)$ 过程会交换
+        $p$ 与 $q$。（完整陈述——条件化后的过程
+        \emph{即是}伴随过程——该结论在
+        本科三年级分册中证明；这里你已验证了其
+        \omterm{ex:b2:powerseries:fibonacci}{母函数}“影子”。）
+  \item 综合：列出三分表——对 $m <
+        1$、$m = 1$、$m > 1$ 时，$q$ 的取值；$\P(Z_n >
+        0)$ 或 $q - q_n$ 的收敛速率；$\E(Y)$；存活
+        世代的规模。用一句话分别说明各工具如何
+        \omterm{ex:b2:powerseries:fibonacci}{母函数}的复合、凸性、在 $1^-$ 处的泰勒展开与
+        切萨罗平均如何贯穿整个问题，以及
+        本科三年级分册补充了哪些内容（鞅 $Z_n/m^n$ 与
+        亚格洛姆的指数极限律）。
+\end{enumerate}
+\end{problem}

@@ -1,0 +1,913 @@
+\chapter{概率：基础与大数
+定律}\label{ch:b3:probability}
+
+本科二年级在可数空间上建立了概率；测度论
+现在去掉了一切限制。概率空间是
+总测度为 $1$ 的测度空间，随机变量是
+可测映射，期望是勒贝格积分——并且整套分析武器库
+一并
+（\cref{ch:b3:measure,ch:b3:lebesgue,ch:b3:product}）适用于随机现象。本章建立
+这套对应关系，构造
+独立随机变量的无穷序列（在
+$\intcc01$ 上，由二进制数字给出：随机性就藏在
+勒贝格测度之中），证明博雷尔--坎泰利引理，
+柯尔莫哥洛夫零一律，厘清收敛的各种
+方式，并证明大数定律——这一定理使
+频率收敛于概率，使统计成为可能。
+周末问题给出埃特马迪
+关于强大数定律在最终 $L^1$ 形式下的证明。
+
+\section{对应关系}
+
+\begin{definition}\label{def:b3:probability:space}
+\emph{概率空间}\index{概率空间}是一个
+测度空间 $(\Omega, \mathcal A, \P)$，满足 $\P(\Omega) =
+1$；$\mathcal A$ 中的元素称为\emph{事件}，一个性质
+\emph{几乎必然}（a.s.）成立，是指其对应事件的
+概率为 $1$。\emph{随机变量}\index{随机
+变量}是可测映射 $X \colon \Omega \to \R$（或
+$\R^d$：随机向量）；其\emph{分布}\index{分布}
+是推前概率测度 $\P_X =
+X_*\P$ 在 $\R$ 上（\cref{exo:b3:product:9}），由
+\emph{分布函数} $F_X(t) = \P(X \leq t)$ 确定
+（\cref{exo:b3:measure:3}）。$X$ 具有\emph{密度} $f$，若
+$\P_X = f\,\dd\lambda$；它为\emph{离散}的，若 $\P_X$ 是
+可数个狄拉克测度的组合。
+\emph{期望}\index{期望}为
+\[
+\E[X] = \int_\Omega X\,\dd\P
+\qquad (X \geq 0 \text{ 或 } X \in L^1(\P)),
+\]
+而\emph{转换定理}（\cref{exo:b3:product:9}）
+在分布意义下计算：$\E[g(X)] = \int_\R g\,\dd\P_X$ ---
+$= \sum g(x_k)p_k$ 为离散情形，$= \int
+g(x)f(x)\dd x$ 为密度情形：本科二年级的公式，如今
+已成为同一理论的定理。\emph{方差}为 $\V(X) =
+\E[(X - \E X)^2] = \E[X^2] - (\E X)^2$ 对 $X \in L^2$ 成立。
+\end{definition}
+
+\begin{example}\label{ex:b3:probability:laws}
+标准分布及其值得注意的性质：伯努利
+分布 $\mathcal B(p)$、二项分布 $\mathcal B(n, p)$、几何分布，
+泊松分布 $\mathcal P(\lambda)$（离散情形，本科二年级的表
+格仍然成立）；$\intcc01$ 上的均匀分布（即勒贝格测度
+本身）；指数分布 $\mathcal E(\lambda)$（密度
+$\lambda\eu^{-\lambda x}\mathbf 1_{x>0}$）；
+以及\emph{高斯分布}\index{高斯分布} $\mathcal N(m, \sigma^2)$
+密度为 $\frac1{\sigma\sqrt{2\pi}}\exp\bigl(-\frac{(x -
+m)^2}{2\sigma^2}\bigr)$ --- 是概率密度，由
+\cref{pb:b3:lebesgue:1}可知，其均值为 $m$，方差为
+$\sigma^2$（高斯矩，见\cref{exo:b3:product:10}）。
+\end{example}
+
+\begin{proposition}[马尔可夫与切比雪夫]
+\label{prop:b3:probability:markov}
+对 $X \geq 0$ 及 $a > 0$，有 $\P(X \geq a) \leq \frac{\E
+X}{a}$；对 $X \in L^2$，有 $\P\bigl(\abs{X - \E X} \geq
+a\bigr) \leq \frac{\V(X)}{a^2}$。\index{马尔可夫
+不等式}\index{切比雪夫不等式}
+\end{proposition}
+
+\begin{proof}
+由\cref{exo:b3:lebesgue:5}(a)可知马尔可夫不等式成立；切比雪夫不等式即将马尔可夫
+不等式用于 $(X - \E X)^2$。
+\end{proof}
+
+\section{独立性}
+
+\begin{definition}\label{def:b3:probability:independence}
+子 $\sigma$-代数 $\mathcal A_1, \dots, \mathcal A_n
+\subseteq \mathcal A$ 称为\emph{独立}\index{独立}的，
+若 $\P(A_1\cap\dots\cap A_n) = \prod\P(A_i)$ 对所有 $A_i \in
+\mathcal A_i$；事件独立，是指其 $\sigma$-代数
+$\{\varnothing, A_i, A_i^c, \Omega\}$ 独立；随机变量
+$X_1, \dots, X_n$ 独立，若 $\sigma$-代数 $\sigma(X_i) =
+X_i^{-1}(\mathcal B(\R))$ 皆独立。称无穷族
+为独立，若每个有限子族都独立。
+\end{definition}
+
+\begin{theorem}\label{thm:b3:probability:independence}
+$X_1, \dots, X_n$ 独立，当且仅当向量
+$(X_1, \dots, X_n)$ 的分布为乘积测度
+$\P_{X_1}\otimes\cdots\otimes\P_{X_n}$。此时，对
+$g_i \geq 0$（或使乘积可积的）：
+\[
+\E\Bigl[\prod_ig_i(X_i)\Bigr] = \prod_i\E[g_i(X_i)],
+\]
+特别地，$\E[XY] = \E X\,\E Y$ 及 $\V(X_1 + \dots +
+X_n) = \sum\V(X_i)$ 对独立的 $L^2$ 变量成立。
+\end{theorem}
+
+\begin{proof}
+若 $X_i$ 独立，则两个概率测度
+$\P_{(X_1,\dots,X_n)}$ 与 $\bigotimes\P_{X_i}$ 在所有
+博雷尔集的乘积 $B_1\times\dots\times B_n$ 上一致 --- 一个
+$\pi$-系，它生成 $\mathcal B(\R^n)$
+（见\cref{prop:b3:product:sections}(b)） --- 从而处处
+（见\cref{thm:b3:measure:uniqueness}）。反之，乘积分布
+将一切事件 $\bigcap_iX_i^{-1}(B_i)$ 分解，即得独立性。期望公式于是
+由托内利/富比尼（\cref{thm:b3:product:tonelli}）经
+转换定理得到；$\E[XY] = \E X\E Y$ 即取 $g_i =
+\mathrm{id}$ 的情形，展开平方即得方差的
+可加性（交叉项 $\E[(X_i - \E X_i)(X_j - \E X_j)]
+= 0$）。
+\end{proof}
+
+\begin{theorem}[独立序列的存在性]
+\label{thm:b3:probability:existence}
+在 $\bigl(\intcc01, \mathcal L, \lambda\bigr)$ 上存在
+独立随机变量序列 $(U_n)_{n\geq1}$，
+每个都在 $\intcc01$ 上均匀分布。由此，对任意给定的
+分布 $(\mu_n)$（定义在 $\R$ 上），存在相互独立的 $(X_n)$，使得
+$\P_{X_n} = \mu_n$。\index{独立序列的存在性}
+\end{theorem}
+
+\begin{proof}
+\emph{二进制数字。} 对 $\omega \in \intcc01$，记 $(b_k(\omega))$
+为其二进制数字（$\omega = \sum b_k2^{-k}$；取
+不以全为 $1$ 的尾部结束的展开；歧义仅涉及
+一个可数、因而零测的集合）。每个 $b_k$ 是随机
+变量（$\{b_k = 1\}$ 是有限个二进
+区间之并），且向量 $(b_1, \dots, b_m)$ 取遍
+$\{0,1\}^m$ 中的每个值都在长为 $2^{-m}$ 的二进区间上取得：
+各 $b_k$ 相互独立，均服从伯努利$(\frac12)$分布。
+
+\emph{重新分组。} 把 $\N^*$ 分成无穷多个两两不交的
+无限集 $(I_n)$（例如按素数幂，或按对角线）；
+令 $(k^n_j)_j$ 枚举 $I_n$，并记
+\[
+U_n = \sum_{j\geq1} b_{k^n_j}\,2^{-j} .
+\]
+每个 $U_n$ 服从均匀分布：其二进制数字是独立的
+公平比特，故 $\P(U_n \in [l2^{-m}, (l+1)2^{-m})) = 2^{-m}$ 对
+每个二进区间成立，且二进区间决定分布
+（见\cref{thm:b3:measure:uniqueness}）。$U_n$ 相互独立：
+它们是独立族 $(b_k)$ 中互不相交的块的函数——
+形式地说，事件 $\{U_n \in D_n\}$（$D_n$ 为
+二进区间）仅依赖于来自互不相交集合的有限多个数字，
+从而可分解；再由 $\pi$-系论证推广到
+一切博雷尔集。
+
+\emph{任意分布。} 设 $G_n(u) = \inf\{t : F_{\mu_n}(t)
+\geq u\}$（即分布函数 $F_{\mu_n}$ 的\emph{分位函数}）；
+关键等价关系 $G_n(u) \leq t
+\iff u \leq F_{\mu_n}(t)$（由 $F$ 的右连续性，
+及单调性）可知 $X_n = G_n(U_n)$ 可测，且
+$\P(X_n \leq t) = \P(U_n \leq F_{\mu_n}(t)) =
+F_{\mu_n}(t)$，即分布为 $\mu_n$；独立性随之继承
+（独立变量的函数，
+见\cref{exo:b3:probability:3}）。
+\end{proof}
+
+\begin{example}[生日问题，如实计算]
+\label{ex:b3:probability:birthday}
+在 $n$ 个人的生日相互独立、且在
+$N = 365$ 天上均匀分布的条件下，所有生日互不相同的概率为
+\[
+p_n = \prod_{k=1}^{n-1}\Bigl(1 - \frac kN\Bigr),
+\]
+可由逐次条件化得到（或直接：有利情形数
+$N(N-1)\cdots(N - n + 1)$ 比上总数 $N^n$，这一计数论证
+借助独立性的乘积公式变得严格）。
+取对数，并利用 $-\ln(1 - x) = x +
+O(x^2)$：
+\[
+\ln p_n = -\frac{n(n-1)}{2N} +
+O\Bigl(\frac{n^3}{N^2}\Bigr),
+\qquad\text{故}\qquad
+p_n \approx \eu^{-n^2/2N} .
+\]
+临界点 $p_n = \frac12$ 位于 $n \approx
+\sqrt{2N\ln2} \approx 1.18\sqrt N$ 处：取 $N = 365$ 时 $n = 23$
+（$p_{23} = 0.4927$）。两点启示。其一，$n$ 个
+元素落入 $N$ 个盒子时的碰撞出现在 $n \sim \sqrt N$ 的量级上，
+而非 $n \sim N$——这正是支配哈希碰撞的\emph{生日尺度}，
+以及密码学中生日攻击的 $\sqrt N$ 代价。其二，
+这一计算是一个模板：
+各 $\binom n2$ 个两两碰撞事件并不独立，
+然而答案的表现却仿佛它们是独立的——
+（$\eu^{-\binom n2/N}$ 恰好就是独立配对的
+启发式近似）——泊松近似的一个初步实例，
+其严格化见\cref{ch:b3:clt}中的周末问题
+（勒卡姆不等式）。
+\end{example}
+
+\section{博雷尔--坎泰利与零一律}
+
+\begin{theorem}[博雷尔--坎泰利]
+\label{thm:b3:probability:borelcantelli}
+设 $(A_n)$ 为事件列，并记 $\limsup A_n = \bigcap_N
+\bigcup_{n\geq N}A_n$（“$A_n$ 无穷多次
+发生”）。\index{博雷尔--坎泰利引理}
+\begin{enumerate}
+  \item 若 $\sum\P(A_n) < \infty$，则 $\P(\limsup A_n) =
+        0$。
+  \item 若 $\sum\P(A_n) = \infty$ \emph{且各 $A_n$
+        相互独立}，则 $\P(\limsup A_n) = 1$。
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) 由\cref{exo:b3:measure:4}可知。(2)：对 $N \leq M$，
+由余事件的独立性（见\cref{exo:b3:probability:3}）
+可得
+\[
+\P\Bigl(\bigcap_{n=N}^{M}A_n^c\Bigr) = \prod_{n=N}^M\bigl(1
+- \P(A_n)\bigr) \leq
+\exp\Bigl(-\sum_{n=N}^M\P(A_n)\Bigr) \xrightarrow[M \to
+\infty]{} 0
+\]
+（$1 - x \leq \eu^{-x}$；级数发散）。
+因此 $\P\bigl(\bigcup_{n\geq N}A_n\bigr) = 1$ 对每个 $N$ 成立，而
+关于 $N$ 的递减交集的概率仍为
+$1$（由上连续性，见\cref{prop:b3:measure:basics}）。
+\end{proof}
+
+\begin{theorem}[柯尔莫哥洛夫 0--1 律]
+\label{thm:b3:probability:zeroone}
+设 $(X_n)$ 独立，记 $\mathcal T =
+\bigcap_N\sigma(X_N, X_{N+1}, \dots)$ 称为\emph{尾
+$\sigma$-代数}\index{尾 $\sigma$-代数}（对有限个
+$X_n$ 的任意改变都不敏感的事件：$\sum X_n$ 的收敛性、
+$\frac{S_n}n$ 的收敛性、$\limsup$ 的取值，\dots）。
+则每个 $T \in \mathcal T$ 都满足 $\P(T) \in \{0,
+1\}$。\index{0--1 律}
+\end{theorem}
+
+\begin{proof}
+固定 $N$。$\sigma$-代数 $\sigma(X_1, \dots, X_N)$ 与
+$\sigma(X_{N+1}, \dots)$ 独立：依赖于不相交变量块的事件，
+在相应的生成 $\pi$-系上乘积分解
+（柱集 $\bigcap_{i\leq N}\{X_i \in B_i\}$，分别为
+关于后续变量的有限条件），再由邓金
+（\cref{thm:b3:measure:dynkin}，两次应用，
+每次一侧）将分解式推广。尾事件 $T$ 属于
+$\sigma(X_{N+1}, \dots)$（对每个 $N$）：$T$ 与
+每个 $\sigma(X_1, \dots, X_N)$ 独立，故与
+它们生成的 $\sigma$-代数 $\sigma(X_1, X_2, \dots)$ 独立（再用一次邓金：
+各 $\sigma(X_1,\dots,X_N)$ 的并是生成它的 $\pi$-系）。
+但 $T \in \sigma(X_1, X_2, \dots)$ 也成立：$T$
+与\emph{自身}独立，$\P(T) = \P(T\cap T) =
+\P(T)^2$，故 $\P(T) \in \{0, 1\}$。
+\end{proof}
+
+\section{收敛方式}
+
+\begin{definition}\label{def:b3:probability:modes}
+$X_n \to X$ \emph{几乎必然收敛}，若 $\P(X_n \to X) = 1$；
+\emph{依概率收敛}，若 $\P(\abs{X_n - X} \geq \varepsilon)
+\to 0$ 对每个 $\varepsilon > 0$ 成立；\emph{$L^p$ 收敛}，若
+$\E\abs{X_n - X}^p \to 0$。\index{随机变量的
+收敛}
+\end{definition}
+
+\begin{proposition}\label{prop:b3:probability:modes}
+(a) 几乎必然收敛蕴含依概率收敛；
+(b) $L^p$ 收敛蕴含依概率收敛；
+(c) 依概率收敛蕴含
+\emph{沿某一子列}几乎必然收敛；
+(d) 一般而言不存在其他蕴含关系。
+\end{proposition}
+
+\begin{proof}
+(a) $\P(\abs{X_n - X} \geq \varepsilon) \leq
+\P\bigl(\sup_{m\geq n}\abs{X_m - X} \geq \varepsilon\bigr)
+\downarrow \P\bigl(\limsup\{\abs{X_m - X} \geq
+\varepsilon\}\bigr) = 0$（几乎必然收敛下成立，
+由上连续性；limsup 事件排除了收敛）。(b)
+马尔可夫不等式：$\P(\abs{X_n - X} \geq \varepsilon) \leq
+\varepsilon^{-p}\,\E\abs{X_n - X}^p$。(c) 取 $n_k$，使
+$\P(\abs{X_{n_k} - X} \geq 2^{-k}) \leq 2^{-k}$；
+由博雷尔–坎泰利 (1)，$\abs{X_{n_k} - X} < 2^{-k}$
+最终几乎必然成立。(d) 打字机序列（见\cref{exo:b3:lp:3}）在
+$(\intcc01, \lambda)$ 上依 $L^1$ 收敛且依概率收敛，
+但处处不逐点收敛；$n\mathbf 1_{\intoo0{1/n}} \to 0$
+几乎必然收敛，但不在 $L^1$ 中收敛；细节及其余反例见
+\cref{exo:b3:probability:6}。
+\end{proof}
+
+\section{大数定律}
+
+全文 $(X_n)$ 独立同分布
+（\emph{i.i.d.}），记 $S_n = X_1 + \dots + X_n$。
+
+\begin{theorem}[弱大数定律]
+\label{thm:b3:probability:wlln}
+若 $X_1 \in L^2$，记 $m = \E X_1$：
+\[
+\P\Bigl(\Bigl|\frac{S_n}{n} - m\Bigr| \geq
+\varepsilon\Bigr) \leq
+\frac{\V(X_1)}{n\,\varepsilon^2}
+\xrightarrow[n\to\infty]{} 0 :
+\]
+$\frac{S_n}n \to m$ 依概率收敛（且在 $L^2$ 中收敛）。\index{弱大数
+定律}
+\end{theorem}
+
+\begin{proof}
+$\E\frac{S_n}n = m$，且 $\V\bigl(\frac{S_n}n\bigr) =
+\frac{n\V(X_1)}{n^2}$
+由\cref{thm:b3:probability:independence}及切比雪夫不等式可得。
+\end{proof}
+
+\begin{theorem}[强大数定律]
+\label{thm:b3:probability:slln}
+若 $X_1 \in L^1$，则\index{强大数定律}
+\[
+\frac{S_n}{n} \xrightarrow[n\to\infty]{\text{几乎必然}} \E[X_1].
+\]
+此处仅在更强的假设 $X_1 \in
+L^4$ 下证明；一般情形（$L^1$，埃特马迪的证明）为
+周末问题。
+\end{theorem}
+
+\begin{proof}[在 $\E X_1^4 < \infty$ 下的证明]
+中心化（$X_i \mapsto X_i - m$），不妨设 $m = 0$。展开：
+\[
+\E[S_n^4] = \sum_{i,j,k,l}\E[X_iX_jX_kX_l]
+= n\,\E[X_1^4] + 3n(n-1)\,\bigl(\E[X_1^2]\bigr)^2 \leq
+C\,n^2 ,
+\]
+由于独立性与中心化，所有含
+孤立因子的项皆为零（$\E[X_iX_jX_kX_l] =
+\E[X_i]\E[\cdots] = 0$，除非指标两两配对：唯一
+幸存的只有 $n$ 项 $i=j=k=l$，以及
+$3n(n-1)$ 个含两对不同指标的项）。马尔可夫不等式：
+\[
+\P\Bigl(\Bigl|\frac{S_n}n\Bigr| \geq \varepsilon\Bigr)
+= \P\bigl(S_n^4 \geq n^4\varepsilon^4\bigr)
+\leq \frac{Cn^2}{n^4\varepsilon^4} =
+\frac{C}{\varepsilon^4n^2},
+\]
+该级数收敛。由博雷尔–坎泰利 (1)，对每个有理数
+$\varepsilon$，$\abs{S_n/n} < \varepsilon$ 最终成立，
+几乎必然；对 $\varepsilon \in \Q_+^*$ 取交（
+可数个概率为 $1$ 的事件）：$S_n/n \to 0$ 几乎必然。
+\end{proof}
+
+\begin{example}[强大数定律能带来什么]
+\label{ex:b3:probability:sllnapps}
+(a) \emph{频率}：对独立同分布的掷硬币试验，观测到的
+正面出现的频率几乎必然收敛于 $p$ --- 这正是
+概率本身的经验依据。
+(b) \emph{蒙特卡罗}\index{蒙特卡罗}：设 $g \in
+L^1(\intcc01)$，$(U_n)$ 为独立同分布的均匀随机变量
+（见\cref{thm:b3:probability:existence}），
+$\frac1n\sum_{k\leq n}g(U_k) \to \int_0^1g$ 几乎必然成立：通过抽样计算积分，
+可用于任意维数，与维数无关的速率 $\sim n^{-1/2}$
+在\cref{ch:b3:clt}中得到精确表述。
+(c) \emph{正规数}：几乎所有实数的二进制展开中，
+“1”出现的渐近频率为 $\frac12$，
+（将强大数定律用于
+\cref{thm:b3:probability:existence}中的数字变量）--- 博雷尔定理，一个
+关于\emph{每个}数的陈述，却由测度证明：
+\cref{pb:b3:probability:1}将其推广到所有进制。
+\end{example}
+
+\begin{method}\label{met:b3:probability:toolkit}
+关于随机序列渐近性陈述的工作步骤如下：
+(1) \emph{该事件是否为尾事件？}若是，
+则其概率为 $0$ 或 $1$，
+（见\cref{thm:b3:probability:zeroone}），只需
+判断是哪一个。(2) \emph{证明几乎必然成立的陈述}：
+博雷尔–坎泰利 --- 对“坏”事件，概率要求可和，
+借助马尔可夫型、切比雪夫型界估计，
+对已存在的各阶矩进行估计；独立性仅在
+逆方向中才需要。(3) \emph{子列 + 夹逼}：先证明
+沿某个易处理的子列收敛；再控制
+其间的振荡，借助单调性或极大
+不等式 --- 这正是埃特马迪证明的骨架。(4) 对
+分布极限，则在\cref{ch:b3:clt}中再讨论。
+\end{method}
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:b3:probability:1}
+(a) 设 $X$ 的分布函数 $F$ 连续且严格递增，
+证明 $F(X)$ 在 $\intcc01$ 上服从均匀分布，
+且 $G(U) \sim F$，这里 $U$ 服从均匀分布，$G = F^{-1}$：
+即通过求逆进行模拟。
+(b) 求 $X^2$ 的分布函数与密度，
+其中 $X$ 在 $\intcc{-1}1$ 上服从均匀分布，以及 $-\frac1\lambda\ln
+U$ 的分布函数与密度，其中 $U$ 在 $\intoo01$ 上服从均匀分布。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b3:probability:2}
+(a) 借助变换定理，计算泊松分布 $\mathcal
+P(\lambda)$ 与几何分布的均值与方差。
+(b) 证明：若正随机变量 $T$ 满足 $\P(T > t)
+> 0$ 对所有 $t$ 成立，并具有\emph{无记忆}性质 $\P(T > t + s \mid
+T > t) = \P(T > s)$ 对所有 $s, t \geq 0$ 成立，当且仅当 $T$ 服从
+指数分布。\emph{（生存函数满足柯西
+函数方程；单调性代替连续性。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:probability:3}
+(a) 证明：若 $X_1, \dots, X_n$ 相互独立，且 $f_i$
+为博雷尔函数，则 $f_i(X_i)$ 相互独立。
+(b) 证明：事件 $A_1, \dots, A_n$ 相互独立，当且仅当
+它们的余事件相互独立，当且仅当示性函数 $\mathbf 1_{A_i}$
+为相互独立的随机变量。
+(c) （两两独立是较弱的条件）两枚均匀硬币：$A = $ 第一枚
+正面朝上，$B = $ 第二枚正面朝上，$C = $ 两枚结果相同。证明
+$A, B, C$ 两两独立，但不相互独立。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:probability:4}
+(a) （无限猴子）独立同分布的均匀击键序列，
+在有限字母表上几乎必然包含每个有限文本
+无穷多次：用博雷尔–坎泰利 (2)，对
+互不相交的块加以证明。
+(b) （游程）对独立同分布的公平比特，记 $R_n$ 为
+从位置 $n$ 开始的连续 1 段长度。证明几乎必然
+$R_n \geq (1+\varepsilon)\log_2n$ 仅出现有限次，且 $R_n
+\geq \log_2 n$ 出现无穷多次 \emph{（博雷尔–坎泰利的两半；
+对后者，取互不相交的块以
+获得独立性）}：前 $n$ 位数字中最长的游程
+增长阶为 $\log_2n$。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:probability:5}
+设 $(X_n)$ 相互独立。
+(a) 证明 $\sum X_n z^n$ 的收敛半径
+几乎必然为常数（可能为 $0$ 或 $\infty$）。
+(b) 证明 $\P(\sum X_n \text{ 收敛}) \in \{0, 1\}$
+以及 $\P(S_n/n \to m) \in \{0,1\}$。
+(c) 给出一个关于 $(X_n)$ 的事件，它\emph{不是}尾事件，
+并验证0–1律对它可能不成立。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:probability:6}
+在 $(\intcc01, \lambda)$ 上 --- 并附证明 --- 给出随机变量，使其
+满足：
+(a) $X_n \to 0$ 依概率收敛，且在每个 $L^p$ 中收敛，但
+几乎必然处处不收敛；
+(b) $X_n \to 0$ 几乎必然成立，但在任何 $L^p$ 中都不收敛；
+(c) $X_n \to 0$ 在 $L^1$ 中收敛，但在 $L^2$ 中不收敛；
+(d) 并证明：若 $X_n \to X$ 依概率成立，且 $\abs{X_n}
+\leq Y \in L^1$，则 $X_n \to X$ 在 $L^1$ 中收敛
+\emph{（子列 + 控制收敛 +
+子列的子列技巧）}。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:probability:7}
+一项民意调查要估计未知比例 $p$，
+以经验频率 $\hat p_n$ 估计，其中 $n$ 为独立抽样次数。
+(a) 用切比雪夫不等式证明 $\P(\abs{\hat p_n - p} \geq \varepsilon)
+\leq \frac1{4n\varepsilon^2}$ （利用 $p(1-p) \leq \frac14$）。
+(b) 按此界，至少需抽取多少次，才能保证误差 $\leq 3\%$ 的
+概率 $\geq 95\%$？（真正答案
+借助\cref{ch:b3:clt}，约为 $1070$，切比雪夫
+界诚实却粗糙。）
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:probability:8}
+（伯恩斯坦）设 $f \in \mathcal C(\intcc01)$，定义
+伯恩斯坦多项式 $B_nf(x) =
+\sum_{k=0}^n\binom nkx^k(1-x)^{n-k}f\bigl(\frac kn\bigr)$.
+(a) 识别 $B_nf(x) = \E\bigl[f\bigl(\frac
+{S_n}n\bigr)\bigr]$，其中 $S_n$ 服从二项分布 $\mathcal B(n, x)$。
+(b) 证明 $B_nf \to f$ 在 $\intcc01$ 上\emph{一致收敛}：
+对事件 $\{\abs{\frac{S_n}n - x} \leq \delta\}$ 及其
+补集分别讨论，利用一致连续性以及切比雪夫不等式，
+并使用一致界 $\V(\frac{S_n}n) \leq \frac1{4n}$。
+(c) 由此得出结论：这是魏尔斯特拉斯逼近定理的第二种
+概率论式证明
+（见\cref{cor:b3:complete:weierstrass}），并给出显式的收敛速度
+$\norm{B_nf - f}_\infty \leq \frac32\,\omega_f(n^{-1/2})$
+其中 $\omega_f$ 为连续模 --- 至少证明
+$O(\omega_f(n^{-1/2}))$ 形式的结论。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:probability:9}
+（赠券收集者问题）从 $n$ 类卡片中均匀地抽取，
+有放回地进行。设 $T_n$ 为直到所有
+类型都出现过为止的抽取次数。
+(a) 写出 $T_n = \sum_{k=1}^{n}\tau_k$，其中 $\tau_k$
+服从参数为 $\frac{n - k + 1}n$ 的几何分布，各 $\tau_k$
+相互独立，由此推出 $\E T_n = n\,H_n \sim n\ln n$
+（$H_n$ 为调和数）及 $\V(T_n) \leq
+\frac{\pi^2}6n^2$。
+(b) 由切比雪夫不等式，$\frac{T_n}{n\ln n} \to 1$ 依概率成立。
+(c) 用博雷尔–坎泰利引理细化：直接证明 $\P(T_n >
+\beta n\ln n) \leq n^{1 - \beta}$，其中 $\beta > 1$，
+\emph{（对“某类型在
+$\beta n\ln n$ 次抽取后仍未被抽到”这一事件使用并集界，并利用 $1 - x \leq \eu^{-x}$）}，
+由此推出：沿 $n = 2^m$，几乎必然 $T_n \leq \beta n\ln
+n$ 最终成立，对每个 $\beta > 2$。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:probability:10}
+利用数字构造
+（见\cref{thm:b3:probability:existence}）：
+(a) 直接计算验证 $U = \sum b_{2k}2^{-k}$
+（取均匀随机数 $\omega$ 的偶数位数字）服从均匀分布，
+且与 $V = \sum b_{2k-1}2^{-k}$ 独立；
+(b) 推出 $\intcc01$ 与
+$\intcc01^2$ 之间存在一个去掉零测集后为双射的保测可测映射，并作评注：
+一个均匀随机数中包含两个（乃至可数多个）
+相互独立的随机数 --- 可与皮亚诺曲线作比较，
+（见\cref{pb:b3:topology:1}），后者实现了满射，但
+不保测，也不是单射。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:probability:11}
+（记录）设 $(X_n)_{n\geq1}$ 独立同分布，其分布函数连续，
+称在时刻 $n$ 出现一个\emph{记录}，若
+$X_n > \max(X_1, \dots, X_{n-1})$（时刻 $1$ 是
+一个记录）。设 $R_n$ 为记录指示变量。
+(a) 证明 $\P(R_n = 1) = \frac1n$ \emph{（由对称性，各
+$n!$ 种 $X_1, \dots, X_n$ 的排列等可能，
+且取值相同的概率为 $0$）}。
+(b) 证明 $R_n$ 相互\emph{独立}\emph{（计算与给定记录位置相容的排列数，
+或论证
+$X_1, \dots, X_{n-1}$ 的相对次序
+与 $X_n$ 在其中的秩独立）}。
+(c) 由博雷尔–坎泰利引理
+（见\cref{thm:b3:probability:borelcantelli}，两部分）可得
+几乎必然有无穷多个记录出现，但
+相邻时刻 $n, n+1$ 同时出现记录无穷多次的概率
+--- 请判断该概率是 0 还是 1！ --- 并计算
+$\sum_n\P(R_n = 1, R_{n+1} = 1)$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:probability:12}
+（最长正面游程）掷一枚均匀硬币无穷次，并
+记 $L_n$ 为前 $n$ 次投掷中连续正面
+构成的最长游程的长度。
+(a) 证明：对每个 $\varepsilon > 0$，几乎必然 $L_n \leq
+(1 + \varepsilon)\log_2n$ 最终成立 \emph{（
+某个长为 $\ell$ 的游程在前 $n$ 次投掷中开始的概率
+至多为 $n2^{-\ell}$；沿 $n =
+2^k$ 应用博雷尔–坎泰利引理）}。
+(b) 证明：几乎必然 $L_n \geq (1 - \varepsilon)\log_2n$
+最终成立 \emph{（将前 $n$ 次投掷分为
+$\lfloor n/\ell\rfloor$ 个互不相交、长为 $\ell =
+\lceil(1 - \varepsilon)\log_2n\rceil$ 的区块，它们
+相互独立，每块全为正面的概率为 $2^{-\ell}$，
+且无一块全为正面的概率至多为
+$\exp(-n2^{-\ell}/\ell)$；沿 $n = 2^k$ 再次求和）}。
+(c) 由此得出 $\frac{L_n}{\log_2n} \to 1$ 几乎必然成立：在一百万次
+均匀投掷中，应预期出现长约 $20$ 的连续正面游程 ---
+而没有这种游程的数据，很可能是伪造的。
+\end{exercise}
+
+\section{问题：埃特马迪的强大数律证明}
+
+\begin{problem}[{周末问题 --- 独立同分布可积变量的
+强大数律}]
+\label{pb:b3:probability:1}
+柯尔莫哥洛夫强大数律 --- $\frac{S_n}n \to \E X_1$ 几乎必然
+对独立同分布的 $X_n \in L^1$ 成立 --- 长期只有繁复的证明；
+1981 年，埃特马迪找到一个极为简洁的证明，
+只用本章的内容（甚至把独立性减弱为
+两两独立）。下面沿用此证明。设 $(X_n)$ 为
+两两独立、同分布且可积的序列；
+$m = \E X_1$, $S_n = X_1 + \dots + X_n$.
+
+\medskip
+\noindent\textbf{Part I --- 化归。}
+\begin{enumerate}
+  \item 证明只需讨论 $X_n \geq 0$ 的情形
+        \emph{（将 $X_n = X_n^+ - X_n^-$ 分解，验证两部分
+        仍为两两独立、同分布的序列，
+        且可积）}。此后假定 $X_n \geq 0$。
+  \item （截断）设 $Y_n = X_n\,\mathbf 1_{X_n \leq n}$
+        并记 $S_n^* = Y_1 + \dots + Y_n$。证明
+        \[
+        \sum_{n\geq1}\P(X_n \neq Y_n) =
+        \sum_{n\geq1}\P(X_1 > n) \leq \E[X_1] < \infty
+        \]
+        （见\cref{exo:b3:product:3}），并由
+        博雷尔–坎泰利引理推出 $\frac{S_n - S_n^*}{n} \to 0$
+        几乎必然。故只需证明 $\frac{S^*_n}n \to m$
+        几乎必然。
+  \item 证明 $\E Y_n = \E\bigl[X_1\mathbf 1_{X_1\leq
+        n}\bigr] \to m$（由单调收敛定理），从而
+        $\frac1n\sum_{k\leq n}\E Y_k \to m$（切萨罗平均）：
+        只需证明 $\frac{S_n^* - \E S_n^*}{n} \to 0$
+        几乎必然。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第二部分 --- 方差估计。}
+\begin{enumerate}[resume]
+  \item 证明
+        \[
+        \V(Y_n) \leq \E[Y_n^2] = \E\bigl[X_1^2\,\mathbf
+        1_{X_1 \leq n}\bigr]
+        \]
+        并利用层饼公式
+        （\cref{prop:b3:product:layercake}），得关键估计
+        \[
+        \sum_{n\geq1}\frac{\V(Y_n)}{n^2}
+        \leq \sum_{n\geq1}\frac1{n^2}\,
+        \E\bigl[X_1^2\mathbf 1_{X_1\leq n}\bigr]
+        \leq C\,\E[X_1] < \infty
+        \]
+        \emph{（交换求和与期望的顺序 ---
+        级数的托内利定理 --- 并用 $\sum_{n \geq
+        x}\frac1{n^2} \leq \frac2{\max(x,1)}$，作内层
+        估计 $x^2\sum_{n\geq x}n^{-2} \leq 2x$）}。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第三部分 --- 沿几何
+子列的收敛性。} 取 $\alpha > 1$，令 $k_j =
+\lfloor\alpha^j\rfloor$。
+\begin{enumerate}[resume]
+  \item 利用两两独立性（方差可加，
+        \cref{thm:b3:probability:independence} --- 验证方差的可加性
+        只需两两独立性），
+        并由切比雪夫不等式，证明对每个
+        $\varepsilon > 0$：
+        \[
+        \sum_{j\geq1}\P\Bigl(\Bigl|
+        \frac{S^*_{k_j} - \E S^*_{k_j}}{k_j}\Bigr| \geq
+        \varepsilon\Bigr)
+        \leq
+        \frac1{\varepsilon^2}\sum_{j\geq1}\frac1{k_j^2}
+        \sum_{n\leq k_j}\V(Y_n)
+        = \frac1{\varepsilon^2}\sum_{n\geq1}\V(Y_n)
+        \sum_{j\,:\,k_j\geq n}\frac1{k_j^2} .
+        \]
+  \item 证明 $\sum_{j : k_j \geq n}k_j^{-2} \leq
+        \frac{C_\alpha}{n^2}$ \emph{（几何级数；
+        注意取整：$k_j \geq \frac{\alpha^j}2$ 对
+        $\alpha^j \geq 2$ 的情形须小心）}，并由
+        第 4 问及博雷尔–坎泰利引理推出：
+        \[
+        \frac{S^*_{k_j} - \E S^*_{k_j}}{k_j}
+        \xrightarrow[j\to\infty]{\text{几乎必然}} 0,
+        \qquad\text{因此}\qquad
+        \frac{S^*_{k_j}}{k_j} \to m \ \text{几乎必然}
+        \]
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第四部分 --- 夹逼与结论。}
+\begin{enumerate}[resume]
+  \item 对 $k_j \leq n \leq k_{j+1}$，利用
+        $S^*_n$ 的单调性（求和项非负！）证明
+        \[
+        \frac{k_j}{k_{j+1}}\,\frac{S^*_{k_j}}{k_j}
+        \;\leq\; \frac{S^*_n}{n} \;\leq\;
+        \frac{k_{j+1}}{k_j}\,\frac{S^*_{k_{j+1}}}{k_{j+1}},
+        \]
+        并几乎必然推出：
+        \[
+        \frac m\alpha \leq \liminf\frac{S^*_n}n \leq
+        \limsup\frac{S^*_n}n \leq \alpha\,m .
+        \]
+  \item 沿某一数列令 $\alpha \downarrow 1$，
+        得 $\frac{S_n^*}n \to m$ 几乎必然，由（第一部分）
+        即\emph{强大数定律}：
+        \[
+        \boxed{\ \frac{S_n}{n}
+        \xrightarrow[n\to\infty]{\text{几乎必然}} \E[X_1].\ }
+        \]
+  \item 究竟在何处，两两独立性（而非
+        完全独立性）已经足够？请列出
+        用到独立性类假设的三处。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第五部分 --- 附加题。}
+\begin{enumerate}[resume]
+  \item （博雷尔正规数）证明：
+        关于 $\lambda$ 几乎处处的 $x \in \intcc01$ 是
+        \emph{在每个基下都是正规数} $b \geq 2$：每个数字
+        $0, \dots, b-1$ 出现的渐近频率为
+        $\frac1b$ \emph{（固定 $b$ 与某一数字，对指示变量应用
+        强大数定律 --- 验证均匀变量的
+        $b$ 进制数字是
+        独立同分布且在 $\{0,\dots,b-1\}$ 上均匀分布，如
+        \cref{thm:b3:probability:existence} --- 再
+        对可数多个概率为一的事件取交
+        集）}。给出一个显式的非正规数，
+        并思考：该定理断言几乎所有
+        数都是正规的，而证明 $\sqrt2$ 或
+        $\pi$ 的正规性仍是公开问题。
+  \item （有保证的蒙特卡罗方法）完整论证
+        \cref{ex:b3:probability:sllnapps}(b) 中的方法，对
+        $g \in L^1(\intcc01^d)$ 的情形：构造
+        $\intcc01^d$ 上的独立同分布均匀样本，由
+        \cref{thm:b3:probability:existence} 及
+        \cref{exo:b3:probability:10}，并说明
+        强大数定律给出的结论。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第六部分 --- 完全独立性的作用：
+极大不等式与随机级数。} 埃特马迪只用到
+两两独立性；其余部分则利用
+完全（相互）独立的版本。设 $(Z_n)$ 为
+$L^2$ 中独立中心化的变量，令 $S_k = Z_1 + \dots + Z_k$（新
+记号，与上文的 $X_n$ 无关）。
+\begin{enumerate}[resume]
+  \item （柯尔莫哥洛夫极大不等式）对 $\varepsilon
+        > 0$，证明
+        \[
+        \P\Bigl(\max_{1\leq k\leq n}\abs{S_k} \geq
+        \varepsilon\Bigr) \;\leq\;
+        \frac1{\varepsilon^2}\sum_{k=1}^n\V(Z_k) :
+        \]
+        切比雪夫的代价换来了对极大值的控制\emph{（
+        按首个指标 $k$ 划分事件，满足
+        $\abs{S_k} \geq \varepsilon$ 的部分；在该部分上写
+        $S_n^2 \geq S_k^2 + 2S_k(S_n - S_k)$，并利用
+        两组 $(Z_1, \dots, Z_k)$ 与
+        $(Z_{k+1}, \dots, Z_n)$ 的独立性，
+        \cref{thm:b3:probability:independence}）}。指出
+        哪一步上两两独立性将不再
+        足够。
+  \item （辛钦–柯尔莫哥洛夫单级数定理）推出：
+        若 $\sum_n\V(Z_n) < \infty$，则 $\sum_nZ_n$
+        几乎必然收敛 \emph{（证明几乎必然地，部分和
+        构成柯西列：令 $m \to
+        \infty$ 时的极大不等式，作用于
+        $Z_{N+1}, \dots, Z_{N+m}$，再令 $N \to
+        \infty$）}。
+  \item （拉德马赫级数）设 $(\varepsilon_n)$ 为
+        独立同分布的符号，$\P(\varepsilon_n = \pm1) =
+        \frac12$（\cref{thm:b3:probability:existence}），并令
+        $(x_n)$ 为实数列。证明
+        $\sum_nx_n\varepsilon_n$ 几乎必然收敛，只要
+        $\sum_nx_n^2 < \infty$；并证明，无论
+        $(x_n)$ 如何，
+        $\sum_nx_n\varepsilon_n$ 收敛的概率为 $0$ 或 $1$
+        （\cref{thm:b3:probability:zeroone}）。
+  \item 反之，用初等方法。记 $T_n = \sum_{k\leq
+        n}x_k\varepsilon_k$ 及 $s_n^2 = \sum_{k\leq
+        n}x_k^2$，并假设 $s_n \to \infty$。
+        (a) 证明\emph{佩利–齐格蒙德不等式}：对满足
+        $Z \geq 0$、$\E Z^2 < \infty$ 与 $0 < \theta <
+        1$，
+        \[
+        \P\bigl(Z > \theta\,\E Z\bigr) \;\geq\; (1 -
+        \theta)^2\,\frac{(\E Z)^2}{\E Z^2}
+        \]
+        \emph{（将 $\E Z$ 在水平 $\theta\E Z$ 处分开，并
+        对上段应用柯西–施瓦茨不等式）}。
+        (b) 证明 $\E T_n^4 \leq 3s_n^4$。
+        (c) 推出 $\P\bigl(\abs{T_n} > \frac{s_n}2\bigr)
+        \geq \frac3{16}$，并由此得出
+        $\sum_nx_n\varepsilon_n$ 几乎必然发散；因此
+        得到二分结论：
+        \[
+        \sum_nx_n\varepsilon_n\ \text{几乎必然收敛}
+        \iff \sum_nx_n^2 < \infty .
+        \]
+  \item （随机调和级数）推出：
+        $\sum_n\frac{\varepsilon_n}{n^s}$ 几乎必然收敛\
+        当且仅当 $s > \frac12$。对 $\frac12 < s \leq
+        1$ 时，级数几乎必然收敛，而
+        $\sum_nn^{-s} = \infty$：随机符号产生
+        平方根量级的抵消 --- 可与
+        交错级数 $\sum_n\frac{(-1)^n}{n^s}$ 比较，
+        它对\emph{每个} $s > 0$ 都收敛。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第七部分 --- 集中现象：霍夫丁
+不等式。} 强大数定律断言 $\frac{S_n}n \to m$；
+而集中不等式说明偏差有多么不可能
+\emph{在每个固定的 $n$ 处}。
+\begin{enumerate}[resume]
+  \item（霍夫丁引理）
+        (a) 证明 $\cosh\lambda \leq \eu^{\lambda^2/2}$ 对
+        所有 $\lambda \in \R$，通过两个级数的
+        逐项比较。
+        (b) 设 $Z$ 为中心化随机变量，且 $a \leq Z \leq b$，
+        $a < b$。证明
+        \[
+        \E\,\eu^{\lambda Z} \leq
+        \exp\Bigl(\frac{\lambda^2(b - a)^2}8\Bigr)
+        \]
+        \emph{（将 $\eu^{\lambda z}$ 在 $\intcc ab$ 上用其弦控制，
+        取期望，并研究 $\varphi(t)
+        = -pt + \log(1 - p + p\eu^t)$，其中 $p =
+        \frac{-a}{b-a}$、$t = \lambda(b - a)$，证明
+        $\varphi(0) = \varphi'(0) = 0$ 且 $\varphi''
+        \leq \frac14$）}。
+  \item（霍夫丁不等式）设 $X_1, \dots, X_n$ 为
+        独立，满足 $a_i \leq X_i \leq b_i$，且 $S_n =
+        X_1 + \dots + X_n$。证明：对 $t > 0$，
+        \[
+        \P\bigl(S_n - \E S_n \geq t\bigr) \leq
+        \exp\Bigl(\frac{-2t^2}{\sum_{i=1}^n(b_i -
+        a_i)^2}\Bigr),
+        \]
+        对下尾也有相同的界，
+        \emph{（指数型切比雪夫：界定
+        $\E\,\eu^{\lambda(S_n - \E S_n)}$，利用
+        独立性及第 17 题，然后对
+        $\lambda > 0$ 优化）}。
+  \item（强大数定律，有界情形，附收敛速度）设
+        $X_i$ 为取值于 $\intcc ab$ 中的独立同分布随机变量，且 $m
+        = \E X_1$。证明
+        \[
+        \P\Bigl(\Bigl|\frac{S_n}n - m\Bigr| \geq
+        \varepsilon\Bigr) \leq
+        2\exp\Bigl(\frac{-2n\varepsilon^2}{(b - a)^2}\Bigr)
+        \]
+        并推出 $\frac{S_n}n \to m$ 几乎必然成立，这借助
+        博雷尔–坎泰利引理，得到有界变量强大数定律的第二种证明 ——
+        不作截断，且
+        在每个有限 $n$ 处有指数速度，但要求加项有界
+        且完全独立。比较这些假设
+        与埃特马迪的假设。
+  \item（蒙特卡罗，对固定的 $n$ 有保证）设 $g
+        \colon \intcc01^d \to \intcc01$ 为可测函数，且
+        $(U_k)$ 为第 11 题中的独立同分布均匀样本。
+        给定 $\varepsilon, \delta > 0$，证明
+        \[
+        n \geq \frac{\log(2/\delta)}{2\varepsilon^2}
+        \implies
+        \P\Bigl(\Bigl|\frac1n\sum_{k=1}^ng(U_k) -
+        \int g\,\dd\lambda_d\Bigr| \geq \varepsilon\Bigr)
+        \leq \delta,
+        \]
+        并计算当 $\varepsilon =
+        \delta = 10^{-2}$ 时的门槛值。该界不依赖 $d$：
+        请与第 11 题以及确定性
+        网格作比较。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第八部分 --- 随机游走有多大？
+迈向重对数律。} 设 $S_n = \varepsilon_1 +
+\dots + \varepsilon_n$ 为由
+        独立同分布的公平符号构成的简单随机游走。
+\begin{enumerate}[resume]
+  \item（次高斯尾）证明 $\E\,\eu^{\lambda S_n} =
+        (\cosh\lambda)^n \leq \eu^{n\lambda^2/2}$，并
+        对 $x > 0$，由此推出：
+        \[
+        \P(S_n \geq x) \leq \eu^{-x^2/(2n)},
+        \qquad
+        \P(\abs{S_n} \geq x) \leq 2\,\eu^{-x^2/(2n)} .
+        \]
+  \item 借助博雷尔–坎泰利引理，推出
+        \[
+        \limsup_{n\to\infty}\frac{\abs{S_n}}
+        {\sqrt{2n\log n}} \leq 1 \quad\text{几乎必然}
+        \]
+        \emph{（对 $\eta > 0$，在 $x =
+        (1 + \eta)\sqrt{2n\log n}$ 处对尾概率界求和，再对
+        $\eta = \frac1p$ 取交）}。特别地，随机游走
+        位于中心极限定理尺度 $\sqrt n$ 上，只差一个对数因子
+        ——远小于粗糙的界 $\abs{S_n} \leq n$。
+  \item 沿倍增子列 $n_j = 2^j$，证明
+        \[
+        \limsup_{j\to\infty}\frac{S_{n_j}}
+        {\sqrt{2n_j\log\log n_j}} \leq 1 \quad\text{几乎必然},
+        \]
+        并加以说明：\emph{重对数律
+        }（辛钦；哈特曼–温特纳，对一般中心化的 $L^2$ 加项）
+        断言：
+        \[
+        \limsup_{n\to\infty}\frac{S_n}
+        {\sqrt{2n\log\log n}} = 1 \quad\text{几乎必然}
+        \]
+        请准确说明，刚证明的子列估计与本断言的上半部分
+        究竟有何区别。
+        （须控制每个块内的 $\max_{n_j \leq n \leq
+        n_{j+1}}S_n$，这需要
+        在\emph{指数}尺度上的极大不等式）。
+        并定量检验第 12 题的不等式对此目的
+        是否太弱。下半部分
+        依赖第二博雷尔–坎泰利引理，
+        并作用于独立的块上；两部分都是
+        本科三年级的正规内容，
+        宜在专门的概率论课程中讲授。
+
+  \item （有限类上的一致偏差）设 $A_1,
+        \dots, A_N$ 为可重复试验中的事件，
+        用经验频率估计每个概率，
+        其中 $\hat p_i$ 由 $n$ 次独立同分布重复试验得到。
+        结合霍夫丁不等式与并集界，
+        证明
+        \[
+        \P\Bigl(\max_{i\leq N}\,\abs{\hat p_i - \P(A_i)} >
+        \varepsilon\Bigr) \;\leq\; 2N\,\eu^{-2n\varepsilon^2},
+        \]
+        并推出样本量规则：$n \geq
+        \frac{\ln(2N/\delta)}{2\varepsilon^2}$ 可保证
+        所有 $N$ 个估计同时满足
+        $\varepsilon$ 精度，概率至少为 $\geq 1 -
+        \delta$。计算 $n$，取 $N = 10^6$、$\varepsilon =
+        0.01$、$\delta = 0.05$ 时的样本量，此即一致性的
+        对数代价。
+  \item （随机调和窗口）结合
+        随机级数理论的两半，证明：
+        对独立同分布的符号 $(\varepsilon_n)$，级数
+        $\sum_n\frac{\varepsilon_n}{n^\alpha}$ 在
+        $\alpha > \frac12$ 时几乎必然收敛，在
+        $\alpha \leq \frac12$ 时几乎必然发散。与绝对收敛
+        （要求 $\alpha > 1$）相比：在
+        窗口 $\alpha \in \intoc{\frac12}1$ 上，收敛
+        是真正的概率现象 ---
+        源于抵消，而非项的大小。
+\end{enumerate}
+\end{problem}

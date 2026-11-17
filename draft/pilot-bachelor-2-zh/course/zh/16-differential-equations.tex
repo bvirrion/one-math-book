@@ -1,0 +1,829 @@
+\chapter{微分方程}\label{ch:b2:diffeq}
+
+本科一年级已解决了可用公式求解的线性方程。本章
+补充公式无法给出的内容：\emph{柯西--利普希茨定理}
+--- 即 $y' = f(t, y)$ 的存在唯一性 --- 用
+巴拿赫不动点定理证明，正如在
+\cref{ch:b2:metric}中所承诺的；随后讨论\emph{线性
+微分方程组} $X' = A(t)X + B(t)$ 的完整理论，以矩阵指数与
+朗斯基行列式作为计算工具。
+
+\section{柯西--利普希茨定理}
+
+\begin{theorem}[柯西--利普希茨，全局利普希茨形式]\label{thm:b2:diffeq:cauchylipschitz}
+设 $I$ 为闭区间，$f \colon I \times \R^n \to \R^n$ 连续
+且\emph{关于第二变量满足利普希茨条件}，关于第一变量
+一致地：$\norm{f(t, y) - f(t, z)} \leq k\,\norm{y - z}$ 对所有 $t
+\in I$。于是对每个 $(t_0, y_0) \in I \times \R^n$，柯西
+问题\index{柯西--利普希茨定理}
+\[
+y' = f(t, y), \qquad y(t_0) = y_0
+\]
+有且仅有一个解 $y \colon I \to \R^n$，它属于 $C^1$ 类。
+\end{theorem}
+
+\begin{proof}
+\emph{等价改写。}连续的 $y$ 为该问题的解，当且仅当它
+满足积分方程
+\[
+y(t) = y_0 + \int_{t_0}^{t} f\bigl(s, y(s)\bigr)\,\dd s
+=: T(y)(t)
+\]
+（微积分基本定理双向适用；积分方程的连续解
+自动为 $C^1$ 类）。
+
+\emph{换范后的压缩映射。}在巴拿赫空间 $E =
+C(I, \R^n)$ 上赋予\emph{加权}范数
+\[
+N(y) = \sup_{t \in I}\; \eu^{-2k\abs{t - t_0}}\,\norm{y(t)} ,
+\]
+（与上确界范数等价：权函数在
+闭区间 $I$ 上有上下界，故 $E$ 仍完备），对 $y, z \in
+E$，不妨设 $t \geq t_0$，估计：
+\[
+\norm{T(y)(t) - T(z)(t)}
+\leq \int_{t_0}^{t} k\,\norm{y(s) - z(s)}\,\dd s
+\leq k\,N(y - z)\int_{t_0}^{t} \eu^{2k(s - t_0)}\dd s
+\leq \frac{N(y-z)}{2}\,\eu^{2k(t - t_0)} .
+\]
+将两边乘以 $\eu^{-2k(t - t_0)}$ 并取上确界（$t
+< t_0$ 的情形类似）：$N\bigl(T(y) - T(z)\bigr) \leq \frac12 N(y -
+z)$，故 $T$ 为 $\frac12$-压缩映射，且 $(E, N)$ 完备。
+由巴拿赫不动点定理（见\cref{thm:b2:metric:banach}）得
+唯一不动点，即唯一解。
+\end{proof}
+
+\begin{remark}
+若 $f$ 仅为 $C^1$ 类（局部利普希茨），则定理
+在\emph{局部}意义下成立，解为定义在极大开区间上的极大解；
+解可能在有限时间内爆破（取 $y' = y^2$，$y(0) = 1$，则 $y(t)
+= \frac{1}{1-t}$，在 $t = 1$ 处爆破）。全局利普希茨假设
+是保证整个闭区间上解存在的关键。值得牢记的两条推论：
+利普希茨场所决定的常微分方程，其解曲线\emph{永不相交}；
+且线性齐次方程的解若在某点取零，
+则该解恒为零。
+\end{remark}
+
+\begin{example}[唯一性是定理：一个会“漏”的场]\label{ex:b2:diffeq:leaky}
+考虑 $y' = 2\sqrt{\abs y}$，且 $y(0) = 0$。零
+函数是它的解；另一个解为
+\[
+y(t) = \begin{cases} 0 & t \leq 0,\\ t^2 & t \geq 0,
+\end{cases}
+\]
+该函数是 $C^1$ 类的（两段在接合处的导数都为 $0$，
+并满足 $y'(t) = 2t = 2\sqrt{t^2}$（$t > 0$）---
+事实上，推迟起始时刻便给出一个解，对\emph{每个}
+起始时刻 $c \geq 0$ 都有一个解，故经过
+同一初值的解有无穷多个。这与
+\cref{thm:b2:diffeq:cauchylipschitz}并不矛盾：在 $y = 0$ 附近，
+\[
+\frac{\abs{2\sqrt y - 2\sqrt z}}{\abs{y - z}}
+= \frac{2}{\sqrt y + \sqrt z} \longrightarrow +\infty ,
+\]
+场关于 $y$ 不满足利普希茨条件，该定理在此不给出结论。
+末了点出其物理含义：重力作用下排空的水桶
+倒放——从空的状态出发，人们
+无法判断它何时开始注水；常微分方程的确定性
+恰是利普希茨条件，而非自然规律。
+\end{example}
+
+\section{线性微分方程组}
+
+\begin{theorem}[线性微分方程组的结构]\label{thm:b2:diffeq:linear}
+设 $A \colon I \to \mathcal{M}_n(\R)$ 与 $B \colon I \to \R^n$ 均
+在区间 $I$ 上连续。对每个 $(t_0, X_0)$，问题
+\[
+X' = A(t)X + B(t), \qquad X(t_0) = X_0
+\]
+有且仅有一个定义在\emph{整个} $I$ 上的解。齐次
+方程组（$B = 0$）的解构成向量空间 $\mathcal{S}_H$，其
+维数恰为 $n$，且求值映射 $X \mapsto X(t_0)$ 是一个
+同构 $\mathcal{S}_H \to \R^n$；一般解 $=$
+特解 $+$ 齐次解。
+\end{theorem}
+
+\begin{proof}
+对任一满足 $J \subseteq I$ 且包含 $t_0$ 的闭区间，$f(t, X) =
+A(t)X + B(t)$ 连续，且关于 $X$ 满足利普希茨条件，常数 $k
+= \sup_J \vertiii{A(t)}$（有限：在闭区间上连续）：
+在 $J$ 上可应用\cref{thm:b2:diffeq:cauchylipschitz}；令 $J$
+穷尽 $I$，由唯一性将这些解拼接为 $I$ 上的一个解。
+解集与求值映射的线性显然成立；
+求值映射由存在性得满射，由唯一性得
+单射，故为双射，从而 $\dim \mathcal{S}_H = n$。仿射结构的讨论与
+本科一年级的论证完全相同。
+\end{proof}
+
+\begin{example}[求值同构的具体形式]\label{ex:b2:diffeq:evaliso}
+对 $y'' + y = 0$，将其视为方程组 $X' =
+\begin{pmatrix} 0 & 1\\ -1 & 0\end{pmatrix}X$，取 $X = (y,
+y')$：由定理，解空间为一个平面，且
+$X \mapsto X(0) = (y(0), y'(0))$ 是到
+$\R^2$ 的同构。解 $\cos$ 与 $\sin$ 的取值分别为 $(1, 0)$
+与 $(0, 1)$ --- $\R^2$ 的标准基 ---，因此它们构成
+解空间的一组基，因而\emph{任一}解都是
+\[
+y(t) = y(0)\cos t + y'(0)\sin t ,
+\]
+其中系数可直接由初值读出，无需
+求解线性方程组。小结：选取
+以标准基为初值的基本解组
+（此处为 $\cos, \sin$），恰好是在选取
+$\eu^{tA}$ 的各列；求值同构说明为何初值
+刻画轨线 --- 即线性方程“确定性动力学”的
+几何内容。
+\end{example}
+
+\begin{definition}[朗斯基行列式]\label{def:b2:diffeq:wronskian}
+对齐次方程组的解 $X_1, \dots, X_n$，其
+\emph{朗斯基行列式}\index{朗斯基行列式}为 $W(t) = \det\bigl(X_1(t),
+\dots, X_n(t)\bigr)$。由上述同构，$W$ 要么
+恒为零（族线性相关），要么处处不为零（
+即\emph{基本解组}\index{基本解组}）；定量地，$W' = \operatorname{tr}\bigl(A(t)\bigr)
+W$，于是
+\[
+W(t) = W(t_0)\,\exp\Bigl(\int_{t_0}^{t}
+\operatorname{tr} A(s)\,\dd s\Bigr)
+\quad \text{（刘维尔公式）}.
+\]
+\end{definition}
+
+\begin{example}[在欧拉方程上验证刘维尔公式]\label{ex:b2:diffeq:eulerwronskian}
+在 $\intoo{0}{\infty}$ 上，方程 $t^2y'' + ty' - y = 0$ 有
+解 $y_1(t) = t$ 与 $y_2(t) = \frac1t$（代入即可验证）。
+其朗斯基行列式为：
+\[
+W(t) = \det\begin{pmatrix} t & \tfrac1t\\[2pt]
+1 & -\tfrac{1}{t^2}\end{pmatrix}
+= -\frac1t - \frac1t = -\frac2t ,
+\]
+处处不为零，故为基本解组。现验证刘维尔公式：将方程化为
+标准形式 $y'' + \frac1t\,y' - \frac{1}{t^2}\,y = 0$，其
+友矩阵 $A(t) = \begin{pmatrix} 0 & 1\\ \frac{1}{t^2}
+& -\frac1t\end{pmatrix}$ 的迹为 $-\frac1t$，于是
+\[
+W(t) = W(1)\exp\Bigl(-\int_1^t\frac{\dd s}{s}\Bigr)
+= -2\,\eu^{-\ln t} = -\frac2t . \checkmark
+\]
+小结：在尚未知任何解时，刘维尔公式便预言了
+朗斯基行列式的\emph{形状} --- 此处即 $W$ 必为
+$\frac{c}{t}$；这正是
+降阶法的依据
+（见\cref{prop:b2:diffeq:secondorder}），由已知 $y_1$ 及
+朗斯基行列式的形式，经一次求积即可定出 $y_2$。
+\end{example}
+
+\begin{proof}[刘维尔公式的证明]
+$W(t) = \det M(t)$，其中 $M' = AM$。对行列式
+视为各列的多重线性函数求导，
+\[
+W'(t) = \sum_j \det(X_1, \dots, X_j', \dots, X_n)
+= \sum_j \det(X_1, \dots, AX_j, \dots, X_n) .
+\]
+现考虑映射 $(C_1, \dots, C_n) \mapsto \sum_j \det(C_1, \dots,
+AC_j, \dots, C_n)$ 为 $n$ 重线性且交错的（若两列相等，
+即 $C_i = C_k$，则 $j \notin \{i, k\}$ 的项均为零，
+而 $j = i$ 与 $j = k$ 的两项经一次列交换后两两相消）：
+由唯一性定理，
+（\cref{thm:b2:linalg:detspace}）它等于 $c \cdot \det$，$c$
+由标准列读出：$c = \sum_j \det(e_1, \dots, Ae_j, \dots,
+e_n) = \sum_j a_{jj} = \operatorname{tr} A$。于是 $W' =
+\operatorname{tr}\bigl(A(t)\bigr)W$，即标量线性
+常微分方程，由本科一年级的公式求解。
+\end{proof}
+
+\section{常系数情形：矩阵指数}
+
+\begin{theorem}\label{thm:b2:diffeq:matrixexp}
+对 $A \in \mathcal{M}_n(\R)$（或 $\C$），指数 $\eu^{tA}
+= \sum_k \frac{(tA)^k}{k!}$（见\cref{ex:b2:nvs:matrixexp}）满足：
+$t \mapsto \eu^{tA}$ 是 $C^1$ 的（事实上是 $C^\infty$ 的），
+且有\index{矩阵指数}
+\[
+\frac{\dd}{\dd t}\,\eu^{tA} = A\,\eu^{tA} = \eu^{tA}A ,
+\qquad
+\eu^{(s+t)A} = \eu^{sA}\,\eu^{tA},
+\qquad
+(\eu^{A})^{-1} = \eu^{-A} ;
+\]
+且 $\eu^{A + B} = \eu^A\eu^B$，\emph{当} $AB = BA$ 时成立。柯西
+问题 $X' = AX$，$X(0) = X_0$ 的唯一解为 $X(t) =
+\eu^{tA}X_0$；若含源项，则\emph{常数变易}
+公式成立：
+\[
+X(t) = \eu^{(t - t_0)A}X_0 + \int_{t_0}^{t} \eu^{(t-s)A}B(s)\,\dd
+s .
+\]
+\end{theorem}
+
+\begin{proof}
+\emph{可微性：}级数 $\sum \frac{t^kA^k}{k!}$ 与
+其逐项求导所得级数 $\sum \frac{t^{k-1}A^k}{(k-1)!} = A\sum
+\frac{(tA)^{k-1}}{(k-1)!}$ 在任一闭区间上正规收敛
+（范数 $\leq \frac{(\abs t\,\vertiii A)^k}{k!}$），可逐项
+求导（见\cref{thm:b2:funcseq:seriestransfer}，向量值情形）。
+两种次序 $A\eu^{tA}$ 与 $\eu^{tA}A$ 相等，因为每个
+部分和均与 $A$ 可交换。
+
+\emph{群律：}对于可交换的 $A, B$，两个指数级数的柯西乘积
+依二项式定理重新整理，与
+\cref{ex:b2:series:exp}所示完全相同（在巴拿赫
+代数中，绝对收敛性保证了这一步）：$\eu^{A+B} = \eu^A\eu^B$；取 $B = sA$，
+便得单参数群律，取 $B = -A$ 则得逆元。
+
+\emph{柯西问题：}$X(t) = \eu^{tA}X_0$ 是其解（求导即可验证）；
+唯一性由\cref{thm:b2:diffeq:linear}可得。常数变易法：
+设 $Y(t) = \eu^{-tA}X(t)$；求导得 $Y' = \eu^{-tA}(X' -
+AX) = \eu^{-tA}B(t)$；从 $t_0$ 到 $t$ 积分，
+再左乘 $\eu^{tA}$ 即可。
+\end{proof}
+
+\begin{method}[计算 $\eu^{tA}$]\label{met:b2:diffeq:computeexp}
+化约 $A$（见\cref{ch:b2:reduction}）：若 $A = PDP^{-1}$ 为对角形，
+则 $\eu^{tA} = P\,\eu^{tD}P^{-1}$，其中 $\eu^{tD}$ 为对角矩阵，
+其对角元为 $\eu^{t\lambda_i}$；一般情形用邓福德分解 $A = D + N$
+（二者可交换）：$\eu^{tA} = \eu^{tD}\,\eu^{tN}$，其中 $\eu^{tN}$ 是
+关于 $t$ 的\emph{多项式}（幂零性使级数截断）。复
+特征值成对出现，对应“旋转乘指数”型的块
+（见\cref{exo:b2:diffeq:5}）。
+\end{method}
+
+\begin{remark}[常见陷阱]
+\emph{(i) 不可交换时 $\eu^{A+B} \neq \eu^A\eu^B$：}
+取 $A = \begin{pmatrix} 0 & 1\\ 0 & 0\end{pmatrix}$，$B =
+\begin{pmatrix} 0 & 0\\ 1 & 0\end{pmatrix}$。则 $\eu^A = I +
+A$，$\eu^B = I + B$（由幂零性），于是
+\[
+\eu^A\eu^B = \begin{pmatrix} 2 & 1\\ 1 & 1\end{pmatrix},
+\qquad\text{而}\qquad
+\eu^{A+B} = \cosh(1)\,I + \sinh(1)\,(A + B)
+= \begin{pmatrix} \cosh 1 & \sinh 1\\ \sinh 1 & \cosh 1
+\end{pmatrix},
+\]
+利用 $(A+B)^2 = I$，且 $\cosh 1 \approx 1.54 \neq 2$。
+\cref{thm:b2:diffeq:matrixexp}所述的群律确有
+前提条件。\emph{(ii) 线性问题中的非线性直觉误区：}
+具有连续系数的\emph{线性}系统的解
+在整个区间上均有定义
+（见\cref{thm:b2:diffeq:linear}） --- 若某候选解
+在 $I$ 内爆破，则方程不是线性的，或计算有误；
+反之，对于非线性方程，
+不经论证，绝不可断言解整体存在（$y' = y^2$）。
+\emph{(iii) 除以未知量：}对 $y' = y(1-y)$ 分离变量时，
+会悄然丢掉常数解 $0$ 与
+$1$ --- 恰好组织起相线的那些解
+（见\cref{exo:b2:diffeq:3}）；应先列出常数解。
+\emph{(iv) 初值确定的是向量，而非标量：}一个 $n$ 阶
+标量方程需要 $n$ 个条件（$y, y', \dots$ 在
+$t_0$ 处）；仅匹配 $y(t_0)$ 会留下一个
+$(n-1)$ 参数族，是“丢失”
+常数的经典来源。
+\end{remark}
+
+\begin{example}[用邓福德分解计算 $3\times3$ 指数]\label{ex:b2:diffeq:dunford3}
+求解 $X' = AX$，其中 $A = \begin{pmatrix} 2 & 1 & 0\\ 0 & 2 &
+0\\ 0 & 0 & 3\end{pmatrix}$。按块作邓福德分解：$A = D + N$
+其中 $D = \operatorname{diag}(2, 2, 3)$，$N = E_{12}$，二者
+可交换（$N$ 位于特征值 $2$ 的块内），且 $N^2 =
+0$：
+\[
+\eu^{tA} = \eu^{tD}\,\eu^{tN}
+= \begin{pmatrix}
+\eu^{2t} & t\,\eu^{2t} & 0\\
+0 & \eu^{2t} & 0\\
+0 & 0 & \eu^{3t}
+\end{pmatrix} .
+\]
+逐列读出通解：$X(t) =
+\bigl(\eu^{2t}(x_0 + ty_0),\ \eu^{2t}y_0,\
+\eu^{3t}z_0\bigr)$。验算：当 $t = 0$ 时矩阵为
+$I$；其行列式为 $\eu^{7t} =
+\eu^{t\operatorname{tr}A}$，符合刘维尔公式；而
+因子 $t$ 恰好出现在特征值 $2$
+亏损的地方。要点：多项式乘指数函数
+并非需要死记的猜测 --- 它们正是截断后的级数
+$\eu^{tN}$，其次数以幂零指数为界，
+绝不会更高。
+\end{example}
+
+\begin{method}[从头到尾求解 $X' = AX + B(t)$]\label{met:b2:diffeq:solvelinear}
+\begin{enumerate}
+  \item 求 $A$ 的谱，再用
+        \cref{met:b2:diffeq:computeexp}求出 $\eu^{tA}$（对角化；或
+        用邓福德分解，如\cref{ex:b2:diffeq:dunford3}；或
+        利用多项式技巧，例如 $A^2 = -I$）。
+  \item 特解：常数变易法
+        $\int_{t_0}^t\eu^{(t-s)A}B(s)\dd s$ 总是可行；
+        对于指数多项式型的 $B$，取形式相同的试探解
+        （共振时次数升高，
+        见\cref{exo:b2:diffeq:10}）更快。
+  \item 通解 $= \eu^{(t-t_0)A}X_0 +$ 特解；
+        初值\emph{最后}代入，
+        在完整公式上进行。
+  \item 验算：$X(t_0)$ 正确；齐次部分的
+        增长与特征值实部相符
+        （见\cref{exo:b2:diffeq:8}）；基解矩阵的 $\det$
+        符合刘维尔公式。
+\end{enumerate}
+\end{method}
+
+\begin{example}[相图示例]\label{ex:b2:diffeq:phaseportrait}
+$X' = AX$，其中 $A = \begin{pmatrix} 0 & 1\\ -1 & 0\end{pmatrix}$：
+$A^2 = -I$，于是级数分解为
+\[
+\eu^{tA} = (\cos t)\,I + (\sin t)\,A
+= \begin{pmatrix} \cos t & \sin t\\ -\sin t & \cos t
+\end{pmatrix} :
+\]
+轨道是沿顺时针方向运行的圆 --- 即
+以一阶形式写出的调和振子 $x'' + x = 0$。特征值 $\pm\iu$ 位于
+虚轴上，此为\emph{中心}。更一般地，
+$A$ 的特征值的实部决定 $\norm{X(t)}$ 的增长或衰减
+（见\cref{exo:b2:diffeq:8}）。
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=6.4cm, height=6.4cm,
+    xmin=-2.3, xmax=2.3, ymin=-2.3, ymax=2.3,
+    xtick={-1,1}, ytick={-1,1}]
+  \addplot[omDef, thick, domain=0:360, samples=90, smooth]
+    ({cos(x)}, {-sin(x)});
+  \addplot[omDef!60, thick, domain=0:360, samples=90, smooth]
+    ({1.7*cos(x)}, {-1.7*sin(x)});
+  \draw[-Stealth, omThm, thick] (axis cs:1,0) -- (axis cs:0.995,-0.12);
+  \draw[-Stealth, omThm, thick] (axis cs:1.7,0) -- (axis cs:1.695,-0.12);
+\end{axis}
+\end{tikzpicture}
+\hspace{6mm}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=6.4cm, height=6.4cm,
+    xmin=-2.3, xmax=2.3, ymin=-2.3, ymax=2.3,
+    xtick={-1,1}, ytick={-1,1}]
+  % A = diag(-1,-2)-type stable node: trajectories y = c x^2
+  \addplot[omMeth, thick, domain=-1.5:1.5, samples=60] {x^2};
+  \addplot[omMeth, thick, domain=-1.5:1.5, samples=60] {-x^2};
+  \addplot[omMeth, thick, domain=-2.2:2.2, samples=2] {0};
+  \addplot[omMeth!60, thick, domain=-1.2:1.2, samples=60] {2*x^2};
+  \draw[-Stealth, omThm, thick] (axis cs:1.2,1.44) --
+    (axis cs:1.05,1.1);
+  \draw[-Stealth, omThm, thick] (axis cs:-1.2,-1.44) --
+    (axis cs:-1.05,-1.1);
+\end{axis}
+\end{tikzpicture}
+
+{\small 两个线性相图。左：\emph{中心}
+（特征值 $\pm\iu$） --- 调和振子的闭合圆轨道。
+右：\emph{稳定结点}（特征值 $-1, -2$） ---
+所有轨道沿慢
+特征方向相切地落入原点。}
+\end{omfigure}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=9.6cm, height=6.4cm,
+    xmin=-3.2, xmax=3.2, ymin=-1.6, ymax=2.6,
+    xtick={0}, ytick={0},
+    xlabel={$\tau = \operatorname{tr}A$},
+    ylabel={$\delta = \det A$}]
+  \addplot[omThm, very thick, domain=-3:3, samples=100]
+    {x^2/4};
+  \node[font=\small, omThm] at (axis cs:2.45,2.1)
+    {$\delta = \tau^2/4$};
+  \node[font=\small] at (axis cs:0,-0.9) {鞍点};
+  \node[font=\small] at (axis cs:-2.45,0.7)
+    {稳定结点};
+  \node[font=\small] at (axis cs:2.45,0.7)
+    {不稳定结点};
+  \node[font=\small] at (axis cs:-1.05,1.9)
+    {稳定焦点};
+  \node[font=\small] at (axis cs:1.05,1.9)
+    {不稳定焦点};
+  \node[font=\small, omDef] at (axis cs:0,2.35) {中心};
+  \draw[omDef, very thick] (axis cs:0,0) -- (axis cs:0,2.55);
+\end{axis}
+\end{tikzpicture}
+
+{\small $X' = AX$ 在 $2$ 维情形下的迹--行列式平面：
+水平轴下方为鞍点；水平轴与抛物线 $\delta = \tau^2/4$ 之间为结点；
+抛物线内部为焦点；
+正 $\delta$ 轴上为中心。周末问题证明了这一分类，
+并沿其中一条竖直线 --- 阻尼振子 ---
+考察其进入共振的过程。}
+\end{omfigure}
+
+\begin{remark}[应用]
+线性系统是处理一切非线性问题的局部模型：
+在平衡点附近，光滑向量场（在双曲情形下）的行为
+与其线性化的行为一致，其相图由迹--行列式
+平面刻画。周末问题完整地讨论了振子的故事 ---
+阻尼、受迫、共振，以及变系数情形下的
+施图姆比较定理 ---
+这正是减震器、交流电路与
+谱隙背后共同的数学。本科三年级分册
+将在流形上回到定性理论（流、稳定性、
+首次积分）。
+\end{remark}
+
+\section{变系数的二阶方程}
+
+\begin{proposition}\label{prop:b2:diffeq:secondorder}
+方程 $y'' + a(t)y' + b(t)y = c(t)$（$a, b, c$ 在 $I$ 上连续）
+等价于系统 $X' = A(t)X + B(t)$，其中 $X = (y, y')$：
+在整个 $I$ 上解存在且唯一，初值 $(y(t_0),
+y'(t_0))$ 可任意给定；齐次解构成一个平面。若已知一个
+处处不为零的齐次解 $y_1$，则可通过\emph{降阶}求出与之独立的
+第二个解：令 $y = y_1 z$，齐次方程化为关于 $z'$ 的
+一阶方程，
+再由求积分法解出。
+\end{proposition}
+
+\begin{proof}
+由系统形式及\cref{thm:b2:diffeq:linear}
+即可得到全部结构性结论。降阶：代入 $y = y_1z$，
+\[
+y_1 z'' + (2y_1' + a y_1)z' + \underbrace{(y_1'' + ay_1' +
+by_1)}_{=\,0}\,z = 0 :
+\]
+这是关于 $u = z'$ 的一阶线性方程，可由本科一年级的
+公式解出；对 $u$ 积分得 $z$，从而 $y_2 = y_1 z$，
+它与 $y_1$ 独立，只要 $z$ 非常数。
+\end{proof}
+
+\begin{example}\label{ex:b2:diffeq:lowering}
+$t^2y'' - 2y = 0$ 在 $\intoo{0}{\infty}$ 上：$y_1 = t^2$ 是一个
+解。令 $y = t^2z$，由 $y' = t^2z' + 2tz$ 及 $y''
+= t^2z'' + 4tz' + 2z$，得
+\[
+t^2y'' - 2y = t^4 z'' + 4t^3z' = 0,
+\qquad\text{即}\qquad \frac{z''}{z'} = -\frac4t :
+\]
+$z' = t^{-4}$（相差一个常数），$z = -\frac{1}{3t^3}$，于是 $y_2
+= t^2z = -\frac{1}{3t}$。通解为 $y = \alpha t^2 +
+\frac{\beta}{t}$。
+\end{example}
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:b2:diffeq:1}
+求解 $X' = AX$，$X(0) = (1, 0)^{\mathsf T}$，其中 $A =
+\begin{pmatrix} 1 & 1\\ 0 & 2\end{pmatrix}$（对角化），以及 $A =
+\begin{pmatrix} 2 & 1\\ 0 & 2 \end{pmatrix}$（用邓福德分解）。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:diffeq:2}
+哪些柯西问题在 $\R$ 上有唯一的整体解，可由
+\cref{thm:b2:diffeq:cauchylipschitz}判定？$y' = \sin(ty)$；$\;y' =
+y^2$；$\;y' = \abs y$。对最后一个，分别在 $y(0) =
+0$ 与 $y(0) = 1$ 下显式求解。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:diffeq:3}
+证明：对 $y' = f(t,y)$ 的两个不同的极大解（$f$
+关于 $y$ 满足利普希茨条件），在同一时刻永不取相同的值，
+并由此推出：$y' = y(1 - y)$ 的解若始于
+$\intoo{0}{1}$ 中，则永远留在 $\intoo{0}{1}$ 中。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:diffeq:4}
+计算 $\eu^{tA}$，其中 $A = \begin{pmatrix} 3 & 1\\ -1 &
+1\end{pmatrix}$ \emph{（用邓福德分解：$(A - 2I)^2 = 0$）}，并求解 $X' =
+AX + \begin{pmatrix} \eu^{2t}\\ 0\end{pmatrix}$，$X(0) = 0$，用
+常数变易法。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:diffeq:5}
+设 $A = \begin{pmatrix} \alpha & -\beta\\ \beta &
+\alpha\end{pmatrix}$，证明 $\eu^{tA} =
+\eu^{\alpha t}\begin{pmatrix} \cos\beta t & -\sin\beta t\\
+\sin\beta t & \cos\beta t\end{pmatrix}$ --- 螺线轨迹 ---
+两种方法：利用级数（写 $A = \alpha I + \beta J$，$J^2 =
+-I$），以及借助复数形式 $z' = (\alpha +
+\iu\beta)z$。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:diffeq:6}
+（格朗沃尔引理）设 $u$ 为非负连续函数，且 $u(t)
+\leq C + k\int_{t_0}^{t} u(s)\,\dd s$ 在 $\intco{t_0}{T}$ 上成立。证明
+$u(t) \leq C\,\eu^{k(t - t_0)}$ \emph{（对 $v(t) =
+\eu^{-kt}\int_{t_0}^t u$ 求导）}。再由此推出
+柯西--利普希茨定理中的唯一性，以及解的连续依赖性：$\norm{y(t) -
+z(t)} \leq \norm{y_0 - z_0}\,\eu^{k\abs{t - t_0}}$，
+对初值不同的两个解成立。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:diffeq:7}
+已知 $y_1(t) = \frac{\sin t}{t}$ 是 $ty'' + 2y' + ty =
+0$ 在 $\intoo{0}{\pi}$ 上的一个解，求与之线性无关的第二个解，
+用降阶法，并给出通解。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:diffeq:8}
+设 $A \in \mathcal{M}_n(\C)$，其全部特征值的
+（严格）实部为负。证明 $X' = AX$ 的每个解都趋于
+$0$（当 $t \to +\infty$ 时），且具有指数速率：$\norm{X(t)}
+\leq C\,\eu^{-\alpha t}$，对某个 $\alpha > 0$。
+\emph{（三角化；从最后一行向上逐行处理三角方程组，
+或用邓福德分解：$\eu^{tA} = \eu^{tD}\eu^{tN}$，其中
+$\norm{\eu^{tD}} \leq \eu^{-\alpha' t}$，且 $\eu^{tN}$ 为
+关于 $t$ 的多项式。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:diffeq:9}
+（线性增长时不会在有限时间内逃逸）设 $f$ 连续，
+满足 $\norm{f(t, y)} \leq a\norm y + b$，在
+$\intco{0}{\infty} \times \R^n$ 上关于 $y$ 局部利普希茨。利用
+积分形式的格朗沃尔引理（见\cref{exo:b2:diffeq:6}），证明
+极大解都是整体解（定义在
+整个 $\intco{0}{\infty}$ 上）。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:diffeq:10}
+求解 $y'' - 3y' + 2y = \eu^{t}$：先求齐次方程的解，再求
+形如 $\alpha t\,\eu^{t}$ 的特解 \emph{（朴素猜测
+$\alpha\eu^t$ 为何失效？）}；通解，以及
+满足 $y(0) = y'(0) = 0$ 的解。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:diffeq:11}
+对如下若尔当块计算 $\eu^{tA}$：
+\[
+A = \begin{pmatrix} \lambda & 1 & 0\\ 0 & \lambda & 1\\
+0 & 0 & \lambda\end{pmatrix},
+\]
+并描述 $X' = AX$ 的全部解：指数函数乘以
+次数至多为 $2$ 的多项式向量。这一多项式次数
+从何而来？
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:diffeq:12}
+（周期强迫，周期响应）设 $A \in
+\mathcal{M}_n(\R)$，$B \colon \R \to \R^n$ 连续且
+以 $T$ 为周期。
+\begin{enumerate}
+  \item 证明 $X' = AX + B(t)$ 的解
+        是 $T$ 周期的，当且仅当 $X(T) = X(0)$
+        \emph{（比较 $X(\cdot + T)$ 与 $X$）}。
+  \item 证明 $\eu^{TA}$ 的特征值恰为
+        $\eu^{T\lambda}$, $\lambda \in \operatorname{Sp}A$
+        \emph{（在 $\C$ 上三角化）}。由此可得：若
+        $A$ 的特征值都不属于 $\frac{2\iu\pi}{T}\Z$，则
+        $I - \eu^{TA}$ 可逆。
+  \item 在该假设下，证明该方程组恰有一个
+        $T$ 周期解，且
+        \[
+        X(0) = \bigl(I - \eu^{TA}\bigr)^{-1}
+        \int_0^{T}\eu^{(T-s)A}B(s)\,\dd s .
+        \]
+        对于谐振子，被排除的情形
+        对应什么？（周末问题的答案为：
+        共振。）
+\end{enumerate}
+\end{exercise}
+
+\section{问题：振动、共振与施图姆
+比较定理}
+
+\begin{problem}\label{pb:b2:diffeq:1}
+一个方程支配着机械与电气世界：
+\[
+x'' + 2\zeta\omega\,x' + \omega^2 x = F(t),
+\qquad \omega > 0,\ \zeta \geq 0 .
+\]
+本题将完整研究它 --- 借助平面线性系统的
+迹--行列式分类、三种阻尼情形、
+周期外力下的稳态响应，包括其
+\emph{共振}\index{共振}峰值
+与共振灾变 --- 随后撇开常系数情形，
+转而讨论\emph{施图姆分离定理与比较
+定理}\index{施图姆分离定理与比较定理}，它们控制
+$y'' + q(t)y = 0$ 之解的零点，且完全不需要
+任何显式公式。
+
+\medskip
+\noindent\textbf{第一部分 --- 迹--行列式平面。}设
+$A \in \mathcal M_2(\R)$，$\tau = \operatorname{tr}A$，$\delta
+= \det A$，$\Delta = \tau^2 - 4\delta$。
+\begin{enumerate}
+  \item 证明 $A$ 的特征值为
+        $\frac{\tau\pm\sqrt\Delta}{2}$，并分类：两个实
+        特征值符号相反，当且仅当 $\delta < 0$；实
+        特征值同号，当且仅当 $\delta > 0$，$\Delta
+        \geq 0$（与 $\tau$ 同号）；共轭复数对，当且仅当
+        $\Delta < 0$（实部为 $\frac\tau2$）。
+  \item （鞍点，$\delta < 0$）设特征值为 $\mu < 0 <
+        \lambda$，特征向量为 $v_\pm$，写出通解，并
+        描述轨线：两条稳定射线和
+        两条不稳定射线，其余轨道均渐近于两组
+        射线。为什么除 $0$ 外，没有任何解
+        能在整个 $\R$ 上保持有界？
+  \item （结点，$\delta > 0$，$\Delta > 0$）对于 $\mu < \lambda
+        < 0$：证明每个非零解都趋于 $0$，并
+        说明除快轴上的轨道外，其余轨道均
+        \emph{与慢特征方向相切}地趋于原点
+        \emph{（比较 $\eu^{\mu t}$ 与 $\eu^{\lambda t}$）}。
+  \item （螺旋线与中心，$\Delta < 0$）记特征值为
+        $\alpha \pm \iu\beta$，利用
+        \cref{exo:b2:diffeq:5}（经实基变换后，
+        在该一般情形下承认，或对第二部分中的系统加以证明，
+        这些系统即下文所用者）来描述
+        轨道：当 $\alpha =
+        \frac\tau2 < 0$ 时螺旋线收敛，$\tau > 0$ 时
+        螺旋线发散，$\tau = 0$ 时为闭曲线（中心）。
+  \item （边界情形）对于二重特征值（$\Delta =
+        0$）：证明 $\eu^{tA} = \eu^{\lambda t}(I + tN)$，其中 $N
+        = A - \lambda I$ 幂零，并区分星形结点
+        （$N = 0$）与非正常结点（$N \neq 0$）。
+        在本章图形的迹--行列式图中概括
+        第一部分的内容。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第二部分 --- 阻尼振子。}此时 $F =
+0$：$x'' + 2\zeta\omega x' + \omega^2x = 0$，即\ $X' = AX$
+其中 $A = \begin{pmatrix} 0 & 1\\ -\omega^2 &
+-2\zeta\omega\end{pmatrix}$。
+\begin{enumerate}[resume]
+  \item 计算 $\tau, \delta, \Delta$，并把三种
+        阻尼情形标在迹--行列式平面上：
+        \emph{欠阻尼} $0 < \zeta < 1$（稳定螺旋线），
+        \emph{临界阻尼} $\zeta = 1$（二重特征值），
+        \emph{过阻尼} $\zeta > 1$（稳定
+        结点）；$\zeta = 0$ 对应中心。
+  \item 显式求出三种情形的解：
+        \[
+        \zeta < 1:\ \eu^{-\zeta\omega t}\bigl(a\cos\omega_d t
+        + b\sin\omega_dt\bigr),\ \omega_d =
+        \omega\sqrt{1-\zeta^2};
+        \qquad
+        \zeta = 1:\ (a + bt)\,\eu^{-\omega t};
+        \]
+        $\zeta > 1$：两个实指数函数。定义
+        伪周期 $\frac{2\pi}{\omega_d}$，并证明
+        $\abs x$ 的相邻极大值之比为
+        常数 $\eu^{-2\pi\zeta/\sqrt{1-\zeta^2}}$（即
+        对数衰减率）。
+  \item （闭门器原理）对于 $\zeta \geq 1$，
+        衰减速率由最慢的特征值决定，记为
+        $\lambda_{\mathrm{slow}} = -\omega\bigl(\zeta -
+        \sqrt{\zeta^2-1}\bigr)$。证明
+        $\abs{\lambda_{\mathrm{slow}}} =
+        \frac{\omega}{\zeta + \sqrt{\zeta^2 - 1}}$ 是一个
+        关于 $\zeta \geq 1$ 的\emph{递减}函数：
+        临界阻尼 $\zeta = 1$ 给出最快的
+        非振荡回到静止状态。
+  \item （能量）设 $E(t) = \frac12x'^2 +
+        \frac12\omega^2x^2$。证明 $E' = -2\zeta\omega\,x'^2
+        \leq 0$，并推出当 $\zeta > 0$ 时方程
+        没有非零周期解\emph{（若有周期，则 $E$
+        为常数，从而 $x' \equiv 0$）}。
+  \item 用两句话解释，为何中心 $\zeta = 0$
+        是\emph{结构上脆弱}的：任何 $\zeta > 0$，
+        无论多小，都会破坏周期性 --- 并指出这在迹--行列式平面上
+        的表现（中心直线
+        没有内点）。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第三部分 --- 受迫振动与
+共振。}此时 $F(t) = F\cos(\gamma t)$，其中 $F, \gamma > 0$。
+\begin{enumerate}[resume]
+  \item （$\zeta > 0$：稳态）试取 $x_p =
+        \Re\bigl(z\,\eu^{\iu\gamma t}\bigr)$，并证明
+        \[
+        z = \frac{F}{\omega^2 - \gamma^2 +
+        2\iu\zeta\omega\gamma},
+        \qquad
+        A(\gamma) := \abs z = \frac{F}{\sqrt{(\omega^2 -
+        \gamma^2)^2 + 4\zeta^2\omega^2\gamma^2}} ,
+        \]
+        并写出 $x_p = A(\gamma)\cos(\gamma t - \varphi)$，
+        其中 $\tan\varphi =
+        \frac{2\zeta\omega\gamma}{\omega^2-\gamma^2}$。
+  \item 证明：\emph{每一个}解都是 $x_p$ 加上一个
+        第二部分中的瞬态项，它趋于 $0$；无论
+        初值如何，系统都会锁定到
+        稳态 --- 振幅为 $A(\gamma)$，相位滞后
+        $\varphi$。
+  \item （共振曲线）求 $A$ 的最大值：证明
+        $A(\gamma)$ 有内部极大值，当且仅当 $\zeta <
+        \frac{1}{\sqrt2}$ 时，极大值点与极大值分别为
+        \[
+        \gamma_* = \omega\sqrt{1 - 2\zeta^2},
+        \qquad
+        A(\gamma_*) =
+        \frac{F}{2\zeta\omega^2\sqrt{1-\zeta^2}} ,
+        \]
+        并且当 $\zeta$ 很小时，峰值使静态响应
+        $A(0) = \frac F{\omega^2}$ 放大到
+        $\approx \frac{1}{2\zeta}$ 倍。
+  \item （$\zeta = 0$，非共振）对于 $\gamma \neq \omega$，
+        证明满足 $x(0) = x'(0) = 0$ 的解为
+        \[
+        x(t) = \frac{F}{\omega^2 -
+        \gamma^2}\bigl(\cos\gamma t - \cos\omega t\bigr)
+        = \frac{2F}{\omega^2-\gamma^2}
+        \sin\frac{(\omega-\gamma)t}{2}
+        \sin\frac{(\omega+\gamma)t}{2} :
+        \]
+        有界，且出现\emph{拍}现象 --- 即
+        一个快振荡位于慢包络之下 --- 当 $\gamma$ 接近
+        $\omega$ 时出现。
+  \item （$\zeta = 0$，共振）对于 $\gamma = \omega$，证明
+        $x_p(t) = \frac{F}{2\omega}\,t\sin(\omega t)$ 是
+        一个解，并由第
+        14 问中 $\gamma \to \omega$ 时的极限导出它：振幅
+        线性地无限增长 --- 即共振灾变。
+  \item （与傅里叶的联系）一般周期外力可分解为
+        若干谐波（见傅里叶分析一章）；由线性性，
+        稳态即各谐波响应之和。对于
+        频率 $\omega = 3$ 的无阻尼振子，
+        受方波驱动，该方波属于
+        \cref{exo:b2:fourier:1}类型（谐波取
+        全体奇整数），哪一次谐波会发生共振？用一句话说明
+        工程师为何畏惧方波。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第 IV 部分 --- 施图姆定理。} 考虑方程 $y''
++ q(t)\,y = 0$ 在区间 $I$ 上，$q$ 连续。（任一
+方程 $y'' + ay' + by = 0$ 可借助
+代换 $y = u\exp\bigl(-\frac12\int a\bigr)$ 化为此标准形式；
+第 21 题展示了这一技巧的一个变形应用。）
+\begin{enumerate}[resume]
+  \item 对两解 $y_1, y_2$，证明朗斯基行列式
+        $W = y_1y_2' - y_1'y_2$ 是\emph{常数}，
+        且其为零当且仅当两解成比例；
+        并证明非零解的零点都是\emph{简单、孤立}的。
+  \item （施图姆分离定理）设 $y_1, y_2$ 为线性无关的解，
+        $a < b$ 为 $y_1$ 的两个相邻零点。
+        证明 $y_2$ 在
+        $\intoo{a}{b}$ \emph{（计算常数 $W$ 在 $a$
+        与 $b$ 处的值：此处 $W = y_1'y_2$，且 $y_1'(a)$
+        与 $y_1'(b)$ 异号）}：线性无关解的
+        零点彼此交错。
+  \item （施图姆比较定理）设 $q_1 \leq q_2$ 在 $I$ 上，$y \neq
+        0$ 满足 $y'' + q_1y = 0$，$z \neq 0$ 满足 $z'' + q_2z
+        = 0$，$a < b$ 为 $y$ 的两个相邻零点。证明
+        $z$ 在 $\intcc{a}{b}$ 中有零点 --- 若
+        $q_1 < q_2$ 于 $\intoo ab$ 某处成立，则零点严格位于内部\emph{（若 $z \neq
+        0$ 在 $\intoo ab$ 上，研究 $(yz' - y'z)' = (q_1 -
+        q_2)yz$，对 $y, z$ 取定符号，并比较
+        边界值）}。
+  \item 由此推出\emph{间距界}：若 $0 < m^2 \leq
+        q(t) \leq M^2$ 在 $I$ 上，则任意两个相邻零点
+        $a < b$ （属于 $y'' + qy = 0$ 的非零解）满足
+        下式：
+        \[
+        \frac{\pi}{M} \;\leq\; b - a \;\leq\; \frac{\pi}{m}
+        \]
+        \emph{（与 $u'' + M^2u = 0$ 及 $u'' + m^2u
+        = 0$，其零点间距分别为 $\frac\pi M$ 与
+        $\frac\pi m$）}。在调和振子上验证。
+  \item 将 $ty'' + 2y' + ty = 0$
+        （见\cref{exo:b2:diffeq:7}），令 $u = ty$ 化为 $u'' + u =
+        0$，立即求出其解 $\frac{\sin t}t$，
+        $\frac{\cos t}{t}$，并得出每个非零解的零点
+        间距恰为
+        $\pi$：施图姆的世界观 --- 零点由
+        系数 $q$ 控制，无论有无显式公式。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第 V 部分 --- 杜哈梅原理与有界性的
+临界。}
+\begin{enumerate}[resume]
+  \item （振子的杜哈梅原理）证明：
+        对连续的 $F$，方程 $x'' + \omega^2x =
+        F(t)$ 满足 $x(0) = x'(0) = 0$ 的解为
+        \[
+        x(t) = \frac1\omega\int_0^t\sin\bigl(\omega(t -
+        s)\bigr)F(s)\,\dd s ,
+        \]
+        并由此重新推导第 15 题中的共振解，
+        取 $F(s) = F\cos(\omega s)$ 代入
+        \emph{（积化和差）}。
+  \item （$\zeta > 0$：有界输入、有界输出）证明
+        当 $\zeta > 0$ 时，对\emph{任意}有界连续
+        函数 $F$，阻尼方程的每个解均在
+        $\intco{0}{\infty}$ 上有界\emph{（用常数变易法，并利用
+        $\vertiii{\eu^{tA}} \leq
+        C\eu^{-\alpha t}$ 的指数衰减性质，见\cref{exo:b2:diffeq:8}）}。
+  \item （$\zeta = 0$）证明：无阻尼时，有界
+        周期外力使所有解保持有界，
+        \emph{除了}恰在共振时（$\gamma =
+        \omega$，对比第 15 题与第 14 题）：阻尼的作用是
+        把有界性的临界转化为一致
+        稳定性。
+  \item 综合。每项用一句话说明：（i）迹--行列式平面
+        如何组织第 I--II 部分，以及
+        强迫项（第 III 部分）将其引向何处；（ii）
+        $\gamma_*$、$A(\gamma_*)$ 与
+        因子 $\frac1{2\zeta}$ 的物理含义；（iii）施图姆定理所断言的
+        正是显式公式无法给出的内容；（iv）
+        本题中哪两个结论将在全书其余部分被悄然沿用
+        （刘维尔常值朗斯基行列式；
+        有界输入稳定性）。
+\end{enumerate}
+\end{problem}

@@ -17,9 +17,9 @@ ENTRY = {
     5: "one_math_book_5_university_year_3.tex",
 }
 
-LANGS = {1: ("en", "fr", "nl", "es", "pt", "hi", "ar", "id"), 2: ("en", "fr", "nl", "es", "pt", "hi", "ar", "id"),
-         3: ("en", "fr", "nl", "es", "pt", "hi", "ar", "id"), 4: ("en", "fr", "nl", "es", "pt", "hi", "ar", "id"),
-         5: ("en", "fr", "nl", "es", "pt", "hi", "ar", "id")}
+LANGS = {1: ("en", "fr", "nl", "es", "pt", "hi", "ar", "id", "zh"), 2: ("en", "fr", "nl", "es", "pt", "hi", "ar", "id", "zh"),
+         3: ("en", "fr", "nl", "es", "pt", "hi", "ar", "id", "zh"), 4: ("en", "fr", "nl", "es", "pt", "hi", "ar", "id", "zh"),
+         5: ("en", "fr", "nl", "es", "pt", "hi", "ar", "id", "zh")}
 
 
 def years(book):

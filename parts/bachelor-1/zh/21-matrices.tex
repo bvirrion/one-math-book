@@ -1,0 +1,768 @@
+\chapter{矩阵}\label{ch:b1:matrices}
+
+矩阵是用\omterm{prop:b1:vspaces:coordinates}{坐标}写出的\omterm{def:b1:linmaps:def}{线性映射}。本章建立一套“词典”：
+复合对应矩阵乘积，\omterm{def:b1:logic:inj}{双射}性对应可逆性，
+\omterm{def:b1:matrices:changeofbasis}{基变换}对应相似变换——
+以及算法部分：\omterm{met:b1:matrices:gauss}{初等行变换}，秩与逆矩阵的计算。
+矩阵在高中分册中已初步接触，
+本章将其建立在
+\cref{ch:b1:vspaces,ch:b1:findim,ch:b1:linmaps}的理论之上。
+
+\section{矩阵与线性映射}
+
+\begin{definition}\label{def:b1:matrices:def}
+$\mathcal{M}_{n,p}(K)$ 是由标量组成的 $n \times p$ 阵列 $A
+= (a_{ij})$ 所构成的\omterm{def:b1:vspaces:def}{向量空间}（$i$ 为行，$j$ 为列），其维数为 $np$。
+（基为 $E_{ij}$，即仅有单个 $1$ 的矩阵）。给定基
+$\mathcal{B} = (e_1, \dots, e_p)$（$E$ 的基）与 $\mathcal{C}$（$F$ 的基，$\dim F = n$），
+则 \emph{$u \in \mathcal{L}(E, F)$ 的矩阵}为这样的阵列：
+其第 $j$ 列由 $u(e_j)$ 在
+$\mathcal{C}$ 中的\omterm{prop:b1:vspaces:coordinates}{坐标}组成：
+\[
+\operatorname{Mat}_{\mathcal{B},\mathcal{C}}(u) = (a_{ij}),
+\qquad u(e_j) = \sum_{i=1}^{n} a_{ij}\, f_i .
+\]
+\omterm{def:b1:logic:map}{映射} $u \mapsto \operatorname{Mat}_{\mathcal{B},\mathcal{C}}(u)$
+是从 $\mathcal{L}(E, F)$ 到
+$\mathcal{M}_{n,p}(K)$ 上的同构（\cref{prop:b1:linmaps:basis}：\omterm{def:b1:linmaps:def}{线性映射}
+恰是对各 $e_j$ 像的任意指定）。
+\end{definition}
+
+\begin{example}[导数的矩阵表示]
+\label{ex:b1:matrices:derivative}
+设 $D(P) = P'$，它定义在 $\R_3[X]$ 上。在单项式基 $(1, X, X^2,
+X^3)$ 下：$D(1) = 0$，$D(X) = 1$，$D(X^2) = 2X$，$D(X^3) = 3X^2$，于是
+\[
+\operatorname{Mat}(D) =
+\begin{pmatrix}
+0 & 1 & 0 & 0\\
+0 & 0 & 2 & 0\\
+0 & 0 & 0 & 3\\
+0 & 0 & 0 & 0
+\end{pmatrix}.
+\]
+在\emph{除幂}基 $\bigl(1,\ X,\ \frac{X^2}2,\
+\frac{X^3}6\bigr)$ 中，每个基向量都映到其前一个
+基向量（$D\bigl(\frac{X^k}{k!}\bigr) = \frac{X^{k-1}}{(k-1)!}$），且
+矩阵化为纯移位形式：上对角线上全为 1，其余位置为 0。两点启示：
+矩阵属于\emph{二元组}
+（\omterm{def:b1:logic:map}{映射}，基），而非\omterm{def:b1:logic:map}{映射}本身；好的基能使结构
+一目了然——移位形式立刻说明
+$D^4 = 0$ 在 $\R_3[X]$ 上成立，矩阵的每个幂
+都把由 1 构成的对角线再向外推一格。
+\end{example}
+
+\begin{definition}[乘积]\label{def:b1:matrices:product}
+设 $A \in \mathcal{M}_{n,p}$，$B \in \mathcal{M}_{p,q}$，则
+\[
+(AB)_{ik} = \sum_{j=1}^{p} a_{ij}\, b_{jk}
+\qquad (1 \leq i \leq n,\ 1 \leq k \leq q).
+\]
+这恰好是复合\omterm{def:b1:logic:map}{映射}的矩阵：
+$\operatorname{Mat}(v \circ u) = \operatorname{Mat}(v)\,
+\operatorname{Mat}(u)$（中间的基须相互匹配）。类似地，
+若 $X$ 为 $x$ 的\omterm{prop:b1:vspaces:coordinates}{坐标}列，则 $u(x)$ 的\omterm{prop:b1:vspaces:coordinates}{坐标}列为
+$AX$。
+\end{definition}
+
+\begin{proof}[复合公式的证明]
+\[
+v(u(e_k)) = v\Bigl(\sum_j b_{jk} f_j\Bigr) = \sum_j b_{jk}\, v(f_j)
+= \sum_j b_{jk} \sum_i a_{ij}\, g_i
+= \sum_i \Bigl(\sum_j a_{ij} b_{jk}\Bigr) g_i . \qedhere
+\]
+\end{proof}
+
+\begin{proposition}[代数 $\mathcal{M}_n(K)$]\label{prop:b1:matrices:ring}
+方阵全体 $\mathcal{M}_n(K)$ 构成一个环（当 $n
+\geq 2$ 时不可交换），单位元为 $I_n$；其可逆元群为
+\emph{一般线性群}\index{一般线性群}
+$GL_n(K)$，与\omterm{def:b1:logic:inj}{双射}自\omterm{def:b1:structures:morphism}{同态}相对应。对 $A, B \in
+\mathcal{M}_n(K)$，有：
+\[
+AB = I_n \implies A \in GL_n(K) \text{ 且 } B = A^{-1}
+\]
+（单侧逆即双侧逆，由
+\cref{cor:b1:linmaps:samedim}可知）。
+\end{proposition}
+
+\begin{proof}
+环公理经由 $\mathcal{L}(E)$ 上的
+同构（见\cref{def:b1:matrices:def}）：它把复合化为乘积，
+把和化为和，因此结合律、分配律以及 $I_n$ 的作用
+都继承自\omterm{def:b1:logic:map}{映射}的相应事实，
+无需逐项验证。
+不可交换性：$E_{12}E_{21} = E_{11} \neq E_{22}
+= E_{21}E_{12}$。若 $AB = I_n$，则 $a$ 为 $A$ 所对应的自\omterm{def:b1:structures:morphism}{同态}，
+满足 $a \circ b = \mathrm{id}$，故 $a$ 为\omterm{def:b1:logic:inj}{满射}（$x =
+a(b(x))$ 给出每个 $x$ 的一个\omterm{def:b1:logic:map}{原像}），故在
+\omterm{def:b1:findim:def}{有限维}下为\omterm{def:b1:logic:inj}{双射}（见\cref{cor:b1:linmaps:samedim}）。在 $a
+\circ b = \mathrm{id}$ 的左侧复合 $a^{-1}$，得 $b =
+a^{-1}$，于是 $b\circ a = \mathrm{id}$ 亦成立：单侧逆
+一直都是双侧的——这一便利
+仅限于\omterm{def:b1:findim:def}{有限维}情形。
+\end{proof}
+
+\begin{definition}[转置；迹]\label{def:b1:matrices:transpose}
+$A = (a_{ij}) \in \mathcal{M}_{n,p}$ 的\emph{转置}为 $A^{\mathsf T}
+= (a_{ji}) \in \mathcal{M}_{p,n}$，且满足 $(AB)^{\mathsf T} = B^{\mathsf T}
+A^{\mathsf T}$，$(A^{\mathsf T})^{\mathsf T} = A$。方阵的
+\emph{迹}\index{迹}记为 $\operatorname{tr} A
+= \sum_i a_{ii}$，它是线性的，并且
+\[
+\operatorname{tr}(AB) = \operatorname{tr}(BA)
+\qquad (A \in \mathcal{M}_{n,p},\ B \in \mathcal{M}_{p,n}).
+\]
+\end{definition}
+
+\begin{proof}[迹恒等式的证明]
+$\operatorname{tr}(AB) = \sum_i \sum_j a_{ij} b_{ji}$，且
+$\operatorname{tr}(BA) = \sum_j \sum_i b_{ji} a_{ij}$：二者为同一个
+二重和。
+\end{proof}
+
+\begin{example}[迹的应用]
+\label{ex:b1:matrices:tracework}
+\cref{ch:b1:linmaps}中的\omterm{def:b1:linmaps:projection}{投影}，映到
+$\operatorname{Vect}(1,1)$ 上、沿 $\operatorname{Vect}(0,1)$，
+$p(x, y) = (x, x)$，其矩阵为 $A = \begin{pmatrix} 1 & 0\\ 1 &
+0\end{pmatrix}$（标准基下），事实上 $A^2 = A$，且
+\[
+\operatorname{tr} A = 1 = \operatorname{rk} A ,
+\]
+这印证了\cref{exo:b1:matrices:8}：对于幂等矩阵，迹
+\emph{计量}像的维数，无论矩阵写在哪一组
+基下。不变性的机理在于恒等式
+$\operatorname{tr}(AB) = \operatorname{tr}(BA)$：
+\[
+\operatorname{tr}\bigl(P^{-1}(AP)\bigr) =
+\operatorname{tr}\bigl((AP)P^{-1}\bigr) = \operatorname{tr} A ,
+\]
+故与 $A$ 相似的所有矩阵共享同一迹——这是
+自\omterm{def:b1:structures:morphism}{同态}的第一个\emph{数值不变量}，
+行列式将在\cref{ch:b1:det}中与之并列（即下文
+周末问题中的数对 $(s, p)$）。
+\end{example}
+
+\begin{example}[对称加反对称]
+\label{ex:b1:matrices:symsplit}
+称 $A$ 为\emph{对称矩阵}，当 $A^{\mathsf T} = A$ 时，
+称为\emph{反对称矩阵}，当 $A^{\mathsf T} = -A$ 时。任一方阵都
+唯一地分解为两者之和：
+\[
+A = \underbrace{\frac{A + A^{\mathsf T}}{2}}_{\text{对称}}
++ \underbrace{\frac{A - A^{\mathsf T}}{2}}_{\text{反对称}},
+\]
+既对称又反对称的矩阵为零（$A = -A$）：两个\omterm{def:b1:logic:sets}{集合}
+是 $\mathcal{M}_n(K)$ 的\omterm{def:b1:vspaces:sum}{补子空间}——恰为
+函数奇偶分解的精确类比，
+（见\cref{ex:b1:vspaces:evenodd}），\omterm{def:b1:matrices:transpose}{转置}起着
+$x \mapsto -x$ 的作用。维数方面，对称矩阵自由取值于对角线及其上方，
+反对称矩阵则仅在严格上方自由取值
+（对角线为零）：
+\[
+\frac{n(n+1)}{2} + \frac{n(n-1)}{2} = n^2 ,
+\]
+维数的平衡是格拉斯曼对
+直和性的验证。当 $n = 2$ 时：$\begin{pmatrix} 1 & 5\\ 1 &
+2\end{pmatrix} = \begin{pmatrix} 1 & 3\\ 3 & 2\end{pmatrix} +
+\begin{pmatrix} 0 & 2\\ -2 & 0\end{pmatrix}$。对称
+矩阵又重新出现，作为
+\cref{ch:b1:multivar}中的二阶导数数据（蒙日三元组 $r, s, t$），而
+对称正交矩阵则在
+\cref{exo:b1:euclid:12}中被分类。
+\end{example}
+
+\section{基变换}
+
+\begin{definition}\label{def:b1:matrices:changeofbasis}
+设 $\mathcal{B}, \mathcal{B}'$ 为 $E$ 的两组基。
+称 $P =
+P_{\mathcal{B}\to\mathcal{B}'}$ 为\emph{过渡矩阵}\index{过渡矩阵}，其列为
+\emph{新}基向量在\emph{旧}基下的\omterm{prop:b1:vspaces:coordinates}{坐标}。
+它可逆，$P^{-1} = P_{\mathcal{B}'\to\mathcal{B}}$，且
+\omterm{prop:b1:vspaces:coordinates}{坐标}按 $X = PX'$ 变换（旧 $=$ $P\,\cdot$ 新）。
+\end{definition}
+
+\begin{example}[读懂过渡矩阵]
+\label{ex:b1:matrices:changerun}
+在 $\R^2$ 中，从标准基 $\mathcal B$ 到 $\mathcal B' =
+\bigl((1,1), (1,-1)\bigr)$：
+\[
+P = P_{\mathcal B\to\mathcal B'} =
+\begin{pmatrix} 1 & 1\\ 1 & -1 \end{pmatrix}
+\]
+（新向量用旧\omterm{prop:b1:vspaces:coordinates}{坐标}写出，逐列排列）。对于旧\omterm{prop:b1:vspaces:coordinates}{坐标}为
+$X = (3, 1)^{\mathsf T}$ 的向量，其新\omterm{prop:b1:vspaces:coordinates}{坐标}
+为 $X' = P^{-1}X = \frac12(3 + 1,\ 3 - 1)^{\mathsf T} =
+(2, 1)^{\mathsf T}$。事实上 $2(1,1) + 1(1,-1) = (3,1)$。注意
+方向——矩阵 $P$ 由\emph{新}基构造，
+但它完成的是\emph{由新到旧}的\omterm{prop:b1:vspaces:coordinates}{坐标}换算（$X = PX'$）；由旧到新
+则需取逆。写出验算
+$2(1,1) + (1,-1) = (3,1)$，便能及时发现
+颠倒 $P$ 这一错误，正是本章中
+最常见的错误。
+\end{example}
+
+\begin{theorem}[映射的基变换]\label{thm:b1:matrices:conjugation}
+设 $u \in \mathcal{L}(E)$ 的矩阵为 $A$（基为 $\mathcal{B}$），且 $A'$
+为其在 $\mathcal{B}'$ 下的矩阵，且 $P = P_{\mathcal{B}\to\mathcal{B}'}$，则
+\[
+A' = P^{-1} A\, P .
+\]
+如此相关的两个矩阵称为\emph{相似矩阵}\index{相似矩阵}。
+（对于 $u \colon E \to F$ 及两对基，公式为
+$A' = Q^{-1} A P$——即\emph{等价}矩阵
+\index{等价矩阵}。）
+\end{theorem}
+
+\begin{proof}
+对任意 $x$：$X = PX'$，且像满足 $Y = AX$，$Y = PY'$。
+于是 $PY' = APX'$，即 $Y' = (P^{-1}AP)X'$ 对所有 $X'$ 成立，故
+$u$ 在新基下的矩阵为 $P^{-1}AP$（$X'$ 取
+标准列向量）。
+\end{proof}
+
+\begin{example}[好的基使映射一目了然]
+\label{ex:b1:matrices:conjugationrun}
+设 $u(x, y) = (y, x)$（交换），其矩阵 $A = \begin{pmatrix} 0
+& 1\\ 1 & 0\end{pmatrix}$（标准基下）。在
+基 $\mathcal B' = \bigl((1,1), (1,-1)\bigr)$ 下：
+\[
+P = \begin{pmatrix} 1 & 1\\ 1 & -1 \end{pmatrix},
+\qquad
+P^{-1} = \frac12\begin{pmatrix} 1 & 1\\ 1 & -1 \end{pmatrix},
+\qquad
+P^{-1} A P = \begin{pmatrix} 1 & 0\\ 0 & -1 \end{pmatrix}.
+\]
+其实并不需要真的计算矩阵乘积：$u$ 保持 $(1,1)$ 不变，并
+将 $(1,-1)$ 反向，故在 $\mathcal B'$ 下其矩阵\emph{必为}
+$\operatorname{diag}(1, -1)$——交换恰为
+关于直线 $y = x$ 的反射。对给定的自\omterm{def:b1:structures:morphism}{同态}，寻找使其矩阵
+成为对角矩阵的基，正是
+本科二年级分册（约化理论）的中心问题；下文
+周末问题表明，仅凭\omterm{def:b1:poly:def}{多项式}恒等式本身已能走多远。
+\end{example}
+
+\begin{example}[基变换，逆向运用]
+\label{ex:b1:matrices:reverserun}
+到 $F = \operatorname{Vect}(1,1)$ 上、沿 $G =
+\operatorname{Vect}(1,-1)$ 的\omterm{def:b1:linmaps:projection}{投影}，在适配基 $\mathcal
+B' = \bigl((1,1),(1,-1)\bigr)$ 下，其矩阵为 $A' =
+\operatorname{diag}(1, 0)$，形式极简。求其标准基下的矩阵，
+只需将 \cref{thm:b1:matrices:conjugation} 反向运用，$A = P A'
+P^{-1}$：
+\[
+P = \begin{pmatrix} 1 & 1\\ 1 & -1\end{pmatrix},
+\quad
+P^{-1} = \frac12\begin{pmatrix} 1 & 1\\ 1 & -1\end{pmatrix},
+\quad
+A = P\begin{pmatrix} 1 & 0\\ 0 & 0\end{pmatrix}P^{-1}
+= \frac12\begin{pmatrix} 1 & 1\\ 1 & 1\end{pmatrix}.
+\]
+验算：$A^2 = A$（幂等），$\operatorname{tr} A = 1 =
+\operatorname{rk} A$，且 $A\binom{1}{1} = \binom11$，
+$A\binom{1}{-1} = 0$，与所要求的相符。这种逆向做法——
+即先在适配基下设计矩阵，再共轭还原——
+正是实际中构造旋转、反射与\omterm{def:b1:linmaps:projection}{投影}矩阵的
+方法。
+\end{example}
+
+\begin{theorem}[秩的标准形]\label{thm:b1:matrices:rank}
+矩阵的\emph{秩}（其列的秩，等价地，
+相伴\omterm{def:b1:linmaps:def}{线性映射}的秩）是\omterm{def:b1:logic:equiv}{等价关系}下唯一的不变量：
+每个 $A \in \mathcal{M}_{n,p}$，秩为 $r$，都等价于
+\[
+J_r = \begin{pmatrix} I_r & 0 \\ 0 & 0 \end{pmatrix},
+\]
+且 $\operatorname{rk}(A^{\mathsf T}) = \operatorname{rk}(A)$，即行秩
+等于列秩。
+\end{theorem}
+
+\begin{proof}
+设 $u \colon E \to F$ 的秩为 $r$。取 $S$ 作为
+$\ker u$ 的\omterm{def:b1:vspaces:sum}{补子空间}（$\dim S = r$，见\cref{thm:b1:linmaps:ranknullity}）
+其基为 $(e_1, \dots, e_r)$，再用 $\ker u$ 的基将其扩充为
+$E$ 的基；像 $f_i = u(e_i)$（$i \leq r$）构成
+$\operatorname{im} u$ 的基（限制\omterm{def:b1:logic:map}{映射}为同构），再扩充为
+$F$ 的基。在这些基下，$u$ 的矩阵恰为
+$J_r$。于是 $A = Q J_r P^{-1}$，其中 $P, Q$ 可逆。
+
+\omterm{def:b1:matrices:transpose}{转置}可得：$A^{\mathsf T} = (P^{-1})^{\mathsf T} J_r^{\mathsf T} Q^{\mathsf T}$
+其中 $J_r^{\mathsf T}$ 具有相同形式（秩为 $r$），两侧的
+因子可逆（可逆矩阵的\omterm{def:b1:matrices:transpose}{转置}仍可逆，由
+$(AB)^{\mathsf T} = B^{\mathsf T}A^{\mathsf T}$ 应用于 $AA^{-1} = I$ 得出）：
+故 $\operatorname{rk} A^{\mathsf T} = r$。
+\end{proof}
+
+\section{行变换}
+
+\begin{method}[矩阵的高斯消元法]\label{met:b1:matrices:gauss}
+三种\emph{初等行变换}\index{初等行变换}——
+交换两行、以 $\lambda \neq 0$ 乘某一行、将某行的倍数
+加到另一行上——都不改变秩（每种变换都是
+左乘一个可逆矩阵）。算法：取主元
+（最左的非零元），消去其下方同列元素，转到下一行和下一列；
+所得阶梯形的主元个数
+即为秩。
+
+\emph{求逆：}对分块 $(A \mid
+I_n)$ 施行算法，直至左块变为 $I_n$（当且仅当 $A$
+可逆时才可能）；此时右块即为 $A^{-1}$——事实上，
+所用初等矩阵的乘积恰为 $A^{-1}$。
+\end{method}
+
+\begin{example}\label{ex:b1:matrices:inverse}
+$A = \begin{pmatrix} 1 & 2 \\ 3 & 4 \end{pmatrix}$：对 $(A \mid
+I_2)$ 作行化简：
+\[
+\begin{pmatrix} 1 & 2 & 1 & 0\\ 3 & 4 & 0 & 1 \end{pmatrix}
+\to
+\begin{pmatrix} 1 & 2 & 1 & 0\\ 0 & -2 & -3 & 1 \end{pmatrix}
+\to
+\begin{pmatrix} 1 & 0 & -2 & 1\\ 0 & 1 & \tfrac32 & -\tfrac12
+\end{pmatrix},
+\]
+（运算：$L_2 \leftarrow L_2 - 3L_1$；再令 $L_1 \leftarrow L_1
++ L_2$，$L_2 \leftarrow -\frac12 L_2$）。于是 $A^{-1} =
+\begin{pmatrix} -2 & 1 \\ \tfrac32 & -\tfrac12\end{pmatrix}$.
+\emph{验算：}$AA^{-1} = I_2$。
+\end{example}
+
+\begin{example}[含参数的秩，仅用行变换]
+\label{ex:b1:matrices:rankparameter}
+设 $m \in \R$，求
+$M_m = \begin{pmatrix} 1 & 1 & m\\ 1 & m & 1\\ m & 1 &
+1\end{pmatrix}$ 的秩。作行化简：$L_2 \leftarrow L_2 - L_1$ 与 $L_3
+\leftarrow L_3 - mL_1$ 后，各行分别为
+\[
+(1,\ 1,\ m), \qquad (0,\ m - 1,\ 1 - m), \qquad
+(0,\ 1 - m,\ 1 - m^2).
+\]
+\emph{情形 $m = 1$}：后两行化为零，只有一个主元，
+故 $\operatorname{rk} M_1 = 1$（原三行
+全相等）。\emph{情形 $m \neq 1$}：将 $L_2$ 乘以 $\frac1{m-1}$，
+将 $L_3$ 乘以 $\frac1{1-m}$，得 $(0, 1, -1)$ 与 $(0, 1, 1 + m)$，
+再令 $L_3 \leftarrow L_3 - L_2 = (0, 0, m + 2)$。若 $m = -2$，
+则有两个主元，秩为 $2$；否则有三个主元，秩为 $3$。综上：
+\[
+\operatorname{rk} M_m =
+\begin{cases}
+1 & m = 1,\\
+2 & m = -2,\\
+3 & \text{否则}.
+\end{cases}
+\]
+同样的分界点也会从一次行列式计算中得出，
+在\cref{ch:b1:det}中，\omterm{def:b1:poly:def}{多项式} $-(m+2)(m-1)^2$（
+见\cref{exo:b1:det:7}）——但要注意，消元法所给出、
+而行列式所不给出的，是退化情形下秩的\emph{值}，
+而不仅是秩下降这一事实。
+\end{example}
+
+\begin{example}[计算幂]\label{ex:b1:matrices:powers}
+$A = \begin{pmatrix} 1 & 1 \\ 0 & 1\end{pmatrix} = I + N$，其中 $N =
+E_{12}$，$N^2 = 0$。由于 $I$ 与 $N$ 可交换，二项式定理
+（\cref{prop:b1:structures:binomial}）化为有限和：
+\[
+A^k = I + kN = \begin{pmatrix} 1 & k \\ 0 & 1 \end{pmatrix}
+\qquad (k \in \N, \text{ 且 } k \in \Z \text{ 利用 } A^{-1} = I -
+N).
+\]
+\end{example}
+
+\begin{method}[计算 $A^n$：三种途径]
+\label{met:b1:matrices:powers}
+\begin{enumerate}
+  \item \emph{二项式途径}：若 $A = \lambda I + N$，其中 $N$
+        幂零，二项式定理化为有限和
+        （\cref{ex:b1:matrices:powers}，\cref{exo:b1:matrices:5}）；
+        此途径适用，因为 $\lambda I$ 与一切矩阵可交换。
+  \item \emph{\omterm{def:b1:poly:def}{多项式}途径}：找一个\omterm{def:b1:poly:def}{多项式}恒等式，
+        被 $A$ 满足（维数为 $2$ 时恒有 $A^2 = sA -
+        pI$），并将 $X^n$ 模之约化；
+        下文的周末问题完整地建立了这一途径。
+  \item \emph{相似途径}：找可逆矩阵 $P$，使
+        $P^{-1}AP = D$ 为简单形（对角阵或移位阵），计算
+        $D^n$，再还原：$A^n = P D^n P^{-1}$
+        （\cref{thm:b1:matrices:conjugation}，
+        \cref{ex:b1:matrices:conjugationrun}）；寻找这类 $P$ 的系统方法
+        属于本科二年级的约化理论。
+\end{enumerate}
+无论采用哪一种途径，都应在 $n = 0, 1, 2$ 时检验结果：三项
+简便的检验，几乎能查出所有失误。
+\end{method}
+
+\begin{remark}[常见陷阱：不可交换性的代价]
+\label{rem:b1:matrices:pitfalls}
+凡数量代数中成立、其证明须交换因子次序的恒等式，
+在 $\mathcal{M}_n(K)$，$n \geq 2$ 时均失效。
+\emph{平方}：$(A + B)^2 = A^2 + AB + BA + B^2$，中间项
+并为 $2AB$，仅当 $AB = BA$
+（见\cref{exo:b1:matrices:1}）。
+\emph{积的幂}：$(AB)^k$ 为 $ABAB\cdots$，而非
+$A^kB^k$。
+\emph{零因子}：$E_{12}E_{12} = 0$，而 $E_{12} \neq 0$；
+因此\emph{不满足消去律}：$AB = AC$ 推出 $B = C$
+仅当 $A$ 可逆时才成立（在正确一侧乘 $A^{-1}$——
+注意左右之分）。
+\emph{迹}：$\operatorname{tr}(AB) = \operatorname{tr}(BA)$
+恒成立，但 $\operatorname{tr}(AB) \neq
+\operatorname{tr}A\operatorname{tr}B$ 一般不成立（取 $A = B =
+I_2$：$2 \neq 4$），且 $\operatorname{tr}(ABC) =
+\operatorname{tr}(BCA)$（轮换），而 $\operatorname{tr}(ACB)$
+可能不同。
+\emph{\omterm{def:b1:matrices:transpose}{转置}反序}：$(AB)^{\mathsf T} = B^{\mathsf
+T}A^{\mathsf T}$——忘记反序是正交性计算中最常见的
+错误（见\cref{ch:b1:euclid}）。
+拿不准时，可取 $E_{12}$ 与
+$E_{21}$ 代入检验任一所称恒等式：最小的不可交换一对，
+一行之内便可推翻大多数错误公式。
+\end{remark}
+
+\begin{remark}[矩阵字典的去向]
+\label{rem:b1:matrices:whereused}
+矩阵字典在本册余下的每一部分都会用到：
+\cref{ch:b1:det}为每个方阵赋予一个
+决定可逆性的数，并系统地求解 $AX = B$；
+\cref{ch:b1:euclid}单独挑出保持长度的矩阵
+（即正交矩阵）；并在
+\cref{ch:b1:multivar}中，二元函数的二阶性态是
+一个对称的 $2 \times 2$ 矩阵。前文几乎一笔带过的迹，
+则成为一个强有力的不变量：
+\cref{exo:b1:matrices:6,exo:b1:matrices:8}给出初步体会，
+本科二年级分册则在此基础上建立特征值理论。
+周末问题发展了另一件主力工具：\omterm{def:b1:poly:def}{多项式}恒等式
+矩阵所满足的，它们把 $A^n$ 的计算化为
+一个两项\omterm{pb:b1:matrices:1}{线性递推}式。
+\end{remark}
+
+\begin{remark}[第 3 册内的展望]
+\label{rem:b1:matrices:perspectives}
+这里引入的三类矩阵，将在
+本册后文中再次出场。\emph{对称矩阵}
+（\cref{ex:b1:matrices:symsplit}）承载
+二元函数的二阶信息：
+\cref{ch:b1:multivar}中的蒙日判别法是关于
+一个对称 $2\times2$ 矩阵符号性态的论断，其行列式 $rt - s^2$
+由\cref{ch:b1:det}中的方法算出。\emph{正交
+矩阵}（$A^{\mathsf T}A = I$）是
+\cref{ch:b1:euclid}中的等距变换，\omterm{def:b1:matrices:transpose}{转置}在那里终于获得了
+几何意义：它是内积的
+代数影子。\emph{可逆矩阵}在
+\cref{ch:b1:det}中迎来实用检验——只需一个数 $\det A \neq 0$——
+为本章开始的行化简探寻画上句号。
+迹与行列式随后作为周末问题中的不变量对 $(s, p)$ 结伴出场，
+一直延伸到
+本科二年级的特征值理论。
+\end{remark}
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:b1:matrices:1}
+设 $A = \begin{pmatrix} 1 & 2 \\ 0 & 1 \end{pmatrix}$ 与 $B =
+\begin{pmatrix} 0 & 1 \\ 1 & 0\end{pmatrix}$。计算 $AB$、$BA$、
+$A^2 - B^2$ 与 $(A+B)(A-B)$；并说明后两者为何不相等。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:matrices:2}
+求下列矩阵的秩：
+\[
+M = \begin{pmatrix}
+1 & 2 & 3\\
+2 & 4 & 6\\
+1 & 1 & 1
+\end{pmatrix},
+\qquad
+N = \begin{pmatrix}
+1 & 1 & 0 & 2\\
+0 & 1 & 1 & 1\\
+1 & 2 & 1 & 3
+\end{pmatrix}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:matrices:3}
+用\omterm{met:b1:matrices:gauss}{初等行变换}求 $A = \begin{pmatrix} 1 & 0 & 1\\ 2 & 1 &
+1\\ 1 & 1 & 1 \end{pmatrix}$ 的逆矩阵，并用一次乘积验证。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:matrices:4}
+在 $\R_2[X]$ 的标准基下，写出自\omterm{def:b1:structures:morphism}{同态}
+$u(P) = P(X + 1)$ 的矩阵，不经计算说明其为何可逆，
+并给出 $u^{-1}$ 的矩阵。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:matrices:5}
+设 $A = \begin{pmatrix} 2 & 1 \\ 0 & 2\end{pmatrix}$，写出 $A =
+2I + N$，计算 $N^2$，并
+由二项式定理推出 $A^k$，对所有 $k \in \N$ 成立。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:matrices:6}
+证明：不存在矩阵 $A, B \in \mathcal{M}_n(K)$（$K = \R$ 或 $\C$），
+使得 $AB - BA = I_n$。\emph{（取迹。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:matrices:7}
+称矩阵 $A$ 为\emph{幂零矩阵}，若 $A^m = 0$ 对某个 $m$ 成立。
+证明：此时 $I - A$ 可逆，且
+\[
+(I - A)^{-1} = I + A + A^2 + \dots + A^{m-1} .
+\]
+应用：求矩阵 $\begin{pmatrix} 1 & 2 & 3\\ 0 & 1 & 2\\ 0 & 0 &
+1\end{pmatrix}$ 的逆矩阵。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:matrices:8}
+设 $A \in \mathcal{M}_n(\R)$ 满足 $A^2 = A$（即幂等矩阵）。证明
+$\operatorname{tr} A = \operatorname{rk} A$。\emph{（把
+$A$ 视为\omterm{def:b1:linmaps:projection}{投影}，并选取适配的基；
+\cref{thm:b1:matrices:conjugation} 表明迹
+与基的选取无关，因为 $\operatorname{tr}(P^{-1}MP) =
+\operatorname{tr} M$。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:matrices:9}
+设 $J \in \mathcal{M}_n(\R)$ 为全一矩阵。计算 $J^2$，
+并由此推出，对 $a, b \in \R$，矩阵 $M
+= aI + bJ$ 可逆的条件及 $M^{-1}$ \emph{（试求同形式
+$\alpha I + \beta J$ 的逆）}。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:matrices:10}
+（秩不等式）对 $A, B \in \mathcal{M}_n(K)$，证明
+\[
+\operatorname{rk}(A + B) \leq \operatorname{rk} A +
+\operatorname{rk} B,
+\qquad
+\operatorname{rk}(AB) \geq \operatorname{rk} A + \operatorname{rk}
+B - n .
+\]
+\emph{（对第二式——西尔维斯特不等式——将秩–零化度定理
+应用于 $A$ 所对应的\omterm{def:b1:linmaps:def}{线性映射}在
+$\operatorname{im} B$ 上的限制。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:matrices:11}
+设 $D = \operatorname{diag}(d_1, \dots, d_n)$，其中 $d_i$
+\emph{两两互异}。
+\begin{enumerate}
+  \item 证明矩阵 $A$ 与 $D$ 可交换，当且仅当
+        $A$ 为对角矩阵。\emph{（比较 $(i,j)$ 项，
+        即 $AD$ 与 $DA$ 的对应元素。）}
+  \item 由此推出 $\mathcal{M}_n(K)$ 的\emph{中心}：
+        与\emph{任一}矩阵可交换的矩阵恰为
+        数量矩阵 $\lambda I_n$。\emph{（先
+        以 $D$ 作检验，再以矩阵 $E_{ij}$ 作检验。）}
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:matrices:12}
+（秩为 1 的矩阵）设 $A \in \mathcal{M}_n(K)$，$A \neq 0$。
+\begin{enumerate}
+  \item 证明：$\operatorname{rk} A = 1$ 当且仅当 $A =
+        CL$，其中 $C \in \mathcal{M}_{n,1}$ 为非零列，
+        $L \in \mathcal{M}_{1,n}$ 为非零行。
+  \item 对这样的 $A$，证明 $A^2 = (\operatorname{tr} A)\,A$；
+        由此推出：秩为 1 的矩阵幂零，当且仅当
+        其迹为零。
+  \item 若 $\operatorname{tr} A \neq -1$，证明 $I_n + A$
+        可逆，且
+        \[
+        (I_n + A)^{-1} = I_n - \frac{1}{1 + \operatorname{tr}
+        A}\,A ,
+        \]
+        且 $I_n + A$ 在
+        $\operatorname{tr} A = -1$ 时\emph{不}可逆。\emph{（求一个被
+        $I_n + A$ 零化的向量。）}
+\end{enumerate}
+\end{exercise}
+
+\section{问题：借助多项式除法求矩阵的幂}
+
+\begin{problem}\label{pb:b1:matrices:1}
+逐个元素计算 $A^{100}$ 毫无希望，
+而借助 $A$ 所满足的\omterm{def:b1:poly:def}{多项式}恒等式计算，只需三行。
+本题从头建立这一方法：$X^n$ 的带余除法，
+恒等式 $A^2 - sA + pI = 0$ 对每个 $2
+\times 2$ 矩阵都成立（即
+$2$ 维时的凯莱–哈密顿定理），并给出矩阵幂与\omterm{pb:b1:matrices:1}{线性
+递推}之间的对应关系——以\omterm{pb:b1:matrices:1}{斐波那契数}为贯穿全题的例子。
+\index{凯莱–哈密顿定理（2 维）}
+\index{斐波那契数}\index{线性递推}
+
+\medskip
+\noindent\textbf{第一部分——余式演算。} 设 $s, p
+\in K$ 且 $D = X^2 - sX + p$。
+\begin{enumerate}
+  \item 说明对每个 $n \in \N$，存在唯一的 $Q_n
+        \in K[X]$ 与 $(a_n, b_n) \in K^2$，使得
+        \[
+        X^n = Q_n\,D + a_n X + b_n ,
+        \]
+        并计算 $(a_0, b_0)$ 与 $(a_1, b_1)$。
+  \item 两边乘以 $X$ 再作一次除法，建立
+        下列递推关系
+        \[
+        a_{n+1} = s\,a_n + b_n,
+        \qquad
+        b_{n+1} = -p\,a_n ,
+        \]
+        并由此推出 $a_{n+2} = s\,a_{n+1} - p\,a_n$：
+        系数数列满足与
+        $D$ 相应的\omterm{pb:b1:matrices:1}{线性递推}式。
+  \item 设 $D$ 有两个不同的根 $\lambda \neq \mu$。
+        在带余除法恒等式中代入根，证明
+        \[
+        a_n = \frac{\lambda^n - \mu^n}{\lambda - \mu},
+        \qquad
+        b_n = \frac{\lambda\mu^n - \mu\lambda^n}{\lambda - \mu} .
+        \]
+  \item 设 $D = (X - \lambda)^2$。对除法恒等式求导，
+        证明 $a_n = n\lambda^{n-1}$ 与
+        $b_n = (1 - n)\lambda^{n}$。
+  \item 证明将固定矩阵 $M \in
+        \mathcal{M}_k(K)$ 代入\omterm{def:b1:poly:def}{多项式}时保持和与积：
+        $(PQ)(M) = P(M)\,Q(M)$。由此推出：若 $D(M) =
+        0$，则
+        \[
+        M^n = a_n\,M + b_n\,I \qquad (n \in \N).
+        \]
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第二部分——二维情形：迹、
+行列式值、凯莱–哈密顿。} 设 $A = \begin{pmatrix} a & b\\ c &
+d\end{pmatrix}$ 记 $s = a + d = \operatorname{tr} A$，$p = ad
+- bc$（即在\cref{ch:b1:det}中将称为
+行列式的数）。
+\begin{enumerate}[resume]
+  \item 直接计算验证\emph{$2$ 维凯莱–哈密顿
+        恒等式}：
+        \[
+        A^2 - s\,A + p\,I_2 = 0 .
+        \]
+  \item 用直接展开证明 $p$ 具有乘性：
+        记号意义明确，即 $p(AB) = p(A)\,p(B)$。再证明：
+        $A$ 可逆当且仅当 $p \neq 0$，此时
+        有
+        \[
+        A^{-1} = \frac1p\,\bigl(s\,I_2 - A\bigr).
+        \]
+  \item 设 $A = \begin{pmatrix} 1 & 1\\ 0 & 2\end{pmatrix}$。
+        计算 $s$、$p$ 与 $D$ 的根，并推出 $A^n$ 的
+        闭式，再与直接计算的
+        $A^2$ 进行检验。
+  \item 设 $A = \begin{pmatrix} 3 & 1\\ -1 & 1\end{pmatrix}$。
+        证明 $D$ 有二重根，并计算 $A^n$；
+        取 $n = 2$ 进行检验。
+  \item 设 $F = \begin{pmatrix} 1 & 1\\ 1 & 0\end{pmatrix}$，
+        由 $F_0 = 0$，$F_1 = 1$，
+        $F_{n+2} = F_{n+1} + F_n$ 定义\omterm{pb:b1:matrices:1}{斐波那契数}。证明
+        \[
+        F^n = \begin{pmatrix} F_{n+1} & F_n\\ F_n &
+        F_{n-1}\end{pmatrix} \quad (n \geq 1),
+        \]
+        由此推出比内公式 $F_n = \dfrac{\varphi^n -
+        \psi^n}{\sqrt5}$，其中 $\varphi = \frac{1 + \sqrt5}2$，
+        $\psi = \frac{1 - \sqrt5}2$，并利用第 7 题，
+        推出卡西尼恒等式 $F_{n+1}F_{n-1} - F_n^2 = (-1)^n$。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第三部分——\omterm{pb:b1:matrices:1}{线性递推}的结构。}
+设 $s, p \in K$ 且 $p \neq 0$，记 $E_D$ 为
+满足 $u_{n+2} = s\,u_{n+1} - p\,u_n$ 对一切 $n$ 成立的数列全体。
+\begin{enumerate}[resume]
+  \item 证明 $E_D$ 是维数为 $2$ 的\omterm{def:b1:vspaces:def}{向量空间}
+        （仿照\cref{exo:b1:findim:10}）。
+  \item 证明第一部分中的数列 $(a_n)$ 是
+        $E_D$ 中满足初值 $0, 1$ 的元素，并证明每个 $u
+        \in E_D$ 都满足
+        \[
+        u_n = u_1\,a_n + u_0\,b_n \qquad (n \in \N),
+        \]
+        其中 $(b_n)$ 同第一部分：带余除法的余式
+        一次性解出\emph{全部}递推式。
+  \item 若 $\lambda \neq \mu$ 为 $D$ 的两个根，证明
+        $\bigl((\lambda^n), (\mu^n)\bigr)$ 是 $E_D$ 的一组基；
+        若 $D = (X-\lambda)^2$ 且 $\lambda \neq 0$，证明
+        $\bigl((\lambda^n), (n\lambda^n)\bigr)$ 亦为一组基。
+  \item 完全求解：$u_{n+2} = u_{n+1} + 6u_n$，$u_0 = 1$，
+        $u_1 = 8$；用 $u_2$ 与 $u_3$ 检验结果。
+  \item 设 $C = \begin{pmatrix} 0 & 1\\ -p & s\end{pmatrix}$
+        （$D$ 的\emph{友矩阵}）。证明
+        \[
+        \begin{pmatrix} u_{n}\\ u_{n+1}\end{pmatrix}
+        = C^n \begin{pmatrix} u_0\\ u_1\end{pmatrix}
+        \quad (u \in E_D),
+        \]
+        并证明 $\operatorname{tr} C = s$ 与 $p(C) = p$：
+        递推式与矩阵共同对应同一个\omterm{def:b1:poly:def}{多项式} $D$。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第四部分——三次情形。}设 $D_3 = X^3 -
+\alpha X^2 - \beta X - \gamma$，并令
+\[
+C_3 = \begin{pmatrix} 0 & 1 & 0\\ 0 & 0 & 1\\ \gamma & \beta &
+\alpha \end{pmatrix}.
+\]
+\begin{enumerate}[resume]
+  \item 证明 $D_3(C_3) = 0$。\emph{（计算标准基向量在
+        $C_3$ 各次幂作用下的像：
+        $C_3$ 的\omterm{def:b1:logic:map}{映射}将 $e_1 \mapsto \dots \mapsto$ 化为
+        由最后一行所确定的线性组合。）}
+  \item 证明：若 $D_3$ 有三个互异的根 $\lambda_1,
+        \lambda_2, \lambda_3$，则 $R_n$ 为 $X^n$
+        除以 $D_3$ 所得的余式，是\emph{\omterm{thm:b1:poly:lagrange}{拉格朗日插值}\omterm{def:b1:poly:def}{多项式}}，
+        它以 $\lambda_i^n$ 为取值、$\lambda_i$ 为节点
+        （见\cref{thm:b1:poly:lagrange}）；由此可知
+        $C_3^{\,n}$ 的每个元素都是
+        $\lambda_1^n, \lambda_2^n, \lambda_3^n$ 的固定线性组合。
+  \item 解递推式 $u_{n+3} = 2u_{n+2} + u_{n+1} - 2u_n$，其中 $u_0 =
+        0$，$u_1 = 1$，$u_2 = 1$。\emph{（分解 $D_3 = (X - 1)(X
+        + 1)(X - 2)$。）}用 $u_3$ 检验。
+  \item 求 $X^n$ 模 $(X -
+        \lambda)^3$ 的余式\emph{（$X^n$ 在
+        $\lambda$ 处的泰勒展开）}，并由此推出 $(\lambda I +
+        N)^n$ 的表达式，其中 $N^3 = 0$ 且 $N$ 与所有相关对象可交换；
+        用二项式定理检验此式。
+  \item 证明：对于有互异根的 $D_3$，$3$ 阶递推式的通解
+        为 $u_n = c_1
+        \lambda_1^n + c_2\lambda_2^n + c_3\lambda_3^n$，并证明
+        这三个等比数列构成解空间的
+        一组基。\emph{（证明\omterm{def:b1:vspaces:free}{线性无关}时，对零组合
+        在 $n = 0, 1, 2$ 处求值，并识别出
+        它是关于互异节点的插值方程组，
+        节点为 $\lambda_i$。）}
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第五部分——\omterm{pb:b1:matrices:1}{斐波那契数}的推论与综合。}
+\begin{enumerate}[resume]
+  \item 证明 $F_1 + F_2 + \dots + F_n = F_{n+2} - 1$。
+  \item 由 $F^{m+n} = F^m F^n$ 推出加法公式
+        \[
+        F_{m+n} = F_{m+1}F_n + F_m F_{n-1},
+        \]
+        并由此推出 $F_{2n} = F_n(F_{n+1} + F_{n-1})$。
+  \item 证明 $F_n$ 为最接近
+        $\varphi^n/\sqrt5$ 的整数（对每个 $n \geq 0$）。
+  \item 记 $t_n = \operatorname{tr}(F^n) = F_{n+1} + F_{n-1}$
+        （即\emph{卢卡斯数} $L_n$）。证明 $t_{n+2} =
+        t_{n+1} + t_n$，$t_1 = 1$，$t_2 = 3$；并证 $L_n =
+        \varphi^n + \psi^n$，进而推出 $F_{2n} = F_n L_n$。
+  \item 综合，用四句话回答：为何 $2
+        \times 2$ 矩阵的幂位于平面
+        $\operatorname{Vect}(I, A)$（$\mathcal{M}_2(K)$ 的\omterm{def:b1:vspaces:subspace}{子空间}），
+        即哪一个维数论证保证了二次恒等式，
+        以及第二部分给出了哪个显式恒等式；欧几里得除法如何
+        把幂运算化为两项递推式；
+        本题中哪一个命题是在所有维数下都成立的某定理当 $n =
+        2$ 时的特例（写出其名称，
+        并说明它在本系列中于何处被证明）；以及
+        友矩阵构造为图景增添了什么。
+\end{enumerate}
+\end{problem}

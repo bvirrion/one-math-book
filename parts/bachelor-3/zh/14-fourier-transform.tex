@@ -1,0 +1,765 @@
+\chapter{傅里叶变换}\label{ch:b3:fouriertransform}
+
+傅里叶级数把周期信号分解为离散的
+谐波；傅里叶\emph{变换}则对
+整条实轴上的信号做同样的分解，频率取连续统。它
+把求导化为乘法，把卷积化为
+乘积，把高斯函数化为高斯函数——这正是它
+能够求解微分方程、驱动信号处理，并
+将在\cref{ch:b3:clt}中证明中心极限定理。本章
+发展 $L^1$ 理论（黎曼–勒贝格引理、
+反演、单射性），\omterm{def:b3:fouriertransform:schwartz}{施瓦茨函数类}，在其上
+变换恰好为双射，以及 $L^2$ 理论
+（普朗歇尔：在相差一个常数的意义下，变换是一个酉
+算子），并以两个典型应用作结：热传导方程，
+在周末问题中完整求解，以及泊松
+求和公式。约定：
+\[
+\hat f(\xi) = \int_\R f(x)\,\eu^{-\iu\xi x}\,\dd x .
+\]
+
+\section{\texorpdfstring{$L^1$ 上的变换}{L1 上的变换}}
+
+\begin{proposition}\label{prop:b3:fouriertransform:basic}
+对 $f \in L^1(\R)$，$\hat f$ 良定义、有界
+（$\norm{\hat f}_\infty \leq \norm f_1$）、连续，且：
+\begin{enumerate}
+  \item $\widehat{\tau_af}(\xi) = \eu^{-\iu a\xi}\hat f(\xi)$
+        且 $\widehat{\eu^{\iu ax}f}(\xi) = \hat f(\xi - a)$；
+  \item $\widehat{f(\cdot/\lambda)}(\xi) = \lambda\hat
+        f(\lambda\xi)$，当 $\lambda > 0$ 时；
+  \item 若 $xf \in L^1$，则 $\hat f$ 属于 $\mathcal C^1$，且
+        $(\hat f)'(\xi) = \widehat{(-\iu x)f}(\xi)$；
+  \item 若 $f \in \mathcal C^1$ 且 $f' \in L^1$（并且 $f \to
+        0$ 在 $\pm\infty$ 处（此处自动成立），则
+        $\widehat{f'}(\xi) = \iu\xi\hat f(\xi)$；
+  \item $\widehat{f * g} = \hat f\,\hat g$（$f, g \in L^1$）。
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+有界性：$\abs{\hat f} \leq \int\abs f$。连续性：由控制收敛定理（DCT）
+取控制函数 $\abs f$（\cref{thm:b3:lebesgue:paramcont}）。
+(1)、(2)：作变量替换
+（\cref{thm:b3:product:linearchange}）。(3)：
+积分号下求导，控制函数为 $\abs{xf}$
+（\cref{thm:b3:lebesgue:paramdiff}）。(4)：首先，$f(x) = f(0)
++ \int_0^xf'$ 在 $\pm\infty$ 处有极限（$f' \in L^1$），
+该极限必为 $0$（$f \in L^1$）；然后在 $[-A,
+A]$ 上分部积分，并令 $A \to \infty$。(5)：用富比尼定理，其合法性在于
+$(x,y)\mapsto f(x - y)g(y)\eu^{-\iu\xi x}$ 绝对
+\omterm{def:b3:lebesgue:l1}{可积}（\cref{thm:b3:product:convolution}）：
+\[
+\widehat{f*g}(\xi) = \iint f(x - y)g(y)\eu^{-\iu\xi(x - y)}
+\eu^{-\iu\xi y}\dd x\,\dd y = \hat f(\xi)\,\hat g(\xi).
+\]
+\end{proof}
+
+\begin{example}\label{ex:b3:fouriertransform:gaussian}
+高斯函数：当 $a > 0$ 时，\index{高斯函数, 傅里叶变换}
+\[
+\widehat{\eu^{-ax^2}}(\xi) =
+\sqrt{\frac\pi a}\;\eu^{-\xi^2/4a} :
+\]
+由\cref{exo:b3:lebesgue:7}（常微分方程 $F' = -\frac\xi{2}F$
+的技巧，并作伸缩），或由 (3)：$g = \widehat{\eu^{-ax^2}}$
+满足 $g'(\xi) = -\frac{\xi}{2a}g(\xi)$（分部积分
+）；$g(0) = \sqrt{\pi/a}$。高斯函数是
+变换的不动点（在相差伸缩的意义下）——这正是它们主宰
+中心极限定理的深层原因。
+\end{example}
+
+\begin{theorem}[黎曼–勒贝格引理]
+\label{thm:b3:fouriertransform:riemannlebesgue}
+对 $f \in L^1(\R)$，$\hat f(\xi) \to 0$，当 $\abs\xi \to
+\infty$ 时。于是 $\widehat{\phantom f} \colon L^1 \to \mathcal
+C_0(\R)$（连续且在无穷远处趋于零的函数
+）。\index{黎曼–勒贝格引理}
+\end{theorem}
+
+\begin{proof}
+对区间的示性函数，$\widehat{\mathbf 1_{\intcc
+ab}}(\xi) = \frac{\eu^{-\iu a\xi} - \eu^{-\iu b\xi}}{\iu\xi}
+\to 0$，故对阶梯函数成立。阶梯函数在
+$L^1$ 中稠密（\cref{thm:b3:lp:density}(1)，加上
+有限\omterm{def:b3:measure:measure}{测度}集由有限个区间的并逼近，
+\cref{exo:b3:measure:7}），且变换是
+$\norm\cdot_\infty$-$\norm\cdot_1$ 连续：当 $\norm{f -
+s}_1 < \varepsilon$，$\limsup_{\abs\xi\to\infty}\abs{\hat
+f(\xi)} \leq \varepsilon$。
+\end{proof}
+
+\section{反演与单射性}
+
+\begin{lemma}[乘法公式]
+\label{lem:b3:fouriertransform:multiplication}
+对 $f, g \in L^1(\R)$，$\displaystyle\int \hat f\,g =
+\int f\,\hat g$。
+\end{lemma}
+
+\begin{proof}
+两边都等于 $\iint f(x)g(\xi)\eu^{-\iu x\xi}\dd
+x\,\dd\xi$（托内利–富比尼：绝对值的
+二重积分等于 $\norm f_1\norm g_1$）。
+\end{proof}
+
+\begin{theorem}[反演定理]\label{thm:b3:fouriertransform:inversion}
+设 $f \in L^1(\R)$。\index{傅里叶反演定理}
+\begin{enumerate}
+  \item （高斯可和性）对每个 $x$，
+        \[
+        (f * g_\varepsilon)(x) =
+        \frac1{2\pi}\int_\R \hat f(\xi)\,
+        \eu^{-\varepsilon\xi^2}\,\eu^{\iu x\xi}\,\dd\xi,
+        \qquad\text{其中 } g_\varepsilon(y) =
+        \frac{1}{2\sqrt{\pi\varepsilon}}\,
+        \eu^{-y^2/4\varepsilon},
+        \]
+        且 $f * g_\varepsilon \to f$（在 $L^1$ 中），当 $\varepsilon
+        \to 0$。
+  \item 若又有 $\hat f \in L^1$，则对几乎处处的
+        $x$
+        \[
+        f(x) = \frac{1}{2\pi}\int_\R \hat
+        f(\xi)\,\eu^{\iu x\xi}\,\dd\xi ,
+        \]
+        且 $f$ 有一个连续代表元。
+  \item （单射性）若 $\hat f = 0$，则 $f = 0$ 几乎处处。
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) 固定 $x$，
+由\cref{lem:b3:fouriertransform:multiplication}，对 $f$ 与
+$g(\xi) = \frac1{2\pi}\eu^{-\varepsilon\xi^2}\eu^{\iu x\xi}$ 应用：
+利用\cref{ex:b3:fouriertransform:gaussian}（并用调制
+规则），
+\[
+\hat g(y) = \frac1{2\pi}\sqrt{\frac\pi\varepsilon}\,
+\eu^{-(y - x)^2/4\varepsilon} = g_\varepsilon(x - y),
+\]
+于是 $\frac1{2\pi}\int\hat f(\xi)\eu^{-\varepsilon\xi^2}
+\eu^{\iu x\xi}\dd\xi = \int f(y)g_\varepsilon(x - y)\dd y =
+(f*g_\varepsilon)(x)$。$g_\varepsilon$ 构成一族
+逼近恒等元：$g_\varepsilon \geq 0$，
+$\int g_\varepsilon = 1$（高斯积分），集中于
+$0$；\cref{thm:b3:lp:regularization}(2) 的证明
+逐字适用（仅用到 $\int g_\varepsilon = 1$ 及集中性，
+其中尾部估计为：$\int_{\abs y > \delta}g_\varepsilon \to
+0$）。故 $\norm{f * g_\varepsilon - f}_1 \to 0$。
+
+(2) 若 $\hat f \in L^1$，则 (1) 式右端
+由控制收敛定理（控制函数 $\abs{\hat f}$）收敛于 $\frac1{2\pi}\int\hat
+f(\xi)\eu^{\iu x\xi}\dd\xi$ 对\emph{每一个} $x$ 成立，且该
+极限函数连续（再用一次控制收敛定理）。另一方面 $f
+* g_\varepsilon \to f$ 在 $L^1$ 中，故沿某一子列几乎处处\
+（\cref{thm:b3:lp:complete}），两个极限几乎处处相等。
+
+(3) 若 $\hat f = 0$，则 (1) 式右端为零：$f *
+g_\varepsilon = 0$，对一切 $\varepsilon$ 成立，且 $f *
+g_\varepsilon \to f$ 在 $L^1$ 中，故 $f = 0$ 几乎处处。
+\end{proof}
+
+\section{施瓦茨函数类}
+
+\begin{definition}\label{def:b3:fouriertransform:schwartz}
+称\emph{施瓦茨函数类}\index{施瓦茨函数类} $\mathcal
+S(\R)$ 为由满足下列条件的 $\mathcal C^\infty$ 函数 $f$ 组成的集合：
+$\sup_x\abs{x^m f^{(n)}(x)} < \infty$，对一切 $m, n \geq 0$
+（即一切导数衰减快于任何幂次）。例如：
+$\eu^{-ax^2}$，$\mathcal C_c^\infty$。显然 $\mathcal S
+\subseteq L^p$ 对每个 $p$ 成立（以 $C(1 + x^2)^{-1}$ 为界），且
+$\mathcal S$ 对求导、乘多项式及乘积
+运算封闭。
+\end{definition}
+
+\begin{theorem}\label{thm:b3:fouriertransform:schwartz}
+傅里叶变换将 $\mathcal S(\R)$ 双射到
+其自身，逆变换为 $\check g(x) = \frac1{2\pi}\int
+g(\xi)\eu^{\iu x\xi}\dd\xi$。
+\end{theorem}
+
+\begin{proof}
+设 $f \in \mathcal S$。反复应用
+\cref{prop:b3:fouriertransform:basic}(3)，得 $(\hat f)^{(n)} =
+\widehat{(-\iu x)^nf}$（每个 $x^kf \in L^1$）；反复应用 (4)
+取 $h = (-\iu x)^nf \in \mathcal S$（其一切
+导数均\omterm{def:b3:lebesgue:l1}{可积}），得 $(\iu\xi)^m\hat h =
+\widehat{h^{(m)}}$。综合以上，
+\[
+\abs{\xi^m\,(\hat f)^{(n)}(\xi)}
+= \bigl|\widehat{\,h^{(m)}}(\xi)\bigr|
+\leq \bigl\|\bigl((-\iu x)^nf\bigr)^{(m)}\bigr\|_1 < \infty
+\]
+对 $\xi$ 一致成立，故 $\hat f \in \mathcal S$。由于 $\hat f \in L^1$，
+由\cref{thm:b3:fouriertransform:inversion}(2)可知反演
+公式处处成立（两端均连续）：$\check{\hat f} = f$，并
+对称地有 $\widehat{\check g} = g$（逆变换为
+$g \mapsto \frac1{2\pi}\hat g(-\cdot)$，同样保持
+$\mathcal S$），故为双射。
+\end{proof}
+
+\section{普朗歇雷尔与 \texorpdfstring{$L^2$}{L2}}
+
+\begin{theorem}[普朗歇雷尔]\label{thm:b3:fouriertransform:plancherel}
+对 $f \in L^1 \cap L^2(\R)$：\index{普朗歇雷尔定理}
+\[
+\norm{\hat f}_2^2 = 2\pi\,\norm f_2^2 .
+\]
+由此 $\widehat{\phantom f}$ 唯一延拓为一个
+连续线性映射 $\mathcal F \colon L^2(\R) \to L^2(\R)$，
+满足 $\norm{\mathcal Ff}_2 = \sqrt{2\pi}\norm f_2$；$\mathcal
+F$ 为双射，且 $\mathcal F^{-1} =
+\frac1{2\pi}\,\mathcal F\circ\sigma$，其中 $\sigma f =
+f(-\cdot)$，且其保持\omterm{def:b3:hilbert:inner}{内积}，但相差因子
+$2\pi$。
+\end{theorem}
+
+\begin{proof}
+设 $f \in L^1\cap L^2$，$h = f * \tilde f$，其中
+$\tilde f(x) = \overline{f(-x)}$。则 $h \in L^1$
+（由\cref{thm:b3:product:convolution}），$h$ 连续且
+有界（由\cref{exo:b3:lp:6}，$f, \tilde f \in L^2$），$h(0) =
+\int f\bar f = \norm f_2^2$，且 $\hat h = \hat
+f\,\widehat{\tilde f} = \hat f\,\overline{\hat f} =
+\abs{\hat f}^2 \geq 0$（计算 $\widehat{\tilde f} =
+\overline{\hat f}$）。应用
+\cref{thm:b3:fouriertransform:inversion}(1) 于 $h$ 在 $x = 0$ 处：
+\[
+(h * g_\varepsilon)(0) = \frac1{2\pi}\int \hat
+h(\xi)\,\eu^{-\varepsilon\xi^2}\dd\xi .
+\]
+当 $\varepsilon \to 0$ 时，左边趋于 $h(0)$（
+其中 $h$ 连续有界：$(h*g_\varepsilon)(0) - h(0) = \int(h(-y)
+- h(0))g_\varepsilon(y)\dd y \to 0$，按
+$y$ 的大小分段估计）；右边单调增至 $\frac1{2\pi}\int\hat h$，
+由单调收敛定理（$\hat h \geq 0$）。因此 $\frac1{2\pi}\int\abs{\hat f}^2 =
+\norm f_2^2$，有限与否\emph{先验地}未知——但实际有限，
+从而同时证明了其属于平方\omterm{def:b3:lebesgue:l1}{可积}函数空间的结论及恒等式。
+
+延拓：$L^1\cap L^2 \supseteq \mathcal C_c$ 在
+$L^2$ 中稠密（由\cref{thm:b3:lp:density}），变换
+在其上为 $\sqrt{2\pi}$ 倍等距，故唯一延拓为
+相差常数因子的等距映射 $\mathcal F$，定义于 $L^2$ 上
+（由\cref{thm:b3:complete:extension}）。$\mathcal S$ 上的反演公式
+（由\cref{thm:b3:fouriertransform:schwartz}）经同一稠密性
+推广，两端均 $L^2$ 连续：$\mathcal
+F\bigl(\frac1{2\pi}\mathcal F(\sigma f)\bigr) = f$ 于
+$\mathcal S$ 上成立，从而在 $L^2$ 上成立，故为双射。关于\omterm{def:b3:hilbert:inner}{内积}：
+由范数恒等式经极化恒等式得出。
+\end{proof}
+
+\begin{theorem}[泊松求和公式]
+\label{thm:b3:fouriertransform:poisson}
+设 $f \in \mathcal S(\R)$（连续的 $f$ 满足 $\abs{f} +
+\abs{\hat f} \leq C(1 + \abs\cdot)^{-2}$
+即可）。则\index{泊松求和公式}
+\[
+\sum_{n\in\Z} f(n) \;=\; \sum_{k\in\Z}\hat f(2\pi k) .
+\]
+\end{theorem}
+
+\begin{proof}
+令 $F(x) = \sum_{n\in\Z}f(x + n)$：该级数
+在紧集上正规收敛（由 $f$ 的衰减性），故 $F$ 连续，且
+它以 $1$ 为周期。其傅里叶系数（周期为 $1$）为
+$c_k(F) = \int_0^1F(t)\eu^{-2\iu\pi kt}\dd t$：
+\[
+c_k(F) = \sum_n\int_0^1 f(t + n)\,\eu^{-2\iu\pi kt}\dd t
+= \int_\R f(t)\,\eu^{-2\iu\pi kt}\dd t = \hat f(2\pi k)
+\]
+（正规收敛保证了可以交换求和与积分；相位因子
+以 $1$ 为周期）。级数 $\sum_k\abs{c_k(F)}$
+收敛（由 $\hat f$ 的衰减性），故 $F$ 的傅里叶级数
+正规收敛；其和是连续函数，且与 $F$ 有相同的
+傅里叶系数，故等于 $F$（圆周上的单射性：
+差函数的系数全为零，并且
+由\cref{thm:b3:hilbert:fourier}可知其在 $L^2$ 中为零，从而
+由连续性处处为零）。令 $x = 0$ 代入即得。
+\end{proof}
+
+\begin{example}[$\theta$ 恒等式]
+\label{ex:b3:fouriertransform:theta}
+将泊松求和公式应用于 $f(x) = \eu^{-\pi tx^2}$（$t > 0$），其
+傅里叶变换为 $\hat f(\xi) = t^{-1/2}\eu^{-\xi^2/4\pi t}$
+（见\cref{ex:b3:fouriertransform:gaussian}，取 $a = \pi t$）：
+\[
+\sum_{n\in\Z}\eu^{-\pi n^2t}
+= \frac1{\sqrt t}\sum_{k\in\Z}\eu^{-\pi k^2/t} :
+\]
+这即雅可比西塔函数的函数方程，它是
+黎曼 $\zeta$ 函数的函数方程的关键——同时还是一个惊人的
+数值加速器：当 $t$ 很小时，左端收敛
+很慢，而右端快得惊人。
+\end{example}
+
+\begin{method}\label{met:b3:fouriertransform:method}
+适用范围：$L^1$——变换逐点定义，
+反演要求 $\hat f \in L^1$；$\mathcal S$——一切都合法，
+此处先行证明；$L^2$——变换由稠密性定义
+（而非依积分！），完美的对称性，\omterm{thm:b3:hilbert:parseval}{帕塞瓦尔
+恒等式}的核算。求变换时：化归为表中的
+（示性函数、指数函数、高斯函数）之一，依据
+\cref{prop:b3:fouriertransform:basic}的规则；证明恒等式时：
+先在 $\mathcal S$（或 $\mathcal C_c^\infty$）上验证，再
+借助稠密性与连续性推广
+（见\cref{met:b3:lp:toolkit}）；求解系数为常数的线性偏微分方程或常微分方程时：
+作变换、相除、再逆变换。
+\end{method}
+
+\begin{omfigure}
+\begin{tikzpicture}[xscale=1.05, yscale=2.2]
+  \draw[->] (-4.3,0) -- (4.3,0) node[right,font=\small] {$x$};
+  \draw[->] (0,0) -- (0,1.25);
+  \draw[omThm, thick, smooth]
+    plot[domain=-4:4, samples=81]
+    (\x, {exp(-\x*\x/0.4)/1.1209});
+  \draw[omProp, thick, smooth]
+    plot[domain=-4:4, samples=81]
+    (\x, {exp(-\x*\x/1.6)/2.2418});
+  \draw[omDef, thick, smooth]
+    plot[domain=-4:4, samples=81]
+    (\x, {exp(-\x*\x/6.4)/4.4836});
+  \node[omThm, font=\small] at (1.35,0.75) {$t = 0.1$};
+  \node[omProp, font=\small] at (2.4,0.36) {$t = 0.4$};
+  \node[omDef, font=\small] at (3.5,0.17) {$t = 1.6$};
+\end{tikzpicture}
+
+{\small \omterm{pb:b3:fouriertransform:1}{热核} $g_t(x) =
+\frac1{2\sqrt{\pi t}}\,\eu^{-x^2/4t}$ 在三个时刻：总
+质量恒为 $1$，高度 $\sim t^{-1/2}$，宽度 $\sim
+\sqrt t$。将初始数据与这一扩散的
+高斯函数作卷积，正是本周末问题的全部内容；转到频域，
+同一图景则写作
+$\hat g_t(\xi) = \eu^{-t\xi^2}$——高频先行衰减，
+这一不对称性即时间之箭。}
+\end{omfigure}
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:b3:fouriertransform:1}
+求下列函数的傅里叶变换：$\mathbf 1_{\intcc{-a}a}$；
+$\eu^{-a\abs x}$（$a > 0$）；帐篷函数 $\max(0, 1 -
+\abs x)$；$\frac1{x^2 + a^2}$ \emph{（对第二个用反演公式
+）}。记录由此得到的表。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b3:fouriertransform:2}
+设 $f \in L^1$。用 $\hat f$ 表示下列函数的
+变换：$f(x - a)$、$f(x)\cos(bx)$、$f(ax + b)$、
+$\overline{f(-x)}$、$(f * f)(x)$。在
+高斯函数上逐条验证。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:fouriertransform:3}
+(a) 证明 $\mathbf 1_{\intcc{-1}1} * \mathbf
+1_{\intcc{-1}1}$ 的变换为 $\bigl(\frac{2\sin\xi}\xi
+\bigr)^2$，并推出
+$\int_\R\bigl(\frac{\sin\xi}\xi\bigr)^2\dd\xi = \pi$，由
+普朗歇尔恒等式——或在 $0$ 处由反演得出。参见
+\cref{pb:b3:lebesgue:1}。
+(b) 计算 $\int_\R\frac{\dd x}{(x^2+1)^2}$，借助
+对 $\eu^{-\abs x}$ 应用的普朗歇尔恒等式。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:fouriertransform:4}
+（\omterm{pb:b3:fouriertransform:1}{热核}代数）设 $g_t(x) =
+\frac1{2\sqrt{\pi t}}\eu^{-x^2/4t}$：
+(a) 验证 $\hat g_t(\xi) = \eu^{-t\xi^2}$；
+(b) 直接推出半群律 $g_t * g_s = g_{t+s}$，
+不借助任何积分计算；
+(c) 证明 $\norm{g_t}_1 = 1$ 且 $\norm{g_t}_2^2 =
+(8\pi t)^{-1/2}$。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:fouriertransform:5}
+证明：若 $f \in L^1$ 为实偶函数，则 $\hat f$ 为
+偶函数；若 $f$ 为实奇函数，则 $\hat f$ 为奇函数且为
+纯虚函数。$\hat f(0)$ 计算的是什么？由此推出：$f \geq
+0$ 蕴含 $\norm{\hat f}_\infty = \hat f(0) = \int f$，
+并就概率密度加以解释（见\cref{ch:b3:clt}：
+特征函数的模 $\leq 1$，且
+在 $0$ 处取等号）。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:fouriertransform:6}
+（非满射性）证明 $\widehat{\phantom f}\colon L^1
+\to \mathcal C_0$ 是单射且连续，但\emph{不是}
+满射，分三步进行。
+(i) 单射性（由\cref{thm:b3:fouriertransform:inversion}）与
+连续性（$\norm{\hat f}_\infty \leq \norm f_1$），以及
+$\mathcal C_0$ 是巴拿赫空间（在
+$\norm\cdot_\infty$ 下闭）。
+(ii) 若该映射满射，则它是双射，
+由开映射定理（\cref{thm:b3:banach:openmapping}）
+可得常数 $C$，使 $\norm f_1 \leq C\norm{\hat
+f}_\infty$ 对所有 $f \in L^1$ 成立。
+(iii) 由此导出矛盾：取 $f_n(x) = \frac{\sin
+x}{x}\cdot\frac{\sin(x/n)}{x/n}$：其变换（在相差常数意义下）为
+卷积 $\mathbf 1_{\intcc{-1}1} *
+\mathbf 1_{\intcc{-1/n}{1/n}}$ 型梯形函数——证明
+一致地有 $\norm{\hat f_n}_\infty \leq \pi$，而
+$\norm{f_n}_1 \geq c\ln n$，可通过数出
+$\frac{\abs{\sin x}}x$ 在 $[1, n]$ 上拱的个数（其中第二个因子
+有正的下界），参见\cref{thm:b3:banach:fourierdiverge}。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:fouriertransform:7}
+（光滑性 $\leftrightarrow$ 衰减的对应）证明：若 $f \in
+L^1$，且 $\hat f(\xi) = O(\abs\xi^{-k-1-\delta})$，
+其中 $\delta > 0$ 为某个常数，则 $f$ 有 $\mathcal C^k$ 代表元。
+反之，若 $f \in \mathcal C^k_c$，则 $\hat f(\xi) =
+O(\abs\xi^{-k})$。试以
+帐篷函数说明两个方向。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:fouriertransform:8}
+（海森堡不等式）设 $f \in \mathcal S(\R)$ 为实函数，
+且 $\norm f_2 = 1$，证明
+\[
+\Bigl(\int x^2f(x)^2\dd x\Bigr)\cdot
+\Bigl(\frac1{2\pi}\int \xi^2\abs{\hat f(\xi)}^2\dd\xi\Bigr)
+\;\geq\; \frac14 ,
+\]
+等号对高斯函数成立。\emph{（先写出 $1 = \int f^2 =
+-\int x\,(f^2)'$ 分部积分，用柯西–施瓦茨不等式放缩，
+并借助普朗歇尔恒等式换算 $\norm{f'}_2$）}。解释：
+一个信号与其频谱不可能同时集中。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:fouriertransform:9}
+详细论证 \cref{ex:b3:fouriertransform:theta}
+（验证高斯函数满足泊松求和公式的各项条件），并利用该恒等式
+计算 $\sum_{n\in\Z}\eu^{-\pi n^2}$ 的值，精确到小数点后六位，
+只取三项。问：达到同样精度时，\emph{定义式}级数
+在 $t = 10^{-2}$ 时需要多少项，与变换后的级数相比
+又需要多少项？
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:fouriertransform:10}
+（带限函数）设 $f \in L^2(\R)$，$\mathcal Ff$
+的支集含于 $\intcc{-\pi}\pi$。证明 $f$ 有一个
+代表元，其每个值都可由
+样本值恢复。证明在整数点上的\emph{香农插值}
+公式：
+\[
+f(x) = \sum_{n\in\Z} f(n)\,
+\frac{\sin\bigl(\pi(x - n)\bigr)}{\pi(x - n)}
+\quad\text{在 } L^2,
+\]
+将 $\mathcal Ff$ 在
+$L^2(\intcc{-\pi}\pi)$ 的傅里叶基下展开（见\cref{thm:b3:hilbert:fourier}），
+再逐项作逆变换。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:fouriertransform:11}
+（作为四阶算子的变换）在 $\mathcal
+S(\R)$ 上，设 $\mathcal F f = \hat f$。
+(a) 利用反演公式，证明 $(\mathcal F^2f)(x) =
+2\pi\,f(-x)$，并推出 $\mathcal F^4 = (2\pi)^2\,
+\mathrm{id}$。
+(b) 由此推出，$\mathcal F$ 在
+$\mathcal S$ 上的每个特征值都属于 $\{\pm\sqrt{2\pi},
+\pm\iu\sqrt{2\pi}\}$，并给出对应于
+$+\sqrt{2\pi}$ 的一个特征函数\emph{（本章中哪个函数与其
+自身的变换成比例？）}。
+(c) 证明偶函数满足 $\mathcal F^2f = 2\pi
+f$，奇函数满足 $\mathcal F^2f = -2\pi f$；取特征值
+$-\iu\sqrt{2\pi}$ 的特征函数，由
+$x\eu^{-x^2/2}$ 出发，通过计算其
+变换（对高斯函数的变换求导）求得。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:fouriertransform:12}
+（自相关与维纳引理）设 $f \in L^2(\R)$，
+定义 $\tilde f(x) = \overline{f(-x)}$，并将
+\emph{自相关}记作 $A_f = f * \tilde f$。
+(a) 证明 $A_f$ 是有界连续函数，且
+$A_f(0) = \norm f_2^2 \geq \abs{A_f(x)}$ 对所有 $x$
+（见\cref{exo:b3:lp:6}，并用柯西–施瓦茨不等式）。
+(b) 先对 $f \in L^1\cap L^2$ 证明
+$\widehat{A_f} = \abs{\hat f\,}^2 \geq 0$：
+自相关的变换非负——自相关的谱
+即为功率谱。
+(c) 由此推出恒等式 $\int_\R\abs{\hat
+f(\xi)}^2\eu^{\iu x\xi}\,\dd\xi = 2\pi A_f(x)$（由反演公式，
+并说明其适用性：设 $\hat f \in L^2$ 且
+$\abs{\hat f}^2 \in L^1$），并对 $f = \mathbf
+1_{\intcc{-1/2}{1/2}}$ 在 $x = 0$ 处求值，恢复
+$\int_\R\bigl(\frac{\sin u}u\bigr)^2\dd u = \pi$。
+\end{exercise}
+
+\section{问题：直线上的热方程}
+
+\begin{problem}[{周末问题——$\partial_tu =
+\partial^2_{xx}u$，从头到尾求解}]
+\label{pb:b3:fouriertransform:1}
+热量会扩散；方程 $\partial_tu = \partial_{xx}^2u$
+说明其密度的扩散速率
+由温度分布的局部曲率决定。下面求解柯西
+问题（定义在 $\R$ 上）——即给定 $f$，求 $u(t, x)$，其中 $t > 0$，使
+$u(0, \cdot) = f$——证明解的若干卓越
+性质，并说明时间为何不可逆转。全文中
+$g_t(x) = \frac1{2\sqrt{\pi t}}\eu^{-x^2/4t}$ 为
+\emph{热核}\index{热核}，且 $u(t, \cdot) = g_t *
+f$。
+
+\medskip
+\noindent\textbf{第一部分——推导\omterm{pb:b3:fouriertransform:1}{热核}。}先作形式计算：
+设 $u(t, \cdot) \in \mathcal S$ 满足
+方程，并记 $\hat u(t, \xi)$ 为关于
+$x$ 的变换。
+\begin{enumerate}
+  \item 形式地证明 $\partial_t\hat u = -\xi^2\hat u$，
+        由此 $\hat u(t,\xi) = \eu^{-t\xi^2}\hat f(\xi)$，并
+        识别出 $u(t) = g_t * f$
+        （见\cref{exo:b3:fouriertransform:4}）。这启发我们给出 $u$ 的
+        \emph{定义}；此后一切都可直接证明：
+        对 $f \in \mathcal C_b(\R)$（有界
+        连续函数）或 $f \in L^p$。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第二部分——验证。}
+\begin{enumerate}[resume]
+  \item 证明：当 $t > 0$ 时，$u(t, x) = \int
+        g_t(x-y)f(y)\dd y$ 对 $f \in \mathcal
+        C_b$ 有良定义，并证明 $u$ 为 $\mathcal C^\infty$ 函数
+        （关于 $(t, x)$），在 $\intoo0\infty\times\R$ 上 \emph{（在积分号下求导；
+        对高斯函数各阶导数作局部控制，
+        且关于 $(t,x)$ 局部一致）}。
+  \item 通过直接计算验证 $\partial_tg_t = \partial^2_{xx}g_t$，
+        并由此推出 $\partial_tu =
+        \partial^2_{xx}u$（$t > 0$）。
+  \item （初始条件）证明：对 $f \in \mathcal
+        C_b$，$u(t, x) \to f(x)$（当 $t \to 0^+$ 时），且在
+        紧集上一致成立 \emph{（逼近恒等：分 $\abs y
+        \leq \delta$ 与 $\abs y > \delta$ 两部分讨论）}；对 $f \in L^p$
+        （$p < \infty$），证明 $\norm{u(t) - f}_p \to 0$。
+  \item （瞬时光滑化）由此可得：即使只是有界
+        连续函数 $f$，解为 $\mathcal C^\infty$ 的，
+        对每个 $t > 0$ 皆然——热量瞬间抹平
+        粗糙性。显式计算 $u(t, \cdot)$，取 $f =
+        \mathbf 1_{\intoo0\infty}$（误差函数），并
+        画出其在 $t$ 的三个取值下的大致图像。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第三部分——结构性质。}
+\begin{enumerate}[resume]
+  \item （正性与比较）若 $f \geq 0$，则 $u > 0$
+        对所有 $t > 0$ 成立（严格成立，除非 $f = 0$ 几乎处处）；若
+        $f_1 \leq f_2$，则 $u_1 \leq u_2$。冷点会
+        瞬间升温：请加以评注。
+  \item （守恒性）对 $f \in L^1$，$\int u(t, x)\dd x =
+        \int f$ 对所有 $t$ 成立 \emph{（用托内利定理）}——总热量
+        保持守恒。
+  \item （耗散性）对 $f \in L^1\cap L^2$，借助
+        普朗歇尔恒等式证明 $t \mapsto \norm{u(t)}_2$ 为
+        不增，且除 $f = 0$ 外严格递减，并计算
+        其在 $t \to \infty$ 时的极限。进一步证明
+        $\norm{u(t)}_\infty \leq \frac{\norm
+        f_1}{2\sqrt{\pi t}} \to 0$：热量扩散并趋于消散。
+  \item （$L^2$ 类中的唯一性）设 $u$ 为解，且
+        $u(t) \in L^2$（对所有 $t$），$u \in \mathcal
+        C^1(\intoo0\infty, L^2)$（自然意义下）且
+        $u(t) \to f$（在 $L^2$ 中，当 $t\to0$ 时），承认
+        变换将其化为 $\partial_t\hat u =
+        -\xi^2\hat u$ 关于 $\xi$ 几乎处处逐点成立，对几乎每个 $t$
+        \emph{（可用 $\mathcal
+        C_c^\infty$ 在 $\xi$ 上作检验论证，请概述之）}，证明
+        $\hat u(t,\xi) = \eu^{-t\xi^2}\hat f(\xi)$，由此
+        即得该类中的唯一性。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第四部分——时间之箭。}
+\begin{enumerate}[resume]
+  \item 证明\emph{逆向}问题是不适定的：
+        要使解在时刻 $-s$（$s > 0$）存在，
+        且数据 $f$ 位于时刻 $0$——亦即 $f = g_s * h$
+        要有解 $h \in L^2$——必要条件是
+        $\eu^{s\xi^2}\hat f(\xi) \in L^2$：这是一个极端的
+        衰减条件，即对 $\hat f$ 的要求。给出一个显式的光滑 $f
+        \in L^2$，使得在任何时间区间上都不存在逆向解：
+        取满足 $\hat f(\xi) =
+        \eu^{-\abs\xi}$ 的函数——确定 $f$
+        （见\cref{exo:b3:fouriertransform:1}），并证明
+        $\eu^{s\xi^2}\eu^{-\abs\xi} \notin L^2$，对每个 $s >
+        0$。
+  \item （光滑化与信息）用一小段文字说明，
+        利用第 5、9 与 10 题，解释为何热半群
+        $(f \mapsto g_t * f)_{t\geq0}$ 为单射，
+        却非 $L^2$ 上的满射，并说明这为何
+        体现了扩散的不可逆性。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第五部分——香农采样定理。}称
+函数 $f \in L^2(\R)$ 为\emph{带限}于 $\Omega$，
+若 $\hat f = 0$ 在 $\intcc{-\Omega}\Omega$ 之外几乎处处成立；记这\omterm{def:b3:representations:character}{类函数}组成的空间为
+$PW_\Omega$（佩利–维纳空间）。
+\begin{enumerate}[resume]
+  \item 证明每个 $f \in PW_\Omega$ 几乎处处与
+        $\mathcal C^\infty$ 函数
+        $\frac1{2\pi}\int_{-\Omega}^{\Omega}\hat
+        f(\xi)\eu^{\iu x\xi}\,\dd\xi$ 相等（需论证光滑性与
+        上述等同关系），且各阶导数均有界：
+        带限性是正则性的一种极端形式。
+        此后 $f$ 即指这一代表元。
+  \item 将 $\hat f \in L^2(\intcc{-\Omega}\Omega)$ 按该区间上的
+        傅里叶基展开，并将系数识别为
+        \emph{采样值}（取自 $f$）：
+        \[
+        \hat f(\xi) = \frac\pi\Omega\sum_{n\in\Z}
+        f\Bigl(\frac{n\pi}\Omega\Bigr)\,
+        \eu^{-\iu n\pi\xi/\Omega}
+        \quad\text{在 } L^2(\intcc{-\Omega}\Omega) .
+        \]
+  \item 由此推出\emph{采样定理}：对 $f \in
+        PW_\Omega$,
+        \[
+        f(x) = \sum_{n\in\Z}f\Bigl(\frac{n\pi}
+        \Omega\Bigr)\,\operatorname{sinc}(\Omega x - n\pi),
+        \qquad \operatorname{sinc}t = \frac{\sin t}t,
+        \]
+        级数在 $L^2(\R)$ 中收敛，并在 $\R$ 上一致收敛
+        \emph{（将第 13 题的级数代入反演公式，
+        并计算初等积分）}：
+        带限信号完全
+        由其在步长为
+        $\pi/\Omega$ 的格点上的取值所确定——即奈奎斯特速率。
+  \item 证明函数 $x \mapsto
+        \operatorname{sinc}(\Omega x - n\pi)$，$n \in \Z$，
+        在 $L^2(\R)$ 中构成正交族，且范数为常数
+        $\sqrt{\pi/\Omega}$，并由此推出能量
+        恒等式 $\norm f_2^2 =
+        \frac\pi\Omega\sum_n\abs{f(n\pi/\Omega)}^2$。
+  \item （混叠）给出一个非零的 $g \in PW_{2\Omega}$，
+        在每个采样点 $\frac{n\pi}\Omega$ 处为零
+        \emph{（考虑 $g(x) =
+        \sin(\Omega x)\operatorname{sinc}(\Omega x)$，并检验其
+        频带）}：低于奈奎斯特速率的采样
+        会丢失信息——两个不同的信号可以拥有
+        完全相同的全部采样值：这正是频闪车轮效应的
+        数学化表述。
+  \item （自由度）利用第 14--15 题，论证如下工程规则：
+        一个带限于
+        $\Omega$ 的信号，其能量基本集中于
+        长为 $T$ 的时间窗口内，则约需
+        $\frac{\Omega T}\pi$ 个实采样值来描述——
+        使“基本”一词精确化：借助能量恒等式与
+        尾和 $\sum_{\abs{n\pi/\Omega} >
+        T/2}$。
+  \item （一致性检验）手工验证采样定理在
+        $PW_\Omega$ 中的两个元素上成立：(a) $f =
+        \operatorname{sinc}(\Omega\,\cdot)$，其采样值
+        为 $\delta_{n0}$；(b) $f(x) = \cos(\omega x)
+        \operatorname{sinc}(\varepsilon x)$ 型窄带
+        信号——更确切地说，证明对 $f \in
+        PW_{\Omega'}$，其中 $\Omega' < \Omega$，则
+        以 $\Omega$ 为速率的级数也能重建 $f$
+        （过采样无害），通过嵌入 $PW_
+        {\Omega'} \subseteq PW_\Omega$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第六部分——不确定性，再来两次。}
+海森堡不等式（见\cref{exo:b3:fouriertransform:8}）
+刻画 $f$ 与 $\hat f$ 能\emph{如何}同时集中，
+这里给出它的非此即彼的“姊妹”结论，以及它的
+精确饱和情形。
+\begin{enumerate}[resume]
+  \item 设 $f \in L^1$，且 $\operatorname{supp}f \subseteq
+        \intcc{-A}A$。证明 $\hat f$ 是一个
+        处处收敛的幂级数之和：
+        \[
+        \hat f(\xi) = \sum_{k\geq0}\frac{(-\iu\xi)^k}{k!}
+        \,m_k, \qquad m_k = \int_{-A}^{A}x^kf(x)\,\dd x,
+        \quad \abs{m_k} \leq A^k\norm f_1
+        \]
+        \emph{（展开 $\eu^{-\iu\xi x}$，并论证
+        求和与积分的交换可由正规收敛得出）}：变换是
+        \emph{实解析的}，在每一点处收敛半径为
+        无穷。
+  \item 推出支集的二分性：实解析函数
+        若在某非空开区间上为零，则
+        恒等于零 \emph{（所有导数都为零的
+        点集既开又闭——请完成
+        泰勒论证）}；由此推得：不存在非零的 $f$，
+        使 $f$ 与 $\hat f$ 都紧支，并且
+        $PW_\Omega$ 中不含非零紧支函数
+——带限信号永远持续，
+        时限信号会泄漏到所有
+        频率。
+  \item （海森堡不等式的饱和）在高斯族 $f
+        = \eu^{-ax^2}$，计算两个集中度，
+        并验证归一化乘积
+        $\bigl(\int x^2\abs f^2\bigr)\bigl(\frac1{2\pi}\int
+        \xi^2\abs{\hat f}^2\bigr)\big/\norm f_2^4$ 等于
+        $\frac14$ 对\emph{每个} $a$ 都成立——
+        即\cref{exo:b3:fouriertransform:8}中取等族的具体体现；
+        用尺度论证说明该乘积为何
+        在该族上必为常数。
+  \item 解释其物理含义（量子态的位置与动量
+        密度；$\hbar$ 在归一化中
+        给出 $\sigma_x\sigma_p \geq
+        \frac\hbar2$），并在全章中贯通：
+        瞬时光滑化（第二部分）、不可逆性（
+        第四部分）、采样（第五部分）、海森堡不等式与支集二分性
+        是同一定律的五种表述——
+        $\hat f$ 在无穷远处的性态规定了 $f$
+        在任何地方可以怎样。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第七部分——\omterm{pb:b3:fouriertransform:1}{热核}的代数，以及一个
+可求解的例子。}
+\begin{enumerate}[resume]
+  \item （半群）证明\emph{查普曼–柯尔莫哥洛夫
+        恒等式} $g_t * g_s = g_{t+s}$ 对 $t, s > 0$ 成立（借助
+        卷积定理与变换在
+        $L^1$ 上的单射性），并推出 $u(t + s) = g_s *
+        u(t)$：演化时间 $t + s$ 等价于先演化 $t$，
+        再演化 $s$。加强第 8 题中的耗散性质：
+        记 $\norm{u(t)}_2^2 = \frac1{2\pi}\int
+        \eu^{-2t\xi^2}\abs{\hat f(\xi)}^2\dd\xi$，借助
+        柯西–施瓦茨不等式证明
+        \[
+        t \longmapsto \ln\,\norm{u(t)}_2
+        \quad\text{为凸函数，定义域} \intoo0{+\infty} :
+        \]
+        $L^2$ 能量不只是递减，而是
+        以对数凸的方式递减。
+  \item （热量去往何处）设 $f \geq 0$，$f \in L^1$，
+        且 $\int x^2f(x)\dd x < \infty$。证明对所有
+        $t > 0$
+        \[
+        \int_\R x\,u(t, x)\,\dd x = \int_\R x f(x)\,\dd x,
+        \qquad
+        \int_\R x^2u(t, x)\,\dd x
+        = \int_\R x^2f(x)\,\dd x + 2t\int_\R f :
+        \]
+        热量的重心从不移动，而方差
+        随时间\emph{线性}增长——扩散
+        标度 $x \sim \sqrt{2t}$，待
+        布朗运动在\cref{ch:b3:probability}中出现时再加以回顾。
+        \emph{（计算 $g_t$ 的前两阶矩，并对卷积
+        应用托内利定理。）}
+  \item （高斯函数的完整求解）设 $f(x) =
+        \eu^{-x^2}$，建立如下闭形式
+        \[
+        u(t, x) = \frac1{\sqrt{1 + 4t}}\,
+        \exp\Bigl(-\frac{x^2}{1 + 4t}\Bigr),
+        \]
+        并在其上手工验证：方程 $\partial_tu
+        = \partial^2_{xx}u$；守恒 $\int u(t) =
+        \sqrt\pi$；耗散律 $\norm{u(t)}_2 =
+        (\pi/2)^{1/4}(1 + 4t)^{-1/4}$（比较其 $t^{-1/4}$
+        衰减与 $t^{-1/2}$ 的上确界范数衰减，
+        参见第 8 题）；以及第 24 题中方差的精确增长。
+        当 $t = 6$ 时：峰值降至其初始高度的 $\frac15$，
+        而曲线宽度是原来的五倍
+——热量未变，只是分布得更开。
+\end{enumerate}
+\end{problem}

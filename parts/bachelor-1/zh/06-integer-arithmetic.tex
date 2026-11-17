@@ -1,0 +1,800 @@
+\chapter{整数算术}\label{ch:b1:arith}
+
+算术——即对 $\Z$ 中\omterm{def:b1:arith:divides}{整除性}的研究——已在
+高中分册中开始。本章完整地从
+欧几里得除法出发，并给出全部证明：\omterm{thm:b1:arith:gcd}{最大公因数}与
+\omterm{met:b1:arith:euclid}{欧几里得算法}、贝祖恒等式与高斯引理、质因数
+分解，以及直至费马小定理为止的\omterm{def:b1:arith:congruence}{同余}演算。
+除其自身的趣味外，这部分内容正是
+\cref{ch:b1:poly} 在多项式上所仿效的范例。
+
+\section{整除性与欧几里得除法}
+
+\begin{definition}[整除性]\label{def:b1:arith:divides}
+设 $a, b \in \Z$，$b$ \emph{整除} $a$（记作 $b \mid
+a$）\index{整除性}，当 $a = bq$ 对某 $q \in \Z$ 成立时。基本
+性质：若 $b \mid a$ 且 $b \mid a'$，则 $b \mid (ua + va')$；
+对所有 $u, v \in \Z$ 成立；若 $b \mid a$ 且 $a \neq 0$，则 $\abs b \leq
+\abs a$；又 $a \mid b$ 与 $b \mid a$ 共同蕴含 $b = \pm a$。
+\end{definition}
+
+\begin{theorem}[欧几里得除法]\label{thm:b1:arith:division}
+对所有 $a \in \Z$ 及 $b \in \N^*$，存在唯一的数对 $(q, r)
+\in \Z \times \N$，使得
+\[
+a = bq + r, \qquad 0 \leq r < b .
+\]
+\end{theorem}
+
+\begin{proof}
+\emph{存在性。}\omterm{def:b1:logic:sets}{集合} $A = \{a - bk : k \in \Z\} \cap \N$ 是
+$\N$ 的一个非空子集（取 $k = -\abs a$：$a + b\abs a \geq a +
+\abs a \geq 0$）。设 $r = a - bq$ 为其最小元。若 $r \geq b$，
+则 $r - b = a - b(q+1)$ 将是 $A$ 中更小的元素：
+矛盾。故 $0 \leq r < b$。
+
+\emph{唯一性。}若 $bq + r = bq' + r'$，且 $0 \leq r, r' < b$，
+则 $b(q - q') = r' - r$，且 $\abs{r' - r} < b$：
+左端为 $b$ 的倍数，故只能为 $0$，于是 $q = q'$，$r = r'$。
+\end{proof}
+
+\begin{example}[用反复除法进行位值记数]\label{ex:b1:arith:base7}
+将 $2026$ 写成 $7$ 进制数。反复除以 $7$，保留
+每次所得的余数：
+\[
+2026 = 7 \times 289 + 3, \quad
+289 = 7 \times 41 + 2, \quad
+41 = 7 \times 5 + 6, \quad
+5 = 7 \times 0 + 5 .
+\]
+由后往前读出余数：$2026 =
+(5\,6\,2\,3)_7$。验算：$5 \times 343 + 6 \times 49 + 2 \times 7
++ 3 = 1715 + 294 + 14 + 3 = 2026$。欧几里得除法的唯一性恰好
+保证了每一位数字\emph{唯一确定}：每一步中，余数是
+$\intint06$ 中唯一与
+当前值模 $7$ \omterm{def:b1:arith:congruence}{同余}的整数，因此 $7$ 进制表示是唯一的——
+这一事实在周末问题中每当处理
+“$n$ 在 $p$ 进制下的各位数字”时都被默默使用。
+\end{example}
+
+\section{最大公因数}
+
+\begin{theorem}[$\Z$ 的子群；最大公因数的存在性]\label{thm:b1:arith:gcd}
+\begin{enumerate}
+  \item $(\Z, +)$ 的每个子群都具有 $n\Z = \{nk : k
+        \in \Z\}$ 的形式，其中 $n \in \N$ 唯一。
+  \item 设 $a, b \in \Z$ 不全为零，则\omterm{def:b1:logic:sets}{集合} $a\Z + b\Z = \{au +
+        bv : u, v \in \Z\}$ 是 $\Z$ 的子群，因此等于
+        $d\,\Z$，其中 $d \in \N^*$ 唯一。这个 $d$ 即
+        \emph{最大公因数}\index{最大公因数}
+        $\gcd(a, b)$：它\omterm{def:b1:arith:divides}{整除} $a$ 与 $b$，并且
+        $a$ 与 $b$ 的每个公因数都\omterm{def:b1:arith:divides}{整除} $d$。
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) 设 $H \subseteq \Z$ 为子群（非空，且对减法封闭；
+形式化定义见\cref{ch:b1:structures}，
+这里只用到这两条性质）。若 $H = \{0\}$，取 $n = 0$。
+否则 $H$ 含有非零元及其相反数，因而有一个
+最小正元素 $n$。于是 $n\Z \subseteq H$。对 $x
+\in H$，记 $x = nq + r$，其中 $0 \leq r < n$
+（由\cref{thm:b1:arith:division}）；$r = x - nq \in H$，而由
+$n$ 的极小性迫使 $r = 0$，故 $x \in n\Z$。唯一性：$n$ 是
+$n\Z$ 中最小的正元素。
+
+(2) $a\Z + b\Z$ 含有 $0$，且对减法封闭，故它是
+$d\Z$，其中 $d \geq 1$（它含有非零的 $a$ 或 $b$）。由于 $a, b
+\in d\Z$，故 $d$ 同时\omterm{def:b1:arith:divides}{整除}二者。若 $c$ \omterm{def:b1:arith:divides}{整除} $a$ 与 $b$，则 $c$
+\omterm{def:b1:arith:divides}{整除}每个 $au + bv$——特别地 $c \mid d$，因为 $d \in a\Z
++ b\Z$。这正是所宣称的性质（并且它蕴含 $\abs c \leq
+d$，故 $d$ 配得上\emph{最大}公因数之名）。
+\end{proof}
+
+\begin{corollary}[贝祖恒等式]\label{cor:b1:arith:bezout}
+设 $a, b$ 不全为零，则存在 $u, v \in \Z$ 使
+\[
+au + bv = \gcd(a, b) .
+\]
+特别地（$\gcd(a,b) = 1$，即\emph{互质}\index{互质}
+情形）：$a$ 与 $b$ \omterm{cor:b1:arith:bezout}{互质}，当且仅当 $au + bv = 1$ 有
+解。
+\end{corollary}
+
+\begin{proof}
+$\gcd(a,b) = d \in d\Z = a\Z + b\Z$。关于等价性，若
+$\gcd(a,b) = 1$，由贝祖恒等式即有解；反之，若 $au + bv =
+1$，则 $a, b$ 的每个公因数都\omterm{def:b1:arith:divides}{整除} $1$。
+\end{proof}
+
+\begin{method}[扩展的欧几里得算法]\label{met:b1:arith:euclid}
+计算 $\gcd(a, b)$（$a > b > 0$）：作除法 $a = bq + r$；则
+$\gcd(a, b) = \gcd(b, r)$（$(a,b)$ 与 $(b,r)$ 的公因数相同，
+因为 $r = a - bq$）；重复此过程直至余数为 $0$；最后一个非零余数
+即为\omterm{thm:b1:arith:gcd}{最大公因数}\index{欧几里得算法}。将这些除法倒推
+（或在逐步计算时同时维护系数）即可得到一组贝祖
+系数 $(u, v)$。
+\end{method}
+
+\begin{example}\label{ex:b1:arith:euclid}
+$\gcd(120, 23)$：$120 = 5 \times 23 + 5$；$23 = 4 \times 5 + 3$；$5 =
+1\times 3 + 2$；$3 = 1 \times 2 + 1$；$2 = 2 \times 1 + 0$。于是
+$\gcd = 1$。倒推：
+\begin{align*}
+1 &= 3 - 2 = 3 - (5 - 3) = 2\times 3 - 5 = 2(23 - 4\times 5) - 5 \\
+&= 2 \times 23 - 9 \times 5 = 2\times 23 - 9(120 - 5\times 23)
+= 47 \times 23 - 9 \times 120 .
+\end{align*}
+验算：$47 \times 23 = 1081$，$9 \times 120 = 1080$。
+\end{example}
+
+\begin{theorem}[高斯引理及其推论]\label{thm:b1:arith:gauss}
+设 $a, b, c \in \Z$。
+\begin{enumerate}
+  \item （高斯引理\index{高斯引理}）若 $a \mid bc$ 且
+        $\gcd(a, b) = 1$，则 $a \mid c$。
+  \item 若 $a \mid c$，$b \mid c$ 且 $\gcd(a,b) = 1$，则 $ab \mid
+        c$。
+  \item 若 $\gcd(a, b) = \gcd(a, c) = 1$，则 $\gcd(a, bc) = 1$。
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) 由贝祖等式 $au + bv = 1$，两边乘 $c$，得 $acu + bcv = c$。两项
+都能被 $a$ \omterm{def:b1:arith:divides}{整除}（第二项因 $a \mid bc$），故 $a
+\mid c$。
+
+(2) 设 $c = aq$；由 $b \mid aq$ 及 $\gcd(a, b) = 1$，利用 (1)
+得 $b \mid q$，故 $ab \mid aq = c$。
+
+(3) 已知 $au + bv = 1$ 与 $au' + cv' = 1$，将两式
+相乘：
+\[
+1 = (au + bv)(au' + cv')
+= a\,\bigl(auu' + ucv' + u'bv\bigr) + bc\,(vv') ,
+\]
+这是 $a$ 与 $bc$ 之间的贝祖等式，由
+\cref{cor:b1:arith:bezout}可知 $\gcd(a, bc) = 1$。
+\end{proof}
+
+\begin{example}[求解线性丢番图方程]\label{ex:b1:arith:diophantine}
+求出所有 $(x, y) \in \Z^2$，使 $6x + 10y = 4$。首先考察
+\emph{存在性检验}：$\gcd(6, 10) = 2$ \omterm{def:b1:arith:divides}{整除} $4$，故方程
+有解（若\omterm{thm:b1:arith:gcd}{最大公因数}不\omterm{def:b1:arith:divides}{整除}右端，则左端
+恒为它的倍数，从而无解）。两边同时约去公因数，
+得 $3x + 5y = 2$。显见一个特解为 $(x_0,
+y_0) = (-1, 1)$。求一般解，作差：$3(x + 1) = -5(y -
+1)$，故 $3 \mid 5(y-1)$，且由高斯引理（$\gcd(3,5) = 1$）得
+$3 \mid y - 1$，即 $y = 1 - 3k$，于是 $x = -1 + 5k$。反之，
+这样的数对均满足：
+\[
+(x, y) = (-1 + 5k,\ 1 - 3k), \qquad k \in \Z .
+\]
+这一规律具有一般性：一个特解加上
+$\bigl(\frac b{\gcd}, -\frac a{\gcd}\bigr)$ 的整数倍——
+这与“特解加齐次解”的结构相同，见
+\cref{ch:b1:diffeq}，其中由高斯引理
+承担唯一性的作用。
+\end{example}
+
+\begin{definition}[最小公倍数]\label{def:b1:arith:lcm}
+$\operatorname{lcm}(a, b)$\index{最小公倍数}是
+$\N$ 中子群 $a\Z \cap b\Z$ 的生成元：它是
+$a$ 与 $b$ 的公倍数，且\omterm{def:b1:arith:divides}{整除}每个公倍数；对
+$a, b \in \N^*$，则
+\[
+\gcd(a,b) \times \operatorname{lcm}(a,b) = ab
+\qquad (\text{证明见 } \cref{exo:b1:arith:5}).
+\]
+\end{definition}
+
+\begin{example}[对齐问题即最小公倍数问题]\label{ex:b1:arith:gears}
+两个相互啮合的齿轮分别有 $84$ 和 $36$ 个齿。两者经过
+多少个齿的共同运动后，才会同时回到初始位置？
+当已转过的齿数是
+$84$ 与 $36$ 的公倍数时状态重复；首次为
+\[
+\operatorname{lcm}(84, 36) = \frac{84 \times 36}{\gcd(84, 36)}
+= \frac{3024}{12} = 252
+\]
+个齿——即大齿轮转 $3$ 圈，而
+小齿轮转 $7$ 圈（$252/84$ 与 $252/36$）。注意实用的做法：
+\emph{先计算\omterm{thm:b1:arith:gcd}{最大公因数}}（\omterm{met:b1:arith:euclid}{欧几里得算法}：$84 = 2\times36 + 12$，$36
+= 3\times12$），再相除——切勿
+通过列举倍数来求\omterm{def:b1:arith:lcm}{最小公倍数}。凡周期性重合问题（齿轮、行星排列
+、循环小数相遇）均可归结为这一
+计算。
+\end{example}
+
+\section{质数}
+
+\begin{definition}\label{def:b1:arith:prime}
+称整数 $p \geq 2$ 为\emph{质数}\index{质数}，当其
+唯一的正因数是 $1$ 与 $p$。设 $p$ 为质数且 $a \in \Z$，
+则 $p \mid a$ 或 $\gcd(p, a) = 1$，二者必居其一。
+由\cref{thm:b1:arith:gauss}可知，\emph{欧几里得引理}成立：若 $p \mid
+ab$，则 $p \mid a$ 或 $p \mid b$。
+\end{definition}
+
+\begin{remark}[用试除法判断质数]\label{rem:b1:arith:trialdivision}
+若 $n = ab$，其中 $2 \leq a \leq b$，则 $a^2 \leq ab = n$，故 $a
+\leq \sqrt n$：合数 $n$ 总有一个质因数 $\leq
+\sqrt n$。因此，要判断 $n$ 是否为\omterm{def:b1:arith:prime}{质数}，只需对
+不超过 $\sqrt n$ 的\omterm{def:b1:arith:prime}{质数}做试除。当 $n = 271$ 时，$\sqrt{271} < 17$，且
+$271$ 不能被 $2, 3, 5, 7, 11, 13$ 中任何一个\omterm{def:b1:arith:divides}{整除}（它是奇数，数字和
+为 $10$，末位不是 $0$ 或 $5$，$271 = 7\cdot38 + 5 =
+11\cdot24 + 7 = 13\cdot20 + 11$），是\omterm{def:b1:arith:prime}{质数}，仅需六次试除
+而非两百次。$\sqrt n$ 这一界限是一道真正的
+门槛：要对上百位的大数高效跨越它，
+须借助
+由\cref{thm:b1:arith:fermat}发展而来的现代\omterm{def:b1:arith:prime}{质数}判定法。
+\end{remark}
+
+\begin{theorem}[欧几里得]\label{thm:b1:arith:euclidprimes}
+\omterm{def:b1:arith:prime}{质数}有无穷多个。
+\end{theorem}
+
+\begin{proof}
+每个整数 $n \geq 2$ 都有一个质因数：它的最小
+因数 $\geq 2$ 是\omterm{def:b1:arith:prime}{质数}（若它可真分解，则会给出
+$n$ 的一个更小因数）。假设 $p_1, \dots, p_k$ 是全部的
+\omterm{def:b1:arith:prime}{质数}，并令 $N = p_1 p_2 \cdots p_k + 1 \geq 2$。某个\omterm{def:b1:arith:prime}{质数} $p_i$
+\omterm{def:b1:arith:divides}{整除} $N$；但 $p_i$ 也\omterm{def:b1:arith:divides}{整除} $N - 1 = p_1\cdots p_k$，于是 $p_i
+\mid 1$——矛盾。
+\end{proof}
+
+\begin{theorem}[算术基本定理]\label{thm:b1:arith:fta}
+每个整数 $n \geq 2$ 都可以写成\omterm{def:b1:arith:prime}{质数}之积，且这种分解
+\[
+n = p_1^{\alpha_1} p_2^{\alpha_2} \cdots p_k^{\alpha_k}
+\qquad (p_1 < p_2 < \dots < p_k \text{ 为质数},\ \alpha_i \in \N^*)
+\]
+唯一。\index{质因数分解}
+\end{theorem}
+
+\begin{proof}
+\emph{存在性}。由强归纳法（见\cref{thm:b1:logic:induction}）：
+$n = 2$ 是\omterm{def:b1:arith:prime}{质数}；对 $n > 2$，或者 $n$ 是\omterm{def:b1:arith:prime}{质数}，或者 $n = ab$，其中
+$2 \leq a, b < n$，由归纳假设，$a$ 与 $b$ 都可以分解为\omterm{def:b1:arith:prime}{质数}之积。
+
+\emph{唯一性}。设 $p_1 \cdots p_r = q_1 \cdots q_s$
+（\omterm{def:b1:arith:prime}{质数}可重复列出，不妨设 $r \leq s$），对
+$r$ 作归纳。若 $r = 0$，则左边为 $1$，于是 $s = 0$（非空的
+\omterm{def:b1:arith:prime}{质数}之积大于 $1$）。当 $r \geq 1$ 时，\omterm{def:b1:arith:prime}{质数} $p_1$
+\omterm{def:b1:arith:divides}{整除} $q_1(q_2\cdots q_s)$，由欧几里得引理，要么 $p_1
+\mid q_1$，要么 $p_1 \mid q_2\cdots q_s$；反复应用，$p_1$ \omterm{def:b1:arith:divides}{整除}
+某个 $q_j$。但 $q_j$ 为\omterm{def:b1:arith:prime}{质数}且 $p_1 \geq 2$，必然 $p_1
+= q_j$。消去这个公因子（合理，因为 $\Z$ 是一个
+整环）得到
+\[
+p_2 \cdots p_r = q_1 \cdots \widehat{q_j} \cdots q_s
+\]
+（帽记号表示省略），这是两个更短乘积的等式；由
+归纳假设，两组 $p_2, \dots, p_r$ 与
+$q_1, \dots, \widehat{q_j}, \dots, q_s$ 在不计次序时相同，
+从而原来的两组也相同。指数形式把相同
+的\omterm{def:b1:arith:prime}{质数}合并起来。
+\end{proof}
+
+\begin{proposition}[赋值]\label{prop:b1:arith:valuation}
+设 $p$ 为\omterm{def:b1:arith:prime}{质数}，$n \in \N^*$，记 $v_p(n)$\index{$p$-进
+赋值}为 $p$ 在 $n$ 的分解式中的指数
+（约定 $v_p(n) = 0$，若 $p \nmid n$）。于是有
+\[
+v_p(mn) = v_p(m) + v_p(n),
+\qquad
+m \mid n \iff \forall p,\ v_p(m) \leq v_p(n),
+\]
+\[
+v_p\bigl(\gcd(m,n)\bigr) = \min\bigl(v_p(m), v_p(n)\bigr),
+\qquad
+v_p\bigl(\operatorname{lcm}(m,n)\bigr) = \max\bigl(v_p(m),
+v_p(n)\bigr).
+\]
+\end{proposition}
+
+\begin{proof}
+第一式成立，因为分解式可以相乘，且
+$mn$ 的分解式唯一。若 $m \mid n$，记 $n = mq$，
+并应用前一式。反之，若所有 $v_p(m) \leq v_p(n)$，则整数 $q =
+\prod_p p^{\,v_p(n) - v_p(m)}$ 满足 $mq = n$。\omterm{thm:b1:arith:gcd}{最大公因数}的公式：
+由判别准则，整数 $d = \prod p^{\min}$ 同时\omterm{def:b1:arith:divides}{整除}二者；
+任一公因数 $c$ 都有 $v_p(c) \leq \min$（对一切 $p$ 成立），故 $c
+\mid d$。对\omterm{def:b1:arith:lcm}{最小公倍数}，用 $\max$ 作同样的推理。
+\end{proof}
+
+\begin{example}[用赋值看平方数与立方数]\label{ex:b1:arith:squarecube}
+整数 $n \geq 1$ 为完全平方数，当且仅当每个
+$v_p(n)$ 为偶数（若 $n = m^2$，则 $v_p(n) = 2v_p(m)$；
+反之，把每个指数减半）。立方数同理，只需
+每个指数都是 $3$ 的倍数。于是 $21168 = 2^4 \times 3^3 \times 7^2$ 不是
+平方数（$v_3 = 3$ 为奇数），也不是立方数（$v_2 = 4$）。求最小正整数 $m$，使
+$21168\,m$ \emph{是}立方数，办法是把每个指数补足到
+下一个
+$3$ 的倍数：
+\[
+m = 2^{6-4} \times 3^{3-3} \times 7^{3-2} = 2^2 \times 7 = 28,
+\qquad
+21168 \times 28 = 2^6\,3^3\,7^3 = (2^2 \times 3 \times 7)^3
+= 84^3 .
+\]
+要点在于：乘法性质（平方数、立方数、因数、
+\omterm{thm:b1:arith:gcd}{最大公因数}、\omterm{def:b1:arith:lcm}{最小公倍数}）化为\emph{逐坐标}的问题，
+作用于指数向量 $(v_2, v_3, v_5, \dots)$——唯一分解
+断言的正是这些坐标存在且良定义。
+\end{example}
+
+\section{同余}
+
+\begin{definition}\label{def:b1:arith:congruence}
+对 $n \in \N^*$：$a \equiv b \pmod n$\index{同余}，当 $n \mid
+a - b$。这是一个与加法及
+乘法相容的\omterm{def:b1:logic:equiv}{等价关系}：若 $a \equiv b$ 且 $a' \equiv b'$（模 $n$），则
+$a + a' \equiv b + b'$，$aa' \equiv bb'$，且 $a^k \equiv b^k$
+对 $k \in \N$ 成立。
+\end{definition}
+
+\begin{example}[弃九法]\label{ex:b1:arith:castingnines}
+\omterm{def:b1:arith:congruence}{同余}与 $+$、$\times$ 相容，这是一种与商业一样
+古老的验算方法。由于 $10 \equiv 1 \pmod 9$，每个整数
+模 $9$ 都与其各位数字之和\omterm{def:b1:arith:congruence}{同余}（证明见
+\cref{exo:b1:arith:2}）。为检验 $1234 \times 567 =
+699\,678$：各位数字之和给出 $1234 \equiv 1$，$567 \equiv 18
+\equiv 0 \pmod 9$，因此乘积必须 $\equiv 1 \times 0 =
+0$；事实上 $6 + 9 + 9 + 6 + 7 + 8 = 45 \equiv 0$。检验
+通过（且乘积确实正确）。若有人报告
+$699\,478$，则其各位数字之和 $43 \equiv 7 \not\equiv 0$ 会
+立即揭穿其错误。该检验是单向的——它能查出错误，
+除非错误本身是 $9$ 的倍数——这恰是
+伪素数教训的微缩版（见
+\cref{ex:b1:arith:pseudoprime}）：\omterm{def:b1:arith:congruence}{同余}检验只能
+否定，不能证实。
+\end{example}
+
+\begin{proposition}[模 $n$ 的可逆性]\label{prop:b1:arith:invmod}
+$a$ 称为\emph{模 $n$ 可逆}（即 $ab \equiv 1 \pmod n$
+有解 $b$），当且仅当 $\gcd(a, n) = 1$。此时逆元在
+模 $n$ 下唯一，并由扩展\omterm{met:b1:arith:euclid}{欧几里得算法}算出。
+\end{proposition}
+
+\begin{proof}
+$ab \equiv 1 \pmod n$ 即 $ab + nk = 1$（$k$ 为某个整数），这是一个贝祖
+等式，它存在当且仅当 $\gcd(a,n) = 1$
+（由\cref{cor:b1:arith:bezout}）。唯一性：若 $ab \equiv ab' \equiv 1$，
+则 $b \equiv b(ab') = (ab)b' \equiv b' \pmod n$。
+\end{proof}
+
+\begin{example}[求 $7$ 模 $26$ 的逆元]\label{ex:b1:arith:inv7mod26}
+由 $\gcd(7, 26) = 1$ 可知，$7$ 所在的剩余类模 $26$ 可逆。
+用扩展\omterm{met:b1:arith:euclid}{欧几里得算法}：
+\[
+26 = 3 \times 7 + 5, \qquad
+7 = 1 \times 5 + 2, \qquad
+5 = 2 \times 2 + 1 ,
+\]
+然后逆推：
+\[
+1 = 5 - 2 \times 2 = 5 - 2(7 - 5) = 3 \times 5 - 2 \times 7
+= 3(26 - 3 \times 7) - 2 \times 7 = 3 \times 26 - 11 \times 7 .
+\]
+于是 $7 \times (-11) \equiv 1 \pmod{26}$，即 $7^{-1} \equiv
+-11 \equiv 15 \pmod{26}$；验算：$7 \times 15 = 105 = 4 \times 26
++ 1$。有了逆元，任一\omterm{def:b1:arith:congruence}{同余}式 $7x \equiv c
+\pmod{26}$ 只需一次乘法即可解出：$x \equiv 15c$。
+这种机械求逆是模运算的主力——
+也是公钥协议的核心，这些协议在
+\cref{rem:b1:arith:whereused}中提及，其模数有数百位，
+但所用算法与此完全相同。
+\end{example}
+
+\begin{example}[系数不可逆的情形]\label{ex:b1:arith:noninvertible}
+解\omterm{def:b1:arith:congruence}{同余}式 $12x \equiv 8 \pmod{20}$。这里 $\gcd(12, 20) = 4$，故 $12$
+模 $20$ 不可逆——但该\omterm{def:b1:arith:congruence}{同余}式
+仍可处理。\omterm{def:b1:arith:congruence}{同余}式表示 $20 \mid 12x - 8$；将
+整个关系式除以 $4$（它是三者的公因数），则
+它等价于 $5 \mid 3x - 2$，即
+\[
+3x \equiv 2 \pmod 5 .
+\]
+此时 $\gcd(3, 5) = 1$，且 $3^{-1} \equiv 2 \pmod 5$（$3 \times 2 =
+6 \equiv 1$），故 $x \equiv 4 \pmod 5$，于是解为 $x
+\equiv 4, 9, 14, 19 \pmod{20}$——共\emph{四个}剩余类（模 $20$），
+与\omterm{thm:b1:arith:gcd}{最大公因数}一致。（若右端不被 $4$ \omterm{def:b1:arith:divides}{整除}，
+例如 $12x \equiv 6 \pmod{20}$，则根本无解：
+左端总是 $\equiv 0 \pmod 4$。）一般形式为 $ax
+\equiv b \pmod n$ 有解当且仅当 $\gcd(a, n) \mid b$，此时
+恰有 $\gcd(a, n)$ 个解的剩余类——将所有项
+除以\omterm{thm:b1:arith:gcd}{最大公因数}后求逆。
+\end{example}
+
+\begin{theorem}[费马小定理]\label{thm:b1:arith:fermat}
+设 $p$ 为\omterm{def:b1:arith:prime}{质数}。对每个 $a \in \Z$：
+\[
+a^p \equiv a \pmod p,
+\]
+若 $p \nmid a$，则 $a^{p-1} \equiv 1 \pmod
+p$。\index{费马小定理}
+\end{theorem}
+
+\begin{proof}
+首先，对 $1 \leq k \leq p - 1$，\omterm{def:b1:counting:objects}{二项式系数} $\binom pk
+= \frac{p!}{k!(p-k)!}$ 可被 $p$ \omterm{def:b1:arith:divides}{整除}：事实上 $k!\,(p-k)!\,
+\binom pk = p!$，$p$ \omterm{def:b1:arith:divides}{整除} $p!$，但与 $k!(p-k)!$ \omterm{cor:b1:arith:bezout}{互质}
+（所有因子都 $< p$），由高斯引理得 $p \mid \binom pk$。
+
+现对 $a^p \equiv a$ 用归纳法证明，其中 $a \in \N$。当 $a =
+0$ 时显然成立。若 $a^p \equiv a$，则由二项式定理
+\[
+(a+1)^p = \sum_{k=0}^{p} \binom pk a^k
+\equiv a^p + 1 \equiv a + 1 \pmod p,
+\]
+中间各项模 $p$ 均为零。对 $a < 0$，将结论应用于
+$-a$，并将 $p = 2$（此时 $x \equiv -x$）与奇数 $p$（此时
+$(-a)^p = -a^p$）。最后，若 $p \nmid a$，将 $a^p \equiv a$ 乘以
+$a$ 模 $p$ 的逆元（见\cref{prop:b1:arith:invmod}）。
+\end{proof}
+
+\begin{example}[费马小定理的逆不成立：$341$]\label{ex:b1:arith:pseudoprime}
+费马小定理给出一个简便的\emph{合数性}检验：
+$a^{n-1} \not\equiv 1 \pmod n$，其中 $a$ 与 $n$ \omterm{cor:b1:arith:bezout}{互质}，
+则 $n$ 不是\omterm{def:b1:arith:prime}{质数}。这个检验能否也证明素性？答案是否定的：
+取 $n = 341 = 11 \times 31$，它是合数，并取 $a = 2$。由于
+$2^{10} = 1024 = 3 \times 341 + 1$，
+\[
+2^{10} \equiv 1 \pmod{341}
+\qquad\Longrightarrow\qquad
+2^{340} = \bigl(2^{10}\bigr)^{34} \equiv 1 \pmod{341} :
+\]
+合数 $341$ 通过了以 $2$ 为基的费马检验（它是
+最小的\emph{伪素数}）。以 $3$ 为基则可将其识破
+（$3^{340} \not\equiv 1$），因此实用素性检验
+通常对若干个基运行该检验，并辅以各种改进——
+这一思想的工业级版本，正是用来认证
+在\cref{rem:b1:arith:whereused}中提到的大\omterm{def:b1:arith:prime}{质数}。要点是：一个蕴涵式与它的逆
+命题互不相干
+（见\cref{rem:b1:logic:pitfalls}），即使对定理也是如此。
+\end{example}
+
+\begin{example}[同余计算的实例]\label{ex:b1:arith:congruences}
+$7^{2026}$ 模 $11$ 的余数是多少？由费马小定理，$7^{10}
+\equiv 1 \pmod{11}$。由于 $2026 = 10 \times 202 + 6$：
+\[
+7^{2026} \equiv 7^6 = (7^2)^3 = 49^3 \equiv 5^3 = 125 \equiv 4
+\pmod{11}.
+\]
+余数为 $4$。策略是：先将指数对由费马定理给出的
+阶取模，然后在每一步
+都对中间的幂取余。
+\end{example}
+
+\begin{remark}[算术中的常见陷阱]\label{rem:b1:arith:pitfalls}
+\begin{enumerate}
+  \item \emph{\omterm{def:b1:arith:congruence}{同余}式的除法。}由 $ac \equiv bc \pmod n$
+        \emph{不能}推出 $a \equiv b$，除非 $\gcd(c,
+        n) = 1$：$6 \equiv 2 \pmod 4$，但 $3 \not\equiv 1 \pmod
+        4$。正确的一般规则同时要把模也除以相应的因子：$ac
+        \equiv bc \pmod n \iff a \equiv b \pmod{n/\gcd(c,n)}$。
+  \item \emph{误用欧几里得引理。}$a \mid bc$ 推出 $a
+        \mid b$ 或 $a \mid c$，仅当 $a$ 为\emph{\omterm{def:b1:arith:prime}{质数}}
+        （或与某一因子\omterm{cor:b1:arith:bezout}{互质}）时成立：$6 \mid 4 \times 9$，但 $6$
+        不\omterm{def:b1:arith:divides}{整除}任一因子。
+  \item \emph{\omterm{cor:b1:arith:bezout}{互质}是一种关系，而非性质。}“$8$ 与
+        $9$ \omterm{cor:b1:arith:bezout}{互质}”成立，尽管二者都不是\omterm{def:b1:arith:prime}{质数}；
+        “两两\omterm{cor:b1:arith:bezout}{互质}”比“整体
+        \omterm{cor:b1:arith:bezout}{互质}”更强（$\gcd(6, 10, 15) = 1$，但没有任何一对数\omterm{cor:b1:arith:bezout}{互质}
+        ）。
+  \item \emph{指数不能按模 $n$ 约化。}在 $a^k \bmod n$ 中，
+        指数只能模\emph{阶}约化，
+        即 $a$ 的阶（例如费马定理适用时取 $p - 1$），绝不能按模 $n$ 约化：
+        $2^{10} \bmod 11$ 等于 $1$，而不是 $2^{10 \bmod
+        11} = 2^{10}$——行之有效的约化，正是
+        \cref{ex:b1:arith:congruences}中所做的那种。
+\end{enumerate}
+\end{remark}
+
+\begin{remark}[本章的用途]\label{rem:b1:arith:whereused}
+本章既是工具箱，也是一个模板。整条论证链
+——带余除法、\omterm{thm:b1:arith:gcd}{最大公因数}、贝祖、高斯、唯一分解
+在\cref{ch:b1:poly}中被原样搬到多项式上，其中
+“次数”起着绝对值的作用；把两章并列比较，
+是理解两者的最佳途径。\omterm{def:b1:arith:congruence}{同余}运算
+化为环 $\Z/n\Z$，这在
+\cref{ch:b1:structures}中出现，其可逆元
+（\cref{prop:b1:arith:invmod}）构成第一个非平凡的
+单位群例子。赋值的概念在下文的周末问题中再次出现
+（勒让德公式），并为
+\cref{ch:b1:reals}中的无理性证明提供动力。本卷之外，模 $n$ 的贝祖求逆
+是公钥密码学的引擎，而费马小定理
+是素性检验的鼻祖，这些检验用来认证
+此处所用的大\omterm{def:b1:arith:prime}{质数}。
+\end{remark}
+
+\begin{remark}[插曲：作为模板的 $\Z$]\label{rem:b1:arith:interlude}
+跳出个别定理，观察本章的
+架构：一个工具（带余除法）
+产生了一个分类（子群 $n\Z$），由此得到
+存在性定理（\omterm{thm:b1:arith:gcd}{最大公因数}、贝祖），由此得到一套\omterm{def:b1:arith:divides}{整除}
+演算（高斯），进而得到唯一分解——每一层
+只依赖于其下一层。同一座大厦本卷中还将
+再建两次，但底层各不相同：
+在\cref{ch:b1:poly}中，以次数除法取代按大小的除法，
+其上的一切\emph{原样重复}；另外，
+以小规模的形式出现在\cref{ch:b1:structures}中的每个 $\Z/n\Z$ 之内，
+其中关于可逆性的问题（即本章的
+\cref{prop:b1:arith:invmod}）化为关于
+环与域的结构性陈述。把论证认作“$\Z$ 论证
+的移植”，是学好这些章节最快的途径——也是
+初次尝到代数的核心思维习惯：证明关于
+\emph{公理}的定理，而不是关于对象的定理。
+\end{remark}
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=0.42]
+  \foreach \n/\k in {0/0, 1/0, 1/1, 2/0, 2/2, 3/0, 3/1, 3/2, 3/3,
+      4/0, 4/4, 5/0, 5/1, 5/4, 5/5, 6/0, 6/2, 6/4, 6/6,
+      7/0, 7/1, 7/2, 7/3, 7/4, 7/5, 7/6, 7/7}
+    \fill[omDef] ({2*\k - \n}, {-\n}) circle (0.32);
+  \foreach \n/\k in {2/1, 4/1, 4/2, 4/3, 5/2, 5/3, 6/1, 6/3, 6/5}
+    \draw[gray] ({2*\k - \n}, {-\n}) circle (0.32);
+\end{tikzpicture}
+
+{\small 杨辉三角第 $0$ 行至第 $7$ 行，其中填出\emph{奇数}项：
+第 $n$ 行含有 $2^{s_2(n)}$ 个奇数项，其中
+$s_2(n)$ 为 $n$ 的二进制表示中“1”的个数
+（第 $1, 2, 4$ 行各有两个奇数项；第 $7 = (111)_2$ 行全部八个）。
+自相似的图案——每个“奇数三角形”会
+生出自身的两个副本——这是库默尔定理的图示形式，
+并在下文的周末问题中证明。}
+\end{omfigure}
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:b1:arith:1}
+用\omterm{met:b1:arith:euclid}{欧几里得算法}计算 $\gcd(1\,001, 777)$，
+并求出它的一组贝祖系数。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:arith:2}
+证明十进制（\omterm{def:b1:counting:card}{基数} $10$）下的\omterm{def:b1:arith:divides}{整除}判别法：一个整数
+模 $9$ \omterm{def:b1:arith:congruence}{同余}于其各位数字之和，模 $11$ \omterm{def:b1:arith:congruence}{同余}于其各位数字的
+交错和。求 $123\,456\,789$ 模 $9$ 与模 $11$ 的余数。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:arith:3}
+在 $\Z$ 中求解：$91x \equiv 1 \pmod{237}$ \emph{（用扩展\omterm{met:b1:arith:euclid}{欧几里得算法}）}。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:arith:4}
+求所有满足 $(x, y) \in \Z^2$ 且 $17x + 39y = 1$ 的数对；再求
+所有满足 $17 x + 39 y = 5$ 的数对。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:arith:5}
+证明：对 $a, b \in \N^*$，有 $\gcd(a,b) \times
+\operatorname{lcm}(a,b) = ab$。\emph{（利用
+\cref{prop:b1:arith:valuation}中的赋值公式，以及 $\min(\alpha,\beta) +
+\max(\alpha,\beta) = \alpha + \beta$。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:arith:6}
+设 $a = 2^{10} \times 3^4 \times 5^2$，$b = 2^6 \times 3^7 \times
+7$。求 $\gcd(a, b)$、$\operatorname{lcm}(a,b)$ 以及
+$a$ 的正因数的个数。\emph{（证明因数个数公式
+$\prod_i (\alpha_i + 1)$。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:arith:7}
+利用赋值证明 $\sqrt p$ 对每个\omterm{def:b1:arith:prime}{质数} $p$ 都是无理数，
+比较 $v_p$ 在等式 $p q^2 = r^2$ 两边的值。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:arith:8}
+（中国剩余定理问题）求所有满足下式的整数 $x$：
+\[
+x \equiv 2 \pmod 7, \qquad x \equiv 5 \pmod{11}.
+\]
+在此过程中证明：对\omterm{cor:b1:arith:bezout}{互质}的 $m, n$，\omterm{def:b1:arith:congruence}{同余}式组
+$x \equiv a \ (m)$，$x \equiv b\ (n)$ 恒有解，
+且在模 $mn$ 下唯一。\index{中国剩余定理}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:arith:9}
+计算 $3^{1000}$ 模 $7$ 的余数，以及
+$7^{100}$ 的末两位十进制数字 \emph{（模 $100 = 4 \times 25$：利用
+\cref{exo:b1:arith:8}）}。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:arith:10}
+对 $m, n \in \N^*$，证明 $\gcd(2^m - 1,\, 2^n - 1) =
+2^{\gcd(m,n)} - 1$。\emph{提示：先证明 $2^m
+- 1$ 模 $2^n - 1$ 的余数为 $2^r - 1$，其中 $r$ 是 $m$
+模 $n$ 的余数；再利用\omterm{met:b1:arith:euclid}{欧几里得算法}。}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:arith:11}
+（威尔逊定理）设 $p$ 为\omterm{def:b1:arith:prime}{质数}，证明
+\[
+(p-1)! \equiv -1 \pmod p ,
+\]
+，通过将 $(p-1)!$ 的每个因子与其模 $p$ 的逆元配对，并
+找出自配对的因子（先解\omterm{def:b1:arith:congruence}{同余}方程 $x^2 \equiv 1 \pmod p$
+）。再验证逆命题：若 $n \geq 2$ 不是\omterm{def:b1:arith:prime}{质数}，则 $(n-1)!
+\not\equiv -1 \pmod n$。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:arith:12}
+（费马数）对 $n \in \N$，令 $F_n = 2^{2^n} + 1$。
+\begin{enumerate}
+  \item 证明 $F_0 F_1 \cdots F_{n-1} = F_n - 2$ 对 $n \geq
+        1$ 成立（用归纳法）。
+  \item 由此推出费马数两两\omterm{cor:b1:arith:bezout}{互质}。
+  \item 由此给出一个不依赖于
+        \cref{thm:b1:arith:euclidprimes}的第二种证明，
+        即\omterm{def:b1:arith:prime}{质数}有无穷多个。
+\end{enumerate}
+\end{exercise}
+
+\section{问题：勒让德公式与库默尔进位}
+
+\begin{problem}\label{pb:b1:arith:1}
+$1000!$ 的十进制写法末尾有多少个零——进一步地，
+\omterm{def:b1:arith:prime}{质数} $p$ \omterm{def:b1:arith:divides}{整除} $n!$ 的精确幂次是多少，或
+\omterm{def:b1:arith:divides}{整除}某个\omterm{def:b1:counting:objects}{二项式系数}的精确幂次？完整的答案是初等算术中的两颗明珠：
+\emph{勒让德公式}
+\index{勒让德公式} $v_p(n!) = \sum_{k\geq1}
+\lfloor n/p^k \rfloor$，及其数字形式 $v_p(n!) = \frac{n
+- s_p(n)}{p-1}$，以及\emph{库默尔定理}\index{库默尔
+定理}：$v_p\binom{m+n}m$ 计数相加时出现的\emph{进位}次数，
+$m$ 与 $n$ 以 $p$ 为底相加。本题证明这两个结论，
+并以数值方法相互核对，并导出经典
+推论——末尾零的个数、帕斯卡三角形的奇偶性，
+以及在\omterm{def:b1:arith:prime}{质数}定理方向上的一个初步界。
+全文中，$p$ 为\omterm{def:b1:arith:prime}{质数}，$\floor{x}$ 为取整函数，
+而 $s_p(n)$ 表示 $n$ 以 $p$ 进制写出时各位数字之和。
+
+\medskip
+\noindent\textbf{第一部分——取整函数、赋值与勒让德
+公式。}
+\begin{enumerate}
+  \item 热身：计算 $10!$，并读出其末尾零的个数；
+        计算 $v_2(10!)$ 与 $v_5(10!)$，直接由
+        各因子 $1, 2, \dots, 10$ 的分解求出。
+  \item 证明：对 $x \in \R$ 与 $n \in \N^*$，有
+        $\bigl\lfloor \lfloor x \rfloor / n \bigr\rfloor =
+        \lfloor x/n \rfloor$。
+  \item 证明：$v_p(a + b) \geq \min\bigl(v_p(a),
+        v_p(b)\bigr)$ 对所有 $a, b \in \N^*$ 成立，且
+        当 $v_p(a) \neq v_p(b)$ 时取等号。
+  \item 说明 $m$ 的倍数在 $\intint1n$ 中的个数为
+        $\lfloor n/m \rfloor$。
+  \item 证明\emph{勒让德公式}：对每个 $n \in \N^*$，
+        \[
+        v_p(n!) = \sum_{k=1}^{\infty}
+        \Bigl\lfloor \frac{n}{p^k} \Bigr\rfloor
+        \]
+        （这是有限和：当 $p^k > n$ 时各项为零）。
+        \emph{对每个 $k$，统计 $\intint1n$
+        中能被 $p^k$ \omterm{def:b1:arith:divides}{整除}的因子个数：每个因子在它所达到的
+        每一层级上恰好贡献一个单位。}
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第二部分——数字形式与末尾零的
+个数。}
+\begin{enumerate}[resume]
+  \item 计算 $v_5(1000!)$ 与 $v_2(1000!)$，并由此得出：
+        $1000!$ 的末尾有多少个零？
+  \item 证明勒让德公式的数字形式：将 $n =
+        \sum_i a_i p^i$ 写作 $p$ 进制，则
+        \[
+        v_p(n!) = \frac{n - s_p(n)}{p - 1} .
+        \]
+  \item 对 $p = 2$ 的两个推论：说明 $2^n$ 永不
+        \omterm{def:b1:arith:divides}{整除} $n!$，并说明 $2^{n-1}$ \omterm{def:b1:arith:divides}{整除} $n!$ 当且仅当
+        $n$ 为 $2$ 的幂。
+  \item 估计偏差：说明 $\frac n{p-1} - \log_p(n) - 1 \leq
+        v_p(n!) < \frac n{p-1}$，从而 $\frac{v_p(n!)}{n} \to
+        \frac1{p-1}$：长期来看，
+        每单位平均累积 $\frac1{p-1}$ 个因子 $p$。
+  \item 设 $Z(n) = v_5(n!)$ 为
+        $n!$ 末尾零的个数。说明 $Z(n) - Z(n-1) = v_5(n)$，由此推出 $Z$
+        完全跳过取值 $5$（计算 $Z(24)$ 与 $Z(25)$），并
+        证明没有任何阶乘恰好以五个零结尾。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第三部分——库默尔定理。}
+\begin{enumerate}[resume]
+  \item 证明 $\lfloor x + y \rfloor - \lfloor x \rfloor -
+        \lfloor y \rfloor \in \{0, 1\}$ 对所有 $x, y \in \R$ 成立，并
+        由勒让德公式推出：
+        \[
+        v_p\binom{m+n}m
+        = \sum_{k\geq1}\Bigl(
+        \Bigl\lfloor\frac{m+n}{p^k}\Bigr\rfloor
+        - \Bigl\lfloor\frac{m}{p^k}\Bigr\rfloor
+        - \Bigl\lfloor\frac{n}{p^k}\Bigr\rfloor\Bigr),
+        \]
+        这是一个每项都等于 $0$ 或 $1$ 的和。
+  \item 证明\emph{库默尔定理}：该和式的第 $k$ 项
+        等于 $1$ 当且仅当 $m$ 与 $n$ 的加法在 $p$ 进制下
+        向第 $k$ 位产生进位；因此
+        $v_p\binom{m+n}m$ 等于进位的总次数。
+        \emph{（记 $m = p^km_1 + m_0$，$n = p^kn_1 + n_0$，
+        其中 $0 \leq m_0, n_0 < p^k$，并考察 $\lfloor (m_0 +
+        n_0)/p^k \rfloor$。）}
+  \item 由此推出：对 $0 < j < p^k$，有
+        \[
+        v_p\binom{p^k}{j} = k - v_p(j) ,
+        \]
+        通过计算加法 $j + (p^k - j)$ 中的进位个数得到。
+        （特别地，$p \mid \binom p j$ 对 $0 < j < p$ 成立：此即
+        \cref{thm:b1:arith:fermat}的关键步骤，由此重新得到。）
+  \item 证明 $v_2\binom{2n}n = s_2(n)$。由此推出中心\omterm{def:b1:counting:objects}{二项式系数}
+        总是偶数，并且 $\binom{2n}n \equiv 2 \pmod 4$
+        当且仅当 $n$ 是
+        $2$ 的幂。
+  \item 利用范德蒙德恒等式
+        （见\cref{exo:b1:counting:7}）及第 13 题，证明
+        $\binom{2p}p \equiv 2 \pmod p$ 对每个\omterm{def:b1:arith:prime}{质数} $p$ 成立。
+  \item 用两种方法计算 $v_3\binom{1000}{500}$：一是用库默尔定理（将 $500$ 写成 $3$ 进制，
+        并数出 $500 +
+        500$ 的加法中的进位个数）；二是用勒让德公式的数字形式（计算 $s_3(500)$
+        与 $s_3(1000)$），并检验两者结果相同。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第四部分——帕斯卡三角形的奇偶性，以及
+\omterm{def:b1:arith:prime}{质数}密度的界。}
+\begin{enumerate}[resume]
+  \item 证明数字判别法：$\binom nk$ 为\emph{奇数}，当且仅当
+        $k$ 的每个二进制数字都不超过 $n$ 的对应数字。
+        试叙述并证明 $p \nmid \binom nk$ 在
+        $p$ 进制下的类似判别法。
+  \item 由此推出：帕斯卡三角形第 $n$ 行恰含 $2^{s_2(n)}$ 个奇数项；
+        在第 $4$ 行与第 $5$ 行上加以验证。
+  \item 由此推出：所有内部项 $\binom nk$（$0 < k < n$）都是偶数，
+        当且仅当 $n$ 是 $2$ 的幂。
+  \item 证明：$\binom{m+n}m$ 的每个\omterm{def:b1:arith:prime}{质数}幂因子都至多为
+        $m + n$：若 $p^a \mid \binom{m+n}m$，则 $p^a \leq
+        m + n$。\emph{（第 11 题中的和式最多能有多少个
+        非零项？）}
+  \item 由此推出 $\binom{2n}n$ \omterm{def:b1:arith:divides}{整除} $\operatorname{lcm}(1, 2, \dots, 2n)$，
+        并结合下界
+        $\binom{2n}n \geq \frac{4^n}{2n+1}$
+        （这一下界留待你证明：中心项是 $2n + 1$ 个项中最大的，
+        这些项即第 $2n$ 行的各项）。由此可得
+        \[
+        \operatorname{lcm}(1, \dots, 2n) \geq \frac{4^n}{2n+1} :
+        \]
+        前若干个正整数的公倍数
+        \emph{呈指数级}增长——这是对\omterm{def:b1:arith:prime}{质数}之多的
+        初步定量认识。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第五部分——综合。}
+\begin{enumerate}[resume]
+  \item 求最小的 $n$，使得 $n!$ 末尾至少有
+        $2026$ 个零。\emph{（先估计 $Z(n) \approx n/4$，
+        再利用精确公式调整。）}
+  \item 作最后一次交叉检验：证明 $7$ \emph{不}\omterm{def:b1:arith:divides}{整除} $\binom{100}{50}$，
+        先将 $50$ 写成 $7$ 进制，
+        并验证加法 $50 + 50$ 中无进位；然后
+        用勒让德公式计算 $v_7(100!)$ 与 $v_7(50!)$，
+        从而得证。
+  \item 本题究竟在何处用到了：（i）唯一分解；
+        （ii）带余除法分解 $n = p^k n_1 + n_0$；
+        （iii）在\cref{ch:b1:counting}中的计数论证？
+        每项各用一句话回答。
+  \item 用一小段文字作综合：勒让德公式
+        把\omterm{def:b1:arith:divides}{整除}问题化为数字运算，
+        库默尔定理则从一次加法的进位中
+        读出答案。请评述这一转化、第 16 题中的检验，
+        以及第 21 题的界对\omterm{def:b1:arith:prime}{质数}有何启示
+        （完整叙述即\omterm{def:b1:arith:prime}{质数}定理，远超本卷范围；
+        本章工具的
+        多项式类比见
+        \cref{ch:b1:poly}。）
+\end{enumerate}
+\end{problem}

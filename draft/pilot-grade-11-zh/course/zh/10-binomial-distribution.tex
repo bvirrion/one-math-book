@@ -1,0 +1,453 @@
+\chapter{二项分布}\label{ch:g11:binom}
+
+独立重复做同一个是/否试验若干次，并统计成功次数：
+所得分布 --- 即\emph{二项分布} --- 是
+所有离散分布中最重要的一种。本章借助树状图与路径计数构造它；
+路径数的闭式公式（含阶乘）
+随\cref{ch:g12:comb}中的计数工具一并给出，
+并在\cref{ch:g12:randvar}中再次讨论该分布。
+
+\section{伯努利试验}
+
+\begin{definition}[伯努利试验]\label{def:g11:binom:bernoulli}
+称恰有两种结果的试验为\emph{伯努利试验}\index{伯努利试验}，其结果为
+\emph{成功}（概率为 $p$）与\emph{失败}（概率为 $1 - p$）。
+设随机变量 $X$ 在成功时取 $1$，在失败时取 $0$，
+则称其服从
+\emph{伯努利分布} $\mathcal B(p)$，且
+\[
+\E(X) = p,
+\qquad
+\V(X) = p(1 - p).
+\]
+\end{definition}
+
+\begin{proof}[两个公式的证明]
+$\E(X) = p \times 1 + (1-p) \times 0 = p$；又因 $X^2 = X$（$0$
+与 $1$ 都与自身的平方相等），故 $\E(X^2) = p$，由
+\cref{prop:g11:prob:konig}，$\V(X) = p - p^2 = p(1-p)$。
+\end{proof}
+
+\begin{definition}[重复独立试验]\label{def:g11:binom:repeated}
+将伯努利试验重复 $n$ 次且\emph{独立}进行，是指：
+每次试验的结果不影响其他试验，且任一完整结果序列的概率
+等于其在树中对应路径上各概率的\emph{乘积} ---
+即每次成功取 $p$，
+每次失败取 $1 - p$。
+\end{definition}
+
+\begin{example}\label{ex:g11:binom:threetrials}
+成功概率为 $p$ 的三次独立试验。序列 SFS
+（成功、失败、成功）的概率为 $p(1-p)p = p^2(1-p)$ --- 而
+同样，\emph{任一}恰有两次成功的序列，其概率亦为此值，与
+成功与失败的位置无关，只有 S 与 F 的\emph{个数}起作用。
+\end{example}
+
+\section{路径数与二项式系数}
+
+\begin{definition}[二项式系数]\label{def:g11:binom:coefficient}
+在 $n$ 次独立试验的树中，
+称\emph{二项式系数}\index{二项式系数} $\binom{n}{k}$（读作“$n$
+选 $k$”）为恰含 $k$ 次成功的路径条数。
+\end{definition}
+
+\begin{example}
+$\binom{3}{2} = 3$：路径为 SSF、SFS、FSS。同理 $\binom{3}{0} = 1$
+（路径 FFF），$\binom{3}{1} = 3$ 与 $\binom{3}{3} = 1$。由
+约定与树状图可知，$\binom n0 = \binom nn = 1$ 对任意 $n$ 均成立。
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}[font=\small]
+  \coordinate (root) at (0,0);
+  \node (S) at (1.5,1.5) {S};
+  \node (F) at (1.5,-1.5) {F};
+  \node (SS) at (3.0,2.25) {S};
+  \node (SF) at (3.0,0.75) {F};
+  \node (FS) at (3.0,-0.75) {S};
+  \node (FF) at (3.0,-2.25) {F};
+  \node (SSS) at (4.5,2.6) {S};
+  \node (SSF) at (4.5,1.85) {F};
+  \node (SFS) at (4.5,1.1) {S};
+  \node (SFF) at (4.5,0.35) {F};
+  \node (FSS) at (4.5,-0.35) {S};
+  \node (FSF) at (4.5,-1.1) {F};
+  \node (FFS) at (4.5,-1.85) {S};
+  \node (FFF) at (4.5,-2.6) {F};
+  \draw[omThm, thick] (root) -- (S);
+  \draw[omThm, thick] (S) -- (SS);   \draw[omThm, thick] (SS) -- (SSF);
+  \draw[omThm, thick] (S) -- (SF);   \draw[omThm, thick] (SF) -- (SFS);
+  \draw[omThm, thick] (root) -- (F);
+  \draw[omThm, thick] (F) -- (FS);   \draw[omThm, thick] (FS) -- (FSS);
+  \draw[gray] (SS) -- (SSS);
+  \draw[gray] (SF) -- (SFF);
+  \draw[gray] (FS) -- (FSF);
+  \draw[gray] (F) -- (FF);
+  \draw[gray] (FF) -- (FFS);
+  \draw[gray] (FF) -- (FFF);
+  \node[gray, anchor=west] at (5.0,2.6) {$3$ 次成功};
+  \node[omThm, anchor=west] at (5.0,1.85) {$2$ 次成功};
+  \node[omThm, anchor=west] at (5.0,1.1) {$2$ 次成功};
+  \node[gray, anchor=west] at (5.0,0.35) {$1$ 次成功};
+  \node[omThm, anchor=west] at (5.0,-0.35) {$2$ 次成功};
+  \node[gray, anchor=west] at (5.0,-1.1) {$1$ 次成功};
+  \node[gray, anchor=west] at (5.0,-1.85) {$1$ 次成功};
+  \node[gray, anchor=west] at (5.0,-2.6) {$0$ 次成功};
+\end{tikzpicture}
+
+{\small $n = 3$ 次试验的树：$\binom{3}{2} = 3$ 条路径（红色）恰含
+两次成功，每条路径的概率均为 $p^2(1-p)$。}
+\end{omfigure}
+
+\begin{proposition}[帕斯卡法则]\label{prop:g11:binom:pascal}
+\index{帕斯卡三角形}
+对 $1 \leq k \leq n - 1$，有
+\[
+\binom{n}{k} = \binom{n-1}{k-1} + \binom{n-1}{k}.
+\]
+\end{proposition}
+
+\begin{proof}
+将 $n$ 次试验的树中恰含 $k$ 次成功的路径，按
+其\emph{最后一次}试验的结果分类。以成功结尾的路径，
+由前 $n-1$ 次试验中恰含 $k - 1$ 次成功的路径延伸得到，共有
+$\binom{n-1}{k-1}$ 条。以失败结尾的路径，由含 $k$ 次成功的
+前 $n-1$ 次试验中的路径延伸得到，共 $\binom{n-1}{k}$ 条。
+每条路径恰属于两类中的一类。
+\end{proof}
+
+帕斯卡法则逐行生成系数 --- 每个数
+都是其上方两数之和：
+\[
+\begin{array}{ccccccccccc}
+&&&&&1&&&&&\\
+&&&&1&&1&&&&\\
+&&&1&&2&&1&&&\\
+&&1&&3&&3&&1&&\\
+&1&&4&&6&&4&&1&\\
+1&&5&&10&&10&&5&&1
+\end{array}
+\]
+
+\begin{remark}
+闭式公式 $\binom nk = \frac{n!}{k!(n-k)!}$ 连同系统的计数理论，
+将在\cref{ch:g12:comb}中建立。在本阶段，
+帕斯卡三角即可算出所需的每一个系数。
+\end{remark}
+
+\section{二项分布}
+
+\begin{theorem}[二项分布]\label{thm:g11:binom:binomial}
+设 $X$ 为 $n$ 次独立伯努利试验中成功的次数，
+其中每次试验的参数为 $p$，则 $X$ 服从
+\emph{二项分布}\index{二项分布} $\mathcal B(n, p)$：
+\[
+\P(X = k) = \binom{n}{k}\, p^k (1-p)^{n-k},
+\qquad k = 0, 1, \dots, n .
+\]
+\end{theorem}
+
+\begin{proof}
+事件 $X = k$ 即恰含 $k$ 次成功的所有路径构成的
+每条这样的路径概率为 $p^k(1-p)^{n-k}$：沿路径的乘积
+中含 $k$ 个因子 $p$ 与 $n - k$ 个因子 $1-p$，次序任意
+（见\cref{def:g11:binom:repeated}）。这样的路径共有 $\binom nk$ 条
+（见\cref{def:g11:binom:coefficient}），它们的概率相加即得。
+\end{proof}
+
+\begin{example}\label{ex:g11:binom:quiz}
+一次测验有 $5$ 道相互独立的题，每题有 $4$ 个选项；一名学生
+随机作答，因此每题成功的概率为 $p = \frac14$。答对题数
+$X$ 服从 $\mathcal B\left(5, \frac14\right)$，
+利用帕斯卡三角第 $5$ 行，有
+\[
+\P(X = 2) = \binom52 \left(\frac14\right)^2\left(\frac34\right)^3
+= 10 \times \frac{1}{16} \times \frac{27}{64}
+= \frac{270}{1024} \approx 0.26 .
+\]
+至少答对一题的概率利用对立事件计算：
+$\P(X \geq 1) = 1 - \P(X = 0) = 1 - \left(\frac34\right)^5 \approx
+0.76$。
+\end{example}
+
+\begin{proposition}[期望与方差]\label{prop:g11:binom:expectation}
+若 $X \sim \mathcal B(n, p)$，则：
+\[
+\E(X) = np,
+\qquad
+\V(X) = np(1-p).
+\]
+\end{proposition}
+
+\begin{proof}[说明]
+记 $X = X_1 + X_2 + \dots + X_n$，其中 $X_i$ 等于 $1$，
+当第 $i$ 次试验成功时；每个 $X_i$ 都是期望为 $p$ 的伯努利变量
+（见\cref{def:g11:binom:bernoulli}）。期望可加：把 $n$ 个贡献相加，
+得 $\E(X) = np$。对独立变量，\emph{方差}也可相加，这一点
+成立，但更为细致：方差公式是
+\emph{在本阶段不加证明地承认}，并在\cref{ch:g12:sums}中证明。
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[
+  width=10cm, height=5cm,
+  ybar, bar width=9pt,
+  xlabel={$k$}, ylabel={$\P(X = k)$},
+  xmin=-0.8, xmax=10.8, ymin=0, ymax=0.3,
+  xtick={0,1,2,3,4,5,6,7,8,9,10},
+  ytick={0.1, 0.2},
+  tick label style={font=\small},
+  label style={font=\small},
+  title={$\mathcal B(10,\ 0.5)$}]
+  \addplot[fill=omDef!40, draw=omDef] coordinates {
+    (0,0.00098) (1,0.00977) (2,0.04395) (3,0.11719) (4,0.20508)
+    (5,0.24609) (6,0.20508) (7,0.11719) (8,0.04395) (9,0.00977)
+    (10,0.00098)};
+\end{axis}
+\end{tikzpicture}
+
+{\small $\mathcal B(10, 0.5)$ 的分布（十次公平抛硬币）：
+中心位于 $\E(X) = np = 5$，图形对称，几乎全部概率
+集中在 $2$ 与 $8$ 之间。}
+\end{omfigure}
+
+\begin{method}[识别二项情形]\label{met:g11:binom:recognize}
+在写出 $X \sim \mathcal B(n, p)$ 之前，需检验三个要素：
+\emph{固定的}试验次数 $n$，且事先确定；每次试验有
+\emph{两种结果}，且成功概率都是\emph{相同的} $p$；试验是
+\emph{独立}的（有放回抽样，或使用各自独立的装置）。
+从小总体中不放回抽取，\emph{并非}
+二项情形——每次抽取后，概率都会改变
+（见\cref{exo:g11:prob:6}）。
+\end{method}
+
+\section{抽样：观察结果是否出人意料？}
+
+二项分布回答了一个非常实际的问题：\emph{若成功概率确实为 $p$，
+那么成功次数取怎样的值
+是合理的？}
+
+\begin{example}\label{ex:g11:binom:decision}
+按设计，机器产出的次品至多占 $10\%$。在一
+批 $10$ 件产品中有 $4$ 件次品。是运气不好，还是机器坏了？若
+机器运转正常，则次品数
+服从 $\mathcal B(10, 0.1)$，且有
+\[
+\P(X \geq 4) = 1 - \P(X \leq 3) \approx 1 - 0.987 = 0.013 :
+\]
+约为 $80$ 分之一的机会。观察到如此小概率的事件，是一个强烈的
+信号 --- 应\emph{拒绝}“机器仍
+以 $10\%$ 的次品率运转”这一假设，同时须记住，
+该判断出错的概率约为 $0.013$。
+\end{example}
+
+\begin{method}[基于二项模型的判定准则]\label{met:g11:binom:decision}
+对于观察到的成功次数 $k$，将其与假设
+$X \sim \mathcal B(n, p)$ 进行比较：在该假设下，计算
+出现与 $k$ 相比\emph{至少同样极端}的结果的概率。若该概率
+非常小（常用约定为低于 $5\%$），则拒绝该假设；
+否则，观察结果与该假设相容。阈值是一种
+选择，而非定理 --- 统计学只量化风险，
+是否接受该风险则由使用者决定。
+\end{method}
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:g11:binom:1}
+将帕斯卡三角形扩展到第 $7$ 行，并求
+$\binom62$、$\binom{7}{3}$ 和 $\binom74$ 的值。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g11:binom:2}
+将一颗均匀骰子掷 $4$ 次，$X$ 为掷出六点的次数。说明
+$X \sim \mathcal B\left(4, \frac16\right)$，并计算 $\P(X = 0)$、
+$\P(X = 1)$ 和 $\P(X \geq 2)$。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g11:binom:3}
+下列各量中，哪些服从二项分布？说明理由。
+\begin{enumerate}
+  \item 掷一枚均匀硬币 $20$ 次，正面出现的次数。
+  \item 从一副牌中抽取 $5$ 张牌，其中 A 牌的张数。
+  \item 下周的雨天数，若每天下雨的概率为
+        $0.3$，且各天相互独立。
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g11:binom:4}
+设 $X \sim \mathcal B(50, 0.2)$，求 $\E(X)$、$\V(X)$ 和 $\sigma(X)$。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:binom:5}
+一名射手每次射击击中目标的概率为 $0.7$，
+各次射击相互独立。射击 $6$ 次，求恰好击中 $4$ 次的概率，
+以及至少击中 $5$ 次的概率。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:binom:6}
+一份判断题测验共 $8$ 题，某学生对每题均随机猜测答案。
+求其及格（至少答对 $6$ 题）的概率。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:binom:7}
+每个购买的麦片盒中装有小人偶 A 或小人偶 B 之一，
+二者概率各为 $\frac12$，且相互独立。收藏者购买 $5$ 盒，
+求收藏者至少得到每种小人偶各一个的
+概率。（对立事件：全为 A 或全为 B。）
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:binom:8}
+一名篮球运动员每次罚球命中的概率为 $p$，
+各次罚球相互独立。设 $X \sim \mathcal B(3, p)$ 为
+三次罚球中命中的次数。将 $\P(X = 3)$ 和 $\P(X \geq 1)$ 表示为 $p$ 的函数，
+并求 $p$ 为何值时，三次罚球全部命中的概率
+等于 $\frac{27}{64}$。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:binom:9}
+一枚均匀硬币至少需要掷多少次，才能使得
+至少出现一次正面的概率超过 $0.99$？（先考虑对立事件，再逐个试验
+$n$ 的取值。）
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:binom:10}
+利用帕斯卡法则（见\cref{prop:g11:binom:pascal}）及
+$\binom n0 = \binom nn = 1$，证明帕斯卡三角形的每一行中各数之和
+恰为 $2^n$：将等式两边都解释为计算树状图中的
+全部路径条数。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g11:binom:11}
+某政客声称其支持率为 $60\%$。在一个含 $10$ 人的随机样本中，
+仅有 $3$ 人表示支持。
+\begin{enumerate}
+  \item 若该宣称成立，样本中表示支持的
+        人数 $X$ 服从什么分布？求 $\P(X \leq 3)$。
+  \item 利用\cref{met:g11:binom:decision}中的判定准则，取
+        阈值为 $5\%$，该观察结果与该宣称是否相容？
+\end{enumerate}
+\end{exercise}
+
+\section{问题：高尔顿板}
+
+\begin{problem}[{周末问题 --- 小球、钉子与帕斯卡
+三角形：钟形曲线如何形成，为何系列赛有利于较强的一方，
+以及何时应当提出质疑}]
+\label{pb:g11:binom:1}
+让一千个小球穿过一排钉子组成的格阵，每次弹跳都相当于一次
+左右等可能的抛硬币，下方的格子便会堆积成一个
+平滑对称的钟形 --- 每次皆然。这台装置称为
+高尔顿板，其数学恰是本章的
+二项分布（见\cref{thm:g11:binom:binomial}）。本题
+将构造三角形、运行高尔顿板、裁判一场
+七场四胜制的系列赛，最后落在二项分布大显身手之处：
+判断一个观察结果何时应使我们
+对某一宣称产生怀疑。
+
+\medskip
+\noindent\textbf{第一部分 --- 三角形。}
+\begin{enumerate}
+  \item 作出帕斯卡三角形，直至第 $6$ 行
+        （\cref{prop:g11:binom:pascal}）。用一句话叙述并解释
+        对称性 $\binom nk = \binom{n}{n-k}$，
+        （选出 $k$ 个对象，等同于\,\dots）。
+  \item 在第 $4$ 行和第 $5$ 行上验证每一行之和均为 $2^n$，
+        并加以证明：所有 $\binom nk$ 合起来
+        计数的是什么？
+  \item 用委员会论证法重新推导帕斯卡法则
+        $\binom{n+1}{k} = \binom nk + \binom{n}{k-1}$，
+        即先固定一位特定的人，
+        再按此人的去留将委员会分类。
+  \item 计算 $\binom73$ 两次：一次由三角形得出，
+        另一次由阶乘公式得出。
+  \item 验证阶梯恒等式
+        $\binom22 + \binom32 + \binom42 + \binom52 =
+        \binom63$，并通过
+        自 $\binom63$ 向下逐次应用帕斯卡法则来解释。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第二部分 --- 高尔顿板。}
+一个小球穿过 $n$ 行钉子下落；每遇到一颗钉子，它便
+以概率 $\frac12$ 向左或向右弹开，且各次弹跳相互独立。
+按向右弹跳的次数，将各槽编号为 $0$ 至 $n$。
+\begin{enumerate}[resume]
+  \item 借助
+        \cref{met:g11:binom:recognize}所列的检验清单，说明槽号为何
+        服从二项分布
+        $\mathcal B\!\left(n, \frac12\right)$。
+  \item 对较小的板（$n = 4$），求出五个槽的
+        概率。哪一个槽最为拥挤？
+  \item 取 $n = 10$，共 $1\,024$ 个球，求中间槽、第 $7$ 号槽
+        及各边缘槽中的\emph{期望}球数各为多少？
+        并描述球堆的形状。
+  \item 设 $X \sim \mathcal B\!\left(10, \frac12\right)$：
+        求 $\E(X)$、$V(X)$ 及 $\sigma$
+        （见\cref{prop:g11:binom:expectation}），再求
+        期望落在中心 $2\sigma$ 之内的球的比例，
+        （即槽 $2$ 至 $8$），并将其与
+        由\cref{pb:g11:stat:1}给出的切比雪夫保证作比较。
+  \item 倾斜的板以概率 $0.6$ 向右弹开：
+        求 $\E$、$V$ 与 $\sigma$（$n = 10$），并描述
+        球堆会发生怎样的变化。
+  \item 用一两句话回答：板的设计中，是什么
+        造就了钟形 --- 以及为何现实中的许多量
+        （如身高、测量误差）同样以这种方式堆积？
+        （两者背后的深刻定理是
+        中心极限定理，它是
+        大学分册概率课程的巅峰。）
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第三部分 --- 七场四胜。}
+两支队伍进行一场系列赛：先赢得 $4$ 场者夺得冠军；
+各场比赛相互独立。
+\begin{enumerate}[resume]
+  \item 两队实力相当（$p = \frac12$），求
+        系列赛恰以横扫（恰好 $4$ 场）结束的概率。
+  \item 求系列赛打满
+        $7$ 场的概率（前 $6$ 场之后比分须为何？）。
+  \item 补全系列赛长度的分布，
+        即 $4$、$5$、$6$ 或 $7$ 场（两队实力相当），并
+        求期望长度。哪一种长度
+        最有可能出现？
+  \item 现设一队每场获胜的概率为 $p = 0.6$，求该队
+        夺得系列赛的概率（在 $4$、$5$、$6$
+        或 $7$ 场内获胜，即每种情形中该队都在最后一场获胜，
+        且此前已赢得其中 $3$ 场）。系列赛对
+        每场优势有何影响？
+  \item 将其与单场决赛（胜率 $60\,\%$）及三场两胜制
+        （需计算其概率）相比较。说明系列赛长度
+        对实力与运气的相对作用有何一般影响 --- 以及为何联赛
+        偏好较长的决赛？
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第四部分 --- 何时应当提出质疑。}
+\begin{enumerate}[resume]
+  \item 一枚硬币抛掷 $100$ 次，出现 $62$ 次正面。对于一枚均匀硬币，
+        求 $\E$、$\sigma$ 及该观察结果的
+        标准分数（见\cref{pb:g11:stat:1}）。
+        按 $2\sigma$ 约定，结论如何？
+  \item 某供应商宣称其零件的次品率为 $2\,\%$。从一批
+        $50$ 个零件中你发现 $3$ 个次品。求
+        该宣称成立时的 $\P(X \geq 3)$
+        （$X \sim \mathcal B(50, 0.02)$；逐一计算
+        $\P(X = 0), \P(X = 1), \P(X = 2)$），在
+        $5\,\%$ 阈值（见\cref{met:g11:binom:decision}，
+        \cref{exo:g11:binom:11}）下，是否令人警觉？
+  \item 彩票中的持久性问题：每张彩票中奖（某种奖项）的概率为
+        $\frac{1}{1000}$。求
+        用 $1\,000$ 张彩票时至少中奖一次的概率。答案
+        （$\approx 63\,\%$，而非 $100\,\%$！）隐藏着一个著名常数：
+        计算 $0.999^{1000}$，并牢记这一数值
+        $0.368$，留待十二年级使用。
+  \item 压轴题 --- 二项分布的小像：识别清单
+        （$n$ 固定，各次独立，$p$ 恒定）；
+        以帕斯卡三角形为其表格，以钟形为其形状；
+        以 $np$ 与 $np(1-p)$ 为其罗盘；其两位继承者
+        正等待着十二年级的登场 --- 光滑的钟形曲线与
+        大数定律。每项各用一句话作答。
+\end{enumerate}
+\end{problem}

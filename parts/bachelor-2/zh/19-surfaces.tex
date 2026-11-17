@@ -1,0 +1,963 @@
+\chapter{曲面}\label{ch:b2:surfaces}
+
+讲完曲线，接下来讨论曲面：它们是 $\R^3$ 中的双参数对象。
+\cref{ch:b2:diffcalc}中的\omterm{def:b2:diffcalc:differential}{微分}学提供了我们所需的一切：
+偏导数给出切向量，叉积给出法向量，
+\omterm{def:b2:linalg:det}{行列式}给出\omterm{def:b2:surfaces:area}{面积}。我们定义正则\omterm{def:b2:surfaces:param}{参数曲面}、
+它们的\omterm{def:b2:surfaces:tangent}{切平面}，以及
+\emph{\omterm{def:b2:surfaces:fff}{第一基本形式}}，它编码了所有长度与\omterm{def:b2:surfaces:area}{面积}的
+度量。曲面也可以作为水平集出现：
+$f(x, y, z) = c$，此时梯度决定法向。
+
+\section{参数曲面}
+
+\begin{definition}[正则参数曲面]\label{def:b2:surfaces:param}
+设 $U \subseteq \R^2$ 为\omterm{def:b2:metric:topology}{开集}。称
+\emph{参数曲面}\index{参数曲面}为 $\mathcal{C}^k$ 类（$k \geq 1$）的映射
+$\sigma \colon U \to
+\R^3$，$(u, v) \mapsto \sigma(u, v)$，且属于 $\mathcal{C}^k$ 类。
+称一点为\emph{正则}点，若偏导数向量
+\[
+\sigma_u(u, v) = \frac{\partial\sigma}{\partial u}(u,v),
+\qquad
+\sigma_v(u, v) = \frac{\partial\sigma}{\partial v}(u,v)
+\]
+线性无关，即 $\sigma_u \wedge \sigma_v \neq 0$；
+若每一点都正则，则称该曲面为\emph{正则}曲面。
+\end{definition}
+
+\begin{example}[三种标准描述]\label{ex:b2:surfaces:standard}
+\leavevmode
+\begin{enumerate}
+\item \emph{图像：}$\sigma(u, v) = (u,\ v,\ f(u, v))$，其中 $f \in
+\mathcal{C}^1(U)$。恒为正则：$\sigma_u = (1, 0, f_u)$ 与
+$\sigma_v = (0, 1, f_v)$ 线性无关。
+\item \emph{球面（球坐标）：}对半径为
+$R$ 的球面，
+\[
+\sigma(\theta, \varphi)
+= (R\cos\theta\cos\varphi,\ R\sin\theta\cos\varphi,\
+R\sin\varphi),
+\qquad
+(\theta, \varphi) \in \R \times
+\bigl(-\tfrac\pi2, \tfrac\pi2\bigr),
+\]
+其中 $\theta$ 为经度，$\varphi$ 为纬度。易验证
+$\norm{\sigma_\theta \wedge \sigma_\varphi} = R^2\cos\varphi > 0$，
+故该曲面在除两极外的点处均正则（此坐标卡不含两极）。
+\item \emph{水平集：}$S = \{(x,y,z) : f(x, y, z) = c\}$，其中
+$f$ 为 $\mathcal{C}^1$ 类，且 $\nabla f \neq 0$ 在 $S$ 上。在每一点附近，
+可将某一坐标表示为其余两个坐标的函数，
+由隐函数定理（见\cref{ch:b2:diffcalc}）保证，故
+$S$ 局部为某函数的图像。
+\end{enumerate}
+\end{example}
+
+\begin{example}[从水平集到图像]
+\label{ex:b2:surfaces:levelgraph}
+第 3 项中的隐函数定理值得明确地演算一次。
+取球面 $x^2 + y^2 + z^2 = R^2$ 在北极
+$(0, 0, R)$ 附近。此处 $\frac{\partial f}{\partial z} = 2z =
+2R \neq 0$，解出 $z$ 即得图像坐标卡
+\[
+z = \sqrt{R^2 - x^2 - y^2},
+\qquad x^2 + y^2 < R^2 ,
+\]
+该坐标卡在其（开）定义域上处处正则，包括
+球面坐标卡未覆盖的那个北极。在赤道上的一点
+例如 $(R, 0, 0)$ 附近，同一定理改为解出 $x$
+（$\frac{\partial f}{\partial x} = 2R \neq 0$）。经验法则是：水平曲面是
+在某个坐标平面上的图像，该平面
+\emph{与梯度的最大分量正交}，
+用六个这样的图像坐标卡覆盖球面，
+即可不借助任何三角函数，
+便能验证其在各处的光滑性。
+\end{example}
+
+\section{切平面与法向量}
+
+\begin{definition}[切平面]\label{def:b2:surfaces:tangent}
+设 $\sigma$ 在 $(u_0, v_0)$ 处正则，$M_0 = \sigma(u_0, v_0)$。
+$T_{M_0}S$ 称为\emph{切平面}\index{切平面}，它是过 $M_0$ 的平面，
+其方向由 $\operatorname{Vect}(\sigma_u, \sigma_v)$ 张成（偏导数取在
+$(u_0, v_0)$ 处）。\emph{单位法向量}\index{单位法向量}为
+\[
+n(u_0, v_0)
+= \frac{\sigma_u \wedge \sigma_v}
+       {\norm{\sigma_u \wedge \sigma_v}} .
+\]
+\end{definition}
+
+\begin{proposition}[切向量是速度
+向量]\label{prop:b2:surfaces:velocity}
+$T_{M_0}S$ 的方向恰由下列向量组成：
+$\gamma'(0)$，其中 $\gamma = \sigma \circ c$ 取遍
+画在曲面上的 $\mathcal{C}^1$ 曲线，且经过 $M_0$（即
+$c \colon (-\varepsilon, \varepsilon) \to U$ 为 $\mathcal{C}^1$ 类，
+且 $c(0) = (u_0, v_0)$）。
+\end{proposition}
+
+\begin{proof}
+若 $c(t) = (u(t), v(t))$，由链式法则
+（见\cref{ch:b2:diffcalc}）可得
+\[
+\gamma'(0) = u'(0)\,\sigma_u + v'(0)\,\sigma_v
+\in \operatorname{Vect}(\sigma_u, \sigma_v).
+\]
+反之，向量 $a\sigma_u + b\sigma_v$ 可由
+曲线 $c(t) = (u_0 + at,\ v_0 + bt)$ 取得，该曲线在\omterm{def:b2:metric:topology}{开集}
+$U$ 中（只要 $\abs t$ 充分小）。
+\end{proof}
+
+\begin{example}[螺旋面的切平面]
+\label{ex:b2:surfaces:helicoidtangent}
+对螺旋面 $\sigma(u, v) = (v\cos u,\ v\sin u,\ au)$，
+在点 $\sigma(0, 1) = (1, 0, 0)$ 处：
+\[
+\sigma_u = (0,\ 1,\ a), \qquad \sigma_v = (1,\ 0,\ 0),
+\qquad
+\sigma_u \wedge \sigma_v = (0,\ a,\ -1),
+\]
+于是\omterm{def:b2:surfaces:tangent}{切平面}为 $a\,y = z$。它包含
+整条水平直母线 $\{(t, 0, 0)\}$（方向 $\sigma_v$）。
+与\cref{exo:b2:surfaces:1}中的锥面一样，由直线\omterm{def:b2:structures:generated}{生成}的曲面，
+每条母线都位于沿它的\omterm{def:b2:surfaces:tangent}{切平面}之中。
+另一切方向 $\sigma_u$ 是
+螺旋线 $u \mapsto \sigma(u, 1)$ 的速度：一个坐标卡，
+两条所画曲线，整个\omterm{def:b2:surfaces:tangent}{切平面}便被张成——
+\cref{prop:b2:surfaces:velocity}的应用。
+\end{example}
+
+\begin{proposition}[等值曲面的法向量]\label{prop:b2:surfaces:gradient}
+设 $S = \{f = c\}$，其中 $f$ 属于 $\mathcal{C}^1$ 类，且 $\nabla
+f(M_0) \neq 0$。则 $S$ 在 $M_0$ 处的\omterm{def:b2:surfaces:tangent}{切平面}为
+过 $M_0$ 且与 $\nabla f(M_0)$ 正交的平面：
+\[
+T_{M_0}S :\quad
+\langle \nabla f(M_0),\ M - M_0\rangle = 0 .
+\]
+\end{proposition}
+
+\begin{proof}
+对任一曲线 $\gamma$，它画在 $S$ 上且过 $M_0$，$f(\gamma(t)) =
+c$ 恒成立，由链式法则可得 $\langle
+\nabla f(M_0), \gamma'(0)\rangle = 0$。所有速度向量都
+与梯度正交，故切方向包含于
+平面 $\nabla f(M_0)^\perp$ 中。两者均为 $2$ 维
+子空间——切方向是二维的，因为 $S$ 局部为
+正则图像（见\cref{ex:b2:surfaces:standard}），正交补也是二维的，因为
+$\nabla f(M_0) \neq 0$——故二者
+相等。
+\end{proof}
+
+\begin{example}\label{ex:b2:surfaces:spheretangent}
+对球面 $x^2 + y^2 + z^2 = R^2$：$\nabla f = 2(x, y, z)$，
+故 $M_0$ 处的\omterm{def:b2:surfaces:tangent}{切平面}与半径
+$\vect{OM_0}$ 正交——这是经典事实：半径与\omterm{def:b2:surfaces:tangent}{切平面}
+互相垂直，其方程为 $\langle M_0, M\rangle = R^2$。
+\end{example}
+
+\begin{example}[图像的切平面]\label{ex:b2:surfaces:graphtangent}
+对 $z = f(x, y)$ 在 $(x_0, y_0)$ 处，
+将\cref{prop:b2:surfaces:gradient}用于 $F(x,y,z) = f(x,y) - z$，
+\[
+z = f(x_0, y_0)
++ f_x(x_0, y_0)(x - x_0)
++ f_y(x_0, y_0)(y - y_0) ,
+\]
+即一阶泰勒展开的仿射部分——\omterm{def:b2:surfaces:tangent}{切平面}
+恰是\omterm{def:b2:diffcalc:differential}{微分}的图像，理应如此。
+\end{example}
+
+\begin{example}[曲面上
+的最近点]\label{ex:b2:surfaces:closest}
+抛物面 $z = x^2 + y^2$ 上哪一点离
+$P = (0, 0, 1)$ 最近？沿曲面极小化距离的平方：
+令 $\rho^2 = x^2 + y^2$，
+\[
+g(\rho^2) = \rho^2 + (\rho^2 - 1)^2,
+\qquad
+g'(\rho^2) = 1 + 2(\rho^2 - 1) = 0
+\iff \rho^2 = \tfrac12 ,
+\]
+由此得高度为 $z = \frac12$ 的一圈点，
+它们的距离为 $\sqrt{\tfrac12 + \tfrac14} = \frac{\sqrt3}2$。
+极小性的几何标志：在这样的点 $M$ 处，
+向量 $\vect{MP}$ 必为曲面的\emph{法向}——
+否则沿所画曲线滑动，而速度含有
+指向 $P$ 的分量，距离便会减小。验证：
+$\nabla(z - x^2 - y^2) = (-2x, -2y, 1)$，在 $M = (x, y,
+\tfrac12)$ 处，而 $\vect{MP} = (-x, -y, \tfrac12) =
+\tfrac12(-2x, -2y, 1)$，二者平行，与所预期一致。
+一阶条件“垂足”，与
+将在等值曲面上驱动极值的条件相同，
+它将在\cref{exo:b2:surfaces:12}中出现。
+\end{example}
+
+\begin{example}[二次曲面的切平面：
+极化法则]\label{ex:b2:surfaces:polarization}
+设 $S : xy + yz + zx = 1$，$M_0 = (1, 1, 0) \in S$。这里
+$\nabla f = (y + z,\ x + z,\ x + y)$，故 $\nabla f(M_0) = (1,
+1, 2)$，\omterm{def:b2:surfaces:tangent}{切平面}为
+\[
+(x - 1) + (y - 1) + 2z = 0,
+\qquad\text{即}\qquad x + y + 2z = 2 .
+\]
+同样的答案也可由\emph{极化法则}得到，该法则
+推广了\cref{ex:b2:surfaces:spheretangent}及
+\cref{exo:b2:surfaces:2}的结论：在\omterm{pb:b2:surfaces:1}{二次曲面}方程中，将
+$x^2$ 换为 $x_0x$，每个乘积 $xy$ 换为 $\frac{x_0y +
+y_0x}2$（并\omterm{def:b2:structures:sn}{轮换}）：
+\[
+\frac{x_0y + y_0x}2 + \frac{y_0z + z_0y}2 + \frac{z_0x +
+x_0z}2 = 1
+\;\xrightarrow{\ M_0 = (1,1,0)\ }\;
+\frac{x + y}2 + \frac z2 + \frac z2 = 1 ,
+\]
+即 $x + y + 2z = 2$，与前相同。该法则之所以成立，因为
+\omterm{def:b2:quadratic:def}{二次型}的 $\nabla$ 是相伴双线性型
+在基点处的取值——\omterm{pb:b2:surfaces:1}{二次曲面}的相切
+即极化，这是\cref{ch:b2:quadratic}的又一侧面。
+\end{example}
+
+\section{第一基本形式}
+
+\begin{definition}[第一基本形式]\label{def:b2:surfaces:fff}
+设 $\sigma \colon U \to \R^3$ 为正则 $\mathcal{C}^1$
+曲面，其\emph{第一基本形式}\index{第一基本形式}
+在 $(u,v)$ 处是
+$\R^2$ 上的正定\omterm{def:b2:quadratic:def}{二次型}
+\[
+I(h, k) = \norm{h\,\sigma_u + k\,\sigma_v}^2
+= E\,h^2 + 2F\,hk + G\,k^2,
+\]
+其中
+\[
+E = \norm{\sigma_u}^2,
+\qquad
+F = \langle \sigma_u, \sigma_v\rangle,
+\qquad
+G = \norm{\sigma_v}^2 .
+\]
+\end{definition}
+
+\begin{remark}
+$I$ 是所在欧氏空间的内积限制到
+\omterm{def:b2:surfaces:tangent}{切平面}上、在基 $(\sigma_u, \sigma_v)$ 下的表示，它
+正定，恰因 $\sigma_u, \sigma_v$
+线性无关（\cref{ch:b2:quadratic}）。曲面上的每个度量量
+——所画曲线的长度、曲线之间的夹角、\omterm{def:b2:surfaces:area}{面积}——
+仅由 $E, F, G$ 算出。两个曲面若在适当参数下有相同的 $E,
+F, G$，则即使在空间中摆放不同，它们也是\emph{等距}的：
+这正是内蕴几何的
+出发点。
+\end{remark}
+
+\begin{example}[坐标曲线间的
+夹角]\label{ex:b2:surfaces:coordangle}
+\omterm{def:b2:surfaces:fff}{第一基本形式}也能度量夹角。坐标曲线
+$u \mapsto \sigma(u, v_0)$ 与 $v \mapsto
+\sigma(u_0, v)$ 相交，交角为 $\theta$，满足
+\[
+\cos\theta = \frac{\langle\sigma_u,
+\sigma_v\rangle}{\norm{\sigma_u}\,\norm{\sigma_v}}
+= \frac{F}{\sqrt{EG}} :
+\]
+单个系数 $F$ 决定参数网
+的正交性。对于球面坐标卡与螺旋面，$F =
+0$：经线与纬线相交，螺旋线与水平
+直母线相交成直角——这正是它们的\omterm{def:b2:surfaces:area}{面积}被积式化为
+$\sqrt{EG}$ 的原因。对图像型坐标卡，
+$F = f_xf_y$ 仅在某个偏导数为零处才为零：
+倾斜图像的坐标网\emph{不}正交，
+尽管下方的 $(x, y)$ 网是正交的。
+曲面上的计算看起来繁琐时，首要
+做法是寻找满足 $F = 0$ 的坐标卡。
+\end{example}
+
+\begin{example}[鞍面坐标卡]\label{ex:b2:surfaces:saddlechart}
+对于鞍面 $z = xy$，取坐标卡 $\sigma(u, v) = (u, v,
+uv)$：
+\[
+\sigma_u = (1, 0, v), \qquad \sigma_v = (0, 1, u),
+\qquad
+E = 1 + v^2, \quad F = uv, \quad G = 1 + u^2 ,
+\]
+且 $EG - F^2 = 1 + u^2 + v^2 > 0$，处处正则。过一点的
+两条坐标曲线是\emph{直线
+}（$\R^3$ 中的直线；固定 $u$ 或固定 $v$：
+双直纹鞍面的直母线），然而在坐标轴之外 $F \neq 0$：直母线
+过一般点的直母线并不正交。两条直母线都
+位于\omterm{def:b2:surfaces:tangent}{切平面}内并张成\omterm{def:b2:surfaces:tangent}{切平面}——于是\omterm{def:b2:surfaces:tangent}{切平面}
+沿两条整条直线截曲面，正是球面的极端反面，
+球面的\omterm{def:b2:surfaces:tangent}{切平面}只在一点处相触。
+曲面与其\omterm{def:b2:surfaces:tangent}{切平面}之间“二阶接触”的符号，
+是\omterm{thm:b2:curves:frenet2d}{曲率}问题，
+留待本科三年级分册讨论。
+\end{example}
+
+\begin{proposition}[曲面上所画曲线的
+长度]\label{prop:b2:surfaces:curvelength}
+若 $\gamma(t) = \sigma(u(t), v(t))$，$t \in [a, b]$，
+为 $\mathcal{C}^1$ 的，则
+\[
+L(\gamma) = \int_a^b
+\sqrt{E\,u'^2 + 2F\,u'v' + G\,v'^2}\;\dd t ,
+\]
+其中 $E, F, G$ 在 $(u(t), v(t))$ 处取值。
+\end{proposition}
+
+\begin{proof}
+由链式法则，$\gamma' = u'\sigma_u + v'\sigma_v$，于是
+$\norm{\gamma'}^2 = I(u', v') = Eu'^2 + 2Fu'v' + Gv'^2$；对
+$\norm{\gamma'}$ 积分（\cref{def:b2:curves:length}）。
+\end{proof}
+
+\begin{example}[为何客机飞越极点]\label{ex:b2:surfaces:polarroute}
+两座机场位于纬度 $\varphi_0$ 上、经度相对的两点，
+$A = \sigma(0, \varphi_0)$ 与 $B = \sigma(\pi,
+\varphi_0)$，它们位于半径为 $R$ 的球面上。
+沿纬线（$\varphi \equiv \varphi_0$），长度为
+$\int_0^\pi R\cos\varphi_0\,\dd\theta = \pi R\cos\varphi_0$。
+沿过极点的路线（沿经线 $\theta = 0$ 向上，
+沿经线 $\theta = \pi$ 向下），长为 $2R(\frac\pi2 -
+\varphi_0)$。取纬度 $\varphi_0 = \frac\pi3$（六十
+度时，沿纬线的路线为 $\pi R/2 \approx 1.571\,R$，极点路线
+为 $\pi R/3 \approx 1.047\,R$——短了三分之一。事实上
+$\pi\cos\varphi_0 \geq \pi - 2\varphi_0$ 在
+$\intcc0{\pi/2}$ 上成立（函数 $\pi\cos\varphi - \pi +
+2\varphi$ 在两端点处为零，其导数 $2 -
+\pi\sin\varphi$ 恰变号一次，故它先增
+后减，因而非负）：极点路线不会
+更长。\omterm{def:b2:surfaces:fff}{第一基本形式}把一个导航问题
+化为两个简短的积分；\cref{exo:b2:surfaces:6}把这一
+想法推进为关于经线的真正极小性证明。
+\end{example}
+
+\begin{lemma}[拉格朗日恒等式]\label{lem:b2:surfaces:lagrange}
+对所有 $a, b \in \R^3$：
+$\norm{a \wedge b}^2 = \norm a^2 \norm b^2 - \langle a, b\rangle^2$。
+特别地，
+\[
+\norm{\sigma_u \wedge \sigma_v} = \sqrt{EG - F^2}.
+\]
+\end{lemma}
+
+\begin{proof}
+两边都不变：若把 $b$ 换为其分量 $b_\perp
+= b - \frac{\langle a, b\rangle}{\norm a^2}a$（与 $a$ 正交）
+（$a \neq 0$；$a = 0$ 的情形显然）：左边
+因 $a \wedge a = 0$ 而不变；右边由 $\norm
+{b_\perp}^2 = \norm b^2 - \frac{\langle a,b\rangle^2}{\norm a^2}$ 展开，
+并利用 $\langle a, b_\perp\rangle = 0$ 而不变。因此只需对正交的
+$a, b$ 证明恒等式，此时它化为 $\norm{a \wedge
+b} = \norm a \norm b$：成立，因正交向量的叉积\omterm{def:b2:nvs:norm}{范数}为
+$\norm a\norm b\,\abs{\sin\frac\pi2}$。
+上式即 $a = \sigma_u$、$b = \sigma_v$ 的情形。
+\end{proof}
+
+\begin{remark}
+拉格朗日恒等式表明 $EG - F^2 = \det\begin{psmallmatrix}
+E & F\\ F & G\end{psmallmatrix}$ 为 $(\sigma_u, \sigma_v)$ 的\emph{格拉姆
+\omterm{def:b2:linalg:det}{行列式}}，即它们所张平行四边形\omterm{def:b2:surfaces:area}{面积}的平方。
+正则性、\omterm{def:b2:surfaces:fff}{第一基本形式}的正定性与格拉姆\omterm{def:b2:linalg:det}{行列式}的正性
+是同一条件的三种说法——
+这正是下文\omterm{def:b2:surfaces:area}{面积}被积函数
+在正则坐标卡上永不为零的
+原因。
+\end{remark}
+
+\begin{definition}[面积]\label{def:b2:surfaces:area}
+设 $\sigma \colon U \to \R^3$ 为正则单射
+$\mathcal{C}^1$ 曲面，$K \subseteq U$ 为紧区域，
+其上二重积分有意义（见\cref{ch:b2:multint}）。
+曲面片 $\sigma(K)$ 的\emph{面积}\index{面积!曲面}为
+\[
+\mathcal{A}
+= \iint_K \norm{\sigma_u \wedge \sigma_v}\,\dd u\,\dd v
+= \iint_K \sqrt{EG - F^2}\;\dd u\,\dd v .
+\]
+\end{definition}
+
+\begin{remark}[此公式的来由]
+在一阶近似下，矩形 $[u, u + \dd u] \times [v, v + \dd v]$ 被映为
+由 $\sigma_u\,\dd u$ 与 $\sigma_v\,\dd v$ 张成的平行四边形，
+其\omterm{def:b2:surfaces:area}{面积}为 $\norm{\sigma_u \wedge
+\sigma_v}\,\dd u\,\dd v$：定义所作的积分
+正是对局部\omterm{def:b2:surfaces:area}{面积}畸变因子的积分，正如弧长是对局部速率的积分。
+与\omterm{def:b2:curves:reparam}{参数变换}的相容性
+见\cref{exo:b2:surfaces:8}；与二重积分换元公式的相容性
+则在
+\cref{ch:b2:multint}中讨论。
+\end{remark}
+
+\begin{example}[两个不同的图像，
+面积相同]\label{ex:b2:surfaces:samearea}
+在单位圆盘上比较碗面 $z = \frac12(x^2 + y^2)$
+与马鞍面 $z = xy$。二者的\omterm{def:b2:surfaces:area}{面积}被积函数
+（见\cref{exo:b2:surfaces:5}）分别为
+\[
+\sqrt{1 + x^2 + y^2}
+\qquad\text{ 和 }\qquad
+\sqrt{1 + y^2 + x^2} :
+\]
+完全相同。两张曲面——一张在所有方向上以同样的方式弯曲，
+另一张呈马鞍形——二者在每个区域上的\omterm{def:b2:surfaces:area}{面积}恰好相等，
+在单位圆盘上均为 $\frac{2\pi}3(2\sqrt2 - 1)$。
+\omterm{def:b2:surfaces:area}{面积}元只感知梯度的
+\emph{长度}，而不感知弯曲的排布；
+要区分碗面与马鞍面，需要二阶数据
+（即\cref{fig:b2:surfaces:saddle}所示的符号结构），
+而任何\omterm{def:b2:surfaces:area}{面积}测量都无法探测这一点。
+\omterm{def:b2:surfaces:fff}{第一基本形式}是度量，对形状无感；
+能反映形状的第二基本形式属于本科三年级的内容。
+\end{example}
+
+\begin{example}[球面的面积]\label{ex:b2:surfaces:spherearea}
+对\cref{ex:b2:surfaces:standard}中的球面坐标卡：
+\[
+\sigma_\theta = R(-\sin\theta\cos\varphi,\
+\cos\theta\cos\varphi,\ 0),
+\qquad
+\sigma_\varphi = R(-\cos\theta\sin\varphi,\
+-\sin\theta\sin\varphi,\ \cos\varphi),
+\]
+于是 $E = R^2\cos^2\varphi$，$F = 0$，$G = R^2$，且 $\sqrt{EG - F^2}
+= R^2\cos\varphi$。由此
+\[
+\mathcal{A}
+= \int_{-\pi/2}^{\pi/2}\!\!\int_0^{2\pi}
+R^2\cos\varphi\;\dd\theta\,\dd\varphi
+= 2\pi R^2\,\bigl[\sin\varphi\bigr]_{-\pi/2}^{\pi/2}
+= \boxed{4\pi R^2} .
+\]
+\end{example}
+
+\begin{example}[圆锥，
+与中学公式核对]\label{ex:b2:surfaces:conearea}
+对圆锥面 $z = \sqrt{x^2 + y^2}$，在圆环 $a \leq
+\rho \leq b$ 上，
+由\cref{exo:b2:surfaces:5}中的图像公式得 $1 + f_x^2 + f_y^2 = 2$
+（计算 $f_x = x/\rho$，$f_y = y/\rho$），于是
+\[
+\mathcal A = \sqrt2\,\pi\,(b^2 - a^2) .
+\]
+相容性检验：与\cref{ex:b2:surfaces:revolution}中的斜高公式 $\pi\rho\ell$ 比较。
+底面半径分别为 $b$ 与 $a$ 的整圆锥，
+其侧\omterm{def:b2:surfaces:area}{面积}分别为 $\pi b\cdot b\sqrt2$ 与
+$\pi a\cdot a\sqrt2$，二者之差恰为
+$\sqrt2\pi(b^2 - a^2)$。两张坐标卡、两个公式、同一\omterm{def:b2:surfaces:area}{面积}
+——即\cref{exo:b2:surfaces:8}中证明的不变性，
+在实例中得到验证。
+\end{example}
+
+\begin{remark}[曲面面积的快速检验]
+三项即时检验可以发现\omterm{def:b2:surfaces:area}{面积}计算中的大多数错误。
+\emph{缩放}：曲面按 $\lambda$ 倍放大时，
+$E, F, G$ 乘以 $\lambda^2$，\omterm{def:b2:surfaces:area}{面积}也乘以
+$\lambda^2$——若答案对 $R$ 的依赖不是
+二次的（如 $4\pi R^2$），则必定有误。\emph{\omterm{def:b2:surfaces:area}{面积}元的
+正性}：$\sqrt{EG - F^2}$ 在坐标卡内部必须严格为正；
+若其取零，则标志坐标卡退化，
+须像球面两极那样挖去。\emph{对称性}：对称部分上的计算
+必须与其全等部分之和相容：
+半球面的\omterm{def:b2:surfaces:area}{面积}应当
+为 $2\pi R^2$。
+\end{remark}
+
+\begin{example}[旋转曲面]\label{ex:b2:surfaces:revolution}
+将曲线 $z \mapsto (r(z), 0, z)$，$r > 0$，
+且属 $\mathcal{C}^1$ 类，绕 $z$ 轴旋转：
+\[
+\sigma(\theta, z) = (r(z)\cos\theta,\ r(z)\sin\theta,\ z).
+\]
+于是 $E = r(z)^2$，$F = 0$，$G = 1 + r'(z)^2$，因此
+\[
+\mathcal{A} = \int_a^b\!\!\int_0^{2\pi}
+r(z)\sqrt{1 + r'(z)^2}\;\dd\theta\,\dd z
+= 2\pi\int_a^b r(z)\sqrt{1 + r'(z)^2}\,\dd z ,
+\]
+即经典公式（圆周长 $2\pi r$ 乘以斜长
+微元）。对于圆锥 $r(z) = kz$，$z \in [0, h]$：$\mathcal
+A = 2\pi k\sqrt{1 + k^2}\,\frac{h^2}{2} = \pi \rho \ell$，其中
+$\rho = kh$ 为底面半径，$\ell = h\sqrt{1 + k^2}$ 为斜高
+——中学公式，此处由推导得出，而非不加证明地承认。
+\end{example}
+
+\begin{example}[悬链面]\label{ex:b2:surfaces:catenoid}
+将悬链线 $r(z) = \cosh z$，$z \in \intcc{-1}{1}$，
+绕其轴旋转，所得\emph{悬链面}的\omterm{def:b2:surfaces:area}{面积}由旋转公式
+及 $1 + \sinh^2 z = \cosh^2 z$ 得出：
+\[
+\mathcal A = 2\pi\int_{-1}^1\cosh z\,\sqrt{1 + \sinh^2z}\,
+\dd z = 2\pi\int_{-1}^1\cosh^2z\,\dd z
+= \pi\bigl[z + \sinh z\cosh z\bigr]_{-1}^{1},
+\]
+即
+\[
+\mathcal A = 2\pi + \pi\sinh 2 \approx 17.68 .
+\]
+斜长因子 $\sqrt{1 + r'^2}$ 与半径合并成
+一个完全平方——与曲线一章中使悬链线弧长
+可初等求出的恒等式相同。这并非代数上的偶然：在所有张成两个边界圆的
+旋转曲面中，悬链面的\omterm{def:b2:surfaces:area}{面积}最小
+（它恰是两圆环之间肥皂膜的形状），而这一变分性质
+正是使 $\cosh$ 脱颖而出的原因；
+本科三年级分册借助
+变分法
+证明了这一点。
+\end{example}
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[scale=1.05]
+  % A saddle surface z = x^2 - y^2 drawn as a wire mesh in oblique projection
+  % projection: (x,y,z) -> (x + 0.45*y, z + 0.35*y)
+  \begin{scope}
+    % u-lines (x varies, y fixed)
+    \foreach \yy in {-1,-0.5,0,0.5,1} {
+      \draw[ocDarkBlue!70, thick, domain=-1:1, smooth, samples=25]
+        plot ({\x + 0.45*\yy}, {\x*\x - \yy*\yy + 0.35*\yy});
+    }
+    % v-lines (y varies, x fixed)
+    \foreach \xx in {-1,-0.5,0,0.5,1} {
+      \draw[ocMint!80!black, thick, domain=-1:1, smooth, samples=25]
+        plot ({\xx + 0.45*\x}, {\xx*\xx - \x*\x + 0.35*\x});
+    }
+    % tangent plane at origin: z = 0 -> parallelogram
+    \draw[ocRed, dashed]
+      (-0.8 - 0.36, -0.28) -- (0.8 - 0.36, -0.28)
+      -- (0.8 + 0.36, 0.28) -- (-0.8 + 0.36, 0.28) -- cycle;
+    \fill (0,0) circle (0.045) node[below right, font=\small] {$M_0$};
+    % normal vector at origin
+    \draw[->, thick] (0,0) -- (0,0.9)
+      node[right, font=\small] {$n$};
+  \end{scope}
+\end{tikzpicture}
+\caption{原点附近的鞍面 $z = x^2 - y^2$，及其
+坐标曲线（蓝色为 $u$ 曲线，绿色为 $v$ 曲线）、
+在 $M_0 = (0,0,0)$ 处的\omterm{def:b2:surfaces:tangent}{切平面}（虚线）与\omterm{def:b2:surfaces:tangent}{单位法向量} $n$。
+曲面穿过其\omterm{def:b2:surfaces:tangent}{切平面}——这是拐点概念
+在二维情形下的类比。}
+\label{fig:b2:surfaces:saddle}
+\end{figure}
+
+\begin{remark}[常见误区]
+(i) \emph{坐标卡的奇点不是曲面的奇点}：
+球面坐标卡在两极处退化，
+（$\cos\varphi = 0$），但球面在那里完全光滑——
+另一坐标卡（交换坐标轴的角色）在两极处正则，
+故在断定某点为奇点之前，应先尝试第二种参数化。
+(ii) \emph{$\sigma$ 的正则性只涉及参数化，而不涉及
+像集}：$\sigma(u, v) = (u^3, v,
+0)$ 沿 $u = 0$ 非正则，尽管其像集是一个
+平面。（iii）\omterm{def:b2:surfaces:area}{面积}公式要求 $\sigma$
+在 $K$ 上\emph{单射}：坐标卡若将某一块覆盖两次，
+则计算时该块被计入两次（$\theta$ 取遍 $\intcc0{4\pi}$
+会使球面\omterm{def:b2:surfaces:area}{面积}加倍）。（iv）\omterm{def:b2:surfaces:tangent}{单位法向量}由曲面
+仅确定到符号为止，其符号由坐标卡\emph{选定}
+（$u, v$ 的次序）；涉及定向的命题必须先固定
+这一选择。（v）最后，$EG - F^2 > 0$ 并非额外假设：
+由拉格朗日恒等式，它恰好就是正则性，
+若它在某处为零，问题出在坐标卡上，
+此处任何\omterm{def:b2:surfaces:area}{面积}或\omterm{def:b2:surfaces:tangent}{切平面}公式均不适用。
+\end{remark}
+
+\begin{remark}[本卷的其他视角]
+由此展望的联系。\omterm{def:b2:surfaces:area}{面积}元 $\sqrt{EG -
+F^2}\,\dd u\,\dd v$ 其实是伪装的二维雅可比
+而 \cref{ch:b2:multint} 使这一类比
+与换元定理严格对应——那里的曲\omterm{def:b2:surfaces:area}{面
+积}分即本章的\omterm{def:b2:surfaces:area}{面积}，附带一个被积函数
+。\omterm{def:b2:surfaces:fff}{第一基本形式}是正定
+\omterm{def:b2:quadratic:def}{二次型}的场，逐点借助
+\cref{ch:b2:quadratic} 中的工具处理，其谱定理也支撑
+本章周末问题中的\omterm{pb:b2:surfaces:1}{二次曲面}分类。而法线
+驱动约束集上的极值问题
+（见\cref{ex:b2:surfaces:closest}），是
+拉格朗日乘子法的几何雏形，由
+\cref{thm:b2:diffcalc:extrema} 勾勒。
+\end{remark}
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=0.8]
+  \draw[omDef, thick] (0,0) ellipse (1.5 and 0.95);
+  \draw[omThm] (0,0) ellipse (1.5 and 0.35);
+  \node[below, font=\small] at (0,-1.25) {椭球面};
+\end{tikzpicture}
+\qquad
+\begin{tikzpicture}[scale=0.8]
+  \draw[omDef, thick] plot[domain=-1.1:1.1, samples=30]
+    ({0.6*(exp(\x)+exp(-\x))/2}, {\x});
+  \draw[omDef, thick] plot[domain=-1.1:1.1, samples=30]
+    ({-0.6*(exp(\x)+exp(-\x))/2}, {\x});
+  \draw[omThm] (0,0) ellipse (0.6 and 0.16);
+  \draw[omDef] (0,1.1) ellipse (1.0 and 0.22);
+  \draw[omDef] (0,-1.1) ellipse (1.0 and 0.22);
+  \node[below, font=\small] at (0,-1.55)
+    {单叶双曲面};
+\end{tikzpicture}
+\qquad
+\begin{tikzpicture}[scale=0.8]
+  \draw[omDef, thick] plot[domain=-1.05:1.05, samples=30]
+    ({\x}, {1.1*\x*\x - 1.1});
+  \draw[omThm] (0,0.055) ellipse (1.0 and 0.22);
+  \node[below, font=\small] at (0,-1.45)
+    {椭圆抛物面};
+\end{tikzpicture}
+\qquad
+\begin{tikzpicture}[scale=0.8]
+  \draw[omDef, thick] plot[domain=-1:1, samples=30]
+    ({\x}, {0.55*\x*\x});
+  \draw[omThm, thick] plot[domain=-1:1, samples=30]
+    ({0.45*\x}, {-0.55*\x*\x + 0.18*\x});
+  \node[below, font=\small] at (0,-1.15)
+    {双曲抛物面};
+\end{tikzpicture}
+
+{\small 下图为周末问题中分类的九种\omterm{pb:b2:surfaces:1}{二次曲面}中的四种，
+以其轮廓线及一条等高线示意
+（红色）：有界椭球面、带腰的双直纹单叶双曲面、
+椭圆抛物面的碗状面，以及
+马鞍面，其两条抛物截线
+朝相反方向弯曲。}
+\end{omfigure}
+
+\begin{remark}[应用]
+\omterm{def:b2:surfaces:area}{面积}元 $\norm{\sigma_u\wedge\sigma_v}\,\dd u\,\dd v$
+是 \cref{ch:b2:multint} 中的曲\omterm{def:b2:surfaces:area}{面积}分测度，它在此与
+格林公式相遇；\omterm{def:b2:surfaces:fff}{第一基本形式}是
+\omterm{def:b2:quadratic:def}{二次型}场的原型，逐点研究，
+借助 \cref{ch:b2:quadratic} 中的工具；本章的
+周末问题利用谱定理对所有\omterm{pb:b2:surfaces:1}{二次曲面}
+分类。本科三年级分册借助
+\omterm{def:b2:diffcalc:differential}{微分}形式与散度定理重新讨论曲面，以及内蕴
+\omterm{thm:b2:curves:frenet2d}{曲率}——即 $E, F, G$ 所反映的弯曲性质——
+是通向\omterm{def:b2:diffcalc:differential}{微分}几何本身的门户。
+\end{remark}
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:b2:surfaces:1}
+证明：锥面 $z = \sqrt{x^2 + y^2}$ 的所有\omterm{def:b2:surfaces:tangent}{切平面}
+（去掉顶点）都经过顶点。\emph{（取参数表示
+$\sigma(\theta, r) = (r\cos\theta, r\sin\theta, r)$, $r > 0$.)}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:surfaces:2}
+求椭球面 $\frac{x^2}{a^2} +
+\frac{y^2}{b^2} + \frac{z^2}{c^2} = 1$ 上一点 $(x_0, y_0,
+z_0)$ 处的\omterm{def:b2:surfaces:tangent}{切平面}。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:surfaces:3}
+计算 $E, F, G$，其中螺旋面 $\sigma(u, v) = (v\cos u,\
+v\sin u,\ au)$, $a > 0$，以及该片 $0 \leq u \leq
+2\pi$, $0 \leq v \leq 1$ 的\omterm{def:b2:surfaces:area}{面积}，写成积分形式（利用
+$\int\sqrt{v^2 + a^2}\,\dd v = \frac12\bigl(v\sqrt{v^2+a^2} +
+a^2\ln(v + \sqrt{v^2 + a^2})\bigr) + C$).
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:surfaces:4}
+（环面）写出环面的参数化，该环面由圆心为
+$(R, 0, 0)$、半径为 $r < R$ 的圆在 $xz$ 平面内绕
+$z$ 轴旋转得到：
+\[
+\sigma(\theta, \psi) = \bigl((R + r\cos\psi)\cos\theta,\
+(R + r\cos\psi)\sin\theta,\ r\sin\psi\bigr).
+\]
+计算 $E, F, G$，检验正则性，并证明\omterm{def:b2:surfaces:area}{面积}为
+$4\pi^2 R r$（帕普斯：平均周长 $2\pi R$ 乘以圆的
+周长 $2\pi r$）。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:surfaces:5}
+证明 $f \in \mathcal{C}^1(K)$ 的图像\omterm{def:b2:surfaces:area}{面积}为
+$\iint_K \sqrt{1 + f_x^2 + f_y^2}\,\dd x\,\dd y$，并计算它
+对抛物面片 $z = \frac12(x^2 + y^2)$ 在圆盘
+$x^2 + y^2 \leq 1$ 上的部分（用极坐标，
+见\cref{ch:b2:multint}）。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:surfaces:6}
+球面上一条画出的曲线 $\gamma(t) = \sigma(u(t), v(t))$，
+半径为 $R$（用球面坐标卡），且 $u = \theta(t)$，$v =
+\varphi(t)$。将其长度写成关于 $\theta, \varphi$ 的积分，
+并证明：在连接同一
+子午线 $\theta = \theta_0$ 上两点的所有曲线中，子午线弧段最短。
+\emph{（将被积函数从下方以 $R\abs{\varphi'}$ 估计。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:surfaces:7}
+（球面的法线）设 $S$ 为正则水平曲面
+$\{f = c\}$，连通，且其所有法线都经过
+定点 $\Omega$。证明 $S$ 含于
+以 $\Omega$ 为球心的球面中。\emph{（证明 $\norm{M - \Omega}^2$
+沿 $S$ 上任一画出的曲线的导数为零。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:surfaces:8}
+（\omterm{def:b2:surfaces:area}{面积}是几何量）设 $\Phi \colon U' \to U$ 为 $\mathcal{C}^1$
+\omterm{def:b2:diffcalc:differential}{微分}同胚（$\R^2$ 中\omterm{def:b2:metric:topology}{开集}之间），且 $\tilde\sigma =
+\sigma \circ \Phi$。证明
+\[
+\norm{\tilde\sigma_{u'} \wedge \tilde\sigma_{v'}}
+= \abs{\det J_\Phi}\,
+\norm{(\sigma_u \wedge \sigma_v)\circ\Phi} ,
+\]
+再利用
+在\cref{ch:b2:multint}中的换元公式，推出
+\cref{def:b2:surfaces:area}所定义的\omterm{def:b2:surfaces:area}{面积}
+不依赖于所选的正则参数化。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:surfaces:9}
+（阿基米德帽盒定理）在半径为 $R$ 的球面上，
+两纬线（$z_1 \leq z \leq z_2$）之间的\emph{球带}
+（$-R \leq z_1 < z_2 \leq R$）的\omterm{def:b2:surfaces:area}{面积}为 $2\pi R\,(z_2 - z_1)$：
+用球面坐标卡证明它，并由此断定：球带的
+\omterm{def:b2:surfaces:area}{面积}仅由其高度决定——把橙子切成等厚的薄片，
+各片所含果皮\omterm{def:b2:surfaces:area}{面积}相等。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:surfaces:10}
+证明旋转曲面
+$\sigma(\theta, z) = (r(z)\cos\theta,\ r(z)\sin\theta,\ z)$
+（$r > 0$ 为 $\mathcal C^1$ 类函数）的每条法线都与旋转轴
+相交，并求出交点的位置。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:surfaces:11}
+（展开圆柱面）单位圆柱面的坐标卡 $\sigma(u, v) = (\cos u,\
+\sin u,\ v)$ 满足 $E = G = 1$，$F = 0$。
+请验证之，并说明为何每条画出的曲线 $t \mapsto
+\sigma(u(t), v(t))$ 与平面曲线 $t
+\mapsto (u(t), v(t))$ 的长度相同。由此推出，从 $(1, 0, 0)$
+到 $(1, 0, 2\pi c)$ 且绕行一圈的螺旋线，其长度为
+$2\pi\sqrt{1 + c^2}$，并证明端点相同且绕行一整圈的
+任一画出的曲线都不比它短。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:surfaces:12}
+设 $S = \{f = c\}$ 为紧的正则水平曲面，
+$M_0 \in S$ 为到原点距离最大的点。证明
+$\nabla f(M_0)$ 与 $\vect{OM_0}$ 共线——即
+最远点处的法线是径向的。将其应用于椭球面
+$\frac{x^2}{a^2} + \frac{y^2}{b^2} + \frac{z^2}{c^2} = 1$（$a >
+b > c > 0$）：求出法线为径向的全部点，并
+确定其中最远的那些点。
+\end{exercise}
+
+\section{问题：$\R^3$ 中二次曲面的
+分类}
+
+\begin{problem}[{周末问题——每一个二次曲面，
+用谱定理加以分类}]\label{pb:b2:surfaces:1}
+称\emph{二次曲面}\index{二次曲面}为 $\R^3$ 中某个
+二次多项式的零点集，其形式为
+\[
+q(X) = X^{\mathsf T}\!AX + 2\,\langle b, X\rangle + c,
+\qquad A \in \mathcal S_3(\R),\ A \neq 0,\ b \in \R^3,\
+c \in \R .
+\]
+本章图中的曲面——球面、
+椭球面、鞍面、锥面、柱面——都是\omterm{pb:b2:surfaces:1}{二次曲面}。
+本题将它们\emph{全部}分类：谱定理
+（\cref{thm:b2:quadratic:spectral}）可将二次部分化为标准形，
+在\cref{ch:b2:affine}中的仿射平移可吸收一次部分，
+剩下的便是一份简短而\omterm{def:b2:metric:complete}{完备}的
+标准形列表。
+
+\medskip
+\noindent\textbf{第一部分——化简机制。}
+\begin{enumerate}
+  \item 设 $X = PY + t$，其中 $P \in O(3)$，$t \in \R^3$（
+        刚性坐标变换）。证明 $q(PY + t) =
+        Y^{\mathsf T}\!A'Y + 2\langle b', Y\rangle + c'$，其中
+        \[
+        A' = P^{\mathsf T}\!AP, \qquad
+        b' = P^{\mathsf T}(At + b), \qquad
+        c' = q(t) .
+        \]
+        由此可知 $A$ 的谱（从而其秩与
+        \omterm{thm:b2:quadratic:sylvester}{符号差}）是方程的刚性不变量，并说明为何
+        给定\omterm{pb:b2:surfaces:1}{二次曲面}的方程只能确定到
+        相差一个非零数因子。
+  \item 利用谱定理证明，经过一次旋转后
+        方程化为 $\sum_i \lambda_i y_i^2 +
+        2\sum_i\beta_iy_i + c = 0$，其中 $\lambda_1, \lambda_2,
+        \lambda_3$ 为 $A$ 的\omterm{def:b2:reduction:eigen}{特征值}。
+  \item 对每个 $i$，若 $\lambda_i \neq 0$，则通过平移吸收
+        $\beta_iy_i$ 项，作平移（$y_i \mapsto y_i -
+        \beta_i/\lambda_i$）。当
+        $\operatorname{rank} A = r$ 时，写出化简后的方程：$\sum_{i\leq r}\lambda_i
+        z_i^2 + 2\sum_{i > r}\beta_iz_i + c'' = 0$。
+  \item 对方程 $q = 0$ 所确定的\omterm{pb:b2:surfaces:1}{二次曲面}，\emph{中心}是
+        一点 $\Omega$，使得 $q(2\Omega - X) = q(X)$ 对所有
+        $X$ 成立：关于 $\Omega$ 的点反射保持
+        方程，从而保持该曲面。证明 $q(2\Omega - X)
+        - q(X) = -4\langle A\Omega + b, X\rangle + 4\langle
+        A\Omega + b, \Omega\rangle$，并推出：中心
+        恰为 $A\Omega = -b$ 的解；
+        它们存在当且仅当 $b \in \operatorname{im}A$，而中心
+        唯一当且仅当 $A$ 可逆。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第二部分——中心\omterm{pb:b2:surfaces:1}{二次曲面}
+（$\operatorname{rank}A = 3$）。}此时化简后的方程为
+$\lambda_1z_1^2 + \lambda_2z_2^2 + \lambda_3z_3^2 = \delta$。
+\begin{enumerate}[resume]
+  \item 必要时乘以 $-1$，不妨设至少有两个
+        $\lambda_i > 0$。列出所有可能情形：
+        \omterm{thm:b2:quadratic:sylvester}{符号差}为 $(3, 0)$，且 $\delta > 0$、$= 0$、$< 0$，
+        以及\omterm{thm:b2:quadratic:sylvester}{符号差}为 $(2, 1)$，且 $\delta > 0$、$= 0$、$<
+        0$；依次命名由此得到的六类集合（椭球面、点、
+        空集、单叶双曲面、锥面、双叶
+        双曲面），并将每一个化为其欧氏标准形
+        （$\frac{x^2}{a^2} + \frac{y^2}{b^2} +
+        \frac{z^2}{c^2} = 1$ 等）。
+  \item 对方程 $x^2 + y^2 + z^2 + 4xy + 4yz + 4zx = 1$ 进行分类：
+        证明 $A = 2J - I$，其中 $J$ 为全一矩阵，
+        计算谱 $\{5, -1, -1\}$，并判定
+        其为绕轴的双叶旋转双曲面，轴为
+        $\R(1,1,1)$。
+  \item （直母线）对单叶双曲面
+        $\frac{x^2}{a^2} + \frac{y^2}{b^2} - \frac{z^2}{c^2}
+        = 1$，作因式分解
+        \[
+        \Bigl(\frac xa - \frac zc\Bigr)
+        \Bigl(\frac xa + \frac zc\Bigr)
+        = \Bigl(1 - \frac yb\Bigr)\Bigl(1 + \frac yb\Bigr)
+        \]
+        并由此得到两族单参数直线，
+        它们均位于该曲面上。
+  \item 证明：过单叶双曲面上的每一点，
+        每族恰有一条直线通过：
+        即该曲面是\emph{双重直纹面}。
+  \item 单叶双曲面的\emph{渐近锥面}
+        为 $C : \frac{x^2}{a^2} + \frac{y^2}{b^2}
+        - \frac{z^2}{c^2} = 0$。记 $\rho^2 = \frac{x^2}{a^2}
+        + \frac{y^2}{b^2}$，证明单叶双曲面上任一点
+        到锥面的距离至多为 $c\bigl(\rho -
+        \sqrt{\rho^2 - 1}\bigr) = \frac{c}{\rho +
+        \sqrt{\rho^2 - 1}}$（即 $C$ 的距离），因此曲面
+        在无穷远处紧贴其锥面。双曲面被平面
+        $x = \pm a$ 所截的截口是什么？
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第三部分——秩 $2$ 与秩 $1$：
+抛物面、柱面、平面。}
+\begin{enumerate}[resume]
+  \item 设 $\operatorname{rank}A = 2$，不妨设 $\lambda_1,
+        \lambda_2 \neq 0 = \lambda_3$。从第
+        3 题出发，分两种情形，按 $\beta_3 \neq 0$
+        （由第 4 题，无中心）或 $\beta_3 = 0$（中心构成
+        一条直线），并化为
+        \[
+        \lambda_1z_1^2 + \lambda_2z_2^2 + 2\beta_3z_3 = 0
+        \qquad\text{或}\qquad
+        \lambda_1z_1^2 + \lambda_2z_2^2 + c'' = 0 :
+        \]
+        第一种情形中为椭圆抛物面或双曲抛物面，
+        以中心二次曲线为准线的柱面（或相交平面对、
+        一条直线、空集）属于
+        第二种情形。
+  \item 证明鞍面 $z = xy$ 为双曲
+        抛物面：旋转 $\pi/4$（在 $xy$ 平面内），
+        得 $z = \tfrac12(u^2 - v^2)$，即
+        \cref{fig:b2:surfaces:saddle} 中的曲面（相差一个比例）。
+  \item 证明鞍面 $z = xy$ 上带有两族
+        直线 $\{x = x_0,\ z = x_0y\}$ 与 $\{y = y_0,\ z
+        = xy_0\}$，且过曲面上每一点，每族恰有一条
+        直线通过：此即第二个双重直纹\omterm{pb:b2:surfaces:1}{二次曲面}。
+  \item 对方程 $x^2 + y^2 - 2x + 4y + 3 = 0$ 在 $\R^3$ 中进行分类
+        （配方；判定一个正圆柱面，
+        并给出其轴与半径）。
+  \item 现设 $\operatorname{rank}A = 1$，不妨设 $\lambda_1
+        \neq 0 = \lambda_2 = \lambda_3$。在核
+        平面内旋转并平移，化为
+        \[
+        \lambda_1z_1^2 + 2\beta z_2 = 0 \quad (\beta \neq 0)
+        \qquad\text{或}\qquad
+        \lambda_1z_1^2 + c'' = 0 :
+        \]
+        抛物柱面，或一对平行平面、
+        二重平面，或空集。对方程 $(x + y)^2 =
+        z$ 作完全分类（标准形，以及
+        平移不变性的轴）。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第四部分——分类定理。}
+\begin{enumerate}[resume]
+  \item 将第一至第三部分综合为一个定理：\emph{每一个
+        $\R^3$ 中的\omterm{pb:b2:surfaces:1}{二次曲面}经刚体运动后，恰好
+        对应唯一一个标准形}。列出十七种仿射类型
+        （计入空集的各种形式与退化集合），
+        并挑出其中九种二次\emph{曲面}：
+        椭球面、单叶与双叶双曲面、锥面，
+        椭圆抛物面与双曲抛物面、椭圆柱面、
+        双曲柱面与抛物柱面。
+  \item 写出分类\emph{算法}：给定 $(A,
+        b, c)$，应计算哪些量、按何顺序计算，
+        以及哪一分支决定哪种类型？说明
+        每一步均可实际执行（对称
+        $3\times3$ 矩阵的\omterm{def:b2:reduction:eigen}{特征值}、秩，
+        以及 $A\Omega = -b$ 的可解性）。
+  \item 对方程 $x^2 + y^2 + z^2 - 2xy - 2yz -
+        2zx = 1$ 运行该算法：证明 $A = 2I - J$ 的谱为 $\{2, 2,
+        -1\}$，并得出结论：这是绕轴
+        $\R(1,1,1)$ 的单叶旋转双曲面。
+  \item 对方程 $x^2 + y^2 - z^2 - 2x + 4y + 2z + 4 = 0$ 运行该算法：
+        求中心，并判定该\omterm{pb:b2:surfaces:1}{二次曲面}。
+  \item 对方程 $x^2 + 4xy + y^2 = 2z$ 运行该算法：将
+        $xy$ 部分对角化（$u = \frac{x+y}{\sqrt2}$，$v =
+        \frac{x-y}{\sqrt2}$），并判定该\omterm{pb:b2:surfaces:1}{二次曲面}。
+  \item 欧氏与仿射的比较：证明两个标准形中心
+        \omterm{pb:b2:surfaces:1}{二次曲面}\emph{刚性地}等价，当且仅当它们的
+        系数表相同（允许置换，
+        及对方程乘以一个公共正数），
+        而\emph{仿射地}，只有\omterm{thm:b2:quadratic:sylvester}{符号差}这一数据保留：
+        每个椭球面都是
+        圆球面的仿射像。哪一定理保证了沿途的
+        \omterm{thm:b2:quadratic:sylvester}{符号差}不会改变
+        （\cref{thm:b2:quadratic:sylvester}）？
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第五部分——红利。}
+\begin{enumerate}[resume]
+  \item 证明\omterm{pb:b2:surfaces:1}{二次曲面}被任一仿射平面所截的每个截面，都是该平面内的
+        二次曲线（可能退化）。
+        求马鞍面 $z = xy$ 被
+        平面 $z = c$（$c \neq 0$ 与 $c = 0$）所截的截面，并判定其类型。
+  \item 哪些\omterm{pb:b2:surfaces:1}{二次曲面}包含直线？证明椭球面、双叶双曲面与椭圆抛物面
+        均不含直线，
+        \emph{（将 $q$ 限制到一条直线上；对双叶情形
+        利用柯西–施瓦茨不等式
+        ）}；锥面与柱面各由一族直线张成；
+        由此推出，双重直纹的\omterm{pb:b2:surfaces:1}{二次曲面}恰为
+        单叶
+        双曲面与双曲抛物面。
+  \item 若只需要\emph{仿射}类型，则
+        \omterm{thm:b2:quadratic:gauss}{高斯化简}（\cref{thm:b2:quadratic:gauss}）比对角化更简便。
+        用高斯算法重做第 17 题，
+        验证\omterm{thm:b2:quadratic:sylvester}{符号差}为 $(2, 1)$；
+        \omterm{thm:b2:quadratic:gauss}{高斯化简}丢失了哪些欧氏信息？
+  \item 对称矩阵的\omterm{def:b2:reduction:eigen}{特征值}全为实数。由此证明，
+        $A$ 的\omterm{def:b2:reduction:eigen}{特征值}的\emph{符号}可由
+        \omterm{def:b2:reduction:charpoly}{特征多项式}依笛卡儿符号法则读出，
+        并验证：
+        第 6 题中 $\chi_A(\lambda) = \lambda^3 - 3\lambda^2
+        - 9\lambda - 5$ 恰有一次变号，
+        故\omterm{thm:b2:quadratic:sylvester}{符号差}为 $(1, 2)$。
+  \item 综述。用几行概括算法，并说明
+        (i) 谱定理、(ii) 中心方程 $A\Omega = -b$、
+        (iii) 西尔维斯特惯性定理、(iv) \omterm{thm:b2:quadratic:gauss}{高斯化简}
+        各自所起的确切作用。同一机制在
+        $\R^2$ 中给出什么结果？
+        在 $\R^n$ 中又有何变化？
+\end{enumerate}
+\end{problem}

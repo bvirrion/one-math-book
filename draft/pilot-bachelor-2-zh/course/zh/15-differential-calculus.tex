@@ -1,0 +1,776 @@
+\chapter{微分学}\label{ch:b2:diffcalc}
+
+本科一年级分册中的二元微积分在此发展为
+赋范空间之间映射的微分学，主要包括：
+以最佳线性逼近刻画的\emph{微分}、完全一般的链式法则、
+并\emph{证明}施瓦茨对称定理、泰勒公式，
+以及极值问题的完整二阶分析。
+逆映射定理作为理论的顶峰，陈述时
+将其证明思路 --- 巴拿赫不动点 --- 明确写出。
+
+全文中，$U$ 为 $\R^n$ 的开子集（或赋范空间；
+有限维情形已包含全部思想），$f \colon U \to
+\R^m$。
+
+\section{微分}
+
+\begin{definition}\label{def:b2:diffcalc:differential}
+称 $f$ 在 $a$ 处\emph{可微}\index{可微}，若
+存在（连续）线性映射 $\dd f_a \colon \R^n \to \R^m$，使得
+\[
+f(a + h) = f(a) + \dd f_a(h) + o(\norm h)
+\qquad (h \to 0).
+\]
+映射 $\dd f_a$，即 $f$ 在 $a$ 处的\emph{微分}\index{微分}，
+是唯一的；它在标准基下的矩阵
+即\emph{雅可比矩阵}\index{雅可比矩阵} $J_f(a) =
+\bigl(\frac{\partial f_i}{\partial x_j}(a)\bigr)$。
+可微性蕴含连续性，并保证所有方向导数存在，
+其值为 $\dd f_a(v) = \lim_{t\to0}\frac{f(a + tv)
+- f(a)}{t}$；其逆不成立
+（见\cref{exo:b2:diffcalc:2}）。当 $m = 1$ 时，$\dd f_a(h) = \langle
+\nabla f(a), h\rangle$：本科一年级分册中的梯度，现理解为
+表示该微分的向量。
+\end{definition}
+
+\begin{theorem}[$C^1$ 判别法]\label{thm:b2:diffcalc:c1}
+若 $f$ 在 $U$ 上的所有偏导数都存在，且在
+$a$ 处连续，则 $f$ 在 $a$ 处可微。“$C^1$ 于 $U$ 上”，
+即偏导数连续 --- 因此蕴含处处可微，
+且其微分连续。
+\end{theorem}
+
+\begin{proof}
+逐分量证明即可（$m = 1$ 已足够）。本科一年级分册中的二元证明 ---
+每次移动一个坐标，对每段应用一元中值定理，
+并利用偏导数的连续性 ---
+在 $a$ 处 --- 可原样推广到 $n$ 段：
+\[
+f(a + h) - f(a) = \sum_{j=1}^{n} \bigl(f(a + h^{(j)}) - f(a +
+h^{(j-1)})\bigr)
+= \sum_j h_j\,\frac{\partial f}{\partial x_j}(\xi_j),
+\]
+其中 $h^{(j)}$ 保留前 $j$ 个坐标（取自 $h$），
+$\xi_j$ 位于第 $j$ 段上，连续性使每一项
+$\frac{\partial f}{\partial x_j}(\xi_j)$ 化为 $\frac{\partial
+f}{\partial x_j}(a) + o(1)$，误差为 $o(\norm h)$。
+\end{proof}
+
+\begin{theorem}[链式法则]\label{thm:b2:diffcalc:chainrule}
+若 $f$ 在 $a$ 处可微，$g$ 在 $f(a)$ 处可微，则 $g \circ f$
+在 $a$ 处可微，且满足
+\[
+\dd(g \circ f)_a = \dd g_{f(a)} \circ \dd f_a ,
+\qquad
+J_{g\circ f}(a) = J_g\bigl(f(a)\bigr)\,J_f(a) :
+\]
+雅可比矩阵相乘。\index{链式法则}
+\end{theorem}
+
+\begin{proof}
+记 $f(a + h) = f(a) + \dd f_a(h) + \norm h\,\varepsilon_1(h)$，
+且 $g(b + k) = g(b) + \dd g_b(k) + \norm k\,\varepsilon_2(k)$，其中
+$b = f(a)$，$k = k(h) = \dd f_a(h) + \norm h \varepsilon_1(h)$。
+代入可得：
+\[
+g(f(a+h)) = g(b) + \dd g_b\bigl(\dd f_a(h)\bigr)
++ \norm h\,\dd g_b(\varepsilon_1(h)) + \norm{k}\,\varepsilon_2(k),
+\]
+两个误差项均为 $o(\norm h)$：第一项因 $\dd g_b$
+连续且 $\varepsilon_1 \to 0$；第二项因 $\norm k
+\leq C\norm h$（有界线性映射加上小项），且
+$\varepsilon_2(k) \to 0$（当 $h \to 0$ 时）。
+\end{proof}
+
+\begin{example}[径向函数，一劳永逸]\label{ex:b2:diffcalc:radial}
+设 $r(x) = \norm x_2$ 在 $\R^n\setminus\{0\}$ 上，且 $f = g \circ
+r$，其中 $g$ 为一元 $C^1$ 函数。首先，$r$ 在
+$0$ 以外可微：由 $r^2 = \sum x_i^2$，
+\[
+\frac{\partial r}{\partial x_i} = \frac{x_i}{r},
+\qquad\text{即}\qquad
+\nabla r(x) = \frac{x}{\norm x} ,
+\]
+单位径向向量（对 $r^2$ 求导后相除 --- 或
+对 $\sqrt{\cdot}$ 用链式法则）。
+于是对任意径向函数，链式法则给出
+\[
+\nabla f(x) = g'\bigl(\norm x\bigr)\,\frac{x}{\norm x} .
+\]
+算例：取 $g(r) = \frac1r$，则 $\nabla\frac{1}{\norm
+x} = -\frac{x}{\norm x^3}$，即万有引力与静电学中的
+平方反比场 --- 方向沿径向，大小为
+$\frac{1}{\norm x^2}$。小结：径向函数的梯度
+都沿径向，因为水平集为球面，且
+梯度与水平集正交；而在 $x = 0$ 处，
+$r$ 则\emph{不}可微（不存在线性映射，
+在各方向都与 $\norm h$ 吻合）。光滑的
+径向剖面需 $g'(0) = 0$，才能
+平顺地穿过原点。
+\end{example}
+
+\begin{theorem}[中值不等式]\label{thm:b2:diffcalc:mvi}
+设 $f$ 在 $U$ 上可微，且线段 $\intcc{a}{b}
+= \{a + t(b-a)\}$ 含于 $U$。则
+\[
+\norm{f(b) - f(a)} \leq \norm{b - a}\,
+\sup_{x \in \intcc{a}{b}} \vertiii{\dd f_x} .
+\]
+特别地，在一个
+\emph{连通}开集上，微分恒为零的可微映射为常值映射。
+\end{theorem}
+
+\begin{proof}
+函数 $\varphi(t) = f(a + t(b-a))$ 在
+$\intcc{0}{1}$ 上可微，且其导数 $\varphi'(t) = \dd f_{a + t(b-a)}(b - a)$
+（由链式法则），范数 $\leq M\norm{b-a}$，其中 $M$ 为
+上式所示的上确界。对 $\R$ 值函数 $f$，一元
+中值不等式即得结论；对向量值，将其用于 $t \mapsto \langle u,
+\varphi(t)\rangle$，其中 $u$ 为沿 $f(b) - f(a)$ 方向的单位向量。
+常值性：局部常值（球内的线段），再加上
+连通性（$f$ 取某一给定值的集合既开又闭，见
+\cref{ch:b2:metric}）。
+\end{proof}
+
+\begin{example}[由中值不等式得到的利普希茨常数]\label{ex:b2:diffcalc:lipschitz}
+$f(x, y) = \sin x\,\sin y$ 在 $\R^2$ 上是否为利普希茨函数，若是，
+其常数为多少？它的梯度为 $\nabla f = (\cos x\sin y,\
+\sin x\cos y)$，其范数的平方为
+\[
+\cos^2x\sin^2y + \sin^2x\cos^2y
+\leq \sin^2 y + \cos^2y\cdot 1 = 1
+\]
+（分别将 $\cos^2x$ 与 $\sin^2x$ 放缩为 $1$），因此
+$\vertiii{\dd f_{(x,y)}} = \norm{\nabla f} \leq 1$ 处处成立，
+并由\cref{thm:b2:diffcalc:mvi}，在任意两点
+之间的线段上可得
+\[
+\abs{f(b) - f(a)} \leq \norm{b - a}_2 :
+\]
+$f$ 为 $1$-利普希茨函数，且该常数是最优的（在
+原点附近，$f(x, \tfrac\pi2) = \sin x$ 的斜率为 $1$）。小结
+：中值不等式将关于微分的逐点界
+转化为一个整体的连续模 ---
+这是在任意维数下求利普希茨估计的标准途径，
+也是\cref{exo:b2:diffcalc:12}中的核心工具。
+\end{example}
+
+\section{二阶导数}
+
+\begin{theorem}[施瓦茨]\label{thm:b2:diffcalc:schwarz}
+若 $f$ 为 $C^2$ 函数，即在 $U$ 上所有二阶偏导数存在且连续，
+则对所有 $i, j$：\index{施瓦茨定理}
+\[
+\frac{\partial^2 f}{\partial x_i\,\partial x_j}
+= \frac{\partial^2 f}{\partial x_j\,\partial x_i} .
+\]
+\end{theorem}
+
+\begin{proof}
+只需考虑两个变量（取 $x = x_i$，$y = x_j$，其余变量固定）。
+考虑二阶差分
+\[
+\Delta(h) = f(a + h, b + h) - f(a + h, b) - f(a, b + h) + f(a,b) .
+\]
+固定 $h$，令 $\varphi(x) = f(x, b+h) - f(x, b)$，则 $\Delta(h)
+= \varphi(a + h) - \varphi(a)$，两次应用
+中值定理，可得
+\[
+\Delta(h) = h\,\varphi'(\xi)
+= h\Bigl(\frac{\partial f}{\partial x}(\xi, b+h) -
+\frac{\partial f}{\partial x}(\xi, b)\Bigr)
+= h^2\,\frac{\partial^2 f}{\partial y\,\partial x}(\xi, \eta),
+\]
+其中 $\xi \in \intoo{a}{a+h}$，$\eta \in \intoo{b}{b+h}$。由
+连续性，$\frac{\Delta(h)}{h^2} \to \frac{\partial^2 f}{\partial
+y\partial x}(a, b)$（$h \to 0$ 时）。同样的计算，
+将变量角色互换（先固定第二个变量）
+得到 $\frac{\Delta(h)}{h^2} \to \frac{\partial^2 f}{\partial x
+\partial y}(a,b)$：同一量的两个极限相同。
+\end{proof}
+
+\begin{example}[为何需要 $C^2$：皮亚诺反例]\label{ex:b2:diffcalc:peano}
+设 $f(x, y) = \dfrac{xy(x^2 - y^2)}{x^2 + y^2}$，$f(0,0) = 0$。
+在原点之外 $f$ 为 $C^\infty$ 函数；在原点处，所有一阶
+与二阶偏导数均存在，但混合偏导数不相等。计算
+沿坐标轴：$f(x, 0) = f(0, y) = 0$，当 $y \neq 0$ 时，
+\[
+\frac{\partial f}{\partial x}(0, y)
+= \lim_{x\to0}\frac{f(x,y)}{x}
+= \frac{y(0 - y^2)}{y^2} = -y ,
+\qquad\text{对称地}\qquad
+\frac{\partial f}{\partial y}(x, 0) = x .
+\]
+因此
+\[
+\frac{\partial^2 f}{\partial y\,\partial x}(0,0)
+= \frac{\dd}{\dd y}\Bigl[\frac{\partial f}{\partial
+x}(0,y)\Bigr]_{y=0} = -1,
+\qquad
+\frac{\partial^2 f}{\partial x\,\partial y}(0,0) = +1 :
+\]
+两个混合偏导数存在且不相等，与
+\cref{thm:b2:diffcalc:schwarz}并不矛盾：$f$ 的二阶偏导数在
+$0$ 处不连续（沿 $y = tx$ 检验）。小结：
+施瓦茨定理是一个关于\emph{连续性}的实质性定理，
+而非形式上的恒等式 ---“$C^2$”这一假设在
+下文的泰勒--杨公式中起着实质作用。
+\end{example}
+
+\begin{theorem}[二阶泰勒--杨公式]\label{thm:b2:diffcalc:taylor}
+设 $f \colon U \to \R$ 为 $C^2$ 函数，$a \in U$。则当 $h \to 0$ 时，
+\[
+f(a + h) = f(a) + \langle\nabla f(a), h\rangle
++ \frac12\, \langle H_a h,\, h\rangle + o\bigl(\norm h^2\bigr),
+\]
+其中 $H_a = \bigl(\frac{\partial^2 f}{\partial x_i\partial
+x_j}(a)\bigr)$ 为（由施瓦茨定理知其）对称的\emph{黑塞
+矩阵}\index{黑塞矩阵}。
+\end{theorem}
+
+\begin{proof}
+应用一元泰勒--杨公式（本科一年级分册）于
+$\varphi(t) = f(a + th)$ 在 $\intcc{0}{1}$ 上，由链式法则：
+$\varphi'(t) = \langle \nabla f(a + th), h\rangle$，且 $\varphi''(t)
+= \langle H_{a+th}h, h\rangle$，二者关于 $t$ 均连续。于是
+$\varphi(1) = \varphi(0) + \varphi'(0) + \frac12\varphi''(\theta)$
+（泰勒--拉格朗日形式），其中 $\theta \in \intoo{0}{1}$，
+由二阶偏导数的连续性，$\varphi''(\theta) =
+\varphi''(0) + o(1)\cdot\norm h^2$ 一致成立，
+即得所示展开式。
+\end{proof}
+
+\begin{example}[两种方式展开]\label{ex:b2:diffcalc:taylortwoways}
+在原点处将 $f(x, y) = \eu^x\cos y$ 展开至 $2$ 阶。
+\emph{利用一元展开式的复合：}
+\[
+\eu^x\cos y = \Bigl(1 + x + \frac{x^2}{2} +
+o(x^2)\Bigr)\Bigl(1 - \frac{y^2}{2} + o(y^2)\Bigr)
+= 1 + x + \frac{x^2 - y^2}{2} + o\bigl(\norm{(x,y)}^2\bigr) .
+\]
+\emph{利用偏导数：} $f_x = \eu^x\cos y$，$f_y =
+-\eu^x\sin y$，故 $\nabla f(0) = (1, 0)$；又 $f_{xx} = f$，
+$f_{yy} = -f$，$f_{xy} = -\eu^x\sin y$ 给出 $H_0 =
+\operatorname{diag}(1, -1)$：由\cref{thm:b2:diffcalc:taylor}
+得到 $1 + x + \frac12(x^2 - y^2)$。两种计算
+结果一致，且复合的做法更快 --- 无需
+任何二阶偏导数。收尾要点：原点\emph{不}是
+临界点（$\nabla f \neq 0$），故尽管黑塞矩阵不定，
+也没有需要宣布的鞍点：线性项起主导作用，
+而二阶判别法只对临界
+点作出判断。
+\end{example}
+
+\begin{theorem}[二阶极值判别法（已证）]\label{thm:b2:diffcalc:extrema}
+设 $f$ 为 $C^2$ 函数，在临界点 $a$（$\nabla f(a) = 0$）附近，
+其黑塞矩阵为 $H = H_a$。
+\begin{enumerate}
+  \item 若 $H$ 正定，则 $a$ 为严格局部极小点
+        （负定时为极大点）。
+  \item 若 $H$ 的特征值有正有负，则 $a$ 为鞍点：
+        不是极值点。
+  \item 若 $H$ 奇异（且为半定），则不能作出结论。
+\end{enumerate}
+本科一年级的“$rt - s^2$”判别法是 $n = 2$ 的情形：$\det H = rt -
+s^2$，$\operatorname{tr}$ 的符号由 $r$ 直接读出。
+\end{theorem}
+
+\begin{proof}
+由谱定理（见\cref{thm:b2:quadratic:spectral}），$H$ 的
+二次型夹在其最小与最大特征值之间：
+$\lambda_{\min}\norm h^2 \leq \langle Hh, h\rangle \leq
+\lambda_{\max}\norm h^2$.
+
+(1) 若 $\lambda_{\min} > 0$，由泰勒--杨公式可得
+\[
+f(a + h) - f(a) \geq \frac{\lambda_{\min}}{2}\norm h^2 -
+o(\norm h^2) > 0
+\]
+对充分小的 $h \neq 0$，即严格局部极小点。
+
+(2) 沿特征向量 $v_+$（对应 $\lambda_+ > 0$）方向：$f(a + tv_+) -
+f(a) = \frac{\lambda_+}{2}t^2 + o(t^2) > 0$，对充分小的 $t$ 成立；沿
+$v_-$（对应 $\lambda_- < 0$）方向上差值为负：两种符号
+在每个邻域中都会出现。
+
+(3) $f(x,y) = x^2 + y^4$，$x^2 - y^4$，$x^2 + y^3$ 三者在
+$0$ 处有相同的奇异半定黑塞矩阵，行为却
+各不相同。
+\end{proof}
+
+\begin{example}[完整分类，包括全局情形]\label{ex:b2:diffcalc:quarticrun}
+对 $f(x, y) = x^4 + y^4 - 4xy$ 在 $\R^2$ 上的全部极值进行分类。
+\emph{临界点：} $\nabla f = (4x^3 - 4y,\ 4y^3 - 4x) =
+0$ 给出 $y = x^3$，且 $x = y^3 = x^9$，故 $x(x^8 - 1) = 0$：
+实解为 $(0,0)$、$(1,1)$、$(-1,-1)$。
+\emph{黑塞矩阵：} $H = \begin{pmatrix} 12x^2 & -4\\ -4 &
+12y^2\end{pmatrix}$。在 $(\pm1, \pm1)$ 处：$\begin{pmatrix} 12 &
+-4\\ -4 & 12\end{pmatrix}$，特征值为 $8$ 与 $16$，故正定，
+严格局部极小点，且 $f = -2$。在 $(0,0)$ 处：
+$\begin{pmatrix} 0 & -4\\ -4 & 0\end{pmatrix}$，特征值为
+$\pm4$，故为鞍点。\emph{全局性：}由 $2\abs{xy} \leq x^2 +
+y^2$，
+\[
+f(x, y) \geq x^4 + y^4 - 2(x^2 + y^2)
+= (x^2 - 1)^2 + (y^2 - 1)^2 + x^2 + y^2 - 2
+\xrightarrow[\norm{(x,y)}\to\infty]{} +\infty :
+\]
+$f$ 是强制的，故取得全局最小值
+（由下水平集的紧性），且必在临界
+点处取得：值 $-2$ 同时在 $(1,1)$ 与 $(-1,-1)$ 处达到，
+即全局最小值；不存在最大值（$f$ 无上界）。
+收尾要点：局部判别法只能对候选点分类，
+只有增长性论证才能把“局部”变为“全局” --- 这是本书中
+每个最优化证明的两步模式。
+\end{example}
+
+\begin{method}[$f \colon \R^n \to \R$ 的极值分类]\label{met:b2:diffcalc:extrema}
+\begin{enumerate}
+  \item 解 $\nabla f = 0$（求出全部临界点；若定义域带边界，
+        则边界单独处理，方法见
+        \cref{exo:b2:diffcalc:7}）。
+  \item 在每个临界点处计算黑塞矩阵及其
+        特征值符号 --- 在 $2$ 维情形下，只需计算 $\det H$
+        与 $\operatorname{tr} H$：$\det < 0$ 为鞍点；$\det >
+        0$ 时为极值点，其类型由
+        迹的符号决定；$\det = 0$ 时判别法不作判断，
+        需沿曲线研究 $f$。
+  \item 若要得出全局性结论，需补充紧性或强制性论证
+        （$f \to +\infty$ 于无穷远处，或紧的
+        约束集），然后比较各临界值。
+\end{enumerate}
+\end{method}
+
+\section{反函数定理}
+
+\begin{theorem}[反函数定理]\label{thm:b2:diffcalc:inverse}
+设 $f \colon U \to \R^n$ 为 $C^1$ 映射，$a \in U$，且 $\dd f_a$
+\emph{可逆}。则存在开邻域 $V \ni a$、$W
+\ni f(a)$，使 $f \colon V \to W$ 为双射，
+其逆映射为 $C^1$ 的，且\index{反函数定理}
+\[
+\dd (f^{-1})_{f(x)} = (\dd f_x)^{-1} \qquad (x \in V).
+\]
+\end{theorem}
+\admitted
+
+\begin{remark}[为何成立：不动点策略]
+求解 $f(x) = y$（在 $a$ 附近）可改写为不动点方程
+$x = x + \dd f_a^{-1}\bigl(y - f(x)\bigr) =: \Phi_y(x)$；映射
+$\Phi_y$ 的微分为 $\mathrm{id} - \dd f_a^{-1}\dd f_x$，
+在 $a$ 附近很小，由 $\dd f$ 的连续性可知，故 $\Phi_y$ 在一小闭球上是
+压缩映射，由巴拿赫不动点定理
+（\cref{thm:b2:metric:banach}）给出唯一的局部
+解 $x = f^{-1}(y)$。逆映射的连续性与可微性
+随后由压缩映射中的估计得出。完整的
+验证在本科三年级完成；此策略及
+该定理的叙述从此可以自由使用。配套的
+\emph{隐函数定理}（由 $F(x, y) = 0$ 解出 $y(x)$，
+当 $\frac{\partial F}{\partial y}$ 可逆时）
+可通过将本定理应用于 $(x, y) \mapsto (x, F(x,y))$ 得到。
+\end{remark}
+
+\begin{example}[极坐标]\label{ex:b2:diffcalc:polar}
+$\Phi(r, \theta) = (r\cos\theta, r\sin\theta)$ 的雅可比矩阵为
+\[
+J_\Phi = \begin{pmatrix} \cos\theta & -r\sin\theta\\ \sin\theta &
+r\cos\theta \end{pmatrix},
+\qquad \det J_\Phi = r :
+\]
+当 $r \neq 0$ 时可逆，故 $\Phi$ 在原点之外为局部 $C^1$
+微分同胚，此即“化为
+极坐标”的依据，并在
+\cref{ch:b2:multint}中再次用于重积分。
+\end{example}
+
+\begin{example}[处处局部，无处整体]\label{ex:b2:diffcalc:localnotglobal}
+设 $f(x, y) = \bigl(\eu^x\cos y,\ \eu^x\sin y\bigr)$ 定义于
+$\R^2$ 上。其雅可比矩阵为
+\[
+J_f = \begin{pmatrix}
+\eu^x\cos y & -\eu^x\sin y\\
+\eu^x\sin y & \eu^x\cos y
+\end{pmatrix},
+\qquad
+\det J_f = \eu^{2x} > 0 ,
+\]
+行列式处处不为零，由\cref{thm:b2:diffcalc:inverse}可知，$f$ 在
+平面的\emph{每一点}处都是局部 $C^1$ 微分同胚。
+然而 $f$ 远非单射：$f(x, y + 2\pi) = f(x, y)$，故
+每个值都被取到无穷多次；它也不是满射，
+因为 $\norm{f(x, y)} = \eu^x > 0$，原点不在像中。
+结语：反函数定理本质上是
+\emph{局部}的——每个 $\dd f_a$ 可逆，只能得到
+一族局部逆，它们未必能拼合成一个整体逆。
+（熟悉复数的读者会认出 $z \mapsto
+\eu^z$；这族局部逆正是对数的各个分支。）
+可与\cref{exo:b2:diffcalc:12}比较，那里的定量整体
+假设确实迫使存在唯一的整体逆。
+\end{example}
+
+\begin{remark}[常见误区]
+\emph{(i) 方向导数易求，微分则不然
+：}即使不可微，所有方向导数仍可能存在，
+甚至不随方向线性变化；
+见\cref{exo:b2:diffcalc:2}。只有 $C^1$
+判别准则
+（\cref{thm:b2:diffcalc:c1}）能将偏导数升为
+微分。\emph{(ii) 临界点不等于极值：}
+鞍点（\cref{ex:b2:diffcalc:quarticrun}）与
+沉默的奇异情形（\cref{thm:b2:diffcalc:extrema}~(3)）都隐藏在
+$\nabla f = 0$ 之后。\emph{(iii) 向量值的均值
+等式不成立：}只有\emph{不等式}
+（\cref{thm:b2:diffcalc:mvi}）依然成立
+（\cref{exo:b2:diffcalc:9}）；切勿写 $f(b) - f(a) = \dd
+f_c(b-a)$，此处 $f$ 取值于 $\R^m$，$m \geq 2$。
+\emph{(iv) 局部可逆不等于单射：}
+见\cref{ex:b2:diffcalc:localnotglobal}。\emph{(v) 梯度
+依赖于内积：}$\nabla f$ 是在选定内积下表示 $\dd f_a$ 的
+向量；若更换内积（如二次型一章的加权例子），
+梯度便随之转动，
+而作为内蕴对象的微分
+则保持不动。
+\end{remark}
+
+\begin{remark}[应用场合]
+本章之后的一切内容都是微分学的应用：
+微分方程一章对流作线性化，并
+使用刘维尔行列式公式（该公式于本章的
+周末问题中证明）；曲线与曲面各章借助
+隐函数定理研究水平集与参数化；
+重积分则通过雅可比矩阵作变量替换。
+周末问题在\emph{矩阵空间
+本身}上发展微积分：行列式与逆的微分、
+矩阵指数，以及作为光滑水平集的正交群，
+这是本科三年级分册以流形与李群形式化的内容在
+本科二年级的初步体现。
+\end{remark}
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:b2:diffcalc:1}
+求 $f(x,y) = (x^2 - y^2,\, 2xy)$ 与
+$\Phi(r,\theta,z) = (r\cos\theta, r\sin\theta, z)$ 的雅可比矩阵，并判断
+其微分在哪些点处可逆？
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:diffcalc:2}
+设 $f(x,y) = \frac{x^3}{x^2 + y^2}$（$f(0,0) = 0$）。证明 $f$ 在 $0$ 处的所有
+方向导数都存在，但 $f$ 在 $0$ 处不可微
+\emph{（映射 $v \mapsto$
+方向导数不是线性的）}。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:diffcalc:3}
+求 $f(x, y) = x^3 + y^3 -
+3xy$ 的临界点并加以分类（利用\cref{thm:b2:diffcalc:extrema}），以及 $g(x,y) = x^4 +
+y^4 - 2(x - y)^2$ 的临界点并加以分类。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:diffcalc:4}
+设 $f \colon \R^n \to \R$ 为 $C^1$ 函数，且\emph{$p$ 次
+齐次}：$f(tx) = t^pf(x)$（$t > 0$）。证明欧拉恒等式
+\[
+\langle \nabla f(x), x\rangle = p\,f(x) ,
+\]
+并证明其逆命题对 $C^1$ 函数在 $\R^n\setminus\{0\}$ 上成立。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:diffcalc:5}
+设 $A$ 为对称矩阵，$f(x) = \frac12\langle Ax, x\rangle -
+\langle b, x\rangle$。求 $\nabla f$ 与 $H_f$，并判断 $f$ 何时
+为凸函数？设 $A$ 正定，证明 $f$ 在 $Ax = b$ 的解处取得唯一的
+全局极小值 --- 这正是梯度下降法的
+存在理由。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:diffcalc:6}
+（拉格朗日乘数法，单一约束，直接证明）设 $f, g$ 为 $C^1$
+函数，定义于 $\R^2$ 上，并设 $f$ 在 $a$ 处
+取得其在水平集 $\{g = 0\}$ 上的局部极值，且 $\nabla g(a) \neq 0$。证明
+$\nabla f(a) = \lambda\nabla g(a)$ 对某个 $\lambda$ 成立。
+\emph{（利用隐函数定理，在 $a$ 附近将水平集参数化，并对
+$t \mapsto f(\gamma(t))$ 求导。）}应用：
+求 $f(x,y) = xy$ 在单位圆周 $x^2 + y^2 = 1$ 上的极值。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:diffcalc:7}
+求 $f(x, y) = x^2 + y^2 - xy + x - y$ 在 $\R^2$ 上的极值，
+再求其在以 $(0,0)$、$(1,0)$、$(0,1)$ 为顶点的闭三角形上的最大值与最小值
+\emph{（依次考虑内部临界点，
+再考虑三条边，最后考虑顶点）}。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:diffcalc:8}
+设 $f \colon \R^2 \to \R^2$，$f(x, y) = (x + y^2,\; y + x^2)$。
+证明 $f$ 在 $0$ 附近为局部微分同胚，计算
+$\dd(f^{-1})_{(0,0)}$，并求最大的 $r$，使得 $\dd f$
+在球 $\norm{(x,y)}_2 < r$ 内可逆\emph{（计算
+$\det J_f$）}。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:diffcalc:9}
+（罗尔定理失效，中值不等式依然成立）给出 $f \colon \R \to \R^2$，
+$C^1$ 类，且 $f(0) = f(2\pi)$，但 $f'(t) \neq 0$ 对所有 $t$ 成立
+（不存在向量值罗尔定理）。然后在你给出的例子上验证
+\cref{thm:b2:diffcalc:mvi}中的中值\emph{不等式}。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:diffcalc:10}
+计算 $f(x) = \norm
+x_2^2$ 与 $g(x) = \langle Ax, x\rangle$ 在 $\R^n$ 上的微分与梯度（$A$ 为
+方阵，不假定对称），并求二者的黑塞矩阵。
+问 $A$ 满足何条件时 $g$ 为凸函数？
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:diffcalc:11}
+设 $f \colon \R^n \to \R$ 为 $C^2$ 函数。证明 $f$ 为凸函数当且仅当
+其黑塞矩阵 $H_x$ 在每一点 $x$ 处都是半正定的
+\emph{（化为一元情形：$t \mapsto f(a + t(b-a))$；
+沿一个方向用泰勒–拉格朗日公式，逆命题则计算
+$\varphi''$）}。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:diffcalc:12}
+（全局逆定理）设 $g \colon \R^n \to \R^n$ 为 $C^1$ 映射，且
+$\vertiii{\dd g_x} \leq k < 1$ 对所有 $x$ 成立，并设 $f =
+\mathrm{id} + g$。
+\begin{enumerate}
+  \item 证明 $\norm{f(x) - f(y)} \geq (1 - k)\norm{x - y}$，则 $f$
+        为单射，且在其像上具有连续的逆映射。
+  \item 证明：对每个 $y \in \R^n$，映射 $x \mapsto y -
+        g(x)$ 是完备空间 $\R^n$ 上的压缩映射，
+        由巴拿赫不动点定理
+        （\cref{thm:b2:metric:banach}）得 $f$ 为满射。
+  \item 由此得 $f$ 为 $\R^n$ 上的双射，且其逆映射为
+        $(1-k)^{-1}$-利普希茨映射 --- 这是
+        \cref{thm:b2:diffcalc:inverse}的\emph{全局}对应结论，
+        （相比之下，该定理纯属局部）。
+\end{enumerate}
+\end{exercise}
+
+\section{问题：矩阵的微积分 --- 雅可比，
+指数与正交群}
+
+\begin{problem}\label{pb:b2:diffcalc:1}
+微分学最理想的练习场，正是空间
+$\mathcal M_n(\R) \simeq \R^{n^2}$ 本身：其最自然的映射
+--- 乘积、求逆、行列式与指数 --- 的微分都具有
+惊人的优美形式。本题将它们全部算出：
+\emph{诺伊曼级数}、求逆映射的微分，
+行列式的\emph{雅可比公式}\index{雅可比公式}，并
+附带得到\emph{刘维尔公式}，以及
+\emph{矩阵指数}\index{矩阵指数}，满足
+$\det\eu^A = \eu^{\operatorname{tr}A}$，最后是
+将正交群 $O_n$ 视为光滑水平集，并以
+反对称矩阵为切空间 --- 微分几何的
+雏形。全文中 $\vertiii\cdot$ 是从属于
+$\norm\cdot_2$ 的算子范数，而 $\langle X, Y\rangle =
+\operatorname{tr}(X^{\mathsf T}Y)$ 是弗罗贝尼乌斯内积。
+
+\medskip
+\noindent\textbf{第一部分 --- 诺伊曼级数。}
+\begin{enumerate}
+  \item 证明次可乘性，$\vertiii{AB} \leq
+        \vertiii A\,\vertiii B$，并由此推出
+        $A$ 的多项式映射（矩阵乘积、行列式、迹）
+        在 $\mathcal M_n(\R)$ 上连续。
+  \item 若 $\vertiii X < 1$，证明 $\sum_{k\geq0}X^k$
+        在 $\mathcal M_n(\R)$ 中绝对收敛
+        （见\cref{thm:b2:nvs:absoluteconvergence}），其和为
+        $(I - X)^{-1}$，并证明
+        \[
+        \vertiii{(I - X)^{-1}} \leq \frac{1}{1 - \vertiii X},
+        \qquad
+        (I - X)^{-1} = I + X + O\bigl(\vertiii X^2\bigr) .
+        \]
+  \item 由此推出 $GL_n(\R)$ 是\emph{开集}：若 $A$
+        可逆，且 $\vertiii H <
+        \frac{1}{\vertiii{A^{-1}}}$，则 $A + H$
+        可逆。由此还可推出 $GL_n(\R)$ 在 $\mathcal M_n(\R)$ 中\emph{稠密}；
+        \emph{（对 $A$ 作
+        $\varepsilon I$ 的扰动：$\det(A + \varepsilon I)$ 是
+        $\varepsilon$ 的非零多项式）}。
+  \item 证明求逆映射 $\Phi(A) = A^{-1}$ 在
+        $GL_n(\R)$ 上连续。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第二部分 --- 一阶微分。}
+\begin{enumerate}[resume]
+  \item 证明平方映射 $A \mapsto A^2$
+        可微，其微分为 $H \mapsto AH + HA$，
+        更一般地，$A \mapsto A^k$ 有
+        微分 $H \mapsto \sum_{i=0}^{k-1}
+        A^iHA^{k-1-i}$。为何一般地\emph{不能}写成 $kA^{k-1}H$
+        ？
+  \item 证明 $\Phi(A) = A^{-1}$ 在
+        $GL_n(\R)$ 上可微，且
+        \[
+        \dd\Phi_A(H) = -A^{-1}HA^{-1}
+        \]
+        \emph{（写出 $(A + H)^{-1} = (I + A^{-1}H)^{-1}A^{-1}$，
+        并利用第 2 题展开）}。以标量情形检验该公式，
+        即 $n = 1$ 的情形。
+  \item 对 $C^1$ 曲线 $t \mapsto A(t) \in GL_n(\R)$，由此推出
+        $\bigl(A(t)^{-1}\bigr)' = -A^{-1}A'A^{-1}$，并将
+        $t \mapsto (I + tB)^{-1}$ 在 $t = 0$ 处展开到一阶。
+  \item 计算 $f(A) =
+        \operatorname{tr}(A^k)$ 的微分，并确定它关于
+        弗罗贝尼乌斯内积的梯度：
+        \[
+        \dd f_A(H) = k\operatorname{tr}\bigl(A^{k-1}H\bigr),
+        \qquad
+        \nabla f(A) = k\,\bigl(A^{k-1}\bigr)^{\mathsf T} .
+        \]
+  \item 对 $f(A) = \operatorname{tr}
+        (A^{\mathsf T}A) = \norm A_F^2$，同样求其微分、
+        梯度，以及（常值）黑塞矩阵；由此推出
+        $\norm\cdot_F^2$ 是严格凸的。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第三部分 --- 雅可比公式。}
+\begin{enumerate}[resume]
+  \item 证明
+        \[
+        \det(I + H) = 1 + \operatorname{tr}H +
+        O\bigl(\vertiii H^2\bigr)
+        \]
+        \emph{（将 $\det(e_1 + h_1, \dots, e_n + h_n)$ 按列展开，
+        利用列的多重线性：至少含两个
+        $h$ 列的项为 $O(\vertiii H^2)$）}：$\dd(\det)_I =
+        \operatorname{tr}$。
+  \item 设 $A$ 可逆，由此推出
+        \[
+        \dd(\det)_A(H) = \det(A)\,
+        \operatorname{tr}\bigl(A^{-1}H\bigr) .
+        \]
+  \item 证明对\emph{每个} $A$（无论是否可逆），
+        $\frac{\partial\det}{\partial a_{ij}}(A) = C_{ij}$，
+        即 $(i,j)$ 代数余子式\emph{（按第
+        $i$ 行的拉普拉斯展开）}，于是记伴随矩阵 $\operatorname{adj}A =
+        \operatorname{com}(A)^{\mathsf T}$：
+        \[
+        \dd(\det)_A(H) =
+        \operatorname{tr}\bigl(\operatorname{adj}(A)\,H\bigr),
+        \qquad
+        \nabla(\det)(A) = \operatorname{com}(A) ,
+        \]
+        当 $A$ 可逆时，即得第 11 题的结论
+        （$\operatorname{adj}A = \det(A)A^{-1}$）。这就是
+        \emph{雅可比公式}：$\bigl(\det
+        A(t)\bigr)' = \operatorname{tr}\bigl(
+        \operatorname{adj}(A(t))\,A'(t)\bigr)$。
+  \item （刘维尔公式）设 $A(t)$ 为矩阵值 $C^1$ 曲线，
+        满足线性微分方程
+        $A'(t) = M(t)A(t)$。证明
+        \[
+        \bigl(\det A(t)\bigr)' =
+        \operatorname{tr}\bigl(M(t)\bigr)\,\det A(t),
+        \qquad\text{ 因此 }\qquad
+        \det A(t) = \det A(0)\,
+        \exp\Bigl(\int_0^t\operatorname{tr}M\Bigr)
+        \]
+        \emph{（用 $\operatorname{adj}(A)\,A = \det(A)I$ 及
+        迹的轮换不变性）} --- 这就是朗斯基行列式的
+        恒等式，微分方程一章将
+        经常用到它。
+  \item 证明 $SL_n(\R) = \{\det = 1\}$ 是光滑的
+        水平集：对每个 $A \in SL_n(\R)$，其微分
+        $\dd(\det)_A$ 是一个\emph{满射}线性映射，映到
+        $\R$ 上\emph{（在 $H = \frac1nA$ 处求值）}。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第 IV 部分 --- 矩阵指数。}
+\begin{enumerate}[resume]
+  \item 证明 $\eu^A = \sum_{k\geq0}\frac{A^k}{k!}$
+        对每个 $A$ 绝对收敛，在每个
+        球上正规收敛，且 $\vertiii{\eu^A} \leq
+        \eu^{\vertiii A}$；并证明 $\eu^A$
+        连续依赖于 $A$。
+  \item 证明：若 $AB = BA$，则 $\eu^{A+B} =
+        \eu^A\eu^B$ \emph{（柯西乘积，由
+        绝对收敛性保证其合理性）}；由此可得 $\eu^A$ 总是
+        可逆的，其逆为 $\eu^{-A}$：$\exp$ 把
+        $\mathcal M_n(\R)$ 映入 $GL_n(\R)$。
+  \item 证明 $t \mapsto \eu^{tA}$ 是 $C^1$ 的（事实上
+        是 $C^\infty$ 的），且有
+        \[
+        \frac{\dd}{\dd t}\,\eu^{tA} = A\,\eu^{tA} =
+        \eu^{tA}A
+        \]
+        \emph{（在区间上逐项求导，
+        导出的级数正规收敛）}。
+  \item 证明恒等式
+        \[
+        \det\bigl(\eu^{A}\bigr) = \eu^{\operatorname{tr}A}
+        \]
+        \emph{（应用第 13 题的刘维尔公式，取
+        $A(t) = \eu^{tA}$）}。检验：$n = 1$；
+        幂零 $A$；迹为零的矩阵均落在
+        $SL_n(\R)$ 中。
+  \item 证明 $\eu^H = I + H + O(\vertiii H^2)$，从而 $\exp$ 在
+        $0$ 处可微，且 $\dd(\exp)_0 =
+        \mathrm{id}$。由反函数定理
+        （\cref{thm:b2:diffcalc:inverse}）可知 $\exp$
+        是 $C^1$ 微分同胚，把 $0$ 的某邻域
+        映到 $I$ 的某邻域上：
+        接近单位矩阵的每个矩阵都有对数。
+  \item 证明 $\exp$ 把对称矩阵映为对称
+        \emph{正定}矩阵，且为双射
+        \emph{（对角化；其逆是谱
+        对数）}。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第 V 部分 --- 作为水平
+集的正交群。}
+\begin{enumerate}[resume]
+  \item 设 $F(A) = A^{\mathsf T}A$，它从 $\mathcal M_n(\R)$ 到
+        对称矩阵全体 $S_n$。求 $\dd F_A(H) =
+        A^{\mathsf T}H + H^{\mathsf T}A$，并证明在每个
+        $A \in O_n = F^{-1}(I)$ 处，该微分为
+        \emph{满射}到 $S_n$ 上 \emph{（给定 $S \in S_n$，
+        试取 $H = \frac12 AS$）}：$O_n$ 是光滑水平集，
+        其维数为 $n^2 - \frac{n(n+1)}2 = \frac{n(n-1)}2$。
+  \item 证明：每条 $C^1$ 曲线 $A(t) \in O_n$ 满足 $A(0) =
+        I$ 时，其速度 $A'(0)$ 为\emph{反对称}矩阵；反之，
+        对反对称矩阵 $K$，曲线
+        $\eu^{tK}$ 保持在 $O_n$ 中：$O_n$ 在
+        $I$ 处的切空间恰为反对称矩阵全体。
+  \item 证明 $\det\eu^{K} = 1$ 对反对称矩阵 $K$ 成立
+        （第 18 题）：指数曲线位于旋转群
+        $SO_n$ 中。对 $n = 2$ 完整计算，取 $J =
+        \begin{pmatrix}0 & -1\\ 1 & 0\end{pmatrix}$，证明
+        \[
+        \eu^{\theta J} = \begin{pmatrix} \cos\theta &
+        -\sin\theta\\ \sin\theta & \cos\theta\end{pmatrix} :
+        \]
+        矩阵指数\emph{恰是}转过
+        $\theta$ 角的旋转，而余弦与正弦的级数定义
+        又在矩阵内部重新出现。
+  \item （稠密性技巧）利用 $GL_n(\R)$ 的稠密性，
+        结合连续性（第 3 题），把恒等式由可逆矩阵
+        推广到所有矩阵：
+        \[
+        \operatorname{adj}(AB) =
+        \operatorname{adj}(B)\operatorname{adj}(A)
+        \]
+        \emph{（对可逆 $A, B$，两边都等于
+        $\det(AB)(AB)^{-1}$；两边都是矩阵元素的
+        多项式）}。
+  \item 综合题。每项各用一句话作答：(i) 哪些前面的章节
+        为各部分提供了主要工具
+        （完备性与赋范代数；谱定理；反函数定理）；
+        (ii) 本题的哪个公式将被微分方程一章所用，
+        并说明用于何处；(iii) 试说明
+        $\dd(\det)_I = \operatorname{tr}$ 与 $\det\eu^A =
+        \eu^{\operatorname{tr}A}$ 如何把迹与行列式
+        分别理解为“无穷小体积”与“整体体积”；
+        (iv) 本科三年级分册如何看待
+        第 21--23 题
+        （李群及其李代数）。
+\end{enumerate}
+\end{problem}

@@ -108,6 +108,9 @@ def pattern(term, lang, langcfg, no_capital=()):
         head = r'(?:[A-Za-z]+-)?' if " " not in term else ""
         return re.compile(r'(?<![\w\\@-])(' + head + body + tail + r')(?![\w-])')
 
+    if getattr(langcfg, "CJK", False):
+        return _cjk_pattern(term, langcfg)
+
     words = to_text(term).split()
     pieces = []
     for i, w in enumerate(words):
@@ -128,6 +131,30 @@ def pattern(term, lang, langcfg, no_capital=()):
     body = r'\s+'.join(pieces)
     head = langcfg.HEAD if len(words) == 1 else ""
     return re.compile(_BEFORE + r'(' + head + body + r')' + _AFTER)
+
+
+# Chinese (and any other script written without spaces) has no word boundary to
+# test: every Han character is \w, so the boundary above would refuse a term
+# sitting between two other characters, i.e. nearly every use. In CJK mode the
+# boundary only keeps a term from starting or ending inside a LATIN word, a
+# number or a macro name. There is no plural, no capital and no attached head.
+# xeCJK drops a newline between two Han characters, so a source line may break
+# inside a term: allow one line break (and its indentation) between any two
+# characters. A one-character term (域, 环, 群, 像) sits inside many compounds
+# (定义域, 环境, 群体, 图像) and is never linked unless the language config lowers
+# CJK_MIN_CHARS. Opt-in per language: the en/fr/nl/es/pt/hi/ar/id patterns are
+# unchanged (tools/check_book5_golden.sh).
+_CJK_BEFORE = r'(?<![A-Za-z0-9\\@-])'
+_CJK_AFTER = r'(?![A-Za-z0-9-])'
+
+
+def _cjk_pattern(term, langcfg):
+    text = to_text(term)
+    if len(re.sub(r"\s", "", text)) < getattr(langcfg, "CJK_MIN_CHARS", 2):
+        return re.compile(r"(?!)")
+    chars = [c for c in text if not c.isspace()]
+    body = r"(?:\n[ \t]*)?".join(_esc(c) for c in chars)
+    return re.compile(_CJK_BEFORE + r'(' + body + r')' + _CJK_AFTER)
 
 
 def derive(term, langcfg):

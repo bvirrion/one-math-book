@@ -38,9 +38,18 @@ STMT_LABEL = r'\\label\{((?:thm|prop|lem|cor|ex|met|rem|pb):[^}]*)\}'
 ANY_LABEL = r'\\label\{([a-z]+:[^}]*)\}'
 
 
+_CJK_GAP = re.compile('(?<=[\u3400-\u9fff]) (?=[\u3400-\u9fff])')
+
+
+def _ws(s):
+    """One space for any run of whitespace, and none between two Chinese characters: a term wrapped over two lines
+    (\\emph{方向\\n向量}) is the same term as on one line. Latin text never has a Han neighbour, so English is unchanged."""
+    return _CJK_GAP.sub('', re.sub(r'\s+', ' ', s).strip())
+
+
 def index_display(entry):
     """\\index{sort key@display} -> display; skip subentries."""
-    entry = re.sub(r'\s+', ' ', entry).strip()
+    entry = _ws(entry)
     if "!" in entry:
         return None
     if "@" in entry:
@@ -84,7 +93,7 @@ def _bare_emph_ordinals(body, leaf):
     for e in re.finditer(EMPH, body):
         if e.group(2):
             continue
-        term = re.sub(r'\s+', ' ', e.group(1)).strip()
+        term = _ws(e.group(1))
         key = re.sub(r'[^a-z]', '', morphology.to_text(term).lower())
         if key and len(key) >= 4 and (key.startswith(leaf) or leaf.startswith(key)):
             out.add(i)
@@ -151,7 +160,7 @@ def harvest(files, cfg, lang, langcfg, load=read):
                 continue
             lab = lab.group(1)
             for e in re.finditer(EMPH_INDEX, body):
-                defs[re.sub(r'\s+', ' ', e.group(1)).strip()].append((lab, seq))
+                defs[_ws(e.group(1))].append((lab, seq))
             for e in re.finditer(INDEX, body):
                 d = index_display(e.group(1))
                 if d:
@@ -166,7 +175,7 @@ def harvest(files, cfg, lang, langcfg, load=read):
             for e in re.finditer(EMPH, body):
                 if e.group(2):
                     continue
-                term = re.sub(r'\s+', ' ', e.group(1)).strip()
+                term = _ws(e.group(1))
                 if ords is None:
                     key = re.sub(r'[^a-z]', '', morphology.to_text(term).lower())
                     ok = (key and len(key) >= 4
@@ -178,8 +187,10 @@ def harvest(files, cfg, lang, langcfg, load=read):
                 i += 1
 
     ambig = {t for t, v in defs.items() if len({l for l, _ in v}) > 1}
+    # three letters is a Latin-script floor; a two-character Chinese word (区间, 积分) is a whole term
+    least = getattr(langcfg, 'CJK_MIN_CHARS', 3) if getattr(langcfg, 'CJK', False) else 3
     terms = {t: v[0][0] for t, v in defs.items()
-             if t not in cfg.STOP and t not in ambig and len(t) >= 3
+             if t not in cfg.STOP and t not in ambig and len(t) >= least
              and not _too_long(t, cfg)}
 
     # notions introduced outside a definition environment
@@ -187,9 +198,9 @@ def harvest(files, cfg, lang, langcfg, load=read):
         s = load(path)
         body = DEF_RE.sub(lambda m: " " * len(m.group(0)), s)
         for e in re.finditer(EMPH_INDEX, body):
-            t = re.sub(r'\s+', ' ', e.group(1)).strip()
+            t = _ws(e.group(1))
             labs = re.findall(STMT_LABEL, s[:e.start()])
-            if (not labs or t in cfg.STOP or t in terms or len(t) < 3
+            if (not labs or t in cfg.STOP or t in terms or len(t) < least
                     or _too_long(t, cfg)):
                 continue
             terms[t] = labs[-1]

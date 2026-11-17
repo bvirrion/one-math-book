@@ -1,0 +1,479 @@
+\chapter{积分}\label{ch:g12:integ}
+
+积分同时回答两个问题：曲线下方的面积是多少，
+以及如何由函数的变化率还原出函数？微积分基本定理
+断言这两个问题本质上是同一个问题——
+这是十七世纪数学中最深刻、最有用的发现。
+
+\section{连续函数的积分}
+
+\begin{definition}[正函数的积分]\label{def:g12:integ:area}
+设 $f$ 在 $\intcc{a}{b}$ 上连续且取正值，
+则称下式为\emph{积分}\index{积分}：
+\[
+\int_a^b f(x)\,\dd x
+\]
+它表示由 $f$ 的图像、$x$ 轴以及直线 $x = a$ 与 $x = b$ 所围，
+区域的面积（以面积单位计）。
+\end{definition}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[
+  width=8.4cm, height=5cm,
+  axis lines=middle, xmin=-0.4, xmax=3.4, ymin=-0.3, ymax=2.3,
+  xtick={0.5,2.7}, xticklabels={$a$,$b$}, ytick=\empty,
+  samples=100, domain=-0.2:3.3]
+  \addplot[name path=curve, omDef, thick, domain=0.2:3.2]
+    {1 + 0.5*sin(deg(2*x)) + 0.2*x};
+  \path[name path=axis] (0.5,0) -- (2.7,0);
+  \addplot[omDef!20] fill between[of=curve and axis, soft clip={domain=0.5:2.7}];
+  \node at (axis cs:1.6,0.55) {$\displaystyle\int_a^b f$};
+\end{axis}
+\end{tikzpicture}
+\end{omfigure}
+
+对于任意符号的函数，位于 $x$ 轴下方的面积计为负值；
+并规定
+$\int_b^a f(x)\,\dd x = -\int_a^b f(x)\,\dd x$.
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=9.6cm, height=4.8cm,
+  xmin=-0.5, xmax=7, ymin=-1.4, ymax=1.4,
+  xtick={3.1416,6.2832}, xticklabels={$\pi$,$2\pi$}, ytick={-1,1}]
+  \addplot[name path=sine, omDef, thick, domain=0:6.2832, samples=120]
+    {sin(deg(x))};
+  \path[name path=xaxis] (0,0) -- (6.2832,0);
+  \addplot[omDef!20] fill between[of=sine and xaxis,
+    soft clip={domain=0:3.1416}];
+  \addplot[omThm!20] fill between[of=sine and xaxis,
+    soft clip={domain=3.1416:6.2832}];
+  \node at (axis cs:1.57,0.4) {$+$};
+  \node at (axis cs:4.71,-0.4) {$-$};
+\end{axis}
+\end{tikzpicture}
+
+{\small 有向面积：$\int_0^{2\pi} \sin x\,\dd x = 0$，
+下方区域（红色）与上方区域（蓝色）相互抵消。}
+\end{omfigure}
+
+\begin{proposition}[积分的性质]\label{prop:g12:integ:properties}
+设 $f, g$ 在包含 $a, b, c$ 的区间上连续，
+且 $\lambda \in \R$。
+\begin{enumerate}
+  \item \emph{线性性：}
+        $\displaystyle\int_a^b (f + \lambda g) = \int_a^b f + \lambda \int_a^b g$.
+  \item \emph{沙勒关系：}
+        $\displaystyle\int_a^c f = \int_a^b f + \int_b^c f$.
+  \item \emph{保号性：}若 $a \leq b$ 且 $f \geq 0$ 在 $\intcc{a}{b}$ 上，
+        则 $\displaystyle\int_a^b f \geq 0$；若 $f \leq g$，则
+        $\displaystyle\int_a^b f \leq \int_a^b g$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+沙勒关系与保号性由面积的意义直接可得（区域拼接时面积相加，
+高度为正的区域面积为正）。比较性由保号性用于 $g - f$ 得到，
+线性性对正函数之和直观明显（将面积叠加），
+其严格证明在大学阶段给出，
+\emph{在本阶段不加证明地承认}。
+\end{proof}
+
+\section{微积分基本定理}
+
+\begin{definition}[原函数]\label{def:g12:integ:primitive}
+$f$ 在区间 $I$ 上的\emph{原函数}\index{原函数}是指函数 $F$，
+它在 $I$ 上可导，且 $F' = f$。
+\end{definition}
+
+\begin{proposition}\label{prop:g12:integ:primunique}
+若 $F$ 为 $f$ 在区间 $I$ 上的原函数，则 $f$ 在 $I$ 上的全体原函数
+恰为函数 $F + c$，$c \in \R$。给定 $x_0 \in I$ 及
+$y_0 \in \R$，存在唯一的原函数满足 $F(x_0) = y_0$。
+\end{proposition}
+
+\begin{proof}
+若 $G' = F' = f$，则 $(G - F)' = 0$ 在区间 $I$ 上，故 $G - F$
+为常函数。\footnote{区间上导数为零的函数是常函数，由
+\cref{thm:g12:deriv:variations}可知：它既递增又递减。}
+反之，每个 $F + c$ 都是原函数。条件
+$F(x_0) = y_0$ 确定了常数。
+\end{proof}
+
+\begin{theorem}[微积分基本定理]\label{thm:g12:integ:ftc}
+\index{微积分基本定理}
+设 $f$ 在区间 $I$ 上连续，$a \in I$。函数
+\[
+F \colon x \longmapsto \int_a^x f(t)\,\dd t
+\]
+是 $f$ 在 $I$ 上的原函数，且在 $a$ 处取值为零。因此，
+若 $G$ 为 $f$ 的任一原函数，$a, b \in I$，则：
+\[
+\int_a^b f(t)\,\dd t = \bigl[G(t)\bigr]_a^b = G(b) - G(a).
+\]
+\end{theorem}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=9.2cm, height=5.6cm,
+  xmin=-0.4, xmax=4.2, ymin=-0.4, ymax=2.9,
+  xtick={0.5,2.2,2.7}, xticklabels={$a$,$x$,\ $x+h$}, ytick=\empty]
+  \addplot[name path=curve, omDef, thick, domain=0:3.9, samples=80]
+    {1 + 0.4*x + 0.2*sin(deg(2*x))};
+  \path[name path=xaxis] (0,0) -- (3.9,0);
+  \addplot[omDef!20] fill between[of=curve and xaxis,
+    soft clip={domain=0.5:2.2}];
+  \addplot[omProp!40] fill between[of=curve and xaxis,
+    soft clip={domain=2.2:2.7}];
+  \draw[black, dashed, thin] (axis cs:2.2,1.69) -- (axis cs:2.7,1.69);
+  \draw[black, dashed, thin] (axis cs:2.2,1.925) -- (axis cs:2.7,1.925)
+    node[above right, font=\small] {$f(x+h)$};
+  \node at (axis cs:1.35,0.6) {$F(x)$};
+\end{axis}
+\end{tikzpicture}
+
+{\small 证明思路：增量 $F(x+h) - F(x)$ 是窄条（橙色）的面积，
+该窄条夹在高分别为
+$f(x)$ 与 $f(x+h)$、底长为 $h$ 的两个矩形之间。}
+\end{omfigure}
+
+\begin{proof}[当 $f$ 递增时的证明]
+取定 $x \in I$ 及 $h > 0$，使 $x + h \in I$。由沙勒关系，
+\[
+F(x+h) - F(x) = \int_x^{x+h} f(t)\,\dd t .
+\]
+因为 $f$ 递增，故 $f(x) \leq f(t) \leq f(x+h)$，
+其中 $t \in \intcc{x}{x+h}$，由积分的比较性质（
+常数 $c$ 在长为 $h$ 的区间上的积分为 $ch$）：
+\[
+h\,f(x) \leq F(x+h) - F(x) \leq h\,f(x+h),
+\]
+于是
+\[
+f(x) \leq \frac{F(x+h) - F(x)}{h} \leq f(x+h).
+\]
+当 $h \to 0^+$ 时，$f(x+h) \to f(x)$（由连续性），再由夹逼定理，
+可知差商趋于 $f(x)$；$h < 0$ 的情形
+类似可证。因此 $F' = f$，且 $F(a) = 0$。一般（非单调）的
+连续情形将在大学阶段证明。
+
+最后，若 $G$ 为任一原函数，则 $G = F + c$
+（见\cref{prop:g12:integ:primunique}），于是
+$G(b) - G(a) = F(b) - F(a) = \int_a^b f$.
+\end{proof}
+
+\begin{example}
+$\displaystyle\int_0^1 x^2\,\dd x = \left[\frac{x^3}{3}\right]_0^1 =
+\frac13$：抛物线下方的面积是单位正方形面积的三分之一，
+正如阿基米德所知。
+\end{example}
+
+原函数表可由导数表读出
+（$u$ 表示可导函数，$c$ 为任意常数）：
+\begin{center}
+\renewcommand{\arraystretch}{1.7}
+\begin{tabular}{c|c||c|c}
+$f(x)$ & 原函数 & $f$ & 原函数 \\
+\hline
+$x^n \ (n \neq -1)$ & $\dfrac{x^{n+1}}{n+1} + c$ &
+$u'u^n \ (n \neq -1)$ & $\dfrac{u^{n+1}}{n+1} + c$\\
+$\dfrac1x \ (x > 0)$ & $\ln x + c$ &
+$\dfrac{u'}{u} \ (u > 0)$ & $\ln u + c$\\
+$\eu^x$ & $\eu^x + c$ &
+$u'\eu^u$ & $\eu^u + c$\\
+$\cos x$ & $\sin x + c$ &
+$\dfrac{u'}{\sqrt u} \ (u>0)$ & $2\sqrt u + c$\\
+$\sin x$ & $-\cos x + c$ & &
+\end{tabular}
+\end{center}
+
+\begin{method}[识别 $u' \times (\text{ 某式，关于 } u)$ 形式]\label{met:g12:integ:uprime}
+求积分时，若被积式为乘积，则寻找一个因子，它是某内函数 
+$u$ 的导数（相差一个常数倍）。例如在
+$\int_0^1 x\,\eu^{x^2}\dd x$ 中，因子 $x$ 为 $\frac12 (x^2)'$：
+\[
+\int_0^1 x\,\eu^{x^2}\dd x = \frac12\left[\eu^{x^2}\right]_0^1
+= \frac{\eu - 1}{2}.
+\]
+\end{method}
+
+\begin{theorem}[分部积分法]\label{thm:g12:integ:ibp}
+\index{分部积分法}
+设 $u, v$ 在 $\intcc{a}{b}$ 上可导，且导函数连续。
+则
+\[
+\int_a^b u'(t)\,v(t)\,\dd t
+= \bigl[u(t)\,v(t)\bigr]_a^b - \int_a^b u(t)\,v'(t)\,\dd t .
+\]
+\end{theorem}
+
+\begin{proof}
+由乘积法则得 $(uv)' = u'v + uv'$，
+在 $\intcc{a}{b}$ 上两边积分，并对左端用微积分基本定理，
+得 $\bigl[uv\bigr]_a^b = \int_a^b u'v + \int_a^b uv'$。
+\end{proof}
+
+\begin{example}\label{ex:g12:integ:ibp}
+$\displaystyle\int_0^1 t\,\eu^{t}\,\dd t$：取 $u' = \eu^t$，$v = t$，
+于是 $u = \eu^t$，$v' = 1$：
+\[
+\int_0^1 t\,\eu^t\,\dd t = \bigl[t\,\eu^t\bigr]_0^1 - \int_0^1 \eu^t\,\dd t
+= \eu - (\eu - 1) = 1 .
+\]
+\end{example}
+
+\section{应用}
+
+\begin{definition}[平均值]\label{def:g12:integ:mean}
+称连续函数 $f$ 在
+$\intcc{a}{b}$（$a<b$）上的\emph{平均值}\index{平均值}为
+\[
+\mu = \frac{1}{b-a}\int_a^b f(t)\,\dd t .
+\]
+\end{definition}
+
+\begin{proposition}\label{prop:g12:integ:meanbounds}
+若 $m \leq f \leq M$ 在 $\intcc{a}{b}$ 上成立，则 $m \leq \mu \leq M$。
+\end{proposition}
+
+\begin{proof}
+对不等式 $m \leq f(t) \leq M$ 在 $\intcc{a}{b}$ 上积分，
+再除以 $b - a > 0$。
+\end{proof}
+
+\begin{method}[两条曲线之间的面积]\label{met:g12:integ:areabetween}
+若 $f \geq g$ 在 $\intcc{a}{b}$ 上，则两曲线之间的面积为
+$\int_a^b \bigl(f(x) - g(x)\bigr)\dd x$。若两曲线相交，则在交点处将
+区间分段，并对 $\abs{f - g}$ 逐段积分。
+\end{method}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=8.4cm, height=5.8cm,
+  xmin=-2.1, xmax=2.9, ymin=-1.8, ymax=5.6,
+  xtick={-1,2}, ytick=\empty]
+  \addplot[name path=line, omThm, thick, domain=-1.7:2.5] {x + 1};
+  \addplot[name path=parab, omDef, thick, domain=-1.9:2.45] {x^2 - 1};
+  \addplot[omDef!20] fill between[of=line and parab,
+    soft clip={domain=-1:2}];
+  \fill (axis cs:-1,0) circle (1.5pt);
+  \fill (axis cs:2,3) circle (1.5pt);
+\end{axis}
+\end{tikzpicture}
+
+{\small 直线 $y = x + 1$（红色）与抛物线
+$y = x^2 - 1$（蓝色）之间的面积为 $\int_{-1}^{2}
+\bigl((x+1) - (x^2-1)\bigr)\dd x = \frac92$。}
+\end{omfigure}
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:g12:integ:1}
+计算
+\[
+\int_1^2 \left(3x^2 - \frac{1}{x^2}\right)\dd x, \qquad
+\int_0^{\pi/2} \cos t \,\dd t, \qquad
+\int_0^{1} \frac{\dd t}{2t+1} .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:integ:2}
+求 $F$，使其为 $f(x) = x\eu^{x^2}$ 在 $\R$ 上的原函数，且 $F(0) = 1$。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:integ:3}
+求 $f(t) = \sin t$ 在 $\intcc{0}{\pi}$ 上的平均值，并
+借助图像解释所得结果。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:integ:4}
+利用分部积分法计算
+\[
+\int_1^{\eu} \ln t\,\dd t
+\qquad\text{ 和 }\qquad
+\int_0^{\pi} t \sin t\,\dd t .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:integ:5}
+求抛物线 $y = x^2$ 与直线
+$y = x + 2$ 所围区域的面积。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:integ:6}
+设 $I = \displaystyle\int_0^1 \frac{\dd t}{1 + t}$。
+\begin{enumerate}
+  \item 计算 $I$。
+  \item 对 $n \in \N$，记 $I_n = \displaystyle\int_0^1 \frac{t^n}{1+t}\dd t$。
+        证明 $I_n + I_{n+1} = \dfrac{1}{n+1}$，并证明
+        $0 \leq I_n \leq \dfrac{1}{n+1}$。
+  \item 由此推出
+        $1 - \frac12 + \frac13 - \dots + \frac{(-1)^{n-1}}{n}
+        \xrightarrow[n \to +\infty]{} \ln 2$。
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:integ:7}
+火车出发后前 $100$ 秒内的速度（单位：m/s）
+可由 $v(t) = 30\bigl(1 - \eu^{-t/50}\bigr)$ 描述。求
+这 $100$ 秒内行驶的距离，以及火车在该
+时间区间上的平均速度。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:integ:8}
+对 $n \geq 1$，记 $S_n = \dfrac1n \displaystyle\sum_{k=1}^{n} \frac{1}{1 + k/n}$。
+\begin{enumerate}
+  \item 将 $S_n$ 解释为近似某区域面积的矩形面积，该区域为
+        $t \mapsto \frac{1}{1+t}$ 的曲线在 $\intcc{0}{1}$ 上的下方区域。
+  \item 利用 $t \mapsto \frac{1}{1+t}$ 的单调性，证明
+        \[
+        S_n \leq \int_0^1 \frac{\dd t}{1+t} \leq S_n + \frac1n\left(1 - \frac12\right),
+        \]，
+        并由此推出 $\lim\limits_{n\to+\infty} S_n = \ln 2$。
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:integ:9}
+\emph{（沃利斯积分。）}对 $n \in \N$，令
+$W_n = \displaystyle\int_0^{\pi/2} \sin^n t\,\dd t$。
+\begin{enumerate}
+  \item 计算 $W_0$ 和 $W_1$。
+  \item 利用 $\sin^{n+2}t = \sin t \cdot \sin^{n+1} t$，
+        用分部积分法证明 $W_{n+2} = \dfrac{n+1}{n+2}\,W_n$。
+  \item 由此求 $W_2$、$W_3$、$W_4$，并证明数列 $(W_n)$ 递减
+        且恒为正。
+\end{enumerate}
+\end{exercise}
+
+\section{问题：阿基米德对阵机器}
+
+\begin{problem}[{周末问题 --- 抛物线下的面积，
+以三种方法跨越二十二个世纪求得，以及
+对数作为面积的隐秘身份}]
+\label{pb:g12:integ:1}
+约公元前 240 年，阿基米德求出了抛物线
+弓形的精确面积 --- 不借助坐标，不借助极限，不借助代数。
+十九个世纪之后，黎曼的矩形法以蛮力
+夹逼重算了一遍；而微积分基本定理
+（\cref{thm:g12:integ:ftc}）只需一行即可完成。本题
+让三种方法一一交锋，再用同一台机器揭示
+对数的真正面目：一种具有伸缩对称性的面积。
+
+\medskip
+\noindent\textbf{第一部分 --- 熟练计算。}
+\begin{enumerate}
+  \item 计算 $\displaystyle\int_0^1 (3x^2 - 2x + 1)\,\dd x$，
+        \ $\displaystyle\int_1^{\eu} \frac{\dd x}{x}$，\ 和
+        $\displaystyle\int_0^{\pi/2} \cos x\,\dd x$。
+  \item 识别 $u'u$ 型
+        （\cref{met:g12:integ:uprime}）：
+        $\displaystyle\int_0^1 x\,\eu^{x^2}\dd x$ 和
+        $\displaystyle\int_0^1 \frac{2x}{x^2 + 1}\,\dd x$。
+  \item 用分部积分法（\cref{thm:g12:integ:ibp}）计算：
+        $\displaystyle\int_0^1 x\,\eu^x \dd x$ 和
+        $\displaystyle\int_1^{\eu} \ln x\,\dd x$。
+  \item 计算 $\sin$ 在
+        $\intcc{0}{\pi}$ 上的平均值
+        （\cref{def:g12:integ:mean}）--- 注意它\emph{不是}
+        $\frac12$。
+  \item 计算直线 $y = x$ 与
+        抛物线 $y = x^2$ 在 $\intcc{0}{1}$ 上所夹区域的面积
+        （\cref{met:g12:integ:areabetween}）。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第二部分 --- 抛物线的三种求法。}
+\begin{enumerate}[resume]
+  \item 黎曼式设置：求 $y = x^2$ 在
+        $\intcc{0}{1}$ 上的面积，写出下和 $L_n$ 与上和
+        $U_n$，取 $n$ 个等宽矩形（参见
+        \cref{exo:g12:integ:8}）。
+  \item 用归纳法（方法同\cref{pb:g12:seq:1}）证明
+        平方和公式
+        \[
+        1^2 + 2^2 + \dots + n^2 = \frac{n(n+1)(2n+1)}{6} .
+        \]
+  \item 求 $U_n$ 与 $L_n$ 的闭式，并计算它们的
+        共同极限，得出面积为 $\frac13$。
+  \item 现在动用机器计算
+        $\int_0^1 x^2\,\dd x$，利用微积分基本定理，
+        一行即可。比较两种方法的工作量。
+  \item 阿基米德另有叙述：\emph{抛物线弓形
+        是其内接三角形面积的 $\frac43$ 倍}。对于
+        被弦截 $y = x^2$ 所得的弓形，该弦连接
+        $(-1, 1)$ 与 $(1, 1)$ --- 用积分求弓形面积，
+        再求内接三角形面积（顶点为
+        $(0, 0)$），并验证阿基米德所给的比值。
+  \item 阿基米德自己的方法：先用大三角形填满弓形，
+        三角形 $T$，再用两个总面积为
+        $\frac T4$ 的三角形，再用四个总面积为 $\frac{T}{16}$ 的三角形，
+        依此类推。对等比级数求和，
+        得 $\frac43 T$ --- 正是初中分册中那条被无限咬下去的巧克力，
+        被一位希腊几何学家吃掉了。
+  \item 各用一句话说明：穷竭法（阿基米德）、夹逼法
+        （黎曼）、求原函数（牛顿--莱布尼茨）---
+        各自需要什么，又各自给出什么？
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第三部分 --- 对数是一种面积。}
+对 $x > 0$，令
+$A(x) = \displaystyle\int_1^x \frac{\dd t}{t}$。
+\begin{enumerate}[resume]
+  \item 求 $A(1)$ 与 $A'(x)$
+        （\cref{thm:g12:integ:ftc}），由此得出 $A$ 恰为
+        自然对数，其定义见
+        \cref{def:g12:exp:ln}。
+  \item 伸缩奇迹：固定 $a > 0$，研究
+        $g(x) = A(ax) - A(x)$。求 $g'$（链式法则），
+        推出 $g$ 为常数，并求出该常数 ---
+        由此得出函数方程
+        \[
+        \ln(ab) = \ln a + \ln b ,
+        \]
+        仅用微积分即可证明：从 $1$ 到 $ab$ 的面积
+        可拆分为伸缩后的若干副本。
+  \item 由第 14 题推出 $\ln(a^n) = n\ln a$ 和
+        $\ln\frac1a = -\ln a$。
+  \item \Cref{exo:g12:integ:8} 将
+        $\frac{1}{n+1} + \frac{1}{n+2} + \dots + \frac{1}{2n}$
+        视作 $\frac{1}{1 + t}$ 下的矩形，计算该和式
+        在 $n = 10$ 时的值（保留三位小数），并与
+        $\ln 2$ 比较。哪些和式逐项看与调和级数相似而
+        发散，这里却收敛于一个面积？
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第四部分 --- 累积。}
+\begin{enumerate}[resume]
+  \item 一辆汽车加速行驶，速度为 $v(t) = 3t^2$ m/s，
+        其中 $t \in \intcc{0}{10}$。求该车行驶的路程、
+        平均速度，以及
+        瞬时速度等于平均速度的时刻。
+  \item 一根长 $4$ 米的细杆，线密度为
+        $\rho(x) = 2 + x$ kg/m。求其总质量及其
+        质心
+        $\dfrac{\int_0^4 x\,\rho(x)\,\dd x}{\int_0^4
+        \rho(x)\,\dd x}$ --- 即初中分册中硬纸板三角形的平衡点，
+        这次终于用
+        随位置变化的权重来计算。
+  \item 沃利斯积分（\cref{exo:g12:integ:9}）：
+        利用\cref{pb:g12:trigo:1}中的线性化方法，计算 $W_0$、$W_1$ 及
+        $W_2 = \int_0^{\pi/2} \sin^2 t\,\dd t$。
+        （在大学分册中，它们的无穷阶梯将攀升到
+        $\pi$ 的一个乘积公式，
+        并通向钟形曲线的
+        归一化。）
+  \item 尾声 --- 积分的三副面孔：按定义是\emph{面积}，
+        在现实世界中是\emph{累积}（如距离、质量），
+        由微积分基本定理则是\emph{原函数}；
+        并回顾它的三个名字背后的历史。
+        以本章的明珠作结：计算器上哪一个日常按键
+        其实对应着 $\frac1t$ 下方的面积，
+        这块面积又证明了哪一个恒等式？
+\end{enumerate}
+\end{problem}

@@ -1,0 +1,619 @@
+\chapter{数列}\label{ch:g12:seq}
+
+数列是以自然数为下标的一列实数。数列
+可以刻画离散的演化过程 --- 例如逐年统计的人口数、
+银行账户的余额、某个数的逐次近似值 --- 它们的极限是人们
+第一次认真接触无穷。本章介绍数列的基本词汇、
+归纳法原理以及基本的
+收敛定理。
+
+\section{用归纳法推理}
+
+\begin{theorem}[归纳法原理]\label{thm:g12:seq:induction}
+设 $P(n)$ 是依赖于整数 $n$ 的命题，并设 $n_0 \in \N$。
+若
+\begin{enumerate}
+  \item \emph{（奠基）}$P(n_0)$ 为真，且
+  \item \emph{（归纳步骤）}对每个 $n \geq n_0$，$P(n)$ 蕴含 $P(n+1)$，
+\end{enumerate}
+则 $P(n)$ 对每个 $n \geq n_0$ 为真。
+\end{theorem}
+
+\begin{proof}
+用反证法，假设集合 $A$（由满足 $n \geq n_0$ 且使 $P(n)$ 为假的整数组成）
+非空。于是 $A$ 有最小元素
+$m$。\footnote{$\N$ 的每个非空子集都有最小元素；
+$\N$ 的这一性质被取作公理。}由 $P(n_0)$ 为真，得 $m > n_0$，因此
+$m - 1 \geq n_0$，且 $m-1 \notin A$，即 $P(m-1)$ 为真。由归纳步骤
+应用于 $n = m-1$，得 $P(m)$ 为真，与
+$m \in A$ 矛盾。
+\end{proof}
+
+\begin{example}\label{ex:g12:seq:bernoulli}
+下面证明\emph{伯努利不等式}：对每个实数 $a > 0$ 及每个
+$n \in \N$,
+\[
+(1+a)^n \geq 1 + na.
+\]
+\emph{奠基。}当 $n = 0$ 时，两边均等于 $1$。
+\emph{归纳步骤。}假设 $(1+a)^n \geq 1+na$ 对某个 $n \in \N$ 成立。由于
+$1 + a > 0$，两边乘以 $1+a$ 后不等号方向不变：
+\[
+(1+a)^{n+1} \geq (1+na)(1+a) = 1 + (n+1)a + na^2 \geq 1 + (n+1)a .
+\]
+由归纳法，对所有 $n \in \N$ 该不等式成立。
+\end{example}
+
+\begin{method}[归纳法证明的写法]\label{met:g12:seq:induction}
+动手之前，务必先明确写出命题 $P(n)$。一个完整的证明
+应明显包含三个部分：奠基、归纳步骤（“假设 $P(n)$ 成立；
+证明 $P(n+1)$ 成立”），以及援引归纳法原理的结论。
+最常见的错误是证明归纳步骤时从未用到
+归纳假设 $P(n)$。出现这种情况时，要么证明有误，要么
+根本不需要用归纳法。
+\end{method}
+
+\section{数列的基本词汇}
+
+\begin{definition}[数列]\label{def:g12:seq:sequence}
+\emph{数列}\index{数列}是函数 $u \colon \N \to \R$（或从
+$\{n \in \N : n \geq n_0\}$ 到 $\R$ 的函数）。$n$ 的像记作 $u_n$，
+数列本身记作 $(u_n)_{n\in\N}$，或简记为 $(u_n)$。
+\end{definition}
+
+数列可以\emph{显式}地给出，即由公式 $u_n = f(n)$ 确定，
+也可以\emph{递推}地给出，即由首项及关系式 $u_{n+1} = f(u_n)$ 确定。
+
+\begin{definition}[单调性]\label{def:g12:seq:monotonic}
+称数列 $(u_n)$ 为\emph{递增}\index{数列！递增}，若
+$u_{n+1} \geq u_n$ 对所有 $n$ 成立；称为\emph{递减}，若
+$u_{n+1} \leq u_n$ 对所有 $n$ 成立，并称为\emph{单调}，若它递增或递减。
+当上述不等式均为\emph{严格}不等式时，
+称为严格递增（或递减）。
+\end{definition}
+
+\begin{method}[研究数列单调性的方法]\label{met:g12:seq:monotonicity}
+常用的三种方法：
+\begin{enumerate}
+  \item 考察 $u_{n+1} - u_n$ 的符号；
+  \item 若各项均为正，则将 $\dfrac{u_{n+1}}{u_n}$ 与 $1$ 比较；
+  \item 若 $u_n = f(n)$，且 $f$ 定义在 $\intco{0}{+\infty}$ 上，则利用
+        $f$ 的单调性。
+\end{enumerate}
+\end{method}
+
+\begin{definition}[有界数列]\label{def:g12:seq:bounded}
+称数列 $(u_n)$ 为\emph{有上界}\index{数列！有上界}的，若存在
+$M \in \R$ 使 $u_n \leq M$ 对所有 $n$ 成立；称为\emph{有下界}，若存在
+$m \in \R$ 使 $u_n \geq m$ 对所有 $n$ 成立；并称为\emph{有界}，若上述
+两者同时成立。
+\end{definition}
+
+\subsection{等差数列与等比数列}
+
+\begin{definition}[等差数列与等比数列]\label{def:g12:seq:arith-geom}
+称数列 $(u_n)$ 为\emph{等差}\index{数列！等差}数列，公差为 $r$，若
+$u_{n+1} = u_n + r$ 对所有 $n$ 成立，并
+称为\emph{等比}\index{数列！等比}数列，公比为 $q$，若
+$u_{n+1} = q\,u_n$ 对所有 $n$ 成立。
+\end{definition}
+
+\begin{proposition}[通项公式与求和]\label{prop:g12:seq:arith-geom}
+设 $n \in \N$。
+\begin{enumerate}
+  \item 若 $(u_n)$ 为公差为 $r$ 的等差数列，则
+        $u_n = u_0 + nr$，且
+        \[
+        u_0 + u_1 + \dots + u_n = (n+1)\,\frac{u_0 + u_n}{2}.
+        \]
+  \item 若 $(u_n)$ 为公比 $q \neq 1$ 的等比数列，则
+        $u_n = u_0\, q^n$，且
+        \[
+        u_0 + u_1 + \dots + u_n = u_0\,\frac{1 - q^{n+1}}{1 - q}.
+        \]
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+显式形式可由直接归纳得出。对于等差数列的和，
+记 $S = u_0 + \dots + u_n$，将同一和式按相反次序写出并与之相加：
+上下对应的 $n+1$ 个列和都等于 $u_0 + u_n$，故 $2S = (n+1)(u_0+u_n)$。
+对于等比数列的和，计算 $S - qS$：除首项与末项外，
+其余各项两两相消，故 $(1-q)S = u_0(1 - q^{n+1})$。
+\end{proof}
+
+\section{数列的极限}
+
+\begin{definition}[收敛数列]\label{def:g12:seq:limit}
+称数列 $(u_n)$ \emph{收敛}\index{极限！数列}于实数
+$\ell$，若包含 $\ell$ 的每个开区间都从某项起包含全部项
+$u_n$。记作 $\lim\limits_{n\to+\infty} u_n = \ell$。
+
+等价地：对任意 $\varepsilon > 0$，存在 $N \in \N$，使得
+对所有 $n \geq N$，有 $\abs{u_n - \ell} \leq \varepsilon$。
+\end{definition}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=11cm, height=5.6cm,
+  xlabel={$n$}, ylabel={$u_n$},
+  xmin=0, xmax=16.5, ymin=0.7, ymax=2.9,
+  xtick={4}, xticklabels={$N$}, ytick={2}, yticklabels={$\ell$}]
+  \fill[omDef!20] (axis cs:0,1.75) rectangle (axis cs:16.5,2.25);
+  \addplot[omProp, dashed, domain=0:16.5] {2};
+  \addplot[omDef, only marks, mark=*, mark size=1.5pt,
+    samples at={1,...,16}] {2 + (-1)^x/x};
+  \draw[black, dashed, thin] (axis cs:4,0.7) -- (axis cs:4,2.25);
+  \node[font=\small, anchor=east] at (axis cs:16.3,2.4) {$\ell+\varepsilon$};
+  \node[font=\small, anchor=east] at (axis cs:16.3,1.6) {$\ell-\varepsilon$};
+\end{axis}
+\end{tikzpicture}
+
+{\small 数列 $u_n = 2 + \frac{(-1)^n}{n}$ 收敛于 $\ell = 2$：给定
+$\varepsilon > 0$，从第 $N$ 项起，所有项都落在
+带形区域 $\intcc{\ell-\varepsilon}{\ell+\varepsilon}$ 内。}
+\end{omfigure}
+
+\begin{definition}[发散到无穷]\label{def:g12:seq:infinity}
+称数列 $(u_n)$ \emph{趋于 $+\infty$}，若对任意 $A \in \R$，
+存在 $N \in \N$，使得 $u_n \geq A$ 对一切 $n \geq N$ 成立。记作
+$\lim\limits_{n\to+\infty} u_n = +\infty$；
+$\lim u_n = -\infty$ 的定义类似。不收敛的数列
+称为\emph{发散}。
+\end{definition}
+
+\begin{remark}
+数列可以发散而不趋于 $\pm\infty$：数列
+$u_n = (-1)^n$ 只取值 $1$ 与 $-1$，没有极限。
+\end{remark}
+
+\begin{proposition}[极限的唯一性]\label{prop:g12:seq:uniqueness}
+若数列 $(u_n)$ 收敛，则其极限唯一。
+\end{proposition}
+
+\begin{proof}
+假设 $u_n \to \ell$ 且 $u_n \to \ell'$，其中 $\ell \neq \ell'$，不妨设
+$\ell < \ell'$。取 $\varepsilon = \frac{\ell' - \ell}{3} > 0$。从某项起，
+有 $\abs{u_n - \ell} \leq \varepsilon$ 且
+$\abs{u_n - \ell'} \leq \varepsilon$，因此
+\[
+\ell' - \ell \leq \abs{\ell' - u_n} + \abs{u_n - \ell}
+\leq 2\varepsilon = \tfrac{2}{3}(\ell' - \ell) < \ell' - \ell,
+\]
+这与假设矛盾。
+\end{proof}
+
+\begin{proposition}[极限的运算]\label{prop:g12:seq:operations}
+设 $(u_n)$ 与 $(v_n)$ 为数列，其极限分别为 $\ell$ 与 $\ell'$（有限或
+无穷）。则当右端不是未定式时，
+\[
+\lim (u_n + v_n) = \ell + \ell', \qquad
+\lim (u_n v_n) = \ell\,\ell', \qquad
+\lim \frac{u_n}{v_n} = \frac{\ell}{\ell'}.
+\]
+未定式为
+$(+\infty) + (-\infty)$、$0 \times \infty$、$\frac{\infty}{\infty}$ 及
+$\frac{0}{0}$。
+\end{proposition}
+
+\begin{proof}
+我们证明有限极限情形的和法则；其余情形类似，留作
+练习。任取 $\varepsilon > 0$，存在 $N_1, N_2$，使得
+$\abs{u_n - \ell} \leq \varepsilon/2$ 对 $n \geq N_1$ 成立，且
+$\abs{v_n - \ell'} \leq \varepsilon/2$ 对 $n \geq N_2$ 成立。对
+$n \geq \max(N_1, N_2)$，由三角不等式得
+\[
+\abs{(u_n + v_n) - (\ell + \ell')}
+\leq \abs{u_n - \ell} + \abs{v_n - \ell'} \leq \varepsilon. \qedhere
+\]
+\end{proof}
+
+\begin{method}[提取主导项处理未定式]\label{met:g12:seq:indeterminate}
+遇到未定式时，提出主导项。例如
+\[
+n^2 - n = n^2\left(1 - \tfrac{1}{n}\right) \xrightarrow[n\to+\infty]{} +\infty,
+\qquad
+\frac{2n^2+1}{n^2 - n} = \frac{2 + 1/n^2}{1 - 1/n}
+\xrightarrow[n\to+\infty]{} 2 .
+\]
+\end{method}
+
+\section{收敛定理}
+
+\begin{theorem}[比较定理与夹逼定理]\label{thm:g12:seq:squeeze}
+设 $(u_n)$、$(v_n)$、$(w_n)$ 为数列。
+\begin{enumerate}
+  \item 若从某项起 $u_n \leq v_n$，且 $u_n \to +\infty$，则
+        $v_n \to +\infty$。
+  \item （\emph{夹逼定理}\index{夹逼定理}）若
+        从某项起 $u_n \leq v_n \leq w_n$，且 $(u_n)$ 与 $(w_n)$
+        都收敛于同一极限 $\ell$，则 $(v_n)$ 收敛
+        于 $\ell$。
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\emph{1.} 设 $A \in \R$。由 $u_n \to +\infty$，存在 $N$，使得
+$u_n \geq A$（$n \geq N$）；必要时增大 $N$，可得
+$v_n \geq u_n \geq A$（$n \geq N$）。
+
+\emph{2.} 设 $\varepsilon > 0$。从某项起，两式
+$\ell - \varepsilon \leq u_n$ 与 $w_n \leq \ell + \varepsilon$ 均成立，于是
+$\ell - \varepsilon \leq u_n \leq v_n \leq w_n \leq \ell + \varepsilon$，即
+$\abs{v_n - \ell} \leq \varepsilon$。
+\end{proof}
+
+\begin{example}
+对所有 $n \geq 1$，$-\frac{1}{n} \leq \frac{(-1)^n}{n} \leq \frac{1}{n}$，且
+两界都趋于 $0$；因此 $\frac{(-1)^n}{n} \to 0$。
+\end{example}
+
+\begin{theorem}[单调收敛定理]\label{thm:g12:seq:monotone}
+递增且有上界的数列收敛。递减
+且有下界的数列收敛。递增且无
+上界的数列趋于 $+\infty$。
+\end{theorem}
+
+\begin{proof}[部分证明]
+证明第三条结论。设 $(u_n)$ 递增且无
+上界，设 $A \in \R$。由于 $A$ 不是上界，存在 $N$，
+使得 $u_N \geq A$；由单调性，$u_n \geq u_N \geq A$ 对所有 $n \geq N$ 成立。
+因此 $u_n \to +\infty$。
+
+前两条结论依赖于
+$\R$ 的确界原理；它们\emph{在本阶段不加证明地承认}（并于
+本科一年级证明）。
+\end{proof}
+
+\begin{remark}
+定理保证了极限的\emph{存在性}，但未给出
+其值。递增且以 $M$ 为上界的数列收敛于某个
+$\ell \leq M$，但不一定收敛于 $M$。
+\end{remark}
+
+\begin{theorem}[等比数列的极限]\label{thm:g12:seq:geometric}
+设 $q \in \R$。
+\begin{enumerate}
+  \item 若 $q > 1$，则 $q^n \to +\infty$。
+  \item 若 $q = 1$，则 $q^n \to 1$。
+  \item 若 $\abs{q} < 1$，则 $q^n \to 0$。
+  \item 若 $q \leq -1$，则 $(q^n)$ 发散，无极限。
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\emph{1.} 记 $q = 1 + a$，其中 $a > 0$。由伯努利不等式
+（\cref{ex:g12:seq:bernoulli}）得 $q^n \geq 1 + na \to +\infty$，再
+由比较定理（\cref{thm:g12:seq:squeeze}）即得结论。
+
+\emph{2.} 显然。
+
+\emph{3.} 若 $q = 0$，结论显然。否则由 $\abs{q} < 1$ 得
+$1/\abs{q} > 1$，故由第 1 点，$(1/\abs{q})^n \to +\infty$，因此
+$\abs{q}^n \to 0$，且 $-\abs{q}^n \leq q^n \leq \abs{q}^n$，于是
+由夹逼定理即得结论。
+
+\emph{4.} 当 $q \leq -1$ 时，$(q^{2n})$ 的项都 $\geq 1$，而
+$(q^{2n+1})$ 的项都 $\leq -1$：
+两子列不可能收敛于同一极限。
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=10cm, height=5.6cm,
+  xlabel={$n$}, ylabel={$q^n$},
+  xmin=-0.5, xmax=13, ymin=-1.3, ymax=4.3,
+  xtick={5,10}, ytick={-1,1}]
+  \addplot[omThm, only marks, mark=*, mark size=1.5pt,
+    samples at={0,...,6}] {1.25^x};
+  \addplot[omDef, only marks, mark=*, mark size=1.5pt,
+    samples at={0,...,12}] {0.75^x};
+  \addplot[omProp, only marks, mark=*, mark size=1.5pt,
+    samples at={0,...,12}] {(-0.8)^x};
+  \node[omThm, font=\small, anchor=west] at (axis cs:6.3,3.7) {$q=1.25$};
+  \node[omDef, font=\small, anchor=south west] at (axis cs:3.4,0.55) {$q=0.75$};
+  \node[omProp, font=\small, anchor=north] at (axis cs:7,-0.75) {$q=-0.8$};
+\end{axis}
+\end{tikzpicture}
+
+{\small $(q^n)$ 的三种行为：发散至 $+\infty$（$q > 1$，红色）；
+收敛于 $0$（$\abs q < 1$，蓝色）；
+以及阻尼振荡 --- 仍收敛于 $0$ --- 对应 $-1 < q < 0$（橙色）。}
+\end{omfigure}
+
+\begin{method}[递推数列 $u_{n+1} = f(u_n)$]\label{met:g12:seq:recurrent}
+研究由 $u_{n+1} = f(u_n)$ 定义的数列时：
+\begin{enumerate}
+  \item 用归纳法证明 $(u_n)$ 始终落在区间 $I$ 上，
+        $f$ 在该区间上性质良好（并且常常还可证明 $(u_n)$ 单调）；
+  \item 由单调收敛定理推出收敛；
+  \item 在关系式 $u_{n+1} = f(u_n)$ 两边取极限：若 $f$
+        连续，且 $u_n \to \ell \in I$，则 $\ell$ 满足
+        $f(\ell) = \ell$（见\cref{ch:g12:limcont}）；解此方程，
+        并选出正确的根。
+\end{enumerate}
+\end{method}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis,
+  width=8.4cm, height=6.4cm,
+  xmin=-0.4, xmax=3.1, ymin=-0.4, ymax=2.7,
+  xtick={0,1.414,1.848}, xticklabels={$u_0$,$u_1$,$u_2$}, ytick=\empty]
+  \addplot[omProp, dashed, domain=-0.3:2.6] {x};
+  \addplot[omDef, thick, domain=-0.4:2.9] {sqrt(x+2)};
+  \draw[omThm, thick] (axis cs:0,0) -- (axis cs:0,1.414)
+    -- (axis cs:1.414,1.414) -- (axis cs:1.414,1.848)
+    -- (axis cs:1.848,1.848) -- (axis cs:1.848,1.961)
+    -- (axis cs:1.961,1.961);
+  \draw[black, dashed, thin] (axis cs:1.414,0) -- (axis cs:1.414,1.414);
+  \draw[black, dashed, thin] (axis cs:1.848,0) -- (axis cs:1.848,1.848);
+  \fill (axis cs:2,2) circle (1.5pt)
+    node[below right, font=\small] {$\ell = 2$};
+  \node[omDef, font=\small, above left] at (axis cs:2.75,2.18)
+    {$y = f(x)$};
+  \node[omProp, font=\small, anchor=north west] at (axis cs:1.08,0.82)
+    {$y = x$};
+\end{axis}
+\end{tikzpicture}
+
+{\small $u_{n+1} = \sqrt{u_n + 2}$，$u_0 = 0$ 的阶梯作图
+（\cref{exo:g12:seq:6}）：每一竖直步在曲线上读出 $f(u_n)$，
+每一水平步借助 $y = x$ 将其折回横轴，数列
+逐步升至不动点 $\ell = 2$，即曲线与直线的交点。}
+\end{omfigure}
+
+\begin{example}\label{ex:g12:seq:sqrt2}
+设 $u_0 = 2$，$u_{n+1} = \frac{1}{2}\left(u_n + \frac{2}{u_n}\right)$。
+用归纳法易证 $u_n \geq \sqrt{2}$ 对所有 $n$ 成立（不等式
+$\frac{1}{2}(x + 2/x) \geq \sqrt{2}$（$x>0$）等价于
+$(x - \sqrt2)^2 \geq 0$），再证 $(u_n)$ 递减，因为
+\[
+u_{n+1}-u_n=\frac{2-u_n^2}{2u_n}\leq 0 .
+\]
+递减且有下界，$(u_n)$
+收敛于某个 $\ell \geq \sqrt{2}$，该极限必满足
+$\ell = \frac{1}{2}(\ell + 2/\ell)$，即 $\ell^2 = 2$。于是
+$u_n \to \sqrt{2}$。这就是海伦算法，
+早已为巴比伦人所用；其收敛极快（$u_3$ 已给出 $\sqrt 2$
+精确到小数点后八位的近似值）。
+\end{example}
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:g12:seq:1}
+用归纳法证明：对所有 $n \in \N$，
+\[
+1^2 + 2^2 + \dots + n^2 = \frac{n(n+1)(2n+1)}{6}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:seq:2}
+研究下列由 $n \geq 1$ 定义的数列的单调性：
+\[
+a_n = \frac{n+1}{n}, \qquad
+b_n = \frac{2^n}{n}, \qquad
+c_n = n^2 - 10n .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:seq:3}
+求下列数列的极限，其通项分别为
+\[
+u_n = \frac{3n^2 - n + 1}{2n^2 + 5}, \qquad
+v_n = \sqrt{n+1} - \sqrt{n}, \qquad
+w_n = \frac{2^n - 3^n}{3^n + 1}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:seq:4}
+设 $(u_n)$ 为等差数列，$u_0 = 5$，公差
+为 $r = 3$，$(v_n)$ 为等比数列，$v_0 = 8$，公比
+为 $q = \frac{1}{2}$。求 $u_n$、$v_n$、$\sum_{k=0}^{n} u_k$ 与
+$\sum_{k=0}^{n} v_k$，并求这四个式子当
+$n \to +\infty$ 时的极限。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:seq:5}
+利用夹逼定理，求
+\[
+\lim_{n\to+\infty} \frac{n + \cos n}{n + 1}
+\qquad\text{ 与 }\qquad
+\lim_{n\to+\infty} \frac{n!}{n^n},
+\]
+其中 $n! = 1 \times 2 \times \dots \times n$。对第二个极限，
+试用等比数列的某一项对 $\frac{n!}{n^n}$ 作上界估计。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:seq:6}
+设 $u_0 = 0$，$u_{n+1} = \sqrt{u_n + 2}$，对所有 $n \in \N$。
+\begin{enumerate}
+  \item 用归纳法证明 $0 \leq u_n \leq 2$，对所有 $n$ 成立。
+  \item 证明 $(u_n)$ 递增。
+  \item 由此推出 $(u_n)$ 收敛，并求其极限。
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:seq:7}
+一位病人每天早上服用 $1$ 个单位的药物。在每
+个 24 小时内，人体会排出体内现存药量的 $40\%$。设 $u_n$ 为
+第 $n$ 天刚服药后体内的药量，且满足
+$u_0 = 1$。
+\begin{enumerate}
+  \item 说明 $u_{n+1} = 0.6\,u_n + 1$。
+  \item 设 $v_n = u_n - 2.5$。证明 $(v_n)$ 为等比数列，并由此推出
+        $u_n$ 的通项公式。
+  \item 求体内药量的长期稳定值。
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:seq:8}
+设数列 $(u_n)$ 由 $u_0 = 3$ 与 $u_{n+1} = \frac{4u_n - 1}{u_n + 2}$ 定义。
+\begin{enumerate}
+  \item 用归纳法证明 $u_n > 1$ 对所有 $n \in \N$ 成立。
+  \item 证明 $v_n = \dfrac{1}{u_n - 1}$ 确定一个等差数列。
+  \item 由此求 $v_n$ 与 $u_n$ 的通项公式，以及
+        $(u_n)$ 的极限。
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:seq:9}
+对 $n \geq 1$，令
+$H_n = 1 + \frac{1}{2} + \frac{1}{3} + \dots + \frac{1}{n}$.
+\begin{enumerate}
+  \item 证明：对所有 $n \geq 1$，$H_{2n} - H_n \geq \frac{1}{2}$。
+  \item 由此推出 $H_{2^k} \geq 1 + \frac{k}{2}$ 对所有 $k \in \N$ 成立，并
+        得出 $H_n \to +\infty$。
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:seq:10}
+\emph{（相邻数列。）}两数列 $(a_n)$ 与 $(b_n)$ 称为
+\emph{相邻}，若 $(a_n)$ 递增，$(b_n)$ 递减，且
+$b_n - a_n \to 0$。
+\begin{enumerate}
+  \item 证明：对所有 $n$，$a_n \leq b_n$。（提示：研究
+        $(b_n - a_n)$ 的单调性。）
+  \item 证明：相邻数列都收敛，且收敛于同一极限。
+  \item 应用：证明数列
+        $a_n = \sum_{k=0}^{n} \frac{1}{k!}$ 与
+        $b_n = a_n + \frac{1}{n \cdot n!}$（$n \geq 1$）是相邻数列。（它们的
+        公共极限为数 $\eu$，在\cref{ch:g12:exp}中研究。）
+\end{enumerate}
+\end{exercise}
+
+\section{问题：海伦数列，终获判定}
+
+\begin{problem}[{周末问题 --- 归纳法作证，单调收敛定理，
+以及两千年前的 $\sqrt2$ 算法终于获证
+（以高斯绝妙的平均数作甜点）
+}]
+\label{pb:g12:seq:1}
+本系列三次遇到海伦算法——将猜测值与
+$2/\text{猜测值}$ 取平均，三次都只能
+\emph{观察}到此算法有效。本章终于拥有判断的工具：
+归纳法
+（\cref{thm:g12:seq:induction}），单调收敛定理
+（\cref{thm:g12:seq:monotone}），以及递推式的极限。
+判定结论与可认证的速度占据本题核心；
+围绕它的是归纳法的经典陷阱，
+数学中最慢的发散，以及高斯找到的
+最快收敛。
+
+\medskip
+\noindent\textbf{第一部分 --- 归纳法热身。}
+\begin{enumerate}
+  \item 用归纳法证明：
+        $1 + 3 + 5 + \dots + (2n - 1) = n^2$（奇数的阶梯，
+        已在初中分册中画出，今日得到
+        证明）。
+  \item 用归纳法证明 $2^n > n$ 对每个
+        $n \in \N$ 成立。
+  \item 用归纳法证明伯努利不等式：对
+        $x \geq 0$ 及 $n \in \N$，
+        $(1 + x)^n \geq 1 + nx$。
+  \item 经典陷阱：“所有弹珠颜色都相同——
+        对一颗弹珠成立；若任意 $n$ 颗弹珠总是同色，
+        则在 $n + 1$ 颗弹珠中，前 $n$ 颗同色，
+        后 $n$ 颗同色，故
+        $n + 1$ 颗全部同色。”孩子们都知道结论荒谬，
+        请找出归纳法恰好失效的那一步。
+  \item 用归纳法证明 $4^n - 1$ 能被 $3$ 整除，
+        对每个 $n \in \N$ 成立。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第二部分 --- 海伦算法的检验。}
+设 $x_0 = 2$，且 $x_{n+1} = \dfrac12\left(x_n +
+\dfrac{2}{x_n}\right)$。
+\begin{enumerate}[resume]
+  \item 计算 $x_1$、$x_2$、$x_3$，写成精确分数（老朋友
+        们）。
+  \item 证明关键恒等式
+        \[
+        x_{n+1}^2 - 2 = \left(\frac{x_n^2 - 2}{2x_n}\right)^{\!2}
+        \geq 0,
+        \]
+        由此用归纳法推出 $x_n > 0$ 且
+        $x_n^2 > 2$ 对每个 $n$ 成立。
+  \item 证明 $(x_n)$ 严格递减（计算
+        $x_{n+1} - x_n$，并利用第 7 题）。
+  \item 运用单调收敛定理：为何
+        $(x_n)$ 收敛于某个极限 $L \geq 1$？
+  \item 求出极限：对递推式取极限
+        （\cref{prop:g12:seq:operations}），并得出
+        $L = \sqrt2$。给出历史判定：忠实服务两千年后，
+        海伦算法终于被
+        \emph{证明}其收敛。
+  \item 可认证的速度：令 $e_n = x_n - \sqrt2$，证明
+        \[
+        e_{n+1} = \frac{e_n^2}{2 x_n} ,
+        \]
+        并由此推出 $e_{n+1} \leq \frac{e_n^2}{2\sqrt2}$：
+        每一步误差都被平方——
+        即初中分册中观察到的位数翻倍，现已成为定理。
+  \item 数值验证：计算 $e_0, e_1, e_2, e_3$（由
+        第 6 题得出），并检验每个 $\frac{e_{n+1}}{e_n^2}$
+        都接近 $\frac{1}{2x_n}$。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第三部分 --- 最慢的发散。}
+\begin{enumerate}[resume]
+  \item \Cref{exo:g12:seq:9} 已证明
+        $H_{2^k} \geq 1 + \frac k2$ 对调和部分和成立。要保证
+        $H_n > 10$，需要多少项？（取 2 的幂即可；
+        请惊叹它的大小。）
+  \item 相比之下，几何和
+        $1 + \frac12 + \frac14 + \dots + \frac{1}{2^n} =
+        2 - \frac{1}{2^n}$ 收敛于 $2$
+        （\cref{thm:g12:seq:geometric}）：初中分册中的巧克力棒直觉，
+        终于成为一个极限命题。
+        请写出两行的证明。
+  \item 介于两者之间：证明下列部分和
+        $S_n = 1 + \frac{1}{4} + \frac{1}{9} + \dots +
+        \frac{1}{n^2}$ 收敛，通过放缩
+        $\frac{1}{k^2} \leq \frac{1}{k(k-1)} =
+        \frac{1}{k-1} - \frac{1}{k}$（对 $k \geq 2$），
+        裂项相消，并应用单调收敛定理。（其
+        极限 $\frac{\pi^2}{6}$ 是欧拉的奇迹之一，
+        在大学分册中证明。）
+  \item 用两句话概括第 13--15 题的要旨：
+        “各项趋于 $0$”对级数的收敛性能决定什么——
+        又不能决定什么？
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第四部分 --- 高斯的算术--几何
+平均数。}
+设 $a_0 = 1$，$b_0 = 2$，且
+\[
+a_{n+1} = \sqrt{a_n b_n},
+\qquad
+b_{n+1} = \frac{a_n + b_n}{2} .
+\]
+\begin{enumerate}[resume]
+  \item 计算 $a_1, b_1, a_2, b_2$（精确到小数点后五位）。你对
+        这些数的收敛速度有何观察？
+  \item 证明 $a_n \leq b_n$ 对每个 $n$ 成立（即算术--几何
+        不等式，本系列多处用到），
+        且 $(a_n)$ 递增，$(b_n)$ 递减。
+  \item 证明
+        $b_{n+1} - a_{n+1} \leq \frac{b_n - a_n}{2}$
+        （将 $b_{n+1} - a_{n+1} =
+        \frac{(\sqrt{b_n} - \sqrt{a_n})^2}{2}$ 因式分解后比较），
+        并由\cref{exo:g12:seq:10}可知这两个
+        数列相邻：它们有共同的极限
+        $M(1, 2)$，即\emph{算术--几何平均数}。
+  \item 计算 $M(1, 2)$，精确到小数点后六位（需要多少次
+        迭代？）。1799 年 5 月 30 日，高斯计算出
+        $M(1, \sqrt2)$ 精确到小数点后十一位，
+        并将 $\frac{\pi}{M(1,\sqrt2)}$ 认作已知积分，且
+        写道一个“新的分析领域”已经开辟 ---
+        的确如此：椭圆积分，在大学分册中有讲述。
+        最后，将本题中观察到的各收敛速度
+        按从慢到快排列。
+\end{enumerate}
+\end{problem}

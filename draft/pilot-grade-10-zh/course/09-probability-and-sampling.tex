@@ -1,0 +1,422 @@
+\chapter{Probability and Sampling}\label{ch:g10:proba}
+
+\omterm{def:g10:proba:distribution}{Probability} assigns numbers to chance. Starting from experiments with
+equally likely outcomes --- dice, coins, cards --- this chapter builds the
+basic rules for computing probabilities of \omterm{def:g10:proba:events}{events}, introduces \omterm{met:g10:proba:tree}{tree
+diagrams} for two-step experiments, and ends with the link between
+probabilities and observed frequencies. The theory continues in
+\cref{ch:g11:prob}.
+
+\section{Random experiments and events}
+
+\begin{definition}[Outcomes and events]\label{def:g10:proba:events}
+A \emph{random experiment}\index{random experiment} is an experiment whose
+result cannot be predicted (rolling a die). The set of all possible
+results is the \emph{sample space}\index{sample space}
+$\Omega = \{\omega_1, \dots, \omega_n\}$; its elements are the
+\emph{outcomes}. An \emph{event}\index{event} is a set of outcomes; an
+event \emph{occurs} when the result of the experiment belongs to it.
+\end{definition}
+
+\begin{definition}[Probability distribution]\label{def:g10:proba:distribution}
+Assigning to each outcome $\omega_i$ a number $p_i \geq 0$, with
+$p_1 + \dots + p_n = 1$, defines a \emph{probability}\index{probability}:
+the probability $\P(A)$ of an \omterm{def:g10:proba:events}{event} $A$ is the sum of the $p_i$ of the
+outcomes in $A$. In particular $\P(\Omega) = 1$ and the impossible \omterm{def:g10:proba:events}{event}
+$\varnothing$ has probability $0$.
+\end{definition}
+
+\begin{proposition}[Equally likely outcomes]\label{prop:g10:proba:uniform}
+If the $n$ outcomes are equally likely (each $p_i = \frac1n$), then for
+every \omterm{def:g10:proba:events}{event} $A$:
+\[
+\P(A) = \frac{\text{number of outcomes in } A}{n}
+= \frac{\text{favorable cases}}{\text{possible cases}} .
+\]
+\end{proposition}
+
+\begin{proof}
+$A$ contains some number $k$ of outcomes, each of \omterm{def:g10:proba:distribution}{probability} $\frac1n$,
+so $\P(A) = \frac kn$.
+\end{proof}
+
+\begin{example}\label{ex:g10:proba:die}
+Roll a fair die: $\Omega = \{1, 2, 3, 4, 5, 6\}$, each outcome having
+\omterm{def:g10:proba:distribution}{probability} $\frac16$. The \omterm{def:g10:proba:events}{event} $A$: ``the result is even'' is
+$A = \{2, 4, 6\}$, so $\P(A) = \frac36 = \frac12$. The \omterm{def:g10:proba:events}{event} $B$: ``the
+result is at least $5$'' is $B = \{5, 6\}$, so $\P(B) = \frac26 =
+\frac13$.
+\end{example}
+
+\section{Combining events}
+
+\begin{definition}[Intersection, union, complement]\label{def:g10:proba:operations}
+Let $A$ and $B$ be \omterm{def:g10:proba:events}{events}.
+\begin{itemize}
+  \item $A \cap B$ (``$A$ and $B$'') occurs when both occur;
+  \item $A \cup B$ (``$A$ or $B$'') occurs when at least one occurs;
+  \item the \emph{complement}\index{complement} $\bar A$ (``not $A$'')
+        occurs exactly when $A$ does not;
+  \item $A$ and $B$ are \emph{incompatible}\index{incompatible} when they cannot occur
+        together: $A \cap B = \varnothing$.
+\end{itemize}
+\end{definition}
+
+\begin{theorem}[Addition rules]\label{thm:g10:proba:addition}
+For all \omterm{def:g10:proba:events}{events} $A$ and $B$:
+\[
+\P(A \cup B) = \P(A) + \P(B) - \P(A \cap B),
+\qquad
+\P(\bar A) = 1 - \P(A) .
+\]
+For \omterm{def:g10:proba:operations}{incompatible} \omterm{def:g10:proba:events}{events}, the first rule simplifies to
+$\P(A \cup B) = \P(A) + \P(B)$.
+\end{theorem}
+
+\begin{proof}
+Summing $\P(A) + \P(B)$ adds the \omterm{def:g10:proba:distribution}{probability} of every outcome of
+$A \cup B$ once, \emph{except} those of $A \cap B$, which are counted
+twice --- once in $A$ and once in $B$. Subtracting $\P(A \cap B)$ repairs
+the double counting. For the \omterm{def:g10:proba:operations}{complement}: $A$ and $\bar A$ are \omterm{def:g10:proba:operations}{incompatible}
+and $A \cup \bar A = \Omega$, so $\P(A) + \P(\bar A) = \P(\Omega) = 1$.
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=0.9]
+  \draw[omExo, thick, rounded corners] (-3.1,-1.7) rectangle (3.4,1.7);
+  \node[omExo, font=\small] at (3.0,1.45) {$\Omega$};
+  \begin{scope}
+    \clip (-0.8,0) circle (1.25);
+    \fill[omProp!25] (0.8,0) circle (1.25);
+  \end{scope}
+  \draw[omDef, thick] (-0.8,0) circle (1.25);
+  \draw[omThm, thick] (0.8,0) circle (1.25);
+  \node[omDef, font=\small] at (-1.6,0.9) {$A$};
+  \node[omThm, font=\small] at (1.7,0.9) {$B$};
+  \node[font=\small] at (0,0) {$A \cap B$};
+\end{tikzpicture}
+
+{\small Two overlapping \omterm{def:g10:proba:events}{events}: in $\P(A) + \P(B)$, the shaded
+\omterm{def:g10:numbers:interunion}{intersection} $A \cap B$ is counted twice, which explains the subtraction
+in the addition rule.}
+\end{omfigure}
+
+\begin{example}\label{ex:g10:proba:cards}
+Draw one card from a standard $52$-card deck. Let $A$: ``the card is a
+heart'' ($13$ cards) and $B$: ``the card is a king'' ($4$ cards). Then
+$A \cap B$ is ``the king of hearts'' ($1$ card), and
+\[
+\P(A \cup B) = \frac{13}{52} + \frac{4}{52} - \frac{1}{52} = \frac{16}{52}
+= \frac{4}{13}.
+\]
+The \omterm{def:g10:proba:operations}{complement} rule is often the fastest route: the \omterm{def:g10:proba:distribution}{probability} that the
+card is \emph{not} a heart is $1 - \frac{13}{52} = \frac34$.
+\end{example}
+
+\section{Tree diagrams}
+
+\begin{method}[Two-step experiments]\label{met:g10:proba:tree}
+For an experiment performed in two steps:
+\begin{enumerate}
+  \item draw a \emph{tree}\index{tree diagram}: one branch per possible
+        result of the first step, then from each of these, one branch per
+        result of the second step, writing the \omterm{def:g10:proba:distribution}{probability} on each branch
+        (the branches leaving any node must sum to $1$);
+  \item the \omterm{def:g10:proba:distribution}{probability} of a \emph{path} (a leaf of the \omterm{met:g10:proba:tree}{tree}) is the
+        product of the probabilities along its branches;
+  \item the \omterm{def:g10:proba:distribution}{probability} of an \omterm{def:g10:proba:events}{event} is the sum of the probabilities of
+        the paths that realize it.
+\end{enumerate}
+\end{method}
+
+\begin{example}\label{ex:g10:proba:tree}
+An urn contains $3$ red balls and $2$ blue balls. Draw one ball, put it
+back, draw again. Each draw gives red (R) with \omterm{def:g10:proba:distribution}{probability} $\frac35$ and
+blue (B) with \omterm{def:g10:proba:distribution}{probability} $\frac25$.
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=1.0]
+  \coordinate (root) at (0,0);
+  \coordinate (R) at (2.3,1.1);
+  \coordinate (B) at (2.3,-1.1);
+  \coordinate (RR) at (5.0,1.7);
+  \coordinate (RB) at (5.0,0.5);
+  \coordinate (BR) at (5.0,-0.5);
+  \coordinate (BB) at (5.0,-1.7);
+  \draw (root) -- (R) node[midway, above, font=\small, sloped] {$\frac35$};
+  \draw (root) -- (B) node[midway, below, font=\small, sloped] {$\frac25$};
+  \draw (R) -- (RR) node[midway, above, font=\small, sloped] {$\frac35$};
+  \draw (R) -- (RB) node[midway, below, font=\small, sloped] {$\frac25$};
+  \draw (B) -- (BR) node[midway, above, font=\small, sloped] {$\frac35$};
+  \draw (B) -- (BB) node[midway, below, font=\small, sloped] {$\frac25$};
+  \node[omThm, font=\small] at (R) [above left=-2pt] {R};
+  \node[omDef, font=\small] at (B) [below left=-2pt] {B};
+  \node[right, font=\small] at (RR)
+    {RR:\ $\frac35 \times \frac35 = \frac{9}{25}$};
+  \node[right, font=\small] at (RB)
+    {RB:\ $\frac35 \times \frac25 = \frac{6}{25}$};
+  \node[right, font=\small] at (BR)
+    {BR:\ $\frac25 \times \frac35 = \frac{6}{25}$};
+  \node[right, font=\small] at (BB)
+    {BB:\ $\frac25 \times \frac25 = \frac{4}{25}$};
+\end{tikzpicture}
+
+{\small The \omterm{met:g10:proba:tree}{tree} of two draws with replacement. The four path
+probabilities sum to $1$.}
+\end{omfigure}
+
+The \omterm{def:g10:proba:distribution}{probability} of getting two balls of the same color is
+$\P(\text{RR}) + \P(\text{BB}) = \frac{9}{25} + \frac{4}{25} =
+\frac{13}{25}$; the \omterm{def:g10:proba:distribution}{probability} of at least one blue is
+$1 - \P(\text{RR}) = 1 - \frac{9}{25} = \frac{16}{25}$ (\omterm{def:g10:proba:operations}{complement} rule).
+\end{example}
+
+\begin{remark}
+Without replacement, the probabilities of the second draw depend on the
+first: with the urn above, after drawing a red ball, only $2$ red and $2$
+blue remain, so the second branch carries $\frac24$ and $\frac24$. The
+\omterm{met:g10:proba:tree}{tree} method works unchanged; only the numbers on the second-level branches
+change.
+\end{remark}
+
+\section{Frequencies and sampling}
+
+When a \omterm{def:g10:proba:events}{random experiment} is repeated many times, the observed \omterm{def:g10:stats:series}{frequency}
+of an \omterm{def:g10:proba:events}{event} approaches its \omterm{def:g10:proba:distribution}{probability} --- this is why \omterm{def:g10:proba:distribution}{probability} is
+useful for describing the real world.
+
+\begin{definition}[Sample]\label{def:g10:proba:sample}
+A \emph{sample}\index{sample} of size $n$ is the result of repeating the
+same experiment $n$ times independently. The \emph{observed \omterm{def:g10:stats:series}{frequency}} of
+an \omterm{def:g10:proba:events}{event} in the sample is the number of occurrences divided by $n$.
+\end{definition}
+
+\begin{example}\label{ex:g10:proba:sampling}
+A fair coin gives heads with \omterm{def:g10:proba:distribution}{probability} $0.5$. Tossing it $100$ times
+rarely gives exactly $50$ heads: \omterm{def:g10:proba:sample}{samples} \emph{fluctuate}. Typical runs of
+$100$ tosses give frequencies like $0.46$, $0.53$, $0.49$ --- close to
+$0.5$, but not equal. Larger \omterm{def:g10:proba:sample}{samples} fluctuate less: with $10\,000$
+tosses, observed frequencies are usually within about $0.01$ of $0.5$.
+\end{example}
+
+\begin{remark}[Fluctuation interval]
+A useful rule of thumb, justified in \cref{ch:g11:binom}: for a \omterm{def:g10:proba:sample}{sample} of
+size $n$ of an \omterm{def:g10:proba:events}{event} of \omterm{def:g10:proba:distribution}{probability} $p$ (with $n$ reasonably large), the
+observed \omterm{def:g10:stats:series}{frequency} lies in the \omterm{def:g10:numbers:interval}{interval}
+\[
+\intcc{p - \frac{1}{\sqrt n}}{\,p + \frac{1}{\sqrt n}}
+\]
+in roughly $95\%$ of \omterm{def:g10:proba:sample}{samples}. If an observed \omterm{def:g10:stats:series}{frequency} falls far outside
+this \omterm{def:g10:numbers:interval}{interval}, doubt the value of $p$: this is the starting point of
+statistical testing.
+\end{remark}
+
+\begin{example}\label{ex:g10:proba:test}
+A factory claims that only $10\%$ of its parts are defective
+($p = 0.1$). In a \omterm{def:g10:proba:sample}{sample} of $n = 400$ parts, $64$ are defective: observed
+\omterm{def:g10:stats:series}{frequency} $\frac{64}{400} = 0.16$. The fluctuation \omterm{def:g10:numbers:interval}{interval} is
+$\intcc{0.1 - \frac{1}{20}}{0.1 + \frac{1}{20}} = \intcc{0.05}{0.15}$,
+and $0.16$ falls outside it: the \omterm{def:g10:proba:sample}{sample} casts serious doubt on the claim.
+\end{example}
+
+\section{Exercises}
+
+\begin{exercise}[$\star$]\label{exo:g10:proba:1}
+A fair die is rolled. Compute the \omterm{def:g10:proba:distribution}{probability} of each \omterm{def:g10:proba:events}{event}: ``getting a
+$6$''; ``getting an odd number''; ``getting at most $4$''; ``getting a
+$7$''.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g10:proba:2}
+A bag contains $5$ green, $3$ yellow and $2$ black marbles; one marble is
+drawn at random. Compute the \omterm{def:g10:proba:distribution}{probability} that it is green; that it is not
+black; that it is green or yellow.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g10:proba:3}
+In a class of $30$ students, $18$ study Spanish, $10$ study German, and
+$4$ study both. A student is picked at random. Using the addition rule,
+compute the \omterm{def:g10:proba:distribution}{probability} that this student studies at least one of the two
+languages, then the \omterm{def:g10:proba:distribution}{probability} that they study neither.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g10:proba:4}
+A fair coin is tossed twice. Draw the \omterm{met:g10:proba:tree}{tree} of the experiment and compute
+the \omterm{def:g10:proba:distribution}{probability} of getting two heads; exactly one head; at least one
+head.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g10:proba:5}
+An urn contains $4$ red and $6$ white balls. Two balls are drawn one after
+the other \emph{without} replacement. Draw the \omterm{met:g10:proba:tree}{tree} with the correct
+probabilities on the second level, and compute the \omterm{def:g10:proba:distribution}{probability} of drawing
+two red balls, then of drawing two balls of different colors.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g10:proba:6}
+Two fair dice are rolled and their sum is recorded.
+\begin{enumerate}
+  \item Explain why the \omterm{def:g10:proba:events}{sample space} can be taken as the $36$ equally
+        likely pairs $(1,1), (1,2), \dots, (6,6)$.
+  \item Compute the \omterm{def:g10:proba:distribution}{probability} that the sum is $7$; that it is $12$;
+        that it is at most $4$.
+  \item Which sum is the most likely?
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g10:proba:7}
+A multiple-choice question offers $4$ answers, one correct. A student
+answers $2$ independent such questions completely at random. Compute the
+\omterm{def:g10:proba:distribution}{probability} of answering both correctly, exactly one correctly, none
+correctly. Check that the three probabilities sum to $1$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g10:proba:8}
+A politician claims $50\%$ approval. In a poll of $n = 900$ randomly
+chosen voters, $396$ approve.
+\begin{enumerate}
+  \item Compute the observed \omterm{def:g10:stats:series}{frequency} and the fluctuation \omterm{def:g10:numbers:interval}{interval}
+        around $p = 0.5$ for $n = 900$.
+  \item Does the poll cast doubt on the claim?
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g10:proba:9}
+A game costs $2$ to play: you roll a fair die and win $6$ if you roll a
+$6$, $3$ if you roll a $5$, nothing otherwise.
+\begin{enumerate}
+  \item Compute the \omterm{def:g10:proba:distribution}{probability} of each amount won ($6$, $3$, $0$).
+  \item Over $600$ games, about how many of each outcome do you expect?
+        Compute the total expected gain and loss: is the game worth
+        playing?
+\end{enumerate}
+\end{exercise}
+
+\section{Problem: The three doors that fooled a thousand
+mathematicians}
+
+\begin{problem}[{Weekend problem --- the Monty Hall paradox and
+its cousins: how information changes probability, and how samples
+separate claims from wishful thinking}]
+\label{pb:g10:proba:1}
+In 1990 the columnist Marilyn vos Savant published a puzzle about
+a game show host, three doors, a car and two goats --- and
+answered it correctly. Ten thousand readers, among them hundreds
+of mathematics PhDs, wrote in to insist she was wrong. This
+problem arms you with \omterm{met:g10:proba:tree}{trees} (\cref{met:g10:proba:tree}),
+\omterm{def:g10:proba:operations}{complements} and the addition rules
+(\cref{thm:g10:proba:addition}), lets you settle the argument
+yourself, and finishes with the tool that arbitrates every such
+dispute in practice: the fluctuating \omterm{def:g10:proba:sample}{sample}.
+
+\medskip
+\noindent\textbf{Part I --- The rules, warmed up.}
+\begin{enumerate}
+  \item One card from a standard $52$-card deck: compute
+        $P(\text{king or heart})$ with the addition rule ---
+        and say why $\frac{4}{52} + \frac{13}{52}$ alone is
+        wrong.
+  \item Three fair coin flips: compute $P(\text{at least one
+        head})$ by the \omterm{def:g10:proba:operations}{complement}.
+  \item A bag holds $3$ red and $2$ blue marbles; two are drawn
+        without replacement. With a \omterm{met:g10:proba:tree}{tree}, compute
+        $P(\text{two reds})$ and $P(\text{one of each color})$.
+  \item Complete the distribution of question 3 with
+        $P(\text{two blues})$ and check the three probabilities
+        sum to $1$.
+  \item Someone reports, for two \emph{\omterm{def:g10:proba:operations}{incompatible}} \omterm{def:g10:proba:events}{events},
+        $P(A) = 0.6$ and $P(B) = 0.5$. Convict them with one
+        line of arithmetic.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part II --- The three doors.}
+The game: a car hides behind one of three doors, goats behind
+the other two. You pick a door (say door 1). The host --- who
+\emph{knows} where the car is --- opens one of the other two
+doors, always revealing a goat, and offers you the chance to
+switch to the remaining closed door.
+\begin{enumerate}[resume]
+  \item Before computing anything: does switching help, hurt, or
+        not matter? Write down your gut answer --- honestly.
+  \item Now the \omterm{met:g10:proba:tree}{tree}, by cases on the car's true position
+        (each $\frac13$): if the car is behind your door,
+        switching loses; if it is behind either other door, what
+        must the host do, and what does switching then win?
+        Compute $P(\text{win by switching})$.
+  \item The one-line version: switching wins exactly when your
+        first pick was wrong. Conclude again.
+  \item Now the crucial variant --- ``Monty Fall'': the host
+        does \emph{not} know where the car is, opens one of the
+        other doors at random, and by luck reveals a goat. List
+        the six equally likely scenarios (car position $\times$
+        door opened), discard those where the car is revealed,
+        and compute the \omterm{def:g10:proba:distribution}{probability} that switching wins
+        \emph{among the surviving scenarios}. What changed, and
+        why does the host's knowledge matter?
+  \item The intuition pump: one hundred doors, you pick one, the
+        knowing host opens $98$ goat doors. Switch? With what
+        \omterm{def:g10:proba:distribution}{probability} of winning?
+  \item You face a skeptic who, like the thousand letter-writers,
+        insists on ``50--50''. Describe a card-based simulation
+        (three cards, many rounds, a friend as host) and say
+        what proportion of switching wins you expect after $300$
+        rounds --- with the fluctuation \omterm{def:g10:numbers:interval}{interval} of the chapter
+        as your margin.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part III --- Cousins of the paradox.}
+\begin{enumerate}[resume]
+  \item A family has two children; you learn that \emph{at least
+        one is a boy}. List the equally likely two-children
+        configurations compatible with the information, and
+        compute $P(\text{two boys})$.
+  \item Same family, but the information is now: \emph{the elder
+        child is a boy}. Recompute. Why do the two answers
+        differ, and what do they share with the two Montys?
+  \item Three fair coins: compute $P(\text{all three alike})$.
+        The mathematician d'Alembert argued in 1754 for another
+        answer: ``either they are all alike or they are not ---
+        one case in two.'' Name the exact error, with
+        \cref{prop:g10:proba:uniform} in hand.
+  \item A game costs $2$ euros: roll a die, win $6$ euros on a
+        six, $3$ euros on a five, nothing otherwise
+        (\cref{exo:g10:proba:9}). Over $600$ games, what
+        average gain per game does the counting predict? An
+        insurer plays the same mathematics: a $1\,\%$ yearly
+        chance of a $10\,000$-euro claim --- what is the
+        \emph{fair} premium, and why does the real premium
+        exceed it?
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part IV --- \omterm{def:g10:proba:sample}{Samples} as arbiters.}
+\begin{enumerate}[resume]
+  \item A coin is flipped $100$ times. Using the fluctuation
+        \omterm{def:g10:numbers:interval}{interval} $p \pm \frac{1}{\sqrt n}$, decide which of
+        these outcomes should raise eyebrows: $55$ heads; $70$
+        heads.
+  \item A poll of $1\,000$ voters gives a candidate $52\,\%$.
+        Compute the fluctuation \omterm{def:g10:numbers:interval}{interval} around $50\,\%$ and
+        say whether the poll \emph{proves} the candidate is
+        ahead.
+  \item A factory claims $4\,\%$ defective parts. A \omterm{def:g10:proba:sample}{sample} of
+        $400$ shows $28$ defective ($7\,\%$); a later \omterm{def:g10:proba:sample}{sample} of
+        $2\,500$ shows $175$ ($7\,\%$ again). Test the claim
+        against each \omterm{def:g10:proba:sample}{sample}. Why do the verdicts differ?
+  \item Two error sources haunt every survey: sampling
+        \emph{bias} (the how-data-lies weekend problem of the Middle School volume) and sampling
+        \emph{fluctuation} (this chapter). Which one shrinks as
+        $n$ grows, and which one survives any \omterm{def:g10:proba:sample}{sample} size? One
+        sentence each.
+  \item Finale --- the probabilist's checklist, one line per
+        item: outcomes equally likely before counting
+        (question 15); \omterm{met:g10:proba:tree}{trees} and \omterm{def:g10:proba:operations}{complements} for multi-step and
+        ``at least'' (questions 2--3); \emph{information
+        changes probabilities, and how it was obtained matters}
+        (questions 7--14); \omterm{def:g10:proba:sample}{samples} fluctuate by about
+        $\frac{1}{\sqrt n}$, and simulation arbitrates
+        (questions 11, 16--18).
+\end{enumerate}
+\end{problem}

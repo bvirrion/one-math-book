@@ -1,0 +1,890 @@
+\chapter{函数列与函数项级数}\label{ch:b2:funcseq}
+
+当函数列收敛于某一函数时，哪些性质在
+取极限的过程中得以保持？\omterm{def:b2:funcseq:def}{逐点收敛}几乎
+不保持任何性质；\emph{一致}收敛——即上确界\omterm{def:b2:nvs:norm}{范数}意义下的收敛——
+保持\omterm{def:b2:metric:continuity}{连续}性、区间上的积分，以及
+附加一个条件后的导数。本章证明三个保持性定理，
+及其级数形式，并以魏尔斯特拉斯
+逼近定理作结，借助伯恩斯坦优美的概率
+多项式予以证明。
+
+\section{逐点收敛与一致收敛}
+
+\begin{definition}\label{def:b2:funcseq:def}
+设 $f_n, f \colon X \to \R$（或 $\C$，或赋范空间），$X$ 为任意
+集合。$(f_n)$ 收敛于 $f$，
+称为\emph{逐点收敛}\index{逐点收敛}，当 $f_n(x) \to
+f(x)$ 对每个 $x$ 成立；称为\emph{一致收敛}\index{一致收敛}，
+当
+\[
+\norm{f_n - f}_\infty = \sup_{x \in X}\, \abs{f_n(x) - f(x)}
+\xrightarrow[n \to \infty]{} 0 .
+\]
+一致收敛蕴含逐点收敛；在 $C(\intcc{a}{b})$ 上，一致收敛
+恰是在\omterm{def:b2:nvs:banach}{巴拿赫空间}
+$\bigl(C(\intcc{a}{b}), \norm\cdot_\infty\bigr)$ 中的收敛，该空间见
+\cref{ch:b2:nvs}。
+\end{definition}
+
+\begin{example}\label{ex:b2:funcseq:xn}
+在 $\intcc{0}{1}$ 上，$f_n(x) = x^n$ \omterm{def:b2:funcseq:def}{逐点收敛}于
+\emph{不\omterm{def:b2:metric:continuity}{连续}}的极限 $f = \mathbf{1}_{\{1\}}$；该收敛
+不是一致的：$\norm{f_n - f}_\infty \geq f_n\bigl(1 -
+\tfrac1n\bigr) = (1 - \tfrac1n)^n \to \eu^{-1} \neq 0$。在
+$\intcc{0}{a}$（$a < 1$）上它\emph{是}一致的（$\sup = a^n \to
+0$）：一致性既取决于定义域，
+也取决于数列本身。
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=8.2cm, height=5.6cm,
+    xmin=0, xmax=1.08, ymin=0, ymax=1.15,
+    xtick={0,1}, ytick={1}]
+  \addplot[omDef!40, thick, domain=0:1, samples=80] {x^2};
+  \addplot[omDef!60, thick, domain=0:1, samples=80] {x^5};
+  \addplot[omDef, thick, domain=0:1, samples=120] {x^15};
+  \addplot[omThm, very thick, domain=0:1, samples=160] {x^40};
+  \node[font=\small, omDef] at (axis cs:0.62,0.5) {$x^2$};
+  \node[font=\small, omDef] at (axis cs:0.83,0.48) {$x^5$};
+  \node[font=\small, omThm] at (axis cs:0.987,0.5) {$x^{40}$};
+\end{axis}
+\end{tikzpicture}
+
+{\small 函数列 $x^n$ 在 $\intcc{0}{1}$ 上：图像向
+$0$ 下沉，但都须升至 $1$，且在 $x = 1$ 处与不\omterm{def:b2:metric:continuity}{连续}逐点极限的上确界距离
+始终不小于某个常数。}
+\end{omfigure}
+
+\begin{example}[两个不可交换的极限]\label{ex:b2:funcseq:doublelimit}
+本章全部内容都围绕交换极限展开，因此这里给出
+最简单的失效例子。设 $a_{n,m} = \dfrac{n}{n+m}$，
+其中 $n, m \geq 1$。于是
+\[
+\lim_{m\to\infty}\Bigl(\lim_{n\to\infty}a_{n,m}\Bigr)
+= \lim_{m\to\infty} 1 = 1,
+\qquad
+\lim_{n\to\infty}\Bigl(\lim_{m\to\infty}a_{n,m}\Bigr)
+= \lim_{n\to\infty} 0 = 0 :
+\]
+两个累次极限都存在，且彼此不等。本章的每一个保持性定理，
+都是交换两个极限的许可——
+$\lim_n$ 与 $\lim_{x\to a}$（\omterm{def:b2:metric:continuity}{连续}性）、与 $\int$
+（积分）、与 $\frac{\dd}{\dd x}$（求导）——
+而\omterm{def:b2:funcseq:def}{一致收敛}正是使这种交换合法的
+代价。收尾的洞见是：每当某个“证明”悄悄交换两个极限运算，
+这个两行数组正是驳斥它的反例；
+而\cref{exo:b2:funcseq:2}中的滑动凸块，
+则是披着积分号外衣的
+同一现象。
+\end{example}
+
+\section{三个保持性定理}
+
+\begin{theorem}[连续性]\label{thm:b2:funcseq:continuity}
+若每个 $f_n$ 在 $a$ 处\omterm{def:b2:metric:continuity}{连续}，且 $f_n \to f$ 在 $a$ 的某邻域上
+\omterm{def:b2:funcseq:def}{一致收敛}，则 $f$ 在 $a$ 处\omterm{def:b2:metric:continuity}{连续}。\omterm{def:b2:metric:continuity}{连续}函数列的一致极限
+仍是\omterm{def:b2:metric:continuity}{连续}的。
+\end{theorem}
+
+\begin{proof}
+此处的 $3\varepsilon$ 论证已在
+\cref{thm:b2:metric:rncomplete}中用过：取 $n$ 使 $\norm{f_n -
+f}_\infty \leq \varepsilon$，再取 $\delta$，由
+$f_n$ 在 $a$ 处的\omterm{def:b2:metric:continuity}{连续}性；当 $\abs{x - a} \leq \delta$ 时，
+\[
+\abs{f(x) - f(a)} \leq \abs{f(x) - f_n(x)} + \abs{f_n(x) - f_n(a)}
++ \abs{f_n(a) - f(a)} \leq 3\varepsilon . \qedhere
+\]
+\end{proof}
+
+\begin{example}[一致性恰在极限断裂处失效]\label{ex:b2:funcseq:threshold}
+在 $\intcc{0}{2}$ 上，设 $f_n(x) = \dfrac{x^n}{1 + x^n}$。其
+逐点极限是一个分三段的函数：
+\[
+f(x) = \begin{cases} 0 & 0 \leq x < 1,\\[2pt]
+\tfrac12 & x = 1,\\[2pt]
+1 & 1 < x \leq 2, \end{cases}
+\]
+在 $1$ 处不\omterm{def:b2:metric:continuity}{连续}，由\cref{thm:b2:funcseq:continuity}
+可知该收敛在 $\intcc{0}{2}$ 上不可能一致。在
+避开分界点的闭子区间上，它是一致的：对于 $0 \leq x \leq
+a < 1$,
+\[
+\sup_{\intcc{0}{a}}\abs{f_n - 0}
+= \frac{a^n}{1 + a^n} \leq a^n \to 0 ,
+\]
+又对于 $1 < b \leq x \leq 2$，
+\[
+\sup_{\intcc{b}{2}}\abs{f_n - 1}
+= \frac{1}{1 + b^n} \leq b^{-n} \to 0 ,
+\]
+两个上确界均利用了 $u \mapsto
+\frac{u}{1+u}$ 与 $x \mapsto x^n$ 的单调性算得。收尾的洞见是：
+一致性的失效恰好局限于极限的
+不\omterm{def:b2:metric:continuity}{连续}点——与\cref{ex:b2:funcseq:xn}中的几何情形相同，
+也正是“在每个内部闭区间上一致”这一准则
+贯穿全章反复出现的原因。
+\end{example}
+
+\begin{theorem}[线段上的积分]\label{thm:b2:funcseq:integration}
+设 $f_n \to f$ 在 $\intcc{a}{b}$ 上\omterm{def:b2:funcseq:def}{一致收敛}，且 $f_n$ 分段
+\omterm{def:b2:metric:continuity}{连续}（$f$ 亦然），则
+\[
+\int_a^b f_n \longrightarrow \int_a^b f .
+\]
+\end{theorem}
+
+\begin{proof}
+由积分的线性与三角不等式可得
+\[
+\Bigl|\int_a^b f_n - \int_a^b f\Bigr|
+= \Bigl|\int_a^b (f_n - f)\Bigr|
+\leq \int_a^b\abs{f_n - f}
+\leq (b - a)\,\norm{f_n - f}_\infty \longrightarrow 0 .
+\]
+长度因子 $(b - a)$ 正是线段的紧性
+发挥作用之处：若在非紧区间上，同样的估计只会得到
+无用的界 $\infty\cdot0$，而结论确实
+在缺少控制函数时不成立——平坦的凸起 $f_n =
+\frac1n\mathbf 1_{\intcc{0}{n}}$ \omterm{def:b2:funcseq:def}{一致收敛}于 $0$，
+在 $\intco{0}{\infty}$ 上却仍保持 $\int f_n = 1$（见下文
+“陷阱”注记）；在\cref{ch:b2:integration}中的注记里，滑动凸起
+同样以\omterm{def:b2:funcseq:def}{逐点收敛}造成此现象；\omterm{def:b2:funcseq:def}{一致收敛}控制
+的是高度，从不控制宽度。
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=8.6cm, height=5.4cm,
+    xmin=0, xmax=1.05, ymin=0, ymax=1.9,
+    xtick={0,1}, ytick={1}]
+  \addplot[omDef!45, thick, domain=0:1.05, samples=120]
+    {2*x*exp(-2*x^2)};
+  \addplot[omDef!70, thick, domain=0:1.05, samples=120]
+    {5*x*exp(-5*x^2)};
+  \addplot[omDef, thick, domain=0:1.05, samples=160]
+    {15*x*exp(-15*x^2)};
+  \node[font=\small, omDef] at (axis cs:0.62,0.42) {$n=2$};
+  \node[font=\small, omDef] at (axis cs:0.40,0.80) {$n=5$};
+  \node[font=\small, omDef] at (axis cs:0.24,1.55) {$n=15$};
+\end{axis}
+\end{tikzpicture}
+
+{\small 在\cref{exo:b2:funcseq:1}中的凸起 $g_n(x) = nx\,\eu^{-nx^2}$，
+它们在每一点处收敛于 $0$，
+但峰值（高度 $\sim\sqrt{n/(2\eu)}$，趋向
+$0$）无界增长 —— 这是\omterm{def:b2:funcseq:def}{逐点收敛}伴随
+$\norm{g_n}_\infty \to \infty$，且 $\int_0^1 g_n \to \frac12
+\neq 0$：质量隐藏在移动的峰值之下。}
+\end{omfigure}
+
+\begin{theorem}[求导]\label{thm:b2:funcseq:differentiation}
+设 $f_n$ 为 $C^1$ 函数，定义在区间 $I$ 上，并满足：$(f_n')$
+在 $I$ 上（或 $I$ 的每条线段上）\emph{一致}收敛于某函数 $g$，
+且 $(f_n(x_0))$ 在一点 $x_0$ 处收敛。则 $(f_n)$
+（在线段上一致）收敛于 $C^1$ 函数 $f$，且 $f'
+= g$：可对极限求导。
+\end{theorem}
+
+\begin{proof}
+定义 $f(x) = \lim f_n(x_0) + \int_{x_0}^x g$：此定义合理，因为 $g$
+是\omterm{def:b2:metric:continuity}{连续}的：事实上 $g$ 是
+\omterm{def:b2:metric:continuity}{连续}函数 $f_n'$ 在线段上的\emph{一致}极限，故
+可应用\cref{thm:b2:funcseq:continuity}，于是\omterm{def:b2:metric:continuity}{连续}函数的积分
+有良好定义；由微积分基本定理
+可得
+\[
+f'(x) = g(x) \qquad (x \in I) :
+\]
+候选极限为 $C^1$ 函数，其导数
+\emph{按构造}即正确，在证明任何收敛之前已然如此。再
+由微积分基本定理，$f_n(x) = f_n(x_0) + \int_{x_0}^x
+f_n'$，作差得
+\[
+\abs{f_n(x) - f(x)} \leq \abs{f_n(x_0) - \lim f_n(x_0)}
++ \abs{x - x_0}\,\norm{f_n' - g}_{\infty} ,
+\]
+此式在每条线段上一致趋于 $0$。又 $f$ 为 $C^1$
+函数，且按构造有 $f' = g$。
+\end{proof}
+
+\begin{example}[为何假设加在导数上]\label{ex:b2:funcseq:sqrtabs}
+设 $F_n(x) = \sqrt{x^2 + \frac1n}$，定义于 $\R$ 上。每个 $F_n$ 均
+为 $C^1$ 函数（事实上为 $C^\infty$），且向 $\abs x$ 的收敛
+在整个 $\R$ 上是一致的：
+\[
+0 \leq F_n(x) - \abs x
+= \frac{(x^2 + \frac1n) - x^2}{\sqrt{x^2+\frac1n} + \abs x}
+= \frac{1/n}{\sqrt{x^2 + \frac1n} + \abs x}
+\leq \frac{1/n}{1/\sqrt n} = \frac{1}{\sqrt n} .
+\]
+然而极限 $\abs x$ 在 $0$ 处不可导：
+\emph{函数}本身的\omterm{def:b2:funcseq:def}{一致收敛}，无论多快，都不传递
+可导性。这一失效在导数上清楚可见：
+\[
+F_n'(x) = \frac{x}{\sqrt{x^2 + \frac1n}}
+\longrightarrow \begin{cases} 1 & x > 0,\\ 0 & x = 0,\\
+-1 & x < 0, \end{cases}
+\]
+逐点极限不\omterm{def:b2:metric:continuity}{连续}，因此 $(F_n')$ 不能
+在 $0$ 附近\omterm{def:b2:funcseq:def}{一致收敛}（由\cref{thm:b2:funcseq:continuity}再次可知）。
+收尾的洞见：
+\cref{thm:b2:funcseq:differentiation}有意假设
+$f_n'$ 的\omterm{def:b2:funcseq:def}{一致收敛}，而非 $f_n$ 的 ——
+本例即其原因。
+\end{example}
+
+\section{函数项级数}
+
+\begin{definition}\label{def:b2:funcseq:series}
+当函数项级数 $\sum u_n$ 的部分和逐点（或一致）收敛时，
+则称该级数逐点（或一致）收敛。
+称级数\emph{正规收敛}\index{正规收敛}（在 $X$ 上），当 $\sum
+\norm{u_n}_\infty < \infty$ 时。正规收敛蕴含\omterm{def:b2:funcseq:def}{一致收敛}
+（在有界函数的\omterm{def:b2:nvs:banach}{巴拿赫空间}中，见
+\cref{thm:b2:nvs:absoluteconvergence}），而\omterm{def:b2:funcseq:def}{一致收敛}蕴含\omterm{def:b2:funcseq:def}{逐点收敛}；
+两个蕴含关系均为严格的。
+\end{definition}
+
+\begin{example}[同一级数的三种结论]\label{ex:b2:funcseq:threemodes}
+取 $u_n(x) = \frac{x^n}{n}$，定义于 $\intco{0}{1}$ 上。\emph{\omterm{def:b2:funcseq:def}{逐点收敛}：}
+对每个 $x \in \intco01$ 收敛（与几何级数比较）。
+\emph{在 $\intcc{0}{a}$ 上\omterm{def:b2:funcseq:series}{正规收敛}，$a < 1$：}
+$\norm{u_n}_{\infty,\intcc0a} = \frac{a^n}{n}$，可和。
+\emph{在 $\intco{0}{1}$ 上不\omterm{def:b2:funcseq:series}{正规收敛}：}
+$\norm{u_n}_{\infty,\intco01} = \frac1n$，而 $\sum\frac1n$
+发散。\emph{在 $\intco{0}{1}$ 上甚至不\omterm{def:b2:funcseq:def}{一致收敛}：}余项
+在 $1$ 附近仍不能被压小，
+\[
+R_N(x) = \sum_{n>N}\frac{x^n}{n}
+\geq \sum_{n=N+1}^{2N}\frac{x^n}{n}
+\geq \frac{N\,x^{2N}}{2N} = \frac{x^{2N}}{2}
+\xrightarrow[x\to1^-]{} \frac12 ,
+\]
+因此 $\sup_{\intco01}\abs{R_N} \geq \frac12$ 对每个 $N$ 成立。
+收尾的洞见：四种结论和平共存——
+和函数 $-\ln(1-x)$ 在 $\intco{0}{1}$ 上\omterm{def:b2:metric:continuity}{连续}，
+因为\omterm{def:b2:metric:continuity}{连续}性只需\emph{在每一点附近}\omterm{def:b2:funcseq:def}{一致收敛}，即
+在线段 $\intcc0a$ 上\omterm{def:b2:funcseq:def}{一致收敛}；在边界处趋于无穷，
+正是和函数应有的。
+\end{example}
+
+\begin{theorem}[级数的性质传递]\label{thm:b2:funcseq:seriestransfer}
+若 $\sum u_n$ 在相关集合上\omterm{def:b2:funcseq:def}{一致收敛}（例如\omterm{def:b2:funcseq:series}{正规收敛}），
+则各 $u_n$ 在 $a$ 处的\omterm{def:b2:metric:continuity}{连续}性传递给和函数；积分
+可以在线段上逐项进行；若 $\sum u_n(x_0)$
+收敛，且 $\sum u_n'$ 在线段上\omterm{def:b2:funcseq:def}{一致收敛}，则
+和函数为 $C^1$ 函数，其导数为 $\sum u_n'$。
+\end{theorem}
+
+\begin{proof}
+以上各结论均为相应定理用于部分和的结果，
+部分和 $S_N = \sum_{n\leq N}u_n$ 是具有相应正则性的函数的有限和。
+\omterm{def:b2:metric:continuity}{连续}性：每个 $S_N$
+在 $a$ 处\omterm{def:b2:metric:continuity}{连续}，且 $S_N \to \sum u_n$ \omterm{def:b2:funcseq:def}{一致收敛}：
+由\cref{thm:b2:funcseq:continuity}可得。积分方面，在线段上，
+\[
+\int_a^b \sum_{n\geq0} u_n
+= \lim_N \int_a^b S_N
+= \lim_N \sum_{n=0}^{N}\int_a^b u_n
+= \sum_{n\geq0}\int_a^b u_n
+\]
+由\cref{thm:b2:funcseq:integration}可得第一个等号，
+第二个等号由积分的线性性得到。求导时，
+$S_N$ 为 $C^1$ 函数，$S_N(x_0)$ 收敛，且 $S_N' =
+\sum_{n\leq N}u_n'$ 在线段上\omterm{def:b2:funcseq:def}{一致收敛}：
+由\cref{thm:b2:funcseq:differentiation}可知，和函数
+为 $C^1$ 函数，其导数为 $\lim S_N' = \sum u_n'$。
+\end{proof}
+
+\begin{remark}[常见误区]
+四个误区，均见于考试试卷。\emph{(i)
+上确界检验不充分：} 计算 $f_n$ 在精心选取的序列 $x_n$ 上的取值，
+只能给出 $\norm{f_n - f}_\infty$ 的
+\emph{下界}——足以否定\omterm{def:b2:funcseq:def}{一致收敛}，
+（见\cref{ex:b2:funcseq:xn}），却不足以证明它；证明时须
+用对\emph{所有} $x$ 成立的计算控制上确界。\emph{(ii)
+在错误集合上讨论一致性：} \omterm{def:b2:funcseq:series}{正规收敛}或\omterm{def:b2:funcseq:def}{一致收敛}
+常在每个 $\intcc{-a}{a}$ 或 $\intco\delta\infty$ 上成立，
+但在开并集上不成立；这并不构成障碍——\omterm{def:b2:metric:continuity}{连续}性
+与可微性都是局部性质，故
+在\cref{ex:b2:funcseq:zeta}中逐段讨论的做法可推出整个
+\omterm{def:b2:metric:topology}{开集}上的结论。\emph{(iii) 在非线段上积分：}
+\cref{thm:b2:funcseq:integration}只是关于
+线段的命题；在 $\intco0\infty$ 上，\omterm{def:b2:funcseq:def}{一致收敛}并不
+阻止“质量”逃逸到无穷远（$f_n =
+\frac1n\mathbf 1_{\intcc{0}{n}}$ \omterm{def:b2:funcseq:def}{一致收敛}于 $0$，
+且 $\int f_n = 1$）——此处应改用控制收敛定理。
+\emph{(iv) 对极限求导：}
+见\cref{ex:b2:funcseq:sqrtabs}；导数的假设作用于
+$(f_n')$ 上，$(f_n)$ 的收敛速度无法替代
+它。
+\end{remark}
+
+\begin{example}[黎曼 $\zeta$ 函数]\label{ex:b2:funcseq:zeta}
+$\zeta(s) = \sum_{n\geq1} n^{-s}$ 在每条
+半直线 $\intco{a}{+\infty}$（$a > 1$）上\omterm{def:b2:funcseq:series}{正规收敛}（$\norm{n^{-s}}_\infty =
+n^{-a}$，可和）：$\zeta$ 在 $\intoo{1}{+\infty}$ 上\omterm{def:b2:metric:continuity}{连续}；
+逐项求导（导出级数 $\sum -\ln n\; n^{-s}$
+也在 $\intco{a}{\infty}$ 上\omterm{def:b2:funcseq:series}{正规收敛}），$\zeta$ 为 $C^1$ 函数
+——并逐次求导得 $C^\infty$——且 $\zeta'(s) = -\sum \frac{\ln
+n}{n^s}$。注意这一原则：\omterm{def:b2:funcseq:series}{正规收敛}须
+在\emph{真}子半直线上检验，绝不在
+开区间 $\intoo{1}{\infty}$ 本身上检验，那里并不成立。
+\end{example}
+
+\begin{example}[一个对数级数的完整计算]\label{ex:b2:funcseq:logseries}
+设 $F(x) = \sum_{n\geq1} \frac{\eu^{-nx}}{n}$，定义在
+$\intoo{0}{\infty}$ 上。每一项在 $\intco{\delta}
+\infty$ 上以 $\frac{\eu^{-n\delta}}{n} \leq \eu^{-n\delta}$ 为界，它是
+收敛的几何级数：在每个
+$\intco\delta\infty$ 上\omterm{def:b2:funcseq:series}{正规收敛}，故 $F$ 在
+$\intoo{0}{\infty}$ 上\omterm{def:b2:metric:continuity}{连续}。导出级数 $\sum -\eu^{-nx}$ 同样
+在 $\intco\delta\infty$ 上\omterm{def:b2:funcseq:series}{正规收敛}
+（$\norm{\eu^{-nx}}_{\infty,\intco\delta\infty} =
+\eu^{-n\delta}$），故 $F$ 为 $C^1$ 函数，其导数为几何级数形式：
+\[
+F'(x) = -\sum_{n\geq1}\eu^{-nx}
+= \frac{-\eu^{-x}}{1 - \eu^{-x}}
+= \frac{-1}{\eu^{x} - 1} .
+\]
+逐次求导得 $F$ 为 $C^\infty$。对 $F'$ 积分（$F$ 与 $x
+\mapsto -\ln(1 - \eu^{-x})$ 在 $+\infty$ 处都趋于零，并在 $\intoo0\infty$ 上
+具有相同导数）：
+\[
+F(x) = -\ln\bigl(1 - \eu^{-x}\bigr),
+\]
+即对数级数在 $t = \eu^{-x}$ 处的和。收尾的洞见：当 $x
+\to 0^+$ 时，$F(x) = -\ln(x + O(x^2)) = \ln\frac1x + O(x)$——级数
+在边界处对数发散，恰如
+它在 $x = 0$ 时变成的调和级数；\omterm{def:b2:funcseq:series}{正规收敛}在
+$\intco\delta\infty$ 上成立而在 $\intoo0\infty$ 上不成立，正是
+此现象的征兆。
+\end{example}
+
+\begin{method}[证明或否定一致收敛]\label{met:b2:funcseq:uniform}
+若 $f_n \to f$ 在 $X$ 上\omterm{def:b2:funcseq:def}{逐点收敛}：
+\begin{enumerate}
+  \item 计算或估计 $\norm{f_n - f}_\infty$：研究
+        函数 $x \mapsto \abs{f_n(x) - f(x)}$（借助导数、单调性）
+        以求其最大值；一个对一切 $x$ 成立且
+        趋于 $0$ 的界即证明\omterm{def:b2:funcseq:def}{一致收敛}。
+  \item 要\emph{否定}：给出点 $x_n$ 使得
+        $\abs{f_n(x_n) - f(x_n)} \not\to 0$（常令 $x_n$ 跟随
+        移动的凸起，如\cref{exo:b2:funcseq:1}所示）；或
+        用传递定理的逆否命题：
+        \omterm{def:b2:metric:continuity}{连续}函数的不\omterm{def:b2:metric:continuity}{连续}极限（见\cref{ex:b2:funcseq:threshold}），
+        或在线段上 $\int f_n
+        \not\to \int f$。
+  \item 对级数，先试\omterm{def:b2:funcseq:series}{正规收敛}
+        （$\sum\sup\abs{u_n} < \infty$）；若整体失效，
+        则在有关的子线段上检验之
+        （见\cref{ex:b2:funcseq:threemodes}）；若
+        处处失效，则\omterm{def:b2:funcseq:def}{一致收敛}仍可能经由
+        交错余项估计
+        （见\cref{exo:b2:funcseq:4}）或分部求和而成立。
+\end{enumerate}
+\end{method}
+
+\section{魏尔斯特拉斯逼近定理}
+
+\begin{theorem}[魏尔斯特拉斯，经由伯恩斯坦]\label{thm:b2:funcseq:weierstrass}
+每个\omterm{def:b2:metric:continuity}{连续}的 $f \colon \intcc{0}{1} \to \R$ 都是
+多项式的一致极限——更确切地说，是其\emph{伯恩斯坦
+多项式}\index{伯恩斯坦多项式}\index{魏尔斯特拉斯
+逼近定理}
+\[
+B_n(f)(x) = \sum_{k=0}^{n} f\Bigl(\frac kn\Bigr)\binom nk x^k
+(1-x)^{n-k} .
+\]
+\end{theorem}
+
+\begin{proof}
+取定 $x \in \intcc{0}{1}$，记 $p_k(x) = \binom nk x^k(1 -
+x)^{n-k}$。三个二项恒等式，
+由 $(x + y)^n$ 及其两次关于 $x$ 的导数在 $y = 1 - x$ 处求值得到：
+\[
+\sum_k p_k = 1,
+\qquad
+\sum_k k\,p_k = nx,
+\qquad
+\sum_k k(k-1) p_k = n(n-1)x^2 .
+\]
+具体地，$(x+y)^n = \sum_k\binom nk x^ky^{n-k}$ 在 $y = 1-x$ 处
+即第一式；对 $x$ 求导，
+\[
+n(x+y)^{n-1} = \sum_k k\binom nk x^{k-1}y^{n-k} ,
+\]
+再乘以 $x$ 并令 $y = 1 - x$，即得
+第二式；两次求导并乘以 $x^2$，即得
+第三式。将 $(k - nx)^2 = k(k-1) + k(1 - 2nx) +
+n^2x^2$ 展开，并合并三式：
+\[
+\sum_k (k - nx)^2 p_k
+= n(n-1)x^2 + nx(1 - 2nx) + n^2x^2
+= nx(1 - x) \leq \frac n4 ,
+\]
+即\emph{方差恒等式}。
+
+下面估计，利用 $\sum p_k = 1$：
+\[
+\abs{B_n(f)(x) - f(x)}
+\leq \sum_{k} \Bigl| f\Bigl(\frac kn\Bigr) - f(x)\Bigr|\, p_k(x)
+= \Sigma_{\text{近}} + \Sigma_{\text{远}} ,
+\]
+按 $\abs{\frac kn - x} \leq \delta$ 成立与否进行拆分。
+给定 $\varepsilon > 0$，由 $f$ 的一致\omterm{def:b2:metric:continuity}{连续}性（海涅定理）可取
+$\delta$ 使 $\Sigma_{\text{近}} \leq \varepsilon$。对远和，
+记 $M = \norm f_\infty$，由方差恒等式及
+切比雪夫的计数技巧，
+\[
+\Sigma_{\text{远}} \leq 2M \sum_{\abs{k - nx} > n\delta} p_k
+\leq 2M\,\frac{\sum_k (k - nx)^2 p_k}{n^2\delta^2}
+\leq \frac{2M}{4 n \delta^2} \cdot 1
+= \frac{M}{2n\delta^2}
+\xrightarrow[n\to\infty]{} 0 ,
+\]
+对 $x$ 一致成立。于是 $\norm{B_n(f) - f}_\infty \leq \varepsilon +
+\frac{M}{2n\delta^2} \leq 2\varepsilon$（$n$ 充分大时）。
+\end{proof}
+
+\begin{remark}
+经仿射变换，定理对任一线段
+$\intcc{a}{b}$ 上成立。在 $\R$ 上不成立（多项式在
+$\R$ 上的一致极限是多项式，见\cref{exo:b2:funcseq:8}）。概率解释——
+$B_n(f)(x)$ 是 $f$ 在二项
+平均处的期望值，而方差界即切比雪夫不等式——
+这一点在\cref{ch:b2:genfun}中予以严格说明。
+\end{remark}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=8.6cm, height=6.0cm,
+    xmin=0, xmax=1.05, ymin=0, ymax=1.08,
+    xtick={0,1}, ytick={1}]
+  \addplot[omThm, very thick, domain=0:1, samples=80] {x^2};
+  \addplot[omDef!45, thick, domain=0:1, samples=2] {x};
+  \addplot[omDef!70, thick, domain=0:1, samples=80]
+    {x^2 + x*(1-x)/2};
+  \addplot[omDef, thick, domain=0:1, samples=80]
+    {x^2 + x*(1-x)/6};
+  \node[font=\small, omDef] at (axis cs:0.30,0.37) {$B_1f$};
+  \node[font=\small, omDef] at (axis cs:0.52,0.46) {$B_2f$};
+  \node[font=\small, omDef] at (axis cs:0.76,0.56) {$B_6f$};
+  \node[font=\small, omThm] at (axis cs:0.88,0.68) {$f$};
+\end{axis}
+\end{tikzpicture}
+
+{\small 对 $f(x) = x^2$（红色）的\omterm{thm:b2:funcseq:weierstrass}{伯恩斯坦多项式}逼近，利用
+精确公式 $B_nf = x^2 + \frac{x(1-x)}{n}$，
+由\cref{exo:b2:funcseq:7}得出：$B_1f$ 为弦，$n$ 每加倍，
+误差减半。可靠但收敛慢——$\frac1n$ 的
+饱和现象由沃罗诺夫斯卡娅定理（周末问题）
+精确刻画。}
+\end{omfigure}
+
+\begin{remark}[应用]
+魏尔斯特拉斯逼近是经典分析中的稠密性定理，
+它使 $C(\intcc ab)$ 成为可分空间，允许
+仅在多项式上验证积分恒等式（矩问题），
+并为傅里叶一章中三角版本奠定基础，该版本
+借助费耶尔核证明。本章的周末问题
+提取了伯恩斯坦证明中的定量内容——收敛速率
+由\omterm{def:b2:metric:continuity}{连续}模控制——然后在科罗夫金定理中
+分离出真正起作用的部分：正性加三个检验函数。
+本科三年级分册将
+稠密性结论推广到任意子代数
+（斯通–魏尔斯特拉斯）以及紧空间。
+\end{remark}
+
+\begin{example}[带收敛速率的折线逼近]\label{ex:b2:funcseq:polygonal}
+对 $L$-利普希茨函数 $f$（定义在 $\intcc{0}{1}$ 上），令 $I_nf$ 为
+在节点 $\frac kn$ 上的分段仿射插值函数。在
+小区间 $\intcc{\frac kn}{\frac{k+1}n}$ 上，$f(x)$ 与
+$I_nf(x)$ 都介于两个节点值给定时 $L$-利普希茨函数所能取的
+极值之间，因此对小区间内的 $x$，
+记 $x_k = \frac kn$：
+\[
+\abs{I_nf(x) - f(x)}
+\leq \abs{I_nf(x) - f(x_k)} + \abs{f(x_k) - f(x)}
+\leq L\,\abs{x - x_k} + L\,\abs{x - x_k}
+\leq \frac{2L}{n}
+\]
+（插值函数在小区间上本身也是 $L$-利普希茨的：其
+斜率为 $f$ 的差商）。于是 $\norm{I_nf -
+f}_\infty \leq \frac{2L}{n}$，即\omterm{def:b2:metric:continuity}{利普希茨}函数的折线逼近
+以速度 $\frac1n$ 收敛——
+\emph{更快}于伯恩斯坦对同一函数类的 $\frac{1}{\sqrt n}$
+（周末问题第二部分）。最后一点：折线
+插值但不光滑，\omterm{thm:b2:funcseq:weierstrass}{伯恩斯坦多项式}光滑却收敛慢；
+逼近元的正则性与收敛速度之间没有免费的午餐——
+这一权衡由
+周末问题中的饱和性结果精确刻画。
+\end{example}
+
+\begin{remark}[本册中的展望]
+\omterm{def:b2:funcseq:def}{一致收敛}从此是本书的主力工具。
+幂级数一章完全依赖于
+紧子圆盘上的\omterm{def:b2:funcseq:series}{正规收敛}——那里的每个逐项定理都是
+本章转移定理的特例。傅里叶一章
+站在更高一层：其部分和 $S_N$ 恰好在
+本章警告它们可能失效的地方失效（\omterm{def:b2:funcseq:def}{逐点收敛}，但在跳跃处
+不\omterm{def:b2:funcseq:def}{一致收敛}），而其费耶尔平均借助与之相同的推理而成功，
+即 $3\varepsilon$ 论证，它曾用于证明
+\cref{thm:b2:funcseq:continuity}。微分方程一章
+用\omterm{def:b2:funcseq:series}{正规收敛}级数定义 $\eu^{tA}$，并逐项求导——
+字面上正是把
+\cref{thm:b2:funcseq:seriestransfer} 用于矩阵的
+各元素。后文若对“为何能这样做”有疑问，
+答案通常是本章的某个定理。
+\end{remark}
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:b2:funcseq:1}
+研究下列函数在 $\intcc{0}{1}$ 上的\omterm{def:b2:funcseq:def}{逐点收敛}与\omterm{def:b2:funcseq:def}{一致收敛}，然后
+视情况在 $\intcc{0}{a}$（$a < 1$）或 $\intco{\delta}{1}$ 上再作考察：
+\[
+f_n(x) = \frac{x}{1 + nx},
+\qquad
+g_n(x) = n x\,\eu^{-n x^2},
+\qquad
+h_n(x) = x^n(1 - x^n).
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:funcseq:2}
+证明 $\displaystyle\int_0^1 g_n \not\to \int_0^1 \lim g_n$
+对\cref{exo:b2:funcseq:1}中的 $g_n$ 成立，并解释其
+与\cref{thm:b2:funcseq:integration}并不矛盾。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:funcseq:3}
+证明 $S(x) = \sum_{n\geq1} \dfrac{x^n}{n^2}$ 在
+$\intcc{-1}{1}$ 上\omterm{def:b2:metric:continuity}{连续}，且 $S$ 为 $C^1$ 类（在 $\intoo{-1}{1}$ 上），
+$S'(x) = -\frac{\ln(1-x)}{x}$，其中 $0 < \abs x < 1$。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:4}
+设 $F(x) = \sum_{n \geq 0} \dfrac{(-1)^n}{n + x}$ 定义在
+$\intoo{0}{+\infty}$ 上。证明该级数在
+$\intco{\delta}{\infty}$ 上一致（而非正规）收敛，借助交错级数的余项
+估计、\omterm{def:b2:metric:continuity}{连续}性以及函数方程 $F(x) + F(x + 1) =
+\frac1x$。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:5}
+（迪尼）设 $f_n \colon K \to \R$ 在\emph{紧}
+\omterm{def:b2:metric:def}{度量空间}上\omterm{def:b2:metric:continuity}{连续}，$f_n \to f$ \emph{逐点}收敛，$f$ \omterm{def:b2:metric:continuity}{连续}，
+且 $(f_n(x))$ 关于 $n$ \emph{递减}，对每个 $x$ 成立。证明
+该收敛是一致的。\emph{（对给定的 $\varepsilon$，\omterm{def:b2:metric:topology}{开集}
+$U_n = \{x : f_n(x) - f(x) < \varepsilon\}$ 递增且覆盖
+$K$；取有限子覆盖——
+见\cref{thm:b2:metric:borellebesgue}。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:6}
+证明 $\displaystyle\lim_{n\to\infty} \int_0^1
+\frac{n\,f(x)}{1 + n^2x^2}\,\dd x = \frac{\pi}{2} f(0)$，对每个
+\omterm{def:b2:metric:continuity}{连续}函数 $f$（定义于 $\intcc{0}{1}$ 上）成立。\emph{（作代换 $u = nx$；分出
+$f(0)$；作控制。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:7}
+计算 $f(x) = x^2$ 的\omterm{thm:b2:funcseq:weierstrass}{伯恩斯坦多项式}，并
+验证一致误差 $\norm{B_n f - f}_\infty =
+O\bigl(\frac1n\bigr)$ 这一估计，它由
+\cref{thm:b2:funcseq:weierstrass} 的证明所预言——这里恰为 $\frac{x(1 -
+x)}{n}$ 在每一点处。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:8}
+证明：若多项式 $P_n$ 在\emph{整个
+$\R$ 上}\omterm{def:b2:funcseq:def}{一致收敛}于 $f$，则 $f$ 为多项式。\emph{（对充分大的 $m, n$，
+$P_n - P_m$ 为 $\R$ 上的有界多项式，因而为常数；于是
+数列在相差常数的意义下稳定。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:funcseq:9}
+（一个\omterm{def:b2:metric:continuity}{连续}且处处不可微的函数——分步引导）设
+$\varphi$ 为到最近整数的距离（以 $1$ 为周期，
+$\norm{\varphi}_\infty = \frac12$，$1$-利普希茨），并令
+\[
+W(x) = \sum_{n=0}^{\infty} \Bigl(\frac{3}{4}\Bigr)^{\!n}
+\varphi(4^n x) .
+\]
+证明：(a) $W$ 在 $\R$ 上\omterm{def:b2:metric:continuity}{连续}（\omterm{def:b2:funcseq:series}{正规收敛}）；(b) 对
+每个 $x$ 与每个 $m$，取 $h_m = \pm\frac12\cdot 4^{-m}$，其符号
+使 $\varphi$ 在从 $4^m x$
+到 $4^m(x + h_m)$ 的线段上为仿射函数，则差商满足
+\[
+\Bigl|\frac{W(x + h_m) - W(x)}{h_m}\Bigr| \geq 3^m -
+\sum_{n<m} 3^n \geq \frac{3^m + 1}{2} \xrightarrow[m\to\infty]{}
+\infty
+\]
+（$n > m$ 的各项因周期性而为零；$n = m$ 的项恰贡献
+$3^m$；$n < m$ 的各项由\omterm{def:b2:metric:continuity}{利普希茨}性质有界）。
+由此得 $W$ 处处不可微。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:funcseq:10}
+设 $u_n(x) = (-1)^n x^n(1 - x)$，定义于 $\intcc{0}{1}$ 上，证明
+$\sum u_n$ 在 $\intcc{0}{1}$ 上\omterm{def:b2:funcseq:def}{逐点收敛}，并求其和；证明该收敛在
+$\intcc{0}{1}$ 上\omterm{def:b2:funcseq:def}{一致收敛}
+\emph{（估计余项 $R_N(x) = \sum_{n > N} u_n(x)$，
+即几何尾项，以其首项估界，并求 $x^{N+1}(1-x)$ 的最大值）}
+但\emph{不}\omterm{def:b2:funcseq:series}{正规收敛}\emph{（计算 $\norm{u_n}_\infty$）}：
+即\omterm{def:b2:funcseq:def}{一致收敛}严格弱于\omterm{def:b2:funcseq:series}{正规收敛}。
+与 $\sum x^n(1-x)$ 对比，其和在
+$1$ 处不\omterm{def:b2:metric:continuity}{连续}；此处连\omterm{def:b2:funcseq:def}{一致收敛}也不成立。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:funcseq:11}
+设 $f_n \to f$ 在\omterm{def:b2:metric:def}{度量空间} $X$ 上\omterm{def:b2:funcseq:def}{一致收敛}，每个 $f_n$
+\omterm{def:b2:metric:continuity}{连续}，并设 $x_n \to x$ 于 $X$ 中。证明 $f_n(x_n) \to
+f(x)$。试在 $X = \intcc{0}{1}$ 上举例说明，仅\omterm{def:b2:funcseq:def}{逐点收敛}
+不足以保证结论，即使 $f$ \omterm{def:b2:metric:continuity}{连续}。
+\emph{（利用 \cref{exo:b2:funcseq:1} 中的隆起函数 $g_n$ 并取 $x_n =
+\frac{1}{\sqrt{2n}}$）}。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:funcseq:12}
+（用级数求解沃尔泰拉积分方程）设 $f \in
+C(\intcc{0}{1})$，定义 $Tf(x) = \int_0^x f(t)\,\dd t$。
+\begin{enumerate}
+  \item 用归纳法证明：对 $n \geq 1$，有
+        \[
+        T^n f(x) = \int_0^x \frac{(x -
+        t)^{n-1}}{(n-1)!}\,f(t)\,\dd t,
+        \qquad
+        \norm{T^n f}_\infty \leq \frac{\norm f_\infty}{n!} .
+        \]
+  \item 由此可得 $S = \sum_{n\geq0} T^n f$ 在
+        $\intcc{0}{1}$ 上\omterm{def:b2:funcseq:series}{正规收敛}，并满足积分方程 $S = f
+        + TS$。
+  \item 验证 $S(x) = f(x) + \int_0^x \eu^{x-t}f(t)\,\dd
+        t$ 满足同一方程，并证明
+        \omterm{def:b2:metric:continuity}{连续}解的唯一性 \emph{（若 $S = TS$，则
+        $\norm{S}_\infty \leq \norm{T^nS}_\infty \to 0$）}：
+        由此得出级数和的闭形式。
+\end{enumerate}
+\end{exercise}
+
+\section{问题：逼近速率与科罗夫金定理}
+
+\begin{problem}\label{pb:b2:funcseq:1}
+\cref{thm:b2:funcseq:weierstrass} 的伯恩斯坦证明暗藏着
+两份宝藏。第一，它是\emph{定量的}：$B_nf
+\to f$ 的收敛速度由 $f$ 的\omterm{def:b2:metric:continuity}{连续}模决定，其中
+最精确的速率由 $\abs{x - \frac12}$ 取得。第二，它是
+\emph{结构性的}：起作用的只是 $B_n$ 是一个
+正线性算子，且在 $1$、$x$、$x^2$ 上表现良好——
+这一观察经提炼后即为\emph{科罗夫金
+定理}\index{科罗夫金定理}。本题证明这两点，
+并以沃罗诺夫斯卡娅的精确渐近式结束。全文中，
+$f \in C(\intcc{0}{1})$，$M = \norm f_\infty$，$p_k(x) = \binom
+nk x^k(1-x)^{n-k}$，并且 $e_j$ 表示 $x \mapsto x^j$。
+
+\medskip
+\noindent\textbf{第一部分——伯恩斯坦算子。}
+\begin{enumerate}
+  \item 证明 $B_n$ 是线性的，并且是\emph{正的}（$f \geq 0
+        \Rightarrow B_nf \geq 0$），因而单调（$f \leq g
+        \Rightarrow B_nf \leq B_ng$），且满足
+        $\norm{B_nf}_\infty \leq \norm f_\infty$，并且
+        $B_nf$ 在两端点处与 $f$ 取值相同。
+  \item 重新推导恒等式 $B_n e_0 = e_0$，$B_n e_1 =
+        e_1$，以及 $B_n e_2 = e_2 + \frac{e_1 - e_2}{n}$
+        \emph{（对 $(x + y)^n$ 两次求导，并令 $y = 1 -
+        x$）}。
+  \item 由此推出方差恒等式 $\sum_k \bigl(\frac kn -
+        x\bigr)^2 p_k(x) = \frac{x(1-x)}{n}$，并由
+        柯西–施瓦茨不等式，得到一阶矩的估计：
+        \[
+        \sum_{k=0}^{n}\Bigl|\frac kn - x\Bigr|\,p_k(x)
+        \leq \sqrt{\frac{x(1-x)}{n}} \leq \frac{1}{2\sqrt n} .
+        \]
+  \item 证明：若 $f$ 为凸函数，则 $B_nf \geq f$ 在
+        $\intcc{0}{1}$ 上成立\emph{（关于权
+        $p_k(x)$ 的有限琴生不等式）}。
+  \item （切比雪夫计数界，重述）对 $\delta > 0$，
+        证明
+        \[
+        \sum_{\abs{k/n - x} > \delta} p_k(x)
+        \leq \frac{x(1-x)}{n\delta^2}
+        \leq \frac{1}{4n\delta^2} ,
+        \]
+        并给出概率解释：$B_nf(x)$ 是对
+        $f$ 在集中于 $x$ 的二项样本均值上取平均。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第二部分——速率：\omterm{def:b2:metric:continuity}{连续}模。}
+对 $\delta > 0$，令 $\omega(\delta) = \sup\{\abs{f(s) - f(t)}
+: s, t \in \intcc{0}{1},\ \abs{s - t} \leq \delta\}$.
+\begin{enumerate}[resume]
+  \item 证明：$\omega$ 有限、单调不减，
+        $\omega(\delta) \to 0$（$\delta \to 0^+$，海涅），
+        次可加（$\omega(\delta_1 + \delta_2) \leq
+        \omega(\delta_1) + \omega(\delta_2)$），并且
+        $\omega(\lambda\delta) \leq (1 +
+        \lambda)\,\omega(\delta)$ 对所有 $\lambda > 0$。
+  \item 证明主估计，对每个 $\delta > 0$：
+        \[
+        \abs{B_nf(x) - f(x)}
+        \leq \sum_k \omega\Bigl(\Bigl|\frac kn -
+        x\Bigr|\Bigr)p_k(x)
+        \leq \Bigl(1 + \frac1\delta\sum_k\Bigl|\frac kn -
+        x\Bigr|p_k(x)\Bigr)\,\omega(\delta) .
+        \]
+  \item 取 $\delta = n^{-1/2}$，并导出
+        \emph{定量魏尔斯特拉斯定理}：
+        \[
+        \norm{B_nf - f}_\infty \leq
+        \frac32\,\omega\Bigl(\frac{1}{\sqrt n}\Bigr)
+        \xrightarrow[n\to\infty]{} 0 .
+        \]
+  \item 由此推出速率：$\norm{B_nf - f}_\infty \leq
+        \frac{3L}{2\sqrt n}$（对 $L$-利普希茨函数 $f$），且 $\leq
+        \frac32 C n^{-\alpha/2}$（对 $\alpha$-赫尔德函数 $f$，
+        其中 $\abs{f(s) - f(t)} \leq C\abs{s-t}^\alpha$）。
+  \item （最优性例子——一个二项式恒等式）对 $m
+        \geq 1$，证明
+        \[
+        \sum_{k=m+1}^{2m} (k - m)\binom{2m}{k}
+        = \frac{m}{2}\binom{2m}{m},
+        \qquad\text{于是}\qquad
+        \sum_{k=0}^{2m}\abs{k - m}\binom{2m}{k}
+        = m\binom{2m}{m}
+        \]
+        \emph{（利用 $k\binom{2m}k = 2m\binom{2m-1}{k-1}$ 以及
+        二项式系数行的对称性，它给出
+        $\sum_{j=m}^{2m-1}\binom{2m-1}{j} = 2^{2m-2}$）}。
+  \item 对 $f(t) = \abs{t - \frac12}$，由此求出精确值
+        及其渐近行为（中心二项式系数，
+        \cref{ex:b2:comparison:centralbinomial}）：
+        \[
+        B_{2m}f\Bigl(\frac12\Bigr) - f\Bigl(\frac12\Bigr)
+        = \frac{\binom{2m}{m}}{2\cdot4^{m}}
+        \;\sim\; \frac{1}{2\sqrt{\pi m}} :
+        \]
+        第 8 题中的速率 $\omega(n^{-1/2})$ 可以达到
+        （相差一个常数）——对仅仅\omterm{def:b2:metric:continuity}{连续}的 $f$，
+        伯恩斯坦的 $n^{-1/2}$ 是不可改进的。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第三部分——科罗夫金定理。}设 $(L_n)$
+        为从 $C(\intcc{0}{1})$ 到自身的\emph{正线性}算子序列，
+        满足 $L_ne_j \to e_j$
+        对 $j = 0, 1, 2$ 一致成立。
+\begin{enumerate}[resume]
+  \item 证明：正线性算子 $L$ 是单调的，
+        并且逐点满足 $\abs{Lf} \leq L\abs f$。
+  \item 证明：对每个 $\varepsilon > 0$，存在 $\delta > 0$
+        使得对\emph{所有} $s, x \in \intcc{0}{1}$：
+        \[
+        \abs{f(s) - f(x)} \leq \varepsilon +
+        \frac{2M}{\delta^2}(s - x)^2
+        \]
+        \emph{（对 $\abs{s - x} \leq \delta$ 用海涅，
+        对 $\abs{s-x} > \delta$ 用粗略界 $2M$）}。
+  \item 固定 $x$，将 $L_n$ 作用于第 13 题的不等式，
+        关于变量 $s$，并推出
+        \[
+        \abs{L_nf(x) - f(x)\,L_ne_0(x)}
+        \leq \varepsilon\,L_ne_0(x) + \frac{2M}{\delta^2}
+        \bigl(L_ne_2(x) - 2x\,L_ne_1(x) + x^2 L_ne_0(x)\bigr).
+        \]
+  \item 证明 $\sup_x \bigl(L_ne_2(x) - 2x\,L_ne_1(x) + x^2
+        L_ne_0(x)\bigr) \to 0$，进而得到
+        \emph{科罗夫金定理}：$L_nf \to f$ 对
+        \emph{每个} $f \in C(\intcc{0}{1})$ 一致成立。
+  \item 验证 $(B_n)$ 满足科罗夫金定理的条件：
+        由三个单项式入手，第三次用到魏尔斯特拉斯定理。
+  \item 设 $I_n$ 为分段仿射插值
+        算子，节点为 $\frac kn$。证明 $I_n$
+        是正线性的，$I_ne_0 = e_0$，$I_ne_1 = e_1$，且
+        $\norm{I_ne_2 - e_2}_\infty = \frac{1}{4n^2}$
+        \emph{（在每个小区间上，仿射插值 $t^2$ 的误差为
+        $(t - a)(b - t)$）}。由科罗夫金定理得：
+        折线插值对每个
+        \omterm{def:b2:metric:continuity}{连续}的 $f$ \omterm{def:b2:funcseq:def}{一致收敛}。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第四部分——收获：稠密性、矩与
+导数。}
+\begin{enumerate}[resume]
+  \item 证明：系数为\emph{有理数}的多项式
+        在 $\bigl(C(\intcc{0}{1}),
+        \norm\cdot_\infty\bigr)$ 中稠密：这一\omterm{def:b2:nvs:banach}{巴拿赫空间}是
+        可分的。
+  \item （矩决定函数）设 $f \in
+        C(\intcc{0}{1})$，满足 $\int_0^1 f(t)\,t^n \dd t = 0$
+        对每个 $n \in \N$。证明 $\int_0^1 f P = 0$ 对每个多项式成立，
+        再证 $\int_0^1 f^2 = 0$，最后证 $f = 0$。
+  \item 证明下面的导数恒等式：
+        \[
+        (B_nf)'(x) = n\sum_{k=0}^{n-1}\Bigl(
+        f\Bigl(\frac{k+1}{n}\Bigr) -
+        f\Bigl(\frac kn\Bigr)\Bigr)\,
+        \binom{n-1}{k}x^k(1-x)^{n-1-k}
+        \]
+        \emph{（对 $p_k$ 求导并换标号——这是一个
+        \omterm{thm:b2:series:abel}{阿贝尔分部求和}）}。
+  \item 设 $f$ 为 $C^1$ 函数。利用每个增量上的中值定理，
+        并与 $B_{n-1}(f')$ 比较，证明
+        $(B_nf)' \to f'$ 在 $\intcc{0}{1}$ 上一致成立。由此推出：
+        对 $f \in C^1$，存在多项式序列
+        \emph{连同}其导数一起收敛到 $f$。
+  \item 设 $f$ 为 $C^2$ 函数。在 $x$ 处用泰勒–拉格朗日公式证明
+        \[
+        \abs{B_nf(x) - f(x)} \leq
+        \frac{\norm{f''}_\infty}{2}\cdot\frac{x(1-x)}{n}
+        \leq \frac{\norm{f''}_\infty}{8n} :
+        \]
+        光滑性把速率从 $n^{-1/2}$ 提高到
+        $n^{-1}$。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第五部分——饱和：沃罗诺夫斯卡娅
+定理。}
+\begin{enumerate}[resume]
+  \item 证明四阶矩恒等式
+        \[
+        \sum_k (k - nx)^4 p_k(x)
+        = nx(1-x)\bigl(1 + 3(n-2)x(1-x)\bigr) \leq n^2
+        \quad (n \geq 1)
+        \]
+        \emph{（将 $k^4$ 按下降阶乘 $k(k-1)\cdots$
+        展开，再两次使用第 2 题的求导技巧
+        ）}。
+  \item （沃罗诺夫斯卡娅）设 $f$ 为 $C^2$ 函数，且 $x \in
+        \intcc{0}{1}$。记 $f(t) = f(x) + f'(x)(t-x) +
+        \frac{f''(x)}2(t-x)^2 + \eta(t)(t-x)^2$，其中 $\eta$
+        有界，且 $\eta(t) \to 0$（当 $t \to x$ 时），证明
+        \[
+        n\bigl(B_nf(x) - f(x)\bigr)
+        \xrightarrow[n\to\infty]{}
+        \frac{x(1-x)}{2}\,f''(x)
+        \]
+        \emph{（将 $\eta$ 的和在 $\abs{t - x} \leq
+        \delta$ 处拆分；远离部分用第 23 题控制）}。由此
+        第 22 题的误差在阶上\emph{和}
+        常数上都是精确的：$B_n$ \emph{饱和}于 $\frac1n$，无论
+        $f$ 多么光滑 —— 参见
+        \cref{exo:b2:funcseq:7}。
+  \item 综合。每项各用一句话作答：(i) 仅凭正性能得到什么；
+        （第一部分与第三部分）；(ii) 在何处
+        用到 $\intcc{0}{1}$ 的紧性（它进入了每一部分）；(iii) 为何三个
+        检验函数在科罗夫金定理中已经足够；(iv) \omterm{thm:b2:funcseq:weierstrass}{伯恩斯坦多项式}所作的
+        权衡（稳健的 $n^{-1/2}$ 阶对
+        粗糙的 $f$ 成立，但 $\frac1n$ 才是光滑的 $f$ 的上界），以及
+        本书哪一章将借助
+        三角多项式玩同样的游戏。
+\end{enumerate}
+\end{problem}

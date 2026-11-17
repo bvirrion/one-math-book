@@ -1,0 +1,895 @@
+\chapter{线性代数}\label{ch:b2:linalg}
+
+本科一年级分册中的线性代数是在 $\R$ 或 $\C$ 上
+讨论有限维空间的，并对一般\omterm{def:b2:linalg:det}{行列式}仅作了承认。
+本章将三个限制全部推广：理论建立在任意域
+$K$ 上，空间与其\emph{\omterm{def:b2:linalg:dual}{对偶空间}}之间的关系得到系统展开
+（\omterm{def:b2:linalg:dual}{对偶基}、\omterm{def:b2:linalg:annihilator}{零化子}、\omterm{def:b2:linalg:transpose}{转置}），\omterm{def:b2:linalg:det}{行列式}则最终由
+交错多重线性形式及\cref{ch:b2:structures}中的符号\emph{构造}而来，
+兑现了本科一年级分册中的
+全部承认。
+
+全文中，$K$ 是一个域（$\Q$、$\R$、$\C$ 或 $\Z/p\Z$——理论
+并不依赖于具体选取），除非另有说明，空间均为
+$K$ 上的有限维空间。本科一年级分册的结果（基、维数、
+秩--零度定理、矩阵）原样移用：其证明
+除域的公理外从未用到其他任何东西。
+
+\section{对偶空间}
+
+\begin{definition}[对偶空间，对偶基]\label{def:b2:linalg:dual}
+设 $E$ 的\emph{对偶空间}\index{对偶空间}为 $E^* = \mathcal{L}(E,
+K)$，即全体线性型构成的空间。若 $\mathcal{B} = (e_1, \dots, e_n)$
+为 $E$ 的一组基，其\emph{坐标线性型} $e_1^*, \dots, e_n^*$
+由 $e_i^*(e_j) = \delta_{ij}$ 定义（克罗内克符号：$1$ 当 $i = j$ 时，
+否则为 $0$），构成\emph{对偶基}\index{对偶基}
+$\mathcal{B}^*$，它是 $E^*$ 的一组基；特别地，$\dim E^* = \dim E$，且有
+\[
+x = \sum_{i=1}^{n} e_i^*(x)\, e_i \quad (x \in E),
+\qquad
+\varphi = \sum_{i=1}^{n} \varphi(e_i)\, e_i^* \quad (\varphi \in
+E^*).
+\]
+\end{definition}
+
+\begin{proof}[证明 $\mathcal{B}^*$ 是一组基]
+线性无关：将零组合 $\sum \lambda_i e_i^* = 0$ 作用于
+$e_j$ 得 $\lambda_j = 0$。\omterm{def:b2:structures:generated}{生成}：对 $\varphi \in E^*$，
+线性型 $\varphi - \sum_i \varphi(e_i) e_i^*$ 在每个 $e_j$ 上取值为零，
+故其为零（在一组基上取零的线性映射必为零）。两个展开式
+不过是同一计算正着读的结果。
+\end{proof}
+
+\begin{example}\label{ex:b2:linalg:dualexamples}
+在 $K_n[X]$ 中取基 $(1, X, \dots, X^n)$，其\omterm{def:b2:linalg:dual}{对偶基}为 $P
+\mapsto \frac{P^{(k)}(0)}{k!}$（即泰勒系数）。\omterm{def:b2:linalg:dual}{对偶空间}的另一组基由
+求值 $P \mapsto P(x_i)$（取 $n + 1$ 个互异点）给出，
+它在 $K_n[X]$ 中的“前对偶”基恰为拉格朗日多项式族
+$L_i$（见本科一年级分册），因为 $L_i(x_j) =
+\delta_{ij}$。插值\emph{即}对偶。
+\end{example}
+
+\begin{method}[对偶基与前对偶基的实际应用]\label{met:b2:linalg:dualbasis}
+要将线性型 $\varphi$ 在基 $(e_i)$ 上展开（$E$ 的一组基）：
+其坐标就是\emph{值} $\varphi(e_i)$——无需
+解任何方程组。求 $(u_j)$（$E$ 的基），使其\omterm{def:b2:linalg:dual}{对偶基}恰为给定的
+基 $(\varphi_1, \dots, \varphi_n)$（$E^*$ 的一组基，
+即\emph{前\omterm{def:b2:linalg:dual}{对偶基}}）：解 $n$ 个线性方程组
+\[
+\varphi_i(u_j) = \delta_{ij} \qquad (1 \leq i \leq n),
+\]
+逐列求出 $u_j$；用矩阵语言说，若 $M$ 的各行
+列出 $\varphi_i$ 在 $E^*$ 的某已知基下的系数，则
+$M^{-1}$ 的各列即为 $u_j$。前\omterm{def:b2:linalg:dual}{对偶基}的存在性与
+唯一性在本章的周末问题中证明；
+计算始终归结为这一求逆。
+\end{method}
+
+\begin{example}[$\R^2$ 的一组对偶基（完整计算）]\label{ex:b2:linalg:dualbasis2d}
+对于 $b_1 = (1, 1)$、$b_2 = (1, -1)$ 构成的 $\R^2$ 的基，其\omterm{def:b2:linalg:dual}{对偶基}
+$(b_1^*, b_2^*)$ 应满足 $b_i^*(b_j) =
+\delta_{ij}$。设 $b_1^*(x, y) = \alpha x + \beta y$，
+由条件 $\alpha + \beta = 1$ 与 $\alpha - \beta = 0$ 得
+\[
+b_1^*(x, y) = \frac{x + y}{2},
+\qquad\text{同理}\qquad
+b_2^*(x, y) = \frac{x - y}{2} .
+\]
+验算：$b_1^*$ \emph{不是}把 $e_1^* + e_2^*$ 简单求值所得——
+\omterm{def:b2:linalg:dual}{对偶基}依赖于整组基，而非各个向量单独决定，
+（将 $b_2$ 换为 $(0, 1)$ 时，
+$b_1^*$ 变为 $x \mapsto x$）。展开式同样成立：
+$(x, y) = \frac{x+y}2\,b_1 + \frac{x-y}2\,b_2$，这正是
+一对数的奇偶分解——\omterm{def:b2:linalg:dual}{对偶基}是坐标提取器，
+本例中这组\omterm{def:b2:linalg:dual}{对偶基}提取的是对称与
+反对称两部分。
+\end{example}
+
+\begin{definition}[零化子]\label{def:b2:linalg:annihilator}
+设 $F \subseteq E$ 为一子空间，其
+\emph{零化子}\index{零化子}为
+\[
+F^{\circ} = \{\varphi \in E^* : \varphi|_F = 0\},
+\]
+它是 $E^*$ 的子空间。
+\end{definition}
+
+\begin{theorem}[零化子的维数]\label{thm:b2:linalg:annihilator}
+$\dim F^{\circ} = \dim E - \dim F$。此外，映射 $F \mapsto F^\circ$
+反转包含关系，并且 $F$ 可由其\omterm{def:b2:linalg:annihilator}{零化子}恢复：
+\[
+F = \{x \in E : \forall\varphi \in F^\circ,\ \varphi(x) = 0\}.
+\]
+由此，任一 $p$ 维子空间在 $n$ 维空间中都是
+$n - p$ 个独立线性方程的解集——
+反之亦然。
+\end{theorem}
+
+\begin{proof}
+设 $(e_1, \dots, e_p)$ 为 $F$ 的一组基，将其扩充为
+$E$ 的一组基。线性型 $\varphi = \sum \varphi(e_i) e_i^*$ 零化 $F$，当且仅当
+其前 $p$ 个系数为零：$F^\circ =
+\operatorname{Vect}(e_{p+1}^*, \dots, e_n^*)$，其维数为 $n - p$。
+包含关系的反转是显然的。关于恢复，
+右端包含 $F$；反之，若 $x \notin F$，则补全 $F$ 的一组基，
+用 $x$ 与若干向量扩充；$x$ 在此基下的坐标线性型
+零化 $F$ 但不零化 $x$。“方程”的读法是取
+$(\varphi_1, \dots, \varphi_{n-p})$ 为 $F^\circ$ 的一组基，则 $F =
+\bigcap \ker\varphi_j$，即 $n - p$ 个独立
+超平面的交。
+\end{proof}
+
+\begin{example}[零化子的两个方向]\label{ex:b2:linalg:annihilatorwork}
+设 $F = \operatorname{Vect}\bigl((1, 2, 1),\ (1, 0, -1)\bigr)
+\subseteq \R^3$。线性型 $\varphi = a\,e_1^* + b\,e_2^* + c\,e_3^*$
+零化 $F$，当且仅当
+\[
+a + 2b + c = 0
+\qquad\text{且}\qquad
+a - c = 0 ,
+\]
+即 $c = a$ 且 $b = -a$：$F^\circ = \R\,(e_1^* - e_2^* +
+e_3^*)$，其维数为 $3 - 2 = 1$，
+正如 \cref{thm:b2:linalg:annihilator} 所要求。逆向读出：
+$F = \{(x, y, z) : x - y + z = 0\}$——这个平面可表示为
+张成 $F^\circ$ 的唯一线性型的核。由
+张成族到方程组的过程，\emph{正是}计算\omterm{def:b2:linalg:annihilator}{零化子}；
+由方程组到参数化的过程，则是计算
+前\omterm{def:b2:linalg:annihilator}{零化子}。（验证：两个张成向量都满足 $x - y +
+z = 0$。）
+\end{example}
+
+\begin{definition}[转置映射]\label{def:b2:linalg:transpose}
+对 $u \in \mathcal{L}(E, F)$，称\emph{转置}\index{转置
+映射} $u^{\mathsf T} \in \mathcal{L}(F^*, E^*)$ 为
+\[
+u^{\mathsf T}(\psi) = \psi \circ u .
+\]
+且满足 $(v \circ u)^{\mathsf T} = u^{\mathsf T} \circ v^{\mathsf
+T}$。在\omterm{def:b2:linalg:dual}{对偶基}下，$u^{\mathsf T}$ 的矩阵即
+$u$ 的转置矩阵——这\emph{解释}了
+本科一年级所学的转置。
+\end{definition}
+
+\begin{example}[转置，逐项计算]\label{ex:b2:linalg:transposework}
+设 $u \colon \R^2 \to \R^3$ 在标准基下的矩阵为 $A =
+\begin{psmallmatrix} 1 & 2\\ 0 & 1\\ 3 & 0\end{psmallmatrix}$。
+对 $\psi = b_1f_1^* + b_2f_2^* + b_3f_3^*
+\in (\R^3)^*$，计算 $u^{\mathsf T}(\psi) = \psi \circ u$ 在
+$\R^2$ 的基上：
+\[
+(\psi \circ u)(e_1) = \psi(1, 0, 3) = b_1 + 3b_3,
+\qquad
+(\psi \circ u)(e_2) = \psi(2, 1, 0) = 2b_1 + b_2 .
+\]
+于是 $u^{\mathsf T}(\psi) = (b_1 + 3b_3)\,e_1^* + (2b_1 +
+b_2)\,e_2^*$。在\omterm{def:b2:linalg:dual}{对偶基}下，$u^{\mathsf T}$ 的矩阵
+为
+\[
+\begin{pmatrix} 1 & 0 & 3\\ 2 & 1 & 0\end{pmatrix}
+= A^{\mathsf T} :
+\]
+抽象的\omterm{def:b2:linalg:transpose}{转置}\emph{正是}翻转后的矩阵，无需
+再凭信念接受任何计算。注意其机理：
+第 $j$ \emph{列}（$A$ 的）变成了
+新矩阵的第 $j$ \emph{行}，因为 $\psi \circ u$ 读取 $u$ 的
+输出时借助 $\psi$ 的系数。
+\end{example}
+
+\begin{proposition}\label{prop:b2:linalg:transposerank}
+$\ker u^{\mathsf T} = (\operatorname{im} u)^{\circ}$，且
+$\operatorname{im} u^{\mathsf T} = (\ker u)^{\circ}$。因此
+$\operatorname{rk}(u^{\mathsf T}) = \operatorname{rk}(u)$：行秩
+等于列秩，由结构性论证得到。
+\end{proposition}
+
+\begin{proof}
+$\psi \in \ker u^{\mathsf T} \iff \psi \circ u = 0 \iff \psi$ 零化
+$\operatorname{im} u$，此为第一个等式。对于第二个，$u^{\mathsf
+T}(\psi) = \psi \circ u$ 总零化 $\ker u$，故
+$\operatorname{im} u^{\mathsf T} \subseteq (\ker u)^\circ$；
+维数相等，由秩–零度定理及
+\cref{thm:b2:linalg:annihilator}，可得：
+\[
+\operatorname{rk} u^{\mathsf T} = \dim F^* - \dim\ker u^{\mathsf T}
+= \dim F - \bigl(\dim F - \operatorname{rk} u\bigr)
+= \operatorname{rk} u
+= \dim (\ker u)^{\circ} . \qedhere
+\]
+\end{proof}
+
+\begin{example}[从两侧读秩]\label{ex:b2:linalg:rankbothsides}
+设
+\[
+A = \begin{pmatrix}
+1 & 2 & 0 & 1\\
+0 & 1 & 1 & 1\\
+1 & 3 & 1 & 2
+\end{pmatrix} .
+\]
+\emph{列秩：}第三行是前两行之和，因此
+$\operatorname{rk} A \leq 2$；第 $1$ 列与第 $2$ 列线性无关：
+$\operatorname{rk} A = 2$。\emph{\omterm{def:b2:linalg:transpose}{转置}的核：}解
+$A^{\mathsf T}y = 0$ 得 $y \in \R\,(1, 1, -1)$，故 $\ker
+A^{\mathsf T}$ 的维数为 $1 = 3 - 2$，恰好是
+$(\operatorname{im} A)^\circ$，在 $(\R^3)^*$ 与行向量的
+对应下，正如
+\cref{prop:b2:linalg:transposerank} 所断言——唯一的
+单一关系“行$_3$ = 行$_1$ + 行$_2$”\emph{正是}
+列空间的\omterm{def:b2:linalg:annihilator}{零化子}。行秩（$2$ 个线性无关的行）与
+列秩相等，并非偶然，而是因为两者都等于
+$\operatorname{rk} A = \operatorname{rk} A^{\mathsf T}$。
+\end{example}
+
+\begin{example}[对偶性读出求积公式]\label{ex:b2:linalg:quadratureread}
+为何像辛普森求积公式（见\cref{exo:b2:linalg:4}）这样的公式存在，
+且为何唯一？对偶性在任何计算之前就给出了答案。
+在 $E = \R_2[X]$ 上，积分 $P \mapsto \int_0^1 P$ 是
+三维\omterm{def:b2:linalg:dual}{对偶空间} $E^*$ 中的一个特定向量；
+在 $0$、$\frac12$、$1$ 处的求值泛函构成
+$E^*$ 的\emph{基}；因此积分可唯一地在其上展开——此展开
+\emph{正是}辛普森公式，系数一并包含在内。
+维数统计也能校准预期：在 $\R_3[X]$ 上，
+四维的泛函空间一般无法由三个
+求值泛函张成，故对三次多项式的精确性并非对偶性所保证；
+辛普森公式居然对三次多项式精确积分，这只是
+一个额外的对称性（关于 $\frac12$ 的奇次项相消），
+需手工验证。含 $n + 1$ 个节点的公式是
+积分形式在 $\R_n[X]^*$ 的求值基下的展开：
+存在性与唯一性只需一条\omterm{def:b2:linalg:dual}{对偶基}定理；仅
+额外的次数需要付出计算代价。
+\end{example}
+
+\section{多重线性交错形式}
+
+\begin{definition}\label{def:b2:linalg:alternating}
+映射 $f \colon E^n \to K$ 称为\emph{$n$-线性}的，当它关于
+每个变元都线性，并称为\emph{交错}\index{交错形式}的，当它在
+两个自变元相等时恒为零。交错性蕴含
+\emph{反对称}：交换两个自变元会改变符号
+（展开 $f(\dots, x + y, \dots, x + y, \dots) = 0$）；更一般地，
+对 $\sigma \in \mathfrak{S}_n$，
+\[
+f(x_{\sigma(1)}, \dots, x_{\sigma(n)}) =
+\varepsilon(\sigma)\, f(x_1, \dots, x_n),
+\]
+将 $\sigma$ 分解为\omterm{def:b2:structures:sn}{对换}，由此即得
+（见\cref{thm:b2:structures:signature}）。
+\end{definition}
+
+\begin{theorem}[行列式基本定理]\label{thm:b2:linalg:detspace}
+设 $\dim E = n$，$\mathcal{B} = (e_1, \dots, e_n)$ 为一组基。
+全体交错 $n$-线性形式（定义于 $E$ 上）构成的空间维数为 $1$：
+每个此类形式都是下式的倍数：
+\[
+\det{}_{\mathcal{B}}(x_1, \dots, x_n)
+= \sum_{\sigma \in \mathfrak{S}_n} \varepsilon(\sigma)
+\prod_{i=1}^{n} a_{\sigma(i),\,i},
+\qquad
+x_j = \sum_{i} a_{ij} e_i ,
+\]
+而 $\det_{\mathcal{B}}$ 是唯一取值为 $1$ 的形式，
+即在基 $\mathcal{B}$ 上的取值。\index{行列式!构造}
+\end{theorem}
+
+\begin{proof}
+设 $f$ 为交错 $n$-线性形式，将每个自变元
+由多重线性在 $\mathcal{B}$ 上展开，
+\[
+f(x_1, \dots, x_n)
+= \sum_{i_1, \dots, i_n} a_{i_1,1}\cdots a_{i_n,n}\,
+f(e_{i_1}, \dots, e_{i_n}).
+\]
+含重复指标的项为零（由交错性）；保留的
+元组 $(i_1, \dots, i_n)$ 即单射的那些，亦即 $i_k =
+\sigma(k)$，$\sigma$ 为某个置换；由反对称性重排得
+$f(e_{\sigma(1)}, \dots, e_{\sigma(n)}) = \varepsilon(\sigma)
+f(e_1, \dots, e_n)$。由此可得
+\[
+f = f(e_1, \dots, e_n) \cdot \det{}_{\mathcal{B}} :
+\]
+即每个\omterm{def:b2:linalg:alternating}{交错形式}都是该倍数，前提是
+$\det_{\mathcal{B}}$ 本身（即上式的和）\emph{是}
+交错 $n$-线性的，且 $1$ 是其在 $\mathcal B$ 上的值。
+多重线性显然成立（每个求和项关于每一列都是线性的）。
+在 $\mathcal B$ 上的取值：唯一非零项为 $\sigma =
+\mathrm{id}$。交错性：设 $x_j = x_k$（$j \neq k$），于是
+各坐标列满足 $a_{i j} = a_{i k}$，对所有
+$i$。将每个 $\sigma$ 与 $\sigma' = \sigma\circ(j\,k)$——
+这是 $\mathfrak{S}_n$ 上无不动点的对合。
+成对的两项乘积相等：
+\[
+\prod_i a_{\sigma'(i),\,i}
+= a_{\sigma(k),\,j}\; a_{\sigma(j),\,k}
+\prod_{i \neq j,k} a_{\sigma(i),\,i}
+= a_{\sigma(k),\,k}\; a_{\sigma(j),\,j}
+\prod_{i \neq j,k} a_{\sigma(i),\,i}
+= \prod_i a_{\sigma(i),\,i},
+\]
+利用第 $j$ 列与第 $k$ 列相等，而
+$\varepsilon(\sigma') = -\varepsilon(\sigma)$。每一对
+贡献为零，故和为零。
+\end{proof}
+
+\begin{example}[萨鲁斯法则的推导与推翻]\label{ex:b2:linalg:sarrus}
+当 $n = 3$ 时，置换公式恰有 $3! = 6$ 项。
+按符号列出 $\mathfrak{S}_3$ 的元素——
+$\mathrm{id}$、$(1\,2\,3)$、$(1\,3\,2)$ 为偶置换；
+$(1\,2)$、$(1\,3)$、$(2\,3)$ 为奇置换——得
+\[
+\det A = a_{11}a_{22}a_{33} + a_{21}a_{32}a_{13} +
+a_{31}a_{12}a_{23}
+- a_{21}a_{12}a_{33} - a_{31}a_{22}a_{13} -
+a_{11}a_{32}a_{23} :
+\]
+正是中学所教的萨鲁斯“对角线”法则——
+如今它已是定理，其中神秘的正负号被识别为
+置换的符号。推翻之处在于：当 $n = 4$ 时共有 $24$
+个置换，其中仅 $8$ 个能被任何画对角线的方案
+选中；萨鲁斯法则没有 $4$ 阶版本，
+而余子式展开（见\cref{thm:b2:linalg:detrules}~(4)）
+接手。数项也是一个警示：置换公式
+含 $n!$ 个求和项，故它是\emph{定义}，而非
+算法——行化简计算 $\det$ 只需
+$O(n^3)$ 次运算即可。
+\end{example}
+
+\begin{definition}[行列式]\label{def:b2:linalg:det}
+在一组基下的\emph{向量组的行列式}\index{行列式}为
+$\det_{\mathcal{B}}(x_1, \dots, x_n)$；\emph{矩阵的
+行列式}即 $A$ 各列在标准基下的行列式，
+——即上述置换公式；\emph{自同态的
+行列式} $u$ 为满足下式的标量 $\det u$：
+\[
+\det{}_{\mathcal{B}}\bigl(u(x_1), \dots, u(x_n)\bigr)
+= \det u \cdot \det{}_{\mathcal{B}}(x_1, \dots, x_n)
+\quad \text{ 对所有 } x_i
+\]
+（左边是交错 $n$-线性的，因而是
+$\det_\mathcal{B}$ 的倍数，由\cref{thm:b2:linalg:detspace}可知；该因子
+不依赖于 $\mathcal{B}$）。
+\end{definition}
+
+\begin{theorem}[行列式的运算法则（已证）]\label{thm:b2:linalg:detrules}
+\begin{enumerate}
+  \item $\det(uv) = \det u\,\det v$; $\;\det(AB) = \det A \det B$.
+  \item $u$ 可逆 $\iff \det u \neq 0$；一个向量组为基
+        $\iff$ 它在某一组基下的\omterm{def:b2:linalg:det}{行列式}不为零。
+  \item $\det(A^{\mathsf T}) = \det A$.
+  \item 正如本科一年级分册所述，沿任一行或任一列的余子式展开成立；
+        相似矩阵有相同的
+        \omterm{def:b2:linalg:det}{行列式}。
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) 两次应用定义式：
+$\det_{\mathcal B}(uv(x_i)) = \det u \cdot \det_{\mathcal
+B}(v(x_i)) = \det u \det v \cdot \det_{\mathcal B}(x_i)$.
+
+(2) 若 $u$ 可逆，$\det u \det u^{-1} = \det \mathrm{id} =
+1 \neq 0$。若不可逆，则向量 $u(e_i)$ 线性相关；把其中一个
+用其余线性表出并展开，得 $\det_{\mathcal B}(u(e_i)) = 0$
+（交错性消去重复方向），因此 $\det u = 0$。基的
+判别准则对向量组是同一结论。
+
+(3) 在置换公式中，将每个乘积按 $j =
+\sigma(i)$ 换下标，即 $i = \tau(j)$，其中 $\tau = \sigma^{-1}$，
+各因子是相同的数，只是次序不同，于是
+\[
+\prod_{i=1}^{n} a_{\sigma(i),\,i} = \prod_{j=1}^{n}
+a_{j,\,\tau(j)} ,
+\]
+且 $\varepsilon(\tau) = \varepsilon(\sigma)^{-1} =
+\varepsilon(\sigma)$（取值为 $\pm1$；$\varepsilon$ 是
+同态）。对 $\sigma$ 求和与对
+$\tau$ 求和相同（求逆是 $\mathfrak{S}_n$ 的双射）：
+\[
+\det A = \sum_{\tau}\varepsilon(\tau)\prod_j a_{j,\tau(j)}
+= \det(A^{\mathsf T}),
+\]
+末一和式即对\omterm{def:b2:linalg:transpose}{转置}矩阵的元素应用置换公式，
+其中 $(A^{\mathsf T})_{ij} = a_{ji}$。
+
+(4) 固定第 $j$ 列，由线性性把 $x_j = \sum_i a_{ij} e_i$ 拆开，
+得 $\det A = \sum_i a_{ij}\, \det(\dots, e_i, \dots)$，
+将 $e_i$ 移到最后一位（行的\omterm{def:b2:structures:sn}{对换} $n - i$ 次，
+列的\omterm{def:b2:structures:sn}{对换} $n - j$ 次，由 (3) 得 $\det(\dots, e_i, \dots) =
+(-1)^{i+j}\Delta_{ij}$，与子式的关系式正是
+本科一年级分册的余子式法则。相似性：$\det(P^{-1}AP) = \det P^{-1}\det A \det P =
+\det A$，由 (1) 可得。
+\end{proof}
+
+\begin{example}[余子式展开的具体计算]\label{ex:b2:linalg:cofactorwork}
+计算
+\[
+\det\begin{pmatrix}
+2 & 1 & 3\\
+0 & 4 & 1\\
+1 & 2 & 0
+\end{pmatrix}
+\]
+沿第一列展开（此列只有一个零，偷懒的程度有限）。
+符号按棋盘格 $(-1)^{i+j}$ 决定：
+\[
+2\,\det\begin{pmatrix}4 & 1\\ 2 & 0\end{pmatrix}
+- 0
++ 1\cdot\det\begin{pmatrix}1 & 3\\ 4 & 1\end{pmatrix}
+= 2(0 - 2) + (1 - 12) = -15 .
+\]
+用萨吕斯法则验算（见\cref{ex:b2:linalg:sarrus}）：$0 + 1 + 0
+- 12 - 0 - 4 = -15$。策略而非教条：沿
+含零最多的一行或一列展开；若都没有零，则
+先用行变换造出一些零——一轮消元的代价
+小于两层余子式展开。
+\end{example}
+
+\begin{example}[用运算法则计算行列式]\label{ex:b2:linalg:onesmatrix}
+设 $J \in \mathcal{M}_n(K)$ 为元素全为 1 的矩阵，$a \in K$；
+用刚证得的工具计算 $\det(aI_n + J)$。
+$aI_n + J$ 的各列都以相同方式处理：把所有行加到第一行上
+（\omterm{def:b2:linalg:det}{行列式}不变——把某一行的倍数加到另一行上
+相当于加上一个重复方向的项，被交错性消去）。
+第一行变为 $(a + n, a + n, \dots, a + n)$；由该行的线性性提出
+公因子 $a + n$，再从其余每一列中减去第一列，
+所得矩阵是三角矩阵，对角元为
+$(1, a, \dots, a)$。于是
+\[
+\det(aI_n + J) = (a + n)\,a^{\,n-1}.
+\]
+收尾的观察：根 $a = 0$（重数为 $n - 1$）和
+$a = -n$ 说明 $J$ 有特征值 $0$（重数 $n - 1$）
+及特征值 $n$（重数为一）——秩为一矩阵
+$J$ 的谱，提前一章（\cref{ch:b2:reduction}
+将使之系统化）。
+\end{example}
+
+\begin{example}[用置换公式计算行列式]\label{ex:b2:linalg:permexample}
+对于零元素较多的矩阵，此公式本身就很实用。
+例如，在
+\[
+A = \begin{pmatrix}
+0 & a & 0 & 0\\
+0 & 0 & b & 0\\
+0 & 0 & 0 & c\\
+d & 0 & 0 & 0
+\end{pmatrix},
+\]
+唯一选出非零元素的置换是 $4$-轮换
+$\sigma = (1\,2\,3\,4)$，将列 $1 \to$ 行 $4$，等等；
+$\varepsilon(\sigma) = (-1)^3 = -1$，故 $\det A = -abcd$。（验算
+可经三次列\omterm{def:b2:structures:sn}{对换}化为对角矩阵。）
+\end{example}
+
+\begin{example}[用乘积公式计算范德蒙行列式]\label{ex:b2:linalg:vandermondework}
+对于节点 $0, 1, 2$（求积公式如
+\cref{exo:b2:linalg:4}所用的那样），由\cref{exo:b2:linalg:11}中的
+范德蒙\omterm{def:b2:linalg:det}{行列式}一眼即可算出：
+\[
+\det\begin{pmatrix}
+1 & 1 & 1\\
+0 & 1 & 2\\
+0 & 1 & 4
+\end{pmatrix}
+= (1 - 0)(2 - 0)(2 - 1) = 2 ,
+\]
+按第一列直接展开得 $1\cdot(4 - 2)
+= 2$，两者一致。互异节点处\omterm{def:b2:linalg:det}{行列式}非零，即是
+插值理论全部内容在一个\omterm{def:b2:linalg:det}{行列式}中的体现：
+求值型 $P \mapsto P(a_i)$ 构成\omterm{def:b2:linalg:dual}{对偶空间}的一组基，当且仅当
+该\omterm{def:b2:linalg:det}{行列式}非零，即对互异的 $a_i$ 总成立
+——这正是\cref{ex:b2:linalg:dualexamples}的定量化。
+\end{example}
+
+\section{迹，再论}
+
+\begin{proposition}\label{prop:b2:linalg:trace}
+迹 $\operatorname{tr} \colon \mathcal{M}_n(K) \to K$ 是满足
+$\operatorname{tr}(AB) =
+\operatorname{tr}(BA)$ 与 $\operatorname{tr}(I_n) = n$ 的唯一线性型（当
+$\operatorname{char} K = 0$ 时）；自同态的迹
+借助任一矩阵表示是良定的，且
+\[
+\operatorname{tr}(u) = \sum_{i} e_i^*\bigl(u(e_i)\bigr)
+\]
+在任一基下——对偶性以不依赖基的方式写出迹。
+\end{proposition}
+
+\begin{proof}
+$\operatorname{tr}(AB) = \operatorname{tr}(BA)$ 及基不变性
+已在本科一年级证明。唯一性：线性型 $t$ 满足 $t(AB) =
+t(BA)$，它零化每个换位子 $AB - BA$。我们断言换位子
+张成迹为零的超平面，其维数为 $n^2 - 1$。只需两组
+换位子即可。基本矩阵的乘法法则为
+$E_{ab}E_{cd} = \delta_{bc}E_{ad}$。对
+$i \neq j$ 时，得
+\[
+E_{ii}E_{ij} - E_{ij}E_{ii} = E_{ij} - 0 = E_{ij}
+\]
+（第二项 $E_{ij}E_{ii} = \delta_{ji}E_{ii} = 0$
+由 $j \neq i$ 可知）：每个非对角的 $E_{ij}$ 都是换位子。
+又有
+\[
+E_{ij}E_{ji} - E_{ji}E_{ij} = E_{ii} - E_{jj} .
+\]
+$E_{ij}$（$i \neq j$，共 $n^2 - n$ 个）连同
+$E_{11} - E_{jj}$（$j \geq 2$，共 $n - 1$ 个）构成
+$n^2 - 1$ 个线性无关的迹为零的矩阵，它们张成
+超平面 $\ker\operatorname{tr}$。故 $t$ 在
+$\operatorname{tr}$ 为零处亦为零，并经由它分解：$t =
+c\operatorname{tr}$；再由 $t(I) = n$ 得 $c = 1$。下式：
+第 $i$ 个对角元（取 $u$ 的矩阵）恰为
+$e_i^*(u(e_i))$.
+\end{proof}
+
+\begin{remark}[常见误区]\label{rem:b2:linalg:pitfalls}
+（i）\omterm{def:b2:linalg:det}{行列式}关于\emph{列}是 $n$ 重线性的，而非
+关于矩阵线性：一般而言 $\det(A + B) \neq \det A + \det B$，
+并且 $\det(\lambda A) = \lambda^n\det A$，而非
+$\lambda\det A$。（ii）\omterm{def:b2:linalg:transpose}{转置}颠倒乘积的次序：
+$(vu)^{\mathsf T} = u^{\mathsf T}v^{\mathsf T}$；忘记
+乘积次序的颠倒会毁掉所有涉及逆的计算。（iii）\omterm{def:b2:linalg:annihilator}{零化子} $F^\circ$
+位于 $E^*$ 中而非 $E$ 中，它
+只有在内积之后，才成为熟悉的“正交补”，
+而内积使 $E$ 与 $E^*$ 等同（见\cref{ch:b2:quadratic}）；这样的
+等同并非典范的。（iv）“行秩等于列秩
+”并不意味着行\emph{空间}与列空间相等——
+二者位于不同的空间（$K^n$ 与 $K^m$）中，并
+通过\cref{prop:b2:linalg:transposerank}相联系，而不相等。
+（v）置换公式只是证明的工具：对于具体的数，应
+用行变换与代数余子式（\cref{ex:b2:linalg:sarrus}）。
+\end{remark}
+
+\begin{example}[迹配对分解矩阵空间]\label{ex:b2:linalg:tracepairing}
+在 $\mathcal{M}_2(\R)$ 上，取\cref{exo:b2:linalg:9}中的配对 $\langle A, B\rangle =
+\operatorname{tr}(AB)$，将 $M =
+\begin{psmallmatrix}1 & 4\\ 2 & 3\end{psmallmatrix}$ 分解为
+对称部分与反对称部分，
+\[
+M = S + A, \qquad
+S = \tfrac12(M + M^{\mathsf T}) =
+\begin{pmatrix}1 & 3\\ 3 & 3\end{pmatrix},
+\qquad
+A = \tfrac12(M - M^{\mathsf T}) =
+\begin{pmatrix}0 & 1\\ -1 & 0\end{pmatrix}.
+\]
+于是 $\operatorname{tr}(SA) = \operatorname{tr}
+\begin{psmallmatrix}-3 & 1\\ -3 & 3\end{psmallmatrix} = 0$，两部分
+关于迹配对是“正交”的——这是一般事实的一个实例：
+该事实在本章周末问题中证明，即反对称矩阵恰好构成
+对称矩阵的\omterm{def:b2:linalg:annihilator}{零化子}。
+对偶性在选取任何内积之前，即已揭示
+分解 $\mathcal{M}_n = \mathcal{S}_n \oplus
+\mathcal{A}_n$。
+\end{example}
+
+\begin{remark}[本卷中的几种视角]\label{rem:b2:linalg:perspectives}
+留意本章三个构造在后文中如何
+变换形式。\emph{\omterm{def:b2:linalg:transpose}{转置}}将重新出现于
+\cref{ch:b2:reduction}中：$u$ 与 $u^{\mathsf T}$ 具有
+相同的特征值，且几何重数相等（本章的
+周末问题第 15 题），这正是矩阵的行分析与列
+分析永不相互矛盾。\emph{\omterm{def:b2:linalg:det}{行列式}}
+在\cref{ch:b2:reduction}中化为关于参数的函数
+（$\chi_u(X) = \det(X\,\mathrm{id} - u)$），并在
+\cref{ch:b2:multint}中成为雅可比\omterm{def:b2:linalg:det}{行列式}，其多重线性在此化为
+换元因子。\emph{迹}孕育了相似不变量：
+它是 $\chi_u$ 的第二个系数，
+即特征值之和，并最终
+化为\cref{ch:b2:fourier}风格恒等式中对角线的积分。
+一章线性代数，三道长长的影子。
+\end{remark}
+
+\begin{remark}[本章的应用]
+\omterm{def:b2:linalg:dual}{对偶空间}并非为抽象而抽象：\omterm{def:b2:linalg:annihilator}{零化子}与\omterm{def:b2:linalg:transpose}{转置}
+支撑着线性方程组的可解性理论（本章的周末问题
+正是由它们证明了有限维情形的弗雷德霍姆择一定理），非退化配对
+在\cref{ch:b2:quadratic}中以极化形式重新出现，
+在\cref{ch:b2:hermitian}中化为伴随，
+而这里构造的\omterm{def:b2:linalg:det}{行列式}支撑着\cref{ch:b2:reduction}的全部内容。
+在本科三年级分册中，同一对偶性被推广到无穷维，
+化为希尔伯特空间上的里斯表示定理与
+弗雷德霍姆理论，此时以紧性
+取代这里所用的
+维数计数。
+\end{remark}
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:b2:linalg:1}
+在 $\R^3$ 中，设 $\varphi_1(x,y,z) = x + y$，$\varphi_2 = y + z$，
+$\varphi_3 = x + z$。证明 $(\varphi_1, \varphi_2, \varphi_3)$
+是 $(\R^3)^*$ 的一组基，并求 $\R^3$ 的一组基，
+使上述基为其\omterm{def:b2:linalg:dual}{对偶基}。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:linalg:2}
+用排列公式计算下列\omterm{def:b2:linalg:det}{矩阵的行列式}，
+\[
+\begin{pmatrix} 0 & 0 & a\\ 0 & b & 0\\ c & 0 & 0 \end{pmatrix},
+\qquad
+\begin{pmatrix}
+a & b & 0 & 0\\
+c & d & 0 & 0\\
+0 & 0 & e & f\\
+0 & 0 & g & h
+\end{pmatrix},
+\]
+并写出第二个矩阵所提示的分块对角规则。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:linalg:3}
+设 $F = \{(x,y,z,t) \in \R^4 : x + y = z + t \text{ 且 } x = 2y\}$。
+求 $F^\circ$ 的一组基，并
+在维数上检验 \cref{thm:b2:linalg:annihilator}。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:linalg:4}
+设 $a_0, \dots, a_n$ 为 $K$ 中互不相同的点，且令 $\varphi_i \colon
+P \mapsto P(a_i)$ 为 $K_n[X]$ 上的线性形式。证明 $(\varphi_0, \dots,
+\varphi_n)$ 是 $K_n[X]^*$ 的一组基，并求出以之为\omterm{def:b2:linalg:dual}{对偶基}的基，
+再将形式 $P \mapsto \int_0^1 P(t)\,\dd t$（取 $K = \R$，
+$n = 2$，$a_i = 0, \frac12, 1$）在该基下展开，
+并由此识别出辛普森公式。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:linalg:5}
+设 $u \in \mathcal{L}(E)$，$\dim E = n$，且 $\operatorname{rk} u
+= 1$。证明 $u = \varphi(\cdot)\, a$，其中 $a$ 为某个向量，
+$\varphi$ 为某个线性形式；再证 $\operatorname{tr} u = \varphi(a)$，
+且 $u^2 = (\operatorname{tr} u)\, u$。由此推出 $\det(I + u) = 1 +
+\operatorname{tr} u$。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:linalg:6}
+证明 $\mathcal{M}_n(K)$（$n \geq 2$）的每个超平面
+都包含一个可逆矩阵。\emph{提示：超平面为 $\{M :
+\operatorname{tr}(AM) = 0\}$，对某个 $A \neq 0$
+（见\cref{exo:b2:linalg:9}）。若 $A$ 为数量矩阵，则可取一个迹为零的可逆矩阵；
+否则求可逆矩阵 $M$，使
+$AM$ 的对角元全为零——类置换矩阵即可。}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:linalg:7}
+（\omterm{def:b2:linalg:det}{行列式}的导数）设 $A \in \mathcal{M}_n(\R)$，
+利用多重线性证明下式：
+\[
+\frac{\dd}{\dd t}\Big|_{t=0} \det(I_n + tA) = \operatorname{tr} A ,
+\]
+并推出 $\det(\eu^{tA}) = \eu^{t\operatorname{tr} A}$，假设
+$t \mapsto \det(\eu^{tA})$ 可微，且群性质
+$\eu^{(s+t)A} = \eu^{sA}\eu^{tA}$（已在
+\cref{ch:b2:diffeq}中建立）。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:linalg:8}
+（循环矩阵，$3 \times 3$）设 $j = \eu^{2\iu\pi/3}$，并令
+\[
+C = \begin{pmatrix}
+a & b & c\\
+c & a & b\\
+b & c & a
+\end{pmatrix} \in \mathcal{M}_3(\C).
+\]
+验证 $1, j, j^2$ 的范德蒙德矩阵的各列是
+$C$ 的特征向量，并由此推出
+\[
+\det C = (a + b + c)(a + bj + cj^2)(a + bj^2 + cj).
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:linalg:9}
+证明每个线性形式 $t$（定义在 $\mathcal{M}_n(K)$ 上）都可写成 $M \mapsto
+\operatorname{tr}(AM)$ 的形式，其中 $A$ 唯一；映射 $A \mapsto
+\operatorname{tr}(A\,\cdot)$ 是从
+$\mathcal{M}_n(K)$ 到其\omterm{def:b2:linalg:dual}{对偶空间}的同构。由此再次推出
+\cref{prop:b2:linalg:trace}的唯一性结论。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:linalg:10}
+设 $u, v \in \mathcal{L}(E)$，满足 $u \circ v - v \circ u = u$。
+证明 $u$ 幂零。\emph{提示：先证明
+$\operatorname{tr}(u^k) = 0$（对所有 $k \geq 1$，用归纳法计算 $u^k v -
+v u^k$），再利用下面的事实，其证明可借助
+牛顿恒等式或对维数归纳：
+$\C$ 上向量空间的自同态，若其所有幂的迹均为零，则它幂零。
+在 $\C$ 上讨论。}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:linalg:11}
+（范德蒙德）对 $a_0, \dots, a_n \in K$，证明下式：
+\[
+\det\begin{pmatrix}
+1 & 1 & \cdots & 1\\
+a_0 & a_1 & \cdots & a_n\\
+\vdots & \vdots & & \vdots\\
+a_0^n & a_1^n & \cdots & a_n^n
+\end{pmatrix}
+= \prod_{0 \leq i < j \leq n} (a_j - a_i).
+\]
+\emph{（将\omterm{def:b2:linalg:det}{行列式}视为 $a_n$ 的多项式：确定其
+次数、根与首项系数；再用归纳法。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:linalg:12}
+设 $A, B, C, D \in \mathcal{M}_n(K)$，$K$ 为无限域，且
+满足 $CD = DC$。证明下式成立：
+\[
+\det\begin{pmatrix} A & B\\ C & D\end{pmatrix}
+= \det(AD - BC).
+\]
+\emph{（先设 $D$ 可逆，在右侧乘以
+$\begin{psmallmatrix} I & 0\\ -D^{-1}C & I\end{psmallmatrix}$;
+再将 $D$ 换为 $D + tI$，比较关于 $t$ 的两个多项式。）}
+\end{exercise}
+
+\section{问题：弗雷德霍姆择一性}
+
+线性方程组 $u(x) = b$ 何时有解？
+完整的回答是一个对偶性陈述：\emph{当且仅当 $b$ 被
+所有零化其像的线性形式零化时
+$u$}——这些形式可以计算，它们恰为
+\omterm{def:b2:linalg:transpose}{转置}的核。本周末问题建立有限维对偶的完整
+“词典”（包括形式的分解、双对偶、
+\omterm{def:b2:linalg:annihilator}{零化子}演算、\omterm{def:b2:linalg:transpose}{转置}），证明有限维
+\emph{弗雷德霍姆择一性}，并以
+迹形式与一个刻画作结：迹是相似下唯一的
+线性不变量。下文中，$E$ 与 $F$ 均为
+$K$ 上的有限维向量空间，$n = \dim E$。
+
+\begin{problem}[{周末问题——有限维中的对偶
+与弗雷德霍姆择一性}]
+\label{pb:b2:linalg:1}
+记号：对 $S \subseteq E^*$，\emph{前\omterm{def:b2:linalg:annihilator}{零化子}}为
+$S_\circ = \{x \in E : \varphi(x) = 0 \text{ 对所有 } \varphi
+\in S\}$；\omterm{def:b2:linalg:annihilator}{零化子} $F^\circ$ 与\omterm{def:b2:linalg:transpose}{转置} $u^{\mathsf T}$
+分别见 \cref{def:b2:linalg:annihilator} 与
+\cref{def:b2:linalg:transpose}。
+
+\medskip
+\noindent\textbf{第一部分——分解引理。}设
+$\varphi_1, \dots, \varphi_p, \varphi \in E^*$。
+\begin{enumerate}
+  \item 设 $\Phi \colon E \to K^p$，$x \mapsto (\varphi_1(x),
+        \dots, \varphi_p(x))$。确定 $\ker\Phi$，并证明
+        $\Phi^{\mathsf T}$ 将 $K^p$ 的坐标形式映为
+        $\varphi_i$，并推得
+        \[
+        \dim \bigl(\ker\varphi_1 \cap \dots \cap
+        \ker\varphi_p\bigr) = n - \dim
+        \operatorname{Vect}(\varphi_1, \dots, \varphi_p).
+        \]
+  \item （分解引理）证明下述等价：
+        \[
+        \varphi \in \operatorname{Vect}(\varphi_1, \dots,
+        \varphi_p)
+        \iff
+        \ker\varphi_1 \cap \dots \cap \ker\varphi_p \subseteq
+        \ker\varphi .
+        \]
+  \item 由此推出：$(\varphi_1, \dots, \varphi_p)$ 线性无关当且仅当
+        $\bigcap_i \ker\varphi_i$ 的维数为 $n - p$；且
+        余维数为 $p$ 的子空间是 $p$ 个
+        超平面的交，不能更少。
+  \item 在 $\R^4$ 中，设 $\varphi_1 = x + y - z$，$\varphi_2 = y +
+        z - t$，$\psi = x + 2y - t$ 与 $\psi' = x + y + t$。
+        由分解引理，判断 $\psi$ 与
+        $\psi'$ 是否属于 $\operatorname{Vect}(\varphi_1,
+        \varphi_2)$。
+  \item 在 $E = \R_2[X]$ 上，证明 $\psi_0 \colon P \mapsto
+        P(0)$，$\psi_1 \colon P \mapsto P(1)$，$\psi_2 \colon P
+        \mapsto \int_0^1 P(t)\dd t$ 构成 $E^*$ 的一组基，
+        求 $(P_0, P_1, P_2)$ 为 $E$ 的一组基，使上述泛函为其\omterm{def:b2:linalg:dual}{对偶基}，
+        并求唯一的 $P \in \R_2[X]$，满足 $P(0)
+        = 1$，$P(1) = 2$，$\int_0^1 P = \frac32$。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第二部分——双对偶与\omterm{def:b2:linalg:annihilator}{零化子}
+演算。}
+\begin{enumerate}[resume]
+  \item 证明\emph{求值映射} $J \colon E \to
+        E^{**}$，$J(x)(\varphi) = \varphi(x)$，是线性的且
+        单射，从而在有限维下为同构。
+  \item （双\omterm{def:b2:linalg:annihilator}{零化子}）证明 $J(F) = F^{\circ\circ} :=
+        (F^\circ)^\circ$ 对每个子空间 $F \subseteq E$ 成立：
+        经 $J$ 等同后，\omterm{def:b2:linalg:annihilator}{零化子}的\omterm{def:b2:linalg:annihilator}{零化子}
+        恰为该子空间本身。
+  \item 证明\omterm{def:b2:linalg:annihilator}{零化子}演算：$(F + G)^\circ = F^\circ
+        \cap G^\circ$ 与 $(F \cap G)^\circ = F^\circ + G^\circ$。
+  \item 推出（并直接重新证明）：两个核相同的非零
+        线性形式彼此成比例。
+  \item （前\omterm{def:b2:linalg:dual}{对偶基}）证明：对 $(\varphi_1,
+        \dots, \varphi_n)$ 为 $E^*$ 的任一基，存在唯一的
+        $(u_1, \dots, u_n)$ 为 $E$ 的基，使 $\varphi_i(u_j) =
+        \delta_{ij}$。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第三部分——\omterm{def:b2:linalg:transpose}{转置}演算。}
+\begin{enumerate}[resume]
+  \item 证明 $u \mapsto u^{\mathsf T}$ 是线性双射，
+        从 $\mathcal{L}(E, F)$ 到 $\mathcal{L}(F^*, E^*)$ 上的，
+        并证明 $(u^{-1})^{\mathsf T} = (u^{\mathsf T})^{-1}$，
+        当 $u$ 可逆时。
+  \item （自然性）证明 $u^{\mathsf T\mathsf T} \circ J_E
+        = J_F \circ u$：在求值同构下，
+        二次\omterm{def:b2:linalg:transpose}{转置}\emph{恰为} $u$。
+  \item 证明：$u$ 满射当且仅当 $u^{\mathsf T}$ 单射；
+        $u$ 单射当且仅当 $u^{\mathsf T}$ 满射。
+  \item 对 $u \in \mathcal{L}(E)$，子空间 $F$ 在
+        $u$ 下稳定，当且仅当 $F^\circ$ 在
+        $u^{\mathsf T}$ 下稳定。
+  \item 证明 $\ker(u^{\mathsf T} - \lambda\,
+        \mathrm{id}_{E^*}) = \bigl(\operatorname{im}(u - \lambda\,
+        \mathrm{id}_E)\bigr)^\circ$，并由此推出 $u$ 与
+        $u^{\mathsf T}$ 的特征值相同，且
+        几何重数相同。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第四部分——弗雷德霍姆择一性。}
+\begin{enumerate}[resume]
+  \item 证明 $\operatorname{im} u = (\ker u^{\mathsf
+        T})_\circ$，其中 $u \in \mathcal{L}(E, F)$，并由此推出有限维情形下的
+        \emph{弗雷德霍姆择一性}：方程
+        $u(x) = b$ 有解，当且仅当对每个 $\psi \in F^*$
+        （满足 $u^{\mathsf T}\psi = 0$）都有
+        $\psi(b) = 0$。
+  \item 矩阵形式：对 $A \in \mathcal{M}_{m,n}(K)$ 与 $b \in
+        K^m$，以下两者恰有一个成立：（i）$Ax = b$
+        有解；（ii）存在 $y \in K^m$，使得
+        $A^{\mathsf T}y = 0$ 且 $y^{\mathsf T}b = 1$。证明其中的
+        “至多一个”与“至少一个”。
+  \item 求所有使下面的方程组有解的 $b \in \R^3$，
+        \[
+        x + y = b_1, \qquad y + z = b_2, \qquad x + 2y + z = b_3
+        \]
+        通过计算\omterm{def:b2:linalg:transpose}{转置}
+        矩阵的核来求解。
+  \item （离散诺伊曼问题）在 $E = \R^n$（$n \geq 3$）上，
+        定义 $L$，使 $(Lx)_k = x_k - \frac12(x_{k-1} +
+        x_{k+1})$，下标按模 $n$ 理解。证明 $L^{\mathsf T} = L$
+        （取典范同一化），证明 $\ker L$ 是
+        由常向量组成的直线\emph{（考虑最大分量）}，
+        并得出结论：$Lx = b$ 可解当且仅当 $\sum_k b_k = 0$。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第五部分——迹形式与
+不变性定理。} 由\cref{exo:b2:linalg:9}可知，映射 $A \mapsto
+\operatorname{tr}(A\,\cdot)$ 将 $\mathcal{M}_n(K)$ 与其
+        \omterm{def:b2:linalg:dual}{对偶空间}等同。假设 $\operatorname{char} K = 0$（例如 $K = \Q, \R,
+\C$）。
+\begin{enumerate}[resume]
+  \item 在此同一化下，证明
+        对称矩阵子空间 $\mathcal{S}_n$ 的\omterm{def:b2:linalg:annihilator}{零化子}
+        是反对称矩阵子空间 $\mathcal{A}_n$，
+        且反之亦然。
+  \item 证明超平面的\omterm{def:b2:linalg:annihilator}{零化子}
+        $\mathfrak{sl}_n = \{M : \operatorname{tr} M = 0\}$ 是
+        直线 $K I_n$；等价地，在所有迹为零的矩阵上取零值的
+        线性型是迹的倍数。
+  \item 证明 $\mathcal{M}_n(K)$ 中每个矩阵都
+        可写成两个可逆矩阵之和。
+  \item （迹是唯一的线性相似不变量）设
+        $t$ 为 $\mathcal{M}_n(K)$ 上的线性型，满足
+        $t(PMP^{-1}) = t(M)$ 对所有 $M$ 及每个可逆矩阵
+        $P$ 成立。先证 $t(PX) = t(XP)$（$P$ 可逆），然后
+        证明 $t(BX) = t(XB)$ 对\emph{所有} $B$ 成立，并得出 $t = c
+        \operatorname{tr}$，其中 $c \in K$。
+  \item 证明 $\operatorname{rk} u \leq r$ 当且仅当 $u$
+        是 $r$ 个秩 $\leq 1$ 的映射之和，即 $u =
+        \sum_{i=1}^{r} \psi_i(\cdot)\,f_i$，其中 $\psi_i \in E^*$，
+        $f_i \in F$；由此推出 $\operatorname{rk}(u + v) \leq
+        \operatorname{rk} u + \operatorname{rk} v$。
+  \item （综合）整理本题所证明的“字典”：
+        子空间与\omterm{def:b2:linalg:annihilator}{零化子}，和与
+        交，映射与\omterm{def:b2:linalg:transpose}{转置}，可解性与
+        \omterm{def:b2:linalg:transpose}{转置}核的正交性，迹与
+        相似。对表中每一项，指出证明它的小题，
+        并用一句话说明：维数变为无穷时，何物取代
+        维数的计数（本科三年级分册在希尔伯特空间上
+        将此讲得更为精确）。
+\end{enumerate}
+\end{problem}

@@ -1,0 +1,439 @@
+\chapter{概率与随机变量}\label{ch:g11:prob}
+
+\omterm{def:g10:proba:distribution}{概率}用于描述结果不确定的试验，如掷骰子、
+抽牌、玩游戏。本章先介绍有限集上的基本概念，
+再引入整个\omterm{def:g10:proba:distribution}{概率}论的核心对象：
+\emph{\omterm{def:g11:prob:rv}{随机变量}}及其\emph{\omterm{def:g11:prob:expectation}{期望}}。这些概念
+在\cref{ch:g12:randvar}中得到复习和深化，条件\omterm{def:g10:proba:distribution}{概率}则
+在\cref{ch:g12:condprob}中给出。
+
+\section{有限集上的概率}
+
+\begin{definition}[概率模型]\label{def:g11:prob:model}
+有限个结果的试验，由其\emph{样本
+空间}\index{样本空间} $\Omega = \{\omega_1, \dots, \omega_n\}$（结果的集合）及
+一个\emph{\omterm{def:g10:proba:distribution}{概率}} $\P$ 构成模型：为每个
+结果 $\omega_i$ 指定一个数 $p_i \geq 0$，且 $p_1 + \dots + p_n = 1$。
+\emph{事件}\index{事件}是满足 $A \subseteq \Omega$ 的子集，并记
+\[
+\P(A) = \sum_{\omega_i \in A} p_i .
+\]
+当所有结果等可能（$p_i = \frac1n$，即\emph{古典
+概型}\index{古典概型}）时，则
+\[
+\P(A) = \frac{\text{ 结果数，落在 } A}
+{\text{ 结果数，落在 } \Omega}.
+\]
+\end{definition}
+
+\begin{example}\label{ex:g11:prob:twodice}
+掷两颗可区分的骰子：$\Omega$ 为由 $36$ 个有序数对
+$(i, j)$（$1 \leq i, j \leq 6$）组成的集合，且各结果等可能。\omterm{def:g11:prob:model}{事件}
+\omterm{def:g11:prob:model}{事件} $S$ 为“点数之和为 $7$”，包含 $6$ 个数对
+$(1,6)$、$(2,5)$、$(3,4)$、$(4,3)$、$(5,2)$、$(6,1)$，因此
+$\P(S) = \frac{6}{36} = \frac16$。\omterm{def:g11:prob:model}{事件}“点数之和为 $12$”只含
+$(6,6)$，\omterm{def:g10:proba:distribution}{概率}为 $\frac{1}{36}$。选取\emph{正确的}
+\omterm{def:g11:prob:model}{样本空间}——有序数对，而非无序数对——是
+使\omterm{def:g11:prob:model}{古典概型}得以适用的关键。
+\end{example}
+
+\begin{proposition}[概率的运算法则]\label{prop:g11:prob:rules}
+对\omterm{def:g11:prob:model}{事件} $A, B \subseteq \Omega$：
+\[
+\P(\emptyset) = 0, \qquad \P(\Omega) = 1, \qquad
+\P(\bar A) = 1 - \P(A),
+\]
+\[
+\P(A \cup B) = \P(A) + \P(B) - \P(A \cap B),
+\]
+其中 $\bar A$ 是 $A$ 的\emph{\omterm{def:g10:proba:operations}{对立事件}}（即所有不在 $A$ 中的结果）。
+特别地，$\P(A \cup B) = \P(A) + \P(B)$ 当 $A$ 与 $B$
+\emph{\omterm{def:g10:proba:operations}{互斥}}（$A \cap B = \emptyset$）时成立。
+\end{proposition}
+
+\begin{proof}
+空\omterm{def:g11:prob:model}{事件}不含任何结果（空和），而 $\Omega$ 包含全部结果
+（总和为 $1$）。每个结果恰属于 $A$、$\bar A$ 之一，
+故 $\P(A) + \P(\bar A) = 1$。对于\omterm{def:g10:numbers:interunion}{并集}，先对 $p_i$ 求和，
+依次在 $A$、$B$ 上求和，则 $A \cap B$ 中的结果被计了两次；
+减去 $\P(A \cap B)$ 即可修正重复计数。
+\end{proof}
+
+\begin{example}
+某班中，$60\%$ 的学生学习音乐（$M$），$45\%$ 的学生参加体育运动（$S$），
+且 $25\%$ 的学生两者兼有。至少参加一项的比例为
+$\P(M \cup S) = 0.60 + 0.45 - 0.25 = 0.80$，因此 $20\%$ 的学生两者都不参加
+（利用\omterm{def:g10:proba:operations}{对立事件}）。
+\end{example}
+
+\section{随机变量}
+
+\begin{definition}[随机变量与分布]\label{def:g11:prob:rv}
+$\Omega$ 上的\emph{随机变量}\index{随机变量}是一个\omterm{def:g11:func:function}{函数}
+$X$ 为每个结果指定一个数。其
+\emph{分布}\index{分布}是由其全部可能取值
+$x_1, \dots, x_k$ 及其\omterm{def:g10:proba:distribution}{概率}组成的表：
+\[
+\P(X = x_i) = \P\bigl(\{\omega : X(\omega) = x_i\}\bigr),
+\qquad
+\sum_{i=1}^k \P(X = x_i) = 1 .
+\]
+\end{definition}
+
+\begin{example}\label{ex:g11:prob:game}
+一个游戏：先付 $2$ 欧元，掷一枚均匀的骰子，若所得点数
+不小于 $5$，则获得该点数，否则一无所得。设 $G$ 为\emph{收益}（所得
+减去所付）。结果 $1, 2, 3, 4$ 使 $G = -2$；结果 $5$
+使 $G = 3$；结果 $6$ 使 $G = 4$。$G$ 的\omterm{def:g11:prob:rv}{分布}为：
+\begin{center}
+\begin{tabular}{c|ccc}
+$g$ & $-2$ & $3$ & $4$\\
+\hline\rule{0pt}{11pt}%
+$\P(G = g)$ & $\dfrac46$ & $\dfrac16$ & $\dfrac16$
+\end{tabular}
+\end{center}
+\end{example}
+
+\begin{method}[构造分布表]\label{met:g11:prob:table}
+列出 $X$ 的全部可能取值；对每个取值，找出
+使其取该值的结果，并把它们的\omterm{def:g10:proba:distribution}{概率}相加；
+检验\omterm{def:g10:proba:distribution}{概率}之和为 $1$。
+\end{method}
+
+\section{期望}
+
+\begin{definition}[期望]\label{def:g11:prob:expectation}
+\emph{期望}\index{期望}（亦称\omterm{def:g11:stat:mean}{平均数}）是 $X$ 的
+取值以\omterm{def:g10:proba:distribution}{概率}为权重的加权平均：
+\[
+\E(X) = \sum_{i=1}^{k} \P(X = x_i)\; x_i .
+\]
+\end{definition}
+
+\begin{remark}
+$\E(X)$ 即为该实验大量独立重复时所得\omterm{def:g11:stat:mean}{平均数}的理论值，这一结论的精确
+表述是大数定律（证明见\cref{ch:g12:sums}）。注意
+它与带频数的数据集\omterm{def:g11:stat:mean}{平均数}（见\cref{def:g11:stat:mean}）在形式上的类比：
+\omterm{def:g10:proba:distribution}{概率}在其中扮演的角色，
+恰如相对频数
+$\frac{n_i}{n}$ 所扮演的角色。
+\end{remark}
+
+\begin{example}\label{ex:g11:prob:gameexp}
+对于\cref{ex:g11:prob:game}中的游戏：
+\[
+\E(G) = \frac46 \times (-2) + \frac16 \times 3 + \frac16 \times 4
+= \frac{-8 + 3 + 4}{6} = -\frac16 \approx -0.17 .
+\]
+平均而言，玩家每局约输 $17$ 分，该游戏对玩家
+不利。当\omterm{def:g11:prob:expectation}{期望}收益为 $0$ 时，称该游戏为\emph{公平}。
+\end{example}
+
+\begin{proposition}[线性性]\label{prop:g11:prob:linearity}
+对所有\omterm{def:g10:numbers:sets}{实数} $a, b$：
+\[
+\E(aX + b) = a\,\E(X) + b .
+\]
+\end{proposition}
+
+\begin{proof}
+变量 $aX + b$ 取值 $a x_i + b$ 的\omterm{def:g10:proba:distribution}{概率}为
+$\P(X = x_i)$，于是
+\[
+\E(aX + b) = \sum_i \P(X = x_i)(a x_i + b)
+= a \sum_i \P(X = x_i)\,x_i + b \underbrace{\sum_i \P(X =
+x_i)}_{=\,1} = a\,\E(X) + b .
+\]
+\end{proof}
+
+=\section{方差与标准差}
+
+=\begin{definition}[方差]\label{def:g11:prob:variance}
+$X$ 的\emph{方差}\index{方差}刻画其取值
+围绕\omterm{def:g11:prob:expectation}{期望} $m = \E(X)$ 的分散程度：
+\[
+\V(X) = \E\bigl((X - m)^2\bigr)
+= \sum_{i=1}^{k} \P(X = x_i)\,(x_i - m)^2,
+\qquad
+\sigma(X) = \sqrt{\V(X)} .
+\]
+\end{definition}
+
+\begin{proposition}[简便公式]\label{prop:g11:prob:konig}
+\[
+\V(X) = \E(X^2) - \E(X)^2 .
+\]
+\end{proposition}
+
+\begin{proof}
+在求和号内将 $(x_i - m)^2 = x_i^2 - 2m\,x_i + m^2$ \omterm{def:g10:algebra:expand}{展开}：
+\[
+\V(X) = \sum_i \P(X = x_i)\,x_i^2
+- 2m \sum_i \P(X = x_i)\,x_i + m^2\sum_i \P(X = x_i)
+= \E(X^2) - 2m^2 + m^2 ,
+\]
+即 $\E(X^2) - m^2$。这是
+\cref{prop:g11:stat:shortcut}中为数据集所证恒等式的\omterm{def:g11:prob:rv}{随机变量}版本。
+\end{proof}
+
+\begin{proposition}[仿射变换]\label{prop:g11:prob:affine}
+$\V(aX + b) = a^2\,\V(X)$ 且 $\sigma(aX + b) = \abs a\,\sigma(X)$。
+\end{proposition}
+
+\begin{proof}
+由线性性，$aX + b$ 偏离其\omterm{def:g11:prob:expectation}{期望} $a m + b$ 的量为
+$(aX + b) - (am + b) = a(X - m)$：每个偏差都被 $a$ 放大，
+故每个偏差平方都放大 $a^2$ 倍，其加权平均亦然。
+注意常数 $b$ 已消失，平移一个\omterm{def:g11:prob:rv}{随机变量}
+并不改变其分散程度。
+\end{proof}
+
+\begin{example}\label{ex:g11:prob:variance}
+对于\cref{ex:g11:prob:game}中的游戏：
+$\E(G^2) = \frac46 \times 4 + \frac16 \times 9 + \frac16 \times 16
+= \frac{16 + 9 + 16}{6} = \frac{41}{6}$，于是
+\[
+\V(G) = \frac{41}{6} - \left(-\frac16\right)^2
+= \frac{41}{6} - \frac{1}{36} = \frac{245}{36} \approx 6.8,
+\qquad
+\sigma(G) \approx 2.6 .
+\]
+平均每局的损失为 $0.17$，伴随的典型波动幅度约为
+$2.6$ 欧元——仅有\omterm{def:g11:prob:expectation}{期望}而无\omterm{def:g11:stat:variance}{标准差}，
+只能讲出故事的一半。
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[
+  width=8.6cm, height=5.2cm,
+  ybar, bar width=14pt,
+  xlabel={$g$}, ylabel={$\P(G = g)$},
+  xmin=-3.5, xmax=5.5, ymin=0, ymax=0.8,
+  xtick={-2,3,4}, ytick={1/6, 4/6},
+  yticklabels={$\tfrac16$,$\tfrac46$},
+  tick label style={font=\small},
+  label style={font=\small}]
+  \addplot[fill=omDef!40, draw=omDef] coordinates {
+    (-2,0.6667) (3,0.1667) (4,0.1667)};
+  \draw[omThm, dashed, thick] (axis cs:-0.1667,0) --
+    (axis cs:-0.1667,0.75);
+  \node[omThm, font=\small, anchor=south west] at (axis cs:-0.05,0.62)
+    {$\E(G)$};
+\end{axis}
+\end{tikzpicture}
+
+{\small 增益 $G$ 的\omterm{def:g11:prob:rv}{分布}（见
+\cref{ex:g11:prob:game}），及其\omterm{def:g11:prob:expectation}{期望} $\E(G) = -\frac16$（虚线）：
+即\omterm{def:g10:proba:distribution}{概率}质量的平衡点。}
+\end{omfigure}
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:g11:prob:1}
+从一副标准的 $52$ 张扑克牌中抽取一张，计算下列\omterm{def:g11:prob:model}{事件}的\omterm{def:g10:proba:distribution}{概率}：
+抽到红心；抽到 K；抽到红心或 K；
+既不是红心也不是 K。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g11:prob:2}
+掷两颗均匀的骰子，记其点数之和为 $S$。利用
+\cref{ex:g11:prob:twodice} 中的 $36$ 种结果模型，计算 $\P(S = 6)$、
+$\P(S \geq 10)$ 及 $\P(S \text{ 为偶数})$ 的\omterm{def:g10:proba:distribution}{概率}。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g11:prob:3}
+某\omterm{def:g11:prob:rv}{随机变量}的\omterm{def:g11:prob:rv}{分布}为
+\begin{center}
+\begin{tabular}{c|cccc}
+$x$ & $-1$ & $0$ & $2$ & $5$\\
+\hline
+$\P(X=x)$ & $0.3$ & $0.2$ & $0.4$ & $p$
+\end{tabular}
+\end{center}
+求 $p$，再计算 $\E(X)$。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g11:prob:4}
+$X$ 满足 $\E(X) = 3$，$\V(X) = 4$。求
+$Y = 2X - 5$ 的\omterm{def:g11:prob:expectation}{期望}、\omterm{def:g11:prob:variance}{方差}与\omterm{def:g11:stat:variance}{标准差}。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:prob:5}
+一个幸运转盘被分为 $10$ 个相等的扇形：$5$ 个扇形显示 $0$ 欧元，$3$ 个扇形显示
+$2$ 欧元，$2$ 个扇形显示 $5$ 欧元。玩一次需付 $2$ 欧元。
+求增益 $G$（奖金减去赌注）的\omterm{def:g11:prob:rv}{分布}，计算 $\E(G)$，并
+判断该游戏是否有利。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:prob:6}
+袋中有 $3$ 个红球和 $2$ 个蓝球；
+从中\emph{不放回}地取出两个球。设 $X$ 为取出的红球数。
+求 $X$ 的\omterm{def:g11:prob:rv}{分布}（列举 $20$ 种有序取法，或
+利用\omterm{met:g10:proba:tree}{树状图}），并计算 $\E(X)$。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:prob:7}
+对 \cref{exo:g11:prob:5} 中的转盘，计算 $\V(G)$ 与 $\sigma(G)$。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:prob:8}
+某保险公司以 $80$ 欧元售出一份保单。以\omterm{def:g10:proba:distribution}{概率}
+$0.05$ 客户索赔 $1000$ 欧元，以\omterm{def:g10:proba:distribution}{概率} $0.01$ 客户
+索赔 $5000$ 欧元，否则无索赔。设 $B$ 为公司每份保单的收益。
+求 $B$ 的\omterm{def:g11:prob:rv}{分布}，计算 $\E(B)$，并
+解释其含义。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:prob:9}
+某选择题有 $4$ 个选项，其中一个正确。答对得 $+1$ 分；
+为抑制乱猜，答错得 $x < 0$ 分。
+某学生随机作答。对于哪个 $x$ 的值，该学生的
+\omterm{def:g11:prob:expectation}{期望}得分为零？
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:prob:10}
+抛掷两枚均匀的硬币。安提议：“若两枚硬币同面，我付你
+$1$ 欧元；若两枚硬币异面，你付我 $1$ 欧元。”计算每位参与者的\omterm{def:g11:prob:expectation}{期望}
+收益。该游戏公平吗？三枚硬币的情形同样讨论，
+其中三枚全同面时安付 $2$ 欧元。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g11:prob:11}
+某彩票发行 $1000$ 张，每张售价 $5$ 欧元。其中一张可获奖金
+$2000$ 欧元，五张可获奖金 $200$ 欧元，二十张可获奖金 $25$
+欧元。
+\begin{enumerate}
+  \item 求组织者总收入减去奖金之后的\omterm{def:g11:prob:rv}{分布}，以及
+        单个参与者的增益 $G$ 的\omterm{def:g11:prob:rv}{分布}。
+  \item 计算 $\E(G)$ 以及组织者的总\omterm{def:g11:prob:expectation}{期望}利润。
+        验证两个结果是否一致。
+\end{enumerate}
+\end{exercise}
+
+\section{问题：未完成的赌局}
+
+\begin{problem}[{周末问题——帕斯卡、费马与中断赌局的公平分配：
+期望的诞生、线性性的妙用
+，以及期望无法看见的东西}]
+\label{pb:g11:prob:1}
+1654 年，梅雷骑士——即那位骰子赌注开启了初中分册\omterm{def:g10:proba:distribution}{概率}问题的赌徒——
+向布莱兹·帕斯卡提出了一个更深的问题：
+两位技艺相当的选手须在比分为 $5$ 比 $3$ 时中止比赛，
+六胜者可得 $64$ 皮斯托尔的奖池。
+\emph{奖池应如何
+公平分配？}帕斯卡与费马回答此问题的书信
+奠定了本章核心概念：\omterm{def:g11:prob:expectation}{期望}
+（见\cref{def:g11:prob:expectation}）。
+你将用两种方法重新推导他们的答案，再认识线性性的妙招
+以及\omterm{def:g11:prob:expectation}{期望}唯一的盲区。
+
+\medskip
+\noindent\textbf{第一部分——\omterm{def:g11:prob:expectation}{期望}的熟练运用。}
+\begin{enumerate}
+  \item 掷一颗均匀的骰子，增益为（点数 $- 3$）欧元。
+        作出增益 $G$ 的\omterm{def:g11:prob:rv}{分布}表
+        （见\cref{met:g11:prob:table}），并计算 $\E(G)$。
+  \item 利用简便公式（见\cref{prop:g11:prob:konig}）计算 $V(G)$，
+        以及 $\sigma(G)$（保留
+        两位小数）。
+  \item 不另列新表，求 $\E(2G - 1)$ 与
+        $V(2G - 1)$（见\cref{prop:g11:prob:affine}）。
+  \item 某摊位收取 $m$ 欧元，让你掷两颗骰子，
+        按点数之和（以欧元计）向你付钱。求\emph{公平}价格
+        $m$ 为多少？若摊位收取 $8$ 欧元，
+        你每局的\omterm{def:g11:prob:expectation}{期望}损失是多少？
+  \item 一台价值 $800$ 欧元的笔记本电脑，每年有
+        $5\,\%$ 的\omterm{def:g10:proba:distribution}{概率}损坏。求公平的保险费，
+        以及保险公司每份保单的\omterm{def:g11:prob:expectation}{期望}利润
+        （若其收取 $60$ 欧元）。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第二部分——分配赌金。}
+比分为 $5$--$3$，先赢满 $6$ 局者获得 $64$ 枚皮斯托尔，
+每一局都是公平的掷硬币。
+\begin{enumerate}[resume]
+  \item 两个诱人的错误答案：按 $5 : 3$ 分配
+        （按已赢局数成比例），或全部归领先者。
+        请各用一句话说明两种分法
+        各自哪里不公平。
+  \item 费马的方法：甲还需赢 $1$ 局，乙还需
+        赢 $3$ 局。不论实际如何，设想恰好再进行 $3$ 局。
+        列出 $8$ 种等可能的结果，标出每种结果中谁赢得整场比赛，
+        并由此推出 $64$
+        枚皮斯托尔的公平分配。
+  \item 费马必须为之辩护的微妙之处：真实的比赛
+        可能在一局之后就结束——那么为何仍能
+        合理地基于全部 $3$ 个假想的局进行推理？
+  \item 帕斯卡的方法，从终局倒推：计算甲在
+        （假想的）比分 $5$--$5$ 时甲的公平份额，再依次求
+        $5$--$4$、$5$--$3$ 时的份额，每次都对两种
+        等可能的未来取平均。与第 7 题比较。
+  \item 在比分 $4$--$3$ 时提出同样的问题：需要多少个假想的局，
+        哪些结果使乙赢得整场比赛，
+        公平的分配又是多少？
+  \item 指出两种方法共同依据的原理：不确定的未来的公平价值
+        即为它的\emph{\omterm{def:g11:prob:expectation}{期望}}——
+        并举出两个完全建立在该原理之上的现代行业
+        （第 5 题给出了其中一例）。
+  \item 对每一种比分做一个检验：利用
+        \omterm{def:g11:prob:expectation}{期望}的线性性
+        （\cref{prop:g11:prob:linearity}），说明两位玩家
+        的公平份额之和必定恰好等于
+        $64$ 枚皮斯托尔的赌金。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第三部分——线性性的妙招。}
+\begin{enumerate}[resume]
+  \item 一行算出 $\E(\text{两颗骰子之和}) = 7$，
+        利用线性性（\cref{prop:g11:prob:linearity}），无需列
+        $36$ 格的表。对于和的\emph{\omterm{def:g11:prob:variance}{方差}}，
+        由规则 $V(X + Y) = V(X) + V(Y)$ 可知，这要求两颗骰子
+        相互独立（在本阶段不加证明地承认）。请计算该\omterm{def:g11:prob:variance}{方差}。
+  \item 寄帽子的聚会：$n$ 位客人把帽子扔成一堆，
+        然后每人随机取回一顶。设 $X$ 表示
+        拿回自己帽子的客人人数。对某一位固定的客人，
+        他拿回自己帽子的\omterm{def:g10:proba:distribution}{概率}是多少？
+        把这 $n$ 个\omterm{def:g10:proba:distribution}{概率}相加（利用线性性！），求
+        $\E(X)$。答案可能令你惊讶：它并不
+        依赖于 $n$。
+  \item 用穷举法验证 $\E(X) = 1$：分别取 $n = 2$ 和
+        $n = 3$（列出 $2$ 种和 $6$ 种等可能的
+        帽子分配方式，再对计数取平均）。
+  \item 客人们拿回帽子的情况远非相互独立（若
+        $n - 1$ 位客人都拿回了自己的帽子，则最后一位
+        也必然如此）。在第 14 题的计算中，究竟哪一步
+        \emph{没有}用到独立性？
+        请指出线性性的超能力。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第四部分——\omterm{def:g11:prob:expectation}{期望}看不见什么。}
+\begin{enumerate}[resume]
+  \item 两张 $5$ 欧元的刮刮卡：卡 A 赢得 $10$ 欧元的
+        \omterm{def:g10:proba:distribution}{概率}为 $\frac12$；卡 B 赢得 $1\,000$ 欧元的\omterm{def:g10:proba:distribution}{概率}为
+        $0.005$。验证两者的收益\omterm{def:g11:prob:expectation}{期望}相同，再分别
+        计算两者的\omterm{def:g11:prob:variance}{方差}。真实的人们买哪一张，
+        他们买的究竟是什么？
+  \item 圣彼得堡游戏：一直掷硬币，直到首次出现反面为止；
+        若首次出现反面的是第 $n$ 次投掷，则你获得
+        $2^n$ 欧元。计算每个 $n$ 对
+        \omterm{def:g11:prob:expectation}{期望}的贡献，以及\omterm{def:g11:prob:expectation}{期望}本身。你是否愿意花
+        $1\,000$ 欧元玩一次？这一
+        冲突对\omterm{def:g11:prob:expectation}{期望}有何启示？
+  \item 从客户的角度看保险：付 $20$ 欧元，还是
+        面临 $1\,\%$ 的风险损失 $1\,000$ 欧元？比较两者的
+        \omterm{def:g11:prob:expectation}{期望}，并说明购买保险为何仍可能是理性的
+        （单个家庭无法对什么
+        “取平均”？）。
+  \item 终章——\omterm{def:g11:prob:expectation}{期望}的生平，每章一句话：
+        诞生于 1654 年，旨在分配赌金；其超能力是
+        线性性，它无需独立性即可把\omterm{def:g11:prob:expectation}{期望}相加
+        （如帽子问题）；其盲点是风险，
+        由\omterm{def:g11:prob:variance}{方差}刻画（刮刮卡、圣彼得堡游戏、保险）；
+        而其加冕礼定于明年，届时大数定律将
+        恰好解释庄家为何总能赢。
+\end{enumerate}
+\end{problem}

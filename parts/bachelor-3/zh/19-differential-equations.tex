@@ -1,0 +1,878 @@
+\chapter{常微分方程}\label{ch:b3:ode}
+
+本科二年级求解了线性微分方程，并陈述了
+柯西--利普希茨定理；本章将证明它——而且是两种证明：
+先用巴拿赫不动点定理证明存在唯一性，
+再用\omterm{thm:b3:ode:maximal}{极大解}理论和
+逃逸紧集定理研究整体结构。线性理论随后重新建立于
+扎实的基础之上（\omterm{thm:b3:ode:linearstructure}{预解式}、\omterm{thm:b3:ode:linearstructure}{朗斯基行列式}、\omterm{thm:b3:ode:matrixexp}{矩阵
+指数}、\omterm{thm:b3:ode:linearstructure}{杜阿梅尔公式}），本章后半部分则开启
+\emph{定性}理论——流、平衡点、
+\omterm{thm:b3:ode:lyapunov}{李雅普诺夫函数}，以及由线性化研究\omterm{def:b3:ode:stability}{稳定}性：如何
+理解那些永远无法算出的解。周末问题中的摆
+是永恒的案例研究。全文中，
+$U \subseteq \R\times\R^d$ 为\omterm{def:b3:topology:topology}{开集}，且 $f \colon U \to \R^d$
+连续；$x' = f(t, x)$ 的\emph{解}是指一个
+$\mathcal C^1$ 映射 $x \colon I \to \R^d$（$I$ 为区间），
+其图像位于 $U$ 中并满足该方程。
+
+\section{柯西--利普希茨定理}
+
+\begin{definition}\label{def:b3:ode:lipschitz}
+称 $f$ 关于 $x$ 为\emph{局部利普希茨}\index{局部利普希茨}的，
+若 $U$ 中每点都有一个\omterm{def:b3:topology:topology}{邻域} $V$ 和常数
+$L$，使 $\norm{f(t, x_1) - f(t, x_2)} \leq L\norm{x_1 -
+x_2}$，对 $(t, x_1), (t, x_2) \in V$ 成立。若 $f$ 为 $\mathcal
+C^1$ 的（或仅需 $\partial_xf$ 存在且连续），则它
+关于 $x$ 局部利普希茨：在紧凸
+\omterm{def:b3:topology:topology}{邻域}上，由中值不等式取 $L =
+\sup\vertiii{\partial_xf}$。
+\end{definition}
+
+\begin{theorem}[柯西--利普希茨，局部]
+\label{thm:b3:ode:cauchylipschitz}
+设 $f$ 连续且关于 $x$ \omterm{def:b3:ode:lipschitz}{局部利普希茨}，$(t_0,
+x_0) \in U$。则存在 $T > 0$，使得柯西问题
+\[
+x' = f(t, x), \qquad x(t_0) = x_0
+\]
+在 $[t_0 - T, t_0 +
+T]$ 上恰有一个解。\index{柯西--利普希茨定理}
+\end{theorem}
+
+\begin{proof}
+取 $a, b > 0$，使 $Q = [t_0 - a, t_0 + a]\times\bar
+B(x_0, b) \subseteq U$，且在该集上 $\norm f \leq M$，$f$ 为
+$L$-利普希茨（关于 $x$）。$\mathcal C^1$ 函数是解，
+当且仅当它满足积分方程
+\[
+x(t) = x_0 + \int_{t_0}^{t}f\bigl(s, x(s)\bigr)\,\dd s
+\]
+（微积分基本定理，两个方向都成立）。令 $T =
+\min\bigl(a, \frac bM, \frac1{2L}\bigr)$，$I = [t_0 - T, t_0
++ T]$，并记
+\[
+\mathcal E = \{x \in \mathcal C(I, \R^d) : \norm{x(t) - x_0}
+\leq b\ \text{在 } I\},
+\]
+它是巴拿赫空间 $(\mathcal C(I, \R^d),
+\norm\cdot_\infty)$ 的闭子集，因而完备
+（\cref{def:b3:complete:complete}）。定义 $\Phi(x)(t) = x_0 +
+\int_{t_0}^tf(s, x(s))\dd s$：对 $x \in \mathcal E$，
+$\norm{\Phi(x)(t) - x_0} \leq M\abs{t - t_0} \leq MT \leq b$
+——$\Phi$ 把 $\mathcal E$ 映入自身——且对 $x, y \in
+\mathcal E$：
+\[
+\norm{\Phi(x)(t) - \Phi(y)(t)} \leq \Bigl|\int_{t_0}^t
+L\,\norm{x(s) - y(s)}\,\dd s\Bigr| \leq LT\,\norm{x -
+y}_\infty \leq \tfrac12\norm{x - y}_\infty :
+\]
+即为压缩映射。由巴拿赫不动点
+（\cref{thm:b3:complete:banach}）可知，不动点在
+$\mathcal E$ 中唯一存在：这给出存在性，以及在
+$\bar B(x_0, b)$ 中之解的唯一性——但 $I$ 上的任一解都停留在该
+球中（$\norm{x(t) - x_0} \leq M\abs{t - t_0} \leq b$
+只要图像仍在 $Q$ 中，这由连续性论证得出）。
+因此在 $I$ 上唯一。
+\end{proof}
+
+\begin{lemma}[格朗沃尔]\label{lem:b3:ode:gronwall}
+设 $u \colon I \to \intco0\infty$ 连续，$t_0 \in
+I$，且假设\index{格朗沃尔引理}
+\[
+u(t) \leq \alpha + \beta\,\Bigl|\int_{t_0}^{t}u(s)\,\dd
+s\Bigr| \qquad (t \in I)
+\]
+其中 $\alpha \geq 0$，$\beta > 0$。则 $u(t) \leq
+\alpha\,\eu^{\beta\abs{t - t_0}}$ 在 $I$ 上成立。
+\end{lemma}
+
+\begin{proof}
+对 $t \geq t_0$：令 $v(t) = \alpha +
+\beta\int_{t_0}^tu(s)\dd s$，则 $u \leq v$，$v' = \beta u
+\leq \beta v$，且 $(v\eu^{-\beta(t - t_0)})' \leq 0$：$v(t)
+\leq v(t_0)\eu^{\beta(t-t_0)} = \alpha\eu^{\beta(t - t_0)}$。
+对 $t \leq t_0$，将同样的论证用于 $\tilde u(t) = u(2t_0 -
+t)$。
+\end{proof}
+
+\begin{corollary}[唯一性与连续依赖]
+\label{cor:b3:ode:uniqueness}
+在\cref{thm:b3:ode:cauchylipschitz}的条件下，
+若 $x' = f(t,x)$ 的两个解在某一点取值相同，
+则它们在共同的定义区间上处处相等。定量地说，若
+$x, y$ 为两个解，其图像位于一个区域内，该区域上 $f$
+为 $L$-利普希茨（关于 $x$），则
+\[
+\norm{x(t) - y(t)} \leq \norm{x(t_0) -
+y(t_0)}\,\eu^{L\abs{t - t_0}} .
+\]
+\end{corollary}
+
+\begin{proof}
+估计：$u = \norm{x - y}$ 满足 $u(t) \leq u(t_0)
++ L\abs{\int_{t_0}^tu}$（将两个积分方程相减）；
+格朗沃尔不等式。整体唯一性：一致集 $\{t : x(t)
+= y(t)\}$ 在公共区间上是闭的、非空的，且
+是开的——在任一一致点附近，取公共图像的一段紧致部分，
+以有限个利普希茨盒覆盖之，并对每个盒应用估计式，
+其中 $u(t_1) = 0$：局部地 $x \equiv y$。
+区间中非空的既开又闭子集即为整个区间。
+\end{proof}
+
+\section{极大解}
+
+\begin{theorem}[极大解；紧集逃逸]
+\label{thm:b3:ode:maximal}
+设 $f$ 连续，且关于 $x$ \omterm{def:b3:ode:lipschitz}{局部利普希茨}。
+\begin{enumerate}
+  \item 每个柯西问题都有唯一的\emph{\omterm{thm:b3:ode:maximal}{极大解}}
+        $x \colon \intoo{T_-}{T_+} \to \R^d$：每个
+        经过 $(t_0, x_0)$ 的其他解都是它的
+        限制。该区间是开的。
+  \item （\emph{逃逸}）对每个紧集 $K \subseteq U$
+        存在 $\varepsilon > 0$，使得 $(t, x(t)) \notin
+        K$，对所有 $t \in \intoo{T_+ - \varepsilon}{T_+}$ 成立（
+        在 $T_-$ 处对称地成立）：\emph{\omterm{thm:b3:ode:maximal}{极大解}的图像
+        最终离开
+        $U$ 的每个紧子集}。特别地，
+        对 $U = \R\times\R^d$ 且 $T_+ < +\infty$：
+        $\norm{x(t)} \to +\infty$，当 $t \to T_+^-$ 时
+        （\emph{爆破}）。\index{极大解}\index{紧集
+        逃逸}\index{爆破}
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) 设 $\mathcal S$ 为所有经过
+$(t_0, x_0)$ 的解的集合；由\cref{cor:b3:ode:uniqueness}，任两解在
+其区间的交上相等，故可粘合：在 $J =
+\bigcup_{y \in \mathcal S}I_y$ 上定义 $x(t) = y(t)$，其中
+$y$ 为在 $t$ 处有定义的任一解：这是良定义的解，
+显然是极大且唯一的。$J$ 是开的：在端点处有定义的解
+可借助
+\cref{thm:b3:ode:cauchylipschitz} 于该端点处延拓。
+
+(2) 假设结论在 $T_+$ 处不成立：存在 $t_n \to
+T_+$ 使得 $(t_n, x(t_n)) \in K$；注意这要求 $T_+ <
+\infty$，或若 $T_+ = \infty$，则无需证明（$K$
+在时间上有界）。于是设 $T_+ < \infty$。紧性：存在一致常数 $M, L, a,
+b$ 对 $K$ 的某\omterm{def:b3:topology:topology}{邻域}中的全部柯西数据均一致适用
+——具体地，如局部定理证明中那样，将 $K$ 用有限个盒 $Q_i$ 覆盖，
+并令 $T^* > 0$ 为
+相应存在时间的最小值：$K$ 中任一柯西数据
+所确定的解在其初始时刻之后至少存活 $T^*$
+的时间。将此用于 $(t_n, x(t_n))$，取 $t_n > T_+ -
+T^*/2$，则可将 $x$ 延拓越过 $T_+$（延拓与 $x$ 一致，
+由唯一性再向前延长），与
+极大性矛盾。故图像最终确定地离开 $K$，
+且在 $T_+$ 之前。对 $U = \R\times\R^d$：若 $\norm{x(t)}\not\to\infty$，
+则存在数列 $t_n \to T_+$，使 $(t_n, x(t_n))$ 落在紧集
+$[t_0, T_+]\times\bar B(0, R)$ 中，与之矛盾。
+\end{proof}
+
+\begin{corollary}[线性增长下的整体存在性]
+\label{cor:b3:ode:globallinear}
+若 $U = I\times\R^d$（$I$ 为开区间）且 $\norm{f(t, x)}
+\leq \alpha(t)\norm x + \beta(t)$，其中 $\alpha, \beta$
+连续，则每个\omterm{thm:b3:ode:maximal}{极大解}都在整个
+$I$ 上有定义。
+\end{corollary}
+
+\begin{proof}
+在紧区间 $[t_0, T] \subseteq I$ 上：$\norm{x(t)} \leq
+\norm{x_0} + \int_{t_0}^t(\alpha\norm x + \beta)$，于是由
+格朗沃尔不等式（其中 $\alpha, \beta$ 分别以 $A, B$ 为界）
+$\norm{x(t)} \leq (\norm{x_0} + B(T - t_0))\eu^{A(T - t_0)}$，
+故有界。若 $T_+ < \sup I$，则图像
+保持于 $I\times\R^d$ 的某紧集中（靠近 $T_+$），与
+逃逸性（\cref{thm:b3:ode:maximal}）矛盾。
+\end{proof}
+
+\section{线性系统}
+
+本节中 $A \colon I \to M_d(\R)$ 与 $b
+\colon I \to \R^d$ 均连续；系统为 $x' = A(t)x
++ b(t)$——线性增长：所有\omterm{thm:b3:ode:maximal}{极大解}都定义在
+整个 $I$ 上（见\cref{cor:b3:ode:globallinear}）。
+
+\begin{theorem}[结构]\label{thm:b3:ode:linearstructure}
+齐次系统 $x' = A(t)x$ 的解构成一个
+$d$ 维向量空间 $S_H$；对每个 $t_0$，
+求值映射 $x \mapsto x(t_0)$ 是 $S_H \to
+\R^d$ 的同构。\emph{预解式}\index{线性系统的
+预解式} $R(t, s) \in GL_d(\R)$，由 $t \mapsto R(t,
+s)v$ 为取值 $v$ 于 $s$ 处的解所定义，满足
+\[
+R(s,s) = I,\quad R(t, u)R(u, s) = R(t, s),\quad
+\partial_tR(t,s) = A(t)R(t,s),
+\]
+非齐次问题的解由\emph{杜阿梅尔
+公式}\index{杜阿梅尔公式}给出：
+\[
+x(t) = R(t, t_0)\,x_0 + \int_{t_0}^{t}R(t, s)\,b(s)\,\dd s .
+\]
+最后，\emph{朗斯基行列式}\index{朗斯基行列式} $w(t) = \det
+R(t, s)$ 满足刘维尔公式 $w' =
+\operatorname{tr}A(t)\,w$，于是 $w(t) =
+\exp\bigl(\int_s^t\operatorname{tr}A\bigr) > 0$。
+\end{theorem}
+
+\begin{proof}
+方程的线性使解构成一个向量空间；
+求值映射是线性的、单射的（唯一性：一个
+在 $t_0$ 处为零的解必为 $\equiv 0$），且满射（存在性）：
+维数为 $d$。\omterm{thm:b3:ode:linearstructure}{预解式}的性质只是重述唯一性
+（等式两端都解同一柯西问题）；
+由 $R(s,t)R(t,s) = I$ 得可逆性。验证\omterm{thm:b3:ode:linearstructure}{杜阿梅尔公式}：对
+其求导——$x'(t) = A(t)R(t,t_0)x_0 + R(t,t)b(t) +
+\int_{t_0}^tA(t)R(t,s)b(s)\dd s = A(t)x(t) + b(t)$
+（积分号下求导是合法的：被积函数
+为 $\mathcal C^1$（对 $t$），且其导数
+在 $(t,s)$ 上连续；也可由积分方程验证）。刘维尔公式：
+$w(t + h) = \det\bigl(R(t+h, t)\bigr)w(t)$，而 $R(t + h, t) =
+I + hA(t) + o(h)$（由积分方程），于是 $\det = 1
++ h\operatorname{tr}A(t) + o(h)$（$\det$ 在
+$I$ 处的展开）：$w'(t) = \operatorname{tr}A(t)\,w(t)$；
+对标量线性常微分方程积分。
+\end{proof}
+
+\begin{theorem}[矩阵指数]\label{thm:b3:ode:matrixexp}
+对 $A \in M_d(\C)$，级数 $\eu^{A} =
+\sum_{n\geq0}\frac{A^n}{n!}$ 绝对收敛（在任一
+次乘范数下），$\eu^{A+B} = \eu^A\eu^B$ 当 $AB = BA$ 时，
+且 $t \mapsto \eu^{tA}$ 是常系数系统的\omterm{thm:b3:ode:linearstructure}{预解式}：
+$R(t,s) = \eu^{(t-s)A}$；它是 $\mathcal
+C^\infty$，且 $\frac{\dd}{\dd t}\eu^{tA} = A\eu^{tA}$。
+此外：若 $\operatorname{Re}\lambda < -\alpha < 0$，其中 $\lambda$ 取遍
+$A$ 的特征值，则 $\vertiii{\eu^{tA}}
+\leq C\eu^{-\alpha t}$，当 $t \geq 0$ 时。\index{矩阵
+指数}
+\end{theorem}
+
+\begin{proof}
+收敛性：$\vertiii{A^n/n!} \leq \vertiii A^n/n!$，可和
+（\cref{exo:b3:complete:1}(b)，在巴拿赫代数
+$M_d$ 中）。对可交换的 $A, B$，两个
+绝对收敛级数的柯西乘积借二项式
+定理（在 $AB = BA$ 时成立）重排为
+$\sum_n\frac{(A+B)^n}{n!}$。直接验证可微性：
+$\frac{\eu^{(t+h)A} - \eu^{tA}}h = \eu^{tA}\frac{\eu^{hA} -
+I}{h} \to \eu^{tA}A$，因为 $\norm{\frac{\eu^{hA} - I}h - A}
+\leq \sum_{n\geq2}\frac{\abs h^{n-1}\vertiii A^n}{n!} =
+O(h)$。于是 $t \mapsto \eu^{(t - s)A}v$ 满足
+定义 $R(t,s)v$ 的柯西问题。谱界：由\omterm{thm:b3:modules:jordan}{若尔当标准形}
+（\cref{thm:b3:modules:jordan}），$A = P(D + N)P^{-1}$，其中 $D$
+为以特征值为对角元的对角阵，$N$ 为幂零矩阵，且 $DN =
+ND$。于是 $\eu^{tA} = P\,\eu^{tD}\eu^{tN}P^{-1}$，其中
+$\vertiii{\eu^{tD}} \leq \eu^{-(\alpha + \delta)t}$ 对某个
+$\delta > 0$（$t \geq 0$）成立，且 $\eu^{tN}$ 关于 $t$ 为多项式
+（由幂零性），故乘积 $\leq C\eu^{-\alpha t}$
+（多项式被 $\eu^{-\delta t}$ 压制）。
+\end{proof}
+
+\begin{example}[平面的分类]
+\label{ex:b3:ode:planeclassification}
+对 $x' = Ax$，其中 $A \in M_2(\R)$ 可逆，
+$0$ 附近的相图由 $\tau = \operatorname{tr}A$
+和 $\delta = \det A$ 决定，经由特征值 $\lambda_\pm
+= \frac{\tau \pm \sqrt{\tau^2 - 4\delta}}2$：
+\begin{itemize}
+  \item $\delta < 0$：实特征值，符号相反——
+        为\emph{鞍点}；两条轨线进入，两条离开，
+        其余轨线都掠过。总是不\omterm{def:b3:ode:stability}{稳定}。
+  \item $\delta > 0$，$\tau^2 \geq 4\delta$：实特征值
+        同号（$= \operatorname{sign}\tau$）——
+        为\emph{结点}，\omterm{def:b3:ode:stability}{稳定}当且仅当 $\tau < 0$；轨线
+        与慢特征方向相切。
+  \item $\delta > 0$，$\tau^2 < 4\delta$，$\tau \neq 0$：
+        共轭复特征值 $\frac\tau2 \pm
+        \iu\omega$——为\emph{螺旋点}（焦点），\omterm{def:b3:ode:stability}{稳定}当且仅当
+        $\tau < 0$；解为
+        $\eu^{\tau t/2}\times$ 周期为
+        $\frac{2\pi}\omega$ 的旋转。
+  \item $\tau = 0$，$\delta > 0$：纯虚
+        特征值——为\emph{中心}：闭\omterm{def:b3:groups:action}{轨道}
+        （椭圆），\omterm{def:b3:ode:stability}{稳定}但非渐近\omterm{def:b3:ode:stability}{稳定}，
+        恰是这样一类临界情形，
+        \cref{thm:b3:ode:linearization}对非线性系统无法判定
+        （摆的下平衡点，
+        \cref{pb:b3:ode:1}即位于此）。
+\end{itemize}
+边界抛物线 $\tau^2 = 4\delta$ 上为
+退化结点（若尔当块：轨线具有唯一的
+切方向）。一切皆由两个数读出——
+这正是为何在画任何平面相图之前，首要做法
+是计算 $\operatorname{tr}$ 与 $\det$；例如\
+$A = \bigl(\begin{smallmatrix}0 & 1\\ -1 &
+-c\end{smallmatrix}\bigr)$（阻尼振子）：$\delta = 1 >
+0$，$\tau = -c$：当 $0 < c < 2$ 时为\omterm{def:b3:ode:stability}{稳定}螺旋点，
+当 $c \geq 2$ 时为\omterm{def:b3:ode:stability}{稳定}结点——欠阻尼与过阻尼之别，
+一目了然。
+\end{example}
+
+\section{流、平衡点、稳定性}
+
+现考虑\emph{自治}方程 $x' = F(x)$，$F
+\colon \Omega \to \R^d$ \omterm{def:b3:ode:lipschitz}{局部利普希茨}，\omterm{def:b3:topology:topology}{开集} $\Omega
+\subseteq \R^d$ 上。记 $\varphi_t(x_0) = x(t)$ 为
+满足 $x(0) = x_0$ 的\omterm{thm:b3:ode:maximal}{极大解}（
+\emph{流}\index{向量场的流}）；由自治性可得
+群性质 $\varphi_{t+s} =
+\varphi_t\circ\varphi_s$，在有定义之处成立（两边都是
+时刻 $s$ 处同一问题的解）。
+
+\begin{definition}\label{def:b3:ode:stability}
+称点 $\bar x$ 为\emph{平衡点}，若 $F(\bar x) =
+0$（从而 $\varphi_t(\bar x) = \bar x$）。该点是
+\emph{稳定}\index{稳定}的，若对每个
+$\varepsilon > 0$，存在 $\delta > 0$，使得
+$\norm{x_0 - \bar x} < \delta$ 蕴含该解
+对所有 $t \geq 0$ 存在，且 $\norm{\varphi_t(x_0) - \bar
+x} < \varepsilon$；称为\emph{渐近稳定}的，若进一步
+$\varphi_t(x_0) \to \bar x$ 对所有 $x_0$（$\bar x$ 附近）成立。
+\end{definition}
+
+\begin{theorem}[李雅普诺夫函数]\label{thm:b3:ode:lyapunov}
+设 $\bar x$ 为平衡点，$V \colon \mathcal V \to
+\R$ 为 $\mathcal C^1$ 函数，定义在 $\bar x$ 的某一\omterm{def:b3:topology:topology}{邻域}上，
+满足：\index{李雅普诺夫函数}
+\[
+V(\bar x) = 0,\qquad V(x) > 0 \text{ 当 } x \neq \bar x,
+\qquad \dot V(x) = \nabla V(x)\cdot F(x) \leq 0 .
+\]
+则 $\bar x$ \omterm{def:b3:ode:stability}{稳定}。若进一步 $\dot V < 0$ 在 $\bar
+x$ 之外，则 $\bar x$ 渐近\omterm{def:b3:ode:stability}{稳定}。
+\end{theorem}
+
+\begin{proof}
+沿解有 $\frac{\dd}{\dd t}V(x(t)) = \dot V(x(t))
+\leq 0$：$V$ 递减。给定 $\varepsilon$（充分小，
+使 $\bar B(\bar x, \varepsilon) \subseteq \mathcal V$），取
+$m = \min\{V(x) : \norm{x - \bar x} = \varepsilon\} > 0$
+（由紧性与正性），并取 $\delta < \varepsilon$
+使 $V < m$ 在 $B(\bar x, \delta)$ 上成立（由连续性）。
+始于 $B(\bar x, \delta)$ 的解，
+对所有之后的时刻有 $V(x(t)) < m$，故它永远不能到达球面 $\norm{x -
+\bar x} = \varepsilon$（其上 $V \geq m$）：它停留在
+球内——进而该解对所有 $t \geq 0$ 存在：
+其始终位于紧集 $\bar B$ 中，故
+由\cref{thm:b3:ode:maximal}(2)（逃离紧集）可得
+$T_+ = +\infty$。由此得\omterm{def:b3:ode:stability}{稳定}性。
+
+渐近情形：设 $x(t)$ 始于 $B(\bar x, \delta)$；
+$V(x(t))$ 递减趋于某个 $c \geq 0$。若 $c > 0$：轨线
+停留在 $K = \{x \in \bar B(\bar x,
+\varepsilon): V(x) \geq c\}$，这是一个紧集，并且排除了
+$\bar x$ 的一个\omterm{def:b3:topology:topology}{邻域}（$V$ 连续且 $V(\bar x)
+= 0 < c$）。在 $K$ 上，函数 $\dot V$ 连续，
+严格为负，故 $\mu = \max_K\dot V < 0$
+（由紧性）；于是 $V(x(t)) \leq V(x(0)) + \mu t \to
+-\infty$：与 $V \geq 0$ 矛盾。因此
+$c = 0$，且 $x(t) \to \bar x$（球内距离满足 $\geq
+\rho$ 者，即距 $\bar x$ 的点，满足 $V \geq m_\rho >
+0$）。
+\end{proof}
+
+\begin{theorem}[线性化稳定性]
+\label{thm:b3:ode:linearization}
+设 $F$ 为 $\mathcal C^1$ 函数，$F(\bar x) = 0$，$A = DF(\bar x)$。
+若 $A$ 的每个特征值都满足 $\operatorname{Re}\lambda <
+0$，则 $\bar x$ 渐近\omterm{def:b3:ode:stability}{稳定}。\index{线性化
+稳定性}
+\end{theorem}
+
+\begin{proof}
+将 $\bar x$ 平移到 $0$，并写 $F(x) = Ax + g(x)$，其中
+$g(x) = o(\norm x)$（$\mathcal C^1$ 可微性）。取
+$\alpha > 0$ 使得 $\vertiii{\eu^{tA}} \leq C\eu^{-\alpha t}$
+（$t \geq 0$；\cref{thm:b3:ode:matrixexp}），再取 $r > 0$，使得
+$\norm{g(x)} \leq \frac{\alpha}{2C}\norm x$，当 $\norm x \leq
+r$ 时。对 $b(s) = g(x(s))$ 使用\omterm{thm:b3:ode:linearstructure}{杜阿梅尔公式}：
+\[
+x(t) = \eu^{tA}x_0 + \int_0^t\eu^{(t-s)A}g(x(s))\,\dd s,
+\]
+只要 $\norm{x(s)} \leq r$ 即成立。记 $u(t) =
+\eu^{\alpha t}\norm{x(t)}$ 满足
+\[
+u(t) \leq C\norm{x_0} +
+\int_0^{t}C\,\frac{\alpha}{2C}\,u(s)\,\dd s ,
+\]
+由格朗沃尔不等式得 $u(t) \leq C\norm{x_0}\eu^{\alpha t/2}$，
+即 $\norm{x(t)} \leq C\norm{x_0}\eu^{-\alpha t/2}$。若
+$\norm{x_0} < r/C$，则先验界使 $\norm{x(t)} <
+r$ 对所有 $t$ 成立（连续性/自举论证：
+满足 $\norm x \leq r$ 的时刻集合在
+$\intco0{T_+}$ 中既开又闭（由严格估计），解是
+整体的，并以指数速度收敛到 $0$：渐近
+\omterm{def:b3:ode:stability}{稳定}。
+\end{proof}
+
+\begin{method}\label{met:b3:ode:strategy}
+面对一个常微分方程：(1) 存在唯一性——检验\omterm{def:b3:ode:lipschitz}{局部
+利普希茨}（通常为 $\mathcal C^1$）；(2) 整体性——线性
+增长、有界性，或借助\omterm{thm:b3:ode:lyapunov}{李雅普诺夫
+函数}或首次积分得到的不变紧集；若不成立，怀疑爆破，
+并用标量漫画 $x' = x^2$ 检验；(3) 线性
+系统——\omterm{thm:b3:ode:linearstructure}{预解式}、\omterm{thm:b3:ode:linearstructure}{杜阿梅尔公式}，常系数情形下
+考察 $A$ 的特征结构；(4) 定性
+问题——平衡点、线性化，并寻找\omterm{thm:b3:ode:lyapunov}{李雅普诺夫
+函数}（系统为力学系统时取能量），或首次积分，其水平集
+能够围住轨线。周末
+问题通过单摆完整地演示了这一方法。
+\end{method}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=11cm, height=6cm,
+    xmin=-7.2, xmax=7.2, ymin=-2.9, ymax=2.9,
+    xtick={-6.2832, -3.1416, 0, 3.1416, 6.2832},
+    xticklabels={$-2\pi$, $-\pi$, $0$, $\pi$, $2\pi$},
+    ytick={-2,0,2}]
+  % oscillations: E<1 : y = +-sqrt(2(E+cos x)), E = -0.3, 0.5
+  \foreach \E in {-0.3, 0.5}{
+    \addplot[omDef, samples=200, domain=-7.2:7.2]
+      {sqrt(max(0, 2*(\E + cos(deg(x)))))};
+    \addplot[omDef, samples=200, domain=-7.2:7.2]
+      {-sqrt(max(0, 2*(\E + cos(deg(x)))))};
+  }
+  % separatrix E = 1
+  \addplot[omThm, thick, samples=300, domain=-7.2:7.2]
+    {sqrt(max(0, 2*(1 + cos(deg(x)))))};
+  \addplot[omThm, thick, samples=300, domain=-7.2:7.2]
+    {-sqrt(max(0, 2*(1 + cos(deg(x)))))};
+  % rotations E > 1
+  \foreach \E in {1.6, 2.4}{
+    \addplot[omProp, samples=200, domain=-7.2:7.2]
+      {sqrt(2*(\E + cos(deg(x))))};
+    \addplot[omProp, samples=200, domain=-7.2:7.2]
+      {-sqrt(2*(\E + cos(deg(x))))};
+  }
+\end{axis}
+\end{tikzpicture}
+
+{\small 单摆 $x'' = -\sin x$ 在
+$(x, x')$ 平面上的相图：能量 $E = \frac{x'^2}2
+- \cos x$ 的水平曲线。闭曲线（蓝色）：振动，$E < 1$；
+旋转曲线（橙色）：整周旋转，$E > 1$；二者之间
+为\emph{分界线}（红色），$E = 1$，连接
+不\omterm{def:b3:ode:stability}{稳定}平衡点 $(\pm\pi, 0)$。周末问题证明了
+这幅图所暗示的一切。}
+\end{omfigure}
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:b3:ode:1}
+显式求解并确定极大区间：
+(a) $x' = x^2$，$x(0) = 1$；(b) $x' = 1 + x^2$，$x(0) = 0$；
+(c) $x' = x(1-x)$，$x(0) = \frac12$。将每个答案与
+\cref{thm:b3:ode:maximal}(2) 及
+\cref{cor:b3:ode:globallinear} 对照。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b3:ode:2}
+设 $x, y$ 为 $x' = f(t,x)$ 的解，其中 $f$
+整体 $L$-利普希茨，关于 $x$ 在 $\R\times\R^d$ 上。
+(a) 证明 $\norm{x(t) - y(t)} \leq \norm{x(0) -
+y(0)}\eu^{L\abs t}$，并用线性方程的例子说明
+因子 $\eu^{L\abs t}$ 确实可以取到。
+(b) 由此推出流映射 $x_0 \mapsto x(t; x_0)$ 连续，
+事实上它在有界集上是利普希茨的。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:ode:3}
+证明下列每个方程的所有\omterm{thm:b3:ode:maximal}{极大解}都在 $\R$ 上整体存在，
+并引用恰当的定理：
+(a) $x' = \sin(tx)$；
+(b) $x' = \frac{t\,x}{1 + x^2}$；
+(c) $x'' + q(t)x = 0$，其中 $q$ 连续（化为
+一阶方程组）；
+(d) $x' = A(t)x$，其中 $A$ 连续且有界——并给出
+关于 $\norm{x(t)}$ 的格朗沃尔界。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:ode:4}
+(a) 对下列矩阵计算 $\eu^{tA}$：
+$A = \bigl(\begin{smallmatrix}0 & -1\\ 1 &
+0\end{smallmatrix}\bigr)$,
+$\bigl(\begin{smallmatrix}\lambda & 1\\ 0 &
+\lambda\end{smallmatrix}\bigr)$，以及
+$\bigl(\begin{smallmatrix}0 & 1\\ 1 &
+0\end{smallmatrix}\bigr)$.
+(b) 求受迫振子 $x'' + x = \cos(\omega t)$
+的解，用\omterm{thm:b3:ode:linearstructure}{杜阿梅尔公式}（方程组形式），分别对 $\omega \neq 1$ 与 $\omega =
+1$ 两种情形讨论：共振表现为久期项 $t\sin t$。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:ode:5}
+对标量方程 $x'' + p(t)x' + q(t)x = 0$：
+(a) 证明两个解的\omterm{thm:b3:ode:linearstructure}{朗斯基行列式} $w = x_1x_2' - x_1'x_2$
+满足 $w' = -p\,w$（阿贝尔公式），并由此推出
+两个在某点处 $w \neq 0$ 的解构成一组基。
+(b) 已知一个处处不为零的解 $x_1$，求方程的
+通解，用\emph{降阶法}：取 $x_2 = x_1\int
+\frac{\eu^{-\int p}}{x_1^2}$ 并验证。将其应用于 $t^2x'' -
+2x = 0$ 在 $\intoo0{+\infty}$ 上，取 $x_1(t) = t^2$。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:ode:6}
+（逻辑斯蒂方程）对 $x' = x(1 - x)$，求出所有平衡点及
+其\omterm{def:b3:ode:stability}{稳定}性（由\cref{thm:b3:ode:linearization}及
+直接计算）；证明满足 $x(0) \in \intoo01$ 的每个解都
+递增、整体存在，且极限依次为 $0$ 与 $1$（分别对应 $\mp\infty$）；
+并显式求解加以验证。再证明更一般地，
+标量自治方程的解都是单调的，由此推出
+在 $1$ 维情形下不存在非常数的周期解。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:ode:7}
+（首次积分）设 $H \colon \Omega \to \R$ 为 $\mathcal
+C^1$ \omterm{def:b3:representations:character}{类函数}，考虑平面哈密顿系统 $x' =
+\partial_yH$, $y' = -\partial_xH$.
+(a) 证明 $H$ 沿解为常数。
+(b) 对 $H = \frac{y^2}2 + \frac{x^4}4$，证明所有解
+都整体存在且有界，并证明原点是\omterm{def:b3:ode:stability}{稳定}的
+（以\omterm{thm:b3:ode:lyapunov}{李雅普诺夫函数} $H$ 判定），而其线性化
+($\bigl(\begin{smallmatrix}0&1\\0&0\end{smallmatrix}\bigr)$)
+却是\emph{不}渐近\omterm{def:b3:ode:stability}{稳定}的，线性化方法
+可能得不出结论。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:ode:8}
+（阻尼摆）$x'' + cx' + \sin x = 0$，$c > 0$；方程组为：
+$x' = y$, $y' = -\sin x - cy$.
+(a) 证明 $V(x, y) = \frac{y^2}2 + 1 - \cos x$ 满足 $\dot
+V = -cy^2 \leq 0$，故原点是\omterm{def:b3:ode:stability}{稳定}的。
+(b) $\dot V$ 在整条轴 $y = 0$ 上恒为零，李雅普诺夫的
+严格判别法失效。仍证明渐近\omterm{def:b3:ode:stability}{稳定}性，
+利用线性化（\cref{thm:b3:ode:linearization}）：计算
+$(0,0)$ 处线性化矩阵的特征值，并验证
+$\operatorname{Re} < 0$，对每个 $c > 0$ 均成立。
+(c) 在平衡点 $(\pi, 0)$ 处会发生什么？计算其
+线性化并作出结论（有一个特征值为正：
+不\omterm{def:b3:ode:stability}{稳定}——可以非正式地使用不\omterm{def:b3:ode:stability}{稳定}性的结论，
+或者对线性系统构造一个显式的
+逃逸解）。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:ode:9}
+（唯一性的临界）对 $\alpha \in \intoo01$，证明
+问题 $x' = \abs x^{\alpha}$，$x(0) = 0$ 有无穷多
+个解（改编自\cref{pb:b3:complete:1}的第三部分）。
+反之，证明当 $\alpha = 1$（即 $x' = \abs
+x$）时过 $0$ 的解唯一，并精确指出
+哪一条假设
+在\cref{thm:b3:ode:cauchylipschitz}中区分了两种
+情形。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:ode:10}
+（先验界将解困住）设 $F \colon \R^d \to \R^d$
+为\omterm{def:b3:ode:lipschitz}{局部利普希茨}映射，并满足 $\langle F(x), x\rangle \leq 0$，
+只要 $\norm x \geq R$。
+(a) 证明闭球 $\bar B(0, R)$ 是正向
+不变的：从球内出发的解在 $t \geq
+0$ 时仍留在球内。\emph{（若 $\norm{x(t_2)} > R$，考虑
+最后时刻 $t_1 < t_2$，且 $\norm{x(t_1)} = R$，并研究
+$\frac{\dd}{\dd t}\norm{x(t)}^2$ 在 $\intcc{t_1}{t_2}$ 上的变化。）}
+(b) 由此推出初值位于球内时的整体正向存在性。
+然后处理梯度系统 $x' = -\nabla G(x)$，$G \in
+\mathcal C^2$ 且 $G(x) \to +\infty$，当 $\norm x \to
+\infty$ 时，证明 $G$ 沿解递减，且每个
+解都停留在（有界的）下水平集 $\{G \leq
+G(x_0)\}$ 中，并由此推出整体正向存在性。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:ode:11}
+（比较法证明爆破）考虑 $x' = x^2 + t^2$，$x(0) =
+1$。
+(a) 证明\omterm{thm:b3:ode:maximal}{极大解}定义在某个 $\intco0{T_+}$ 上，
+其中 $T_+ < \infty$：与 $y' = y^2$，$y(0) = 1$ 作比较
+\emph{（证明所需的比较引理：若 $x' \geq
+F(x)$，$y' = F(y)$，$x(0) \geq y(0)$，则在二者共同定义之处 $x \geq
+y$）}，并由此推出 $T_+ \leq 1$。
+(b) 估计 $T_+$ 的下界：在 $\intcc01$ 上有 $x' \leq x^2 +
+1$；与上解 $z' = z^2 + 1$，$z(0) =
+1$，其解为 $z(t) = \tan\bigl(t + \frac\pi4\bigr)$，
+由此得 $T_+ \geq \frac\pi4$。
+(c) 综合 $\frac\pi4 \leq T_+ \leq 1$，并指出其中的要点：
+右端的超线性增长是导致整体存在性失效的原因
+（\cref{exo:b3:ode:3} 是与之对照的例子），
+而分界点是
+$\int^{\infty}\frac{\dd s}{F(s)}$ 的收敛性。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:ode:12}
+（斯图姆比较定理）设 $q_1 \leq q_2$ 为
+区间 $I$ 上的连续函数，$u \neq 0$ 满足 $u''
++ q_1u = 0$，$v \neq 0$ 满足 $v'' + q_2v = 0$。
+(a) 建立\omterm{thm:b3:ode:linearstructure}{朗斯基行列式}的恒等式：记 $W = uv' - u'v$，
+则 $W' = (q_1 - q_2)\,uv$。
+(b) （斯图姆）证明：若 $a < b$ 为 $u$ 的两个相邻零点，
+则要么 $v$ 在 $\intoo ab$ 内某处为零，要么
+$q_1 = q_2$ 且 $v \propto u$ 在该处成立 \emph{（设 $u > 0$
+于 $\intoo ab$ 上，且 $v > 0$；对 (a) 从 $a$ 到
+$b$ 积分，并考察边界项 $W(a),
+W(b)$ 的符号）}。
+(c) 由此推出：$u'' + qu = 0$ 的解，当 $q \geq m > 0$ 时，
+在任一长度为 $\pi/\sqrt m$ 的区间内至少有一个零点
+（与 $v'' + mv = 0$ 比较）；当 $q \leq 0$ 时，解
+在 $\R$ 上至多有一个零点。两者均在
+$q \equiv \pm1$ 上检验。
+\end{exercise}
+
+\section{问题：摆的完整求解}
+
+\begin{problem}[{周末问题——振动、旋转、
+分界线与周期}]\label{pb:b3:ode:1}
+摆方程 $x'' = -\sin x$——写成方程组即 $x' =
+y$，$y' = -\sin x$，定义在 $\R^2$ 上——是动力学中的“果蝇”：
+写法简单，无法用初等公式求解，
+却可以用定性
+方法。设 $E(x, y) = \frac{y^2}2 - \cos x$（
+\emph{能量}）。
+
+\medskip
+\noindent\textbf{第一部分——整体结构。}
+\begin{enumerate}
+  \item 证明所有\omterm{thm:b3:ode:maximal}{极大解}都是整体的
+        （即在 $\R$ 上有定义）：利用 $\dot E = 0$ 与
+        \cref{thm:b3:ode:maximal}。求平衡点：$(k\pi, 0)$；
+        对其线性化进行分类（偶数 $k$ 为中心型，
+        奇数 $k$ 为鞍点）。
+  \item 证明轨线包含于水平集
+        $\{E = E_0\}$ 中，并依
+        $E_0 \in \intco{-1}{+\infty}$ 的取值描述（或画出）它们：$E_0 = -1$
+        （平衡点），$-1 < E_0 < 1$（绕
+        $(2k\pi, 0)$ 的闭曲线），$E_0 = 1$（经过
+        $(\pm\pi, 0)$ 的分界线），$E_0 > 1$（沿 $x$ 方向的
+        图像：旋转）。
+  \item 证明下方平衡点 $(0,0)$ 是\omterm{def:b3:ode:stability}{稳定}的，
+        但\emph{不是}渐近\omterm{def:b3:ode:stability}{稳定}的。\emph{（用李雅普诺夫方法：
+        取 $V = E + 1$；非渐近性：能量守恒使\omterm{def:b3:groups:action}{轨道}
+        被困于远离
+        原点的水平曲线上。）}
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第二部分——振动及其周期。}
+固定 $-1 < E_0 < 1$，写 $E_0 = -\cos a$，其中 $a \in
+\intoo0\pi$（振幅）。
+\begin{enumerate}[resume]
+  \item 证明满足 $x(0) = a$，$y(0) = 0$ 的解
+        作振动：$x(t) \in \intcc{-a}a$，且\omterm{def:b3:groups:action}{轨道}为
+        闭曲线 $y^2 = 2(\cos x - \cos a)$。论证
+        该解是周期的：\omterm{def:b3:groups:action}{轨道}是紧曲线，
+        不含平衡点，并以有正下界的速率运行
+        ——请给出论证（解在有限时间内回
+        到初始点，再由唯一性
+        推出周期性）。
+  \item 证明周期公式
+        \[
+        T(a) = 4\int_0^{a}\frac{\dd x}{\sqrt{2(\cos x -
+        \cos a)}}
+        \]
+        \emph{（在四分之一\omterm{def:b3:groups:action}{轨道}上 $y = \frac{\dd x}{\dd t} >
+        0$，分离变量；论证
+        在 $x = a$ 处广义积分的收敛性）}。
+  \item （小振动）作代换 $\sin\frac x2 =
+        \sin\frac a2\,\sin\varphi$，证明
+        \[
+        T(a) = 4\int_0^{\pi/2}\frac{\dd\varphi}{\sqrt{1 -
+        k^2\sin^2\varphi}},
+        \qquad k = \sin\frac a2
+        \]
+        （完全椭圆积分）。由控制收敛定理推出
+        $T(a) \to 2\pi$，当 $a \to 0^+$ 时：即
+        与振幅无关的调和极限——
+        伽利略的近似等时性，其精确修正为
+        $T(a) = 2\pi\bigl(1 + \frac{k^2}4 +
+        O(k^4)\bigr)$（展开被积函数并逐项积分，
+        由一致收敛性加以论证）。
+  \item 证明 $T(a) \to +\infty$，当 $a \to \pi^-$ 时
+        \emph{（在 $\varphi =
+        \frac\pi2$ 附近对被积函数作下界估计（当 $k \to 1$ 时），或
+        应用单调收敛定理）}：接近分界线时，
+        摆无限减速。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第三部分——分界线。}
+\begin{enumerate}[resume]
+  \item 对 $E_0 = 1$，取上支 $y = 2\cos\frac x2$，
+        分离变量并积分，求出
+        显式解
+        \[
+        x(t) = 4\arctan\bigl(\eu^{t}\bigr) - \pi
+        \]
+        （其中 $x(0) = 0$，$y(0) = 2$）。直接验证它满足摆方程，
+        并求出它的
+        极限，以及 $y(t)$ 当 $t \to
+        \pm\infty$ 时的极限。
+  \item 结论：分界线\omterm{def:b3:groups:action}{轨道}连接鞍点
+        $(-\pi, 0)$（当 $t \to -\infty$ 时）到
+        鞍点 $(\pi, 0)$（当 $t \to +\infty$ 时），但两者都不能在有限时间内到达
+        ——与唯一性相容（若在有限时间内到达鞍点，
+        则为何会与
+        \cref{cor:b3:ode:uniqueness}相矛盾？）。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第四部分——转动与完整的
+相图。}
+\begin{enumerate}[resume]
+  \item 对 $E_0 > 1$，证明 $y$ 从不为零，$x$ 严格单调，
+        整体存在，且 $x(t) \to
+        \pm\infty$，$t \mapsto y(t)$ 为周期函数，
+        周期为
+        \[
+        \tau(E_0) = \int_{-\pi}^{\pi}
+        \frac{\dd x}{\sqrt{2(E_0 + \cos x)}} .
+        \]
+  \item 画出完整的相图（本章的图），
+        并对每个特征给出完整论证，并
+        写一段十行的方法小结：能量、
+        水平集、紧性、唯一性——每个
+        定理如何进入论证。我们何时
+        需要一般解的公式？
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第五部分——显微镜下的
+周期函数。}
+\begin{enumerate}[resume]
+  \item 证明沃利斯矩
+        \[
+        W_n = \int_0^{\pi/2}\sin^{2n}\varphi\,\dd\varphi
+        = \frac\pi2\cdot\frac{(2n)!}{4^n\,(n!)^2}
+        \]
+        用归纳法（分部积分）证明，并将
+        第 6 题的被积函数用二项级数展开，并
+        论证逐项积分的合理性，以得到完整的
+        级数
+        \[
+        T(a) = 2\pi\sum_{n\geq0}
+        \Bigl(\frac{(2n)!}{4^n(n!)^2}\Bigr)^{\!2}k^{2n}
+        = 2\pi\Bigl(1 + \frac{k^2}4 + \frac{9k^4}{64}
+        + O(k^6)\Bigr),
+        \qquad k = \sin\frac a2 .
+        \]
+  \item 换算为振幅：
+        \[
+        T(a) = 2\pi\Bigl(1 + \frac{a^2}{16} +
+        \frac{11\,a^4}{3072} + O(a^6)\Bigr)
+        \]
+        \emph{（将 $\sin\frac a2$ 的展开式代入，
+        并合并同类项）}。等时性在 $a^2$ 阶即告失效，并且
+        这种失效现在已量化到 $a^4$ 阶。
+  \item 证明 $a \mapsto T(a)$ 连续，
+        并在 $\intoo0\pi$ 上严格递增，结合第 6--7 题作出结论：
+        $T$ 是从
+        $\intoo0\pi$ 到 $\intoo{2\pi}{+\infty}$ 上的双射：每一个
+        超临界周期恰由一个
+        振幅实现。
+  \item （钟表匠的算术）在振幅趋于零时校准的摆
+        保持\omterm{def:b3:rings:ideal}{理想}时间；证明以振幅 $a$ 运行时，
+        它所慢的时间占\omterm{def:b3:rings:ideal}{理想}时间的比例为
+        $\frac{a^2}{16} + O(a^4)$，并计算
+        $a = 0.2$ 弧度时的漂移：约
+        $216$ 秒每天。（惠更斯的摆线颊片与擒纵机构的
+        小恒定振幅，两者都是
+        对这一数值的解答。）
+  \item 回到第
+        10 题的转动周期 $\tau$：证明 $\tau$ 在
+        $\intoo1{+\infty}$ 上严格递减，且 $\tau(E_0) \to +\infty$，当
+        $E_0 \to 1^+$ 时（由单调收敛定理），并且
+        $\sqrt{2E_0}\,\tau(E_0) \to 2\pi$，当 $E_0 \to
+        +\infty$ 时（由控制收敛定理）：快速旋转渐近
+        于自由转动，其角速度为
+        $\sqrt{2E_0}$。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第六部分——方法的推广：
+洛特卡--沃尔泰拉。}摆的方法——首次积分、
+紧水平曲线、唯一性——可用于求解一个生态系统。
+取 $\alpha, \beta, \gamma, \delta > 0$，并在
+开象限 $Q = \intoo0{+\infty}\times\intoo0{+\infty}$ 上考虑
+\[
+x' = x\,(\alpha - \beta y), \qquad
+y' = y\,(\delta x - \gamma)
+\]
+（$x$ 为猎物，$y$ 为捕食者）。
+\begin{enumerate}[resume]
+  \item 证明 $Q$ 是不变的——坐标轴是
+        \omterm{def:b3:groups:action}{轨道}的并，可显式计算，且任何解都不
+        能穿越（见\cref{cor:b3:ode:uniqueness}）——并且
+        $Q$ 中唯一的平衡点为 $(x_*, y_*) =
+        \bigl(\frac\gamma\delta, \frac\alpha\beta\bigr)$。
+  \item 证明
+        \[
+        H(x, y) = \delta x - \gamma\ln x + \beta y -
+        \alpha\ln y
+        \]
+        是首次积分，且 $H = f(x) + g(y)$，其中
+        $f, g$ 在 $\intoo0{+\infty}$ 上严格凸且真，
+        并在 $x_*$、$y_*$ 处取极小值，且
+        由此推出 $Q$ 中所有\omterm{thm:b3:ode:maximal}{极大解}都是整体的。
+  \item 证明：对 $h > h_* = H(x_*, y_*)$，水平集
+        $\{H = h\}\cap Q$ 是围绕平衡点的一条闭曲线：
+        由两支连续分支 $y_\pm(x)$ 构成，定义在
+        紧区间 $\intcc{x_-}{x_+} \ni x_*$ 上，
+        两端点处相接——这是摆的
+        卵形曲线的类比。
+  \item 证明 $Q$ 中每条非平衡\omterm{def:b3:groups:action}{轨道}都是
+        周期的：建立逆时针环绕，穿过由直线
+        $x = x_*$ 与 $y = y_*$ 所切出的四个区域，
+        并界定每段弧的穿越时间，
+        用带收敛平方根奇点的积分，
+        （如第 5 题），最后由
+        唯一性（如第 4 题）作结。
+  \item （沃尔泰拉的平均律）若 $T$ 为
+        此类\omterm{def:b3:groups:action}{轨道}的周期，证明
+        \[
+        \frac1T\int_0^Tx(t)\,\dd t = \frac\gamma\delta,
+        \qquad
+        \frac1T\int_0^Ty(t)\,\dd t = \frac\alpha\beta :
+        \]
+        时间平均等于平衡点的值，
+        无论振幅如何，\emph{（对 $(\ln x)' =
+        \alpha - \beta y$ 在一个周期上积分）}。
+  \item （捕鱼悖论）两个物种同时以速率
+        $\varepsilon \in \intoo0\alpha$ 被捕获，系统保持
+        其形式不变，只是以 $\alpha - \varepsilon$ 与 $\gamma +
+        \varepsilon$ 分别替代 $\alpha$ 与 $\gamma$。平均种群
+        会如何变化？请解释
+        达安科纳的观察（1914--1918 年）：当亚得里亚海
+        在战争期间捕鱼减少时，捕获物中
+        捕食者（鲨鱼）的比例\emph{增加了}——
+        以及为何适度捕鱼有利于猎物。
+  \item 写出十行的寓意：本章哪些定理
+        支撑每一步，何者取代了
+        摆的能量，以及为何两个系统都不需要、
+        或不承认初等闭形式的解。
+
+  \item （速度调制）在转动区域 $E_0 > 1$ 中，
+        证明 $y = x'$ 在
+        $\sqrt{2(E_0 - 1)}$（当 $x \equiv \pi \bmod 2\pi$ 时）
+        与 $\sqrt{2(E_0 + 1)}$（当 $x \equiv 0$ 时）之间振荡，并且
+        $y$ 在一个周期上的时间平均恰为
+        $\frac{2\pi}{\tau(E_0)}$，并且调制比
+        $\sqrt{\frac{E_0 + 1}{E_0 - 1}} \to 1$，当 $E_0
+        \to \infty$ 时：快速转动渐近
+        均匀。
+  \item （转动周期的单调性）证明
+        $\tau(E_0)$ 为 $\mathcal C^1$ 函数，且
+        在 $\intoo1{+\infty}$ 上严格递减
+        \emph{（在积分号下求导，并在每个
+        $\intco{1 + \delta}\infty$ 上加以控制）}，
+        且 $\tau \to \infty$（当 $E_0 \to 1^+$ 时），而 $\tau
+        \to 0$（当 $E_0 \to \infty$ 时）。写出完整的
+        摆沿能量轴的分岔图景：
+        在 $E_0 = -1$ 处为平衡点，摆动
+        周期自 $2\pi$ 增至 $\infty$，区间为
+        $-1 < E_0 < 1$；在 $E_0 = 1$ 处为分界线，
+        其上为转动，周期自 $\infty$ 减至
+        $0$。
+\end{enumerate}
+\end{problem}

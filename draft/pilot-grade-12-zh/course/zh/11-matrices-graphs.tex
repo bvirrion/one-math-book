@@ -1,0 +1,397 @@
+\chapter{矩阵与图}\label{ch:g12:matrix}
+
+矩阵是由数排成的矩形阵列，其加法与乘法的规则经过设计，
+使矩阵代数能够表示线性
+变换的复合。矩阵可以求解线性方程组，驱动耦合的递推
+数列，并计算网络中的游走数 --- 这正是搜索引擎与
+最短路径算法背后的数学。
+
+\section{矩阵代数}
+
+\begin{definition}[矩阵]\label{def:g12:matrix:matrix}
+称 \emph{$m \times n$ 矩阵}\index{矩阵}为由实数构成的表格，它有
+$m$ 行 $n$ 列：
+$A = (a_{ij})$，其中 $a_{ij}$ 为第 $i$ 行第 $j$ 列的元素。
+同型矩阵按对应元素相加，并
+规定 $\lambda A = (\lambda a_{ij})$。
+\end{definition}
+
+\begin{definition}[矩阵乘积]\label{def:g12:matrix:product}
+设 $A$ 为 $m \times n$ 矩阵，$B$ 为 $n \times p$ 矩阵，则乘积 $AB$ 是
+一个 $m \times p$ 矩阵，其 $(i,j)$ 元素为
+\[
+(AB)_{ij} = \sum_{k=1}^{n} a_{ik} b_{kj}
+\]
+（即“第 $i$ 行（取自 $A$）乘第 $j$ 列（取自 $B$）”的规则）。
+\end{definition}
+
+\begin{example}
+$\begin{pmatrix} 1 & 2\\ 3 & 4\end{pmatrix}
+\begin{pmatrix} 0 & 1\\ 1 & 1\end{pmatrix}
+= \begin{pmatrix} 2 & 3\\ 4 & 7\end{pmatrix}$，
+\quad 而 \quad
+$\begin{pmatrix} 0 & 1\\ 1 & 1\end{pmatrix}
+\begin{pmatrix} 1 & 2\\ 3 & 4\end{pmatrix}
+= \begin{pmatrix} 3 & 4\\ 4 & 6\end{pmatrix}$：
+\emph{矩阵乘法不满足交换律}。
+\end{example}
+
+\begin{proposition}[矩阵代数的运算规则]\label{prop:g12:matrix:rules}
+只要各矩阵的大小使乘积有意义，则下式成立：
+\[
+(AB)C = A(BC), \qquad A(B + C) = AB + AC, \qquad (A+B)C = AC + BC,
+\]
+以及 \emph{单位矩阵} $I_n$（对角线元素为 1，其余元素为 0）
+满足 $I_m A = A I_n = A$，其中 $A$ 的大小为 $m \times n$。
+\end{proposition}
+
+\begin{proof}
+以上各式均由
+\cref{def:g12:matrix:product} 出发逐元素验证；结合律是唯一需要细究的，
+它归结为交换两个有限和的次序：
+$\bigl((AB)C\bigr)_{ij} = \sum_l \left(\sum_k a_{ik}b_{kl}\right) c_{lj}
+= \sum_k a_{ik} \left(\sum_l b_{kl} c_{lj}\right)
+= \bigl(A(BC)\bigr)_{ij}$。
+\end{proof}
+
+\begin{definition}[逆矩阵]\label{def:g12:matrix:inverse}
+称方阵 $A$（$n$ 阶）为\emph{可逆}\index{矩阵！逆矩阵}，若
+存在矩阵 $B$ 使 $AB = BA = I_n$；此时 $B$ 唯一，记为
+$A^{-1}$。
+\end{definition}
+
+\begin{proposition}[$2\times2$ 矩阵的逆]\label{prop:g12:matrix:inverse2x2}
+设 $A = \begin{pmatrix} a & b\\ c & d\end{pmatrix}$，且
+$\det A = ad - bc$（\emph{行列式}\index{行列式}）。则 $A$
+可逆当且仅当 $\det A \neq 0$，此时
+\[
+A^{-1} = \frac{1}{ad - bc}\begin{pmatrix} d & -b\\ -c & a\end{pmatrix}.
+\]
+\end{proposition}
+
+\begin{proof}
+直接计算可得
+$A \begin{pmatrix} d & -b\\ -c & a\end{pmatrix}
+= \begin{pmatrix} d & -b\\ -c & a\end{pmatrix} A = (ad - bc) I_2$；若
+$ad - bc \neq 0$，两边除以它即可。反之，若 $ad - bc = 0$，则 $A$ 的各列
+成比例，$AB$ 的各列（对任意 $B$）亦然；但
+$I_2$ 的各列不成比例，故无 $B$ 能使 $AB = I_2$。
+\end{proof}
+
+\begin{method}[线性方程组]\label{met:g12:matrix:systems}
+该方程组即矩阵方程
+$\begin{cases} ax + by = e\\ cx + dy = f \end{cases}$
+$AX = Y$，其中
+$X = \begin{pmatrix} x \\ y\end{pmatrix}$，
+$Y = \begin{pmatrix} e \\ f\end{pmatrix}$。若 $\det A \neq 0$，则其唯一
+解为 $X = A^{-1}Y$。同一形式亦适用于
+$n$ 个方程、$n$ 个未知数的情形。
+\end{method}
+
+\section{矩阵的幂与递推数列}
+
+\begin{definition}\label{def:g12:matrix:power}
+对方阵 $A$ 及 $k \in \N$，记 $A^k = A \times \dots \times A$
+（共 $k$ 个因子），并规定 $A^0 = I$。
+\end{definition}
+
+\begin{method}[数量矩阵加幂零矩阵及可对角化的情形]\label{met:g12:matrix:powers}
+计算 $A^k$ 的两种标准方法：
+\begin{itemize}
+  \item 若 $A = \lambda I + N$，其中 $N^2 = 0$，
+        则由二项式定理（因 $I$ 与 $N$ 可交换）化为两项：
+        $A^k = \lambda^k I + k \lambda^{k-1} N$。
+  \item 若能找到可逆矩阵 $P$ 使 $A = PDP^{-1}$，且 $D$ 为对角矩阵，
+        则 $A^k = P D^k P^{-1}$，且 $D^k$ 可逐元素计算。
+        （求此类 $P$ 的系统方法属于
+        \emph{对角化}理论，大学阶段才展开；在本阶段 $P$ 是
+        给定的。）
+\end{itemize}
+\end{method}
+
+\begin{example}[耦合数列]\label{ex:g12:matrix:coupled}
+设 $u_{n+1} = 3u_n + v_n$，$v_{n+1} = u_n + 3v_n$。令
+$X_n = \begin{pmatrix} u_n\\ v_n \end{pmatrix}$ 及
+$A = \begin{pmatrix} 3 & 1\\ 1 & 3\end{pmatrix}$，则
+$X_{n+1} = AX_n$，故 $X_n = A^n X_0$。辅助数列
+$s_n = u_n + v_n$ 与 $d_n = u_n - v_n$ 满足 $s_{n+1} = 4s_n$ 及
+$d_{n+1} = 2d_n$，故 $s_n = 4^n s_0$，$d_n = 2^n d_0$，且
+\[
+u_n = \frac{4^n(u_0+v_0) + 2^n(u_0-v_0)}{2}, \qquad
+v_n = \frac{4^n(u_0+v_0) - 2^n(u_0-v_0)}{2}.
+\]
+（背后的思路：$(1,1)$ 与 $(1,-1)$ 是 $A$ 的特征向量方向。）
+\end{example}
+
+\section{图与游走}
+
+\begin{definition}[图、邻接矩阵]\label{def:g12:matrix:graph}
+一个\emph{图}\index{图}由顶点 $1, 2, \dots, n$ 及
+连接某些顶点对的边组成（对于\emph{有向}
+图，边为有序对）。其\emph{邻接矩阵}\index{邻接矩阵}是
+$n \times n$ 矩阵 $M$，其中 $m_{ij} = 1$ 当有边从 $i$ 到
+$j$，否则为 $0$。长度为 $k$ 的从 $i$ 到 $j$ 的\emph{游走}
+是由 $k$ 条相继边组成的、从 $i$ 到 $j$ 的序列。
+\end{definition}
+
+\begin{omfigure}
+\begin{tikzpicture}[baseline=(current bounding box.center)]
+  \node[circle, draw, inner sep=2.5pt] (v1) at (0,0) {$1$};
+  \node[circle, draw, inner sep=2.5pt] (v2) at (2.6,1.2) {$2$};
+  \node[circle, draw, inner sep=2.5pt] (v3) at (2.6,-1.2) {$3$};
+  \draw[-Stealth, omDef, thick] (v1) -- (v2);
+  \draw[-Stealth, omDef, thick] (v2) -- (v3);
+  \draw[-Stealth, omDef, thick] (v1) to[bend right=18] (v3);
+  \draw[-Stealth, omDef, thick] (v3) to[bend right=18] (v1);
+\end{tikzpicture}
+\qquad\qquad
+$M = \begin{pmatrix} 0 & 1 & 1\\ 0 & 0 & 1\\ 1 & 0 & 0 \end{pmatrix}$
+
+{\small 有向图及其邻接矩阵
+（见\cref{exo:g12:matrix:6}）：$m_{ij} = 1$ 当且仅当存在从 $i$ 到
+$j$ 的边。}
+\end{omfigure}
+
+\begin{theorem}[游走计数]\label{thm:g12:matrix:walks}
+长度为 $k$、从顶点 $i$ 到顶点 $j$ 的游走数，
+为 $(i,j)$ 位置上的元素，该矩阵为 $M^k$。
+\end{theorem}
+
+\begin{proof}
+对 $k$ 作归纳。当 $k = 1$ 时，即为 $M$ 的定义。假设
+对 $k$ 的结论成立。长度为 $k+1$ 的从 $i$ 到 $j$ 的游走，是由长度为 $k$ 的、从 $i$ 到某顶点 $l$ 的游走
+后接一条从 $l$ 到 $j$ 的边组成，由
+加法原理与乘法原理，其数目为
+\[
+\sum_{l=1}^{n} \bigl(M^k\bigr)_{il}\, m_{lj} = \bigl(M^{k+1}\bigr)_{ij}.
+\qedhere
+\]
+\end{proof}
+
+\begin{example}
+对三角形图（$3$ 个顶点，每两个顶点都相连），
+$M = \begin{pmatrix} 0&1&1\\ 1&0&1\\ 1&1&0\end{pmatrix}$ 及
+$M^2 = \begin{pmatrix} 2&1&1\\ 1&2&1\\ 1&1&2\end{pmatrix}$：从每个顶点出发，
+回到自身的长度为 $2$ 的游走有 $2$ 条（经由任一邻点），
+到其余每个顶点的游走各有 $1$ 条。
+\end{example}
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:g12:matrix:1}
+设 $A = \begin{pmatrix} 1 & 2\\ 0 & 1 \end{pmatrix}$，
+$B = \begin{pmatrix} 2 & 0\\ 1 & 1 \end{pmatrix}$。计算 $A + B$，$AB$，
+$BA$ 及 $A^2$。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:matrix:2}
+判断下列矩阵是否可逆，并求出
+可逆时的逆矩阵：
+\[
+A = \begin{pmatrix} 2 & 5\\ 1 & 3\end{pmatrix}, \qquad
+B = \begin{pmatrix} 3 & 6\\ 2 & 4\end{pmatrix}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:matrix:3}
+用矩阵求逆法解方程组：
+$\begin{cases} 2x + 5y = 1\\ x + 3y = 2 . \end{cases}$
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:matrix:4}
+设 $A = \begin{pmatrix} 2 & 1\\ 0 & 2\end{pmatrix} = 2I + N$，其中
+$N = \begin{pmatrix} 0 & 1\\ 0 & 0 \end{pmatrix}$.
+\begin{enumerate}
+  \item 验证 $N^2 = 0$，且 $I$ 与 $N$ 可交换。
+  \item 由此求出 $A^k$（对所有 $k \in \N$），并
+        用直接计算验证 $k=2$ 时的公式。
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:matrix:5}
+设 $A = \begin{pmatrix} 0 & 1\\ 1 & 1\end{pmatrix}$，记 $F_n$ 为斐波那契
+数列（$F_0 = 0$，$F_1 = 1$，$F_{n+2} = F_{n+1} + F_n$）。用归纳法证明：
+对 $n \geq 1$，
+\[
+A^n = \begin{pmatrix} F_{n-1} & F_n\\ F_n & F_{n+1}\end{pmatrix},
+\]
+并由此推出恒等式 $F_{n+1}F_{n-1} - F_n^2 = (-1)^n$。
+（提示：行列式满足乘法法则 $\det(MN) = \det M \det N$，你可以
+对 $2\times2$ 矩阵加以验证。）
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:matrix:6}
+顶点为 $\{1, 2, 3\}$ 的有向图，其边为
+$1\to2$、$2\to3$、$3\to1$ 和 $1\to3$。
+\begin{enumerate}
+  \item 写出邻接矩阵 $M$，并计算 $M^2$ 和 $M^3$。
+  \item 长度为 $3$ 的游走中，从 $1$ 到 $1$ 的有多少条？请将它们全部列出。
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:matrix:7}
+某汽车共享公司在两座城市 $A$ 与 $B$ 之间调配车辆。每
+周，$80\%$ 的 $A$ 市车辆留在 $A$ 市，$20\%$ 迁往 $B$ 市；
+$30\%$ 的 $B$ 市车辆迁往 $A$ 市，$70\%$ 留在原城市。设 $a_n, b_n$ 分别为
+各城市车队所占的比例。
+\begin{omfigure}
+\begin{tikzpicture}
+  \node[circle, draw, inner sep=3pt] (A) at (0,0) {$A$};
+  \node[circle, draw, inner sep=3pt] (B) at (3.2,0) {$B$};
+  \draw[-Stealth, omDef, thick] (A) to[bend left=25]
+    node[above, font=\small] {$0.2$} (B);
+  \draw[-Stealth, omDef, thick] (B) to[bend left=25]
+    node[below, font=\small] {$0.3$} (A);
+  \draw[-Stealth, omDef, thick] (A) to[loop left]
+    node[left, font=\small] {$0.8$} (A);
+  \draw[-Stealth, omDef, thick] (B) to[loop right]
+    node[right, font=\small] {$0.7$} (B);
+\end{tikzpicture}
+\end{omfigure}
+\begin{enumerate}
+  \item 写出 $X_{n+1} = MX_n$，其中
+        $X_n = \begin{pmatrix} a_n\\ b_n\end{pmatrix}$，并确定 $M$。
+  \item 求平衡比例（解 $MX = X$，
+        并满足 $a + b = 1$）。
+  \item 证明 $c_n = a_n - 0.6$ 满足 $c_{n+1} = 0.5\,c_n$，并
+        由此推出车队分布收敛于平衡状态。
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:matrix:8}
+设 $A = \begin{pmatrix} 3 & 1\\ 1 & 3 \end{pmatrix}$，
+$P = \begin{pmatrix} 1 & 1\\ 1 & -1 \end{pmatrix}$。
+\begin{enumerate}
+  \item 计算 $P^{-1}$，再求 $D = P^{-1}AP$，并验证 $D$ 是
+        对角矩阵。
+  \item 由此求 $A^n$ 的显式表达式，并与
+        \cref{ex:g12:matrix:coupled} 中的结果比较。
+\end{enumerate}
+\end{exercise}
+
+\section{问题：认识斐波那契数列的矩阵（以及
+天气）}
+
+\begin{problem}[{周末问题 --- 一个 $2 \times 2$ 矩阵
+包含全部斐波那契数，一个马尔可夫矩阵预报长期
+天气，一个特征向量价值十亿美元}]
+\label{pb:g12:matrix:1}
+矩阵是这样一台机器：输入一个状态，返回下一个状态
+--- 因而它的\emph{幂}蕴含整个未来。本题
+从一个惊人的矩阵开始，其幂列出
+斐波那契数（且每个恒等式都只需一行即可证明），
+接着把天气视为马尔可夫链，求其稳态，并
+最后以搜索引擎赖以构建的特征向量作结
+（见\cref{thm:g12:matrix:walks}，
+\cref{met:g12:matrix:powers}）。
+
+\medskip
+\noindent\textbf{第一部分 --- 熟练运算。}
+\begin{enumerate}
+  \item 令 $A = \begin{pmatrix} 1 & 2\\ 3 & 4\end{pmatrix}$
+        及 $B = \begin{pmatrix} 0 & 1\\ 1 & 0\end{pmatrix}$：
+        计算 $AB$ 与 $BA$，并判断乘法是否满足交换律？
+  \item 求 $\begin{pmatrix} 2 & 1\\ 5 & 3\end{pmatrix}$ 的逆矩阵
+        （见\cref{prop:g12:matrix:inverse2x2}），并用逆矩阵
+        解方程组 $2x + y = 4$，$5x + 3y = 7$。
+  \item 设 $N = \begin{pmatrix} 0 & 1\\ 0 & 0\end{pmatrix}$，
+        计算 $N^2$，并由此推出
+        $(I + N)^n = I + nN$ 对所有 $n$ 成立。
+  \item 三角形图（三个顶点两两相连）：
+        写出其邻接矩阵 $A$，计算 $A^3$，并
+        解释其对角线上元素的含义
+        （见\cref{thm:g12:matrix:walks}）。
+  \item 对 $D = \begin{pmatrix} 2 & 0\\ 0 & \frac12
+        \end{pmatrix}$：求 $D^n$，并说明
+        $n \to \infty$ 时的行为。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第二部分 --- 斐波那契矩阵。}
+设 $F = \begin{pmatrix} 1 & 1\\ 1 & 0\end{pmatrix}$，并设
+$F_1 = F_2 = 1, F_3 = 2, \dots$ 是
+\cref{pb:g11:seq:1}中的斐波那契数。
+\begin{enumerate}[resume]
+  \item 计算 $F^2$、$F^3$、$F^4$，并猜想 $F^n$ 的一般形式，
+        该形式用斐波那契数表示。
+  \item 用归纳法证明猜想
+        $F^n = \begin{pmatrix} F_{n+1} & F_n\\ F_n & F_{n-1}
+        \end{pmatrix}$。
+  \item 对等式两边取行列式（矩阵乘积的行列式
+        等于各自行列式之积，若从未见过，可
+        在 $2 \times 2$ 矩阵上验证）：由此推出
+        \emph{卡西尼恒等式}
+        $F_{n+1}F_{n-1} - F_n^2 = (-1)^n$ --- 这是
+        “平方项相消”的核心，一行即可证明。
+  \item 由 $F^{m+n} = F^m F^n$，读出右上角元素，
+        并推出\emph{加法公式}
+        \[
+        F_{m+n} = F_{m+1} F_n + F_m F_{n-1} .
+        \]
+        在 $m = n = 3$ 时验证该式。
+  \item 由加法公式（对 $k$ 用归纳法）推出
+        $F_n$ 整除 $F_{kn}$，并验证
+        $F_3 \mid F_6$ 与 $F_3 \mid F_9$。
+  \item 要计算 $F_{100}$，不必做 $100$ 次矩阵乘法，
+        只需反复平方（$F^2, F^4, F^8, \dots$），
+        再将其组合。多少次矩阵乘法就足够，
+        这是初中分册中哪一种古老的乘法技巧，
+        被推广到矩阵上？
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第三部分 --- 天气机器。}
+某城市中：晴天之后，次日为晴天的
+概率为 $0.8$；雨天之后，次日为晴天的概率为
+$0.4$。将每天的分布记为一列
+$\binom{p_{\text{晴}}}{p_{\text{雨}}}$，演化由下式给出。
+\[
+M = \begin{pmatrix} 0.8 & 0.4\\ 0.2 & 0.6 \end{pmatrix}.
+\]
+\begin{enumerate}[resume]
+  \item 验证 $M$ 的每一列之和为 $1$，并说明
+        为何任何天气机器都必须具有此性质。
+  \item 今天是晴天。求明天与后天的
+        天气预报。
+  \item 求\emph{稳态}：分布 $v$，
+        满足 $Mv = v$（分量之和为 $1$）。
+        长期来看，晴天占多大比例？
+  \item 从雨天出发，取初始分布 $\binom01$，连续作用 $M$ 四次，
+        并在每一步记录其与稳态的距离。
+        每一步间距缩小的倍数是多少？
+        这属于哪一种收敛？
+  \item 迷你版 PageRank：三个网页，链接关系为
+        $A \to B$，$A \to C$，$B \to C$，$C \to A$。随机浏览者
+        以均匀随机的方式沿一条出链前进。
+        写出转移矩阵，求稳态，
+        并对网页进行排序。
+  \item 解释该排序：为何 $C$ 的得分与
+        $A$ 一样高，尽管其接收的链接来自更少的网页？
+        稳态究竟度量的是什么？（真实的 PageRank
+        对死端与跳转还需加入一个阻尼因子；
+        特征向量的思想正是这一点。）
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第四部分 --- 对角化的红利。}
+\begin{enumerate}[resume]
+  \item 两个相互耦合的量满足
+        $u_{n+1} = 3u_n + v_n$，$v_{n+1} = u_n + 3v_n$，即
+        \cref{exo:g12:matrix:8}中的矩阵 $A$。利用该题
+        的对角化，
+        （$D = \operatorname{diag}(4, 2)$），给出 $u_n$ 的闭式表达，
+        其中 $u_0 = 1$、$v_0 = 0$，并
+        与 $n = 1, 2, 3$ 时的直接计算结果相核对。
+  \item 用一两句话说明：对角化对耦合系统
+        究竟\emph{做了什么}？以及
+        第 14 题中的马尔可夫稳态，在何种意义上
+        也是一个特征向量的问题？
+  \item 终章 --- 本周末矩阵的三副面孔：
+        记账（方程组与逆）、组合计数
+        （以幂计数的路径与链接），以及演化
+        （斐波那契数列、天气与网页 --- 未来由特征方向读出），
+        每项各用一句话概括，并给出
+        前瞻：大学分册中的线性代数
+        将使上述每一面都成为一门理论。
+\end{enumerate}
+\end{problem}

@@ -32,8 +32,13 @@
 \def\om@lang@id{id}%
 \def\om@lang@hi{hi}%
 \def\om@lang@ar{ar}%
+\def\om@lang@zh{zh}%
 \newif\ifom@hindi
 \newif\ifom@arabic
+\newif\ifom@chinese
+\ifx\om@booklang@exp\om@lang@zh
+  \om@chinesetrue
+\fi
 \ifx\om@booklang@exp\om@lang@hi
   \om@hinditrue
 \fi
@@ -96,11 +101,37 @@
     \fi
     \RequirePackage{fontspec}%
   \else
+  \ifom@chinese
+    % Simplified Chinese (2026-11-16): XeLaTeX + xeCJK, the Fandol faces that
+    % ship with TeX Live itself (here and in CI's texlive-full), loaded by file
+    % name so no system font is involved. Latin text and mathematics keep Latin
+    % Modern. xeCJK drops the newline between two Chinese characters, so a
+    % sentence may wrap anywhere in the source, and inserts the CJK/Latin gap
+    % itself. \emph -- the series' marker for a defined term -- maps onto the
+    % italic shape, which is Kai here: the textbook convention for a term.
+    \ifXeTeX\else
+      \PackageError{onemath}{%
+        Chinese editions require XeLaTeX.\MessageBreak
+        Use: xelatex \jobname.tex\MessageBreak
+        (or latexmk, which picks XeLaTeX for *_zh.tex)}{Build with XeLaTeX.}%
+    \fi
+    \RequirePackage{fontspec}%
+    \RequirePackage[AutoFallBack=false]{xeCJK}%
+    \setCJKmainfont{FandolSong-Regular.otf}[%
+      BoldFont=FandolSong-Bold.otf,%
+      ItalicFont=FandolKai-Regular.otf,%
+      BoldItalicFont=FandolKai-Regular.otf,%
+      BoldItalicFeatures={FakeBold=2},%
+    ]%
+    \setCJKsansfont{FandolHei-Regular.otf}[BoldFont=FandolHei-Bold.otf]%
+    \setCJKmonofont{FandolFang-Regular.otf}%
+  \else
     \ifPDFTeX
       \RequirePackage[T1]{fontenc}%
       \RequirePackage[utf8]{inputenc}%
       \RequirePackage{lmodern}%
     \fi
+  \fi
   \fi
 \fi
 \RequirePackage{microtype}
@@ -550,13 +581,18 @@
   \renewcommand{\chaptermark}[1]{%
     \markboth{\protect\omTocMark{\@currentHref}{%
       \ifnum\c@secnumdepth>\m@ne\if@mainmatter
-        \@chapapp\ \thechapter. \ %
+        \om@chapmarkprefix
       \fi\fi ##1}}{}}%
   % Same for the section mark, which is what the odd pages show.
   \renewcommand{\sectionmark}[1]{%
     \markright{\protect\omTocMark{\@currentHref}{%
       \ifnum\c@secnumdepth>\z@ \thesection. \ \fi ##1}}}%
 }
+% The chapter number in the running header: "Chapter 3. " (zh: "第3章　").
+\def\om@chapmarkprefix{\@chapapp\ \thechapter. \ }%
+\ifom@chinese
+  \def\om@chapmarkprefix{第\thechapter 章\quad}%
+\fi
 \newcommand{\omHeadMark}[1]{{\small\itshape\nouppercase{#1}}}
 % On even pages the chapter mark shares its line with the book title, and some
 % chapter titles are long ("Product Measures, Fubini, Change of Variables"):
@@ -613,6 +649,14 @@
 % Titles come from styles/lang/<lang>.tex (\omnameDefinition, …).
 % Usage: \begin{theorem}[Monotone convergence]\label{thm:tle:seq:monotone}
 % ----------------------------------------------------------------------------
+% Chinese heads: "定义 4.1（基本对象）" -- full-width brackets around the title and
+% no full stop after the head, as Chinese textbooks set them.
+\ifom@chinese
+  \newtheoremstyle{definition}{\topsep}{\topsep}{\normalfont}{}{\bfseries}{}{.6em}%
+    {\thmname{#1}\thmnumber{ #2}\thmnote{（#3）}}%
+  \newtheoremstyle{remark}{\topsep}{\topsep}{\normalfont}{}{\itshape}{}{.6em}%
+    {\thmname{#1}\thmnumber{ #2}\thmnote{（#3）}}%
+\fi
 \theoremstyle{definition}                 % upright body text, bold heading
 \newtheorem{definition}{\omnameDefinition}[chapter]
 \newtheorem{theorem}[definition]{\omnameTheorem}
@@ -970,3 +1014,82 @@
 \DeclareMathOperator{\lcm}{lcm}
 
 % Misc: \st is defined in styles/lang/<lang>.tex
+
+% ----------------------------------------------------------------------------
+% Simplified Chinese (zh): the places where Chinese puts the number INSIDE the
+% noun ("第3章", "第一部分", "练习 3.2 的解答（第 45 页）"), which no string in
+% styles/lang/zh.tex can express because English puts the noun first. Nothing
+% here runs for any other language.
+% ----------------------------------------------------------------------------
+\ifom@chinese
+  \newcommand{\om@zhnum}[1]{\ifcase#1 〇\or 一\or 二\or 三\or 四\or 五\or 六\or
+    七\or 八\or 九\or 十\or 十一\or 十二\or 十三\or 十四\or 十五\or 十六\or
+    十七\or 十八\or 十九\or 二十\else\number#1\fi}
+  % Chapter head: book.cls prints "\@chapapp\space\thechapter" on its own line.
+  \patchcmd{\@makechapterhead}{\@chapapp\space \thechapter}{第\,\thechapter\,章}{}%
+    {\PackageWarning{onemath}{zh: could not patch the chapter head}}%
+  % Part head: "Part I" -> "第一部分" (hyperref keeps book.cls's \@part as
+  % \H@old@part, which is where the words are).
+  \patchcmd{\H@old@part}{\partname\nobreakspace\thepart}{第\om@zhnum{\value{part}}部分}{}%
+    {\PackageWarning{onemath}{zh: could not patch the part head}}%
+  % Solution header: "练习 3.2 的解答（第 45 页）".
+  \renewenvironment{solution}[1]{%
+    \par\medskip\om@solutionanchor{#1}%
+    \textbf{\cref{#1}\omsolutionof}（第~\pageref{#1}~页）\par\nopagebreak\smallskip
+    \noindent\ignorespaces
+  }{\par\medskip}%
+  % "Solution p. N" pointer -> "解答见第 N 页".
+  \renewcommand{\omsollink@emit}{%
+    \ifdefempty{\omsollink@key}{}{%
+      \par\nopagebreak\smallskip
+      \noindent\hfill{\footnotesize\itshape
+        \hyperref[sol:\omsollink@key]{\omnameGotoSolution 第~\pageref{sol:\omsollink@key}~页}}%
+      \par
+    }%
+  }%
+  % \cref{ch:...} -> "第3章"; cleveref's English conjunctions -> 和、至.
+  % Deferred to the end of begindocument for the reason given in the Arabic
+  % block above: cleveref defines the conjunctions in its own hook.
+  \AddToHook{begindocument/end}{%
+    % A \cref inside math ((\text{proof in } \cref{exo:...}) in the canon)
+    % sets its name in the math font, which has no Chinese glyph: wrap in \text.
+    \crefname{definition}{\text{\omnameDefinition}}{\text{\omnameDefinitions}}%
+    \Crefname{definition}{\text{\omnameDefinition}}{\text{\omnameDefinitions}}%
+    \crefname{theorem}{\text{\omnameTheorem}}{\text{\omnameTheorems}}%
+    \Crefname{theorem}{\text{\omnameTheorem}}{\text{\omnameTheorems}}%
+    \crefname{proposition}{\text{\omnameProposition}}{\text{\omnamePropositions}}%
+    \Crefname{proposition}{\text{\omnameProposition}}{\text{\omnamePropositions}}%
+    \crefname{lemma}{\text{\omnameLemma}}{\text{\omnameLemmas}}%
+    \Crefname{lemma}{\text{\omnameLemma}}{\text{\omnameLemmas}}%
+    \crefname{corollary}{\text{\omnameCorollary}}{\text{\omnameCorollarys}}%
+    \Crefname{corollary}{\text{\omnameCorollary}}{\text{\omnameCorollarys}}%
+    \crefname{method}{\text{\omnameMethod}}{\text{\omnameMethods}}%
+    \Crefname{method}{\text{\omnameMethod}}{\text{\omnameMethods}}%
+    \crefname{example}{\text{\omnameExample}}{\text{\omnameExamples}}%
+    \Crefname{example}{\text{\omnameExample}}{\text{\omnameExamples}}%
+    \crefname{notation}{\text{\omnameNotation}}{\text{\omnameNotations}}%
+    \Crefname{notation}{\text{\omnameNotation}}{\text{\omnameNotations}}%
+    \crefname{remark}{\text{\omnameRemark}}{\text{\omnameRemarks}}%
+    \Crefname{remark}{\text{\omnameRemark}}{\text{\omnameRemarks}}%
+    \crefname{exercise}{\text{\omnameExercise}}{\text{\omnameExercises}}%
+    \Crefname{exercise}{\text{\omnameExercise}}{\text{\omnameExercises}}%
+    \crefname{problem}{\text{\omnameProblem}}{\text{\omnameProblems}}%
+    \Crefname{problem}{\text{\omnameProblem}}{\text{\omnameProblems}}%
+    \crefformat{chapter}{#2第~#1~章#3}%
+    \Crefformat{chapter}{#2第~#1~章#3}%
+    \crefrangeformat{chapter}{#3第~#1~章#4至#5第~#2~章#6}%
+    \crefmultiformat{chapter}{#2第~#1~章#3}{和#2第~#1~章#3}{、#2第~#1~章#3}{和#2第~#1~章#3}%
+    \renewcommand{\crefpairconjunction}{和}%
+    \renewcommand{\crefmiddleconjunction}{、}%
+    \renewcommand{\creflastconjunction}{和}%
+    \renewcommand{\crefpairgroupconjunction}{和}%
+    \renewcommand{\crefmiddlegroupconjunction}{、}%
+    \renewcommand{\creflastgroupconjunction}{和}%
+    \renewcommand{\crefrangeconjunction}{至}%
+    \renewcommand{\crefrangepreconjunction}{}%
+    \renewcommand{\crefrangepostconjunction}{}%
+  }%
+  % ToC page-number box: three Latin Modern digits fit, but leave room.
+  \renewcommand{\@pnumwidth}{2.2em}%
+  \renewcommand{\@tocrmarg}{3.2em}%
+\fi

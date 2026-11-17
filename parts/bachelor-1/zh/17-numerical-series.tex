@@ -1,0 +1,806 @@
+\chapter{数值级数}\label{ch:b1:series}
+
+对无穷多个数求和，就是取其部分和的极限，
+仅此而已。本章建立定义，并给出一年级可用的
+收敛判别法：正项\omterm{def:b1:series:def}{级数}的比较法与等价法、
+\omterm{thm:b1:series:ratio}{比值判别法}、给出\omterm{thm:b1:series:riemann}{黎曼级数}的\omterm{thm:b1:integration:def}{积分}比较法、
+\omterm{thm:b1:series:absolute}{绝对收敛}，以及\omterm{thm:b1:series:alternating}{交错级数}定理。
+更精细的理论（\omterm{def:b1:series:def}{级数}的乘积、分组求和、
+函数项\omterm{def:b1:series:def}{级数}）
+属于二年级。
+
+\section{一般性质}
+
+\begin{definition}\label{def:b1:series:def}
+设 $(u_n)$ 为数列，称 $\sum u_n$ 为\emph{级数}\index{级数}，
+它是由\emph{部分和} $S_N = \sum_{n=0}^{N} u_n$ 组成的数列。
+若 $(S_N)$ 收敛，则称该级数\emph{收敛}，其极限即
+为\emph{和} $\sum_{n=0}^{\infty} u_n$，并记 $R_N = \sum_{n > N} u_n =
+S - S_N$ 为\emph{余项}，且趋于 $0$。
+\end{definition}
+
+\begin{example}[等比级数]\label{ex:b1:series:geometric}
+对 $q \in \C$：$\;S_N = \sum_{n=0}^{N} q^n = \frac{1 -
+q^{N+1}}{1-q}$（$q \neq 1$）。\omterm{def:b1:series:def}{级数}收敛当且仅当 $\abs q < 1$
+（见\cref{exo:b1:seq:3}），且\index{等比级数}其和为
+\[
+\sum_{n=0}^{\infty} q^n = \frac{1}{1 - q} .
+\]
+\end{example}
+
+\begin{example}[循环小数是等比级数]\label{ex:b1:series:periodicdecimal}
+$0.363636\dots$ 是什么数？它的写法本身就是一个\omterm{def:b1:series:def}{级数}：
+\[
+0.\overline{36} = \sum_{k=1}^{\infty} \frac{36}{100^k}
+= 36\cdot\frac{1/100}{1 - 1/100} = \frac{36}{99} =
+\frac{4}{11} ,
+\]
+由等比求和，取 $q = \frac{1}{100}$。一般地，
+循环节 $B$ 由 $p$ 位数字组成，无限重复时其值为
+$\frac{B}{10^p - 1}$——这正是周期性判别法
+（见\cref{pb:b1:reals:1}）背后的机制，本章的语言
+终于可以用一句话表述：\omterm{pb:b1:reals:1}{小数展开}是一个收敛
+\omterm{def:b1:series:def}{级数}，当且仅当其和为有理数时，它最终是周期的。
+第 10 章的数位机制仅凭\omterm{def:b1:reals:bounds}{上确界}建立，
+其实就是化了装的\omterm{def:b1:series:def}{级数}理论。
+\end{example}
+
+\begin{proposition}[基本性质]\label{prop:b1:series:first}
+\begin{enumerate}
+  \item 若 $\sum u_n$ 收敛，则 $u_n \to 0$。（逆命题
+        \emph{不成立}：调和\omterm{def:b1:series:def}{级数}即是反例。）
+  \item 线性性：收敛\omterm{def:b1:series:def}{级数}可逐项相加、数乘，
+        且和随之相加、数乘。
+  \item （裂项\omterm{def:b1:series:def}{级数}\index{裂项级数}）$\sum (v_{n+1} -
+        v_n)$ 收敛当且仅当 $(v_n)$ 收敛，其和为 $\lim v_n -
+        v_0$。
+  \item 改变有限多项不影响收敛性
+        （只改变和）。
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(1) $u_N = S_N - S_{N-1} \to S - S = 0$。调和\omterm{def:b1:series:def}{级数}有
+$u_n = \frac1n \to 0$，但它发散（见\cref{exo:b1:seq:5}）。(2)
+由极限的运算法则。(3) $S_N = v_{N+1} - v_0$。(4) 部分和
+只相差一个最终恒定的量。
+\end{proof}
+
+\begin{example}[用等比余项规划项数]\label{ex:b1:series:georemainder}
+当 $\abs q < 1$ 时，\omterm{ex:b1:series:geometric}{等比级数}的余项
+可以显式写出：
+\[
+R_N = \sum_{n = N+1}^{\infty} q^n = \frac{q^{N+1}}{1 - q} .
+\]
+这使精度要求在任何计算之前
+就能换算为项数。例如计算 $\sum_{n\geq0} \bigl(\frac13\bigr)^n =
+\frac32$，误差在 $10^{-10}$ 之内：需要 $\frac{(1/3)^{N+1}}{2/3} \leq
+10^{-10}$，即 $3^{N} \geq \frac{3}{2}\cdot 10^{10}$，即 $N
+\geq 22$（因 $3^{22} \approx 3.1\cdot10^{10}$），共需 23 项，
+事先即知。凡周末问题中的等比速率估计，
+（如以 $\frac13$ 为公比、用以求 $\ln 2$ 的\omterm{def:b1:series:def}{级数}，马钦的
+\omterm{def:b1:functions:arc}{反正切}\omterm{def:b1:series:def}{级数}见\cref{pb:b1:taylor:1}），都是这套两行预算
+穿上专业外衣后的样子。
+\end{example}
+
+\begin{example}[更长的裂项]\label{ex:b1:series:telescope3}
+计算 $\sum_{n\geq1} \frac{1}{n(n+1)(n+2)}$。先作
+部分分式分解（见\cref{ch:b1:fractions}）：
+\[
+\frac{1}{n(n+1)(n+2)}
+= \frac{1/2}{n} - \frac{1}{n+1} + \frac{1/2}{n+2}
+= \frac12\Bigl(\frac{1}{n(n+1)} - \frac{1}{(n+1)(n+2)}\Bigr),
+\]
+其中第二种形式——即相邻两值之差——
+$w_n = \frac{1}{n(n+1)}$ 的差——正是裂项形式。于是
+\[
+\sum_{n=1}^{N} \frac{1}{n(n+1)(n+2)}
+= \frac12\Bigl(w_1 - w_{N+1}\Bigr)
+= \frac12\Bigl(\frac12 - \frac{1}{(N+1)(N+2)}\Bigr)
+\longrightarrow \frac14 .
+\]
+收尾的要点：三项的部分分式直接写出时很少能
+裂项相消；应先把它们改写为差 $w_n -
+w_{n+1}$ 的形式——收获的不仅是收敛，还有
+精确的和，这是任何比较判别法都无法给出的。
+\end{example}
+
+\section{非负项级数}
+
+\begin{theorem}[部分和有界]\label{thm:b1:series:positive}
+若 $u_n \geq 0$ 对一切 $n$ 成立，则部分和单调递增，故：$\sum
+u_n$ 收敛 $\iff$ 其部分和有\omterm{def:b1:reals:bounds}{上界}。由此得到
+\emph{比较判别法}：若 $0 \leq u_n \leq v_n$ 对
+所有（充分大的）$n$ 成立，
+\[
+\sum v_n \text{ 收敛} \implies \sum u_n \text{ 收敛},
+\qquad
+\sum u_n \text{ 发散} \implies \sum v_n \text{ 发散}.
+\]
+又有\emph{等价判别法}：若 $u_n \sim v_n$ 且 $v_n \geq
+0$，两\omterm{def:b1:series:def}{级数}同敛散。
+\end{theorem}
+
+\begin{proof}
+由单调极限定理（\cref{thm:b1:seq:monotone}）得第一
+点，由部分和的比较得第二点。\omterm{def:b1:logic:equiv}{等价关系}：对
+充分大的 $n$，$\frac12 v_n \leq u_n \leq 2 v_n$（由 $\sim$ 的定义，
+取 $\varepsilon = \frac12$），两个方向的比较判别法均适用。
+\end{proof}
+
+\begin{example}[用等价量证明发散]\label{ex:b1:series:equivdiverge}
+$\sum_{n\geq1} n\sin\dfrac{1}{n^2}$ 的敛散性如何？由于
+$\frac{1}{n^2} \to 0$，且 $\sin h \sim h$（在 $0$ 附近）：
+\[
+n\sin\frac{1}{n^2} \;\sim\; n\cdot\frac{1}{n^2} = \frac1n ,
+\]
+由等价判别法，调和\omterm{def:b1:series:def}{级数}的发散性被传递：
+\omterm{def:b1:series:def}{级数}发散——尽管通项趋于
+$0$。一次展开，一个尺度，一个结论；同样的两步
+套路（先作等价，再查\omterm{thm:b1:series:riemann}{黎曼级数}或几何\omterm{def:b1:series:def}{级数}）可判定
+\cref{exo:b1:series:3}中的全部四个\omterm{def:b1:series:def}{级数}。
+\end{example}
+
+\begin{example}[一行内的等价判别法]\label{ex:b1:series:equivtest}
+$\sum_{n \geq 1} \frac{\sqrt{n+1} - \sqrt n}{n}$ 的敛散性如何？
+分子有理化：
+\[
+\frac{\sqrt{n+1} - \sqrt n}{n}
+= \frac{1}{n\,(\sqrt{n+1} + \sqrt n)}
+\sim \frac{1}{2\,n^{3/2}} ,
+\]
+这是收敛的黎曼尺度（$\alpha = \frac32 > 1$）：\omterm{def:b1:series:def}{级数}
+收敛。整个判断只用了一次等价和一次查表
+——前提是通项非负，本题确实如此。结论性的
+看法是：对于正项\omterm{def:b1:series:def}{级数}，整个收敛
+理论就是一本\emph{尺度词典}（$n^{-\alpha}$、$q^n$、
+$\frac{1}{n(\ln n)^\alpha}$），以及用等价量替换通项的
+许可。分析的工作在于渐近行为（
+见\cref{ch:b1:taylor}），绝不在求和之中。
+\end{example}
+
+\begin{theorem}[积分比较；黎曼级数]\label{thm:b1:series:riemann}
+设 $f$ 为\omterm{def:b1:continuity:continuous}{连续}、非负且\emph{递减}的函数，定义在
+$\intco{1}{+\infty}$ 上。则
+\[
+\int_1^{N+1} f(t)\,\dd t \;\leq\; \sum_{n=1}^{N} f(n) \;\leq\; f(1)
++ \int_1^{N} f(t)\,\dd t ,
+\]
+故 $\sum f(n)$ 收敛当且仅当 $\bigl(\int_1^x f\bigr)$ 有界。特别地，
+对 $\alpha \in \R$：\index{黎曼级数}
+\[
+\sum_{n \geq 1} \frac{1}{n^\alpha} \text{ 收敛}
+\iff \alpha > 1,
+\]
+且 $\sum_{n=1}^{N} \frac1n = \ln N + O(1)$。
+\end{theorem}
+
+\begin{proof}
+当 $n \leq t \leq n+1$ 时，由单调性得 $f(n+1) \leq f(t)
+\leq f(n)$。在 $\intcc{n}{n+1}$（长度为
+$1$ 的\omterm{prop:b1:reals:intervals}{区间}）上\omterm{thm:b1:integration:def}{积分}，得：
+\[
+f(n+1) \;\leq\; \int_n^{n+1} f(t)\,\dd t \;\leq\; f(n) .
+\]
+对 $n = 1, \dots, N-1$ 求和右侧不等式，得
+$\int_1^{N} f \leq \sum_{n=1}^{N-1} f(n)$，再加上
+$f(N) \leq f(1)$，即得\omterm{def:b1:reals:bounds}{上界}估计；对
+$n = 1, \dots, N$ 求和左侧不等式，得 $\sum_{n=2}^{N+1} f(n) \leq
+\int_1^{N+1} f$，经指标替换后即为下界估计。
+收敛性：部分和与\omterm{thm:b1:integration:def}{积分} $\int_1^x f$
+相差不超过常数 $f(1)$，且二者都
+单调不减，故其一有界当且仅当其二有界
+（见\cref{thm:b1:series:positive}）。对 $f(t)
+= t^{-\alpha}$ ($\alpha \neq 1$): $\int_1^x t^{-\alpha}\dd t =
+\frac{x^{1-\alpha} - 1}{1 - \alpha}$，有界当且仅当 $\alpha > 1$；对
+$\alpha = 1$ 时\omterm{thm:b1:integration:def}{积分}为 $\ln x \to \infty$，而夹逼
+估计给出 $\ln(N+1) \leq H_N \leq 1 + \ln N$。对 $\alpha \leq 0$，
+通项不趋于 $0$。
+\end{proof}
+
+\begin{example}[调和级数的累加]\label{ex:b1:series:harmonicstack}
+调和\omterm{def:b1:series:def}{级数}要累加多少项，才能超过 $20$？
+夹逼估计 $\ln(N+1) \leq H_N \leq 1 + \ln N$ 无需任何求和即可
+回答：$H_N \geq 20$ 要求 $1 + \ln N \geq 20$，
+即 $N \geq \eu^{19} \approx 1.8\cdot10^{8}$，而
+一旦 $\ln(N + 1) \geq 20$ 即可保证，此时 $N \approx \eu^{20} \approx
+4.9\cdot10^{8}$。（周末问题将此估计改进为 $N \approx
+\eu^{20 - \gamma} \approx 2.7\cdot10^{8}$，借助\omterm{pb:b1:series:1}{欧拉常数}。）
+结论性的看法是：\omterm{thm:b1:integration:def}{积分}比较不仅
+判定敛散性——它能\emph{定位}部分和，
+以对数精度把原本无望的计算
+（数以亿计的项）化为两行估计。
+\end{example}
+
+\begin{theorem}[比值判别法（达朗贝尔）]\label{thm:b1:series:ratio}
+设 $u_n > 0$ 且 $\frac{u_{n+1}}{u_n} \to \ell$。\index{比值判别法}
+\begin{itemize}
+  \item 若 $\ell < 1$：$\sum u_n$ 收敛；
+  \item 若 $\ell > 1$：$u_n \to +\infty$，发散；
+  \item 若 $\ell = 1$：无结论（$\sum \frac1n$ 发散，$\sum
+        \frac{1}{n^2}$ 收敛）。
+\end{itemize}
+\end{theorem}
+
+\begin{proof}
+若 $\ell < 1$，取 $q \in \intoo{\ell}{1}$，则自某项 $N$ 之后，
+$u_{n+1} \leq q\,u_n$，由归纳法得 $u_n \leq u_N q^{\,n-N}$：
+与\omterm{ex:b1:series:geometric}{等比级数}作比较。若 $\ell > 1$，则自某项 $N$ 之后
+数列 $(u_n)$ 递增，故不可能趋于 $0$
+（其极限若存在，则 $\geq u_N > 0$）；由
+\cref{prop:b1:series:first}~(1)得发散——事实上 $u_n
+\geq u_N q^{n-N}$，其中 $q > 1$，故 $u_n \to \infty$。
+\end{proof}
+
+\begin{example}\label{ex:b1:series:ratio}
+$\sum \frac{x^n}{n!}$ 对每个 $x > 0$ 收敛：比值
+$\frac{x}{n+1} \to 0$。其和为 $\eu^x$：由泰勒–拉格朗日
+公式（\cref{thm:b1:taylor:lagrange}）在 $\intcc{0}{x}$ 上，有
+\[
+\Bigl| \eu^x - \sum_{k=0}^{n} \frac{x^k}{k!} \Bigr|
+\leq \eu^{x}\, \frac{x^{n+1}}{(n+1)!} \xrightarrow[n\to\infty]{} 0 ,
+\]
+该界趋于 $0$，因阶乘占主导
+（\cref{exo:b1:integration:9}~(1) 用到了同一事实）。同样的
+论证对 $\sin$、$\cos$、$\sinh$、$\cosh$ 的\omterm{def:b1:series:def}{级数}，
+在整个 $\R$ 上同样可以求和。
+\end{example}
+
+\begin{example}[比值判别法是充分的，而非必要的]\label{ex:b1:series:rationotnecessary}
+设 $u_n = 2^{-n}$（$n$ 为偶数），$u_n = 2^{-n-2}$（
+$n$ 为奇数）。相邻比值在 $\frac{1}{8}$ 与
+$\frac12\cdot4 = 2$，故 $\frac{u_{n+1}}{u_n}$ 无极限，
+达朗贝尔判别法失效——然而 $u_n \leq 2^{-n}$，而比较
+判别法即刻判定其收敛。该判别法的前提（比值
+\emph{收敛}）是一个真实的限制：它适用于
+具有单一主导乘法结构（阶乘、幂）的项，
+而对起伏不定的项则失效。比值表现失常时，
+退回与几何型包络的比较——
+这恰是\omterm{thm:b1:series:ratio}{比值判别法}的本质，其证明即可看出。
+\end{example}
+
+\begin{example}[阶乘对决中的比值判别法]\label{ex:b1:series:ratiobinom}
+判定 $\sum_{n\geq0} \dfrac{(n!)^2}{(2n)!}$ 的敛散性（它是
+中心\omterm{def:b1:counting:objects}{二项式系数}的倒数，相差因子 $n + 1$）？
+比值可消去阶乘：
+\[
+\frac{u_{n+1}}{u_n}
+= \frac{((n+1)!)^2}{(n!)^2}\cdot\frac{(2n)!}{(2n+2)!}
+= \frac{(n+1)^2}{(2n+1)(2n+2)}
+\longrightarrow \frac14 < 1 :
+\]
+收敛，且尚有余裕——各项本质上按
+$4^{-n}$ 的速度衰减，与 $\binom{2n}{n} \geq
+\frac{4^n}{2n+1}$ 相符（见\cref{pb:b1:integration:1}）。
+要点是：阶乘之商恰是\omterm{thm:b1:series:ratio}{比值判别法}
+所能处理的对象——每个阶乘皆消去，化为关于
+$n$ 的有理函数，其极限可由首项读出。
+\end{example}
+
+\section{绝对收敛；交错级数}
+
+\begin{theorem}[绝对收敛]\label{thm:b1:series:absolute}
+若 $\sum \abs{u_n}$ 收敛（\emph{绝对
+收敛}\index{绝对收敛}），则 $\sum u_n$ 收敛，
+且 $\bigl|\sum u_n\bigr| \leq \sum \abs{u_n}$。此结论对
+实项与复项均成立。
+\end{theorem}
+
+\begin{proof}
+对 $M > N$，部分和满足（柯西准则，
+见\cref{thm:b1:seq:complete}）：
+\[
+\abs{S_M - S_N} = \Bigl| \sum_{n=N+1}^{M} u_n \Bigr|
+\leq \sum_{n=N+1}^{M} \abs{u_n},
+\]
+当 $N$ 充分大时该式很小，因为 $\sum\abs{u_n}$ 的部分和
+构成\omterm{def:b1:seq:cauchy}{柯西序列}。故 $(S_N)$ 亦为\omterm{def:b1:seq:cauchy}{柯西序列}，从而收敛。
+该不等式由有限和的三角不等式取极限得到。
+\end{proof}
+
+\begin{example}[绝对收敛：实数与复数情形]\label{ex:b1:series:absexamples}
+$\sum_{n\geq1} \frac{\sin n}{n^2}$：各项符号
+毫无规律地变化（事实上 $(\sin n)$ 在 $\intcc{-1}{1}$ 中\omterm{def:b1:topology:dense}{稠密}，
+见\cref{exo:b1:seq:12}），且看不出任何
+交错结构。\omterm{thm:b1:series:absolute}{绝对收敛}一举解决了全部问题：
+$\bigl|\frac{\sin n}{n^2}\bigr| \leq \frac{1}{n^2}$，
+这是收敛的标尺，故\omterm{def:b1:series:def}{级数}收敛。同一护盾
+在 $\C$ 上同样有效：$\sum_{n\geq1}\frac{\eu^{\iu n}}{n^2}$ 收敛，
+因为 $\bigl|\frac{\eu^{\iu n}}{n^2}\bigr| = \frac{1}{n^2}$
+——符号的分布，哪怕是二维的，也都无关紧要
+一旦模的\omterm{def:b1:series:def}{级数}收敛。要点在于：\omterm{thm:b1:series:absolute}{绝对收敛}
+是本章唯一从不追问符号
+如何排布的工具，应首先尝试它，
+（见\cref{met:b1:series:decide}），而将精细的判别法
+留给那些不满足\omterm{thm:b1:series:absolute}{绝对收敛}的\omterm{def:b1:series:def}{级数}。
+\end{example}
+
+\begin{theorem}[交错级数判别法]\label{thm:b1:series:alternating}
+设 $(a_n)$ 单调递减，且 $a_n \to 0$。则\omterm{thm:b1:series:alternating}{交错
+级数} $\sum (-1)^n a_n$ 收敛；其和位于任意两个
+相邻部分和之间，且\index{交错级数}
+\[
+\abs{R_N} = \Bigl| \sum_{n > N} (-1)^n a_n \Bigr| \leq a_{N+1} .
+\]
+\end{theorem}
+
+\begin{proof}
+偶数与奇数部分和相邻：$S_{2p+2} - S_{2p} =
+a_{2p+2} - a_{2p+1} \leq 0$（递减），$S_{2p+1} - S_{2p-1} =
+a_{2p} - a_{2p+1} \geq 0$（递增），且 $S_{2p} - S_{2p+1} =
+a_{2p+1} \to 0$。由\cref{thm:b1:seq:adjacent}，二者有公共极限
+$S$，由两\omterm{def:b1:seq:subsequence}{子列}准则
+（\cref{prop:b1:seq:subsequences}）知它即为 $(S_N)$ 的极限；
+此外 $S$ 夹在相邻部分和之间，且
+$\abs{S - S_N}$ 不超过与下一部分和的间距 $a_{N+1}$。
+\end{proof}
+
+\begin{example}[交错调和级数]\label{ex:b1:series:ln2}
+$\sum_{n \geq 1} \frac{(-1)^{n-1}}{n}$ 收敛（由\omterm{thm:b1:series:alternating}{交错级数}判别法），
+但非\omterm{thm:b1:series:absolute}{绝对收敛}（调和\omterm{def:b1:series:def}{级数}发散）。其和为 $\ln 2$，由
+有限几何恒等式 $\frac{1}{1+t} = \sum_{k=0}^{n-1} (-t)^k +
+\frac{(-t)^n}{1+t}$，在 $\intcc{0}{1}$ 上\omterm{thm:b1:integration:def}{积分}，得：
+\[
+\ln 2 = \sum_{k=1}^{n} \frac{(-1)^{k-1}}{k}
++ (-1)^n \int_0^1 \frac{t^n}{1+t}\,\dd t ,
+\qquad
+0 \leq \int_0^1 \frac{t^n}{1+t}\,\dd t \leq \frac{1}{n+1} \to 0 .
+\]
+收敛极其缓慢（$R_N \approx \frac{1}{N}$）——
+\omterm{thm:b1:series:alternating}{交错级数}依靠正负相消而收敛，而非依靠各项之小。
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}[x=0.78cm, y=7.2cm]
+  \draw[-Stealth] (0.3,0.42) -- (11,0.42)
+    node[below, font=\small] {$N$};
+  \draw (1,0.415) -- (1,0.425) node[below=1pt, font=\small]
+    {$1$};
+  \draw (5,0.415) -- (5,0.425) node[below=1pt, font=\small]
+    {$5$};
+  \draw (10,0.415) -- (10,0.425) node[below=1pt, font=\small]
+    {$10$};
+  \draw[gray, dashed] (0.3,0.6931) -- (10.7,0.6931)
+    node[right, font=\small, text=black] {$\ln 2$};
+  \node[left, font=\small] at (0.3,1) {$1$};
+  \node[left, font=\small] at (0.3,0.5) {$0.5$};
+  \draw[omDef, thick]
+    plot coordinates {(1,1) (2,0.5) (3,0.8333) (4,0.5833)
+    (5,0.7833) (6,0.6167) (7,0.7595) (8,0.6345)
+    (9,0.7456) (10,0.6456)};
+  \fill[omDef] (1,1) circle (1.5pt);
+  \fill[omDef] (2,0.5) circle (1.5pt);
+  \fill[omDef] (3,0.8333) circle (1.5pt);
+  \fill[omDef] (4,0.5833) circle (1.5pt);
+  \fill[omDef] (5,0.7833) circle (1.5pt);
+  \fill[omDef] (6,0.6167) circle (1.5pt);
+  \fill[omDef] (7,0.7595) circle (1.5pt);
+  \fill[omDef] (8,0.6345) circle (1.5pt);
+  \fill[omDef] (9,0.7456) circle (1.5pt);
+  \fill[omDef] (10,0.6456) circle (1.5pt);
+\end{tikzpicture}
+
+{\small 部分和 $S_N$ 来自交错调和\omterm{def:b1:series:def}{级数} $1 - \frac12 + \frac13 - \cdots$，
+在每一步都越过其极限
+$\ln 2$：奇数项部分和在上方，偶数项部分和在下方，
+每次跳跃的幅度为 $\frac{1}{N+1}$。夹逼
+正是\cref{thm:b1:series:alternating}证明的直观呈现——而
+收窄过程极其缓慢（$\abs{S_N - \ln 2} \approx
+\frac{1}{2N}$，见\cref{pb:b1:series:1}），这也解释了为何
+无人用这种方法计算 $\ln 2$。}
+\end{omfigure}
+
+\begin{remark}[级数的常见误区]
+（i）\emph{等价判别法须顾及符号}：设 $v_n =
+\frac{(-1)^n}{\sqrt n}$ 及 $u_n = v_n + \frac1n$，则
+$\frac{u_n}{v_n} = 1 + \frac{(-1)^n}{\sqrt n} \to 1$，故 $u_n
+\sim v_n$；然而 $\sum v_n$ 依\omterm{thm:b1:series:alternating}{交错级数}判别法收敛，而
+$\sum u_n = \sum v_n + \sum \frac1n$ 发散。等价性控制的是
+项的\emph{大小}，而对带符号的\omterm{def:b1:series:def}{级数}，大小并
+不决定一切——该判别法的叙述与正确性，仅对
+（自某项起）非负的项成立。（ii）\emph{$u_n \to 0$
+不能说明任何问题}：调和\omterm{def:b1:series:def}{级数}是永恒的反例；
+其逆向陈述
+（\cref{prop:b1:series:first}~(1)）仅是一个快速的
+发散判别法。（iii）\emph{比值极限为 $1$ 无法说明
+收敛}：$\sum\frac1n$ 与 $\sum\frac{1}{n^2}$ 的比值都
+$\to 1$；应改用黎曼尺度或\omterm{thm:b1:integration:def}{积分}比较。
+（iv）\emph{\omterm{thm:b1:series:alternating}{交错级数}须单调递减}：$\sum
+\frac{(-1)^n}{n + (-1)^n}$ 看似交错，却只能
+借助展开来处理（见\cref{exo:b1:series:5}）；
+\cref{ch:b1:taylor}中的周末问题（第 23 题）表明，该判别法
+在缺少单调性时可能彻底失效。（v）\emph{分组与重排
+并非无代价}：对收敛\omterm{def:b1:series:def}{级数}加括号无害，
+但可能从发散中制造出收敛
+（如 $1 - 1 + 1 - \cdots$ 两两分组），而重排
+则可以改变\omterm{def:b1:series:def}{级数}本身的和——这一点在本章的
+周末问题（\cref{pb:b1:series:1}）中有所上演。
+\end{remark}
+
+\begin{method}[判定级数的敛散性]\label{met:b1:series:decide}
+\begin{enumerate}
+  \item $u_n \to 0$ 是否成立？若否，则\omterm{def:b1:series:def}{级数}发散，停止。
+  \item 若各项非负：求 $u_n$ 的等价量（展开式，
+        见\cref{ch:b1:taylor}！），与黎曼尺度或几何尺度比较；
+        阶乘与幂次宜用\omterm{thm:b1:series:ratio}{比值判别法}；
+        单调递减的 $f(n)$ 宜用\omterm{thm:b1:integration:def}{积分}比较。
+  \item 符号可变：先考察\omterm{thm:b1:series:absolute}{绝对收敛}；若不成立，则
+        \omterm{thm:b1:series:alternating}{交错级数}判别法（须仔细检验\emph{单调递减}）；此外
+        则需借助本科二年级的工具。
+\end{enumerate}
+\end{method}
+
+\begin{example}[奇数分母：半截裂项相消]\label{ex:b1:series:oddtelescope}
+求 $\sum_{n \geq 1} \dfrac{1}{4n^2 - 1}$。
+部分分式：$\frac{1}{(2n-1)(2n+1)} =
+\frac12\bigl(\frac{1}{2n-1} - \frac{1}{2n+1}\bigr)$，于是
+\[
+\sum_{n=1}^{N} \frac{1}{4n^2 - 1}
+= \frac12\Bigl(1 - \frac{1}{2N+1}\Bigr)
+\longrightarrow \frac12 .
+\]
+比较 $\sum \frac{1}{n(n+1)} = 1$
+（见\cref{exo:b1:series:1}）：二者有相同的裂项骨架，但
+此处的相邻项在奇数序列中相隔两步，而
+因子 $\frac12$ 记录了这一步长。末尾点明：
+裂项相消是一种视角的转换，而非技巧——只要
+通项为某有极限的数列的差 $w_n - w_{n+1}$，
+则和为 $w_1 - \lim w$，恰为
+\cref{prop:b1:series:first}~(3)。
+\end{example}
+
+\begin{remark}[回望分析学的主线]
+本章是本分册分析内容汇聚之处，每个判别法
+都指明了它的源头。部分和有界，即是单调极限定理，
+（见\cref{ch:b1:seq}），其本身是
+在\cref{ch:b1:reals}中的完备性公理；\omterm{thm:b1:series:absolute}{绝对收敛}是柯西
+准则；\omterm{thm:b1:integration:def}{积分}判别法来自\cref{ch:b1:integration}中对面积的
+刻画；通项的等价量即是
+\cref{ch:b1:taylor}中的展开；而\omterm{thm:b1:series:alternating}{交错级数}判别法是
+\omterm{thm:b1:seq:adjacent}{相邻数列}引理换了周末装束后的形式。倒过来读，
+这条主线解释了每一章究竟是
+\emph{为了什么}——而贯穿其中的周末问题
+（$b$ 进数字、切萨罗–施托尔茨、无理性机器、
+\omterm{pb:b1:series:1}{欧拉常数}）都是同样的几个思想，在越来越高的层次上相会。
+此后的线性代数改变的是对象，
+而非标准：以经证明的误差界来精确陈述的习惯，
+从极限过渡到维数的时候依然保留。
+\end{remark}
+
+\begin{remark}[级数的下一站]
+本章为本册的分析收尾，并打开三扇
+门。在本科二年级分册中，\omterm{def:b1:series:def}{级数}获得了一个变量（$\sum
+a_n x^n$：幂\omterm{def:b1:series:def}{级数}及其收敛半径），然后
+发展出以函数为对象的理论（傅里叶\omterm{def:b1:series:def}{级数}）；\omterm{thm:b1:series:absolute}{绝对收敛}与条件收敛的二分，
+在下面的周末问题中得到生动体现，
+将成为二者共同的基石。在概率论
+（本科三年级分册）中，离散随机变量的期望
+\emph{就是}\omterm{def:b1:series:def}{级数}，而\omterm{thm:b1:series:absolute}{绝对收敛}正是
+使它们得以良定义的条件。而\omterm{thm:b1:series:riemann}{黎曼级数} $\sum n^{-s}$，
+推广到复数 $s$ 时，便成为泽塔函数——数学中被研究得最多的
+一个\omterm{def:b1:series:def}{级数}。
+\end{remark}
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:b1:series:1}
+判断下列\omterm{def:b1:series:def}{级数}的敛散性（若可裂项相消，则求其和）：
+\[
+\sum_{n\geq1} \frac{1}{n(n+1)},
+\qquad
+\sum_{n\geq2} \ln\Bigl(1 - \frac{1}{n^2}\Bigr),
+\qquad
+\sum_{n\geq0} \frac{3^n + 4^n}{5^n} .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:series:2}
+判断下列\omterm{def:b1:series:def}{级数}的敛散性：$\;\sum \dfrac{n^2}{2^n}$；$\;\sum \dfrac{n!}{n^n}$；
+$\;\sum \dfrac{2^n\,n!}{n^n}$；$\;\sum \dfrac{3^n\,n!}{n^n}$。
+\emph{（\omterm{thm:b1:series:ratio}{比值判别法}；回忆 $\bigl(1 + \frac1n\bigr)^n \to \eu$。）}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:series:3}
+判断下列\omterm{def:b1:series:def}{级数}的敛散性：$\;\sum \sin\dfrac{1}{n^2}$；$\;\sum
+\Bigl(1 - \cos\dfrac1n\Bigr)$；$\;\sum \dfrac{1}{\sqrt{n(n+1)}}$；
+$\;\sum \dfrac{\ln n}{n^2}$ \emph{（与 $n^{-3/2}$ 比较）}。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:series:4}
+证明 $\sum_{n\geq1} \frac{1}{n^2}$ 收敛，且其和 $\leq 2$，
+利用 $\frac{1}{n^2} \leq \frac{1}{n(n-1)}$（$n \geq 2$），并
+借助裂项相消给出\omterm{def:b1:reals:bounds}{上界}。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:series:5}
+判断下列\omterm{def:b1:series:def}{级数}的敛散性：$\;\sum \dfrac{(-1)^n}{\sqrt n}$，$\;\sum
+\dfrac{(-1)^n}{n + (-1)^n}$ \emph{（先展开：\omterm{thm:b1:series:alternating}{交错级数}判别法
+不能直接应用——为什么？）}，以及 $\;\sum
+\sin\bigl(\pi\sqrt{n^2+1}\,\bigr)$ \emph{（模 $\pi$ 约化：
+$\sqrt{n^2+1} = n + \frac{1}{2n} + O(n^{-3})$）}。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:series:6}
+对哪些 $\alpha > 0$，\omterm{def:b1:series:def}{级数} $\sum_{n \geq 2}
+\dfrac{1}{n (\ln n)^{\alpha}}$ 收敛？\emph{（\omterm{thm:b1:integration:def}{积分}比较法；
+作代换 $u = \ln t$。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:series:7}
+设 $u_n = \dfrac{1}{n} - \ln\Bigl(1 + \dfrac1n\Bigr)$。证明
+$0 \leq u_n \leq \dfrac{1}{2n^2}$，$\sum u_n$ 收敛，并
+由此推出\omterm{pb:b1:series:1}{欧拉常数}\index{欧拉常数}的存在性：
+\[
+\gamma = \lim_{N \to \infty} \Bigl( \sum_{n=1}^{N} \frac 1n - \ln N
+\Bigr) .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:series:8}
+求下列\omterm{def:b1:series:def}{级数}的和：
+\[
+\sum_{n=1}^{\infty} \frac{1}{n(n+2)}
+\qquad\text{和}\qquad
+\sum_{n=0}^{\infty} \frac{n}{2^n} .
+\]
+\emph{（第一题用部分分式。第二题：先求
+$\sum_{n=1}^{N} n x^{n-1}$ 的闭式，再令 $N \to \infty$，
+在 $x = \frac12$ 处。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:series:9}
+（柯西凝聚判别法）设 $(u_n)$ 非负且单调递减。
+证明
+\[
+\sum_{n \geq 1} u_n \text{ 收敛}
+\iff
+\sum_{k \geq 0} 2^k\, u_{2^k} \text{ 收敛},
+\]
+通过比较相邻 $2$ 的幂之间的各组项。
+由此推出黎曼判别法，以及
+\cref{exo:b1:series:6}。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:series:10}
+利用\cref{ex:b1:series:ln2}中的\omterm{thm:b1:integration:def}{积分}恒等式，
+将其改用于 $\frac{1}{1+t^2}$，证明莱布尼茨公式
+\[
+\frac{\pi}{4} = \sum_{n=0}^{\infty} \frac{(-1)^n}{2n+1}
+= 1 - \frac13 + \frac15 - \frac17 + \cdots
+\]
+并给出误差界 $\abs{R_N} \leq \frac{1}{2N+3}$。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:series:11}
+判断 $\displaystyle\sum_{n \geq 1} \frac{1}{n^{1 + 1/n}}$ 的敛散性。
+\emph{（求 $n^{1/n}$ 的极限，并求通项的等价量：
+黎曼判别法需要一个\emph{固定}的
+指数。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:series:12}
+设 $(u_n)$ 为非负且\emph{递减}的数列，\omterm{def:b1:series:def}{级数} $\sum u_n$
+收敛。证明 $n\,u_n \to 0$ \emph{（将 $n\,u_{2n}$
+用段和 $\sum_{k=n+1}^{2n} u_k$ 控制，并利用柯西
+准则）}。证明逆命题不成立，并说明
+单调性假设不可去掉。
+\end{exercise}
+
+\section{周末问题：欧拉常数与改变其和的
+级数}
+
+\begin{problem}[{周末问题——$H_n = \ln n + \gamma +
+\frac{1}{2n} + O(n^{-2})$，并将 $1 - \frac12 +
+\frac13 - \dots$ 重排为 $\frac{\ln 2}{2}$}]
+\label{pb:b1:series:1}
+两个故事共享调和\omterm{def:b1:series:def}{级数}。其一是其发散性的
+精确核算：$H_n - \ln n$ 收敛于\omterm{pb:b1:series:1}{欧拉
+常数} $\gamma$（见\cref{exo:b1:series:7}），本题
+将该结论加细为双侧估计 $\frac{1}{2(n+1)}
+\leq H_n - \ln n - \gamma \leq \frac{1}{2n}$，并以手算验证 $\gamma
+= 0.5772\dots$。其二是条件收敛的反常现象：
+交错调和\omterm{def:b1:series:def}{级数}之和为 $\ln 2$
+（见\cref{ex:b1:series:ln2}），而\emph{同样的项，次序不同}，
+其和为 $\frac{\ln 2}{2}$ ——或 $\ln 2 +
+\frac12\ln\frac pq$（对任意 $p, q$），或为任一实数
+（黎曼）。两个故事本是一回事：重排后的和
+均\emph{借助} $\gamma$ 律计算。\index{欧拉常数}
+\index{级数的重排}
+
+\medskip
+\noindent\textbf{第一部分——$\gamma$ 的夹逼。}设 $a_n = H_n
+- \ln n$ 和 $b_n = H_n - \ln(n+1)$。
+\begin{enumerate}
+  \item 利用 $\frac{t}{1+t} \leq \ln(1 + t) \leq t$，证明
+        $(a_n)$ 递减，$(b_n)$ 递增，且二者
+        相邻；其公共极限为 $\gamma$，并有 $b_n \leq
+        \gamma \leq a_n$ 对每个 $n$ 成立。
+  \item 数值初试：由 $H_{10} = 2.928968\dots$，
+        将 $\gamma$ 夹在 $b_{10} = 0.5311$ 与 $a_{10} =
+        0.6264$。此粗糙夹逼若要精确到四位小数，
+        需要多大的 $n$？
+  \item 证明精确的余项表示 $a_n - \gamma =
+        \sum_{k \geq n} w_k$（部分和的极限），其中
+        \[
+        w_k = a_k - a_{k+1}
+        = \ln\Bigl(1 + \frac1k\Bigr) - \frac{1}{k+1}
+        = \int_k^{k+1} \frac{(k + 1 - t)}{t\,(k+1)}\,\dd t ,
+        \]
+        并由\omterm{thm:b1:integration:def}{积分}形式推出双侧估计
+        $\dfrac{1}{2(k+1)^2} \leq w_k \leq \dfrac{1}{2k(k+1)}$。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第二部分——$\frac{1}{2n}$ 律。}
+\begin{enumerate}[resume]
+  \item 将第 3 问的界相加（两侧皆可裂项相消，或
+        与裂项和比较），从而得到该律：
+        \[
+        \frac{1}{2(n+1)} \;\leq\; H_n - \ln n - \gamma \;\leq\;
+        \frac{1}{2n} \qquad (n \geq 1).
+        \]
+  \item 推出 $H_n = \ln n + \gamma + \frac{1}{2n} +
+        O\bigl(\frac{1}{n^2}\bigr)$；更精确地，证明
+        $\gamma_n = H_n - \ln n - \frac{1}{2n}$ 满足
+        $-\frac{1}{2n(n+1)} \leq \gamma_n - \gamma \leq 0$。
+  \item 取 $n = 100$，验证四位小数：已知 $H_{100} =
+        5.1873775\dots$，计算 $\gamma_{100} = 0.577207\dots$
+        并得出 $\gamma = 0.5772 \pm 5\cdot10^{-5}$（真值
+        为 $0.5772156\dots$）。
+  \item 该律的两个推论，后文均会用到：当 $m \to
+        \infty$ 时，
+        \[
+        H_{2m} - H_m = \ln 2 - \frac{1}{4m} +
+        O\Bigl(\frac{1}{m^2}\Bigr),
+        \qquad
+        \sum_{j=1}^{m} \frac{1}{2j-1} = \frac{\ln m}{2} + \ln 2
+        + \frac\gamma2 + o(1) ,
+        \]
+        后者借助 $\sum_{j \leq m} \frac{1}{2j-1} = H_{2m}
+        - \frac12 H_m$，同理 $\sum_{j=1}^{m}
+        \frac{1}{2j} = \frac{\ln m}{2} + \frac\gamma2 + o(1)$。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第三部分——交错调和\omterm{def:b1:series:def}{级数}，
+精确到二阶。}
+\begin{enumerate}[resume]
+  \item 用归纳法或分组法证明恒等式
+        $\sum_{k=1}^{2m} \frac{(-1)^{k-1}}{k} = H_{2m} - H_m$，
+        由此推出其和 $\ln 2$（再次得到），以及精确的
+        收敛速度：
+        \[
+        \sum_{k=1}^{2m} \frac{(-1)^{k-1}}{k}
+        = \ln 2 - \frac{1}{4m} + O\Bigl(\frac{1}{m^2}\Bigr) .
+        \]
+  \item 推出交错调和\omterm{def:b1:series:def}{级数}的渐近误差
+        在\emph{任意}指标处 $S - S_N \sim
+        \frac{(-1)^N}{2N}$ ——比
+        最坏情形界 $a_{N+1} \approx \frac1N$ 小一半（见
+        \cref{thm:b1:series:alternating}）。
+  \item （免费的加速）证明平均部分和
+        $\tilde S_N = \frac{S_N + S_{N+1}}{2}$ 满足 $\tilde
+        S_N = \ln 2 + O\bigl(\frac{1}{N^2}\bigr)$。验证：$S_{10}
+        = 0.64563$, $S_{11} = 0.73654$, $\tilde S_{10} =
+        0.69109$，对照 $\ln 2 = 0.69315$：一次平均
+        换得两位小数的精度。
+  \item 用两句话说明，为何此类技巧无法帮助\emph{正}的
+        发散尾项现象（如第 2 问的夹逼）：交错误差
+        振荡（符号
+        $(-1)^N$），故平均会消去其主项，而
+        $\gamma$ 夹逼的误差 $\frac{1}{2n}$ 符号
+        恒定。（对 $a_n$ 与 $b_n$ 取平均\emph{确有}帮助：
+        将 $\frac{a_n + b_n}{2}$ 与中点估计
+        $H_n - \ln\bigl(n + \frac12\bigr)$ 相联系，并证其误差为
+        $O\bigl(\frac{1}{n^2}\bigr)$。）
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第四部分——刚性及其失效。}
+\begin{enumerate}[resume]
+  \item 证明交错调和\omterm{def:b1:series:def}{级数}的正项部分 $\sum \frac{1}{2j-1}$ 与
+        负项部分 $\sum \frac{1}{2j}$ 均发散——
+        这正是
+        \emph{条件收敛}的标志。
+  \item 证明第 12 问背后的一般结论：若
+        $\sum u_n$ 收敛而 $\sum \abs{u_n}$ 发散，则
+        正项部分构成的\omterm{def:b1:series:def}{级数} $\sum u_n^+$ 与
+        负项部分构成的\omterm{def:b1:series:def}{级数} $\sum u_n^-$ 均发散 \emph{（由
+        $u_n^\pm = \frac{\abs{u_n} \pm u_n}{2}$：若其中一个收敛，
+        则另一个亦收敛，从而 $\sum\abs{u_n}$ 收敛）}。
+        这一取之不尽的正负项“质量”储备，
+        正是黎曼配方将要耗用的。
+  \item （刚性）证明：若 $\sum u_n$ \emph{绝对}收敛，
+        且 $\sigma \colon \N \to \N$ 为
+        \omterm{def:b1:logic:inj}{双射}，则 $\sum u_{\sigma(n)}$ 收敛于同一个和
+        \emph{（取 $N$ 充分大时，重排后的前 $M$ 项
+        包含 $u_0, \dots, u_N$；比较部分和
+        借助尾项 $\sum_{n > N}\abs{u_n}$）}。
+  \item （黎曼配方）设 $t \in \R$。描述交错调和\omterm{def:b1:series:def}{级数}的贪心重排：
+        即先依次取正项 $1, \frac13, \frac15, \dots$，
+        直到部分和首次超过 $t$，再依次取负项 $-\frac12, -\frac14, \dots$，
+        直到部分和首次低于 $t$，并如此反复。
+        证明每一项恰好被使用一次，
+        且首次穿越之后，部分和
+        与 $t$ 的距离始终不超过最后所用项的绝对值，
+        由此得出重排\omterm{def:b1:series:def}{级数}收敛于 $t$：
+        \emph{任意}预先给定的和
+        均可达到。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第五部分——$(p, q)$ 公式。}取定整数
+$p, q \geq 1$。将交错调和\omterm{def:b1:series:def}{级数}分块重排：
+每块先取 $p$ 个正项（即接下来的奇数倒数），再取 $q$ 个负项
+（即接下来的偶数倒数），并如此重复。
+\begin{enumerate}[resume]
+  \item 验证这确是一个真正的重排（每一项恰好出现一次），
+        并说明当 $(p, q) = (1, 2)$ 时，它的形式为
+        \[
+        1 - \frac12 - \frac14 + \frac13 - \frac16 - \frac18 +
+        \frac15 - \frac1{10} - \frac1{12} + \dots
+        \]
+  \item （精确减半）对 $(p, q) = (1, 2)$，证明
+        分块恒等式
+        \[
+        \frac{1}{2k-1} - \frac{1}{4k-2} - \frac{1}{4k}
+        = \frac12\Bigl(\frac{1}{2k-1} - \frac{1}{2k}\Bigr),
+        \]
+        并由此推出\emph{精确}关系 $T_{3K} = \frac12
+        S_{2K}$，即重排与原来的部分和之间的关系：
+        和的减半在每个有限阶段都清晰可见，
+        而不只是在极限中。
+  \item 证明经过 $K$ 个完整块之后的部分和
+        等于 $\sum_{j=1}^{pK} \frac{1}{2j-1} -
+        \sum_{j=1}^{qK} \frac{1}{2j}$，并借助第 7 问求其极限，
+        结果为
+        \[
+        \ln 2 + \frac12 \ln\frac pq .
+        \]
+  \item 控制\emph{块内}的部分和（各项趋于 $0$），
+        并得出按 $(p,
+        q)$ 重排的\omterm{def:b1:series:def}{级数}收敛于 $\ln 2 + \frac12\ln
+        \frac pq$。特别地，$(1, 2)$ 给出 $\frac{\ln
+        2}{2}$：用前九项加以验证，$T_9 =
+        0.3083$，并逐步趋近于 $0.3466$。
+  \item 检验与范围：$(1,1)$ 给出 $\ln 2$；
+        $(2,1)$ 给出 $\frac32\ln 2$；哪些和可由 $(p, q)$ 块达到，
+        这一可数的“菜单”
+        与黎曼的完整“菜单”（第 14 问）相比如何？
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第六部分——尾声：$\gamma$ 的应用与
+综合。}
+\begin{enumerate}[resume]
+  \item 确定收敛\omterm{def:b1:series:def}{级数}
+        $\sum_{k\geq1} \bigl(\frac1k - \ln\frac{k+1}{k}\bigr)$
+        的和（见\cref{exo:b1:series:7}），并证明它等于 $\gamma$。
+  \item 对目标值 $t =
+        1$，运行黎曼配方（第 14 问），列出所产生的前十二项（$1, \frac13,
+        -\frac12, \frac15, -\frac14, \frac17, \frac19, -\frac16,
+        \frac1{11}, \frac1{13}, -\frac18, \frac1{15}$),
+        并计算部分和（$\approx 0.980$）——观察
+        算法在其目标值附近如何“呼吸”。
+  \item 证明交错调和\omterm{def:b1:series:def}{级数}的某种重排
+        发散到 $+\infty$ \emph{（每块中取足够多的正项，
+        使每次增加 $1$，利用
+        第 12 问，各块之间以单个负项隔开）}。
+  \item 用 $\gamma$ 律细化\cref{ex:b1:series:harmonicstack}，
+        证明使 $H_N \geq
+        20$ 的首个指标满足 $N = \eu^{\,20 - \gamma}\,(1 + o(1))
+        \approx 2.7\cdot10^{8}$——\omterm{pb:b1:series:1}{欧拉常数}恰好是
+        粗略估计所缺失的那一项修正。
+  \item 综合各点，每点用一句话说明：（i）$\gamma$ 律及其
+        三部分（$\ln n$、$\gamma$、
+        $\frac{1}{2n}$）各自的贡献；（ii）为何条件收敛
+        使\omterm{def:b1:series:def}{级数}的和依赖于求和次序，而\omterm{thm:b1:series:absolute}{绝对收敛}
+        则禁止这种情形；（iii）$(p,q)$ 公式如何
+        是借助 $\gamma$ 律的\emph{计算}，而非
+        抽象的存在性断言；（iv）这些线索
+        在哪里延续——本科二年级分册中的幂\omterm{def:b1:series:def}{级数}与
+        \omterm{def:b1:series:def}{级数}的乘积，以及本科三年级分册中的斯特林公式
+        周末问题，在那里同样的“和与\omterm{thm:b1:integration:def}{积分}”的
+        比较手法发挥其全部威力。
+\end{enumerate}
+\end{problem}

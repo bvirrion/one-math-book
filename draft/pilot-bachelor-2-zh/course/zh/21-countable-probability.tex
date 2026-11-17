@@ -1,0 +1,992 @@
+\chapter{可数空间上的概率}\label{ch:b2:proba}
+
+最后三章发展现代概率论：
+可数样本空间上的概率测度、
+离散随机变量与母函数。
+高中分册中的有限理论获得了完整的
+基础框架：$\sigma$-可加性取代有限可加性，
+而\cref{ch:b2:series}中的可和族理论恰好是
+使无限样本空间可以处理的关键。
+本章的核心结果是概率沿单调事件列的
+连续性与博雷尔--坎特利引理。
+
+\section{概率空间}
+
+\begin{definition}[可数概率空间]\label{def:b2:proba:space}
+设 $\Omega$ 为非空有限或可数集合（
+\emph{样本空间}\index{样本空间}）。
+$\Omega$ 上的\emph{概率测度}\index{概率测度}是
+映射 $\P$ 把集合 $\mathcal{P}(\Omega)$
+（即 $\Omega$ 的全体子集，称为\emph{事件}\index{事件}）映到 $[0, 1]$，使得：
+\begin{enumerate}
+\item $\P(\Omega) = 1$;
+\item （$\sigma$-可加性）对每个
+两两不交事件组成的序列 $(A_n)_{n\in\N}$，
+\[
+\P\Bigl(\,\bigcup_{n \in \N} A_n\Bigr)
+= \sum_{n=0}^{\infty} \P(A_n) .
+\]
+\end{enumerate}
+称二元组 $(\Omega, \P)$ 为（可数）
+\emph{概率空间}\index{概率空间}。
+\end{definition}
+
+\begin{remark}
+在可数集 $\Omega$ 上可把全部子集都取作事件；在
+不可数空间上（本科三年级讨论连续模型时需要），
+这一做法便不再可行，此时需将 $\P$ 限制于适当的
+事件族上，该事件族称为\emph{$\sigma$-代数}。本章的全部公式
+在该推广下原样成立。
+\end{remark}
+
+\begin{proposition}[基本性质]\label{prop:b2:proba:rules}
+对事件 $A, B$ 及概率测度 $\P$，有：
+$\P(\emptyset) = 0$；$\P$ 有限可加；$\P(A^c) = 1 -
+\P(A)$；若 $A \subseteq B$，则 $\P(A) \leq \P(B)$；且
+\[
+\P(A \cup B) = \P(A) + \P(B) - \P(A \cap B) .
+\]
+\end{proposition}
+
+\begin{proof}
+运用 $\sigma$-可加性，取 $A_0 = \Omega$，$A_n = \emptyset$
+（$n \geq 1$）得 $1 = 1 + \sum_{n\geq1}\P(\emptyset)$，故
+$\P(\emptyset) = 0$。对有限个不交并，补上空集即得
+有限可加性。其余论证与有限情形（
+高中分册）一致：$1 = \P(A) + \P(A^c)$，
+由 $\Omega = A \sqcup A^c$ 可得；$\P(B) = \P(A) + \P(B \setminus A)
+\geq \P(A)$（当 $A \subseteq B$ 时）；并将
+其分成三个不交的部分，
+\begin{align*}
+\P(A \cup B) &= \P(A \setminus B) + \P(B \setminus A) +
+\P(A \cap B)\\
+&= \bigl(\P(A) - \P(A\cap B)\bigr) + \bigl(\P(B) - \P(A\cap
+B)\bigr) + \P(A \cap B),
+\end{align*}
+即容斥原理；一般的 $n$ 个集合版本
+见\cref{exo:b2:proba:4}。
+\end{proof}
+
+\begin{proposition}[可数空间上的
+分布]\label{prop:b2:proba:distribution}
+在可数集 $\Omega =
+\{\omega_0, \omega_1, \dots\}$ 上给出概率测度，等价于给出
+非负权重 $p_i = \P(\{\omega_i\}) \geq 0$，满足 $\sum_i p_i = 1$；于是对
+每个 $A \subseteq \Omega$，
+\[
+\P(A) = \sum_{\omega \in A} \P(\{\omega\}) ,
+\]
+这是族 $(p_i)$ 的一个（绝对收敛的）子和。
+\end{proposition}
+
+\begin{proof}
+给定 $\P$，单点集 $\{\omega\}$（$\omega \in A$）构成
+$A$ 的一个可数不交覆盖，故由 $\sigma$-可加性必有
+\[
+\P(A) = \sum_{\omega\in A}\P(\{\omega\}),
+\]
+这是非负可和族的一个无条件子和
+$(p_i)$ --- 重排无害，恰因为
+各项非负（见\cref{ch:b2:series}）。特别地，
+$\sum_ip_i = \P(\Omega) = 1$。
+反之，给定总和为 $1$ 的非负权重，定义
+$\P(A) = \sum_{\omega \in A}p_\omega$：该族可和，且
+$\sigma$-可加性恰是
+在\cref{ch:b2:series}中的分组求和定理，应用于 $\bigcup A_n$ 的
+各 $A_n$ 所成的划分。
+\end{proof}
+
+\begin{example}[几何模型：等待首次
+正面出现]\label{ex:b2:proba:geometric}
+反复投掷正面概率为 $p \in \intoo{0}{1}$ 的硬币，
+并令 $\Omega = \N^* \cup \{\infty\}$，记录首次
+出现正面的序号。自然的权重为
+\[
+\P(\{k\}) = (1 - p)^{k-1}p
+\quad (k \in \N^*),
+\qquad
+\P(\{\infty\}) = 0 ,
+\]
+这确为概率测度，因为 $\sum_{k\geq1}(1-p)^{k-1}p =
+\frac{p}{1 - (1-p)} = 1$：以概率 $1$ 游戏结束 ---
+但样本空间仍须包含
+游戏不结束的可能性。可数可加性使我们能够断言
+$\P(\text{游戏结束}) = \sum_k \P(\{k\})$。
+\end{example}
+
+\begin{theorem}[单调连续性]\label{thm:b2:proba:continuity}
+设 $(A_n)$ 为事件序列。
+\begin{enumerate}
+\item 若 $A_n \subseteq A_{n+1}$ 对所有 $n$ 成立
+（\emph{递增}），则
+$\P\bigl(\bigcup_n A_n\bigr) = \lim_{n\to\infty} \P(A_n)$.
+\item 若 $A_n \supseteq A_{n+1}$ 对所有 $n$ 成立
+（\emph{递减}），则
+$\P\bigl(\bigcap_n A_n\bigr) = \lim_{n\to\infty} \P(A_n)$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\emph{1.} 作不交化：令 $B_0 = A_0$，$B_n = A_n \setminus
+A_{n-1}$。$B_n$ 两两不交，且 $\bigcup_{k \leq n}
+B_k = A_n$，而 $\bigcup_n B_n = \bigcup_n A_n$。
+由 $\sigma$ 可加性与有限可加性，
+\[
+\P\Bigl(\bigcup_n A_n\Bigr)
+= \sum_{n=0}^\infty \P(B_n)
+= \lim_{N\to\infty}\sum_{n=0}^N \P(B_n)
+= \lim_{N\to\infty}\P(A_N) .
+\]
+\emph{2.} 考虑补集：$(A_n^c)$ 递增，并集为
+$\bigl(\bigcap A_n\bigr)^c$，并应用第 1 部分：
+$1 - \P(\bigcap A_n) = \lim (1 - \P(A_n))$.
+\end{proof}
+
+\begin{corollary}[可数次可加性]\label{cor:b2:proba:subadd}
+对任意事件序列，有 $\P\bigl(\bigcup_n A_n\bigr) \leq
+\sum_{n=0}^\infty \P(A_n)$.
+\end{corollary}
+
+\begin{proof}
+有限次可加性 $\P(A_0 \cup \dots \cup A_N) \leq
+\sum_0^N \P(A_n)$ 由容斥原理，经归纳法得出
+（或由不交化后的 $B_n \subseteq A_n$ 的可加性得出）。
+令 $N \to \infty$，左边收敛于
+$\P(\bigcup_n A_n)$，由单调连续性应用于
+递增序列 $C_N = A_0 \cup \dots \cup A_N$。
+\end{proof}
+
+\begin{example}[并界：粗糙却
+坚不可摧]\label{ex:b2:proba:unionbound}
+有限个事件的次可加性 --- 即\emph{并
+界} --- 以精度换取普适性。对于
+$23$ 人的生日问题，碰撞概率
+以两两配对的概率之和作上界，即
+\[
+\P(\text{碰撞}) \leq \binom{23}2\cdot\frac1{365}
+= \frac{253}{365} \approx 0.693 ,
+\]
+与真实值 $0.507$ 相比，偏差很大，因为
+碰撞事件彼此重叠。然而该界需要\emph{无}
+独立性，无需联合分布，只需成对的
+概率 --- 这正是在周末问题中，
+以及贯穿\cref{ch:b2:randomvar}，并界总是
+首先使用的工具：当它恰好较小时，此事
+便已定论，无须进一步建模。
+\end{example}
+
+\begin{example}[六点终将出现]\label{ex:b2:proba:sixeventually}
+无限次掷一颗均匀骰子，令 $B_n = {}$“前 $n$ 次投掷
+中至少出现一个六点”，是递增的事件序列，
+且 $\P(B_n) = 1 - (5/6)^n$。由单调连续性可得
+\[
+\P(\text{六点终将出现})
+= \P\Bigl(\bigcup_nB_n\Bigr)
+= \lim_n\bigl(1 - (5/6)^n\bigr) = 1 .
+\]
+关键不在于（显然的）极限，而在于其中的逻辑步骤：
+“终将”是关于\emph{无穷多次}
+投掷的事件，超出有限可加性的范围，而单调
+连续性 --- 即 $\sigma$ 可加性 --- 正是
+赋予其概率的公理。本书余下部分中每个几乎必然
+成立的陈述，都要经过同一
+扇窄门。
+\end{example}
+
+\section{条件化与独立性}
+
+\begin{definition}[条件概率]\label{def:b2:proba:conditional}
+设 $A, B$ 为事件，且 $\P(B) > 0$，称\emph{条件
+概率}\index{条件概率}为事件 $A$ 在 $B$ 下的概率，即
+\[
+\P(A \mid B) = \frac{\P(A \cap B)}{\P(B)} .
+\]
+映射 $A \mapsto \P(A \mid B)$ 本身是
+$\Omega$ 上的一个概率测度。
+\end{definition}
+
+\begin{remark}
+$A \mapsto \pcond BA$ 仍是概率测度，这一点
+值得稍作思考：$\pcond B\Omega = 1$，且 $\sigma$ 可加性
+经归一化后依然成立，因为与 $B$ 取交
+保持不交并。其直接推论是：本章中每一个
+恒等式 --- 容斥原理、单调
+连续性、博雷尔–坎泰利引理 --- 均可用于\emph{条件化之后}，
+而无需新的证明。概率学家常常
+“在 $\pcond B{\cdot}$ 之下工作”，正是出于这一原因。
+\end{remark}
+
+\begin{example}[条件化可以产生
+均匀性]\label{ex:b2:proba:sumseven}
+掷两颗均匀骰子，并以点数和为 $7$ 为条件，对于
+每个 $k \in \intint16$，
+\[
+\pcond{\{S = 7\}}{X = k}
+= \frac{\P(X = k,\ Y = 7 - k)}{\P(S = 7)}
+= \frac{1/36}{6/36} = \frac16 :
+\]
+在点数和为 $7$ 时，第一颗骰子恰好均匀分布 ---
+$7$ 是唯一与每一面都相容的点数和，故
+条件化抹去了关于 $X$ 的全部信息。其他任何
+点数和都会扭曲其分布（在 $S = 4$ 时，第一颗骰子
+仅在 $\{1, 2, 3\}$ 上均匀分布）。计算条件分布，
+即沿条件事件将联合权重
+重新归一化，仅此而已。
+\end{example}
+
+\begin{example}[第二次抽取与第一次
+一样好]\label{ex:b2:proba:seconddraw}
+一个罐中有 $3$ 个白球和 $2$ 个黑球，不放回地
+抽取两个球。公认 $\P(W_1) = \frac35$；求
+$\P(W_2)$ 为多少？沿第一次抽取作全概率展开：
+\[
+\P(W_2) = \pcond{W_1}{W_2}\,\P(W_1) +
+\pcond{B_1}{W_2}\,\P(B_1)
+= \frac24\cdot\frac35 + \frac34\cdot\frac25
+= \frac{12}{20} = \frac35 :
+\]
+恰为 $\P(W_1)$。无需任何计算：由对称性，
+每个球被第二次抽到的可能性都相同，因此
+第二次抽取 --- \emph{无条件地} --- 与第一次
+具有相同的分布。以第一次结果为条件会改变
+概率；不知道则不然。这一可交换性
+论证将在下一章再次出现，用于抽样
+不放回的情形，在那里它给出超几何分布的均值 $np$，
+完全无需任何二项式恒等式。
+\end{example}
+
+\begin{theorem}[复合概率、全概率、
+贝叶斯]\label{thm:b2:proba:bayes}
+\leavevmode
+\begin{enumerate}
+\item （链式法则）若 $\P(A_1 \cap \dots \cap A_{n-1}) > 0$，
+\[
+\P(A_1 \cap \dots \cap A_n)
+= \P(A_1)\,\P(A_2 \mid A_1)\cdots
+\P(A_n \mid A_1 \cap \dots \cap A_{n-1}) .
+\]
+\item （全概率公式）若 $(B_i)_{i \in I}$ 为有限或
+可数的 $\Omega$ 划分，且 $\P(B_i) > 0$，则对每个
+事件 $A$：
+\[
+\P(A) = \sum_{i \in I} \P(A \mid B_i)\,\P(B_i) .
+\]
+\item （贝叶斯公式）在相同假设下，若另有 $\P(A) > 0$：
+\[
+\P(B_j \mid A)
+= \frac{\P(A \mid B_j)\,\P(B_j)}
+       {\sum_{i \in I} \P(A \mid B_i)\,\P(B_i)} .
+\]
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\emph{1.} 将每个条件概率写成商的形式：
+右边为
+\[
+\P(A_1)\cdot\frac{\P(A_1 \cap A_2)}{\P(A_1)}\cdot
+\frac{\P(A_1 \cap A_2 \cap A_3)}{\P(A_1 \cap A_2)}\cdots
+\frac{\P(A_1 \cap \dots \cap A_n)}{\P(A_1 \cap \dots \cap
+A_{n-1})},
+\]
+这是一个裂项相消的乘积：每个分母与
+前一个分子相消，剩下 $\P(A_1 \cap \dots \cap A_n)$。
+所有分母均满足 $\geq \P(A_1 \cap \dots \cap A_{n-1}) >
+0$（由单调性），因此没有任何项为零。（此假设正是
+为了排除这一情形：以概率为零的事件作条件化
+没有意义。）
+\emph{2.} 集合 $A \cap B_i$ 两两不相交，且并集为
+$A$；应用（$\sigma$-）可加性以及
+条件化的定义。
+\emph{3.} 等式 $\P(B_j \mid A)\P(A) = \P(A \mid
+B_j)\P(B_j)$ 两边都等于 $\P(A \cap B_j)$；两边除以 $\P(A)$，并
+用全概率公式展开 $\P(A)$。
+\end{proof}
+
+\begin{example}[生日碰撞，用链式法则
+求解]\label{ex:b2:proba:birthday}
+设 $n$ 个人的生日相互独立，且均匀分布于
+$365$ 天中，记 $D_n = {}$“所有 $n$ 个生日互不相同”。
+逐人条件化（链式法则）：
+\[
+\P(D_n) = \prod_{k=1}^{n-1}\Bigl(1 - \frac{k}{365}\Bigr),
+\]
+每新加入一人，都须避开已被占用的 $k$ 天。
+当 $n = 23$ 时，$\P(D_{23}) \approx 0.493$ --- 出现
+相同生日的概率已超过一半。下面的启发式方法可解释
+$23$ 为何如此之小：取对数，$-\ln
+\P(D_n) \approx \sum_{k<n}\frac k{365} =
+\frac{\binom n2}{365}$，并由 $\binom{23}2 = 253$ 得
+$253/365 \approx 0.693 \approx \ln 2$。关键在于
+\emph{配对}的个数，它以二次方速度增长：碰撞
+问题的尺度为 $n \sim \sqrt{365}$，而非 $n \sim
+365$ --- 生日悖论实为伪装的平方根。
+\end{example}
+
+\begin{example}[蒙蒂·霍尔问题，用贝叶斯公式]\label{ex:b2:proba:montyhall}
+奖品均匀地藏在三扇门中的一扇后面。你选定
+$1$ 号门；知道奖品所在位置的主持人，打开其中一扇
+其余的门，该门后总是空的（有选择时均匀随机地选取
+），比如 $3$ 号门。记 $B_i = {}$“奖品在
+$i$ 号门后”，$A = {}$“主持人打开 $3$ 号门”。则
+$\pcond{B_1}{A} = \frac12$, $\pcond{B_2}{A} = 1$,
+$\pcond{B_3}{A} = 0$，于是由贝叶斯公式
+（见\cref{thm:b2:proba:bayes}）得
+\[
+\P(B_2 \mid A)
+= \frac{1\cdot\frac13}
+{\frac12\cdot\frac13 + 1\cdot\frac13 + 0\cdot\frac13}
+= \frac23 :
+\]
+换门则三次中有两次获胜。该计算
+准确地揭示了流行误解的根源：主持人的行动是
+\emph{有信息量}（若奖品在 $2$ 号门后，他就不能
+打开它），而贝叶斯公式正是把这种不对称性
+换算为 $\frac23$ 的记账工具。以“所见”而非
+“所真”为条件，这正是
+该公式的全部精髓所在。
+\end{example}
+
+\begin{example}[德·梅雷骑士的两个
+赌局]\label{ex:b2:proba:demere}
+两场十七世纪的赌局，均由独立性求解。第一局
+为：掷一颗骰子 $4$ 次中至少出现一个六点，
+\[
+\P = 1 - \Bigl(\frac56\Bigr)^{\!4} \approx 0.518 > \frac12 .
+\]
+第二局为：掷两颗骰子 $24$ 次中至少出现一次双六，
+\[
+\P = 1 - \Bigl(\frac{35}{36}\Bigr)^{\!24} \approx 0.491 <
+\frac12 .
+\]
+梅雷推断，$24$ 次概率为 $\frac1{36}$ 的试验
+应当与 $4$ 次概率为 $\frac16$ 的试验相当（比例相同，
+$\frac{24}{36} = \frac46$）；这一比例性的失败
+--- 并事件的概率并不随次数
+线性增长 --- 据说促使他写信给帕斯卡，
+由此诞生了概率论。正确的
+比较应借助对数：$n$ 次概率为 $p$ 的试验
+至少成功一次的概率为 $1 - (1-p)^n \approx
+1 - \eu^{-np}$，因此真正的不变量是 $np$：这里
+$4\cdot\frac16 = \frac23$ 与 $24\cdot\frac1{36} =
+\frac23$ --- 恰好相等！两局赌注的差异只在
+$p$ 的二阶项上，且差异恰好足以使其中一局越过
+五成分界线：小概率场合中，直觉需要的是指数，
+而非线性的“尺子”。
+\end{example}
+
+\begin{remark}[条件概率中的常见谬误]
+三种反复出现的混淆，都可在上述各例中看到。
+(i) \emph{条件颠倒}：$\pcond BA$ 与 $\pcond AB$
+相差因子 $\P(A)/\P(B)$ --- 一项对患病者检出率达
+$99\%$ 的检验，仍可能使阳性
+患者几乎肯定是健康的，当疾病罕见时
+（见\cref{exo:b2:proba:3}）；把 $\pcond{\text{患病}}{
+\text{阳性}}$ 用于本应是 $\pcond{\text{阳性}}{
+\text{患病}}$ 之处，即为基率谬误。(ii)
+\emph{条件事件选错}：在蒙提·霍尔问题中，
+正确的条件事件是“主持人打开了 $3$ 号门”，
+而非“奖品不在 $3$ 号门后”；二者携带的
+信息不同，整个 $\frac23$ 的结论正取决于
+这一差别。(iii) \emph{互斥与独立}：
+概率为正的互斥事件永远不独立
+（$\P(A\cap B) = 0 \neq \P(A)\P(B)$） ---
+独立性指信息相容，而非没有
+重叠。
+\end{remark}
+
+\begin{definition}[独立性]\label{def:b2:proba:independence}
+称事件 $A$ 与 $B$ 为\emph{独立事件}\index{独立事件}，若 $\P(A \cap B) =
+\P(A)\P(B)$。称事件族 $(A_i)_{i \in I}$ 为
+\emph{相互独立}，若对每个有限子集 $J
+\subseteq I$，
+\[
+\P\Bigl(\bigcap_{i \in J} A_i\Bigr)
+= \prod_{i \in J} \P(A_i) .
+\]
+\end{definition}
+
+\begin{remark}
+相互独立严格强于两两
+独立：掷两枚公平硬币，事件“第一枚为
+正面”、“第二枚为正面”、“两枚结果一致”两两独立
+（每对的交集概率为 $\frac14 =
+\frac12\cdot\frac12$），但三者交集的概率为
+$\frac14 \neq \frac18$。另外注意，若 $A, B$ 独立，
+则 $A, B^c$ 亦独立（计算：$\P(A \cap B^c) = \P(A) - \P(A\cap B) =
+\P(A)(1 - \P(B))$），进而 $A^c, B^c$ 也独立。
+\end{remark}
+
+\begin{example}[由乘积结构读出的
+独立性]\label{ex:b2:proba:productindep}
+掷两颗公平骰子：$\Omega = \intint16^2$，取均匀
+权重。设 $A = {}$“第一颗为偶数”，$B = {}$“第二颗
+点数至少为 $5$”。计数：$\abs A = 3\cdot6 = 18$，
+$\abs B = 6\cdot2 = 12$，$\abs{A\cap B} = 3\cdot2 = 6$，于是
+\[
+\P(A\cap B) = \frac6{36} = \frac{18}{36}\cdot\frac{12}{36} =
+\P(A)\,\P(B) :
+\]
+故独立，其机制清晰可见 --- $A$ 仅约束
+第一个坐标，$B$ 仅约束第二个坐标，而
+乘积集上的均匀测度使坐标计数
+相乘。凡形如“依赖于
+互不相交掷骰组的事件彼此独立”的断言（大量用于
+周末问题）皆是同一计算，只是披上了
+更多下标的外衣。
+\end{example}
+
+\begin{example}[首步分析]\label{ex:b2:proba:firststep}
+对\cref{ex:b2:proba:geometric}中的几何模型，
+求首次正面出现于
+\emph{偶数}序号处的概率 $u$？以第一次投掷为条件：
+以概率 $p$ 序号为 $1$（奇数）；以概率 $q = 1 - p$ 时
+游戏重新开始且奇偶性全部对调，于是
+\[
+u = p\cdot0 + q\,(1 - u)
+\qquad\Longrightarrow\qquad
+u = \frac{q}{1 + q} .
+\]
+只需一行，无须级数 --- 这与
+\cref{exo:b2:proba:9}的直接求和相符，后者给出 $1 - u =
+\frac1{1+q}$。这种“首步”方法（以首次试验为条件，
+识别出原问题的一个平移副本）
+是递推的概率形式，它正是
+支撑游戏时长方程的引擎，
+正是\cref{exo:b2:proba:6}及
+周末问题中的首次通过计算。
+\end{example}
+
+\section{博雷尔--坎特利引理}
+
+\begin{definition}[事件的上极限]\label{def:b2:proba:limsup}
+设 $(A_n)$ 为事件序列，事件
+\[
+\limsup_n A_n
+= \bigcap_{N=0}^{\infty}\ \bigcup_{n \geq N} A_n
+= \{\omega \in \Omega : \omega \in A_n
+\text{ 对无穷多个 } n\}
+\]
+是事件“$A_n$ 发生无穷多次”。
+\end{definition}
+
+\begin{example}[翻译“无穷多次”与
+“最终”]\label{ex:b2:proba:limsuplang}
+由德摩根律，$\limsup_nA_n$ 的补事件为
+\[
+\Bigl(\bigcap_N\bigcup_{n\geq N}A_n\Bigr)^{\!c}
+= \bigcup_N\bigcap_{n\geq N}A_n^c
+= \{\omega : \omega \notin A_n \text{ 对所有充分大的 }n\},
+\]
+即事件“\emph{最终}，$A_n$ 不发生”（记为
+$\liminf_nA_n^c$）。因此“$A_n$ 发生无穷多次”与
+“$A_n^c$ 最终发生”互为补事件 --- 牢记这套对照关系，
+可避免绝大多数量词上的错误。
+掷硬币的示例翻译如下：“无穷多次
+正面”即 $\limsup\{X_n = H\}$；“只出现有限多段
+连续 $100$ 次正面”是某个上极限的补事件；“累计
+频率收敛到 $\frac12$”的事件为
+$\bigcap_j\bigcup_N\bigcap_{n\geq N}\{\abs{\widehat p_n -
+\tfrac12} < \tfrac1j\}$ --- 全程为可数运算，
+故以上都是真正的事件。
+\end{example}
+
+\begin{theorem}[博雷尔--坎特利]\label{thm:b2:proba:borelcantelli}
+\leavevmode
+\begin{enumerate}
+\item 若 $\sum_{n} \P(A_n) < \infty$，则
+$\P\bigl(\limsup_n A_n\bigr) = 0$.
+\item 若事件 $A_n$ 独立，且 $\sum_n \P(A_n) =
+\infty$，则 $\P\bigl(\limsup_n A_n\bigr) = 1$。
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\emph{1.} 记 $C_N = \bigcup_{n \geq N}A_n$；序列 $(C_N)$
+递减，其交为 $\limsup A_n$，由可数次可加性
+（见\cref{cor:b2:proba:subadd}）
+\[
+\P(C_N) \leq \sum_{n \geq N}\P(A_n)
+\xrightarrow[N\to\infty]{} 0
+\]
+（收敛级数的尾部）。由单调连续性
+（见\cref{thm:b2:proba:continuity}）可得 $\P(\limsup A_n) =
+\lim_N \P(C_N) = 0$.
+
+\emph{2.} 只需证明 $\P\bigl(\bigcup_{n\geq N}A_n\bigr)
+= 1$ 对每个 $N$ 成立。事实上，若事件 $B_N$ 的概率均为
+$1$，则
+\[
+\P\Bigl(\Bigl(\bigcap_NB_N\Bigr)^{\!c}\Bigr)
+= \P\Bigl(\bigcup_NB_N^c\Bigr)
+\leq \sum_N\P(B_N^c) = 0
+\]
+由可数次可加性
+（见\cref{cor:b2:proba:subadd}），故可数交
+$\limsup A_n = \bigcap_N\bigcup_{n\geq N}A_n$ 的概率仍为
+$1$。固定 $N$，对 $M > N$ 考虑
+其补事件：
+\[
+\P\Bigl(\bigcap_{n=N}^{M} A_n^c\Bigr)
+= \prod_{n=N}^{M}\bigl(1 - \P(A_n)\bigr)
+\leq \prod_{n=N}^{M} e^{-\P(A_n)}
+= \exp\Bigl(-\sum_{n=N}^M \P(A_n)\Bigr) ,
+\]
+利用补事件的独立性及凸性不等式 $1 -
+x \leq e^{-x}$。当 $M \to \infty$ 时，指数趋于 $-\infty$
+因级数发散，故由单调连续性
+（递减序列）得 $\P\bigl(\bigcap_{n \geq N}A_n^c\bigr) = 0$，
+即 $\P\bigl(\bigcup_{n \geq N}A_n\bigr) = 1$。
+\end{proof}
+
+\begin{example}[无穷多段连续正面]\label{ex:b2:proba:runs}
+无限次抛掷一枚均匀硬币，令 $A_n$ 为事件“第 $n,
+n+1, \dots, n + k - 1$ 次抛掷均为正面”（即连续 $k$ 次正面
+从时刻 $n$ 开始），对固定的 $k$，事件 $A_{jk}$（$j =
+1, 2, \dots$），依赖于互不相交的抛掷块，它们
+独立，每个事件概率为 $2^{-k}$，且 $\sum_j 2^{-k} =
+\infty$：由博雷尔--坎特利~2，以概率 $1$ 有无穷多
+个抛掷块全为正面 --- \emph{每一个}固定模式都会重现
+无穷多次，几乎必然。反之，若让游程长度增长，
+$B_n = {}$“长为 $2\log_2 n$ 的连续正面始于
+$n$”的概率 $\P(B_n) = n^{-2}$ 可和，故几乎必然只有有限多个
+这样的长游程开始：博雷尔--坎特利引理可精确地刻画
+最长游程\emph{有多长}。
+\end{example}
+
+\begin{example}[无穷猴子问题，定量化]
+一只猴子独立、均匀地从一个
+$26$ 个字母的字母表中敲出字母。把打字稿切成互不相交的
+四字母块；记 $A_j = {}$为事件“第 $j$ 块拼出
+MATH”，这些事件独立，且 $\P(A_j) = 26^{-4}$，
+$\sum_j\P(A_j) = \infty$：由博雷尔--坎特利~2，猴子
+几乎必然无限次敲出 MATH --- 对任何长度的
+固定文本，调整分块后结论同样成立。
+定量的注记消解了这一“奇迹”：$26^4 =
+456\,976$，故首次敲出 MATH 平均需约五十万
+次击键；而一部莎士比亚剧作，长 $10^5$
+个字符，所需等待块数的量级为 $26^{10^5}$ --- “几乎必然”
+是关于时间尺度 $\infty$ 的论断，而非
+猴子实际可能遇到的任何时间尺度。博雷尔--坎特利引理保证了
+极限；各项的大小在人类尺度上讲述了这个故事。
+\end{example}
+
+\begin{remark}
+在\cref{ex:b2:proba:runs}中，基础样本空间（无限
+抛掷序列全体）是不可数的，因此严格说来，
+该例属于本科三年级分册的测度论框架；
+而\emph{计算}只用到本章证明的
+规则，应用于由有限次抛掷确定的事件及
+它们的可数组合。这是本阶段的通行约定：
+理论只在可数样本空间上陈述，无限博弈
+的例子同样用这套工具处理。
+\end{remark}
+
+\begin{remark}[本分册内的展望]
+本章的方法被紧接着的
+后两章整体采用。示性函数把事件化为随机变量，而
+$\sigma$-可加性成为定义
+期望的可和性（\cref{ch:b2:randomvar}）；博雷尔--坎特利加上一个
+可和的尾部界，正是证明抛硬币强大数定律的
+办法。在
+\cref{ch:b2:genfun}中，单调连续性再次出现，
+于决定性时刻：分支过程的灭绝概率
+被\emph{定义}为单调极限
+$\lim\P(Z_n = 0)$，而它满足的不动点方程
+由对该递增数列取极限得到，
+数列——全书的最后定理即依托于
+本章的第一个定理。
+\end{remark}
+
+\begin{remark}[方法：证明概率为一的三种途径]
+几乎必然成立的陈述，用三种杠杆证明，
+按强度递增排列。\emph{单调连续性}：
+将该事件写成有限时域事件的递增并
+（或递减交），这些事件的概率可算（
+\cref{ex:b2:proba:sixeventually}）。
+\emph{零概率并}：可数个概率为零的事件之并
+仍为零概率（可数次可加性），故只需
+分别排除每个坏事件——这正是“对每个
+$j$，最终 $\abs{\widehat p_n - p} < 1/j$”组合成
+收敛。\emph{博雷尔--坎特利}：当事件是
+上极限时，对概率求和；级数收敛则
+该事件概率为零（无需独立性），而发散加上独立性
+则可断定它几乎必然发生。
+证明的全部；周末问题在单个论证中
+同时用上三种杠杆。
+\end{remark}
+
+\begin{remark}[应用之处]
+单调连续性与博雷尔--坎特利，是
+每个“几乎必然”论断的两种杠杆：它们推动了
+本章周末问题中随机游走的常返性，
+大数定律的几乎必然一侧
+（\cref{ch:b2:randomvar}），以及
+分支过程的灭绝分析（\cref{ch:b2:genfun}）。本科三年级分册
+以 $\sigma$-代数与勒贝格积分重建理论，
+其中此处非正式使用的不可数样本空间
+将得到完全严格的处理。
+\end{remark}
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:b2:proba:1}
+一个罐中有 $n$ 个编号的球，逐个
+不放回地取出。计算球 $1$
+先于球 $2$ 被取出的概率。推广：求
+球 $1$ 在球 $1, \dots, k$ 中最先被取出的概率。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:proba:2}
+证明在 $\Omega = \N^*$ 上，权重 $p_k = \frac{1}{k(k+1)}$
+确定一个概率测度，并把 $\P(2\N^*)$（偶数结果）
+写成级数，并证明它等于 $1 - \ln 2$。
+\emph{（裂项 $\frac{1}{2j(2j+1)} = \frac{1}{2j} -
+\frac{1}{2j+1}$，并利用交错调和级数（
+\cref{ch:b2:series}）。}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:proba:3}
+（假阳性）某疾病每 $10\,000$ 人中有一人患病。一项
+检验对患者以概率 $0.99$ 检出，并
+对健康者以概率 $0.01$ 给出假阳性。求已知
+检验为阳性时患病的概率，并作评论。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:proba:4}
+设 $A_1, \dots, A_n$ 为事件。证明容斥
+公式：
+\[
+\P\Bigl(\bigcup_{i=1}^n A_i\Bigr)
+= \sum_{\emptyset \neq J \subseteq \{1,\dots,n\}}
+(-1)^{\abs J + 1}\,\P\Bigl(\bigcap_{i \in J}A_i\Bigr)
+\]
+通过对恒等式 $1 - \prod_{i=1}^n(1 -
+\mathbf{1}_{A_i}) = \mathbf{1}_{\bigcup A_i}$ 在 $\Omega$ 上积分
+（即以 $\P(\{\omega\})$ 为权求和）。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:proba:5}
+（配对问题，借助容斥公式）将 $n$ 封信
+随机均匀地装入 $n$ 个信封，每个信封一封。利用
+\cref{exo:b2:proba:4}，证明\emph{无一封}
+正确配对的概率为 $\sum_{k=0}^n \frac{(-1)^k}{k!} \to e^{-1}$，并
+由此推出恰有一次正确配对的概率。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:proba:6}
+一枚有偏硬币（正面概率 $p \in \intoo{0}{1}$）被抛掷，
+直到出现连续两次正面为止。设 $q_n$ 为
+博弈持续超过 $n$ 次抛掷的概率。以首次（或前几次）
+抛掷为条件，证明 $q_n = (1-p)\,q_{n-1} + p(1-p)\,q_{n-2}$，
+其中 $n \geq 2$，并推出博弈以概率
+$1$ 结束。\emph{（通过与几何
+数列比较证明 $q_n \to 0$：特征方程的两根都
+落在 $\intoo{0}{1}$ 内（取模）。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:proba:7}
+（记录）在下列组合意义下抽取一列独立的均匀排列：
+对每个 $n$，
+前 $n$ 次抽取的相对次序在 $n!$ 种等可能情形中均匀分布，
+并记 $R_n = {}$“第 $n$ 次抽取是记录（比
+之前所有抽取都大）”。承认事件 $R_n$ 相互独立，
+且 $\P(R_n) = 1/n$（至少借助
+对称性证明最后这一等式），利用博雷尔–坎泰利引理证明：几乎必然
+出现无穷多次记录，但
+\emph{相邻}时刻 $n, n+1$ 同时为记录的情形
+无穷次发生的概率 --- 计算 $\sum_n \P(R_n \cap R_{n+1})$，
+并由博雷尔–坎泰利第一引理得出结论。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:proba:8}
+（科亨–斯通风格，较易版本）设 $(A_n)$ 为
+独立事件，且 $\P(A_n) = \frac{1}{n+1}$。证明
+$\P(\limsup A_n) = 1$，虽然 $\P(A_n) \to 0$：“单个罕见，
+整体上必然”。反之，给出一列（不独立的）事件，
+使 $\sum\P(A_n) = \infty$ 且
+$\P(\limsup A_n) = 0$，说明在
+博雷尔–坎泰利第二引理中独立性不可去掉。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:proba:9}
+一枚正面概率为 $p \in \intoo01$ 的硬币被抛掷，直到
+首次出现正面为止。计算
+首次正面恰在奇数次抛掷时出现的概率，并对均匀硬币求其值。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:proba:10}
+设 $(A_n)_{n\geq1}$ 为独立事件，且 $\P(A_n) =
+p_n < 1$。证明
+\[
+\P\Bigl(\bigcap_{n\geq1}A_n^c\Bigr)
+= \prod_{n\geq1}(1 - p_n)
+:= \lim_{N\to\infty}\prod_{n=1}^N(1 - p_n),
+\]
+并证明该极限 $> 0$ 当且仅当 $\sum p_n <
+\infty$。请与博雷尔–坎泰利引理相对照：当 $\sum p_n =
+\infty$ 时，不仅几乎必然有某个 $A_n$ 发生 ---
+而是无穷多个都发生。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:proba:11}
+（巴拿赫火柴盒问题）一名吸烟者每只口袋里各放一盒 $n$ 根火柴，
+每次都随机均匀地选一只口袋伸手去取。
+当他首次发现某盒已空时，
+另一盒恰含 $k$ 根火柴的概率是多少？证明答案为
+$\binom{2n-k}{n}2^{-(2n-k)}$，并
+检验这些概率之和为 $1$（取 $n = 1$）。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:proba:12}
+（$\sigma$ 可加性是真正的公理）
+(a) 证明在 $(\N,
+\mathcal P(\N))$ 上不存在使所有单点集权重相同的概率测度。
+(b) 对 $A \subseteq \N^*$，令 $d(A) =
+\lim_n\frac{\abs{A\cap\intint1n}}{n}$，当该极限存在时
+（\emph{自然密度}）。证明
+对于三者密度均存在的集合对，$d$ 是有限可加的，
+并使每个单点集的密度为 $0$，$\N^*$ 的密度为 $1$ ---
+并由此推出 $d$ 不是 $\sigma$ 可加的。
+(c) 给出一个没有密度的集合。\emph{（交替地纳入与排除
+区块 $\intint{2^{2k}}{2^{2k+1}-1}$。）}
+\end{exercise}
+
+\section{问题：$\Z$ 上的简单随机游走是常返的}
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=0.42, y=0.9cm]
+  \draw[->] (0,0) -- (25,0) node[below] {$n$};
+  \draw[->] (0,-2.6) -- (0,2.9) node[left] {$S_n$};
+  \draw[omDef, thick] plot coordinates {(0,0) (1,1) (2,0)
+    (3,-1) (4,0) (5,1) (6,2) (7,1) (8,2) (9,1) (10,0) (11,-1)
+    (12,-2) (13,-1) (14,0) (15,-1) (16,0) (17,1) (18,2) (19,1)
+    (20,0) (21,1) (22,0) (23,1) (24,2)};
+  \foreach \t in {2,4,10,14,16,20,22}
+    \fill[omThm] (\t,0) circle (5pt);
+  \fill (0,0) circle (5pt);
+\end{tikzpicture}
+
+{\small 简单随机游走的二十四步；红点
+标出返回原点的位置。本题表明，
+以概率 $1$，这些点永远不会停止出现 --- 然而
+相邻两点之间的等待时间的均值却发散。}
+\end{omfigure}
+
+\begin{problem}[{周末问题 --- 波利亚常返定理
+（$\Z$ 上），沿途穿插选票问题与反正弦定律的
+风格}]\label{pb:b2:proba:1}
+无限次抛掷一枚均匀硬币；令 $X_i = \pm1$ 为第 $i$ 步，
+并令 $S_n = X_1 + \dots + X_n$ 为
+\emph{简单随机游走}\index{简单随机游走}（$\Z$ 上），$S_0 = 0$。
+与\cref{ex:b2:proba:runs}中一样，下列事件都由
+有限多次抛掷决定，或是这类事件的可数组合，
+并且依赖于互不相交抛掷块的事件之独立性
+是模型的一部分。记 $u_n =
+\P(S_{2n} = 0)$，并记 $N_n(k)$ 为
+$\pm1$ 路径数，其长为 $n$，从 $0$ 到 $k$。
+
+\medskip
+\noindent\textbf{第 I 部分 --- 路径计数。}
+\begin{enumerate}
+  \item 证明 $N_n(k) = \binom{n}{(n+k)/2}$，当 $n + k$
+        为偶数且 $\abs k \leq n$ 时成立，其余情形为 $0$；由此推出
+        $\P(S_n = k) = N_n(k)\,2^{-n}$。为何
+        长为 $n$ 的每条单独路径都等可能？
+  \item 证明 $S_{2n+1} \neq 0$，且 $u_n =
+        \binom{2n}{n}4^{-n}$，并计算 $u_1, u_2, u_3$。
+  \item 证明 $u_n = \frac{2n-1}{2n}\,u_{n-1}$；由此推出
+        $(u_n)$ 单调递减趋于 $0$，并由
+        \cref{ex:b2:comparison:centralbinomial}可得
+        \[
+        u_n \sim \frac{1}{\sqrt{\pi n}},
+        \qquad\text{于是}\qquad
+        \sum_n u_n = \infty .
+        \]
+  \item （反射原理）设 $k \geq 1$，证明：
+        长为 $n$ 的、从 $1$ 到 $k$ 且触及 $0$ 的路径，
+        与从 $-1$ 到 $k$ 的路径之间存在双射；
+        由此推出，从 $0$ 到 $k$ 的路径中，
+        始终 $> 0$（自时刻 $0$ 起）的条数为 $N_{n-1}(k-1) -
+        N_{n-1}(k+1)$。
+  \item （选票定理）由此推出
+        \[
+        \P\bigl(S_1 > 0, \dots, S_{n-1} > 0 \bigm| S_n =
+        k\bigr) = \frac kn \qquad (k \geq 1) :
+        \]
+        即在一次计票中，胜者领先 $k$ 票，共 $n$ 张选票，
+        胜者在整个计票过程中始终领先的概率为
+        $k/n$。手工验证 $n = 3$，$k =
+        1$ 的情形。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第二部分 --- 回到原点。}
+\begin{enumerate}[resume]
+  \item 证明关键恒等式
+        \[
+        \P(S_1 \neq 0,\ S_2 \neq 0,\ \dots,\ S_{2n} \neq 0) =
+        u_n
+        \]
+        \emph{（对第一步取条件，对终点求和，用第 4 题的计数，
+        再裂项相消；
+        最后以 $2\binom{2n-1}{n} = \binom{2n}{n}$ 结束）}。
+  \item 由单调连续性
+        （见\cref{thm:b2:proba:continuity}）可知随机游走
+        至少返回 $0$ 一次的概率为 $1$，
+        且 $f_n := \P(\text{首次返回于时刻 }2n)$
+        满足
+        \[
+        f_n = u_{n-1} - u_n = \frac{u_n}{2n-1},
+        \qquad \sum_{n\geq1}f_n = 1 .
+        \]
+  \item 证明 $\sum_n 2n\,f_n = \infty$：返回
+        几乎必然发生，但用来计算平均等待时间的级数
+        发散（用
+        \cref{ch:b2:randomvar}中的语言说，返回时间的
+        期望为无穷）。
+  \item 证明对每个 $k \geq 1$，$\P(\text{至少 }
+        k\text{ 次返回到 }0) = 1$ \emph{（对前 $k$ 次返回的时刻作分解：
+        相应的抛掷区段互不相交，
+        因此概率相乘，
+        再求和得 $(\sum_nf_n)^k$）}；借助
+        单调连续性，得
+        \[
+        \P(S_n = 0 \text{ 对无穷多个 } n) = 1 :
+        \]
+        即 $\Z$ 上的简单随机游走是\emph{常返}的。
+  \item 证明随机游走几乎必然访问每个格点 $k \in \Z$，
+        从而（由常返性，在首次访问时重新开始）
+        无穷多次地访问之。\emph{（从 $0$ 出发的相继游历的符号
+        是独立的公平硬币；
+        正的游历访问 $1$。）}
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第三部分 --- 博雷尔--坎泰利引理与有偏
+游走。}
+\begin{enumerate}[resume]
+  \item 事件 $A_n = \{S_{2n} = 0\}$ 满足 $\sum\P(A_n)
+        = \infty$；解释为何博雷尔--坎泰利第二引理
+        \emph{不}适用于它们，以及若该级数收敛，
+        博雷尔--坎泰利第一引理会给出什么结论。
+        （这是整个部分的策略。）
+  \item 现设硬币偏倚 $p \neq \frac12$，$q = 1 -
+        p$。证明 $\P(S_{2n} = 0) = \binom{2n}n(pq)^n =
+        u_n\,(4pq)^n$，其中 $4pq < 1$，由此推出
+        $\sum_n\P(S_{2n} = 0) < \infty$，并由
+        博雷尔--坎泰利第一引理推得：几乎必然地，有偏游走返回 $0$
+        只有有限多次。
+  \item 仍设 $p \neq \frac12$：证明 $\P(S_n = k) \leq
+        \binom{n}{\floor{n/2}}\,(pq)^{n/2}\,(p/q)^{k/2}$，
+        对每个固定的 $k$ 成立，推出每个格点几乎必然
+        只被访问有限多次，并由此得出
+        $\abs{S_n} \to \infty$ 几乎必然成立：有偏游走
+        是\emph{暂返}的。
+  \item 回到公平硬币：利用第 6 题，计算
+        $200$ 次抛掷\emph{不}出现平局的概率
+        （即 $S_n \neq 0$ 对 $1 \leq n \leq 200$ 成立），数值上
+        $u_{100} \approx 0.056$。请评论
+        $1/\sqrt{\pi n}$ 的缓慢衰减，平局长期必然出现，
+        但比直觉所暗示的更罕见。
+  \item （首次通过）设 $T_1$ 为游走首次
+        击中 $1$。利用极大值
+        $M_n = \max_{i\leq n}S_i$ 的反射原理
+        （由第 16 题证明，且不依赖于本题），或直接
+        由第 7 题对第一步取条件得到，
+        证明 $\P(T_1 = 2n - 1) = f_n$；由此推出 $\P(T_1 <
+        \infty) = 1$，而平均时间级数
+        $\sum(2n-1)f_n$ 发散。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第四部分 --- 极大值、最后零点与长期领先。}
+\begin{enumerate}[resume]
+  \item （极大值的反射）对 $k \geq 1$，证明
+        \[
+        \P(M_n \geq k) = 2\,\P(S_n > k) + \P(S_n = k)
+        \]
+        通过在首次到达水平
+        $k$ 之后将路径反射。
+  \item 由此推出 $\P(M_{2n} \geq 1) = 1 - u_n$，即
+        $\P(S_i \leq 0 \text{ 对所有 } i \leq 2n) = u_n$：
+        从未领先的概率等于
+        从未处于零点的概率（第 6 题）——
+        两个不同的事件，却有同一个概率。
+  \item （最后零点）设 $L_{2n} = \max\{k \leq 2n : S_k =
+        0\}$（为偶数）。结合第 6 题与
+        不相交抛掷区段的独立性，证明
+        \[
+        \P(L_{2n} = 2k) = u_k\,u_{n-k}
+        \qquad (0 \leq k \leq n),
+        \]
+        不必再作计算，由此推出二项
+        恒等式 $\sum_{k=0}^n u_ku_{n-k} = 1$。
+  \item 证明 $L_{2n}$ 的分布是对称的（$\P(L =
+        2k) = \P(L = 2n - 2k)$），并利用 $u_j \sim
+        1/\sqrt{\pi j}$，说明其两端的取值是
+        最可能的取值。取 $n = 5$，列出 $\P(L_{10} = 0)
+        = u_5 \approx 0.246$ 与 $\P(L_{10} = 4) = u_2u_3
+        \approx 0.117$。解释：在长期的公平博弈中，
+        最后一次平局往往或者很早，或者很晚——
+        长期领先是常态，而非例外。
+  \item 将第 16--19 题综合成一段，论述公平游走的
+        涨落图景：由第 3 题提示的扩散尺度，
+        返回的必然性与发散的平均等待时间，
+        以及
+        具有反正弦律特征的领先持续性。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第五部分 --- 更新恒等式与
+波利亚定理。}
+\begin{enumerate}[resume]
+  \item 对 $\{S_{2n} = 0\}$ 按首次返回时刻作划分，证明
+        \emph{更新恒等式}：
+        \[
+        u_n = \sum_{k=1}^n f_k\,u_{n-k} \quad (n \geq 1),
+        \qquad\text{因此}\qquad
+        U(x)\bigl(1 - F(x)\bigr) = 1 \quad (0 \leq x < 1),
+        \]
+        其中 $U(x) = \sum_{n\geq0}u_nx^n$ 与 $F(x) =
+        \sum_{n\geq1}f_nx^n$ （请论证收敛半径，以及
+        级数相乘的合理性，见\cref{ch:b2:powerseries}）。
+  \item 由此推出\emph{常返二分性}：令 $x
+        \to 1^-$ （非负系数级数的
+        单调极限），得
+        \[
+        \sum_n u_n = \infty \iff \sum_n f_n = 1 ,
+        \]
+        并与第 3、7 题（公平游走）及
+        第 12 题（有偏游走）相对照。
+  \item （维数 $2$）$\Z^2$ 上的简单游走的步长取
+        $(\pm1, 0)$、$(0, \pm1)$，且等可能。证明
+        旋转坐标 $U_n = X_n + Y_n$ 与 $V_n = X_n
+        - Y_n$ 分别构成两个\emph{独立}的公平游走，
+        在 $\Z$ 上，由此推出
+        \[
+        \P\bigl(S^{(2)}_{2n} = (0,0)\bigr) = u_n^2 \sim
+        \frac1{\pi n},
+        \qquad \sum_n u_n^2 = \infty ,
+        \]
+        并借助第 21--22 题（其证明
+        可原样移用），由此得出
+        $\Z^2$ 上的游走是常返的。
+  \item （维数 $3$）对 $\Z^3$ 上的简单游走，承认
+        局部估计 $\P(S^{(3)}_{2n} = 0) \leq
+        C\,n^{-3/2}$ （可由本科三年级分册中
+        的局部极限定理证明）。由博雷尔--坎泰利第一引理推出
+        $\Z^3$ 上的游走是暂留的，并陈述
+        完整结论：\emph{波利亚定理} --- 简单
+        随机游走在维数 $1$ 与 $2$ 中常返，
+        在维数 $3$ 及更高维时暂留。
+  \item 综合。列出以下各项所起的确切作用：路径计数
+        与反射；单调连续性；
+        互不相交投掷段的独立性；
+        博雷尔--坎泰利第一引理；更新恒等式。哪一个
+        单一的分析事实（$u_n \sim 1/\sqrt{\pi n}$，因而
+        $\sum u_n = \infty$ 但 $\sum u_n^2 = \infty$ 且
+        $\sum n^{-3/2} < \infty$）决定各维数下
+        游走是常返还是暂留？
+\end{enumerate}
+\end{problem}

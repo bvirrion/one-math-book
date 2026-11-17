@@ -1,0 +1,706 @@
+\chapter{\texorpdfstring{$\R^n$}{Rn}中的子流形}
+\label{ch:b3:submanifolds}
+
+球面、环面、旋转群：几何与力学的自然栖息地，
+并不是向量空间，而是\emph{近看像平面的弯曲
+集合}。本章给这一说法一个精确的含义，
+即 $\R^n$ 中的子流形，并介绍在其上运用的微积分。
+基础是反函数定理，
+这里借助巴拿赫不动点定理予以证明；
+其余内容都是坐标变换：子流形的四种等价描述
+（局部拉直、水平集、
+图像、参数化）、切空间，以及
+借助拉格朗日乘子法的约束优化——它
+作为压轴的演示，只用三行几何推理便重新证明了
+实对称矩阵的谱定理。周末问题
+构造旋转群 $SO(3)$ 及其四元数双重覆盖：
+代数（\cref{ch:b3:groups}中的
+$Q_8$ 的进一步推广）与几何相遇。
+
+\section{反函数定理}
+
+\begin{theorem}[反函数定理]
+\label{thm:b3:submanifolds:ift}
+设 $U \subseteq \R^n$ 为开集，$f \colon U \to \R^n$ 为
+$\mathcal C^1$ 类，$a \in U$ 且 $Df(a)$ 可逆。
+则存在开集 $V \ni a$、$W \ni f(a)$，使得
+$f \colon V \to W$ 为双射，且其逆映射为 $\mathcal C^1$ 类，
+并\index{反函数定理}
+\[
+D(f^{-1})(y) = \bigl(Df(f^{-1}(y))\bigr)^{-1}
+\qquad (y \in W).
+\]
+若 $f$ 为 $\mathcal C^k$ 类，则 $f^{-1}$ 亦然。
+\end{theorem}
+
+\begin{proof}
+标准化：将 $f$ 替换为 $x \mapsto Df(a)^{-1}\bigl(f(a +
+x) - f(a)\bigr)$，不妨设 $a = 0$，$f(0) = 0$，$Df(0) =
+I$（一般情形可由与仿射双射复合得到）。
+记 $f(x) = x + g(x)$，则 $Dg(0) = 0$，且
+由 $Dg$ 的连续性，可取 $r > 0$，使得
+$\vertiii{Dg(x)} \leq \frac12$（于 $\bar B(0, r)$ 上）；由中值不等式，
+在该集合上 $\norm{g(x) - g(x')} \leq \frac12
+\norm{x - x'}$。
+
+\emph{在某一邻域上的双射性。}对 $y \in B(0,
+\frac r2)$，求解 $f(x) = y$ 等价于求
+$\Phi_y(x) = y - g(x)$ 的不动点；$\Phi_y$ 将 $\bar B(0, r)$ 映入
+自身（$\norm{\Phi_y(x)} \leq \norm y + \frac12\norm x \leq
+r$），且为 $\frac12$-利普希茨映射：由巴拿赫定理
+（\cref{thm:b3:complete:banach}）得唯一解
+$x = \varphi(y) \in \bar B(0,r)$。此外，$f$ 在
+$\bar B(0,r)$ 上为单射：
+\[
+\norm{f(x) - f(x')} \geq \norm{x - x'} - \norm{g(x) - g(x')}
+\geq \tfrac12\norm{x - x'} .
+\tag{$*$}
+\]
+取 $W = B(0, \frac r2)$，$V = f^{-1}(W)\cap B(0, r)$：
+由连续性知其为开集，且 $f \colon V \to W$ 为双射。
+
+\emph{逆映射的连续性与可微性。}由 $(*)$ 可知
+$\varphi = f^{-1}$ 为 $2$-利普希茨映射。固定 $y_0 = f(x_0)
+\in W$；$A = Df(x_0)$ 的可逆性（它与 $I$ 的距离
+$\leq \frac12$，由诺伊曼级数（
+\cref{prop:b3:banach:neumann}）可知其可逆，再结合 $f$ 的可微性，
+对 $y = f(x)$ 充分接近 $y_0$ 时有：
+\[
+\varphi(y) - \varphi(y_0) - A^{-1}(y - y_0)
+= -A^{-1}\bigl(f(x) - f(x_0) - A(x - x_0)\bigr)
+= -A^{-1}\,o(\norm{x - x_0}) = o(\norm{y - y_0}),
+\]
+其中用到 $(*)$ 以 $\norm{x - x_0} \leq 2\norm{y - y_0}$ 进行换算：
+因此 $\varphi$ 在 $y_0$ 处可微，
+且其微分即为逆映射的微分。至于 $y \mapsto D\varphi(y) =
+Df(\varphi(y))^{-1}$ 的连续性：它是连续映射的复合
+（求逆运算是连续的，
+\cref{prop:b3:banach:neumann}），故 $\varphi \in \mathcal C^1$；
+反复利用同一公式即得 $\mathcal C^k$。
+\end{proof}
+
+\begin{theorem}[隐函数定理]
+\label{thm:b3:submanifolds:implicit}
+设 $F \colon U \subseteq \R^p\times\R^q \to \R^q$ 为
+$\mathcal C^1$ 类（在 $(a, b)$ 附近），$F(a,b) = 0$，且
+偏微分 $D_yF(a,b) \in \mathcal L(\R^q)$
+可逆。则存在邻域 $A \ni a$、$B \ni b$
+及 $\mathcal C^1$ 映射 $\psi \colon A \to B$，使得
+\[
+\bigl\{(x, y)\in A\times B : F(x,y) = 0\bigr\}
+= \{(x, \psi(x)) : x \in A\},
+\]
+且 $D\psi(x) = -D_yF(x, \psi(x))^{-1}\,D_xF(x,
+\psi(x))$。\index{隐函数定理}
+\end{theorem}
+
+\begin{proof}
+将 \cref{thm:b3:submanifolds:ift} 应用于 $\Theta(x, y) = (x,
+F(x,y))$：其在 $(a,b)$ 处的微分为分块上三角矩阵，
+对角块 $I$ 与 $D_yF$ 均可逆，故该微分可逆。
+局部逆映射的形式为 $\Theta^{-1}(x, z) = (x, h(x,
+z))$；令 $\psi(x) = h(x, 0)$，则 $F(x, y) = 0$ 当且仅当
+$\Theta(x,y) = (x, 0)$ 当且仅当 $y = \psi(x)$（局部地）。
+公式：对 $F(x, \psi(x)) = 0$ 用链式法则求导
+即可。
+\end{proof}
+
+\section{子流形：四种定义}
+
+\begin{theorem}[等价刻画]
+\label{thm:b3:submanifolds:characterizations}
+设 $M \subseteq \R^n$，$d \in \{0, \dots, n\}$，且 $k \geq
+1$。对每一点 $a \in M$，下列条件等价
+（且 $M$ 为\emph{$d$ 维
+$\mathcal C^k$ 类子流形}\index{子流形}，若它们在每一点 $a
+\in M$）：
+\begin{enumerate}
+  \item （\emph{拉直}）存在 $\mathcal C^k$ 类微分同胚
+        $\Phi$，它从开集 $\Omega \ni a$
+        映到开集 $\Omega' \subseteq \R^n$ 上，使得
+        \[
+        \Phi(M\cap\Omega) = \Omega' \cap
+        \bigl(\R^d\times\{0\}\bigr).
+        \]
+  \item （\emph{水平集}）存在 $\mathcal C^k$ 类
+        \emph{淹没} $F \colon \Omega \to \R^{n-d}$，
+        （即 $DF(x)$ 满射），在开集 $\Omega \ni a$ 上，
+        使得 $M\cap\Omega = F^{-1}(0)$。
+  \item （\emph{图像}）适当置换坐标后，$M$ 局部地为
+        某个 $\mathcal C^k$ 类映射 $\psi
+        \colon A \subseteq \R^d \to \R^{n-d}$ 的图像。
+  \item （\emph{参数化}）存在 $\mathcal C^k$ 类
+        \emph{浸入} $\varphi \colon A \subseteq \R^d \to
+        \R^n$（$D\varphi(u)$ 单射），其中 $A$ 为开集，
+        $\varphi$ 为从 $A$ 到 $M \cap
+        \Omega$ 上的同胚（对某开集 $\Omega \ni a$）。
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1)$\Rightarrow$(2)：$F = (\Phi_{d+1}, \dots, \Phi_n)$（最后
+几个分量，即 $\Phi$ 的分量）：是浸没（$D\Phi$ 可逆）。
+(2)$\Rightarrow$(3)：$DF(a)$ 满射，即雅可比矩阵的某个 $q \times q$
+子式可逆（$q = n - d$）；
+置换坐标后，$D_yF(a)$ 可逆，于是
+由隐函数定理（\cref{thm:b3:submanifolds:implicit}）
+$M$ 局部地是 $y = \psi(x)$ 的图像。
+(3)$\Rightarrow$(4)：$\varphi(x) = (x, \psi(x))$ 是一个
+浸入（微分 $\bigl(\begin{smallmatrix}I\\
+D\psi\end{smallmatrix}\bigr)$ 单射），并且是到图像上的同胚
+（逆为投影，连续）。
+(4)$\Rightarrow$(1)：设 $\varphi(u_0) = a$；将
+$\operatorname{im}D\varphi(u_0)$ 用补空间 $E$ 补全
+（$\dim E = n - d$），并定义 $\Theta(u, v) = \varphi(u) + v$
+在 $A\times E$ 上，$D\Theta(u_0, 0)$ 是双射（像
+包含 $\operatorname{im}D\varphi(u_0)$ 与 $E$），故
+$\Theta$ 是局部微分同胚
+（\cref{thm:b3:submanifolds:ift}）；其逆 $\Phi$
+将其拉直：在 $a$ 附近，$M$ 的点恰为
+$\varphi(u) = \Theta(u, 0)$ 的点 --- 为此，(4) 中的同胚假设保证
+$M\cap\Omega$ 在足够小的 $\Omega$ 中不含其他片
+（$\varphi(u') + v = m \in
+M$ 接近 $a$ 且 $v \neq 0$ 较小，这样的点必须排除：
+$m = \varphi(u'')$，其中某个 $u''$ 接近 $u_0$，由
+同胚性质，且 $\Theta$ 的局部单射性迫使
+$v = 0$）。于是 $\Phi(M\cap\Omega) = (A\times\{0\})
+\cap\Phi(\Omega)$（缩小后成立）。
+\end{proof}
+
+\begin{example}\label{ex:b3:submanifolds:examples}
+球面 $S^{n-1} = \{\norm x^2 = 1\}$ 是
+浸没 $F(x) = \norm x_2^2 - 1$ 在
+$\R^n\setminus\{0\}$ 上（$DF(x) = 2x^{\mathsf T} \ne 0$）的水平集，
+是一个 $\mathcal C^\infty$ 子流形，维数为 $n - 1$。
+$\R^3$ 中的环面是 $\bigl(\sqrt{x^2 + y^2} -
+R\bigr)^2 + z^2 - r^2$（$0 < r < R$）。锥面 $\{x^2 + y^2 =
+z^2\}$ 在 $0$ 处\emph{不是}子流形
+（\cref{exo:b3:submanifolds:1}）。矩阵群 $SL_n$ 与
+$O_n$ 都是 $M_n(\R)$ 的子流形
+（\cref{exo:b3:submanifolds:5,exo:b3:submanifolds:6}）--- 这
+正是李理论的出发点。
+\end{example}
+
+\section{切空间}
+
+\begin{definition}\label{def:b3:submanifolds:tangent}
+设 $M$ 为 $d$ 维子流形，$a \in M$。以 $T_aM$ 记\emph{切
+空间}\index{切空间}，即速度向量
+$\gamma'(0)$ 的全体，这些向量来自 $\mathcal C^1$ 曲线 $\gamma \colon
+\intoo{-\varepsilon}\varepsilon \to M$，且 $\gamma(0) = a$。
+\end{definition}
+
+\begin{proposition}\label{prop:b3:submanifolds:tangent}
+$T_aM$ 是一个 $d$ 维向量子空间，位于 $\R^n$ 中，且：
+\begin{enumerate}
+  \item 若 $M = F^{-1}(0)$ 局部成立，其中 $F$ 为浸没，则：
+        $T_aM = \ker DF(a)$;
+  \item 若 $M$ 由浸入 $\varphi$ 参数化
+        （$\varphi(u_0) = a$）：$T_aM =
+        \operatorname{im}D\varphi(u_0)$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+$M$ 中的曲线满足 $F(\gamma(t)) = 0$；由链式法则在
+$0$ 处得 $DF(a)\gamma'(0) = 0$，即 $T_aM \subseteq \ker DF(a)$。
+反之，借助拉直（\cref{thm:b3:submanifolds:%
+characterizations}(1)）将
+$\R^d\times\{0\}$ 中的直线变为 $M$ 中的曲线，
+于是 $d$ 维子空间的每个向量都被实现；比较维数
+（$\dim\ker DF(a) = n - (n - d) = d$）迫使 (1) 中的等号成立，
+同样的论证给出 (2)（$D\varphi(u_0)$
+作用于 $A$ 中的直线，维数再次比较）。
+\end{proof}
+
+\begin{theorem}[拉格朗日乘子定理]
+\label{thm:b3:submanifolds:lagrange}
+设 $M = F^{-1}(0)$，其中 $F = (F_1, \dots, F_q) \colon \Omega
+\to \R^q$ 为 $\mathcal C^1$ 浸没，并设 $f \colon
+\Omega \to \R$ 为 $\mathcal C^1$ 函数，若
+$f\restriction_M$ 在 $a \in M$ 处有局部极值，则
+存在唯一的实数 $\lambda_1, \dots, \lambda_q$
+（\emph{拉格朗日乘子}）使得\index{拉格朗日乘子}
+\[
+\nabla f(a) = \lambda_1\nabla F_1(a) + \dots +
+\lambda_q\nabla F_q(a) .
+\]
+\end{theorem}
+
+\begin{proof}
+设 $\gamma$ 为 $M$ 中过 $a$ 的任一曲线：$t \mapsto
+f(\gamma(t))$ 在 $0$ 处有局部极值，于是 $0 =
+\frac{\dd}{\dd t}f(\gamma(t))\big|_0 = \langle\nabla f(a),
+\gamma'(0)\rangle$，即 $\nabla f(a) \perp T_aM = \ker DF(a)$
+（见\cref{prop:b3:submanifolds:tangent}）。而 $\ker DF(a)^\perp
+= \operatorname{im}DF(a)^{\mathsf T}$（本科二年级的秩与正交性恒等式，
+或在有限维情形下见\cref{exo:b3:hilbert:8}：
+$(\ker T)^\perp = \operatorname{im}T^*$），它是
+由梯度 $\nabla F_i(a)$ 张成 --- 它们线性无关，因为
+$DF(a)$ 为满射，故乘子存在且唯一。
+\end{proof}
+
+\begin{example}[从几何角度看谱定理]
+\label{ex:b3:submanifolds:rayleigh}
+设 $A$ 为实对称的 $n\times n$ 矩阵，并求
+$f(x) = \langle Ax, x\rangle$ 在球面 $S^{n-1}$ 上的最大值
+（紧：最大值可取到，在某点 $v_1$ 处取得）。以拉格朗日
+乘子法，取 $F(x) = \norm x^2 - 1$：$\nabla f = 2Ax$ 与 $\nabla F =
+2x$ 给出 $Av_1 = \lambda_1v_1$ --- 即特征向量，其中
+$\lambda_1 = \max_{S^{n-1}}\langle Ax, x\rangle$。限制
+$A$ 到 $v_1^\perp$ 上（不变性：$\langle Av, v_1\rangle =
+\langle v, Av_1\rangle = \lambda_1\langle v, v_1\rangle = 0$）
+并迭代，得到特征向量的标准正交基。这
+即本科二年级的谱定理，此处以纯优化的方法重新证明
+--- 同一论证的无穷维影子证明了
+\cref{lem:b3:spectral:existence}。
+\end{example}
+
+\begin{method}\label{met:b3:submanifolds:method}
+要证明某集合为子流形：在局部将其表示为
+$F^{-1}(0)$，且 $DF$ 在\emph{该集合上}为满射（最常见的
+途径），或表示为图像。
+其维数与切空间分别为 $d = n - q$ 与 $T_a = \ker DF(a)$。
+求其上极值用拉格朗日乘子法——总应先检验紧性（或
+强制性），以使极值存在，从而可应用
+定理，并记住乘子方程仅是
+\emph{必要}条件：须列出全部临界点，再
+比较函数值。对矩阵群，在单位元处对曲线
+求导，以确定切空间。
+\end{method}
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:b3:submanifolds:1}
+(a) 验证下列集合为 $\mathcal C^\infty$
+子流形，并给出其维数：$S^{n-1}$；
+双曲面 $\{x^2 + y^2 - z^2 = 1\}$；
+\cref{ex:b3:submanifolds:examples}中的环面。
+(b) 证明锥面 $C = \{x^2 + y^2 = z^2\} \subseteq
+\R^3$ 不是 $2$ 维子流形（在 $0$ 处）：
+求集合
+$\bigl(C\setminus\{0\}\bigr)\cap B(0,\varepsilon)$ 的连通分支个数，并
+将其与局部拉直
+（见\cref{thm:b3:submanifolds:characterizations}(1)）对平面去掉一点所
+要求的个数作比较。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b3:submanifolds:2}
+计算下列切空间：
+(a) $T_aS^{n-1}$，对任意 $a$（答案：$a^\perp$）；
+(b) 求\cref{ex:b3:submanifolds:examples}中的环面
+在外赤道
+$\{z = 0,\ x^2 + y^2 = (R + r)^2\}$ 上任一点处的切平面；
+(c) 求螺线 $\varphi(t) = (\cos t,
+\sin t, t)$ 在 $\varphi(t_0)$ 处的切线，并验证
+\cref{prop:b3:submanifolds:tangent}(2)。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:submanifolds:3}
+设 $f(x, y) = (x^2 - y^2,\ 2xy)$（即 $z \mapsto z^2$）。
+(a) 在哪些点上可应用\cref{thm:b3:submanifolds:ift}？
+(b) 证明 $f$ 在
+$\R^2\setminus\{0\}$ 上局部可逆、但非整体可逆，并
+显式给出在 $(1, 0)$ 的某邻域上有定义的
+两个局部逆（即两支平方根）。
+(c) 对极坐标映射 $(r,
+\theta) \mapsto (r\cos\theta, r\sin\theta)$ 作同样的讨论。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:submanifolds:4}
+（叶形线）设 $F(x,y) = x^3 + y^3 - 3xy$，且 $\mathcal C =
+F^{-1}(0)$。
+(a) 证明在 $\mathcal C$ 上除原点外的每一点附近，
+$\mathcal C$ 是 $1$ 维子流形，局部为
+关于 $x$ 或关于 $y$ 的图像（哪一种，在何处？）。
+(b) 求 $(\frac32, \frac32)$ 处的切线。
+(c) 原点处的情形如何？（两支曲线相交：
+给出两条 $\mathcal C^1$ 曲线，它们含于 $\mathcal C$ 且过 $0$，
+其速度线性无关，由此得出不存在
+局部拉直。）
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:submanifolds:5}
+设 $F(M) = M^{\mathsf T}M$，从 $M_n(\R)$ 到
+对称矩阵空间 $S_n$ 的映射。
+(a) 证明 $DF(M)(H) = M^{\mathsf T}H + H^{\mathsf T}M$，且
+$DF(M)$ 满射到 $S_n$，对每个 $M \in O_n$ 均成立
+\emph{（给定 $S \in S_n$，试取 $H = \frac12MS$）}。
+(b) 由此得 $O_n = F^{-1}(I)$ 是紧的
+$\mathcal C^\infty$ 子流形，维数为
+$\frac{n(n-1)}2$，且 $T_IO_n = \{H : H^{\mathsf T} = -H\}$，
+即反对称矩阵全体。
+(c) 证明 $\eu^{tH} \in O_n$，对每个反对称 $H$ 成立：
+即切方向积分为群中的曲线。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:submanifolds:6}
+(a) 证明 $\det \colon M_n(\R) \to \R$ 的微分为
+$D\det(M)(H) = \operatorname{tr}\bigl(\operatorname{com}(M)
+^{\mathsf T}H\bigr)$，且在每个 $M \in SL_n$ 处非零。
+(b) 由此得 $SL_n(\R)$ 是维数为
+$n^2 - 1$ 的子流形，且 $T_ISL_n = \{H : \operatorname{tr}H = 0\}$。
+(c) $GL_n(\R)$ 是否为子流形？若是，维数为多少？
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:submanifolds:7}
+用拉格朗日乘子法求解：
+(a) 求 $f(x,y) = xy$ 在圆 $x^2 +
+y^2 = 1$ 上的极值；
+(b) 证明在所有概率向量 $(p_1, \dots,
+p_n)$（分量为正，且和为 $1$），熵 $-\sum
+p_i\ln p_i$ 恰在均匀分布处取最大值；
+(c) 求椭圆 $\{x^2/4 + y^2 = 1\}$
+上距 $(1, 0)$ 最近的点，并
+从几何上检验乘子方程（法向平行）。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:submanifolds:8}
+将\cref{ex:b3:submanifolds:rayleigh}完整写出：用归纳法证明
+实对称矩阵具有
+由特征向量构成的标准正交基，其中
+$\lambda_1 \geq \dots \geq \lambda_n$ 依次为
+瑞利商的约束极大值。然后
+由此直接推出有限维情形下\cref{exo:b3:spectral:8}中的
+库朗–费舍尔公式。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:submanifolds:9}
+（阿达马不等式）设 $M \in GL_n(\R)$，其各列为
+$c_1, \dots, c_n$，则：
+\[
+\abs{\det M} \;\leq\; \prod_{i=1}^n\norm{c_i}_2 ,
+\]
+当且仅当各列正交时等号成立。\emph{（先化为
+各列范数为 $1$ 的情形，即通过数乘；求 $\det$ 在
+紧的球面之积 $(S^{n-1})^n$ 上的极大值；在极大点处，
+对每一列分别用拉格朗日乘子法，得 $\nabla_{c_i}\det =
+\lambda_ic_i$，而 $\nabla_{c_i}\det$ 是第 $i$ 列，
+即 $\operatorname{com}(M)$ 的对应列；由此推出 $M^{\mathsf T}M$ 为对角阵，
+从而 $= I$，进而 $\det = \pm1$。）} 几何意义：平行
+多面体的体积不超过其各棱长
+之积。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:submanifolds:10}
+圆 $S^1$ 在其哪些点附近可表为 $y =
+\psi(x)$ 的图像？又在哪些点附近可表为 $x = \chi(y)$ 的图像？验证图像
+刻画（\cref{thm:b3:submanifolds:%
+characterizations}(3)）在点 $(1, 0)$ 处的具体情形，并用一句话
+解释为何\emph{某个}坐标置换总是足够的，
+而任何单一置换却不能总是奏效。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:submanifolds:11}
+（正交群作为子流形，定量地）
+(a) 证明 $O_n = \{M : M^{\mathsf T}M = I\}$ 是紧的：
+有界（每列都是单位向量，故对欧几里得矩阵范数有 $\norm M \leq
+\sqrt n$），且闭。
+(b) 证明其在 $I$ 处的切空间为反对称矩阵构成的空间，
+其维数为 $\frac{n(n-1)}2$，并证明
+在一般点 $A \in O_n$ 处 $T_AO_n = \{AK : K^{\mathsf T} =
+-K\}$。
+(c) 由此推出：映射 $t \mapsto A\exp(tK)$ 对每个
+反对称矩阵 $K$，是 $O_n$ 中过 $A$ 的曲线，其速度为 $AK$ \emph{（验证
+$\exp(tK) \in O_n$，利用
+$\exp(X)^{\mathsf T} = \exp(X^{\mathsf T})$ 与
+$\exp(-X)\exp(X) = I$）}：每个切向量都由一条显式曲线实现，
+无需隐函数定理。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:submanifolds:12}
+（距离的临界点）设 $M \subseteq \R^n$ 为
+子流形，$p \notin M$。证明：若 $x_0 \in M$
+使到 $p$ 的距离最小（这样的点存在，当 $M$
+为闭且非空时 --- 为什么？），则
+\[
+p - x_0 \;\perp\; T_{x_0}M
+\]
+\emph{（对 $t \mapsto \norm{\gamma(t) - p}^2$ 沿
+$M$ 中的曲线求导）}。由此推出：球面上距给定点最近的点
+位于过球心的射线上；并利用此条件，
+计算 $p = (2, 0)$ 到
+抛物线 $y = x^2$ 的距离（化为三次方程，并数值求解，
+精确到三位数字）。
+\end{exercise}
+
+\section{周末问题：\texorpdfstring{$SO(3)$}{SO(3)} 与
+四元数}
+
+\begin{problem}[{周末问题 --- 旋转、群
+$S^3$ 与二重覆叠}]\label{pb:b3:submanifolds:1}
+四元数 $\mathbb H = \{t + x\mathrm i + y\mathrm j +
+z\mathrm k\}$ --- 其单位群包含 \cref{pb:b3:groups:1} 中的
+$Q_8$，它以两种方式参数化
+三维旋转：映射“用单位四元数共轭”
+是满态射 $S^3 \to
+SO(3)$，核为 $\{\pm1\}$。下面逐一构造。
+回顾并定义：乘法是 $\R$ 双线性的，且满足
+$\mathrm i^2 = \mathrm j^2 = \mathrm k^2 =
+\mathrm{ijk} = -1$；$q = t + x\mathrm i +
+y\mathrm j + z\mathrm k$，其共轭为 $\bar q = t - x\mathrm i -
+y\mathrm j - z\mathrm k$；$N(q) = q\bar q = t^2 + x^2 + y^2
++ z^2$。
+
+\medskip
+\noindent\textbf{第一部分 --- 代数 $\mathbb H$ 与
+群 $S^3$。}
+\begin{enumerate}
+  \item 验证 $\mathbb H$ 是结合的
+        $\R$ 代数，中心为 $\R$，$\overline{pq} =
+        \bar q\,\bar p$，且 $N(pq) = N(p)N(q)$
+        \emph{（一条简洁的路径：将 $q$ 表示为
+        $2\times2$ 复矩阵
+        $\bigl(\begin{smallmatrix}\alpha & \beta\\
+        -\bar\beta & \bar\alpha\end{smallmatrix}\bigr)$，$q =
+        \alpha + \beta\mathrm j$，并用 $\det$）}。
+  \item 由此推出每个 $q \neq 0$ 均可逆（$q^{-1} =
+        \bar q/N(q)$）：$\mathbb H$ 为非交换
+        域，且 $S^3 = \{N(q) = 1\}$ 构成群 ---
+        并且是紧的 $3$ 维子流形，
+        位于 $\R^4$ 中（\cref{ex:b3:submanifolds:examples}）。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第二部分 --- 旋转同态。}将
+$\R^3$ 等同于\emph{纯四元数} $P = \{x\mathrm i +
+y\mathrm j + z\mathrm k\}$，对 $q \in S^3$ 定义
+$\rho_q(v) = q\,v\,\bar q$。
+\begin{enumerate}[resume]
+  \item 证明 $\rho_q$ 将 $P$ 映到 $P$ \emph{（纯
+        四元数即满足 $\bar v = -v$ 者）}，是
+        $\R$ 线性的，保范数，且 $\rho
+        \colon q \mapsto \rho_q$ 是群同态 $S^3
+        \to O(3)$。
+  \item 计算核：$\rho_q = \mathrm{id}$ 当且仅当 $q$
+        与 $\mathrm i, \mathrm j, \mathrm k$ 可交换，当且仅当
+        $q \in \R\cap S^3 = \{\pm1\}$。
+  \item 写出 $q = \cos\frac\theta2 + \sin\frac\theta2\,u$
+        其中 $u \in P$，$N(u) = 1$（为何这总是可能的，
+        对 $q \in S^3$ 而言？）。证明 $\rho_q$ 固定
+        $u$，并在平面 $u^\perp\cap P$ 上作用为
+        转角为 $\theta$ \emph{（计算
+        $\rho_q(w)$（$w \perp u$），利用 $uw = -wu$（对
+        正交纯单位） --- 证明此恒等式，可由
+        乘法表得出，或由 $uw + wu =
+        -2\langle u, w\rangle$）}。
+  \item 结论：$\operatorname{im}\rho \subseteq SO(3)$
+        （每个 $\rho_q$ 都是旋转，其轴与转角如上算得 ---
+        行列式为 $+1$，由 $q
+        \mapsto \det\rho_q$ 在连通的 $S^3$ 上的连续性得出，或
+        直接验证），且 $\rho$ 是到 $SO(3)$ 上的\emph{满射}：每个
+        $\R^3$ 中的旋转都有旋转轴（证明：实
+        $3\times3$ 正交矩阵，$\det = 1$，则有
+        特征值 $1$ --- 考虑特征
+        多项式），因此它是某个 $\rho_q$。小结：
+        \[
+        SO(3) \;\cong\; S^3/\{\pm 1\} .
+        \]
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第三部分 --- 作为子流形的 $SO(3)$；
+罗德里格斯。}
+\begin{enumerate}[resume]
+  \item 证明 $SO(3)$ 是紧的 $3$ 维
+        子流形，位于 $M_3(\R)$ 中，且 $T_ISO(3) =$
+        反对称矩阵
+        （见\cref{exo:b3:submanifolds:5}；行列式
+        条件选出若干连通分支的并）。
+  \item 对反对称矩阵 $A_u$（与 $u \in \R^3$ 相伴，
+        $A_uv = u\wedge v$ 为叉积），
+        证明\emph{罗德里格斯公式}：
+        \[
+        \eu^{\theta A_u} = I + \sin\theta\,A_u + (1 -
+        \cos\theta)\,A_u^2 \qquad (\norm u = 1)
+        \]
+        \emph{（由 $A_u^3 = -A_u$，沿
+        $A_u$ 的幂次拆分指数级数）}，并将其
+        识别为绕轴 $u$、转角为 $\theta$ 的旋转。由此可得
+        $\exp$ 将反对称矩阵\emph{满射}
+        到 $SO(3)$ 上。
+  \item 比较两种参数化：证明 $t
+        \mapsto \rho_{q(t)}$，其中 $q(t) = \cos\frac t2 +
+        \sin\frac t2\,u$ 是一个旋转的单参数群，
+        其在 $t = 0$ 处的导数为 $A_u$
+        --- 四元数指数与矩阵指数讲的是同一件事，
+        只是分别以半速与全速进行。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第四部分 --- 双重覆盖的直观感受。}
+\begin{enumerate}[resume]
+  \item 证明路径 $q(t) = \cos\frac t2 + \sin\frac
+        t2\,\mathrm k$，$t \in \intcc0{2\pi}$，是 $SO(3)$ 中的闭路
+        （其像 $\rho_{q(t)}$ 回到
+        单位元），其四元数提升\emph{不是}
+        闭路：$q(2\pi) = -q(0)$。延拓到 $t = 4\pi$
+        时提升闭合。请用一小段话说明其含义：
+        $2\pi$ 的旋转不能连续地被撤销，
+        而 $4\pi$ 的旋转可以（即皮带技巧），
+        原因在于 $SO(3)$ 的闭路可在其
+        双重覆盖 $S^3$ 中被检测出来。
+  \item 由此还得到实际的好处：旋转的复合
+        即四元数的乘法
+        （相当于 $4$ 次乘法的数据量，而非 $9$ 个，
+        且无正交性漂移） --- 验证
+        绕 $\mathrm i$ 与
+        $\mathrm j$ 的两次四分之一转的复合：计算
+        该乘积的轴与角。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第五部分 --- 显式矩阵：}
+\textbf{欧拉--罗德里格斯。} 记 $q = a + b\mathrm i + c\mathrm j +
+d\mathrm k \in S^3$，从而 $a^2 + b^2 + c^2 + d^2 = 1$。
+\begin{enumerate}[resume]
+  \item 由乘法表完整计算 $\rho_q(\mathrm i)$，
+        然后求 $\rho_q(\mathrm
+        j)$ 与 $\rho_q(\mathrm k)$，由循环
+        代换 $\mathrm i \to \mathrm j \to \mathrm k
+        \to \mathrm i$，$(b, c, d) \to (c, d, b)$
+        \emph{（说明其合理性：循环 $\mathrm i, \mathrm j,
+        \mathrm k$ 可延拓为 $\mathbb
+        H$ 的自同构，因为定义关系是循环对称的
+        ）}。于是 $\rho_q$ 在基
+        $(\mathrm i, \mathrm j, \mathrm k)$ 下的矩阵
+        为\emph{欧拉--罗德里格斯矩阵}，即
+        \[
+        R_q = \begin{pmatrix}
+        a^2 + b^2 - c^2 - d^2 & 2(bc - ad) & 2(bd + ac)\\
+        2(bc + ad) & a^2 - b^2 + c^2 - d^2 & 2(cd - ab)\\
+        2(bd - ac) & 2(cd + ab) & a^2 - b^2 - c^2 + d^2
+        \end{pmatrix}.
+        \]
+  \item （由旋转反推）证明
+        \[
+        \operatorname{tr}R_q = 4a^2 - 1 = 1 + 2\cos\theta,
+        \qquad
+        \tfrac12\bigl(R_q - R_q^{\mathsf T}\bigr) =
+        \sin\theta\,A_u,
+        \]
+        沿用第 5 题与第 8 题中的记号。由此得到一个算法，
+        用以恢复 $\pm q$（输入为旋转矩阵
+        $R$）：转角由迹给出；
+        当 $0 < \theta < \pi$ 时，轴由反对称部分给出；
+        而当 $\theta = \pi$ 时，证明并使用恒等式 $R
+        + I = 2\,uu^{\mathsf T}$。
+  \item 对第 11 题的乘积计算 $R_q$，其中 $q =
+        \frac12(1 + \mathrm i + \mathrm j + \mathrm k)$，出现
+        一个置换矩阵。确定该旋转，
+        并与所得的轴与角相互核对，
+        即第 11 题的结果。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第六部分 --- $S^3$ 内部：$SU(2)$，
+共轭类与指数。}
+\begin{enumerate}[resume]
+  \item 证明第 1 题中的矩阵表示
+        （记为 $\Phi$）限制为
+        $S^3$ 到\emph{特殊酉群}上的群同构，
+        \[
+        SU(2) = \bigl\{U \in M_2(\C) : U^*U = I,\ \det U =
+        1\bigr\}
+        \]
+        \emph{（证明满射时，写出
+        $U^{-1} = U^*$ 与 $\det U = 1$ 的方程，
+        对一般的 $2\times2$ 复矩阵）}。
+  \item 证明实部是 $S^3$ 上的共轭不变量
+        --- 即 $\operatorname{Re}(pq\bar p) =
+        \operatorname{Re}q$，对所有 $p \in S^3$ 成立；
+        反之，实部相同的两个单位四元数在
+        $S^3$ 中共轭\emph{（归结为把一个单位纯虚轴移到另一个，
+        这由第二部分给出）}。
+        从几何上描述 $S^3$ 的共轭类；
+        译到 $SU(2)$ 上（即迹的水平集）；
+        经 $\rho$ 投影：两个
+        旋转在 $SO(3)$ 中共轭，当且仅当
+        它们具有相同的转角 $\theta \in \intcc0\pi$。
+  \item 定义 $\exp$（在 $\mathbb H$ 上，由指数级数给出），
+        并验证绝对收敛性，利用
+        $\abs{pq} = \abs p\,\abs q$，其中 $\abs q =
+        \sqrt{N(q)}$。证明，对单位纯虚数 $u$ 与 $\theta
+        \in \R$，有
+        \[
+        \exp(\theta u) = \cos\theta + \sin\theta\,u ,
+        \]
+        由此推出 $\exp$ 将超平面 $P$
+        映上 $S^3$，并验证 $\rho_{\exp(su)} =
+        \eu^{2sA_u}$：即第 9 题中的
+        半角现象再次出现。
+  \item 对纯四元数 $v, w$，证明乘积公式
+        $vw = -\langle v, w\rangle + v\wedge w$，从而
+        得换位子恒等式 $vw - wv = 2\,v\wedge w$；
+        同样证明 $[A_v, A_w] = A_{v\wedge w}$，对第 8 题中的矩阵
+        成立。由此可得
+        $\rho$ 在 $1$ 处沿曲线 $t \mapsto \exp(tv)$ 的导数
+        即线性同构 $v \mapsto 2A_v$，
+        自 $P$ 映上反对称矩阵全体；并且
+        它把四元数的换位子
+        变为矩阵的换位子。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第七部分 --- 整体结构。}
+\begin{enumerate}[resume]
+  \item （不存在连续截面）设 $s \colon SO(3) \to
+        S^3$ 为连续映射，且 $\rho \circ s =
+        \operatorname{id}$。对第 10 题中的回路 $R(t) =
+        \rho_{q(t)}$，令 $\varepsilon(t) =
+        s(R(t))\,q(t)^{-1}$，其中 $t \in \intcc0{2\pi}$。证明
+        $\varepsilon$ 连续，且取值于
+        $\{\pm1\}$，并由此导出矛盾：不存在
+        连续的整体选择，使每个旋转都由一个单位四元数
+        表示。
+  \item （球模型）设 $\bar B \subseteq \R^3$ 为
+        半径为 $\pi$ 的闭球，且 $E(v) = \eu^{A_v}$，
+        $E(0) = I$。证明 $E$ 把 $\bar B$ 满射到
+        $SO(3)$，在开球上是单射，并且在边界球面上
+        恰好将对径点等同：
+        $E(\pi u) = E(-\pi u) = 2uu^{\mathsf T} - I$，
+        且除此之外没有其他重合。于是 $SO(3)$ 是球体
+        边界上对径点粘合之后所得的空间 --- 即
+        射影空间 $\mathbb{RP}^3$ ---，而一条直径
+        成为第 10 题中的不可缩回路。
+  \item 证明 $\rho_p\rho_q\rho_p^{-1} = \rho_{pq\bar
+        p}$；$SO(3)$ 中的对合元（即 $R \neq
+        I$ 且 $R^2 = I$ 者）恰为半转
+        $\rho_w$，其中 $w$ 为单位纯四元数；并且
+        $SO(3)$ 的中心是平凡的。
+  \item 证明每个旋转都是两个
+        半转之积：对 $q = \cos\frac\theta2 +
+        \sin\frac\theta2\,u$，取单位纯四元数 $w \perp
+        u$，验证 $w' = qw$ 仍是单位纯四元数，
+        并验证 $\rho_q =
+        \rho_{w'}\rho_w$。两个轴位于何处，以及
+        它们所成的角是多少？
+  \item 总结拓扑性质：$SO(3)$
+        是紧的且道路连通（给出两种证明：
+        一是 $S^3$ 在 $\rho$ 下的连续像；二是
+        $\exp$ 的像），而 $O(3)$ 恰有两个
+        连通分支，且每个分支都与 $SO(3)$ 同胚。
+
+  \item （复合运算，三种方法）设 $R_1$ 为
+        转角为 $\frac\pi2$、轴为 $z$ 轴的旋转，$R_2$ 为
+        转角为 $\frac\pi2$、轴为 $x$ 轴的旋转。计算
+        $R_2R_1$ 的轴与角：（i）通过
+        将两个 $3\times3$ 矩阵相乘，并利用
+        迹与反对称部分（见第五部分）；（ii）通过
+        将对应的单位四元数相乘，得到
+        $q_2q_1$。检验两种结果一致：转角
+        为 $\frac{2\pi}3$，轴为 $\frac1{\sqrt3}(1, -1, 1)$。
+  \item （凯莱变换）设 $K$ 为反对称矩阵，证明
+        $I + K$ 可逆，且
+        \[
+        C(K) = (I - K)(I + K)^{-1} \in SO(n),
+        \]
+        $-1$ 永远不是 $C(K)$ 的特征值；
+        证明 $K \mapsto C(K)$ 是从反对称矩阵
+        到 $\{R \in SO(n) : -1 \notin
+        \operatorname{Sp}R\}$ 上的双射，其逆为 $R \mapsto (I -
+        R)(I + R)^{-1}$。（$SO(n)$ 的有理坐标卡，
+        与超越的 $\exp$ 相呼应，
+        见\cref{exo:b3:submanifolds:11}。）
+\end{enumerate}
+\end{problem}

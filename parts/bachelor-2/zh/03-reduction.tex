@@ -1,0 +1,951 @@
+\chapter{自同态的约化}\label{ch:b2:reduction}
+
+要理解一个自同态，只需找出它仅仅
+拉伸的方向。本章建立这套工具——\omterm{def:b2:reduction:eigen}{特征值}、
+\omterm{def:b2:reduction:charpoly}{特征多项式}与\omterm{def:b2:reduction:polyu}{极小多项式}、核分解
+引理——以及它的收获：对角化与三角化
+的判别准则、凯莱--哈密顿定理、\omterm{thm:b2:reduction:dunford}{邓福德分解}，以及
+计算幂与指数的方法，它们将为
+\cref{ch:b2:diffeq}所用。全文中 $E$ 是一个
+有限维 $K$-向量空间（$K = \R$ 或 $\C$），且 $u \in
+\mathcal{L}(E)$, $n = \dim E$.
+
+\section{特征值与特征向量}
+
+\begin{definition}\label{def:b2:reduction:eigen}
+$\lambda \in K$ 称为\emph{特征值}\index{特征值}，即对 $u$ 而言，当
+$u(x) = \lambda x$ 对某个 $x \neq 0$ 成立时（
+即\emph{特征向量}）；\emph{特征子空间}为 $E_\lambda(u) =
+\ker(u - \lambda\,\mathrm{id})$。特征值的全体称为
+\emph{谱}\index{谱} $\operatorname{Sp}(u)$。子空间 $F$
+称为\emph{稳定的}，当 $u(F) \subseteq F$ 时；特征子空间都是稳定的，并且
+稳定子空间允许定义诱导自同态 $u|_F$。
+\end{definition}
+
+\begin{theorem}[特征子空间的独立性]\label{thm:b2:reduction:independence}
+属于两两不同\omterm{def:b2:reduction:eigen}{特征值}的\omterm{def:b2:reduction:eigen}{特征向量}构成一个
+线性无关的向量族；等价地，\omterm{def:b2:reduction:eigen}{特征子空间}的和
+$E_{\lambda_1} + \dots + E_{\lambda_r}$（$\lambda_i$ 两两不同）是
+直和。特别地，$u$ 至多有 $n$ 个\omterm{def:b2:reduction:eigen}{特征值}。
+\end{theorem}
+
+\begin{proof}
+对 $r$ 作归纳。设 $x_1 + \dots + x_r = 0$，其中 $x_i \in
+E_{\lambda_i}$，已知结论对 $r - 1$ 成立。两边作用 $u$，
+并减去 $\lambda_r$ 倍的原关系式：
+\[
+\sum_{i=1}^{r-1} (\lambda_i - \lambda_r)\, x_i = 0 ,
+\]
+于是由归纳假设，逐项有 $(\lambda_i - \lambda_r)x_i = 0$，即 $x_i =
+0$（$i < r$ 时），于是 $x_r = 0$。
+维数为 $n$ 的空间中，非零子空间的直和至多含 $n$ 个加项。
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=0.9, >={Stealth}]
+  \draw[gray!40] (-2.6,-2.2) grid (2.6,2.2);
+  \draw[->] (-2.6,0) -- (2.7,0) node[below, font=\small] {$x$};
+  \draw[->] (0,-2.2) -- (0,2.3) node[left, font=\small] {$y$};
+  \draw[omDef, very thick, ->] (0,0) -- (0.7,0.7)
+    node[above, font=\small] {$v_1$};
+  \draw[omDef, thick, ->, dashed] (0,0) -- (2.1,2.1)
+    node[above right, font=\small] {$Av_1 = 3v_1$};
+  \draw[omThm, very thick, ->] (0,0) -- (0.9,-0.9)
+    node[below, font=\small] {$v_2$};
+  \draw[omThm, thick, ->, dashed] (0,0) -- (0.9,-0.9);
+  \draw[omProp, very thick, ->] (0,0) -- (1,0)
+    node[below right, font=\small] {$e_1$};
+  \draw[omProp, thick, ->, dashed] (0,0) -- (2,1)
+    node[right, font=\small] {$Ae_1$};
+\end{tikzpicture}
+
+{\small 矩阵 $A = \begin{psmallmatrix}2 & 1\\ 1 &
+2\end{psmallmatrix}$ 作用在平面上：一般向量
+$e_1$ 被推离了它所在的直线，而特征方向 $v_1 =
+(1,1)$ 与 $v_2 = (1,-1)$ 仅被拉伸——分别伸缩 $3$ 倍与
+$1$ 倍（故 $Av_2 = v_2$：虚线的像与 $v_2$ 重合）。
+对角化即换到基 $(v_1, v_2)$，此时
+$A$ 化为 $\operatorname{diag}(3, 1)$。}
+\end{omfigure}
+
+\begin{definition}[特征多项式]\label{def:b2:reduction:charpoly}
+$\chi_u(X) = \det(X\,\mathrm{id} - u)$\index{特征多项式
+}——在任一基下计算为 $\det(XI_n - A)$，
+是 $n$ 次首一多项式，在相似变换下不变
+（见\cref{thm:b2:linalg:detrules}）。其在 $K$ 中的根恰好是
+\omterm{def:b2:reduction:eigen}{特征值}（$\lambda$ 是\omterm{def:b2:reduction:eigen}{特征值} $\iff u - \lambda\,\mathrm{id}$
+不是单射 $\iff \chi_u(\lambda) = 0$），并且
+\[
+\chi_u(X) = X^n - (\operatorname{tr} u)\, X^{n-1} + \dots +
+(-1)^n \det u .
+\]
+\omterm{def:b2:reduction:eigen}{特征值}的\emph{代数重数}\index{代数重数}
+$m_\lambda$ 是它作为 $\chi_u$ 的根的
+重数；\emph{几何
+重数}\index{几何重数}为 $\dim E_\lambda$，且 $1 \leq \dim E_\lambda \leq
+m_\lambda$.
+\end{definition}
+
+\begin{proof}[所述事实的证明]
+系数部分：用置换公式展开 $\det(XI - A)$；
+恒等置换贡献 $\prod_i (X - a_{ii})
+= X^n - (\sum a_{ii})X^{n-1} + \dots$，其余每个置换
+至多固定 $n - 2$ 个对角位置，贡献的次数 $\leq
+n - 2$：最高两项的系数如上所述；令 $X = 0$ 得到
+常数项 $\det(-A) = (-1)^n\det A$。
+
+\omterm{def:b2:reduction:charpoly}{几何重数} $\leq$ \omterm{def:b2:reduction:charpoly}{代数重数}：设 $d = \dim E_\lambda$，将
+$E_\lambda$ 的一组基扩充为 $E$ 的基，此时 $u$ 的矩阵是
+分块上三角，左上块为 $\lambda I_d$，故 $\chi_u(X) =
+(X - \lambda)^d\, \chi_{\text{（下方块）}}(X)$：
+$\lambda$ 的重数至少为 $d$。
+\end{proof}
+
+\begin{example}[相同 $\chi$，几何不同]\label{ex:b2:reduction:samechi}
+下列两个矩阵
+\[
+\begin{pmatrix}2 & 0\\ 0 & 2\end{pmatrix}
+\qquad\text{和}\qquad
+\begin{pmatrix}2 & 1\\ 0 & 2\end{pmatrix}
+\]
+它们有相同的\omterm{def:b2:reduction:charpoly}{特征多项式} $(X - 2)^2$、迹、
+\omterm{def:b2:linalg:det}{行列式}与谱——但二者不相似：第一个矩阵的
+$E_2$ 的维数为 $2$（\omterm{def:b2:reduction:charpoly}{几何重数}为 $2$），第二个矩阵
+的维数为 $1$。\omterm{def:b2:reduction:charpoly}{特征多项式}只能看到
+\omterm{def:b2:reduction:charpoly}{代数重数}；\omterm{def:b2:reduction:eigen}{特征子空间}的维数是
+更精细的不变量，而\omterm{def:b2:reduction:polyu}{极小多项式}来裁决（$X - 2$
+与 $(X - 2)^2$）。对所有\omterm{def:b2:reduction:diag}{可对角化}性的讨论，其要点是：
+$\chi$ 负责圈定候选者，而
+由核来投票。
+\end{example}
+
+\begin{definition}[可对角化，可三角化]\label{def:b2:reduction:diag}
+称 $u$ 为\emph{可对角化}\index{可对角化}，当 $E$ 存在
+由\omterm{def:b2:reduction:eigen}{特征向量}组成的基（矩阵语言：与某个对角矩阵相似）；
+\emph{可三角化}\index{可三角化}，当它在某组
+基下的矩阵为上三角矩阵。
+\end{definition}
+
+\begin{theorem}[可对角化的判别准则]\label{thm:b2:reduction:diagcrit}
+下列命题等价：
+\begin{enumerate}
+  \item $u$ \omterm{def:b2:reduction:diag}{可对角化}；
+  \item $E = \bigoplus_{\lambda \in \operatorname{Sp} u} E_\lambda$;
+  \item $\chi_u$ 在 $K$ 上分裂，且 $\dim E_\lambda = m_\lambda$
+        对每个\omterm{def:b2:reduction:eigen}{特征值}成立；
+  \item （充分但不必要）$\chi_u$ 有 $n$ 个
+        互不相同的根，且均在 $K$ 中。
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+（1 $\iff$ 2）：\omterm{def:b2:reduction:eigen}{特征向量}构成的基可分成
+各 $E_\lambda$ 的基；反之，把直和的各个
+直和项的基拼接起来即得 $E$ 的一组基
+（见\cref{thm:b2:reduction:independence}，该和为直和；
+维数相等则和即为全部）。
+
+（2 $\iff$ 3）：在对角基下，$\chi_u = \prod (X -
+\lambda)^{\dim E_\lambda}$ 分裂，且重数相符。
+反之，设 $\chi_u$ 分裂，且 $\dim E_\lambda =
+m_\lambda$ 对所有\omterm{def:b2:reduction:eigen}{特征值}成立，则\omterm{def:b2:reduction:eigen}{特征子空间}的
+直和（由\cref{thm:b2:reduction:independence}知其为直和）的维数为
+\[
+\sum_{\lambda}\dim E_\lambda = \sum_{\lambda} m_\lambda =
+\deg\chi_u = n ,
+\]
+中间的等号成立，因为分裂多项式的次数恰是
+其根的重数之和；于是该和即为整个 $E$。这里要注意
+两个假设各自的作用：分裂用来凑足次数，
+重数相等用来凑足维数。
+
+（4 $\Rightarrow$ 1）：$n$ 个互异\omterm{def:b2:reduction:eigen}{特征值}给出 $n$ 个线性无关的
+\omterm{def:b2:reduction:eigen}{特征向量}（见\cref{thm:b2:reduction:independence}）：构成一组基。
+\end{proof}
+
+\begin{method}[判定可对角化]\label{met:b2:reduction:decide}
+实际中按以下顺序检验——每一步都可能
+直接完成判定。（1）是否自然出现根为单根且完全分裂的
+零化多项式（$u^2 = \mathrm{id}$，$u^2 = u$，$u^k =
+\mathrm{id}$）？若是，则\omterm{def:b2:reduction:diag}{可对角化}，无需计算
+（见下文\cref{cor:b2:reduction:minpolycrit}）。（2）计算
+$\chi_u$；若它有 $n$ 个互异的根，且它们均属于 $K$，
+则\omterm{def:b2:reduction:diag}{可对角化}（见\cref{thm:b2:reduction:diagcrit}~(4)）。（3）否则，仅对每个
+重根 $\lambda$，比较 $\dim\ker(u -
+\lambda\,\mathrm{id})$ 与重数 $m_\lambda$：任何
+亏缺即排除\omterm{def:b2:reduction:diag}{可对角化}；处处相等则证明之。
+切勿计算单根的\omterm{def:b2:reduction:eigen}{特征子空间}（其维数必定
+为 $1$），也切勿仅为判定而三角化。
+\end{method}
+
+\begin{example}[对角化的应用]\label{ex:b2:reduction:diagwork}
+$A = I + J = \begin{psmallmatrix}2 & 1 & 1\\ 1 & 2 & 1\\ 1 & 1 &
+2\end{psmallmatrix}$，其中 $J$ 为全一矩阵：由
+$\operatorname{Sp}(J) = \{3, 0\}$
+（见\cref{ex:b2:linalg:onesmatrix}），得 $\operatorname{Sp}(A) = \{4,
+1\}$，\omterm{def:b2:reduction:eigen}{特征子空间}为 $\R(1,1,1)$ 与平面 $\{x + y + z =
+0\}$：维数分别为 $1 + 2 = 3$，\omterm{def:b2:reduction:diag}{可对角化}
+（见\cref{thm:b2:reduction:diagcrit}~(2)）。求幂无需任何
+过渡矩阵：取 $\Pi = J/3$，它是投影到
+$\R(1,1,1)$,
+\[
+A = 4\,\Pi + 1\cdot(I - \Pi)
+\quad\Longrightarrow\quad
+A^k = 4^k\,\Pi + (I - \Pi)
+= \frac{4^k - 1}{3}\,J + I .
+\]
+（验算 $k = 1$：$\frac{4-1}3 J + I = A$。）要点是：
+当\omterm{def:b2:reduction:eigen}{特征子空间}清晰可见时，谱\emph{投影算子}
+计算幂的速度比 $PDP^{-1}$ 所能达到的还快——而且
+公式还直观展示了动态：$A^k$ 以 $4^k$ 的速率
+沿 $(1,1,1)$ 方向增长，而在正交平面上保持不变。
+\end{example}
+
+\begin{theorem}[三角化]\label{thm:b2:reduction:trigonalization}
+$u$ 在 $K$ 上\omterm{def:b2:reduction:diag}{可三角化}，当且仅当 $\chi_u$ 在
+$K$ 上分裂。特别地，每个 $\C$ 上向量空间的自同态都是
+\omterm{def:b2:reduction:diag}{可三角化}。\index{三角化}
+\end{theorem}
+
+\begin{proof}
+（$\Rightarrow$）三角矩阵的\omterm{def:b2:reduction:charpoly}{特征多项式}
+为 $\prod(X - t_{ii})$，因而分裂。
+
+（$\Leftarrow$）对 $n$ 作归纳。因 $\chi_u$ 分裂，它有一个
+根 $\lambda$，取\omterm{def:b2:reduction:eigen}{特征向量} $e_1$。在以
+$e_1$ 为首的基下，矩阵为 $\begin{pmatrix} \lambda & \ast\\ 0 &
+B\end{pmatrix}$，且 $\chi_u = (X - \lambda)\chi_B$：$\chi_B$ 也
+分裂。对 $(n-1) \times
+(n-1)$ 矩阵 $B$ 应用归纳假设，存在可逆的 $Q$，
+使 $Q^{-1}BQ$ 为上三角矩阵；以 $\begin{pmatrix}1 & 0\\
+0 & Q\end{pmatrix}$ 对整个矩阵作共轭，即将其三角化。
+\end{proof}
+
+\begin{example}[手工三角化]\label{ex:b2:reduction:trigwork}
+$B = \begin{pmatrix}3 & -1\\ 1 & 1\end{pmatrix}$：$\chi_B = X^2 -
+4X + 4 = (X - 2)^2$，且 $\ker(B - 2I) =
+\ker\begin{psmallmatrix}1 & -1\\ 1 & -1\end{psmallmatrix}$ 为
+由 $e_1' = (1, 1)$ 张成的直线：只有一个\omterm{def:b2:reduction:eigen}{特征值}，
+其\omterm{def:b2:reduction:eigen}{特征子空间}为一维——不\omterm{def:b2:reduction:diag}{可对角化}，但
+\omterm{def:b2:reduction:diag}{可三角化}（见\cref{thm:b2:reduction:trigonalization}）。
+以 $e_2' = (1, 0)$ 补全为基，并计算：
+\[
+u(e_1') = (2, 2) = 2e_1',
+\qquad
+u(e_2') = (3, 1) = 1\cdot e_1' + 2\, e_2' ,
+\]
+于是在基 $(e_1', e_2')$ 下，矩阵为 $T =
+\begin{psmallmatrix}2 & 1\\ 0 & 2\end{psmallmatrix}$。要点是：
+$T$ 的对角元是被迫的（两个元素都
+必须是二重\omterm{def:b2:reduction:eigen}{特征值} $2$）；只有右上角的元素
+依赖于 $e_2'$ 的选取，而重新缩放 $e_2'$ 即可使它
+取任一非零值——那个顽固的“$1$”是
+邓福德将要分离出的幂零部分的影子。
+\end{example}
+
+\section{自同态的多项式}
+
+\begin{definition}\label{def:b2:reduction:polyu}
+设 $P = \sum a_k X^k \in K[X]$，记 $P(u) = \sum a_k u^k \in
+\mathcal{L}(E)$。映射 $P \mapsto P(u)$ 是
+$K[X] \to \mathcal{L}(E)$ 的代数同态（\cref{def:b2:structures:algebra}）；
+其核 $\{P : P(u) = 0\}$ 是 $K[X]$ 的\omterm{def:b2:structures:ideal}{理想}，且非零（
+因为族 $(\mathrm{id}, u, \dots, u^{n^2})$ 在
+$n^2$ 维的 $\mathcal{L}(E)$ 中线性相关），故它由唯一的
+首一多项式 $\mu_u$ \omterm{def:b2:structures:generated}{生成}。称之为\emph{极小
+多项式}\index{极小多项式}
+（\cref{thm:b2:structures:principal}）。
+\end{definition}
+
+\begin{proposition}\label{prop:b2:reduction:minpoly}
+\begin{enumerate}
+  \item $P(u) = 0 \iff \mu_u \mid P$；$u$ 的\omterm{def:b2:reduction:eigen}{特征值}是
+        每个零化多项式的根，且 $\mu_u$ 的根
+        \emph{恰为}\omterm{def:b2:reduction:eigen}{特征值}。
+  \item 若 $F$ 是不变子空间，则 $\mu_{u|_F} \mid \mu_u$。
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(1) 整除性即\omterm{def:b2:structures:generated}{生成}元的定义。若 $u(x) =
+\lambda x$，$x \neq 0$，则 $0 = P(u)(x) = P(\lambda)x$，于是
+$P(\lambda) = 0$：\omterm{def:b2:reduction:eigen}{特征值}是零化多项式的根，
+特别是 $\mu_u$ 的根。反之，若 $\lambda$ 为根，则 $\mu_u =
+(X - \lambda)Q$，且 $Q(u) \neq 0$（$\mu_u$ 的次数极小）。取
+$y$ 使 $Q(u)(y) \neq 0$，则 $(u - \lambda)(Q(u)(y)) = \mu_u(u)(y)
+= 0$，故 $Q(u)(y)$ 即为\omterm{def:b2:reduction:eigen}{特征向量}。
+
+(2) $\mu_u(u|_F) = \mu_u(u)|_F = 0$，并对 $u|_F$ 应用 (1)。
+\end{proof}
+
+\begin{example}[手工求极小多项式]\label{ex:b2:reduction:minpolyhand}
+\omterm{def:b2:reduction:polyu}{极小多项式}通过逐次检验
+次数来确定。对全一矩阵 $J \in \mathcal{M}_3(\R)$：
+$J \neq \lambda I$（次数 $1$ 已排除），且 $J^2 = 3J$，于是
+\[
+\mu_J = X^2 - 3X = X(X - 3) :
+\]
+次数为 $2$，分裂，根为单根——$J$ \omterm{def:b2:reduction:diag}{可对角化}，谱为
+$\{0, 3\}$（见下文\cref{cor:b2:reduction:minpolycrit}），
+印证了\cref{ex:b2:linalg:onesmatrix}，无需
+任何\omterm{def:b2:linalg:det}{行列式}计算。对
+\cref{ex:b2:reduction:projectorswork}中的交换矩阵 $A$：$A \neq \pm I$ 且 $A^2
+= I$ 得 $\mu_A = X^2 - 1$。两种情形的规律相同：
+即从结构猜出一个低次恒等式
+（秩一导出 $J^2 = (\operatorname{tr}J)\,J$；对合导出
+$A^2 = I$），再验证没有真因子
+能零化它。\omterm{def:b2:reduction:polyu}{极小多项式}通常是\emph{找出}的，而非
+由 $\chi$ 计算出的。
+\end{example}
+
+\begin{theorem}[核分解引理]\label{thm:b2:reduction:kernels}
+若 $P = P_1 P_2 \cdots P_r$，且各 $P_i$ 两两互素，
+则\index{核分解引理}
+\[
+\ker P(u) = \ker P_1(u) \oplus \dots \oplus \ker P_r(u),
+\]
+且到各直和项的投影都是 $u$ 的多项式。
+\end{theorem}
+
+\begin{proof}
+只需对 $r = 2$ 证明，再用归纳法。由 $K[X]$ 中的贝祖
+恒等式（见\cref{thm:b2:structures:principal}）：$U P_1 + V P_2 = 1$，于是
+对每个 $x$，有
+\[
+x = \underbrace{U(u)P_1(u)(x)}_{=:\,x_2}
++ \underbrace{V(u)P_2(u)(x)}_{=:\,x_1}.
+\]
+若 $x \in \ker P(u)$：$P_2(u)(x_2) = U(u)\,P(u)(x) = 0$（
+$u$ 的多项式彼此可交换），故 $x_2 \in \ker P_2(u)$，对称地 $x_1
+\in \ker P_1(u)$。两直和项之和充满 $\ker P(u)$；二者都
+位于 $\ker P(u)$ 内（$P_i \mid P$）。直和性：若 $x \in \ker P_1(u)
+\cap \ker P_2(u)$，则 $x = U(u)P_1(u)x + V(u)P_2(u)x = 0$。
+$x_1, x_2$ 的公式给出投影为 $V(u)P_2(u)$ 与
+$U(u)P_1(u)$。
+\end{proof}
+
+\begin{example}[显式投影的核引理]\label{ex:b2:reduction:projectorswork}
+设 $A = \begin{psmallmatrix}0 & 1 & 0\\ 1 & 0 & 0\\ 0 & 0 &
+1\end{psmallmatrix}$（交换前两个坐标）。于是 $A^2
+= I$：多项式 $X^2 - 1 = (X - 1)(X + 1)$ 零化 $A$，
+其因子互素，且贝祖恒等式是显式的：
+\[
+\frac{1}{2}(X + 1) - \frac12(X - 1) = 1 .
+\]
+依照\cref{thm:b2:reduction:kernels}的证明，
+到 $\ker(A - I)$ 与 $\ker(A + I)$ 上的投影是
+$A$ 的多项式：
+\[
+\pi_+ = \frac{A + I}{2} = \frac12\begin{pmatrix}
+1 & 1 & 0\\ 1 & 1 & 0\\ 0 & 0 & 2\end{pmatrix},
+\qquad
+\pi_- = \frac{I - A}{2} = \frac12\begin{pmatrix}
+1 & -1 & 0\\ -1 & 1 & 0\\ 0 & 0 & 0\end{pmatrix}.
+\]
+验证：$\pi_+ + \pi_- = I$，$\pi_+\pi_- = 0$，$\pi_\pm^2 =
+\pi_\pm$，且像分别是平面 $\{x = y\}$（对称向量，\omterm{def:b2:reduction:eigen}{特征值}
+$1$）与直线 $\R(1, -1, 0)$
+（反对称，\omterm{def:b2:reduction:eigen}{特征值} $-1$）。核引理并非存在性陈述：
+贝祖系数\emph{即为}
+投影公式。
+\end{example}
+
+\begin{example}[投影子同样可用来计算指数]\label{ex:b2:reduction:expprojectors}
+同一交换矩阵，更进一步。由于 $A = \pi_+ -
+\pi_-$，这两个投影子在代数意义上
+正交（$\pi_+\pi_- = 0$）。每个幂次均满足 $A^k = \pi_+ +
+(-1)^k\pi_-$，指数级数按投影子重新组合：
+\[
+\eu^{tA} = \sum_k \frac{t^k}{k!}\bigl(\pi_+ +
+(-1)^k\pi_-\bigr)
+= \eu^{t}\,\pi_+ + \eu^{-t}\,\pi_- =
+\begin{pmatrix}
+\cosh t & \sinh t & 0\\
+\sinh t & \cosh t & 0\\
+0 & 0 & \eu^{t}
+\end{pmatrix}.
+\]
+（验证：$t = 0$ 时为单位矩阵；$0$ 处导数为 $A$。）
+特征分解把一个矩阵级数化为两个
+数项级数——正是\cref{ch:b2:diffeq}将在每个\omterm{def:b2:reduction:diag}{可对角化}
+方程组上运用的精确机制，也是双曲函数
+支配对称耦合的原因。
+\end{example}
+
+\begin{corollary}[借助极小多项式判定可对角化]\label{cor:b2:reduction:minpolycrit}
+$u$ \omterm{def:b2:reduction:diag}{可对角化} $\iff$ $\mu_u$ 在 $K$ 上分裂，
+且根均为\emph{单根}，$\iff$ $u$ 的某个零化多项式
+分裂且根为单根。
+\end{corollary}
+
+\begin{proof}
+若 $P(u) = 0$，其中 $P = \prod_{i}(X - \lambda_i)$（
+$\lambda_i$ 两两互异），由引理得 $E = \ker P(u) = \bigoplus_i \ker(u -
+\lambda_i)$：即\omterm{def:b2:reduction:eigen}{特征子空间}的直和，故 $u$ \omterm{def:b2:reduction:diag}{可对角化}
+（见\cref{thm:b2:reduction:diagcrit}）。反之，\omterm{def:b2:reduction:diag}{可对角化}的
+$u$ 被 $\prod_{\lambda \in \operatorname{Sp}u}(X -
+\lambda)$ 零化（它零化每个\omterm{def:b2:reduction:eigen}{特征子空间}），该多项式分裂且
+单根；$\mu_u$ 整除它，且二者有相同的根
+（见\cref{prop:b2:reduction:minpoly}），故 $\mu_u$ 恰为该乘积。
+\end{proof}
+
+\begin{example}\label{ex:b2:reduction:projections}
+投影满足 $p^2 = p$：被 $X(X-1)$ 零化，分裂且根为
+单根——\omterm{def:b2:reduction:diag}{可对角化}，谱 $\subseteq \{0, 1\}$，且 $E =
+\ker p \oplus \ker(p - \mathrm{id})$：本科一年级的几何分析，
+于一行内重新证明。对称变换（$s^2 = \mathrm{id}$，
+\omterm{def:b2:linalg:annihilator}{零化子}为 $X^2 - 1$）：当 $\operatorname{char} K
+\neq 2$ 时\omterm{def:b2:reduction:diag}{可对角化}，谱 $\subseteq \{\pm 1\}$。一个满足 $u^3 =
+u^2$ 且 $u^2 \neq u$：被 $X^2(X - 1)$ 零化，\emph{未必}
+\omterm{def:b2:reduction:diag}{可对角化}——判别准则能检测出这一点（二重根
+$0$ 须加以检验：\omterm{def:b2:reduction:diag}{可对角化}当且仅当还有 $\ker u^2 = \ker
+u$）。
+\end{example}
+
+\begin{example}[域决定结论：$\R^3$ 中的旋转]\label{ex:b2:reduction:rotation3d}
+设 $R$ 为绕 $z$ 轴的四分之一转：
+\[
+R = \begin{pmatrix}
+0 & -1 & 0\\
+1 & 0 & 0\\
+0 & 0 & 1
+\end{pmatrix},
+\qquad
+\chi_R = (X - 1)(X^2 + 1).
+\]
+在 $\R$ 上：唯一\omterm{def:b2:reduction:eigen}{特征值}为 $1$，\omterm{def:b2:reduction:eigen}{特征子空间}为
+$\R e_3$——即不动向量构成的一条直线，再无进一步的
+化简：$R$ 既不\omterm{def:b2:reduction:diag}{可对角化}，也不\omterm{def:b2:reduction:diag}{可三角化}，
+在 $\mathcal{M}_3(\R)$ 中（$\chi_R$ 不分裂）。在 $\C$ 上有三个
+互异\omterm{def:b2:reduction:eigen}{特征值} $1, \iu, -\iu$，故 $R$ \omterm{def:b2:reduction:diag}{可对角化}，
+\omterm{def:b2:reduction:eigen}{特征向量}为 $e_3$ 与 $e_1 \mp \iu e_2$。几何图景在代数中已有
+反映：平面内的旋转没有
+实不变方向，而复\omterm{def:b2:reduction:eigen}{特征值} $\pm\iu$
+（模为 $1$）储存了角度（$\pm\frac\pi2$），
+这是实矩阵只能通过混合坐标才能表达的。
+\end{example}
+
+\begin{example}[极小多项式与特征多项式]\label{ex:b2:reduction:minvschar}
+设 $D = \operatorname{diag}(2, 2, 3)$：$\chi_D = (X - 2)^2(X -
+3)$，但 $\mu_D = (X - 2)(X - 3)$，因为 $(D - 2I)(D - 3I) = 0$
+（在标准基上验证），而单独的任一因子都不零化
+$D$。对于移位块 $N = \begin{psmallmatrix}0 & 1\\ 0 &
+0\end{psmallmatrix} \oplus (3)$，即 $N' =
+\begin{psmallmatrix}0 & 1 & 0\\ 0 & 0 & 0\\ 0 & 0 &
+3\end{psmallmatrix}$：$\chi_{N'} = X^2(X - 3)$ \emph{且}
+$\mu_{N'} = X^2(X - 3)$——二重根确有必要，
+因为 $N'$ 在 $\ker$ 一侧不\omterm{def:b2:reduction:diag}{可对角化}（$N'e_2 =
+e_1 \neq 0$）。经验法则：$\mu$ 与 $\chi$ 有相同的根
+（见\cref{prop:b2:reduction:minpoly}）；$\mu$ 中的重数
+刻画最大幂零块的大小，
+$\chi$ 中的重数则是\omterm{def:b2:reduction:eigen}{特征子空间}的总维数。
+\end{example}
+
+\begin{theorem}[凯莱--哈密顿]\label{thm:b2:reduction:cayleyhamilton}
+$\chi_u(u) = 0$；因此 $\mu_u \mid \chi_u$，且 $\deg \mu_u
+\leq n$。\index{凯莱--哈密顿定理}
+\end{theorem}
+
+\begin{proof}
+取 $x \neq 0$，令 $d$ 为极大的整数，使得 $(x, u(x), \dots,
+u^{d-1}(x))$ 线性无关；记
+\[
+u^d(x) = -a_0 x - a_1 u(x) - \dots - a_{d-1}u^{d-1}(x),
+\]
+并令 $P_x = X^d + a_{d-1}X^{d-1} + \dots + a_0$，于是 $P_x(u)(x) =
+0$。将该线性无关组扩充为 $E$ 的一组基，在此基下 $u$ 具有
+分块形式 $\begin{pmatrix} C & \ast\\ 0 & D\end{pmatrix}$，其中 $C$
+为 $P_x$ 的伴侣矩阵，其\omterm{def:b2:reduction:charpoly}{特征多项式}为
+$P_x$（沿第一列展开 $\det(XI - C)$，对
+$d$ 用归纳法）。因此 $\chi_u = P_x \cdot \chi_D$，且
+\[
+\chi_u(u)(x) = \chi_D(u)\bigl(P_x(u)(x)\bigr) = 0 .
+\]
+对每个 $x$ 该论证都成立，故 $\chi_u(u) = 0$。
+\end{proof}
+
+\begin{example}[凯莱--哈密顿定理的应用]\label{ex:b2:reduction:chwork}
+设 $A = \begin{pmatrix} 1 & 2\\ 3 & 4\end{pmatrix}$：$\chi_A = X^2 -
+5X - 2$，故 $A^2 = 5A + 2I$。$A$ 的任意幂都可化为
+$I$ 与 $A$ 的线性组合：
+\[
+A^4 = (5A + 2I)^2 = 25A^2 + 20A + 4I = 145A + 54I =
+\begin{pmatrix} 199 & 290\\ 435 & 634\end{pmatrix},
+\]
+逆矩阵随之而来：由 $A(A - 5I) = 2I$ 可得
+\[
+A^{-1} = \tfrac12(A - 5I)
+= \begin{pmatrix} -2 & 1\\ 3/2 & -1/2\end{pmatrix}.
+\]
+小结：凯莱--哈密顿定理把整个代数
+$K[A]$ 压缩到 $\operatorname{Vect}(I, A, \dots, A^{n-1})$——
+$\dim K[A] = \deg\mu_A \leq n$，无论需要的幂次有多大。
+\end{example}
+
+\begin{remark}[常见误区]\label{rem:b2:reduction:pitfalls}
+(i) \omterm{def:b2:reduction:eigen}{特征值}不可相加：$\operatorname{Sp}(A + B)$ 并不等于
+$\operatorname{Sp}A + \operatorname{Sp}B$，且\omterm{def:b2:reduction:diag}{可对角化}矩阵的和
+未必\omterm{def:b2:reduction:diag}{可对角化}——
+$\begin{psmallmatrix}1 & 1\\ 0 & 0\end{psmallmatrix} +
+\begin{psmallmatrix}0 & 0\\ 0 & 1\end{psmallmatrix} =
+\begin{psmallmatrix}1 & 1\\ 0 & 1\end{psmallmatrix}$ 是两个\omterm{def:b2:reduction:diag}{可对角化}矩阵之和
+（各自有互异\omterm{def:b2:reduction:eigen}{特征值}），而
+它本身不\omterm{def:b2:reduction:diag}{可对角化}；只有\emph{可交换}族才表现良好
+（见\cref{exo:b2:reduction:9}）。(ii) “$\chi_u$ 分裂”是关于
+\emph{域}的假设：平面旋转的\omterm{def:b2:reduction:charpoly}{特征多项式}为 $\chi =
+X^2 - 2\cos\theta\,X + 1$，在 $\C$ 上分裂，而不在 $\R$ 上——
+在 $\mathcal{M}_2(\C)$ 中\omterm{def:b2:reduction:diag}{可对角化}，但
+在 $\mathcal{M}_2(\R)$ 中不\omterm{def:b2:reduction:diag}{可三角化}。(iii) 不等式的方向是\omterm{def:b2:reduction:charpoly}{几何重数} $\leq$
+\omterm{def:b2:reduction:charpoly}{代数重数}，绝不能颠倒；仅检验 $\dim E_\lambda \geq
+1$ 并不能推出\omterm{def:b2:reduction:diag}{可对角化}。(iv) $\mu_u$ 并不等于
+$\chi_u$：等号成立当且仅当每个\omterm{def:b2:reduction:eigen}{特征值}恰有
+一条块链（例如伴侣矩阵，以及本章的
+周末问题）；以 $\chi$ 代替所需的 $\mu$，
+会使每一次幂运算都变得繁重。(v) 邓福德的 $d$ 与 $\nu$ 是
+$u$ 的多项式 ——一个具有适当性质的分解 $u = d' + \nu'$，
+但 $d'\nu' \neq \nu'd'$，则\emph{并非}\omterm{thm:b2:reduction:dunford}{邓福德分解}，
+且绝不唯一。
+\end{remark}
+
+\begin{remark}[本章的应用]
+约化是全书其余部分的主力：矩阵的幂与
+矩阵指数驱动了\cref{ch:b2:diffeq}中的线性微分方程组；
+\cref{ch:b2:quadratic}中的谱定理是
+正交化的对角化；\omterm{def:b2:structures:generated}{生成}函数
+（\cref{ch:b2:genfun}）以解析方法重新推导本章
+周末问题的递推渐近性态。在本科三年级分册中，
+同样的纲领在无穷维中展开：
+紧自伴算子的谱理论，其中\omterm{def:b2:reduction:eigen}{特征值}数列取代了
+有限谱，以及正矩阵的佩龙–弗罗贝尼乌斯理论，
+它解释了\emph{为何}计数问题的主\omterm{def:b2:reduction:eigen}{特征值}
+是正的且单的。
+\end{remark}
+
+\section{幂零自同态与邓福德分解}
+
+\begin{proposition}[幂零自同态]\label{prop:b2:reduction:nilpotent}
+对 $u$，若 $\chi_u$ 分裂，则下列各条件等价：$u^n =
+0$；$u^k = 0$ 对某个 $k$ 成立；$\operatorname{Sp}(u) = \{0\}$；$\chi_u
+= X^n$；$u$ \omterm{def:b2:reduction:diag}{可三角化}且对角线全为零。幂零
+自同态的\omterm{def:b2:reduction:polyu}{极小多项式}为 $\mu_u = X^{\text{(幂零指数)}}$，且指数
+$\leq n$。\index{幂零自同态}
+\end{proposition}
+
+\begin{proof}
+$u^k = 0$ 使每个\omterm{def:b2:reduction:eigen}{特征值}都是 $X^k$ 的根，谱为 $\{0\}$
+（当 $\chi$ 分裂时谱非空 ——在 $\C$ 上总成立）。于是 $\chi_u =
+X^n$（根全为零），由凯莱–哈密顿定理得 $u^n = 0$；
+三角化（\cref{thm:b2:reduction:trigonalization}）使
+对角线全为零（对角线恰为\omterm{def:b2:reduction:eigen}{特征值}）。
+反之，设 $A$ 为严格上三角矩阵：$a_{ij} = 0$
+对 $j \leq i$ 成立。下面用归纳法证明
+\[
+(A^k)_{ij} = 0 \qquad \text{当 } j \leq i + k - 1,
+\]
+即每次乘幂都把零区域向上推移一条对角线。
+当 $k = 1$ 时即为假设。对于归纳步，
+\[
+(A^{k+1})_{ij} = \sum_{\ell} (A^k)_{i\ell}\,a_{\ell j} ,
+\]
+各项皆为零：或 $\ell \leq i + k - 1$（第一个
+因子依归纳假设为 $0$），或 $\ell \geq i + k$，此时
+$j \leq i + k \leq \ell$ 使第二个因子为零。当 $k = n$ 时
+条件 $j \leq i + n - 1$ 对一切 $i, j \leq n$ 成立，故 $A^n =
+0$。\omterm{def:b2:reduction:polyu}{极小多项式}整除 $X^n$，零化性质
+确定了指数。
+\end{proof}
+
+\begin{theorem}[邓福德分解]\label{thm:b2:reduction:dunford}
+设 $\chi_u$ 在 $K$ 上分裂（当 $K = \C$ 时自动成立）。则
+存在\emph{唯一}的数对 $(d, \nu)$，满足
+\[
+u = d + \nu, \qquad d \text{ 可对角化}, \quad \nu
+\text{ 幂零}, \quad d\nu = \nu d ,
+\]
+并且 $d$ 与 $\nu$ 都是
+$u$ 的多项式。\index{邓福德分解}
+\end{theorem}
+
+\begin{proof}
+\emph{存在性。}记 $\chi_u = \prod_{i=1}^{r} (X -
+\lambda_i)^{m_i}$（$\lambda_i$ 互异），并令 $N_i = \ker(u -
+\lambda_i)^{m_i}$ 称为\emph{\omterm{def:b2:reduction:eigen}{特征子空间}}。由
+凯莱–哈密顿定理与核引理
+（\cref{thm:b2:reduction:kernels}），
+\[
+E = N_1 \oplus \dots \oplus N_r ,
+\]
+其中投影 $\pi_i$ 为 $u$ 的多项式；每个 $N_i$ 都是
+稳定的（$u$ 的多项式与 $u$ 可交换）。定义 $d = \sum_i \lambda_i
+\pi_i$：$u$ 的多项式，\omterm{def:b2:reduction:diag}{可对角化}（它以 $\lambda_i$
+作用于 $N_i$ 上，故 $E$ 分解为其\omterm{def:b2:reduction:eigen}{特征子空间}）。于是 $\nu = u -
+d$ 是 $u$ 的多项式（因而与 $d$ 可交换），且在每个
+$N_i$ 上作用为 $u - \lambda_i$，且 $(u - \lambda_i)^{m_i} = 0$
+在该处，$\nu^{\max m_i} = 0$ 于每个直和项上成立，故 $\nu$ 幂零。
+
+\emph{唯一性。}设 $u = d' + \nu'$ 为另一个满足条件的数对。由于
+$d'$ 与 $\nu'$ 彼此可交换，因而它们与 $u = d' +
+\nu'$，从而与 $u$ 的每个多项式可交换 ——特别地与 $d$
+及 $\nu$ 可交换。于是 $d - d'$ \omterm{def:b2:reduction:diag}{可对角化}（两个可交换的
+\omterm{def:b2:reduction:diag}{可对角化}映射可同时对角化：
+见\cref{exo:b2:reduction:9}），且等于 $\nu' - \nu$，它是
+幂零的：若 $\nu^k = 0$ 且 $\nu'^{k'} = 0$，可交换性
+允许作如下的二项式展开
+\[
+(\nu' - \nu)^{k + k' - 1}
+= \sum_{j=0}^{k+k'-1}\binom{k + k' - 1}{j}
+\,\nu'^{\,j}\,(-\nu)^{k + k' - 1 - j} ,
+\]
+其中每一项皆为零：或 $j \geq k'$（第一个因子
+为零），或 $k + k' - 1 - j \geq k$（第二个因子为零），且二者
+之一恒成立。\omterm{def:b2:reduction:diag}{可对角化}的幂零自同态为零（其
+谱为 $\{0\}$，且在某组基下为对角形）：$d = d'$，
+$\nu = \nu'$。
+\end{proof}
+
+\begin{example}[幂与指数]\label{ex:b2:reduction:powers}
+$A = \begin{pmatrix} 3 & 1\\ -1 & 1\end{pmatrix}$：$\chi_A = X^2 -
+4X + 4 = (X-2)^2$，只有单一\omterm{def:b2:reduction:eigen}{特征值} $2$，\omterm{def:b2:reduction:eigen}{特征子空间}的
+维数为 $1$，故不\omterm{def:b2:reduction:diag}{可对角化}。\omterm{thm:b2:reduction:dunford}{邓福德分解}：$D = 2I$，$N = A - 2I =
+\begin{pmatrix} 1 & 1\\ -1 & -1\end{pmatrix}$，$N^2 = 0$。于是
+\[
+A^k = (2I + N)^k = 2^k I + k\,2^{k-1} N ,
+\qquad
+\eu^{tA} = \eu^{2t}(I + tN),
+\]
+分别由交换元的二项式定理，以及
+在\cref{ch:b2:diffeq}中的指数级数对可交换的和项进行拆分得到。约化把
+矩阵动力学化为标量动力学。
+\end{example}
+
+\begin{remark}[本卷中的几个视角]\label{rem:b2:reduction:perspectives}
+约化是一个枢纽，下面列出值得关注的四个方面。在
+\cref{ch:b2:nvs}中，适配范数把“所有\omterm{def:b2:reduction:eigen}{特征值}的模
+$< 1$”转化为“某个算子范数 $< 1$”，使
+谱决定幂与级数的收敛性。在
+\cref{ch:b2:diffeq}中，把
+\cref{ex:b2:reduction:powers}的做法化为
+$X' = AX$ 的通解：\omterm{thm:b2:reduction:dunford}{邓福德分解}将 $\eu^{tA}$ 拆分为
+由多项式乘指数函数构成的块，稳定性则由
+\omterm{def:b2:reduction:eigen}{特征值}的实部读出。在\cref{ch:b2:quadratic}中，
+内积迫使得出纯线性代数所不能给出的结论：对称矩阵
+成为\emph{正交}\omterm{def:b2:reduction:diag}{可对角化}的，且完全没有
+幂零部分。而在\cref{ch:b2:genfun}中，本章周末问题的
+主导\omterm{def:b2:reduction:eigen}{特征值}渐近性态
+以解析形式重新出现，表现为\omterm{def:b2:structures:generated}{生成}函数的最小奇点——
+两种语言描述同一个增长率。
+\end{remark}
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:b2:reduction:1}
+将下列矩阵对角化（求\omterm{def:b2:reduction:eigen}{特征值}、\omterm{def:b2:reduction:eigen}{特征子空间}的基以及可逆矩阵 $P$）：
+\[
+A = \begin{pmatrix} 1 & 2\\ 2 & 1 \end{pmatrix},
+\qquad
+B = \begin{pmatrix} 0 & 1 & 1\\ 1 & 0 & 1\\ 1 & 1 & 0
+\end{pmatrix}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:reduction:2}
+证明 $C = \begin{pmatrix} 1 & 1\\ 0 & 1\end{pmatrix}$ 不\omterm{def:b2:reduction:diag}{可对角化}，
+用\omterm{def:b2:reduction:eigen}{特征子空间}与用\omterm{def:b2:reduction:polyu}{极小
+多项式}，两种方法各证一次。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:reduction:3}
+设 $u$ 满足 $u^2 - 5u + 6\,\mathrm{id} = 0$。证明 $u$ \omterm{def:b2:reduction:diag}{可对角化}，
+确定所有可能的谱，并把 $u^k$
+写成 $\mathrm{id}$ 与 $u$ 的线性组合。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:4}
+设 $u$ \omterm{def:b2:reduction:diag}{可对角化}，$F$ 为其不变子空间，证明
+$u|_F$ \omterm{def:b2:reduction:diag}{可对角化}\emph{（对一个零化多项式作限制，
+该多项式具有单的分裂根）}。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:5}
+（斐波那契数列）设 $A = \begin{pmatrix} 1 & 1\\ 1 & 0\end{pmatrix}$。
+将 $A$ 在 $\R$ 上对角化，并推出斐波那契数列的比内公式
+（满足 $F_0 = 0$，$F_1 = 1$，$F_{n+1} = F_n +
+F_{n-1}$）：
+\[
+F_n = \frac{\varphi^n - \psi^n}{\sqrt 5},
+\qquad \varphi = \frac{1 + \sqrt5}{2},\ \psi = \frac{1 -
+\sqrt5}{2}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:6}
+设 $u \in \mathcal{L}(E)$，$u^2$ \omterm{def:b2:reduction:diag}{可对角化}，且 $u$
+可逆（$K = \C$）。证明 $u$ \omterm{def:b2:reduction:diag}{可对角化}，
+并在 $u$ 不可逆时给出一个反例。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:7}
+对下列矩阵求\omterm{thm:b2:reduction:dunford}{邓福德分解}、$A^k$ 及 $\eu^{tA}$：
+\[
+A = \begin{pmatrix} 2 & 1 & 0\\ 0 & 2 & 1\\ 0 & 0 & 2
+\end{pmatrix}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:8}
+设 $A \in \mathcal{M}_n(\C)$，满足 $A^k = I$，其中 $k \geq 1$。
+证明 $A$ \omterm{def:b2:reduction:diag}{可对角化}，且其\omterm{def:b2:reduction:eigen}{特征值}为 $k$ 次
+单位根。由此推出，任一有限阶可逆复矩阵若与
+对角元全为1的三角矩阵相似，则必为单位矩阵。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:reduction:9}
+（同时对角化）设 $u, v$ 为\omterm{def:b2:reduction:diag}{可对角化}的
+且可交换的。证明它们可\emph{同时}对角化，即
+存在一组基使二者同时对角化。\emph{（$u$ 的每个\omterm{def:b2:reduction:eigen}{特征子空间}
+均为 $v$ 不变；在其上将 $v$ 的限制对角化，
+并利用\cref{exo:b2:reduction:4}。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:reduction:10}
+设 $u \in \mathcal{L}(\C^n)$。证明 $u$ \omterm{def:b2:reduction:diag}{可对角化}，当且仅当
+每个 $u$ 不变子空间都有一个 $u$ 不变的
+补子空间。\emph{（对 $\Leftarrow$ 方向，取 $F = \sum_\lambda E_\lambda(u)$，
+即全部\omterm{def:b2:reduction:eigen}{特征子空间}之和，并对其应用该性质；若存在非零的
+不变补子空间 $G$，则对 $u|_G$ 作三角化便
+会得到 $u$ 在 $G$ 中的一个\omterm{def:b2:reduction:eigen}{特征向量}，与 $G \cap
+F = \{0\}$ 矛盾。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:reduction:11}
+（谱半径，盖尔范德式简化版，$2\times2$ 情形的分析味道，
+留待后文）设 $A \in \mathcal{M}_2(\C)$，其两个\omterm{def:b2:reduction:eigen}{特征值}的
+模均 $< 1$。证明 $A^k \to 0$（当 $k \to \infty$ 时，逐元收敛）。
+\emph{（三角化：$A = P(T)P^{-1}$，其中 $T$ 为上三角矩阵；
+显式计算 $T^k$——分别讨论\omterm{def:b2:reduction:eigen}{特征值}相等与
+互异两种情形，并作估计。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:reduction:12}
+设 $u \in \mathcal{L}(\C^n)$，满足 $\operatorname{rk} u = 1$（$n
+\geq 2$）。证明 $\chi_u = X^{n-1}(X - \operatorname{tr} u)$，
+并证明 $u$ \omterm{def:b2:reduction:diag}{可对角化}当且仅当 $\operatorname{tr} u
+\neq 0$。\emph{（回顾 \cref{exo:b2:linalg:5}，有 $u^2 =
+(\operatorname{tr} u)\,u$。）}
+\end{exercise}
+
+\section{问题：线性递推与友矩阵}
+
+线性递推 $u_{n+k} = a_{k-1}u_{n+k-1} + \dots + a_0 u_n$
+实为伪装的矩阵幂，约化可将其化为
+闭式公式、增长率与误差估计。本周末
+问题建立这一对应词典——一侧为友矩阵，
+另一侧为数列空间上的移位算子
+——并证明\emph{线性递推的基本定理}
+（一般解为 $\sum_i Q_i(n)\lambda_i^n$，求和遍及
+\omterm{def:b2:reduction:charpoly}{特征多项式}的根），并把由此得到的收获用于
+$\sqrt2$ 的丢番图逼近、路径与单词的计数，
+以及一组相互耦合的数列，它们只有
+借助同时对角化才能解开。
+
+\begin{problem}[{周末问题——线性递推的
+基本定理}]
+\label{pb:b2:reduction:1}
+取定 $k \geq 1$，标量 $a_0, \dots, a_{k-1} \in \C$，满足 $a_0
+\neq 0$，首一多项式 $P = X^k - a_{k-1}X^{k-1} - \dots -
+a_1 X - a_0$，以及递推式
+\[
+(\mathcal R)\colon\quad u_{n+k} = a_{k-1}u_{n+k-1} + \dots +
+a_1 u_{n+1} + a_0 u_n \qquad (n \geq 0).
+\]
+$P$ 的\emph{友矩阵}为
+\[
+C =
+\begin{pmatrix}
+0 & 1 & & \\
+ & \ddots & \ddots & \\
+ & & 0 & 1\\
+a_0 & a_1 & \cdots & a_{k-1}
+\end{pmatrix}
+\in \mathcal{M}_k(\C).
+\]
+
+\medskip
+\noindent\textbf{第一部分——友矩阵对应词典。}
+\begin{enumerate}
+  \item 证明数列 $(u_n)$ 满足 $(\mathcal R)$ 当且仅当
+        向量 $v_n = (u_n, u_{n+1}, \dots,
+        u_{n+k-1})^{\mathsf T}$ 满足 $v_{n+1} = Cv_n$，从而
+        $v_n = C^n v_0$。
+  \item 证明 $\chi_C = P$（沿第一列展开 $\det(XI - C)$，
+        并对 $k$ 作归纳），再证 $\mu_C = P$
+        亦成立\emph{（改用 $C^{\mathsf T}$，其中 $e_1$
+        为循环向量，并注意矩阵与其\omterm{def:b2:linalg:transpose}{转置}有
+        相同的\omterm{def:b2:reduction:polyu}{极小多项式}）}。
+  \item 证明：设 $\lambda$ 为 $P$ 的任一根，则向量
+        $(1, \lambda, \dots, \lambda^{k-1})^{\mathsf T}$ 张成
+        $C$ 关于 $\lambda$ 的\omterm{def:b2:reduction:eigen}{特征子空间}；由此推出
+        \emph{每一个} $C$ 的\omterm{def:b2:reduction:eigen}{特征子空间}维数均为 $1$，并
+        证明 $C$ \omterm{def:b2:reduction:diag}{可对角化}当且仅当 $P$ 有 $k$
+        个互异的根。
+  \item 设 $P$ 有互异的根 $\lambda_1, \dots,
+        \lambda_k$。证明几何数列
+        $(\lambda_i^n)_n$ 构成解空间的一组基，
+        故 $(\mathcal R)$ 的每个解都是 $u_n = \sum_i
+        c_i\lambda_i^n$，其中常数 $c_i$ 唯一确定。
+  \item 完全求解：$u_{n+2} = u_{n+1} + 6u_n$，$u_0 = 1$，
+        $u_1 = 8$。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第二部分——移位算子与
+基本定理。}设 $\mathcal{S}$ 为全体复数列构成的 $\C$ 上的
+向量空间，并设 $S \in
+\mathcal{L}(\mathcal{S})$ 为移位算子，$S\bigl((u_n)_n\bigr) =
+(u_{n+1})_n$。
+\begin{enumerate}[resume]
+  \item 证明 $(\mathcal R)$ 的解集为 $\ker
+        P(S)$，并证明其维数恰为 $k$ \emph{（把一个
+        解映到其初始值）}。
+  \item 说明为何核分解引理
+        （\cref{thm:b2:reduction:kernels}）无需任何改动即可用于 $S$ 作用在
+        无限维空间 $\mathcal{S}$ 上，
+        并写出 $\ker P(S)$ 的相应分解，其中
+        $P = \prod_{i=1}^{r}(X - \lambda_i)^{m_i}$（互异的
+        $\lambda_i$ 均非零，因 $a_0 \neq 0$）。
+  \item 对 $\lambda \neq 0$ 与 $m \geq 1$，证明
+        \[
+        \ker\,(S - \lambda\,\mathrm{id})^m
+        = \bigl\{\,\bigl(Q(n)\,\lambda^n\bigr)_n : Q \in
+        \C_{m-1}[X]\,\bigr\},
+        \]
+        且其维数为 $m$。\emph{（计算 $(S -
+        \lambda)\bigl(Q(n)\lambda^n\bigr) =
+        \lambda^{n+1}(\Delta Q)(n)$，其中 $\Delta Q = Q(X + 1) -
+        Q(X)$，并利用 $\Delta$ 降低次数；
+        求维数时借助初值证明其不超过 $m$。）}
+  \item （线性递推的基本定理）由此得出：
+        若 $P = \prod_{i=1}^{r}(X - \lambda_i)^{m_i}$，且
+        $\lambda_i$ 互异且非零，则
+        $(\mathcal R)$ 的解恰为如下形式的数列：
+        \[
+        u_n = \sum_{i=1}^{r} Q_i(n)\,\lambda_i^n,
+        \qquad Q_i \in \C_{m_i - 1}[X],
+        \]
+        其中多项式 $Q_i$ 唯一确定。
+  \item 完全求解：$u_{n+2} = 4u_{n+1} - 4u_n$，$u_0 =
+        1$，$u_1 = 0$，并用 $u_2$ 检验答案。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第三部分——占优根与丢番图
+红利。}
+\begin{enumerate}[resume]
+  \item 设各根均为单根，且 $\abs{\lambda_1} >
+        \abs{\lambda_i}$（$i \geq 2$），$u_n = \sum_i c_i
+        \lambda_i^n$，$c_1 \neq 0$。证明 $u_n \sim
+        c_1\lambda_1^n$，且 $u_{n+1}/u_n \to \lambda_1$。
+  \item （佩尔）定义 $a_{n+1} = a_n + 2b_n$，$b_{n+1} = a_n +
+        b_n$，$a_0 = b_0 = 1$。证明 $q(a, b) = a^2 - 2b^2$
+        满足 $q(a_{n+1}, b_{n+1}) = -q(a_n, b_n)$，从而
+        $a_n^2 - 2b_n^2 = (-1)^{n+1}$；将此与
+        矩阵 $M = \begin{psmallmatrix}1 & 2\\ 1 &
+        1\end{psmallmatrix}$ 的\omterm{def:b2:linalg:det}{行列式}相联系。
+  \item 由此推出误差估计
+        \[
+        \Bigl|\frac{a_n}{b_n} - \sqrt2\Bigr|
+        = \frac{1}{b_n\,(a_n + \sqrt2\,b_n)}
+        \leq \frac{1}{2b_n^2},
+        \]
+        并证明它以 $3 -
+        2\sqrt2$ 为公比几何衰减，\emph{（求 $M$ 的\omterm{def:b2:reduction:eigen}{特征值}以及
+        $b_n$ 的增长）}。
+  \item （一般增长）由第 9 题证明：(a) 若每个
+        根都满足 $\abs{\lambda_i} \leq \rho$，则
+        $\abs{u_n} \leq C\,n^{m-1}\rho^n$，其中 $m = \max_i m_i$；
+        (b) 若存在唯一的模最大根 $\lambda_1$，
+        且 $Q_1 \neq 0$，则 $u_{n+1}/u_n \to
+        \lambda_1$——在第 10 题的解上检验此结论。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第四部分——计数游走与词。}对于
+一个有限图，其顶点集为 $\{1, \dots, N\}$，
+\emph{邻接矩阵} $A$ 满足 $A_{ij} = 1$（若 $ij$ 是一条边），
+否则为 $0$。
+\begin{enumerate}[resume]
+  \item 证明 $(A^n)_{ij}$ 是长为
+        $n$ 的、从 $i$ 到 $j$ 的游走数（即由 $n$ 条边组成的序列，每一步沿一条边
+        行走）。
+  \item （三角形）对于 $3$ 个顶点的完全图，
+        $A = J - I$：利用 $J$ 的谱
+        （见\cref{ex:b2:linalg:onesmatrix}），证明
+        \[
+        (A^n)_{ii} = \frac{2^n + 2(-1)^n}{3},
+        \qquad
+        (A^n)_{ij} = \frac{2^n - (-1)^n}{3} \quad (i \neq j),
+        \]
+        并通过列举游走，在 $n = 2$ 时检验两式。
+  \item （不含 $11$ 的词）设 $w_n$ 为
+        长为 $n$ 且不含两个连续 $1$ 的二进制词的个数，
+        用末位字母对词编码，得到转移矩阵，
+        证明 $w_{n+2} = w_{n+1} + w_n$，由此推出 $w_n =
+        F_{n+2}$（斐波那契数，见\cref{exo:b2:reduction:5}），并
+        求增长率 $\lim w_{n+1}/w_n$。
+  \item （路径）对于路径图 $1 - 2 - 3$，证明
+        $A$ 的\omterm{def:b2:reduction:eigen}{特征值}为 $\sqrt2, 0, -\sqrt2$，
+        对应\omterm{def:b2:reduction:eigen}{特征向量}为 $(1, \pm\sqrt2, 1)$ 与 $(1, 0, -1)$，并由此推出
+        长为 $n$ 的、从一端到另一端的游走数为
+        $\bigl((\sqrt2)^n + (-\sqrt2)^n\bigr)/4$：
+        当 $n$ 为奇数时为零，$2^{\,n/2 - 1}$ 适用于偶数 $n$。
+        在 $n = 4$ 时检验。
+  \item （迹公式）证明长为
+        $n$（起点任意）的闭游走总数为
+        $\operatorname{tr}(A^n) = \sum_i \lambda_i^n$，并
+        在三角形上验证此式。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第五部分——数列的环：同时
+对角化。}固定 $k \geq 3$，设 $\omega = \eu^{2\iu\pi/k}$，
+        并设 $W \in \mathcal{M}_k(\C)$ 为循环位移：$W e_i =
+e_{i+1}$（下标按模 $k$，列编号依次为 $0, \dots, k-1$）。
+\begin{enumerate}[resume]
+  \item 证明 $W^{\mathsf T}$ 为
+        $X^k - 1$ 的友矩阵，由此推出 $\chi_W = \mu_W = X^k - 1$，且 $W$
+        \omterm{def:b2:reduction:diag}{可对角化}，其 $k$ 个单\omterm{def:b2:reduction:eigen}{特征值}为
+        $\omega^j$，\omterm{def:b2:reduction:eigen}{特征向量}为 $f_j = (1, \omega^{-j},
+        \omega^{-2j}, \dots, \omega^{-(k-1)j})^{\mathsf T}$。
+  \item \emph{循环矩阵}是形如 $C = c_0 I + c_1 W + \dots
+        + c_{k-1}W^{k-1}$ 的矩阵。证明所有循环矩阵两两可交换，
+        基 $(f_0, \dots, f_{k-1})$ 同时对角化
+        \emph{全部}循环矩阵，并证明
+        $C$ 的\omterm{def:b2:reduction:eigen}{特征值}为 $\widehat c(\omega^j) = \sum_m
+        c_m \omega^{jm}$，$j = 0, \dots, k-1$。
+  \item 由此推出 $\det C = \prod_{j=0}^{k-1} \widehat
+        c(\omega^j)$，并验证 $k = 3$ 时可得
+        \cref{exo:b2:linalg:8} 中的分解式。
+  \item （项链平均）设 $x^{(n+1)} = Mx^{(n)}$，其中
+        $M = \frac12(W + W^{-1})$：排成环状的 $k$ 个数中，每个数
+        都被替换为其两个相邻数的平均值。证明
+        $M$ 的\omterm{def:b2:reduction:eigen}{特征值}为
+        $\cos(2\pi j/k)$，并证明 $x^{(0)}$ 在
+        $f_0$ 上的系数即为均值 $\frac1k\sum_m x^{(0)}_m$
+        \emph{（对 $f_j$ 的各坐标求和）}。
+  \item 总结：当 $k$ 为奇数时，$x^{(n)}$ 收敛于
+        常向量，其值为初始值的均值；
+        当 $k = 4$ 时，指出导致不收敛的\omterm{def:b2:reduction:eigen}{特征值}，
+        以及精确的障碍
+        （一个必须为零的交错均值系数）。
+  \item （综合）各用一句话说明：友矩阵如何
+        将 $(\mathcal R)$ 的分析化为
+        约化；核分解引理在何处
+        不需要有限维；占优\omterm{def:b2:reduction:eigen}{特征值}为何
+        支配增长率与丢番图误差；为何
+        邻接矩阵的幂可以计数游走；以及
+        可交换矩阵有何好处。指出两座高峰：线性递推的基本
+        定理，以及——针对第四部分的正矩阵，
+        见本科三年级分册——即
+        佩龙--弗罗贝尼乌斯定理。
+\end{enumerate}
+\end{problem}

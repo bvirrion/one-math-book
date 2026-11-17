@@ -1,0 +1,910 @@
+ \chapter{傅里叶级数}\label{ch:b2:fourier}
+
+每一个周期信号能否由纯粹的正弦函数与余弦函数重新构造出来？
+傅里叶大胆的“是”开创了一个世纪的分析学。本章
+证明了本阶段可及的两块基石：
+\emph{狄利克雷定理}（对分段 $C^1$ 函数的逐点重构，
+借助\omterm{lem:b2:fourier:kernel}{狄利克雷核}）与\emph{帕塞瓦尔恒等式}（信号的能量
+等于其各次谐波能量之和），并
+推出若干经典数值级数——其中首推巴塞尔级数 $\sum 1/n^2 =
+\pi^2/6$。
+
+全文所涉函数均为 $2\pi$ 周期、分段\omterm{def:b2:metric:continuity}{连续}、复值的，
+$\mathcal{C}$ 表示其中的\omterm{def:b2:metric:continuity}{连续}函数。
+
+\section{傅里叶系数}
+
+\begin{definition}\label{def:b2:fourier:coefficients}
+$f$ 的\emph{傅里叶系数}\index{傅里叶系数}
+由下式给出：
+\[
+c_n(f) = \frac{1}{2\pi}\int_{-\pi}^{\pi} f(t)\,\eu^{-\iu n t}\,\dd
+t \qquad (n \in \Z),
+\]
+并记实形式系数 $a_n = c_n + c_{-n}$、$b_n = \iu(c_n
+- c_{-n})$，于是\emph{傅里叶部分和}\index{傅里叶
+部分和}为
+\[
+S_N(f)(t) = \sum_{n=-N}^{N} c_n(f)\,\eu^{\iu nt}
+= \frac{a_0}{2} + \sum_{n=1}^{N}\bigl(a_n\cos nt + b_n \sin
+nt\bigr).
+\]
+在 $\mathcal{C}$ 上定义\omterm{def:b2:hermitian:def}{埃尔米特内积} $\langle f,
+g\rangle = \frac{1}{2\pi}\int_{-\pi}^{\pi}\conj f\,g$，
+指数函数 $e_n(t) = \eu^{\iu nt}$ 是\emph{标准正交}的
+（$\langle e_m, e_n\rangle = \delta_{mn}$，直接计算），且
+$c_n(f) = \langle e_n, f\rangle$：傅里叶分析
+就是无穷维的埃尔米特几何（见\cref{ch:b2:hermitian}）。
+\end{definition}
+
+\begin{proposition}[贝塞尔不等式]\label{prop:b2:fourier:bessel}
+$S_N(f)$ 是 $f$ 在
+三角多项式空间 $\mathcal{T}_N$ 上的正交投影（次数 $\leq N$），
+且\index{贝塞尔不等式}
+\[
+\sum_{n=-N}^{N} \abs{c_n(f)}^2 \leq \norm f_2^2 =
+\frac{1}{2\pi}\int_{-\pi}^{\pi} \abs f^2 :
+\]
+级数 $\sum \abs{c_n}^2$ 收敛，且 $c_n(f) \to 0$，
+当 $\abs n \to \infty$ 时（系数形式的黎曼–勒贝格引理）。
+\end{proposition}
+
+\begin{proof}
+$f - S_N(f)$ 与每个 $e_k$ 正交，$\abs k \leq N$（$\langle
+e_k, f - S_N f\rangle = c_k - c_k = 0$）：$S_Nf$ 是到
+$\mathcal{T}_N = \operatorname{Vect}(e_{-N}, \dots,
+e_N)$ 的正交投影（本科一年级分册中的投影定理，
+埃尔米特情形下原样成立）。由毕达哥拉斯定理，$\norm f_2^2 = \norm{S_Nf}_2^2 +
+\norm{f - S_Nf}_2^2 \geq \norm{S_Nf}_2^2 = \sum_{\abs n \leq N}
+\abs{c_n}^2$；令 $N \to \infty$。
+\end{proof}
+
+\begin{example}[均方意义下的最佳逼近]\label{ex:b2:fourier:bestapprox}
+低次三角多项式逼近
+锯齿波 $f(t) = t$（在 $\intoo{-\pi}{\pi}$ 上）的均方逼近效果如何？
+由\cref{prop:b2:fourier:bessel}可知，最佳的
+$N$ 次逼近\emph{恰为} $S_N(f)$，其平方误差为
+\[
+\norm{f - S_Nf}_2^2 = \norm f_2^2 -
+\sum_{\abs n\leq N}\abs{c_n}^2 .
+\]
+这里 $\norm f_2^2 = \frac{1}{2\pi}\int_{-\pi}^\pi t^2\dd t =
+\frac{\pi^2}{3}$，又由 $b_n = \frac{2(-1)^{n+1}}{n}$
+（见\cref{ex:b2:fourier:basel}），$\abs{c_n}^2 + \abs{c_{-n}}^2 =
+\frac{b_n^2}{2} = \frac{2}{n^2}$。于是
+\[
+\norm{f - S_Nf}_2^2
+= \frac{\pi^2}{3} - \sum_{n=1}^{N}\frac{2}{n^2}
+\qquad\text{：数值上依次为 } 1.29,\ 0.79,\ 0.57,\ 0.44
+\]
+当 $N = 1, 2, 3, 4$ 时——误差递减，但下降很慢：尾项
+$\sum_{n>N}\frac2{n^2} \sim \frac2N$ 由系数的慢速
+$\frac1n$ 型衰减所决定，而这本身正是
+跳跃的特征（逆用\cref{exo:b2:fourier:6}）。本例
+的要点在于：帕塞瓦尔恒等式把逼近的优劣化为某一数值级数的尾项，
+并且在看到任何图像之前就预言：跳跃使傅里叶级数
+收敛得十分勉强。
+\end{example}
+
+\begin{method}[高效计算傅里叶系数]\label{met:b2:fourier:coefficients}
+在做任何积分之前，先注意：
+\begin{enumerate}
+  \item \emph{奇偶性：}偶函数 $f$ 的 $b_n = 0$，奇函数 $f$ 的 $a_n
+        = 0$，且剩下的积分化为 $\frac2\pi
+        \int_0^\pi$ 形式的积分——工作量减半，可靠性加倍。
+  \item \emph{三角多项式本就现成：}
+        将乘积线性化（$\cos^3$、$\sin^2\cos$、\dots），并
+        直接读出系数
+        （见\cref{exo:b2:fourier:9}）；标准正交性使得任何
+        进一步的积分均属多余。
+  \item \emph{指数因子用复指数处理：}对
+        因子 $\eu^{at}$ 或阻尼振荡，直接计算
+        $c_n$，只需对 $\eu^{(a - \iu
+        n)t}$ 积分一次，胜过两次分部积分
+        （见\cref{exo:b2:fourier:10}）。
+  \item \emph{对已知展开式求导：}若 $f'$ 的系数已知，
+        且 $f$ \omterm{def:b2:metric:continuity}{连续}，则 $c_n(f) =
+        \frac{c_n(f')}{\iu n}$（$n \neq 0$）可求得除
+        $c_0$ 外的全部系数，此项恰为均值——往往是最快的途径，
+        且恰在
+        \cref{thm:b2:fourier:parseval}~(1) 的假设下才合法。
+\end{enumerate}
+\end{method}
+
+\section{狄利克雷定理}
+
+\begin{lemma}[狄利克雷核]\label{lem:b2:fourier:kernel}
+$S_N(f)(x) = \frac{1}{2\pi}\int_{-\pi}^{\pi} f(x + u)\,D_N(u)\,\dd
+u$，其中\index{狄利克雷核}
+\[
+D_N(u) = \sum_{n=-N}^{N} \eu^{\iu nu}
+= \frac{\sin\bigl((N + \frac12)u\bigr)}{\sin\frac u2}
+\quad (u \notin 2\pi\Z),
+\qquad
+\frac{1}{2\pi}\int_{-\pi}^{\pi} D_N = 1 .
+\]
+\end{lemma}
+
+\begin{proof}
+将 $c_n$ 的定义代入 $S_N$，并交换求和与积分的次序
+（这样做是合理的，因为求和为有限和）：
+\[
+S_N(f)(x)
+= \sum_{n=-N}^{N}\Bigl(\frac{1}{2\pi}\int_{-\pi}^{\pi}
+f(t)\,\eu^{-\iu nt}\dd t\Bigr)\eu^{\iu nx}
+= \frac{1}{2\pi}\int_{-\pi}^{\pi} f(t)
+\sum_{n=-N}^{N}\eu^{\iu n(x-t)}\,\dd t ;
+\]
+作代换 $u = t - x$，并将积分区间平移回
+$\intcc{-\pi}{\pi}$，依被积函数的 $2\pi$ 周期性；
+对称的指标范围使得 $\sum_n\eu^{-\iu nu} = D_N(u)$。
+闭形式由公比为 $\eu^{\iu u}$ 的等比求和给出，
+\[
+D_N(u) = \eu^{-\iu Nu}\,\frac{\eu^{\iu(2N+1)u} - 1}{\eu^{\iu u} -
+1}
+= \frac{\eu^{\iu(N + \frac12)u} - \eu^{-\iu(N+\frac12)u}}
+{\eu^{\iu u/2} - \eu^{-\iu u/2}} ,
+\]
+即为正弦之商。其均值为 $1$，仅
+$n = 0$ 一项有贡献。
+\end{proof}
+
+\begin{theorem}[黎曼–勒贝格引理]\label{thm:b2:fourier:riemannlebesgue}
+设 $g$ 在某闭区间上分段\omterm{def:b2:metric:continuity}{连续}，
+则 $\int_a^b g(t)\sin(\lambda t + \varphi)\,\dd t \to 0$，当 $\lambda
+\to +\infty$ 时。\index{黎曼–勒贝格引理}
+\end{theorem}
+
+\begin{proof}
+用阶梯函数一致逼近 $g$
+（不必用到 \cref{thm:b2:funcseq:weierstrass}，
+分段\omterm{def:b2:metric:continuity}{连续}函数的初等阶梯函数逼近即可
+），并对每个阶梯函数显式积分：每一段
+贡献 $O\bigl(\frac1\lambda\bigr)$，而逼近误差
+贡献 $\varepsilon(b - a)$。此论证已
+作为本科一年级分册积分一章的末尾练习完整完成；
+对 $C^1$ 分段，可改用分部积分，
+并以 $\frac C\lambda$ 为界。
+\end{proof}
+
+\begin{example}[系数衰减得有多快？]\label{ex:b2:fourier:decaytable}
+黎曼–勒贝格引理说系数趋于 $0$；其
+\emph{衰减速率}即光滑性的度量。取自本章及其练习的三个
+例子：
+\[
+\text{方波： } b_n = \frac{4}{\pi n}\ (n\ \text{为奇数}),
+\qquad
+\abs t : a_n = \frac{-4}{\pi n^2}\ (n\ \text{为奇数}),
+\qquad
+\abs{\sin t} : a_{2k} = \frac{-4}{\pi(4k^2-1)} .
+\]
+$f$ 的跳跃（方波、锯齿波）使系数具有
+$\frac1n$ 阶：无\omterm{def:b2:funcseq:series}{正规收敛}，跳点处出现
+\omterm{ex:b2:fourier:zetafourodd}{吉布斯现象}。\omterm{def:b2:metric:continuity}{连续}但带尖角（仅 $f'$ 有跳跃）——
+则阶提高到 $\frac{1}{n^2}$：\omterm{def:b2:funcseq:series}{正规收敛}，
+一致重构。一般地，$k$ 阶导数给出 $c_n =
+O(n^{-k})$（见\cref{exo:b2:fourier:6}），反之，若谱
+衰减快于任何幂次，则 $f$ 必为 $C^\infty$
+（此时可合法地逐项求导）。最后的要点：
+信号的正则性与谱的衰减是同一信息——
+工程师从另一者的斜率读出一者，
+而无需画出函数本身。
+\end{example}
+
+\begin{theorem}[狄利克雷]\label{thm:b2:fourier:dirichlet}
+设 $f$ 是 $2\pi$ 周期且分段 $C^1$ 的函数，则对每个 $x$，
+\[
+S_N(f)(x) \xrightarrow[N \to \infty]{}
+\frac{f(x^+) + f(x^-)}{2}
+\]
+（即单侧极限的平均值）——特别地，在每个\omterm{def:b2:metric:continuity}{连续}点处 $S_N(f)(x) \to
+f(x)$。\index{狄利克雷定理}
+\end{theorem}
+
+
+\begin{proof}
+由核引理及其均值为 1 的性质，将积分拆为
+$u > 0$ 与 $u < 0$ 两部分（各自均值为 $\frac12$）：
+\begin{align*}
+S_N(f)(x) - \frac{f(x^+) + f(x^-)}{2}
+&= \frac{1}{2\pi}\int_{0}^{\pi} \bigl(f(x+u) -
+f(x^+)\bigr)D_N(u)\,\dd u\\
+&\quad+ \frac{1}{2\pi}\int_{-\pi}^{0}\bigl(f(x+u) -
+f(x^-)\bigr)D_N(u)\,\dd u .
+\end{align*}
+先处理第一项（第二项对称）。记为
+\[
+\bigl(f(x + u) - f(x^+)\bigr)\,D_N(u)
+= \underbrace{\frac{f(x+u) - f(x^+)}{\sin\frac u2}}_{g(u)}\,
+\sin\Bigl(\Bigl(N + \frac12\Bigr)u\Bigr) .
+\]
+函数 $g$ 在 $\intoc{0}{\pi}$ 上分段\omterm{def:b2:metric:continuity}{连续}，
+并且在 $0^+$ 处有\emph{有限极限}，写作
+\[
+g(u) = \frac{f(x+u) - f(x^+)}{u}\cdot\frac{u}{\sin\frac u2} ,
+\]
+第一个因子趋于 $f'(x^+)$（单侧
+可导性，由分段 $C^1$ 得出），第二个因子趋于 $2$
+（标准极限 $\frac{\sin v}{v} \to 1$ 在 $v = \frac
+u2$）：$g(0^+) = 2f'(x^+)$ 存在。于是 $g$ 可分段
+\omterm{def:b2:metric:continuity}{连续}地延拓到 $\intcc{0}{\pi}$ 上，从而由黎曼–勒贝格引理
+（见\cref{thm:b2:fourier:riemannlebesgue}）使积分趋于
+$0$。这正是该假设的意义所在：若没有
+单侧导数，因子 $\frac{1}{\sin(u/2)}$ 在
+$0$ 处趋于无穷，其速度快于黎曼–勒贝格引理所能抵消的程度，而
+\omterm{def:b2:funcseq:def}{逐点收敛}对仅为\omterm{def:b2:metric:continuity}{连续}的
+$f$ 确实可能失效——这一缺口由费耶尔定理（周末问题）
+借助求平均予以弥补。
+\end{proof}
+
+\begin{example}[狄利克雷在跳跃点处的值]\label{ex:b2:fourier:jumpvalue}
+取锯齿函数 $f(t) = t$，定义在 $\intoo{-\pi}{\pi}$ 上
+（见\cref{ex:b2:fourier:basel}），其周期延拓
+在 $t = \pi$ 处由 $f(\pi^-) = \pi$ 跳至 $f(\pi^+) = -\pi$。
+狄利克雷定理保证该点的值为 $\frac{\pi + (-\pi)}{2} = 0$，
+事实上 $\sum
+\frac{2(-1)^{n+1}}{n}\sin nt$ 的每一项在 $t = \pi$ 处都为零，
+级数收敛到中点，忽略
+两侧的单侧值。若将求值点改为 $t =
+\frac\pi2$（\omterm{def:b2:metric:continuity}{连续}点）处，则同一级数
+变为莱布尼茨的 $\frac\pi4$。同一级数，两种行为——
+恰好对应定理的两条结论。
+\end{example}
+
+\begin{theorem}[$C^1$ 情形的正规收敛；帕塞瓦尔]\label{thm:b2:fourier:parseval}
+\begin{enumerate}
+  \item 若 $f$ \omterm{def:b2:metric:continuity}{连续}、$2\pi$-周期且分段 $C^1$，
+        则 $c_n(f') = \iu n\,c_n(f)$，$f$ 的傅里叶级数
+        在 $\R$ 上\emph{正规}收敛，且其和为 $f$。
+  \item （帕塞瓦尔）对任一分段\omterm{def:b2:metric:continuity}{连续}的 $2\pi$-周期
+        函数 $f$：\index{帕塞瓦尔恒等式}
+        \[
+        \frac{1}{2\pi}\int_{-\pi}^{\pi}\abs{f}^2
+        = \sum_{n=-\infty}^{\infty} \abs{c_n(f)}^2
+        = \frac{\abs{a_0}^2}{4} + \frac12\sum_{n\geq1}
+        \bigl(\abs{a_n}^2 + \abs{b_n}^2\bigr).
+        \]
+        \emph{（此处证明 $f$ \omterm{def:b2:metric:continuity}{连续}且分段 $C^1$ 的情形；
+        一般情形在本阶段不加证明地承认。）}
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+（1）在每个 $C^1$ 段上分部积分（边界项
+由\omterm{def:b2:metric:continuity}{连续}性与周期性相消）：$c_n(f') = \iu n c_n(f)$。再由
+柯西–施瓦茨不等式作用于两个平方\omterm{def:b2:series:summable}{可和族}
+（对 $f'$ 用\cref{prop:b2:fourier:bessel}）：
+\[
+\sum_{n \neq 0} \abs{c_n(f)} = \sum_{n\neq0}
+\frac{\abs{c_n(f')}}{\abs n}
+\leq \Bigl(\sum \abs{c_n(f')}^2\Bigr)^{1/2}
+\Bigl(\sum_{n\neq0}\frac{1}{n^2}\Bigr)^{1/2} < \infty :
+\]
+傅里叶级数\omterm{def:b2:funcseq:series}{正规收敛}。其和\omterm{def:b2:metric:continuity}{连续}，
+并由狄利克雷定理在每点都与 $f$ 相等
+（由 $f$ \omterm{def:b2:metric:continuity}{连续}，见\cref{thm:b2:fourier:dirichlet}）：级数
+\omterm{def:b2:funcseq:def}{一致收敛}到 $f$。
+
+（2）对这样的 $f$：$S_N f \to f$ \omterm{def:b2:funcseq:def}{一致收敛}，故 $\norm{f - S_Nf}_2
+\leq \norm{f - S_Nf}_\infty \to 0$，由毕达哥拉斯恒等式
+($\norm f_2^2 = \sum_{\abs n \leq N}\abs{c_n}^2 + \norm{f -
+S_Nf}_2^2$)在取极限后仍成立。实数形式只是
+对 $a_n, b_n$ 的记账。
+\end{proof}
+
+\begin{example}[$C^1$ 尾项估计的定量化]\label{ex:b2:fourier:tailbound}
+在\cref{thm:b2:fourier:parseval}~(1) 的证明中隐藏着一个可用的
+估计。对\omterm{def:b2:metric:continuity}{连续}、分段 $C^1$ 的 $f$，同样的
+柯西–施瓦茨不等式只用于尾项，得到
+\[
+\sum_{\abs n > N}\abs{c_n(f)}
+= \sum_{\abs n > N}\frac{\abs{c_n(f')}}{\abs n}
+\leq \Bigl(\sum_{\abs n > N}\abs{c_n(f')}^2\Bigr)^{\!1/2}
+\Bigl(\sum_{\abs n>N}\frac{1}{n^2}\Bigr)^{\!1/2}
+\leq \norm{f'}_2\,\sqrt{\frac{2}{N}} ,
+\]
+用到对 $f'$ 的贝塞尔不等式，以及 $\sum_{n>N}n^{-2} \leq \frac1N$。于是
+部分和的一致误差满足
+\[
+\norm{f - S_Nf}_\infty
+\leq \sum_{\abs n>N}\abs{c_n(f)}
+\leq \norm{f'}_2\,\sqrt{\frac2N} .
+\]
+对 $f(t) = \abs t$：$\norm{f'}_2 = 1$（导数为
+$\pm1$），因此仅十项就能一致地逼近 $\abs t$，
+误差在 $\sqrt{0.2} \approx 0.45$ 之内；取 $N = 10^4$ 时误差在
+$0.015$ 之内。小结：一阶导数换来了
+$\frac{1}{\sqrt N}$ 的\omterm{def:b2:funcseq:def}{一致收敛}速度。
+与方波的 $\frac1n$ 系数世界相比（那里根本没有\omterm{def:b2:funcseq:def}{一致收敛}），
+\cref{ex:b2:fourier:decaytable} 中的对照表
+便有了具体的数值。
+\end{example}
+
+\begin{example}[巴塞尔问题及相关结果]\label{ex:b2:fourier:basel}
+设 $f(t) = t$ 定义在 $\intoo{-\pi}{\pi}$ 上，并做 $2\pi$-周期延拓
+（锯齿函数，分段 $C^1$）。计算得 $a_n = 0$（由奇性）以及
+\[
+b_n = \frac{1}{\pi}\int_{-\pi}^{\pi} t\sin nt\,\dd t
+= \frac{2(-1)^{n+1}}{n} .
+\]
+取 $t = \frac\pi2$，由狄利克雷定理恢复莱布尼茨公式 $\frac\pi4 = 1 -
+\frac13 + \frac15 - \dots$；由帕塞瓦尔恒等式得
+\[
+\frac{1}{2\pi}\int_{-\pi}^{\pi} t^2\,\dd t = \frac{\pi^2}{3}
+= \frac12\sum_{n\geq1}\frac{4}{n^2}
+\quad\Longrightarrow\quad
+\boxed{\;\sum_{n\geq1}\frac{1}{n^2} = \frac{\pi^2}{6}\;}
+\]
+——欧拉的巴塞尔级数，两行即得。函数 $f(t) = t^2$
+同样得到 $\sum \frac1{n^4} = \frac{\pi^4}{90}$
+（见\cref{exo:b2:fourier:3}）。
+\end{example}
+
+\begin{example}[完整展开并带内建检验：$\abs{\sin t}$]\label{ex:b2:fourier:abssin}
+函数 $f(t) = \abs{\sin t}$ \omterm{def:b2:metric:continuity}{连续}、偶，
+$\pi$-周期（从而是 $2\pi$-周期），分段 $C^1$。
+偶性使所有 $b_n$ 为零；$a_0 = \frac1\pi\int_{-\pi}^{\pi}
+\abs{\sin t}\dd t = \frac4\pi$；当 $n \geq 1$ 时，
+由积化和差公式得
+\[
+a_n = \frac2\pi\int_0^\pi \sin t\cos nt\,\dd t
+= \frac{1}{\pi}\int_0^\pi\bigl(\sin(1+n)t +
+\sin(1-n)t\bigr)\dd t
+= \frac2\pi\cdot\frac{1 + \cos n\pi}{1 - n^2}
+\]
+当 $n \neq 1$ 时（$a_1 = 0$ 直接验证）：奇数 $n$ 时为零，且
+$a_{2k} = \frac{-4}{\pi(4k^2-1)}$。由
+\cref{thm:b2:fourier:parseval}~(1)可知级数\omterm{def:b2:funcseq:series}{正规收敛}，
+并有
+\[
+\abs{\sin t} = \frac{2}{\pi} - \frac{4}{\pi}
+\sum_{k\geq1}\frac{\cos(2kt)}{4k^2 - 1}
+\qquad (t \in \R) .
+\]
+内建检验：取 $t = 0$，恒等式要求
+$\sum_{k\geq1}\frac{1}{4k^2-1} = \frac12$，
+裂项相消即可验证：
+\[
+\sum_{k\geq1}\frac{1}{4k^2-1}
+= \frac12\sum_{k\geq1}\Bigl(\frac{1}{2k-1} -
+\frac{1}{2k+1}\Bigr) = \frac12 . \checkmark
+\]
+小结：$\abs{\sin}$ 的谱只落在
+\emph{偶数}频率上——对正弦做整流会使其频率成分加倍，
+频率成分，这正是全波整流器会以
+$100$ 或 $120$ 赫兹嗡鸣的原因，恰为市电频率的两倍。
+\end{example}
+
+\begin{example}[帕塞瓦尔等式作为计算工具]\label{ex:b2:fourier:zetafourodd}
+帕塞瓦尔等式可整批地把展开式化为数值级数。
+将其用于 $f(t) = \abs t$（\cref{exo:b2:fourier:2}：$a_0 =
+\pi$，$a_n = \frac{-4}{\pi n^2}$ 当 $n$ 为奇数时，其余为零）：
+\[
+\frac{1}{2\pi}\int_{-\pi}^{\pi}t^2\,\dd t = \frac{\pi^2}{3}
+= \frac{a_0^2}{4} + \frac12\sum_{n \text{ 奇数}} a_n^2
+= \frac{\pi^2}{4} +
+\frac{8}{\pi^2}\sum_{n\text{ 奇数}}\frac{1}{n^4} ,
+\]
+由此得
+\[
+\sum_{n\text{ 奇数}}\frac{1}{n^4}
+= \frac{\pi^2}{8}\Bigl(\frac{\pi^2}{3} -
+\frac{\pi^2}{4}\Bigr) = \frac{\pi^4}{96} .
+\]
+与\cref{exo:b2:fourier:3}对照：将
+$\sum\frac1{n^4}$ 拆为奇、偶两部分，得 $\zeta$ 型的
+记账 $S = S_{\mathrm{odd}} + \frac{S}{16}$，于是 $S =
+\frac{16}{15}\cdot\frac{\pi^4}{96} = \frac{\pi^4}{90}$——
+恰为那里借助另一函数求得的值。两个
+展开式，同一个数：这种相容性正是
+帕塞瓦尔等距性的作用。小结：每一个新的傅里叶展开，都是
+一台\omterm{def:b2:structures:generated}{生成}级数恒等式的机器；周末问题的
+第二部分说明了这台机器为何
+永不自相矛盾。
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=9.2cm, height=5.6cm,
+    xmin=-3.6, xmax=3.6, ymin=-1.5, ymax=1.5,
+    xtick={-3.1416, 0, 3.1416},
+    xticklabels={$-\pi$, $0$, $\pi$}, ytick={-1,1}]
+  \addplot[omExo, thick] coordinates {(-3.1416,-1) (0,-1)};
+  \addplot[omExo, thick] coordinates {(0,1) (3.1416,1)};
+  \addplot[omDef, thick, domain=-3.3:3.3, samples=200]
+    {4/pi*sin(deg(x))};
+  \addplot[omThm, very thick, domain=-3.3:3.3, samples=400]
+    {4/pi*(sin(deg(x)) + sin(deg(3*x))/3 + sin(deg(5*x))/5 +
+     sin(deg(7*x))/7 + sin(deg(9*x))/9)};
+\end{axis}
+\end{tikzpicture}
+
+{\small 方波（灰色）与\omterm{def:b2:fourier:coefficients}{傅里叶部分和} $S_1$
+（蓝色）与 $S_9$（红色）：在每个\omterm{def:b2:metric:continuity}{连续}点处均收敛，但
+在跳跃点附近持续存在 $\sim 9\%$ 的过冲——即
+\emph{吉布斯现象}\index{吉布斯现象}。\omterm{def:b2:funcseq:def}{一致
+收敛}恰因极限不\omterm{def:b2:metric:continuity}{连续}而失效。}
+\end{omfigure}
+
+\begin{example}[平移与调制]\label{ex:b2:fourier:shiftrules}
+两条只占一行的规则，可由一个展开式\omterm{def:b2:structures:generated}{生成}许多展开式。设 $a
+\in \R$，作代换 $s = t - a$：
+\[
+c_n\bigl(f(\cdot - a)\bigr)
+= \frac{1}{2\pi}\int_{-\pi}^{\pi}f(t - a)\eu^{-\iu nt}\dd t
+= \eu^{-\iu na}\,c_n(f)
+\qquad\text{（平移调制频谱）},
+\]
+又由定义直接可得
+\[
+c_n\bigl(\eu^{\iu kt}f\bigr) = c_{n-k}(f)
+\qquad\text{（调制平移频谱）}.
+\]
+算例：将锯齿波平移 $\pi$，记 $g(t) = f(t -
+\pi)$，其中 $f(t) = t$，其 $b_n$ 系数为
+$(-1)^n\cdot\frac{2(-1)^{n+1}}{n} = -\frac2n$，于是
+$g \sim -2\sum\frac{\sin nt}{n}$ 是在
+$0$ 而非 $\pi$ 处跳跃的锯齿波的展开式，无需重算积分。小结
+：时间平移只改变相位，决不改变振幅
+（$\abs{c_n}$ 对平移不变），故能量
+（帕塞瓦尔）与收敛类型都只取决于信号的
+\emph{形状}，而与计时起点无关。
+\end{example}
+
+\begin{remark}[常见误区]
+\emph{(i) 三种收敛，三种度量：}逐点
+（狄利克雷：需分段 $C^1$，在
+每个跳跃点——取\emph{中点}值，绝不取单侧值），一致（需
+\omterm{def:b2:metric:continuity}{连续}的极限；跨越跳跃时不可能，\omterm{ex:b2:fourier:zetafourodd}{吉布斯现象}即
+其明显症状），以及均方收敛（帕塞瓦尔：最
+稳健，对个别点不敏感）。总须指明
+所断言的是哪一种。\emph{(ii) 默认不逐项求导
+：}对
+\cref{ex:b2:fourier:basel}的锯齿波级数逐项求导，得 $\sum
+2(-1)^{n+1}\cos nt$，其通项甚至不趋于 $0$——
+函数列一章中的换序定理需要
+\emph{导出}级数的\omterm{def:b2:funcseq:def}{一致收敛}，而跳跃恰好
+破坏了这一点。先保证光滑，再求导
+（\cref{exo:b2:fourier:6} 即是对照表）。\emph{(iii)
+对称部分和：}狄利克雷定理涉及 $S_N =
+\sum_{-N}^{N}$；重排或先对一侧求和，可能
+使发散变为收敛，亦可反之。\emph{(iv)
+归一化漂移：}各书的约定互不相同
+（前置因子 $\frac{1}{2\pi}$ 或 $\frac1\pi$，周期 $2\pi$ 或
+$1$）；可靠的不变量是正交归一关系
+——在所用约定下重算 $\langle e_m, e_n\rangle$，
+然后方可信任任何公式。
+\end{remark}
+
+\begin{remark}[应用场合]
+帕塞瓦尔等式是傅里叶级数 $L^2$ 理论的萌芽：
+本科三年级分册补全了这幅图景（指数函数构成
+$L^2$ 的希尔伯特基，映射 $f \mapsto (c_n)$ 是一个
+双射等距映射）。在本分册中，周末问题
+证明了\emph{费耶尔定理}——傅里叶级数的切萨罗平均
+对每个\omterm{def:b2:metric:continuity}{连续}周期
+$f$ \omterm{def:b2:funcseq:def}{一致收敛}——使在本阶段不加证明地承认的一般帕塞瓦尔等式
+升为定理，导出三角形式的魏尔斯特拉斯定理，并
+带来两项惊人的收获：外尔等分布定理与
+等周不等式。应用数学每天都在用本章：
+信号的谱、振动系统的谐波，
+以及快速傅里叶变换（其有限形式见
+\cref{exo:b2:hermitian:10}）。
+\end{remark}
+
+\begin{remark}[本分册中的视角]
+本章与另外三章相互呼应。回顾：埃尔米特
+一章提供了几何（标准正交族、投影、贝塞尔不等式），函数列
+一章提供了分析（\omterm{def:b2:funcseq:def}{一致收敛}、转移定理、
+近似恒等式——费耶尔核之于傅里叶级数，
+恰如\omterm{thm:b2:funcseq:weierstrass}{伯恩斯坦多项式}之于魏尔斯特拉斯）。侧面看，幂级数
+一章的边界理论经\omterm{thm:b2:series:abel}{阿贝尔求和}重新出现，
+此处由泊松核实现
+（见\cref{exo:b2:fourier:12}）——圆盘半径 $r$ 充当求和参数。
+向前看，微分方程一章把周期性强迫分解为谐波，
+并将每个谐波送入振子的频率响应；
+共振发生于输入的某个傅里叶模式
+与固有频率相合之时，
+这正是为何该章的周末问题
+与本章的周末问题
+是同一故事的两半。
+\end{remark}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=9.2cm, height=5.6cm,
+    xmin=-3.6, xmax=3.6, ymin=-2.5, ymax=9.5,
+    xtick={-3.1416, 0, 3.1416},
+    xticklabels={$-\pi$, $0$, $\pi$}, ytick={8}]
+  \addplot[omDef, thick, domain=0.02:3.3, samples=300]
+    {sin(deg(8.5*x))/sin(deg(0.5*x))};
+  \addplot[omDef, thick, domain=-3.3:-0.02, samples=300]
+    {sin(deg(8.5*x))/sin(deg(0.5*x))};
+  \addplot[omThm, very thick, domain=0.02:3.3, samples=300]
+    {sin(deg(4*x))^2/(8*sin(deg(0.5*x))^2)};
+  \addplot[omThm, very thick, domain=-3.3:-0.02, samples=300]
+    {sin(deg(4*x))^2/(8*sin(deg(0.5*x))^2)};
+  \node[font=\small, omDef] at (axis cs:1.05,5.2) {$D_8$};
+  \node[font=\small, omThm] at (axis cs:-0.75,6.2) {$F_8$};
+\end{axis}
+\end{tikzpicture}
+
+{\small \omterm{lem:b2:fourier:kernel}{狄利克雷核} $D_8$（蓝色）振荡，且取负值；
+费耶尔核 $F_8$（红色）非负，
+集中于 $0$，均值为 $1$，是一个\emph{近似恒等式}。
+非负性恰恰是\omterm{lem:b2:fourier:kernel}{狄利克雷核}所缺乏的，
+而正是它使周末问题中的费耶尔定理
+成为无条件成立的。}
+\end{omfigure}
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:b2:fourier:1}
+计算方波（$f = -1$ 在
+$\intoo{-\pi}{0}$ 上，$+1$ 在 $\intoo{0}{\pi}$ 上）的\omterm{def:b2:fourier:coefficients}{傅里叶系数}，
+写出狄利克雷在 $t = \frac\pi2$ 及跳跃点 $t = 0$ 处的结论，
+并由此导出莱布尼茨级数。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:fourier:2}
+将 $f(t) = \abs t$（$\abs t \leq \pi$，$2\pi$ 为周期）
+展开为傅里叶级数；说明其级数是\emph{正规}收敛的；在 $t =
+0$ 处取值，得 $\sum_{k\geq0}\frac{1}{(2k+1)^2} = \frac{\pi^2}{8}$，
+并由此重新推出巴塞尔级数之和。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:fourier:3}
+将 $f(t) = t^2$（$\abs t \leq \pi$）展开，并由此推出
+\[
+\sum_{n\geq1}\frac{(-1)^{n+1}}{n^2} = \frac{\pi^2}{12},
+\qquad
+\sum_{n\geq1}\frac{1}{n^4} = \frac{\pi^4}{90}
+\quad\text{（帕塞瓦尔）}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:fourier:4}
+设 $f$ 为\omterm{def:b2:metric:continuity}{连续}的 $2\pi$ 周期函数，且 $c_n(f) = 0$，
+对一切 $n$ 成立。证明 $f = 0$ \emph{（帕塞瓦尔——本章在哪一类函数上证明了它？
+说明\omterm{def:b2:metric:continuity}{连续}与分段 $C^1$ 这一条件可以去掉，
+方法是承认一般帕塞瓦尔等式，
+或概述稠密性论证）}。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:fourier:5}
+对 $\alpha \notin \Z$，将 $f(t) = \cos(\alpha t)$（$\abs t
+\leq \pi$）展开，并由此推出
+余切的部分分式展开：
+\[
+\pi\cot(\pi\alpha) = \frac{1}{\alpha} + \sum_{n\geq1}
+\frac{2\alpha}{\alpha^2 - n^2} .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:fourier:6}
+证明：若 $f$ 为 $2\pi$ 周期的 $C^k$ 函数，且 $f^{(k)}$
+分段\omterm{def:b2:metric:continuity}{连续}，则 $c_n(f) = O\bigl(\abs n^{-k}\bigr)$：
+信号的光滑性 $=$ 其谱的衰减。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:fourier:7}
+（维廷格不等式）设 $f$ 为 $C^1$ 类、$2\pi$ 周期函数，且
+$\int_{-\pi}^{\pi} f = 0$。证明
+\[
+\int_{-\pi}^{\pi} \abs{f}^2 \leq \int_{-\pi}^{\pi} \abs{f'}^2 ,
+\]
+等号成立当且仅当 $f(t) = a\cos t + b\sin t$。\emph{（在两侧使用帕塞瓦尔
+等式；比较 $\abs{c_n}^2$ 与 $n^2\abs{c_n}^2$。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:fourier:8}
+（吉布斯常数）对
+\cref{exo:b2:fourier:1}中的方波，计算部分和在 $x_N =
+\frac{\pi}{2N}$ 处的值：记 $u_k = \frac{(2k+1)\pi}{2N}$，并记 $\Delta u
+= \frac{\pi}{N}$，证明
+\[
+S_{2N-1}\Bigl(\frac{\pi}{2N}\Bigr)
+= \frac{4}{\pi}\sum_{k=0}^{N-1} \frac{\sin u_k}{2k+1}
+= \frac{2}{\pi}\sum_{k=0}^{N-1} \frac{\sin u_k}{u_k}\,\Delta u
+\xrightarrow[N\to\infty]{}
+\frac{2}{\pi}\int_0^{\pi}\frac{\sin u}{u}\,\dd u \approx 1.179 :
+\]
+这是 $\frac{2}{\pi}\cdot\frac{\sin u}{u}$ 在
+$\intcc{0}{\pi}$ 上取中点的黎曼和。由此可知，越过
+跳跃值 $1$ 的过冲并不随 $N \to \infty$ 而消失。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:fourier:9}
+将 $\cos^3 t$ 与 $\sin^2 t\,\cos t$ 展开为傅里叶级数
+\emph{（化为线性形式；三角多项式本身即其傅里叶
+级数，由系数的唯一性可知）}。求 $c_n$、
+$a_n$、$b_n$ 各是多少？
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:fourier:10}
+设 $a > 0$，令 $f(t) = \eu^{at}$ 在 $\intoc{-\pi}{\pi}$ 上，
+以 $2\pi$ 为周期作延拓，计算
+\[
+c_n(f) = \frac{(-1)^n\sinh(a\pi)}{\pi(a - \iu n)} ,
+\]
+在跳跃点 $t = \pi$ 处应用狄利克雷定理，并
+推出双曲余切的部分分式展开：
+\[
+\coth(\pi a) = \frac{1}{\pi a} + \sum_{n\geq1}
+\frac{2a}{\pi(a^2 + n^2)} .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:fourier:11}
+（卷积）设 $f, g$ \omterm{def:b2:metric:continuity}{连续}且以 $2\pi$ 为周期，定义
+\[
+(f * g)(x) = \frac{1}{2\pi}\int_{-\pi}^{\pi} f(x - t)\,g(t)\,
+\dd t .
+\]
+证明 $f * g = g * f$，$c_n(f*g) = c_n(f)\,c_n(g)$
+\emph{（为交换\omterm{def:b2:metric:continuity}{连续}被积函数的两个积分的次序，
+比较上限处的两个函数：二者均在
+左端点处为零，且导数相同，由\omterm{def:b2:metric:continuity}{连续}性及
+积分号下求导可得）}，并证明 $S_N(f) =
+f * D_N$（\omterm{lem:b2:fourier:kernel}{狄利克雷核}）。（周末问题
+中的费耶尔平均同样是卷积，$\sigma_N(f) = f *
+F_N$。）
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:fourier:12}
+（泊松核：傅里叶级数的阿贝尔平均）。对 $0 \leq r <
+1$，令 $P_r(t) = \sum_{n\in\Z} r^{\abs n}\eu^{\iu nt}$。
+\begin{enumerate}
+  \item 对两个几何级数求和，并证明
+        \[
+        P_r(t) = \frac{1 - r^2}{1 - 2r\cos t + r^2} > 0,
+        \qquad
+        \frac{1}{2\pi}\int_{-\pi}^{\pi}P_r = 1 .
+        \]
+  \item 证明：对 $\delta \leq \abs t \leq \pi$，$P_r(t)
+        \leq \frac{1 - r^2}{1 - 2r\cos\delta + r^2} \to 0$，
+        $r \to 1^-$ 时，此界一致地趋于零。
+  \item 由此可知，对每个\omterm{def:b2:metric:continuity}{连续}且以 $2\pi$ 为周期的 $f$，
+        其\emph{阿贝尔平均} $(f * P_r)(x) = \sum_n
+        r^{\abs n}c_n(f)\,\eu^{\iu nx}$ \omterm{def:b2:funcseq:def}{一致收敛}于 $f$，
+        当 $r \to 1^-$ 时——\omterm{def:b2:metric:continuity}{连续}参数下的
+        费耶尔定理的对应，也是傅里叶级数中的
+        \omterm{thm:b2:series:abel}{阿贝尔求和}法的体现，源自幂级数
+        那一章。
+\end{enumerate}
+\end{exercise}
+
+\section{问题：费耶尔定理及其收获}
+
+\begin{problem}\label{pb:b2:fourier:1}
+狄利克雷定理要求 $f$ 分段 $C^1$；对仅\omterm{def:b2:metric:continuity}{连续}的
+$f$，部分和 $S_N(f)$ 可能表现很差。费耶尔
+的发现是：其\emph{切萨罗平均}从不如此。其动力是
+费耶尔核的正性，而收获极为丰富：
+一致三角逼近（魏尔斯特拉斯），
+\omterm{def:b2:fourier:coefficients}{傅里叶系数}的唯一性、对本章每个函数的帕塞瓦尔等式
+（去掉
+\cref{thm:b2:fourier:parseval}中的“承认”），外尔等分布
+定理，以及——为几何学的百年历程画上句号的——
+等周不等式。\index{费耶尔定理}
+\index{等分布}\index{等周不等式}
+全文中 $f$ 以 $2\pi$ 为周期且分段\omterm{def:b2:metric:continuity}{连续}，
+并记
+\[
+\sigma_N(f) = \frac{S_0(f) + S_1(f) + \dots +
+S_{N-1}(f)}{N} .
+\]
+
+\medskip
+\noindent\textbf{第一部分——费耶尔核。}
+\begin{enumerate}
+  \item 证明：$\sigma_N(f)(x) =
+        \frac{1}{2\pi}\int_{-\pi}^{\pi}f(x+u)\,F_N(u)\,\dd u$
+        其中 $F_N = \frac{D_0 + \dots + D_{N-1}}{N}$，并
+        证明 $\frac{1}{2\pi}\int_{-\pi}^{\pi}F_N = 1$。
+  \item 对 $u \notin 2\pi\Z$，证明闭形式：
+        \[
+        F_N(u) = \frac{1}{N}\,
+        \frac{\sin^2\bigl(\frac{Nu}{2}\bigr)}
+        {\sin^2\bigl(\frac u2\bigr)} \;\geq\; 0
+        \]
+        \emph{（对 $\sin\bigl((n+\frac12)u\bigr)$ 求和，视作几何级数的
+        虚部）}。
+  \item 证明集中性估计：对 $0 < \delta \leq
+        \abs u \leq \pi$,
+        \[
+        F_N(u) \leq \frac{1}{N\sin^2\frac\delta2}
+        \xrightarrow[N\to\infty]{} 0
+        \quad\text{一致收敛} :
+        \]
+        $(F_N)$ 是正的近似单位元。
+  \item （费耶尔定理）证明：若 $f$ \omterm{def:b2:metric:continuity}{连续}且
+        以 $2\pi$ 为周期，则 $\sigma_N(f) \to f$
+        \emph{\omterm{def:b2:funcseq:def}{一致收敛}}于 $\R$ 上，\emph{（将
+        $\bigl(f(x+u) - f(x)\bigr)F_N(u)$ 的积分在 $\abs u =
+        \delta$ 处分段；利用海涅定理及第 1--3 小题）}。
+  \item 对分段\omterm{def:b2:metric:continuity}{连续}的 $f$，证明逐点
+        形式 $\sigma_N(f)(x) \to \frac{f(x^+) +
+        f(x^-)}{2}$ 在每点 $x$ 处成立，并证明一致有界
+        $\norm{\sigma_N(f)}_\infty \leq \norm f_\infty$
+        \emph{（正性！）}。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第二部分——魏尔斯特拉斯，唯一性，
+帕塞瓦尔。}
+\begin{enumerate}[resume]
+  \item （三角形式的魏尔斯特拉斯定理）推出：每个\omterm{def:b2:metric:continuity}{连续}的
+        $2\pi$ 周期函数
+        都是三角多项式的一致极限。
+  \item （唯一性）推出：若\omterm{def:b2:metric:continuity}{连续}函数 $f$ 满足 $c_n(f) = 0$，
+        对所有 $n$ 成立，则它恒为零——两个具有相同
+        \omterm{def:b2:fourier:coefficients}{傅里叶系数}的\omterm{def:b2:metric:continuity}{连续}周期函数必相等
+        （见\cref{exo:b2:fourier:4}，此处不再需要
+        任何承认的结论）。
+  \item （帕塞瓦尔恒等式，\omterm{def:b2:metric:continuity}{连续}情形）利用
+        $S_N$ 的投影性质（\cref{prop:b2:fourier:bessel}）及
+        $\sigma_Nf \in \mathcal T_{N-1} \subseteq \mathcal
+        T_N$，证明
+        \[
+        \norm{f - S_Nf}_2 \leq \norm{f - \sigma_Nf}_2
+        \leq \norm{f - \sigma_Nf}_\infty
+        \xrightarrow[N\to\infty]{} 0 ,
+        \]
+        并由此得到对每个
+        \emph{\omterm{def:b2:metric:continuity}{连续}}的 $2\pi$ 周期函数 $f$ 成立的帕塞瓦尔恒等式。
+  \item （帕塞瓦尔恒等式，分段\omterm{def:b2:metric:continuity}{连续}情形）给定 $f$
+        分段\omterm{def:b2:metric:continuity}{连续}，且 $\varepsilon > 0$，构造一个
+        \omterm{def:b2:metric:continuity}{连续}周期函数 $g$，使 $\norm{f - g}_2 \leq
+        \varepsilon$，\emph{（以仿射插值代替 $f$
+        在跳跃点附近的微小区间上的部分）}，
+        由此推出 $\norm{f - S_Nf}_2 \to 0$
+        \emph{（利用贝塞尔不等式：$\norm{S_Nh}_2 \leq \norm h_2$）}：
+        帕塞瓦尔恒等式在
+        \cref{thm:b2:fourier:parseval}中所叙述的完全一般情形下成立——此前的“承认”
+        已不再需要。
+  \item （费耶尔求和无\omterm{ex:b2:fourier:zetafourodd}{吉布斯现象}）与
+        \cref{exo:b2:fourier:8} 对比，证明对于方波
+        $f$，处处有 $\abs{\sigma_N(f)} \leq 1$，对每个
+        $N$ 都成立——切萨罗平均消去了
+        困扰 $S_N$ 的过冲。用一句话说明
+        $F_N$ 的哪一性质起了作用。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第三部分——收敛速率。}
+\begin{enumerate}[resume]
+  \item 证明两个核估计，其中 $0 < \abs u \leq
+        \pi$：
+        \[
+        F_N(u) \leq N,
+        \qquad
+        F_N(u) \leq \frac{\pi^2}{N u^2}
+        \]
+        \emph{（对第一式，由归纳法证明 $\abs{\sin N\theta} \leq
+        N\abs{\sin\theta}$；对第二式，
+        $\sin\frac u2 \geq \frac{u}{\pi}$ 在
+        $\intcc{0}{\pi}$ 上成立）}。
+  \item 由此推出一阶矩估计
+        \[
+        \frac{1}{2\pi}\int_{-\pi}^{\pi}\abs u\,F_N(u)\,\dd u
+        \;\leq\; \frac{C\,\ln N}{N}
+        \qquad (N \geq 2)
+        \]
+        对某个显式常数 \emph{（在 $\abs u =
+        \frac1N$ 处分段）}。
+  \item 由此得出：若 $f$ 为 $L$-利普希茨且 $2\pi$ 周期，
+        则
+        \[
+        \norm{\sigma_N f - f}_\infty \leq \frac{C\,L\ln N}{N} .
+        \]
+  \item （饱和性）计算 $\sigma_N(e_1)$，其中 $e_1(t) =
+        \eu^{\iu t}$ 并证明 $\norm{\sigma_Ne_1 - e_1}_\infty
+        = \frac1N$：即使对最光滑的函数，费耶尔
+        求和的收敛速度也不快于 $\frac1N$——这恰是
+        函数列一章周末问题中伯恩斯坦饱和现象的
+        精确类比。
+  \item （局部性）证明：若分段\omterm{def:b2:metric:continuity}{连续}的 $f$
+        在 $\intoo{x - \delta}{x + \delta}$ 上恒为零，则
+        $\sigma_N(f)(x) \to 0$，无论 $f$ 在别处多么不规则
+——在 $x$ 处的均值收敛只依赖 $f$
+        在 $x$ 附近的值。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第四部分——外尔等分布定理。}
+数列 $(x_n)_{n\geq1}$ 位于 $\intco{0}{1}$ 中，称其为
+\emph{等分布的}，当对每个区间
+$\intcc{a}{b} \subseteq \intcc{0}{1}$，
+\[
+\frac{\#\{n \leq N : x_n \in \intcc ab\}}{N}
+\xrightarrow[N\to\infty]{} b - a .
+\]
+\begin{enumerate}[resume]
+  \item 证明：$(x_n)$ 是等分布的，只要
+        $\frac1N\sum_{n\leq N}f(x_n) \to \int_0^1 f$ 对每个
+        \emph{\omterm{def:b2:metric:continuity}{连续}}的 $1$ 周期函数 $f$ \emph{（将
+        $\intcc ab$ 的示性函数夹在两个\omterm{def:b2:metric:continuity}{连续}
+        分段仿射函数之间，且二者积分相差
+        $\varepsilon$）}。
+  \item （外尔判别法，充分性）设
+        \[
+        \frac{1}{N}\sum_{n=1}^{N}\eu^{2\iu\pi kx_n}
+        \xrightarrow[N\to\infty]{} 0
+        \qquad\text{对每个 } k \in \Z\setminus\{0\} .
+        \]
+        先证明 $\frac1N\sum f(x_n) \to \int_0^1f$
+        对三角多项式成立，再对所有\omterm{def:b2:metric:continuity}{连续}的
+        $1$ 周期函数 $f$ 成立（由第 6 小题，经平移到周期
+        $1$）：结合第 16 小题，$(x_n)$ 是等分布的。
+  \item 设 $\alpha$ 为无理数，$x_n = \{n\alpha\}$
+        （小数部分）。估计几何和
+        \[
+        \Bigl|\sum_{n=1}^{N}\eu^{2\iu\pi kn\alpha}\Bigr|
+        \leq \frac{2}{\abs{1 - \eu^{2\iu\pi k\alpha}}}
+        \qquad (k \neq 0),
+        \]
+        并由此得出\emph{外尔定理}：$(\{n\alpha\})$ 在
+        $\intco{0}{1}$ 中等分布。
+  \item 由此推出 $(\{n\alpha\})$ 在
+        $\intcc{0}{1}$ 中稠密，其中 $\alpha$ 为无理数，并
+        用一句话说明为何等分布性严格强于
+        稠密性。
+  \item （首位数字）证明：在满足
+        $n \leq N$ 的整数中，使 $2^n$ 首位（十进制）数字
+        $1$ 的比例趋于 $\log_{10}2 \approx 0.301$ \emph{（首位
+        数字为 $1$ 即 $\{n\log_{10}2\} \in
+        \intco{0}{\log_{10}2}$；证明 $\log_{10}2$ 为
+        无理数）}。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第五部分——等周不等式。}设
+$\Gamma$ 为闭简单 $C^1$ 曲线，长为 $L$，所围
+有向面积为 $A$，以按比例弧长为参数：$z(t) =
+x(t) + \iu y(t)$，以 $2\pi$ 为周期，且 $\abs{z'(t)} =
+\frac{L}{2\pi}$ 为常数；所围面积为
+\[
+A = \frac12\int_0^{2\pi}\bigl(x\,y' - y\,x'\bigr)\dd t
+= \frac{1}{2}\,\Im\int_0^{2\pi}\conj{z}\,z'\,\dd t
+\]
+（此处取作有向面积的定义；重积分一章
+将证明它与直观面积一致，
+借助格林公式）。
+\begin{enumerate}[resume]
+  \item 将 $z(t) = \sum_{n\in\Z}c_n\eu^{\iu nt}$ 展开（此为
+        $C^1$ 函数的\omterm{def:b2:funcseq:series}{正规收敛}级数），并
+        对 $z'$ 用帕塞瓦尔等式证明：
+        \[
+        \frac{L^2}{2\pi} = \int_0^{2\pi}\abs{z'}^2\dd t
+        = 2\pi\sum_{n\in\Z}n^2\abs{c_n}^2 .
+        \]
+  \item 同理证明 $A = \pi\sum_{n\in\Z}
+        n\,\abs{c_n}^2$ \emph{（极化形式的帕塞瓦尔等式：
+        $\frac{1}{2\pi}\int\conj f g = \sum
+        \conj{c_n(f)}c_n(g)$，取 $f = z$，$g = z'$）}。
+  \item （赫尔维茨）由此得出：
+        \[
+        L^2 - 4\pi A = 4\pi^2\sum_{n\in\Z}
+        (n^2 - n)\abs{c_n}^2 \;\geq\; 0 ,
+        \]
+        等号成立当且仅当 $z(t) = c_0 +
+        c_1\eu^{\iu t}$——即圆。
+        等周不等式：在长为 $L$ 的闭曲线中，只有
+        圆能围出面积 $\frac{L^2}{4\pi}$。
+  \item 验算：对半径为
+        $R$ 的圆验证等号成立，对
+        边长为 $a$ 的正方形验证严格不等式；说明为何对每个整数都有 $n^2 - n \geq 0$，
+        包括负整数在内的 $n$，并指出在何处
+        用到了参数化的匀速性。
+  \item 综合。每项各用一句话作答：(i) 第一至第三部分赖以推出的
+        $F_N$ 所具有的唯一性质，
+        而 $D_N$ 所缺少的；(ii) 此处的切萨罗求和
+        与幂级数一章的周末问题有何关系；
+        （弗罗贝尼乌斯）；(iii) 哪一部分只用到了
+        魏尔斯特拉斯（第 6 题），哪一部分需要完整的
+        帕塞瓦尔等式；(iv) 用一句话说明本科三年级分册
+        增加了什么（$L^2$ \omterm{def:b2:metric:complete}{完备}性：傅里叶级数作为希尔伯特
+        基）。
+\end{enumerate}
+\end{problem}

@@ -1,0 +1,766 @@
+\chapter{Euclidean Spaces}\label{ch:b1:euclid}
+
+Adding an \omterm{def:b1:euclid:def}{inner product} to a real \omterm{def:b1:vspaces:def}{vector space} buys the geometric
+notions --- lengths, angles, orthogonality, distances --- and one
+theorem that towers over the chapter: every \omterm{def:b1:vspaces:subspace}{subspace} admits an
+\omterm{thm:b1:euclid:projection}{orthogonal projection}, computable by Gram--Schmidt, realizing the
+shortest distance. The plane isometries close the chapter and the
+year's geometry.
+
+Throughout, $E$ is a \emph{real} \omterm{def:b1:vspaces:def}{vector space}.
+
+\section{Inner products}
+
+\begin{definition}\label{def:b1:euclid:def}
+An \emph{inner product}\index{inner product} on $E$ is a \omterm{def:b1:logic:map}{map}
+$\langle\cdot,\cdot\rangle \colon E \times E \to \R$ that is
+bilinear, symmetric, and positive definite ($\langle x, x\rangle >
+0$ for $x \neq 0$). A \omterm{def:b1:findim:def}{finite-dimensional} space so equipped is a
+\emph{Euclidean space}\index{Euclidean space}. The \emph{norm} of
+$x$ is $\norm{x} = \sqrt{\langle x, x\rangle}$, and $d(x, y) =
+\norm{x - y}$.
+\end{definition}
+
+\begin{example}\label{ex:b1:euclid:examples}
+On $\R^n$: the canonical product $\langle x, y\rangle = \sum x_i
+y_i$. On $C(\intcc{a}{b})$: $\langle f, g \rangle = \int_a^b fg$
+(positive definiteness is \cref{thm:b1:integration:props}~(4)). On
+$\R_n[X]$: $\langle P, Q\rangle = \int_0^1 PQ$, or $\sum_{i}
+P(x_i)Q(x_i)$ over $n+1$ distinct points.
+\end{example}
+
+\begin{example}[The angle between two polynomials]
+\label{ex:b1:euclid:polyangle}
+Once an \omterm{def:b1:euclid:def}{inner product} is chosen, \emph{any} two nonzero vectors
+have an angle, via $\cos\theta = \frac{\langle x,
+y\rangle}{\norm x\,\norm y}$ (a legitimate cosine by
+Cauchy--Schwarz). For $X$ and $X^2$ in $\int_0^1$:
+\[
+\langle X, X^2\rangle = \frac14, \qquad
+\norm X = \frac1{\sqrt3}, \qquad \norm{X^2} = \frac1{\sqrt5},
+\qquad
+\cos\theta = \frac{1/4}{1/\sqrt{15}} = \frac{\sqrt{15}}{4}
+\approx 0.968 :
+\]
+an angle of about $14.5$ degrees --- on $\intcc{0}{1}$, the
+graphs of $x$ and $x^2$ are ``nearly parallel'' in the
+quadratic-mean sense, which is why removing that shared
+direction (Gram--Schmidt, below) leaves only the small
+correction $X^2 - X + \frac16$.
+\end{example}
+
+\begin{theorem}[Cauchy--Schwarz; norm properties]\label{thm:b1:euclid:cs}
+For all $x, y \in E$:\index{Cauchy--Schwarz inequality}
+\[
+\abs{\langle x, y\rangle} \leq \norm x\, \norm y ,
+\]
+with equality iff $x, y$ are proportional. Consequently $\norm\cdot$
+satisfies the triangle inequality $\norm{x + y} \leq \norm x + \norm
+y$ (and $\norm{\lambda x} = \abs\lambda \norm x$, $\norm x = 0 \iff
+x = 0$). Moreover:
+\[
+\norm{x+y}^2 = \norm x^2 + 2\langle x, y\rangle + \norm y^2,
+\qquad
+\langle x, y \rangle = \tfrac14\bigl(\norm{x+y}^2 -
+\norm{x-y}^2\bigr) .
+\]
+\end{theorem}
+
+\begin{proof}
+If $y = 0$, everything is trivial. Otherwise the quadratic $t
+\mapsto \norm{x + ty}^2 = \norm x^2 + 2t\langle x, y\rangle + t^2
+\norm y^2$ is $\geq 0$ for all $t$: its discriminant is $\leq 0$,
+which is Cauchy--Schwarz; equality means a double root $t_0$, i.e.\
+$x + t_0 y = 0$ (definiteness): proportionality. Triangle
+inequality: expand,
+\[
+\norm{x + y}^2 = \norm x^2 + 2\langle x, y\rangle + \norm y^2
+\leq \norm x^2 + 2\norm x\,\norm y + \norm y^2
+= \bigl(\norm x + \norm y\bigr)^2 ,
+\]
+the middle step being Cauchy--Schwarz; equality forces $\langle
+x, y\rangle = \norm x\norm y$, the \emph{positive} equality
+case, i.e.\ proportionality with nonnegative ratio ---
+geometrically, the triangle degenerates only when the two
+vectors point the same way. The last two
+identities are direct expansions (the second, the
+\emph{polarization identity}, recovers the product from the norm).
+\end{proof}
+
+\section{Orthogonality}
+
+\begin{definition}\label{def:b1:euclid:orthogonal}
+$x \perp y$ when $\langle x, y \rangle = 0$. A family is
+\emph{orthogonal} when its vectors are pairwise orthogonal,
+\emph{orthonormal}\index{orthonormal family} when moreover each has
+norm $1$. The \emph{orthogonal complement} of a \omterm{def:b1:vspaces:subspace}{subspace} $F$ is
+\[
+F^{\perp} = \{x \in E : \forall y \in F,\ \langle x, y\rangle =
+0\},
+\]
+a \omterm{def:b1:vspaces:subspace}{subspace} of $E$.\index{orthogonal complement}
+\end{definition}
+
+\begin{proposition}\label{prop:b1:euclid:orthfree}
+(Pythagoras\index{Pythagorean theorem}) If $x \perp y$ then
+$\norm{x+y}^2 = \norm x^2 + \norm y^2$. An \omterm{def:b1:euclid:orthogonal}{orthogonal} family of
+nonzero vectors is \omterm{def:b1:vspaces:free}{free}. In an \omterm{def:b1:euclid:orthogonal}{orthonormal} \omterm{def:b1:vspaces:free}{basis} $(e_1, \dots,
+e_n)$, \omterm{prop:b1:vspaces:coordinates}{coordinates} and products are
+\[
+x = \sum_{i} \langle x, e_i\rangle\, e_i,
+\qquad
+\langle x, y \rangle = \sum_i \langle x, e_i\rangle \langle y,
+e_i\rangle,
+\qquad
+\norm x^2 = \sum_i \langle x, e_i\rangle^2 .
+\]
+\end{proposition}
+
+\begin{proof}
+Pythagoras: expand. Freeness: take $\langle\,\cdot\,, x_j\rangle$
+of a null combination: $\lambda_j \norm{x_j}^2 = 0$. \omterm{prop:b1:vspaces:coordinates}{Coordinates}:
+write $x = \sum \lambda_i e_i$ and take the product with $e_j$:
+$\lambda_j = \langle x, e_j\rangle$; the two formulas follow by
+bilinearity.
+\end{proof}
+
+\begin{example}[Orthonormal coordinates, with a Parseval check]
+\label{ex:b1:euclid:parsevalcheck}
+Expand $x = (1, 2, 3)$ in the \omterm{def:b1:euclid:orthogonal}{orthonormal} \omterm{def:b1:vspaces:free}{basis} of
+\cref{exo:b1:euclid:3},
+\[
+e_1 = \tfrac{1}{\sqrt2}(1,1,0), \quad
+e_2 = \tfrac{1}{\sqrt6}(1,-1,2), \quad
+e_3 = \tfrac{1}{\sqrt3}(-1,1,1).
+\]
+No system to solve --- three \omterm{def:b1:euclid:def}{inner products}:
+\[
+\langle x, e_1\rangle = \frac{3}{\sqrt2},
+\qquad
+\langle x, e_2\rangle = \frac{1 - 2 + 6}{\sqrt6} =
+\frac{5}{\sqrt6},
+\qquad
+\langle x, e_3\rangle = \frac{-1 + 2 + 3}{\sqrt3} =
+\frac{4}{\sqrt3}.
+\]
+Certification by the norm formula of the proposition:
+\[
+\frac{9}{2} + \frac{25}{6} + \frac{16}{3}
+= \frac{27 + 25 + 32}{6} = 14 = \norm{x}^2 = 1 + 4 + 9 .
+\]
+This sum-of-squared-coordinates check (a finite Parseval
+identity) costs seconds and catches sign and normalization
+errors with near certainty --- make it a habit whenever an
+\omterm{def:b1:euclid:orthogonal}{orthonormal} expansion is computed; its infinite-dimensional
+version, for the Fourier coefficients of
+\cref{ex:b1:euclid:trigortho}, is a theorem of the Year~3
+volume.
+\end{example}
+
+\begin{theorem}[Gram--Schmidt]\label{thm:b1:euclid:gramschmidt}
+Every \omterm{def:b1:euclid:def}{Euclidean space} has \omterm{def:b1:euclid:orthogonal}{orthonormal} bases. Explicitly, from any
+\omterm{def:b1:vspaces:free}{basis} $(v_1, \dots, v_n)$, the recipe\index{Gram--Schmidt process}
+\[
+w_k = v_k - \sum_{i=1}^{k-1} \langle v_k, e_i\rangle\, e_i ,
+\qquad
+e_k = \frac{w_k}{\norm{w_k}}
+\]
+produces an \omterm{def:b1:euclid:orthogonal}{orthonormal} \omterm{def:b1:vspaces:free}{basis} $(e_1, \dots, e_n)$ with
+$\operatorname{Vect}(e_1, \dots, e_k) = \operatorname{Vect}(v_1,
+\dots, v_k)$ for every $k$.
+\end{theorem}
+
+\begin{proof}
+Induction on $k$. Assuming $(e_1, \dots, e_{k-1})$ \omterm{def:b1:euclid:orthogonal}{orthonormal}
+spanning $\operatorname{Vect}(v_1, \dots, v_{k-1})$: the vector
+$w_k$ is \omterm{def:b1:euclid:orthogonal}{orthogonal} to each $e_j$ ($j < k$) by construction
+($\langle w_k, e_j \rangle = \langle v_k, e_j\rangle - \langle v_k,
+e_j\rangle$), and $w_k \neq 0$ since $v_k \notin
+\operatorname{Vect}(v_1, \dots, v_{k-1})$. Normalizing keeps
+orthogonality; the \omterm{def:b1:vspaces:span}{span} \omterm{def:b1:logic:statement}{statement} holds since $e_k$ is a
+combination of $v_k$ and earlier $e_i$'s, invertibly.
+\end{proof}
+
+\begin{example}[Gram--Schmidt on polynomials, in full]
+\label{ex:b1:euclid:legendre}
+Orthonormalize $(1, X, X^2)$ in $\R_2[X]$ with $\langle P,
+Q\rangle = \int_0^1 PQ$. \emph{Step 1}: $\norm{1}^2 = 1$, so
+$e_1 = 1$. \emph{Step 2}: $w_2 = X - \langle X, 1\rangle\,1 = X -
+\frac12$, and $\norm{w_2}^2 = \int_0^1\bigl(x - \frac12\bigr)^2
+\dd x = \frac1{12}$: $e_2 = \sqrt{12}\,\bigl(X - \frac12\bigr)$.
+\emph{Step 3}: $\langle X^2, e_1\rangle = \frac13$ and
+\[
+\langle X^2, e_2\rangle
+= \sqrt{12}\int_0^1 x^2\Bigl(x - \frac12\Bigr)\dd x
+= \frac{\sqrt{12}}{12},
+\qquad\text{so}\qquad
+w_3 = X^2 - \frac13 - \Bigl(X - \frac12\Bigr)
+= X^2 - X + \frac16 .
+\]
+Its norm was computed in \cref{exo:b1:euclid:9}: $\norm{w_3}^2 =
+\frac1{180}$, whence $e_3 = \sqrt{180}\,\bigl(X^2 - X +
+\frac16\bigr)$. The \omterm{def:b1:poly:def}{polynomials} $1$, $X - \frac12$, $X^2 - X +
+\frac16$ are, up to scale, the first \emph{Legendre \omterm{def:b1:poly:def}{polynomials}}
+of the \omterm{prop:b1:reals:intervals}{interval} $\intcc{0}{1}$; the construction continues one
+degree at a time, each new \omterm{def:b1:poly:def}{polynomial} \omterm{def:b1:euclid:orthogonal}{orthogonal} to all its
+predecessors. Note how the algorithm recycles earlier work: the
+\omterm{def:b1:linmaps:projection}{projection} subtracted at step 3 is exactly the best affine
+approximation of $X^2$ found in \cref{ex:b1:euclid:bestapprox}
+--- Gram--Schmidt \emph{is} iterated \omterm{thm:b1:euclid:projection}{orthogonal projection}.
+\end{example}
+
+\begin{theorem}[Orthogonal projection]\label{thm:b1:euclid:projection}
+Let $F$ be a \omterm{def:b1:vspaces:subspace}{subspace} of the \omterm{def:b1:euclid:def}{Euclidean space} $E$. Then
+\[
+E = F \oplus F^{\perp},
+\]
+and the associated \omterm{def:b1:linmaps:projection}{projection} $p_F$ onto $F$ (the \emph{orthogonal
+projection}\index{orthogonal projection}) is given, in any
+\omterm{def:b1:euclid:orthogonal}{orthonormal} \omterm{def:b1:vspaces:free}{basis} $(e_1, \dots, e_k)$ of $F$, by $p_F(x) = \sum_i
+\langle x, e_i\rangle e_i$. It realizes the distance to $F$:
+for all $y \in F$,
+\[
+\norm{x - p_F(x)} \leq \norm{x - y},
+\]
+with equality only for $y = p_F(x)$; one writes $d(x, F) = \norm{x -
+p_F(x)}$.
+\end{theorem}
+
+\begin{proof}
+Take an \omterm{def:b1:euclid:orthogonal}{orthonormal} \omterm{def:b1:vspaces:free}{basis} $(e_i)_{i \leq k}$ of $F$
+(\cref{thm:b1:euclid:gramschmidt} inside $F$) and set $\pi(x) =
+\sum \langle x, e_i\rangle e_i \in F$. Then $x - \pi(x) \perp e_j$
+for each $j$ (same cancellation as above), hence $x - \pi(x) \in
+F^\perp$: $E = F + F^\perp$. And $F \cap F^\perp = \{0\}$: such a
+vector satisfies $\langle x, x\rangle = 0$. So the sum is direct and
+$\pi = p_F$.
+
+Distance: for $y \in F$, decompose $x - y = (x - p_F(x)) + (p_F(x) -
+y)$, \omterm{def:b1:euclid:orthogonal}{orthogonal} pieces ($F^\perp$ and $F$); Pythagoras:
+\[
+\norm{x - y}^2 = \norm{x - p_F(x)}^2 + \norm{p_F(x) - y}^2
+\geq \norm{x - p_F(x)}^2,
+\]
+equality iff $y = p_F(x)$.
+\end{proof}
+
+\begin{example}[Projections never lengthen]
+\label{ex:b1:euclid:bessel}
+Applying Pythagoras to the split $x = p_F(x) + (x - p_F(x))$:
+\[
+\norm{p_F(x)}^2 = \norm x^2 - \norm{x - p_F(x)}^2 \leq
+\norm x^2 ,
+\]
+with equality iff $x \in F$. In an \omterm{def:b1:euclid:orthogonal}{orthonormal} \omterm{def:b1:vspaces:free}{basis} $(e_1,
+\dots, e_k)$ of $F$ this reads $\sum_{i \leq k}\langle x,
+e_i\rangle^2 \leq \norm x^2$ (a \emph{Bessel inequality}):
+however many \omterm{def:b1:euclid:orthogonal}{orthonormal} directions one measures, the squared
+\omterm{prop:b1:vspaces:coordinates}{coordinates} never exceed the squared length --- compare the
+exact equality of \cref{ex:b1:euclid:parsevalcheck} when the
+family is a full \omterm{def:b1:vspaces:free}{basis}. This one-line inequality is what makes
+Fourier coefficients summable in the Year~3 volume; here it
+already explains why adding more \omterm{def:b1:vspaces:free}{basis} functions to a least
+squares fit can only decrease the residual.
+\end{example}
+
+\begin{example}[Best quadratic approximation]\label{ex:b1:euclid:bestapprox}
+In $C(\intcc{0}{1})$ with $\langle f, g\rangle = \int_0^1 fg$, the
+\omterm{def:b1:poly:def}{polynomial} of degree $\leq 1$ closest to $f(x) = x^2$ in the
+associated (quadratic mean) distance is $p_F(f)$ where $F = \R_1[X]$.
+Gram--Schmidt on $(1, X)$: $e_1 = 1$, $w_2 = X - \frac12$,
+$\norm{w_2}^2 = \int_0^1 (x - \frac12)^2 = \frac{1}{12}$, $e_2 =
+\sqrt{12}\,(X - \tfrac12)$. Then
+\[
+p_F(f) = \langle f, e_1\rangle e_1 + \langle f, e_2\rangle e_2
+= \frac13 + 12\Bigl(\int_0^1 x^2\bigl(x - \tfrac12\bigr)\dd
+x\Bigr)\bigl(X - \tfrac12\bigr)
+= X - \frac{1}{6},
+\]
+using $\int_0^1 x^2(x - \frac12)\dd x = \frac14 - \frac16 =
+\frac{1}{12}$. The ``least squares'' idea in one line of \omterm{def:b1:linmaps:def}{linear}
+algebra.
+\end{example}
+
+\begin{method}[Three routes to a distance $d(x, F)$]
+\label{met:b1:euclid:distance}
+\begin{enumerate}
+  \item \emph{\omterm{def:b1:euclid:orthogonal}{Orthonormal} \omterm{def:b1:vspaces:free}{basis} of $F$}: then $p_F(x) = \sum_i
+        \langle x, e_i\rangle e_i$ and, by Pythagoras,
+        \[
+        d(x, F)^2 = \norm{x}^2 - \norm{p_F(x)}^2
+        = \norm x^2 - \sum_i \langle x, e_i\rangle^2 ,
+        \]
+        often cheaper than computing $x - p_F(x)$ itself.
+  \item \emph{Normal equations}: with any generating family of
+        $F$, solve $\langle x - p, v_j\rangle = 0$ for the
+        coefficients of $p$ (\cref{exo:b1:euclid:5}) --- no
+        orthonormalization needed.
+  \item \emph{Through the complement}: if $F^\perp$ is smaller
+        than $F$ (e.g.\ $F$ a \omterm{def:b1:linmaps:forms}{hyperplane}, $F^\perp$ a line
+        $\operatorname{Vect}(n)$), project onto $F^\perp$
+        instead:
+        \[
+        d(x, F) = \norm{p_{F^\perp}(x)} =
+        \frac{\abs{\langle x, n\rangle}}{\norm n} ,
+        \]
+        which is the classical distance-to-a-plane formula
+        (\cref{exo:b1:multivar:8} uses it).
+\end{enumerate}
+Route 3 is a special case of a general reflex: always project
+onto whichever of $F$, $F^\perp$ has the smaller dimension.
+\end{method}
+
+\begin{example}[Trigonometric orthogonality: a Fourier preview]
+\label{ex:b1:euclid:trigortho}
+On $C(\intcc{0}{2\pi})$ with $\langle f, g\rangle =
+\frac1\pi\int_0^{2\pi} fg$, the family
+\[
+\Bigl(\frac{1}{\sqrt2},\ \cos x,\ \sin x,\ \cos 2x,\ \sin 2x,\
+\dots\Bigr)
+\]
+is \omterm{def:b1:euclid:orthogonal}{orthonormal}: for instance $\langle \cos px, \cos qx\rangle =
+\frac1\pi\int_0^{2\pi}\cos px\cos qx\,\dd x = 0$ for $p \neq q$
+(linearize the product into $\frac12[\cos(p{-}q)x +
+\cos(p{+}q)x]$ and integrate over full periods), while
+$\frac1\pi\int_0^{2\pi}\cos^2 px\,\dd x = 1$. The \omterm{thm:b1:euclid:projection}{orthogonal
+projection} onto the \omterm{def:b1:vspaces:span}{span} of the first $2N + 1$ of these functions
+therefore has \omterm{prop:b1:vspaces:coordinates}{coordinates} $\langle f, e_i\rangle$ --- \omterm{thm:b1:integration:def}{integrals}
+against cosines and sines. These are the \emph{Fourier
+coefficients} of $f$, and the \omterm{def:b1:linmaps:projection}{projection} is its best
+quadratic-mean trigonometric approximation; the Year~3 volume
+studies their convergence. Orthogonality is doing all the work:
+the formulas for the coefficients are
+\cref{thm:b1:euclid:projection} verbatim.
+\end{example}
+
+\section{Isometries of the plane}
+
+\begin{definition}\label{def:b1:euclid:isometry}
+An endomorphism $u$ of a \omterm{def:b1:euclid:def}{Euclidean space} is an
+\emph{isometry}\index{isometry} (or \omterm{def:b1:euclid:orthogonal}{orthogonal} \omterm{def:b1:logic:map}{map}) when it
+preserves the norm: $\norm{u(x)} = \norm x$ for all $x$ ---
+equivalently (polarization) it preserves the \omterm{def:b1:euclid:def}{inner product};
+equivalently its matrix $A$ in an \omterm{def:b1:euclid:orthogonal}{orthonormal} \omterm{def:b1:vspaces:free}{basis} satisfies
+$A^{\mathsf T} A = I$. Isometries form a \omterm{def:b1:structures:group}{group}, the \omterm{def:b1:euclid:orthogonal}{orthogonal} \omterm{def:b1:structures:group}{group}
+$O(E)$.
+\end{definition}
+
+\begin{example}[Recognizing an isometry at sight]
+\label{ex:b1:euclid:recognize}
+Is $A = \dfrac15\begin{pmatrix} 3 & -4\\ 4 & 3\end{pmatrix}$
+\omterm{def:b1:euclid:orthogonal}{orthogonal}? Columns: norms $\frac15\sqrt{9 + 16} = 1$ and
+$\frac15\sqrt{16 + 9} = 1$; product $\frac1{25}(3\cdot(-4) +
+4\cdot3) = 0$. Yes --- and $\det A = \frac{9 + 16}{25} = 1$, so
+it is the rotation $R_\theta$ with $\cos\theta = \frac35$,
+$\sin\theta = \frac45$ (the ``$3$-$4$-$5$ rotation'', whose
+angle is no remarkable fraction of $\pi$). By contrast $B =
+\frac{1}{\sqrt2}\begin{pmatrix} 1 & 1\\ 0 & 1\end{pmatrix}$ has
+unit determinant-scaled look but non-unit first column
+($\frac1{\sqrt2}$): not \omterm{def:b1:euclid:orthogonal}{orthogonal} --- determinant $\pm1$ alone
+certifies nothing, the columns must be checked.
+\end{example}
+
+\begin{theorem}[Plane isometries]\label{thm:b1:euclid:plane}
+In an \omterm{def:b1:euclid:orthogonal}{orthonormal} \omterm{def:b1:vspaces:free}{basis} of a Euclidean plane, the matrices of
+isometries are exactly
+\[
+R_\theta = \begin{pmatrix}
+\cos\theta & -\sin\theta\\ \sin\theta & \cos\theta
+\end{pmatrix}
+\quad (\text{rotation of angle } \theta,\ \det = 1),
+\]
+\[
+S_\theta = \begin{pmatrix}
+\cos\theta & \sin\theta\\ \sin\theta & -\cos\theta
+\end{pmatrix}
+\quad (\det = -1),
+\]
+the latter being the reflection in the line making angle
+$\frac\theta2$ with the first \omterm{def:b1:vspaces:free}{basis} vector.
+\end{theorem}
+
+\begin{proof}
+Let $A = \begin{pmatrix} a & c\\ b & d\end{pmatrix}$ with
+$A^{\mathsf T}A = I$: columns are unit and \omterm{def:b1:euclid:orthogonal}{orthogonal}. The first
+column is $(\cos\theta, \sin\theta)$ for some $\theta$; the second,
+unit and \omterm{def:b1:euclid:orthogonal}{orthogonal} to it, is $\pm(-\sin\theta, \cos\theta)$. The
+sign $+$ gives $R_\theta$; the sign $-$ gives $S_\theta$. One checks
+$S_\theta^2 = I$ and that the vector $(\cos\frac\theta2,
+\sin\frac\theta2)$ is fixed while its \omterm{def:b1:euclid:orthogonal}{orthogonal} is reversed: a
+reflection. (And $R_\alpha R_\beta = R_{\alpha+\beta}$: the
+rotation \omterm{def:b1:structures:group}{group} is the angle \omterm{def:b1:structures:group}{group} --- compare
+\cref{thm:b1:complex:funceq}.)
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=1.15]
+  \draw[->, thin] (-1.2,0) -- (2.9,0) node[below] {$x$};
+  \draw[->, thin] (0,-1.2) -- (0,2.6) node[left] {$y$};
+  \draw[omDef, very thick] (-0.9,0) -- (2.6,0)
+    node[below, pos=0.9, font=\small] {axis of $r_1$};
+  \draw[omThm, very thick] (-0.9,-0.9) -- (2.3,2.3)
+    node[right, pos=0.97, font=\small] {axis of $r_2$};
+  \fill (2,0.5) circle (0.05) node[right, font=\small] {$M$};
+  \fill (2,-0.5) circle (0.05)
+    node[right, font=\small] {$r_1(M)$};
+  \fill (-0.5,2) circle (0.05)
+    node[above, font=\small] {$r_2(r_1(M))$};
+  \draw[omDef, dashed] (2,0.5) -- (2,-0.5);
+  \draw[omThm, dashed] (2,-0.5) -- (-0.5,2);
+  \draw[omProp, thick, ->] (0.9,0) arc (0:45:0.9);
+  \node[omProp, font=\small] at (1.15,0.32) {$\frac\pi4$};
+\end{tikzpicture}
+
+{\small Two reflections make a rotation: reflecting $M = (2,
+0.5)$ in the $x$-axis, then in the line $y = x$, lands at
+$(-0.5, 2)$ --- the \omterm{def:b1:linmaps:kerim}{image} of $M$ under the rotation of angle
+$\frac\pi2$ about the origin, \emph{twice} the angle
+$\frac\pi4$ between the axes. The weekend problem turns this
+picture into the composition law of all plane isometries.}
+\end{omfigure}
+
+\begin{remark}[Common pitfalls]
+\label{rem:b1:euclid:pitfalls}
+\emph{The \omterm{def:b1:linmaps:projection}{projection} formula needs an \omterm{def:b1:euclid:orthogonal}{orthonormal} \omterm{def:b1:vspaces:free}{basis}}: for a
+merely generating family $(v_i)$ of $F$, the sum $\sum_i\langle
+x, v_i\rangle v_i$ is \emph{not} $p_F(x)$ (test $F = \R^2$, $v_1
+= e_1$, $v_2 = e_1 + e_2$); with a \omterm{def:b1:euclid:orthogonal}{non-orthonormal} family, solve
+the normal equations instead
+(\cref{met:b1:euclid:distance}~(2)).
+\emph{\omterm{def:b1:euclid:orthogonal}{Orthogonal} families must avoid $0$ to be \omterm{def:b1:vspaces:free}{free}}: the zero
+vector is \omterm{def:b1:euclid:orthogonal}{orthogonal} to everything, including itself ---
+freeness in \cref{prop:b1:euclid:orthfree} requires nonzero
+vectors.
+\emph{$F^\perp$ depends on the \omterm{def:b1:euclid:def}{inner product}}: in $\R_1[X]$, the
+complement of $\operatorname{Vect}(X)$ for $\int_0^1 PQ$ is not
+the constants but $\operatorname{Vect}(1 - \frac32 X)$ ---
+compute $\int_0^1 x(1 - \frac32 x) = \frac12 - \frac12 = 0$;
+``perpendicular'' is meaningless until the product is named.
+\emph{Do not expand $\norm{x + y}$ linearly}: the correct
+identity is $\norm{x+y}^2 = \norm x^2 + 2\langle x, y\rangle +
+\norm y^2$; the cross term vanishes only under orthogonality
+(Pythagoras), and the triangle inequality is an
+\emph{inequality}.
+\emph{Sending unit vectors to unit vectors is not enough}: $u(x,
+y) = (x + y,\ 0)$ \omterm{def:b1:logic:map}{maps} both canonical \omterm{def:b1:vspaces:free}{basis} vectors to the unit
+vector $(1, 0)$, yet $\norm{u(1,1)} = 2 \neq \sqrt2$: no
+\omterm{def:b1:euclid:isometry}{isometry}. The definition demands $\norm{u(x)} = \norm x$ for
+\emph{all} $x$; in matrix terms $A^{\mathsf T}A = I$, i.e.\
+columns that are unit \emph{and pairwise \omterm{def:b1:euclid:orthogonal}{orthogonal}} --- both
+conditions, checked together.
+\end{remark}
+
+\begin{remark}[Where the inner product goes]
+\label{rem:b1:euclid:whereused}
+\omterm{thm:b1:euclid:projection}{Orthogonal projection} is the most applied theorem of the chapter:
+it underlies least squares (the weekend problem of
+\cref{ch:b1:multivar} builds regression lines on it), Fourier
+coefficients (\cref{ex:b1:euclid:trigortho}), and the normal
+equations of \cref{exo:b1:euclid:5}, which numerical analysis
+solves at scale. The classification $R_\theta / S_\theta$ is
+completed below: the weekend problem classifies \emph{all}
+distance-preserving transformations of the plane, \omterm{def:b1:linmaps:def}{linear} or not,
+and their finite \omterm{def:b1:structures:group}{groups} --- the mathematics of rosettes and
+regular polygons. In the Year~2 volume the \omterm{def:b1:euclid:def}{inner product} meets
+eigenvalue theory (symmetric matrices, quadratic forms); in
+Year~3, infinite-dimensional Euclidean geometry becomes Hilbert
+space theory.
+\end{remark}
+
+\begin{remark}[Perspectives inside Book 3]
+\label{rem:b1:euclid:perspectives}
+Two bridges leave this chapter. \emph{Backward}, to the \omterm{def:b1:linmaps:def}{linear}
+algebra: the Gram matrix of \cref{exo:b1:euclid:11} packages
+\omterm{def:b1:euclid:def}{inner products} into the determinant machinery of
+\cref{ch:b1:det}, and \omterm{thm:b1:euclid:projection}{orthogonal projection} is the special
+projector of \cref{ch:b1:linmaps} whose kernel is
+$F^\perp$ --- all its algebra ($p^2 = p$, $s = 2p -
+\mathrm{id}$) applies verbatim, now with the bonus that $\norm{x
+- p(x)}$ is a \emph{distance}. \emph{Forward}, to analysis:
+\cref{ch:b1:curves} measures arc length with this chapter's
+norm and classifies nothing without its isometries;
+\cref{ch:b1:multivar} reads the gradient through
+Cauchy--Schwarz (steepest ascent) and closes the volume with
+least squares, which is \cref{thm:b1:euclid:projection} applied
+to a data vector in $\R^n$. The \omterm{def:b1:euclid:def}{inner product} is the point
+where the book's algebra and its analysis finally meet.
+\end{remark}
+
+\section{Exercises}
+
+\begin{exercise}[$\star$]\label{exo:b1:euclid:1}
+In $\R^3$ canonical: compute $\langle u, v\rangle$, $\norm u$,
+$\norm v$ and the angle between $u = (1, 2, 2)$ and $v = (2, -2,
+1)$. Verify Cauchy--Schwarz numerically.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:euclid:2}
+Prove the parallelogram identity $\norm{x+y}^2 + \norm{x-y}^2 =
+2\norm x^2 + 2\norm y^2$ in any \omterm{def:b1:euclid:def}{Euclidean space}, and use it to show
+that the sup norm on $\R^2$, $\norm{(x,y)}_\infty = \max(\abs x,
+\abs y)$, does not come from an \omterm{def:b1:euclid:def}{inner product}.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:euclid:3}
+Apply Gram--Schmidt to $\bigl((1,1,0), (1,0,1), (0,1,1)\bigr)$ in
+canonical $\R^3$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:euclid:4}
+In $\R^3$, let $F = \operatorname{Vect}\bigl((1,1,1)\bigr)$.
+Determine $F^\perp$ (equation and \omterm{def:b1:vspaces:free}{basis}), the matrix of $p_F$ in
+the canonical \omterm{def:b1:vspaces:free}{basis}, and $d\bigl((1, 2, 3), F\bigr)$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:euclid:5}
+(Normal equations) Let $F =
+\operatorname{Vect}\bigl((1,0,1),(0,1,1)\bigr) \subseteq \R^3$ and
+$x = (1, 1, 4)$. Compute $p_F(x)$ by solving $\langle x - p, v
+\rangle = 0$ for the two generators ($p = \alpha(1,0,1) +
+\beta(0,1,1)$), then $d(x, F)$. Why is Gram--Schmidt unnecessary
+here?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:euclid:6}
+For $f$ \omterm{def:b1:continuity:continuous}{continuous} on $\intcc{0}{1}$, prove
+\[
+\Bigl(\int_0^1 f\Bigr)^{\!2} \leq \int_0^1 f^2 ,
+\]
+with the case of equality, as an instance of Cauchy--Schwarz in
+$C(\intcc{0}{1})$. Then prove $\bigl(\sum_{i=1}^n a_i\bigr)^2 \leq
+n \sum a_i^2$ for reals $a_i$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:euclid:7}
+Prove that for every \omterm{def:b1:vspaces:subspace}{subspace} $F$ of a \omterm{def:b1:euclid:def}{Euclidean space}:
+$(F^{\perp})^{\perp} = F$ and $\dim F^{\perp} = \dim E - \dim F$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:euclid:8}
+Identify the plane isometries of matrices
+\[
+A = \frac{1}{\sqrt 2}\begin{pmatrix} 1 & -1\\ 1 & 1\end{pmatrix},
+\qquad
+B = \frac{1}{5}\begin{pmatrix} 3 & 4\\ 4 & -3\end{pmatrix}
+\]
+(type, angle or axis). Compute $A^8$ and $B^2$ without
+multiplying matrices.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:euclid:9}
+(Minimum as a \omterm{def:b1:linmaps:projection}{projection}) Compute
+\[
+\min_{(a, b) \in \R^2} \int_0^1 \bigl(x^2 - a - bx\bigr)^2 \dd x ,
+\]
+using \cref{ex:b1:euclid:bestapprox}: the minimum is $\norm{f -
+p_F(f)}^2$ for $f = X^2$, $F = \R_1[X]$.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:euclid:10}
+Let $u$ be an \omterm{def:b1:euclid:isometry}{isometry} of a \omterm{def:b1:euclid:def}{Euclidean space} $E$. Prove that
+$\ker(u - \mathrm{id}) \perp \operatorname{im}(u - \mathrm{id})$,
+and deduce $E = \ker(u - \mathrm{id}) \oplus \operatorname{im}(u -
+\mathrm{id})$. \emph{(Compute $\langle x - u(x), y\rangle$ for
+$u(y) = y$, using preservation of the product.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:euclid:11}
+(Gram matrix) For vectors $v_1, \dots, v_k$ of a \omterm{def:b1:euclid:def}{Euclidean
+space}, let $G = \bigl(\langle v_i, v_j\rangle\bigr)_{1 \leq i, j
+\leq k}$ be their \emph{Gram matrix}.
+\begin{enumerate}
+  \item Prove that $(v_1, \dots, v_k)$ is \omterm{def:b1:vspaces:free}{free} if and only if
+        $G$ is invertible. \emph{(If $Gc = 0$, compute
+        $\norm{\sum_i c_i v_i}^2$.)}
+  \item Compute the Gram matrix of $(1, X, X^2)$ in $\R_2[X]$
+        with $\langle P, Q\rangle = \int_0^1 PQ$, recognize the
+        \omterm{pb:b1:det:1}{Hilbert matrix} $H_3$ of the weekend problem of
+        \cref{ch:b1:det}, and conclude freeness from $\det H_3 =
+        \frac1{2160} \neq 0$.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:euclid:12}
+Let $u$ be an endomorphism of a \omterm{def:b1:euclid:def}{Euclidean space} $E$ whose matrix
+$A$ in an \omterm{def:b1:euclid:orthogonal}{orthonormal} \omterm{def:b1:vspaces:free}{basis} is both \omterm{def:b1:euclid:orthogonal}{orthogonal} ($A^{\mathsf T}A
+= I$) and symmetric ($A^{\mathsf T} = A$).
+\begin{enumerate}
+  \item Show $A^2 = I$, and deduce (via
+        \cref{thm:b1:linmaps:projchar}) that $E = \ker(u -
+        \mathrm{id}) \oplus \ker(u + \mathrm{id})$.
+  \item Show that the two \omterm{def:b1:vspaces:subspace}{subspaces} are \omterm{def:b1:euclid:orthogonal}{orthogonal}, so that $u$
+        is the \emph{\omterm{def:b1:euclid:orthogonal}{orthogonal} symmetry} with respect to $F =
+        \ker(u - \mathrm{id})$: reflection through $F$.
+        \emph{(For $u(x) = x$ and $u(y) = -y$, compute $\langle
+        x, y\rangle$ two ways.)}
+  \item Classify the plane case: which matrices of
+        \cref{thm:b1:euclid:plane} are symmetric, and what are
+        the corresponding \omterm{def:b1:logic:map}{maps}?
+\end{enumerate}
+\end{exercise}
+
+\section{Problem: plane isometries and Leonardo's theorem}
+
+\begin{problem}\label{pb:b1:euclid:1}
+An \emph{\omterm{def:b1:euclid:isometry}{isometry} of the plane} is any \omterm{def:b1:logic:map}{map} $f \colon \R^2 \to
+\R^2$ preserving distances: $\norm{f(x) - f(y)} = \norm{x - y}$
+for all $x, y$ --- no linearity assumed. This problem proves
+that such \omterm{def:b1:logic:map}{maps} are exactly the translations, rotations,
+reflections and \omterm{pb:b1:euclid:1}{glide reflections} (the classification of plane
+isometries), computes their compositions, and determines all
+their \emph{finite} \omterm{def:b1:structures:group}{groups}: Leonardo's theorem, the mathematics
+behind rosette patterns. From Part II on we identify $\R^2$ with
+$\C$ (\cref{ch:b1:complex}): the canonical \omterm{def:b1:euclid:def}{inner product} is
+$\langle z, w\rangle = \operatorname{Re}(z\conj w)$ and the norm
+is the \omterm{def:b1:complex:field}{modulus}.\index{isometry}\index{glide reflection}
+\index{Leonardo's theorem}\index{dihedral group}
+
+\medskip
+\noindent\textbf{Part I --- Every \omterm{def:b1:euclid:isometry}{isometry} is affine.}
+\begin{enumerate}
+  \item Check that translations $t_a(x) = x + a$, \omterm{def:b1:linmaps:def}{linear}
+        isometries, and all their compositions are isometries,
+        and that the isometries form a \omterm{def:b1:structures:group}{group} under composition.
+  \item Let $f$ be an \omterm{def:b1:euclid:isometry}{isometry} with $f(0) = 0$. Show that $f$
+        preserves norms, then --- by polarization,
+        \cref{thm:b1:euclid:cs} --- that $\langle f(x),
+        f(y)\rangle = \langle x, y\rangle$ for all $x, y$.
+  \item Still with $f(0) = 0$: expand $\norm{f(x + y) - f(x) -
+        f(y)}^2$ and $\norm{f(\lambda x) - \lambda f(x)}^2$
+        using question 2, and conclude that $f$ is
+        \emph{\omterm{def:b1:linmaps:def}{linear}}: $f \in O(\R^2)$.
+  \item Deduce that every \omterm{def:b1:euclid:isometry}{isometry} $f$ writes \emph{uniquely} as
+        $f = t_a \circ g$ with $a = f(0)$ and $g$ a \omterm{def:b1:linmaps:def}{linear}
+        \omterm{def:b1:euclid:isometry}{isometry} (the \emph{\omterm{def:b1:linmaps:def}{linear} part} of $f$).
+  \item Call $f$ \emph{direct} if $\det g = 1$, \emph{indirect}
+        if $\det g = -1$. Show that the \omterm{def:b1:linmaps:def}{linear} part of a
+        composition is the composition of the \omterm{def:b1:linmaps:def}{linear} parts, and
+        state the resulting sign rule
+        (direct/indirect compose like $+1/-1$).
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part II --- The four types.} Via
+\cref{thm:b1:euclid:plane}, the \omterm{def:b1:linmaps:def}{linear} isometries of $\C$ are $z
+\mapsto az$ and $z \mapsto a\conj z$ with $\abs a = 1$; so every
+plane \omterm{def:b1:euclid:isometry}{isometry} is
+\[
+f(z) = a z + b \quad (\text{direct}) \qquad\text{or}\qquad
+f(z) = a\conj z + b \quad (\text{indirect}), \qquad \abs a = 1 .
+\]
+\begin{enumerate}[resume]
+  \item Verify the dictionary: $R_\theta$ is $z \mapsto
+        \eu^{\iu\theta}z$ and $S_\theta$ is $z \mapsto
+        \eu^{\iu\theta}\conj z$ (check both on $1$ and $\iu$).
+  \item (Direct case) Let $f(z) = az + b$, $\abs a = 1$. Show:
+        if $a = 1$, $f$ is a translation; if $a \neq 1$, $f$ has
+        the unique fixed point $z_0 = b/(1 - a)$ and $f(z) - z_0
+        = a(z - z_0)$: a \emph{rotation} of center $z_0$ and
+        angle $\arg a$.
+  \item (Indirect case) Let $f(z) = a\conj z + b$, and $v =
+        a\conj b + b$. Show $f \circ f = t_v$ and $f \circ t_v =
+        t_v \circ f$. If $v = 0$: show that the midpoint of $z$
+        and $f(z)$ is a fixed point, and that $f$ is a
+        \emph{reflection} in a line. If $v \neq 0$: show that $r
+        = t_{-v/2}\circ f$ is a reflection whose axis is
+        parallel to $v$, so that $f = t_{v/2} \circ r$ is a
+        \emph{\omterm{pb:b1:euclid:1}{glide reflection}}. Conclude: every plane \omterm{def:b1:euclid:isometry}{isometry}
+        is a translation, a rotation, a reflection or a \omterm{pb:b1:euclid:1}{glide
+        reflection} (the classification of plane isometries).
+  \item (Compositions) Show: the composition of rotations of
+        angles $\alpha$ and $\beta$ is a rotation of angle
+        $\alpha + \beta$ (a translation if $\alpha + \beta \in
+        2\pi\Z$); the composition of two reflections is a
+        rotation of angle twice the angle between the axes (a
+        translation if the axes are parallel).
+  \item Deduce that every plane \omterm{def:b1:euclid:isometry}{isometry} is a composition of at
+        most three reflections.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part III --- Three identifications.}
+\begin{enumerate}[resume]
+  \item Classify completely $f(z) = \iu\conj z + 1 + \iu$:
+        type, axis, glide vector.
+  \item Let $f$ be the rotation of angle $\frac\pi2$ about $0$
+        and $g$ the rotation of angle $\frac\pi2$ about $1$.
+        Compute $g \circ f$ in the form $z \mapsto az + b$ and
+        identify it (type, center, angle).
+  \item Let $r_1(z) = \conj z$ (reflection in the real axis) and
+        $r_2(z) = \iu\conj z$ (reflection in the line $y = x$).
+        Compute $r_2 \circ r_1$ and check question 9 on this
+        example.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part IV --- Finite \omterm{def:b1:structures:group}{groups}: Leonardo's theorem.}
+Let $G$ be a \emph{finite} \omterm{def:b1:structures:group}{group} of plane isometries.
+\begin{enumerate}[resume]
+  \item Show that isometries preserve barycenters: if
+        $\lambda_1 + \dots + \lambda_m = 1$ and $f = t_a \circ
+        g$ ($g$ \omterm{def:b1:linmaps:def}{linear}), then $f\bigl(\sum_i \lambda_i
+        x_i\bigr) = \sum_i \lambda_i f(x_i)$.
+  \item Set $c = \frac{1}{\abs G}\sum_{g \in G} g(x_0)$ for any
+        chosen $x_0$. Show that every $h \in G$ fixes $c$: a
+        finite \omterm{def:b1:structures:group}{group} of isometries has a common fixed point.
+  \item Deduce that, after conjugating by $t_{-c}$, one may
+        assume $G \subseteq O(\R^2)$. Let $G^{+} = \{g \in G :
+        \det g = 1\}$; show that either $G = G^{+}$ or $G^{+}$
+        has exactly index $2$ in $G$ (exhibit a bijection $G^+
+        \to G \setminus G^+$).
+  \item Show that a finite \omterm{def:b1:structures:group}{group} of \emph{rotations} about $c$
+        is cyclic: among its elements pick the rotation
+        $R_{\theta_0}$ of smallest angle $\theta_0 \in
+        \intoo{0}{2\pi}$, and use euclidean division of angles
+        to prove that it generates; conclude $\theta_0 =
+        \frac{2\pi}n$ and $G^{+} = \{R_{\theta_0}^{\,k}\} \cong
+        C_n$.
+  \item Suppose $G \neq G^{+}$ and pick a reflection $s \in G$.
+        Show $G = G^{+} \cup sG^{+}$, that $s r s = r^{-1}$ for
+        every rotation $r \in G^{+}$, and that all $n$ elements
+        of $sG^{+}$ are reflections: $G$ is the \emph{\omterm{pb:b1:euclid:1}{dihedral
+        group}} $D_n$ of order $2n$.
+  \item Conclude (\emph{Leonardo's theorem}): every finite \omterm{def:b1:structures:group}{group}
+        of isometries of the plane is cyclic $C_n$ or dihedral
+        $D_n$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part V --- Dividends, and synthesis.}
+\begin{enumerate}[resume]
+  \item Show directly that a finite \omterm{def:b1:structures:group}{group} of isometries can
+        contain no translation and no \omterm{pb:b1:euclid:1}{glide reflection} other
+        than the identity (consider the powers of such an
+        element).
+  \item Let $P_n$ be the regular $n$-gon with vertices the
+        $n$-th \omterm{def:b1:complex:unity}{roots of unity} ($n \geq 3$). Show that its
+        symmetry \omterm{def:b1:structures:group}{group} is exactly $D_n$: the $n$ rotations $z
+        \mapsto \omega^k z$ and the $n$ reflections $z \mapsto
+        \omega^k \conj z$, $\omega = \eu^{2\iu\pi/n}$, and no
+        others.
+  \item Exhibit plane figures whose symmetry \omterm{def:b1:structures:group}{groups} are $C_1$,
+        $D_1$, $D_2$ and $C_3$ respectively.
+  \item List the eight elements of the symmetry \omterm{def:b1:structures:group}{group} of the
+        square with vertices $\pm1, \pm\iu$ as \omterm{def:b1:logic:map}{maps} $z \mapsto
+        \omega^k z$ or $z \mapsto \omega^k\conj z$, and give
+        the axis of each of the four reflections.
+  \item Let $f, g$ be rotations of the same angle $\theta
+        \notin 2\pi\Z$ about \emph{distinct} centers $c_1 \neq
+        c_2$. Compute $f\circ g - g\circ f$ pointwise and show
+        $f\circ g \neq g\circ f$; show moreover that $(f \circ
+        g)\circ(g\circ f)^{-1}$ is a nontrivial translation, so
+        that any \omterm{def:b1:structures:group}{group} containing $f$ and $g$ is infinite ---
+        a second explanation of the single center in Leonardo's
+        theorem.
+  \item Synthesis, in four sentences: which two structural
+        results reduce arbitrary isometries to linear algebra
+        (questions 3--4) and arbitrary finite \omterm{def:b1:structures:group}{groups} to
+        \omterm{def:b1:structures:subgroup}{subgroups} of $O(2)$ (question 15); what the complete
+        list of plane isometries is and which invariants
+        (direct/indirect, fixed points) separate the four types;
+        why the composition rules of question 9 make reflections
+        the generators of everything; and what Leonardo's
+        theorem adds on the finite scale. Name the two theorems
+        proved in Parts II and IV.
+\end{enumerate}
+\end{problem}

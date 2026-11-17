@@ -1,0 +1,400 @@
+\chapter{随机变量与二项分布}\label{ch:g12:randvar}
+
+随机变量为试验的每一个结果赋予一个数：
+如增益、计数或持续时间。其期望是其取值的长期平均，
+方差则刻画这些取值的分散程度。本章的重点是二项分布，
+它统计独立重复试验中成功的次数。
+随机变量与二项分布首见于
+\cref{ch:g11:prob,ch:g11:binom}；本章对二者加以复习和深化，
+并借助\cref{ch:g12:comb}中的组合工具，
+现已能够更深入地展开。
+
+\section{离散型随机变量}
+
+\begin{definition}[随机变量，分布]\label{def:g12:randvar:rv}
+\emph{随机变量}\index{随机变量}是定义在有限样本空间
+$\Omega$ 上的函数 $X \colon \Omega \to \R$。
+其\emph{分布}\index{分布}（又称律）由可能取值
+$x_1, \dots, x_k$ 及下列概率所构成的数据：
+\[
+p_i = \P(X = x_i), \qquad \sum_{i=1}^{k} p_i = 1 .
+\]
+\end{definition}
+
+\begin{definition}[期望、方差与标准差]\label{def:g12:randvar:exp}
+\emph{期望}\index{期望}为随机变量 $X$：
+\[
+\E(X) = \sum_{i=1}^{k} p_i\, x_i ,
+\]
+其\emph{方差}\index{方差}与\emph{标准差}分别为
+\[
+\V(X) = \E\bigl((X - \E(X))^2\bigr) = \sum_{i=1}^k p_i\bigl(x_i - \E(X)\bigr)^2,
+\qquad
+\sigma(X) = \sqrt{\V(X)} .
+\]
+\end{definition}
+
+\begin{proposition}[柯尼希--惠更斯公式]\label{prop:g12:randvar:konig}
+\index{柯尼希--惠更斯公式}
+$\V(X) = \E(X^2) - \E(X)^2$.
+\end{proposition}
+
+\begin{proof}
+记 $m = \E(X)$，展开可得：
+\[
+\V(X) = \sum_i p_i (x_i^2 - 2m x_i + m^2)
+= \E(X^2) - 2m\sum_i p_i x_i + m^2\sum_i p_i
+= \E(X^2) - 2m^2 + m^2 . \qedhere
+\]
+\end{proof}
+
+\begin{proposition}[仿射变换]\label{prop:g12:randvar:affine}
+对 $a, b \in \R$，有：
+\[
+\E(aX + b) = a\,\E(X) + b, \qquad
+\V(aX + b) = a^2\,\V(X) .
+\]
+\end{proposition}
+
+\begin{proof}
+第一式即定义式中求和的重排。对第二式，$aX + b$
+与其均值的偏差为 $a(X - \E(X))$，平方后乘以
+$a^2$。
+\end{proof}
+
+\begin{example}[公平游戏]\label{ex:g12:randvar:game}
+一次游戏需付 $2$ 欧元；掷一枚骰子，玩家所得为
+掷出的点数（若不小于 $5$），否则一无所得。增益 $G$ 的取值为
+$-2$（概率为 $\frac46$）、$3$（$\frac16$）、$4$（$\frac16$）：
+\[
+\E(G) = \frac{-8 + 3 + 4}{6} = -\frac{1}{6} < 0 .
+\]
+平均而言，玩家每局损失 $17$ 欧分，这个游戏对玩家不利
+（与大多数实际游戏一样）。
+\end{example}
+
+\section{伯努利试验与二项分布}
+
+\begin{definition}[伯努利分布]\label{def:g12:randvar:bernoulli}
+\emph{伯努利试验}\index{伯努利试验}是只有两种结果的试验，
+其结果分别为\emph{成功}（概率为 $p$）与\emph{失败}
+（$q = 1 - p$）。成功的示性变量 $X$（成功时 $X = 1$，
+失败时为 $0$）服从\emph{伯努利分布} $\mathcal B(p)$：
+\[
+\E(X) = p, \qquad \V(X) = p(1-p) .
+\]
+（事实上 $\E(X) = p$，$\E(X^2) = p$，由柯尼希--惠更斯公式可得
+$\V(X) = p - p^2$。）
+\end{definition}
+
+\begin{definition}[二项分布]\label{def:g12:randvar:binomial}
+将一次伯努利试验独立重复 $n$ 次，记 $X$ 为
+成功的总次数。$X$ 的分布称为\emph{二项
+分布}\index{二项分布} $\mathcal B(n, p)$。
+\end{definition}
+
+\begin{omfigure}
+\begin{tikzpicture}[font=\small]
+  \coordinate (root) at (0,0);
+  \node (S) at (1.6,1.6) {成};
+  \node (F) at (1.6,-1.6) {败};
+  \node (SS) at (3.2,2.4) {成};
+  \node (SF) at (3.2,0.8) {败};
+  \node (FS) at (3.2,-0.8) {成};
+  \node (FF) at (3.2,-2.4) {败};
+  \node (SSS) at (4.8,2.8) {成};
+  \node (SSF) at (4.8,2.0) {败};
+  \node (SFS) at (4.8,1.2) {成};
+  \node (SFF) at (4.8,0.4) {败};
+  \node (FSS) at (4.8,-0.4) {成};
+  \node (FSF) at (4.8,-1.2) {败};
+  \node (FFS) at (4.8,-2.0) {成};
+  \node (FFF) at (4.8,-2.8) {败};
+  \draw[omThm, thick] (root) -- (S);
+  \draw[omThm, thick] (S) -- (SS);   \draw[omThm, thick] (SS) -- (SSF);
+  \draw[omThm, thick] (S) -- (SF);   \draw[omThm, thick] (SF) -- (SFS);
+  \draw[omThm, thick] (root) -- (F);
+  \draw[omThm, thick] (F) -- (FS);   \draw[omThm, thick] (FS) -- (FSS);
+  \draw[gray] (SS) -- (SSS);
+  \draw[gray] (SF) -- (SFF);
+  \draw[gray] (FS) -- (FSF);
+  \draw[gray] (F) -- (FF);
+  \draw[gray] (FF) -- (FFS);
+  \draw[gray] (FF) -- (FFF);
+  \node[gray, anchor=west] at (5.3,2.8) {$X=3$};
+  \node[omThm, anchor=west] at (5.3,2.0) {$X=2$};
+  \node[omThm, anchor=west] at (5.3,1.2) {$X=2$};
+  \node[gray, anchor=west] at (5.3,0.4) {$X=1$};
+  \node[omThm, anchor=west] at (5.3,-0.4) {$X=2$};
+  \node[gray, anchor=west] at (5.3,-1.2) {$X=1$};
+  \node[gray, anchor=west] at (5.3,-2.0) {$X=1$};
+  \node[gray, anchor=west] at (5.3,-2.8) {$X=0$};
+\end{tikzpicture}
+
+{\small 三次伯努利试验中，恰有 $\binom{3}{2} = 3$ 条
+路径（共 $2^3$ 条）给出两次成功（红色），每条概率为 $p^2(1-p)$，
+故 $\P(X = 2) = 3p^2(1-p)$。}
+\end{omfigure}
+
+\begin{theorem}\label{thm:g12:randvar:binomial}
+若 $X \sim \mathcal B(n, p)$，则对 $0 \leq k \leq n$ 有：
+\[
+\P(X = k) = \binom{n}{k} p^k (1-p)^{n-k},
+\]
+且
+\[
+\E(X) = np, \qquad \V(X) = np(1-p) .
+\]
+\end{theorem}
+
+\begin{proof}
+一个指定的、含 $k$ 次成功、$n-k$ 次失败的结果序列，
+其概率为 $p^k(1-p)^{n-k}$，由独立性可得；这样的序列个数
+即把 $k$ 次成功安排到 $n$ 次试验中的方法数，
+为 $\binom nk$（见\cref{ch:g12:comb}）。对所有序列求和，得
+公式 --- 二项式定理也验证了
+$\sum_k \P(X = k) = (p + q)^n = 1$.
+
+求期望时，利用 $k\binom nk = n\binom{n-1}{k-1}$
+（见\cref{exo:g12:comb:7}）：
+\[
+\E(X) = \sum_{k=1}^{n} k\binom nk p^k q^{n-k}
+= np\sum_{k=1}^{n} \binom{n-1}{k-1} p^{k-1} q^{(n-1)-(k-1)}
+= np\,(p + q)^{n-1} = np .
+\]
+方差公式可类似证明，所用恒等式为
+$k(k-1)\binom nk = n(n-1)\binom{n-2}{k-2}$，得
+$\E(X(X-1)) = n(n-1)p^2$，于是
+$\V(X) = n(n-1)p^2 + np - (np)^2 = np(1-p)$。（一种结构性证明 ---
+即独立随机变量之和的方差 ---
+见\cref{thm:g12:sums:variance}。）
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[
+  width=10cm, height=4.8cm,
+  ybar, bar width=4pt,
+  xlabel={$k$}, ylabel={$\P(X = k)$},
+  xmin=-1, xmax=21, ymin=0,
+  ytick={0, 0.1, 0.2},
+  title={$\mathcal B(20,\ 0.3)$}]
+  \addplot[fill=omDef!40, draw=omDef] coordinates {
+    (0,0.000798) (1,0.006839) (2,0.027846) (3,0.071604)
+    (4,0.130421) (5,0.178863) (6,0.191639) (7,0.164262)
+    (8,0.114397) (9,0.065370) (10,0.030817) (11,0.012006)
+    (12,0.003859) (13,0.001018) (14,0.000218) (15,0.000037)
+    (16,0.000005) (17,0.000001) (18,0) (19,0) (20,0)};
+\end{axis}
+\end{tikzpicture}
+
+{\small 分布 $\mathcal B(20, 0.3)$：平均数 $np = 6$，标准
+差 $\sqrt{npq} \approx 2.05$。}
+\end{omfigure}
+
+\begin{method}[识别二项分布情形]\label{met:g12:randvar:recognize}
+写出 $X \sim \mathcal B(n,p)$ 之前，先检查三个要素：一是
+\emph{固定次数} $n$ 的试验；每次试验有\emph{两种}结果，
+且各次成功概率\emph{相同}，均为 $p$；各次试验\emph{独立}
+（\emph{有放回}抽样，或取自很大的总体）。然后用
+\[
+\P(X \geq 1) = 1 - (1-p)^n
+\]
+用于“至少一次成功”的情形；求一般的
+$\P(X \leq k)$ 时，可用计算器或累积分布表。
+\end{method}
+
+\begin{example}\label{ex:g12:randvar:atleastone}
+掷一颗骰子，要使掷出六点的概率至少为 $99\%$，
+至少需掷多少次？设 $X \sim \mathcal B\left(n, \frac16\right)$：
+$\P(X \geq 1) = 1 - \left(\frac56\right)^n \geq 0.99$ 等价于
+$\left(\frac56\right)^n \leq 0.01$，\emph{亦即}
+$n \geq \frac{\ln 0.01}{\ln(5/6)} \approx 25.3$，从 $n = 26$ 次起满足要求。
+\end{example}
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:g12:randvar:1}
+设随机变量 $X$ 取值 $-1, 0, 2, 5$，对应概率分别为
+$0.3, 0.2, 0.4, 0.1$。求 $\E(X)$、$\V(X)$ 和 $\sigma(X)$。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:randvar:2}
+一份选择题测验共有 $10$ 道题，每题有 $4$ 个选项，其中
+只有一个正确。某同学独立地随机作答。
+设 $X$ 为答对的题数。
+\begin{enumerate}
+  \item 写出 $X$ 的分布，并求 $\E(X)$ 和 $\sigma(X)$。
+  \item 求 $\P(X = 0)$、$\P(X = 5)$ 和 $\P(X \geq 1)$。
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:randvar:3}
+某保险公司为 $n = 400$ 位客户投保，每位客户在一年内
+提出理赔的概率为 $p = 0.05$，且彼此独立。设 $X$ 为
+理赔次数。确定 $X$ 的分布，并求其期望和
+标准差。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:randvar:4}
+在\cref{ex:g12:randvar:game}的游戏中，组织者希望通过改变入场费使游戏公平
+（$\E(G) = 0$），即调整入场费 $c$。求 $c$，并计算
+这一公平版本中收益的方差；“公平”是否与
+“无风险”相同？
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:randvar:5}
+某篮球运动员罚球命中的概率为 $0.7$。她投篮
+$8$ 次（各次相互独立），求她命中次数恰为 $6$、至少为 $6$、至少一次的概率；
+并求最可能的命中次数
+是多少？
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:randvar:6}
+某航空公司知道，每位已订票的乘客到场的概率为
+$0.9$，且彼此独立。某航班有 $100$ 个座位，航空公司售出了 $104$
+张票。试用二项分布表示到场乘客人数多于座位数的概率，
+并用计算器估计其数值，
+同时写出精确表达式。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:randvar:7}
+设 $X \sim \mathcal B(n, p)$。证明下式成立：
+\[
+\frac{\P(X = k+1)}{\P(X = k)} = \frac{n-k}{k+1}\cdot\frac{p}{1-p},
+\]
+并由此推出分布在
+$k^* = \floor{(n+1)p}$ 之前递增，之后递减（
+即二项分布的 \emph{众数}）。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:randvar:8}
+\emph{（圣彼得堡悖论，驯化版。）}一枚均匀硬币被反复掷出，
+直至出现正面，但至多掷 $10$ 次。设 $N$ 为所用的掷币次数，
+若出现正面，玩家获得 $2^N$ 欧元，否则获得 $0$ 欧元。
+\begin{enumerate}
+  \item 求 $N$ 在获胜结果上的分布：
+        $\P(\text{首次正面出现于掷币第} k) = 2^{-k}$，其中
+        $1 \leq k \leq 10$，并验证获胜的总概率。
+  \item 求期望收益。若去掉 $10$ 次掷币的上限，
+        期望将变为多少？
+\end{enumerate}
+\end{exercise}
+
+\section{问题：超售的航班}
+
+\begin{problem}[{周末问题 --- 航空公司售出多于座位数的机票，工厂接收
+几乎未经充分抽检的批次，
+而二项分布可以同时裁决这两者}]
+\label{pb:g12:randvar:1}
+某航空公司有 $100$ 个座位，乐观地售出了 $105$ 张机票：约
+$10\,\%$ 的乘客从不到场，而空座位不产生任何收益。
+航空公司能超售到何种程度，才会使被拒载的乘客
+吞噬利润？二项分布
+（\cref{thm:g12:randvar:binomial}）给出精确到小数的答案 --- 
+同样的方法还可用于检验工厂批次、为抽奖定价、
+保障保险公司的偿付能力。重复决策正是
+二项分布的本职工作。
+
+\medskip
+\noindent\textbf{第一部分 --- 熟练运算。}
+\begin{enumerate}
+  \item 列出三次掷一枚骰子时掷得六点的次数 $X$ 的
+        完整分布表。
+  \item 计算 $\E(X)$ 与 $V(X)$
+        （见\cref{def:g12:randvar:exp}）。
+  \item 某摊位对三次掷骰收取 $1$ 欧元，每得到一个六点支付 $2$
+        欧元。求期望收益，
+        并判断该游戏是否公平？
+  \item 检查清单练习（见\cref{met:g12:randvar:recognize}）：
+        从一副牌中抽取 $5$ 张，其中红心张数
+        \emph{不放回}抽取时是否服从二项分布？放回抽取呢？
+        说明理由。
+  \item 设 $X \sim \mathcal B(20,\ 0.3)$，求 $\E(X)$ 与
+        $\sigma(X)$，再求得分的 $\E(S)$ 与 $\sigma(S)$，
+        其中 $S = 5X - 10$（见\cref{prop:g12:randvar:affine}）。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第二部分 --- 超售的航班。}
+座位数：$100$。已售机票：$105$ 张。每位持票人
+以概率 $0.9$ 到场，且彼此独立；设 $X$ 为
+到场的人数。
+\begin{enumerate}[resume]
+  \item 建立模型：依据检查清单论证 $X \sim \mathcal B(105,\ 0.9)$，
+        并坦承模型最薄弱的环节 ---
+        （未到场者真的相互独立吗？想想团体出行与
+        恶劣天气）。
+  \item 计算 $\E(X)$ 与 $\sigma(X)$。
+  \item 拒载发生于 $X \geq 101$ 时：将
+        $\P(X \geq 101)$ 写成五个二项分布项之和的
+        显式形式。
+  \item 用计算器计算该和：有多大比例的航班
+        至少有一名乘客被拒载？
+  \item 经济分析：多售出的五张机票带来
+        $5 \times 200 = 1\,000$ 欧元收入；每名被拒载乘客需赔偿
+        $800$ 欧元。求被拒载乘客的期望人数，
+        记作
+        $\sum_{k=101}^{105} (k - 100)\,\P(X = k)$，期望赔偿，
+        并评价该政策。
+  \item 设计：监管机构容许
+        $\P(\text{拒载}) < 5\,\%$。通过
+        对 $n = 105, 106, 107, \dots$ 逐一试算，求
+        允许的最大售票数 $n$。
+  \item 钟形曲线捷径：当 $n = 105$ 时，计算拒载阈值的
+        标准分数，
+        $z = \frac{100.5 - \E(X)}{\sigma(X)}$，并比较
+        粗略估计“约 $2\sigma$，故上尾约 $2$--$3\,\%$”
+        与你的精确结果相比较。（该捷径背后的曲线
+        是后续章节的
+        重点。）
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第三部分 --- 工厂验收关。}
+若一批零件的一个容量为 $20$ 的样本中
+至多含一个次品，则该批零件被接收。
+\begin{enumerate}[resume]
+  \item 若真实次品率为 $2\,\%$（合格批次），
+        求该批被接收的概率。
+  \item 若次品率为 $10\,\%$（不合格批次），再算一次。
+  \item 指出该程序的两类风险（合格批次被拒收，
+        不合格批次被接收），两者的数值见
+        第 13--14 题，并说明哪一项单一改动可同时改善两者 ---
+        这需付出怎样的代价？
+  \item 改善背后的原理：证明观测到的次品
+        \emph{频率} $\frac Xn$（样本容量为 $n$）的标准差为
+        $\sqrt{\frac{p(1-p)}{n}}$，并
+        由此说明精度如何随样本容量变化（这是
+        十年级的老朋友：$\frac{1}{\sqrt n}$）。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第 IV 部分 --- 游戏、抽奖、准备金。}
+\begin{enumerate}[resume]
+  \item 带上限的圣彼得堡游戏（见
+        \cref{exo:g12:randvar:8}）的期望收益为 $10$ 欧元。
+        用一段话将其与
+        \cref{pb:g11:prob:1}中遇到的无上限悖论作对比：上限究竟抑制了什么？
+        现在什么样的价格才算公平？
+  \item 一场慈善抽奖售出 $200$ 张彩票，每张 $2$ 欧元；
+        奖品为：一个价值 $100$ 欧元的礼篮和两个价值 $50$ 欧元的礼篮。
+        计算每张彩票的期望收益和该抽奖的
+        利润率；并与欧洲轮盘赌的庄家优势相比较
+        （$\frac{1}{37} \approx 2.7\,\%$）。这场抽奖为什么
+        仍能如此运作？
+  \item 某保险公司持有 $1\,000$ 份相互独立的保单：每份保单的理赔概率为 $0.01$，
+        每次理赔金额为 $10\,000$ 欧元，每份保单的保费为 $130$ 欧元。
+        计算预期年利润
+        \emph{和}总理赔额的标准差。
+        比较这两个数值：这种比较迫使真实的保险公司
+        持有何种准备金？
+  \item 总结 --- 二项分布作为决策裁判：
+        识别清单；罗盘 $\E \pm \sigma$；
+        以尾部概率作为风险的代价；以及两条
+        始终有效的注意事项（独立性是一种建模假设，
+        导致破产的是罕见尾部，而非均值）。每项各用一句话，
+        并指出后续内容：大数定律与钟形曲线
+        将在下几章中补全裁判的规则手册。
+\end{enumerate}
+\end{problem}

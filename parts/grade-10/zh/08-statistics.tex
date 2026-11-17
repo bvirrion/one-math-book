@@ -1,0 +1,385 @@
+\chapter{描述统计}\label{ch:g10:stats}
+
+统计用少数几个精心选取的指标，概括大量的数据——如成绩、工资、
+气温——的特征。本章介绍两类指标：一类刻画数据的
+\emph{中心}位置（\omterm{def:g10:stats:mean}{平均数}、\omterm{def:g10:stats:median}{中位数}），另一类刻画
+数据的\emph{离散程度}（\omterm{def:g10:stats:quartiles}{极差}、\omterm{def:g10:stats:quartiles}{四分位数}）。
+包括标准差在内的更深入讨论，见
+\cref{ch:g11:stat}。
+
+\section{数据与频率}
+
+\begin{definition}[统计数据]\label{def:g10:stats:series}
+\emph{统计数据}\index{统计数据}是一列数值
+$x_1, x_2, \dots, x_N$，是在容量为 $N$ 的总体上观测得到的。若某个值
+$x$ 出现 $n$ 次时，$n$ 称为它的\emph{频数}，比值
+\[
+f = \frac{n}{N}
+\]
+即为该值的\emph{频率}\index{频率}（常以百分数表示）。
+所有取值的频率之和为 $1$。
+\end{definition}
+
+\begin{example}\label{ex:g10:stats:frequencies}
+某次小测验中 $20$ 名学生的成绩（满分 $5$ 分）：
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{c|cccccc}
+成绩 $x$ & $0$ & $1$ & $2$ & $3$ & $4$ & $5$ \\
+\hline
+频数 $n$ & $1$ & $2$ & $4$ & $6$ & $5$ & $2$ \\
+\omterm{def:g10:stats:series}{频率} $f$ & $0.05$ & $0.10$ & $0.20$ & $0.30$ & $0.25$ & $0.10$ \\
+\end{tabular}
+\end{center}
+检验：$1 + 2 + 4 + 6 + 5 + 2 = 20$，\omterm{def:g10:stats:series}{频率}之和为 $1$。
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[
+  width=8.4cm, height=5.2cm,
+  ybar, bar width=14pt,
+  xmin=-0.7, xmax=5.7, ymin=0, ymax=7.4,
+  xtick={0,1,2,3,4,5},
+  ytick={1,2,3,4,5,6},
+  xlabel={成绩}, ylabel={频数},
+  tick label style={font=\small},
+  label style={font=\small}]
+  \addplot[fill=omDef!30, draw=omDef] coordinates
+    {(0,1) (1,2) (2,4) (3,6) (4,5) (5,2)};
+\end{axis}
+\end{tikzpicture}
+
+{\small 小测验成绩的条形图：每个取值对应一个条形，条形高度
+等于对应的频数。}
+\end{omfigure}
+
+\section{集中趋势的度量}
+
+\begin{definition}[平均数]\label{def:g10:stats:mean}
+\omterm{def:g10:stats:series}{统计数据}的\emph{平均数}\index{平均数}为
+\[
+\bar x = \frac{x_1 + x_2 + \dots + x_N}{N}.
+\]
+若取值 $v_1, \dots, v_k$ 的频数分别为 $n_1, \dots, n_k$，则
+同一个数也可以按\emph{加权平均数}计算，即
+\[
+\bar x = \frac{n_1 v_1 + n_2 v_2 + \dots + n_k v_k}{n_1 + n_2 + \dots + n_k}.
+\]
+\end{definition}
+
+\begin{example}\label{ex:g10:stats:mean}
+对\cref{ex:g10:stats:frequencies}中的小测验：
+\[
+\bar x = \frac{1 \times 0 + 2 \times 1 + 4 \times 2 + 6 \times 3
++ 5 \times 4 + 2 \times 5}{20}
+= \frac{0 + 2 + 8 + 18 + 20 + 10}{20}
+= \frac{58}{20} = 2.9 .
+\]
+\end{example}
+
+\begin{definition}[中位数]\label{def:g10:stats:median}
+\emph{中位数}\index{中位数}是把\emph{排序}后的数据一分为二的值：
+至少一半的数据 $\leq$ 中位数，
+至少一半的数据 $\geq$ 中位数。实际计算时，先将 $N$ 个数据排序：
+\begin{itemize}
+  \item 若 $N$ 为奇数，则中位数为中间的数据，位于
+        第 $\frac{N+1}{2}$ 个位置；
+  \item 若 $N$ 为偶数，则取中间两个数据的\omterm{prop:g10:coordgeom:midpoint}{中点}，它们位于
+        第 $\frac N2$ 和 $\frac N2 + 1$ 个位置。
+\end{itemize}
+\end{definition}
+
+\begin{example}\label{ex:g10:stats:median}
+排序后的 $7$ 套房价（单位：千元）为：$120$，$150$，$160$，
+$180$，$210$，$240$，$900$。\omterm{def:g10:stats:median}{中位数}是第 $4$ 个数，即 $180$。\omterm{def:g10:stats:mean}{平均数}
+为 $\frac{1960}{7} = 280$——大于其中 $6$ 个价格（共 $7$ 个）！
+一个极端值（$900$）对\omterm{def:g10:stats:mean}{平均数}的影响远大于对\omterm{def:g10:stats:median}{中位数}的影响：
+\omterm{def:g10:stats:median}{中位数}是\emph{稳健}的，\omterm{def:g10:stats:mean}{平均数}则不然。
+\end{example}
+
+\section{离散程度的度量}
+
+\begin{definition}[极差、四分位数]\label{def:g10:stats:quartiles}
+对于排序后的\omterm{def:g10:stats:series}{统计数据}：
+\begin{itemize}
+  \item \emph{极差}\index{极差}为\omterm{def:g10:functions:extrema}{最大值}与
+        \omterm{def:g10:functions:extrema}{最小值}之差；
+  \item \emph{第一四分位数}\index{四分位数} $Q_1$ 是满足至少
+        四分之一（$25\%$）的数据不大于
+        $\leq Q_1$ 的\omterm{def:g10:functions:extrema}{最小值}；\emph{第三四分位数} $Q_3$ 是满足至少
+        四分之三（$75\%$）的数据不大于
+        $\leq Q_3$ 的\omterm{def:g10:functions:extrema}{最小值}；
+  \item \emph{四分位距}\index{四分位距} $Q_3 - Q_1$ 刻画数据中
+        间一半数据的离散程度。
+\end{itemize}
+\end{definition}
+
+\begin{method}[求四分位数]\label{met:g10:stats:quartiles}
+对于一组已排序的 $N$ 个数值：
+\begin{enumerate}
+  \item 计算 $\frac N4$；若其不是\omterm{def:g10:numbers:sets}{整数}，则将其\emph{向上}取整为
+        相邻的下一个\omterm{def:g10:numbers:sets}{整数}；$Q_1$ 为该位置上的数值；
+  \item 计算 $\frac{3N}{4}$；需要时向上取整；$Q_3$ 为该位置上的
+        数值。
+\end{enumerate}
+\end{method}
+
+\begin{example}\label{ex:g10:stats:quartiles}
+取已排序的 $11$ 个数值：
+\[
+2,\ 3,\ 5,\ 5,\ 6,\ 7,\ 8,\ 9,\ 9,\ 10,\ 12 .
+\]
+\omterm{def:g10:stats:median}{中位数}：位置为 $\frac{11+1}{2} = 6$，故\omterm{def:g10:stats:median}{中位数}为 $7$。
+$Q_1$：$\frac{11}{4} = 2.75$，向上取整得 $3$；第 $3$ 个数值为 $5$。
+$Q_3$：$\frac{33}{4} = 8.25$，向上取整得 $9$；第 $9$ 个数值为 $9$。
+\omterm{def:g10:stats:quartiles}{极差}：$12 - 2 = 10$；\omterm{def:g10:stats:quartiles}{四分位距}：$9 - 5 = 4$。
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=0.85]
+  \draw[-Stealth] (1,0) -- (13.4,0) node[below, font=\small] {数值};
+  \foreach \x in {2,4,6,8,10,12}
+    { \draw (\x,-0.07) -- (\x,0.07);
+      \node[below, font=\footnotesize] at (\x,-0.1) {\x}; }
+  \draw[omDef, thick, fill=omDef!12] (5,0.5) rectangle (9,1.3);
+  \draw[omDef, very thick] (7,0.5) -- (7,1.3);
+  \draw[omDef, thick] (2,0.9) -- (5,0.9);
+  \draw[omDef, thick] (9,0.9) -- (12,0.9);
+  \draw[omDef, thick] (2,0.7) -- (2,1.1);
+  \draw[omDef, thick] (12,0.7) -- (12,1.1);
+  \node[above, font=\small] at (5,1.32) {$Q_1$};
+  \node[above, font=\small] at (7,1.32) {中位数};
+  \node[above, font=\small] at (9,1.32) {$Q_3$};
+  \node[above, font=\small] at (2,1.12) {最小值};
+  \node[above, font=\small] at (12,1.12) {最大值};
+\end{tikzpicture}
+
+{\small \cref{ex:g10:stats:quartiles}的箱线图：箱体跨越
+四分位\omterm{def:g10:numbers:interval}{区间} $\intcc{Q_1}{Q_3}$，并包含数据的中间一半；
+须线延伸至极端值。}
+\end{omfigure}
+
+\begin{example}[比较两组]\label{ex:g10:stats:comparison}
+两个班级参加了同一次测验（满分 $20$ 分）：
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{c|ccc}
+ & \omterm{def:g10:stats:median}{中位数} & $Q_1$ & $Q_3$ \\
+\hline
+A 班 & $12$ & $10$ & $14$ \\
+B 班 & $12$ & $6$ & $17$ \\
+\end{tabular}
+\end{center}
+\omterm{def:g10:stats:median}{中位数}相同，但离散程度差异很大：A 班较为均匀（其一半的
+成绩在 $\intcc{10}{14}$ 内），B 班则参差不齐（其中间一半的
+成绩跨越 $\intcc{6}{17}$）。只看集中趋势的指标，
+永远无法说明全貌。
+\end{example}
+
+\begin{remark}
+\omterm{def:g10:stats:mean}{平均数}与\omterm{def:g10:stats:median}{中位数}都谈不上“更好”：\omterm{def:g10:stats:mean}{平均数}用到每一个
+数值（计算总和时必须用到它），\omterm{def:g10:stats:median}{中位数}则不受极端值影响。
+对一组\omterm{def:g10:stats:series}{统计数据}的认真概括，至少应给出一个集中趋势指标
+\emph{和}一个离散程度指标。
+\end{remark}
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:g10:stats:1}
+下面是 $15$ 名学生一年内阅读书籍的数量：
+\[
+0,\ 1,\ 1,\ 2,\ 2,\ 2,\ 3,\ 3,\ 4,\ 4,\ 5,\ 6,\ 7,\ 8,\ 12 .
+\]
+求这组\omterm{def:g10:stats:series}{统计数据}的\omterm{def:g10:stats:mean}{平均数}、\omterm{def:g10:stats:median}{中位数}和\omterm{def:g10:stats:quartiles}{极差}。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g10:stats:2}
+一颗骰子被掷了 $50$ 次：
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{c|cccccc}
+结果 & $1$ & $2$ & $3$ & $4$ & $5$ & $6$ \\
+\hline
+次数 & $7$ & $9$ & $8$ & $10$ & $6$ & $10$ \\
+\end{tabular}
+\end{center}
+求每个结果的\omterm{def:g10:stats:series}{频率}以及结果的\omterm{def:g10:stats:mean}{平均数}。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g10:stats:3}
+求下列已排序\omterm{def:g10:stats:series}{统计数据}的\omterm{def:g10:stats:median}{中位数}、$Q_1$ 和 $Q_3$，
+\[
+1,\ 2,\ 4,\ 4,\ 5,\ 6,\ 6,\ 7,\ 8,\ 9,\ 9,\ 11 \qquad (N = 12),
+\]
+并画出相应的箱线图。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g10:stats:4}
+$24$ 个测验成绩的\omterm{def:g10:stats:mean}{平均数}为 $11.5$。第 $25$ 名学生参加了测验，
+得 $19$ 分。求全班的新\omterm{def:g10:stats:mean}{平均数}。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g10:stats:5}
+某学生的平均分为 $12$（共 $5$ 次测验，各次权重相同）。
+第 $6$ 次测验得多少分，可使平均分提高到 $13$？平均分能否达到
+$14$（成绩满分为 $20$ 分）？
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g10:stats:6}
+试构造一组由 $7$ 个非负数值组成的数据，使其\omterm{def:g10:stats:median}{中位数}为 $10$，
+且\omterm{def:g10:stats:mean}{平均数}大于 $20$；再构造一组\omterm{def:g10:stats:median}{中位数}为 $10$、\omterm{def:g10:stats:mean}{平均数}
+小于 $6$ 的数据。为什么这类数据的\omterm{def:g10:stats:mean}{平均数}永远不可能小于
+$\frac{40}{7}$？这些例子说明了什么？
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g10:stats:7}
+某公司有 $9$ 名员工，每人每月工资为 $1800$ 元，
+经理的月工资为 $12000$ 元。
+\begin{enumerate}
+  \item 求工资的\omterm{def:g10:stats:mean}{平均数}与\omterm{def:g10:stats:median}{中位数}。
+  \item 哪个指标最能描述这里的“典型”工资？为什么？
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g10:stats:8}
+某班有 $12$ 名男生，平均身高为 $168$ cm；同班 $18$ 名女生
+的平均身高为 $163$ cm。求
+全班的平均身高。（注意：它\emph{并非} $168$ 与 $163$ 的\omterm{prop:g10:coordgeom:midpoint}{中点}，
+——应按两组人数对\omterm{def:g10:stats:mean}{平均数}加权。）
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g10:stats:9}
+一组由 $N$ 个数值 $x_1, \dots, x_N$ 组成的数据，\omterm{def:g10:stats:mean}{平均数}为 $\bar x$。每个数值
+被变换为 $y_i = a x_i + b$，其中 $a$、$b$ 为给定的常数。
+\begin{enumerate}
+  \item 证明新数据的\omterm{def:g10:stats:mean}{平均数}为 $a \bar x + b$。
+  \item 某周的气温（以摄氏度计）\omterm{def:g10:stats:mean}{平均数}为 $20$。
+        求这些气温以华氏度计的\omterm{def:g10:stats:mean}{平均数}
+        （$F = 1.8\,C + 32$）？
+\end{enumerate}
+\end{exercise}
+
+\section{问题：不存在“平均的人”}
+
+\begin{problem}[{周末问题——平均数与中位数之争：离群值、
+评分曲线、途中的仓库，以及专为无人而设计的
+驾驶舱}]
+\label{pb:g10:stats:1}
+1950 年，美国空军对 $4\,000$ 名飞行员的十项身体
+尺寸进行了测量，并为\emph{平均的人}设计驾驶舱。该驾驶舱
+实际上并不合适——正如一位中尉通过计数所发现的——
+几乎无人适用。统计学用单个数字概括人群，而每个数字
+都只在某些方面说了真话，在另一些方面却说了假话。本题
+将\omterm{def:g10:stats:mean}{平均数}与\omterm{def:g10:stats:median}{中位数}
+（见\cref{def:g10:stats:mean}、\cref{def:g10:stats:median}）送上“法庭”，
+让它们各自展示所长，并为驾驶舱一案作结。
+
+\medskip
+\noindent\textbf{第一部分——两种概括接受审判。}
+\begin{enumerate}
+  \item 某条街上出售七套房屋，价格（以千欧元计）如下：
+        $200$、$210$、$220$、$230$、$240$、$250$ ——另有一幢
+        豪宅，价格为 $1\,200$。求这些房屋的平均价格与\omterm{def:g10:stats:median}{中位
+        数}。哪个数能描述“这条街上的一套房屋”？
+  \item 去掉豪宅，重新计算两个数。两者各自
+        变动了多少？请指出关于离群值的教训。
+  \item 某份人口普查表显示：$100$ 个家庭中，$20$ 个没有
+        孩子，$25$ 个有一个孩子，$30$ 个有两个孩子，$15$ 个有三个孩子，
+        $10$ 个有四个孩子。求每户孩子数的\omterm{def:g10:stats:mean}{平均数}。没有
+        家庭“有 $1.7$ 个孩子”，那么\omterm{def:g10:stats:mean}{平均数}所刻画的
+        是什么实际量？（将它乘以 $100$。）
+  \item 对以下十五个成绩
+        $4, 6, 7, 8, 9, 10, 10, 11, 12, 12, 13, 14, 15, 17, 19$：
+        求\omterm{def:g10:stats:median}{中位数}及\omterm{def:g10:stats:quartiles}{四分位数} $Q_1$、$Q_3$
+        （见\cref{met:g10:stats:quartiles}）。
+  \item 对同一组数据，求\omterm{def:g10:stats:quartiles}{极差}与
+        \omterm{def:g10:stats:quartiles}{四分位距}，并说明它们各自刻画什么。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第二部分——评分调整与合并班级。}
+\begin{enumerate}[resume]
+  \item 依\cref{exo:g10:stats:9}，若每个数值都加上 $+b$，
+        则\omterm{def:g10:stats:mean}{平均数}、\omterm{def:g10:stats:median}{中位数}与\omterm{def:g10:stats:quartiles}{四分位数}都加上 $+b$；若乘以 $a$，
+        则它们都乘以 $a$。平移后，\omterm{def:g10:stats:quartiles}{极差}与
+        \omterm{def:g10:stats:quartiles}{四分位距}会怎样变化？伸缩后呢？
+        请说明理由。
+  \item 某次测验的平均分为 $9$（满分 $20$ 分），老师希望
+        平均分达到 $12$。现提出两种调整方案：一是每人加 $3$ 分，
+        二是将每个成绩乘以 $\frac43$。求在每种方案下，
+        得 $6$ 分与 $18$ 分的学生在两种方案下的成绩，
+        哪种方案对哪些学生有利，哪种方案存在
+        上限问题？
+  \item A 班（$20$ 名学生）的平均分为 $12$；B 班（$30$
+        名学生）的平均分为 $10$。求两班合并后全部 $50$ 名学生的
+        平均分，并说明它为何不是 $11$
+        （即初中分册中调和\omterm{def:g10:stats:mean}{平均数}周末问题所蕴含的加权平均道理，
+        在课堂上重温）。
+  \item 说明\omterm{def:g10:stats:median}{中位数}不会配合这种做法：先分别求
+        $A = \{1, 2, 3\}$ 与 $B = \{0, 10\}$ 的\omterm{def:g10:stats:median}{中位数}，再求
+        合并后数据的\omterm{def:g10:stats:median}{中位数}，并与两个\omterm{def:g10:stats:median}{中位数}
+        按人数加权的\omterm{def:g10:stats:mean}{平均数}进行比较。
+  \item 花样滑冰：五名裁判分别给出 $5.2$、$5.3$、$5.4$、
+        $5.5$、$9.9$ 分。求\omterm{def:g10:stats:mean}{平均数}、\omterm{def:g10:stats:median}{中位数}与
+        \emph{截尾\omterm{def:g10:stats:mean}{平均数}}（去掉最低分与最高分，对其余
+        分数求平均）。为什么多数评判类体育项目要去掉极端分？
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第三部分——读懂分布。}
+\begin{enumerate}[resume]
+  \item 两家工厂生产的螺栓平均长度均为
+        $50$ mm。工厂 A：$Q_1 = 49.9$，$Q_3 = 50.1$；工厂
+        B：$Q_1 = 48$，$Q_3 = 52$。需要可互换的
+        螺栓，应选哪家工厂？哪个统计量起了决定作用？
+  \item 在一家诊所，等待时间的\omterm{def:g10:stats:median}{中位数}为 $10$ 分钟，
+        而平均等待时间为 $25$ 分钟。这对数字暴露出数据的
+        何种形态？试构造一组五个数值的数据，使其恰好具有此
+        \omterm{def:g10:stats:median}{中位数}与\omterm{def:g10:stats:mean}{平均数}。
+  \item “你的宝宝身高位于第 75 百分位数”——
+        这句话是什么意思？一个城镇里的每个孩子是否都能
+        “高于平均”？能否都“高于\omterm{def:g10:stats:median}{中位数}”？请解释两者的
+        区别。
+  \item A 班：\omterm{def:g10:functions:extrema}{最小值} $4$，$Q_1\,8$，\omterm{def:g10:stats:median}{中位数} $11$，$Q_3\,13$，\omterm{def:g10:functions:extrema}{最大值}
+        $17$。B 班：\omterm{def:g10:functions:extrema}{最小值} $2$，$Q_1\,9$，\omterm{def:g10:stats:median}{中位数} $11$，$Q_3\,12$，\omterm{def:g10:functions:extrema}{最大值}
+        $19$。比较两班：典型成绩，中间一半成绩的
+        一致程度，以及两端极端值的波动程度。
+  \item 记者的核查清单：某标题写道：“TechCorp 公司的平均
+        薪资为 $5\,000$ 欧元”。请列出本题教会你的三个问题，
+        它们应当在你相信这一标题能说明
+        关于某位典型员工的任何情况之前
+        先行提出。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第四部分——驾驶舱案例。}
+\begin{enumerate}[resume]
+  \item 自己构造证据：构造五个房价，
+        \omterm{def:g10:stats:mean}{平均数}为 $300$，\omterm{def:g10:stats:median}{中位数}为 $200$（单位：千欧元）。
+  \item \omterm{def:g10:stats:mean}{平均数}是平衡点：由定义证明，
+        与\omterm{def:g10:stats:mean}{平均数}的偏差总相互抵消，
+        即 $\sum (x_i - \bar x) = 0$，并在你的数据集上验证这一结论，
+        该数据集见第 16 题。
+  \item \omterm{def:g10:stats:median}{中位数}是跑腿最省的点：五家商店位于一条道路上，
+        分别距起点 $1$、$3$、$4$、$9$、$13$ 千米，仓库须使
+        到各商店的\emph{总距离}最小。
+        计算仓库设在\omterm{def:g10:stats:median}{中位数}（$4$）、\omterm{def:g10:stats:mean}{平均数}（$6$）及 $5$ 处时的该总距离，
+        哪一处最优？
+        （这一结论具有一般性：\omterm{def:g10:stats:median}{中位数}使总绝对距离最小，
+        可任选其他位置加以检验。）
+  \item 驾驶舱问题的解决：设某飞行员在某一身体维度上
+        “接近平均”的概率为 $30\,\%$，
+        各维度相互独立，共 $10$ 个维度。
+        估算飞行员在
+        \emph{全部十个}维度上均“接近平均”的概率，并将结果与
+        空军中尉在 $4\,000$ 名飞行员中的发现相对照。
+        空军转而设计了什么来代替平均型驾驶舱？
+  \item 终章——使用指南，每条一行：关注总量（如预算、收成）时，
+        用\dots；
+        关注典型个体（如薪资、等待时间）时，
+        用\dots；关注分散程度的公平性时，
+        报告\dots；存在污染风险时，用
+        \dots。以本题标题结束本案。
+\end{enumerate}
+\end{problem}

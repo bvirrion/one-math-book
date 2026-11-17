@@ -1,0 +1,812 @@
+\chapter{计数}\label{ch:b1:counting}
+
+有限集的计数看似初等 --- 但很快就变得微妙。
+本章通过双射严格定义基数（
+思路与\cref{ch:b1:logic}一致），建立几条计数的基本原理，
+它们是导出一切结论的基础，并由此推得
+经典计数：有序列、排列、子集与二项式系数。
+
+\section{有限集的基数}
+
+\begin{definition}[有限集，基数]\label{def:b1:counting:card}
+对 $n \in \N^*$，记 $\intint{1}{n} = \{1, 2, \dots,
+n\}$。集合 $E$ 称为\emph{有限集}\index{有限集}，当 $E = \emptyset$
+或存在从 $\intint{1}{n}$ 到 $E$ 的双射，
+其中 $n \in \N^*$ 为某个数，且此 $n$ 唯一（由\cref{thm:b1:counting:welldef}可知），
+并称它为\emph{基数}\index{基数}，
+记 $E$ 的基数为 $\abs{E}$（并约定 $\abs{\emptyset} = 0$）。
+\end{definition}
+
+\begin{theorem}[基数是良定义的]\label{thm:b1:counting:welldef}
+若 $m \neq n$，则不存在从 $\intint{1}{m}$
+到 $\intint{1}{n}$ 的双射。更准确地说，若 $m > n$，则
+不存在从 $\intint{1}{m}$ 到 $\intint{1}{n}$ 的单射。
+\end{theorem}
+
+\begin{proof}
+对 $n$ 用归纳法证明如下命题：\emph{对所有 $m > n$，
+不存在单射 $\intint{1}{m} \to \intint{1}{n}$}。当 $n = 0$ 时目标集为空，又 $m \geq 1$，
+故根本不存在映射。假设命题对 $n$ 成立，设 $f \colon
+\intint{1}{m} \to \intint{1}{n+1}$ 为单射，
+且 $m > n + 1$。若值 $n + 1$ 未被取到，则 $f$
+是到 $\intint{1}{n}$ 的单射，与
+归纳假设矛盾。否则 $f(a) = n + 1$ 恰对一个 $a$ 成立；
+于是交换 $f(a)$ 与 $f(m)$（形式上即与
+两取值的对换复合），使新单射 $g$ 满足 $g(m) = n + 1$。
+于是 $g$ 在 $\intint{1}{m-1}$ 上的限制
+是到 $\intint{1}{n}$ 的单射，且 $m - 1 > n$ ---
+再次导出矛盾。
+\end{proof}
+
+\begin{corollary}[鸽巢原理]\label{cor:b1:counting:pigeonhole}
+若 $\abs{E} > \abs{F}$，则任一映射 $f \colon E \to F$ 都不是单射：
+$E$ 中必有两个元素的像相同\index{鸽巢原理}。
+\end{corollary}
+
+\begin{proof}
+记 $\abs E = m$，$\abs F = n$，其中 $m > n$，并取双射
+$u \colon \intint1m \to E$ 与 $v \colon F \to \intint1n$。若 $f$
+是单射，则 $v \circ f \circ u$ 便是从
+$\intint1m$ 到 $\intint1n$ 的单射（单射的复合，
+见\cref{prop:b1:logic:comp}），与
+\cref{thm:b1:counting:welldef}矛盾。
+\end{proof}
+
+\begin{remark}[插曲：定理证明中为何要作交换？]\label{rem:b1:counting:swapinterlude}
+\cref{thm:b1:counting:welldef}的证明中包含
+本章第一个真正巧妙的手法，值得细细回味。
+困难在于：要应用归纳假设，就希望
+删去源集的最后一点 $m$ \emph{和}目标集的
+最后一点 $n+1$，但 $f$ 可能把另一点 $a$ 映到 $n
++ 1$，这时删去目标点会破坏映射
+在别处的性质。补救之法是将 $f$ 与
+两个\emph{取值} $f(a)$、$f(m)$ 所成的对换复合 --- 它是目标集上的
+双射，因而保持单射性 --- 此后
+棘手的取值 $n + 1$ 便落在无害的位置 $m$，
+两次删除便都干净利落。这种“先规范化、再切割”
+的模式反复出现：本章周末问题中的错排递推
+借此重定向 $\sigma^{-1}(n+1)$，同样的做法也
+贯穿于置换的修补，
+在\cref{ch:b1:structures}的对称群习题中随处可见。
+\end{remark}
+
+\begin{proposition}[单射、满射与基数]\label{prop:b1:counting:injsur}
+设 $E, F$ 为有限集，$\abs{E} = \abs{F}$，且 $f \colon E
+\to F$。则
+\[
+f \text{ 单射} \iff f \text{ 满射} \iff f \text{ 双射}.
+\]
+\end{proposition}
+
+\begin{proof}
+设 $f$ 为单射，则 $f$ 是从 $E$ 到 $f(E)$ 上的双射，
+于是 $\abs{f(E)} = \abs{E} = \abs{F}$。若 $f(E)$ 漏掉了一点 $y_0$，
+（$F$ 的元素），则 $f$ 便是 $E$ 到 $F \setminus \{y_0\}$ 的单射，
+基数为 $\abs{F} - 1 < \abs{E}$ 的集合 --- 由
+鸽巢原理，这不可能。故 $f(E) = F$，$f$ 为满射，
+从而为双射。
+
+设 $f$ 为满射。对每个 $y \in F$，取一个原像 $s(y)
+\in E$，于是 $f \circ s = \mathrm{id}_F$，故 $s$ 为单射
+（见\cref{prop:b1:logic:comp}）。由上段对 $s$ 应用同样的论证
+（基数相等），$s$ 为双射。由 $f \circ s =
+\mathrm{id}_F$ 得 $f = \mathrm{id}_F \circ s^{-1} = s^{-1}$，故
+$f$ 为双射。最后，按定义，双射既是
+单射又是满射，从而完成了各蕴含关系的循环证明。
+\end{proof}
+
+\begin{example}[有限性至关重要]\label{ex:b1:counting:finiteonly}
+在\emph{有限}集上，\cref{prop:b1:counting:injsur}是一条有力的
+捷径：任何从 $E$ 到自身的单射自动便是
+$E$ 的一个置换 --- 双射性的一半便免费得到。这两个
+蕴含关系在无限集上都不再成立：$n \mapsto n + 1$
+是从 $\N$ 到 $\N$ 的单射，但漏掉了 $0$；而映射 $\N \to \N$
+将 $0 \mapsto 0$，且 $n \mapsto n - 1$（$n \geq 1$），
+是满射却不是单射。每当使用本命题时，
+有限性假设起着实质作用 --- 这一主题
+在\cref{ch:b1:logic}的周末问题中从另一面探讨，
+其中无限集恰恰是那些允许此类自映射的集合。
+\end{example}
+
+\begin{example}[白得的一半]\label{ex:b1:counting:mod7}
+考虑映射 $f$，它定义在 $\{0, 1, \dots, 6\}$ 上，将 $k$ 映为
+$3k$ 被 $7$ 除所得的余数；其取值表为
+\[
+0,\ 3,\ 6,\ 2,\ 5,\ 1,\ 4 .
+\]
+$f$ 是否为双射？仅单射性便已足够
+（由\cref{prop:b1:counting:injsur}）：若 $3k$ 与 $3k'$ 有相同的
+余数，则 $7$ 整除 $3(k - k')$，由于 $7$ 为质数且
+不整除 $3$，故它整除 $k - k'$（此即欧几里得引理，在中学
+水平已用过，证明见\cref{ch:b1:arith}）；由
+$\abs{k - k'} \leq 6$ 可得 $k = k'$。满射性
+白得 --- 无需对 $3k \equiv c$ 逐一求解（$c$ 取遍各值），尽管
+取值表证实每个值恰好出现一次。此捷径
+是一件主力工具：它证明了模乘法的
+可逆性（见\cref{ch:b1:arith}），支撑威尔逊
+定理中的配对，并在线性代数中以“有限维空间上的自同态
+是单射，当且仅当
+它是满射”（见\cref{ch:b1:findim}）。
+\end{example}
+
+\section{计数原理}
+
+\begin{proposition}[加法与乘法法则]\label{prop:b1:counting:rules}
+设 $E, F$ 为有限集。
+\begin{enumerate}
+  \item 若 $E \cap F = \emptyset$，则 $\abs{E \cup F} = \abs{E} +
+        \abs{F}$；更一般地，若 $E$ 被划分为若干块
+        $E_1, \dots, E_k$，$\abs{E} = \sum_i \abs{E_i}$。
+  \item 一般地，$\abs{E \cup F} = \abs{E} + \abs{F} - \abs{E \cap
+        F}$。
+  \item $\abs{E \times F} = \abs{E} \times \abs{F}$。
+  \item 集合 $F^E$（即从 $E$ 到 $F$ 的全体映射）满足
+        $\abs{F^E} = \abs{F}^{\abs{E}}$。
+  \item $\abs{\mathcal{P}(E)} = 2^{\abs{E}}$。
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(1) 依次连接两个枚举：若 $E = \{x_1, \dots, x_m\}$ 与 $F =
+\{y_1, \dots, y_n\}$ 均无重复，则 $x_1, \dots, x_m, y_1,
+\dots, y_n$ 即为 $E \cup F$ 的无重复枚举（由于两者不交）。
+归纳即可推广到 $k$ 块。
+
+(2) $E \cup F$ 是 $E$ 与 $F \setminus E$ 的不交并，而
+$F$ 是 $F \cap E$ 与 $F \setminus E$ 的不交并，故
+$\abs{E \cup F} = \abs{E} + \abs{F \setminus E} = \abs{E} + \abs{F} -
+\abs{E \cap F}$。
+
+(3) $E \times F$ 为对 $x \in E$ 取遍的集合
+$\{x\} \times F$ 的不交并，每个集合的基数为 $\abs{F}$；由 (1) 即得。
+
+(4) 从 $E = \{x_1, \dots, x_m\}$ 到 $F$ 的映射，恰为
+$m$ 元组 $(f(x_1), \dots, f(x_m)) \in F^m$ 的选取；此
+对应为一个双射，且 $\abs{F^m} = \abs{F}^m$，由 (3) 及
+归纳法即得。
+
+(5) $E$ 的子集与映射 $E \to \{0, 1\}$ 之间存在双射
+（将 $A$ 映为其示性函数）；由 (4) 即得。
+\end{proof}
+
+\begin{example}[补集计数]\label{ex:b1:counting:complement}
+有多少个 $4$ 位 PIN 码（数字取 $0$--$9$，次序有关，
+允许重复）中含\emph{至少一个}重复数字？
+若直接计数，则需分别处理“恰有一对
+、恰有两对、三个相同、四个相同” --- 五种相互重叠的
+情形。改为计算补集：全部编码的个数为
+$10^4 = 10\,000$（乘法法则），四个数字互异的编码数
+为 $10 \times 9 \times 8 \times 7 = 5\,040$
+（$4$ 元排列），故所求为
+\[
+10^4 - 10 \cdot 9 \cdot 8 \cdot 7 = 10\,000 - 5\,040 = 4\,960 .
+\]
+近一半的 PIN 码含有重复数字。要点在于：凡
+计数以“至少”或“并非全部”表述，应先考虑
+补集 --- 加法法则保证
+$\abs{A} = \abs{E} - \abs{\overline A}$，而补集
+往往只是一种清晰简洁的情形。
+\end{example}
+
+\begin{example}[格路]\label{ex:b1:counting:paths}
+求从网格的角点 $(0,0)$ 到角点
+$(4, 3)$ 的最短路径条数，每次只能向右（R）或向上
+（U）移动一步。每条这样的路径恰走 $7$ 步，其中
+$4$ 步为 R，$3$ 步为 U；反之，由字母 R、U 组成的长为 $7$ 的
+单词（含四个 R）恰对应一条路径。因此路径
+与 R 所占位置的选取一一对应，于是
+其个数为：
+\[
+\binom{7}{4} = 35 .
+\]
+关键在于\emph{编码}：每条路径一经译为单词，计数便
+变得平凡，即译为位置的某个子集 ---
+这正是“正确的计数是一个伪装的双射”这一格言的又一例
+（见\cref{met:b1:counting:which}）。
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=0.85]
+  \draw[gray!60] (0,0) grid (4,3);
+  \draw[->, thin] (-0.4,0) -- (4.6,0);
+  \draw[->, thin] (0,-0.4) -- (0,3.6);
+  \draw[omDef, very thick]
+    (0,0) -- (1,0) -- (1,1) -- (3,1) -- (3,2) -- (4,2) -- (4,3);
+  \fill (0,0) circle (0.07) node[below left] {$(0,0)$};
+  \fill (4,3) circle (0.07) node[above right] {$(4,3)$};
+  \node[omDef, below] at (0.5,0) {\small R};
+  \node[omDef, left] at (1,0.5) {\small U};
+  \node[omDef, below] at (1.5,1) {\small R};
+  \node[omDef, below] at (2.5,1) {\small R};
+  \node[omDef, left] at (3,1.5) {\small U};
+  \node[omDef, below] at (3.5,2) {\small R};
+  \node[omDef, left] at (4,2.5) {\small U};
+\end{tikzpicture}
+
+{\small $\binom74 = 35$ 条从 $(0,0)$ 到
+$(4,3)$ 的最短路径之一：图中路径对应单词 RURRURU，
+即在七步中字母 R 所处的位置为
+$\{1,3,4,6\}$。}
+\end{omfigure}
+
+\section{列表、排列、子集}
+
+\begin{definition}[排列、置换与组合]\label{def:b1:counting:objects}
+设 $E$ 为集合，$\abs{E} = n$，且 $0 \leq k \leq n$。
+\begin{itemize}
+  \item \emph{$k$-排列}是 $E$ 的单射 $k$ 元组，
+        即 $E$ 中元素构成的无重复有序选取；
+  \item $E$ 的\emph{置换}\index{置换}是
+        从 $E$ 到自身的双射，等价地，即一个 $n$-排列；
+  \item \emph{$k$-组合}是 $E$ 的含 $k$ 个元素的子集，
+        即无重复的无序选取。其个数记作
+        $\binom{n}{k}$，读作“$n$ 选
+        $k$”\index{二项式系数}。
+\end{itemize}
+\end{definition}
+
+\begin{theorem}[三种计数]\label{thm:b1:counting:counts}
+设 $n = \abs{E}$，$0 \leq k \leq n$，则：
+\begin{enumerate}
+  \item $k$-排列（取自 $E$）的个数为 $n (n-1) \cdots
+        (n-k+1) = \dfrac{n!}{(n-k)!}$；
+  \item $E$ 的置换个数为 $n!$；
+  \item $\dbinom{n}{k} = \dfrac{n!}{k!\,(n-k)!}$。
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+（1）先选第一个坐标（$n$ 种方法），再选第二个（$n - 1$
+种剩余选择），\dots，然后选第 $k$ 个（$n - k + 1$ 种选择）。
+严格地，对 $k$ 作归纳。当 $k = 1$ 时，
+单元素单射元组有 $n$ 个。设对 $k - 1$ 的计数成立。每个
+$k$-排列 $(x_1, \dots, x_k)$ 恰由唯一一个
+$(k-1)$-排列（即其截断 $(x_1, \dots, x_{k-1})$）
+通过添加一个不属于 $\{x_1, \dots,
+x_{k-1}\}$ 的末坐标得到，末坐标恰有 $n - (k - 1)$ 个可选值。
+于是，$k$-排列按截断划分为若干类，
+每类大小均为 $n - k + 1$，类由
+$(k-1)$-排列标记，由加法法则得
+\[
+\frac{n!}{(n-k+1)!}\;(n - k + 1) = \frac{n!}{(n-k)!} .
+\]
+
+（2）即 $k = n$ 时的（1）。
+
+（3）每个 $k$ 元子集可排成 $k!$ 个不同的 $k$-排列，且
+每个 $k$-排列恰来自唯一一个子集，因此
+$\frac{n!}{(n-k)!} = \binom nk \cdot k!$。
+\end{proof}
+
+\begin{example}[圆桌：对对称性取商]\label{ex:b1:counting:roundtable}
+$n$ 位客人围坐圆桌，若每位客人的左右邻座均相同，则视为同一种坐法，
+即相差一个旋转。问共有多少种不同的坐法？
+每种圆周坐法
+恰对应 $n$ 种线性坐法（在 $n$ 个位置中任取一处将圆周断开），
+于是 $n!$ 种线性排列每
+$n$ 个一组被合并：
+\[
+\frac{n!}{n} = (n-1)! \quad\text{种圆周坐法。}
+\]
+等价地：先让某位指定的客人就座于任一位置（以消除旋转自由度），
+再排列其余 $n - 1$ 位客人的座次，
+按顺时针方向。当 $n = 6$ 时，共有 $120$ 种坐法。这两种解法体现了
+处理重复计数的两种标准方法：除以恰好的
+重复次数，或\emph{打破对称性}，即固定一个
+对象的位置。两种方法都要求每种配置的
+重复群大小相同——上文证明公式
+$\binom nk = \frac{n!}{k!\,(n-k)!}$ 时同样用到了这一点，
+只是以 $k!$ 代替了 $n$。
+\end{example}
+
+\begin{example}[增加约束]\label{ex:b1:counting:constraint}
+继续圆桌问题：在 $(n-1)!$ 种坐法中，设客人数 $n \geq
+3$，有多少种使两位指定客人 $A$ 与 $B$ \emph{不相邻}（即不挨着）就座？
+先计算其补集。若 $A$ 与 $B$
+相邻，则将二人捆绑为一个整体——圆桌上共 $n - 1$ 个对象，
+即 $(n-2)!$ 种圆周排列——再
+排列该整体内两人的次序（$2$ 种方法），共 $2\,(n-2)!$
+种相邻坐法。于是
+\[
+(n-1)! - 2\,(n-2)! = (n-2)!\,\bigl((n - 1) - 2\bigr)
+= (n-3)\,(n-2)!
+\]
+种坐法使二人不相邻。检验：$n = 3$ 时结果为 $0$（围成三角形时，
+每人都与其他人相邻），$n = 4$ 时结果为 $2$，
+可直接列举验证。捆绑法——将被强制相邻的块视为一个对象，
+再计算其内部排列——是
+处理相邻约束（无论线性还是圆周）的标准方法。
+\end{example}
+
+\begin{proposition}[基本恒等式]\label{prop:b1:counting:identities}
+对 $0 \leq k \leq n$，有
+\[
+\binom{n}{k} = \binom{n}{n-k},
+\qquad
+\binom{n}{k} = \binom{n-1}{k-1} + \binom{n-1}{k}
+\quad (1 \leq k \leq n-1),
+\qquad
+\sum_{k=0}^{n} \binom{n}{k} = 2^n .
+\]
+\end{proposition}
+
+\begin{proof}
+第一个恒等式：$A \mapsto E \setminus A$ 是
+$k$ 元子集与 $(n-k)$ 元子集之间的双射。帕斯卡法则\index{帕斯卡法则}：
+固定元素 $a \in E$；$k$ 元子集分为两类，含
+$a$ 者（从其余元素中选 $k - 1$ 个：$\binom{n-1}{k-1}$ 种）与
+不含 $a$ 者（$\binom{n-1}{k}$ 种）。第三个恒等式：两边都计数
+$E$ 的全部子集，左边按大小分类
+（\cref{prop:b1:counting:rules}~(1) 与 (5)）。
+\end{proof}
+
+\begin{theorem}[二项式定理]\label{thm:b1:counting:binomial}
+对交换环中的任意 $a, b$（例如 $\R$ 或 $\C$）及 $n \in \N$：
+\[
+(a + b)^n = \sum_{k=0}^{n} \binom{n}{k} a^k b^{\,n-k} .
+\]
+\end{theorem}
+
+\begin{proof}
+将 $(a+b)(a+b)\cdots(a+b)$ 按分配律展开，每个因子中取 $a$ 或 $b$
+的每种选法对应一项：项 $a^k b^{n-k}$
+恰在选出哪 $k$ 个因子（在 $n$ 个因子中）取 $a$ 的每种方式下出现一次，
+即共 $\binom nk$ 次（另证可对
+$n$ 归纳，利用帕斯卡法则。）
+\end{proof}
+
+\begin{example}\label{ex:b1:counting:binomial}
+两个经典的特化：$a = b = 1$ 给出 $\sum_k \binom nk
+= 2^n$；取 $a = -1$、$b = 1$，得 $\sum_{k} (-1)^k \binom nk = 0$，
+当 $n \geq 1$ 时，非空集合的子集中，
+恰有一半的子集基数为偶数。
+\end{example}
+
+\begin{example}[一个恒等式，两种证明]\label{ex:b1:counting:threen}
+取二项式定理中 $a = 2$、$b = 1$ 的特化，得
+\[
+\sum_{k=0}^{n} \binom nk\,2^k = 3^n .
+\]
+下面用完全不涉及代数的方法证明同一恒等式：右边
+计数的是长为 $n$ 的单词（字母表为 $\{0, 1, 2\}$）个数
+（乘法法则）。按非零字母所在位置的集合 $K$ 对单词分类：
+选取 $K$，使 $\abs K = k$，有
+$\binom nk$ 种方式，再让 $K$ 中每个位置独立地取 $1$
+或 $2$，共 $2^k$ 种方式。对 $k$ 用加法法则即得左边。
+两种证明的结果一致固然令人愉快，但它们各有所长：
+代数证明可推广到 $a$ 的任意取值，
+组合证明则\emph{解释}了公式本身，并能适应
+各种约束（例如禁止末位出现字母 $2$），
+而任何代入都无法体现这些约束。同时掌握两种技巧，
+正是本章要训练的实用能力。
+\end{example}
+
+\begin{method}[该用哪种计数？]\label{met:b1:counting:which}
+计算之前，先就选取方式回答两个问题：
+\emph{顺序}是否重要，是否允许\emph{重复}？
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{l|c|c}
+ & 考虑顺序 & 不考虑顺序 \\
+\hline
+不允许重复 & $\dfrac{n!}{(n-k)!}$ & $\dbinom{n}{k}$ \\[6pt]
+允许重复 & $n^k$ & （见\cref{exo:b1:counting:10}） \\
+\end{tabular}
+\end{center}
+然后寻找双射或划分，把问题化归为这些
+基本计数模型；一个正确的计数往往就是一个隐蔽的双射。
+\end{method}
+
+\begin{remark}[计数中的常见误区]\label{rem:b1:counting:pitfalls}
+\begin{enumerate}
+  \item \emph{对并非互不相交的情形求和。}加法法则要求
+        各情形构成一个划分；若某种配置可同时满足两种情形，
+        则它被计数两次 --- 补救办法是
+        容斥原理（见\cref{thm:b1:counting:inclexcl}）或
+        更细的分情形讨论。
+  \item \emph{有序与无序。}“两人委员会”的选法
+        数为 $\binom n2$，而非 $n(n-1)$：\emph{在
+        计算之前}判断选取是否带有顺序；
+        若有序计数更简便，则先按有序计数，最后再除以
+        排列数 --- 但仅当每个无序对象
+        都由\emph{相同}数目的有序对象产生。
+  \item \emph{不独立的多阶段选择。}
+        乘法法则要求每一阶段的选择数目
+        与之前的选择无关。“先选一名
+        队长，再选一名不同的副队长”是合适的（$n(n-1)$）；
+        “挑选两名彼此相处融洽的队员”不是两阶段的
+        乘积。
+  \item \emph{构造时重复计数。}每个对象被构造两次：
+        例如将\emph{至少}含一张 A 的手牌数作
+        （选一张 A）$\times$（再选 $4$ 张牌），
+        这会重复计数含两张 A 的手牌。
+        “至少”一词几乎总需要借助补集
+        （见\cref{ex:b1:counting:complement}）。
+\end{enumerate}
+\end{remark}
+
+\begin{example}[扑克式计数]\label{ex:b1:counting:poker}
+从一副 $52$ 张牌中，$5$ 张牌的手牌数为
+$\binom{52}{5} = 2\,598\,960$。恰含一张 A 的手牌：
+先选 A（$4$ 种方式），再选 $4$ 张牌，取自 $48$ 张非 A 牌：
+$4 \binom{48}{4} = 778\,320$。选取可分为相互独立的阶段，
+故可用乘法法则。
+\end{example}
+
+\begin{method}[双重计数]\label{met:b1:counting:doublecount}
+要证明两个计数表达式之间的恒等式，
+找一个两边都计数的有限集合 --- 通常是\emph{序对}的集合 ---
+并以两种不同的次序计算它的基数。
+典型例子是\emph{握手引理}：在一次聚会上，计数序对
+（人，所握之手）。对人求和得 $\sum_p d_p$（每人
+$p$ 的握手次数）；对握手求和得握手次数的两倍
+（每次握手涉及两人）。因此
+$\sum_p d_p$ 为偶数 --- 故握了奇数次手的人数
+总是偶数，这是一个非平凡的结论，
+且完全不需要任何公式。同一方法适用于
+\cref{exo:b1:counting:12} 以及下文的
+周末问题中的若干问题。
+\end{method}
+
+\begin{example}[平均子集]\label{ex:b1:counting:averagesubset}
+求 $n$ 元集合 $E$ 的子集的平均基数，
+并假定 $2^n$ 个子集等可能出现？用双重计数法计数
+序对 $(A, a)$，其中 $a \in A$：对子集求和得
+$\sum_A \abs A$，即所求总量；对元素求和得
+$n \cdot 2^{n-1}$（$n$ 个元素中每一个恰好属于一半的子集
+--- 将每个 $A$（含 $a$）与 $A
+\setminus \{a\}$ 配对）。因此
+\[
+\frac{1}{2^n}\sum_{A \subseteq E} \abs A
+= \frac{n\,2^{n-1}}{2^n} = \frac n2 :
+\]
+平均而言子集恰好半满 --- 正如对称 $A
+\leftrightarrow \overline A$（它把大小为 $k$ 与 $n - k$ 的子集配对）
+所预示的那样。两种证明得出同一答案，且二者都避开了
+直接计算 $\sum_k k\binom nk$（见\cref{exo:b1:counting:5}）：一个
+恰当的配对往往能省去一个恒等式的计算。
+\end{example}
+
+\section{容斥原理}
+
+\begin{theorem}[容斥原理]\label{thm:b1:counting:inclexcl}
+设 $A_1, \dots, A_p$ 为有限集：
+\[
+\Bigl|\, \bigcup_{i=1}^{p} A_i \,\Bigr|
+= \sum_{\emptyset \neq I \subseteq \intint{1}{p}}
+(-1)^{\abs{I}+1} \Bigl|\, \bigcap_{i \in I} A_i \,\Bigr| .
+\]
+当 $p = 3$ 时：
+$\abs{A \cup B \cup C} = \abs A + \abs B + \abs C - \abs{A \cap B} -
+\abs{A \cap C} - \abs{B \cap C} + \abs{A \cap B \cap C}$.
+\end{theorem}
+
+\begin{proof}
+任取并集中的一个元素 $x$，计算它
+对右端的贡献。令 $J = \{i : x \in A_i\}$，其基数为 $m \geq
+1$。元素 $x$ 在 $\abs{\bigcap_{i \in I} A_i}$ 中恰被计数一次，
+当且仅当 $\emptyset \neq I \subseteq J$ 时，
+其符号为 $(-1)^{\abs I + 1}$；其总贡献为
+\[
+\sum_{k=1}^{m} \binom{m}{k} (-1)^{k+1}
+= 1 - \sum_{k=0}^{m} \binom mk (-1)^k = 1 - 0 = 1
+\]
+由\cref{ex:b1:counting:binomial}可得，因此并集中的每个元素
+恰好被计数一次。
+\end{proof}
+
+\begin{example}[计数互质的整数]\label{ex:b1:counting:coprime}
+在 $\intint1{120}$ 中，与 $120 = 2^3
+\times 3 \times 5$ 互质的整数有多少个？一个整数与 $120$ 有公因数，
+当且仅当它能被 $2$、$3$ 或 $5$ 整除，故计算
+$A_2 \cup A_3 \cup A_5$ 的补集，其中 $A_d$ 为
+$d$ 的倍数组成的集合。在 $\intint1{120}$ 中，$d$ 的倍数
+共有 $120/d$ 个（只要 $d$ 整除 $120$ --- 无需取整函数 --- 且
+$A_2 \cap A_3 = A_6$ 等）。由容斥原理得：
+\[
+\abs{A_2 \cup A_3 \cup A_5}
+= 60 + 40 + 24 - 20 - 12 - 8 + 4 = 88 ,
+\]
+于是 $120 - 88 = 32$ 个与 $120$ 互质的整数。
+将计算改写为乘积形式，颇具启发性：
+\[
+120 - 88 = 120\Bigl(1 - \frac12\Bigr)\Bigl(1 -
+\frac13\Bigr)\Bigl(1 - \frac15\Bigr) = 120 \cdot \frac12 \cdot
+\frac23 \cdot \frac45 = 32 :
+\]
+展开这三个括号，恰好给出容斥原理中的八项
+带符号之和，每项对应 $\{2, 3,
+5\}$ 的一个子集。这一乘积形式定义了欧拉函数，其
+算术作用与\cref{ch:b1:arith}中的同余一并出现，
+并将在本科二年级分册中展开。
+\end{example}
+
+\begin{example}[错排]\label{ex:b1:counting:derangement}
+称 \emph{错排} 为没有不动点的置换。设 $A_i$
+为 $\intint{1}{n}$ 上以 $i$ 为不动点的置换所组成的集合；
+则 $\abs{\bigcap_{i \in I} A_i} = (n - \abs I)!$，
+并由容斥原理算出至少有一个不动点的置换个数，
+于是错排数为
+\[
+D_n = n! \sum_{k=0}^{n} \frac{(-1)^k}{k!} .
+\]
+由于 $\sum (-1)^k / k! \to \eu^{-1}$（见\cref{ch:b1:series}），
+所有置换中约 $37\%$ 为错排，无论 $n$ 为何值。
+\end{example}
+
+\begin{remark}[本章的应用]\label{rem:b1:counting:whereused}
+二项式系数是本章被复用得最多的对象：它们
+在\cref{ch:b1:poly}中给出二项式定理
+（$(X + a)^n$ 的展开），在\cref{ch:b1:derivative}中给出乘积的 $n$ 阶导数的莱布尼茨公式，
+以及
+在\cref{ch:b1:taylor}中给出泰勒展开的系数。
+置换以群的形式再次出现 --- 连同由计算逆序数构造的
+符号 --- 在\cref{ch:b1:structures}中出现，而
+符号又在\cref{ch:b1:det}中定义行列式。
+容斥原理与计数原理是离散概率的有限基础，
+将在本科二年级分册中展开；
+\cref{ex:b1:counting:derangement}中的错排数
+在下面的周末问题中被深入研究。
+\end{remark}
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:b1:counting:1}
+车牌依次由两个字母（A--Z）、三个数字、
+两个字母组成。共有多少种可能的车牌？其中
+四个字母互不相同的车牌有多少种？
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:counting:2}
+对 \textsc{orange} 一词的字母作重排（不论有无意义），
+共有多少种？\textsc{banana} 呢？
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:counting:3}
+选出 $4$ 人组成的委员会，其成员取自 $7$ 名女性和 $5$ 名男性。问：
+委员会共有多少个？其中恰有 $2$ 名女性的有多少个？至少有一名
+男性的有多少个？
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:counting:4}
+证明：任意 $13$ 人中必有两人出生月份相同；
+以及任取 $n + 1$ 个取自 $\intint{1}{2n}$ 的整数，其中必有两数相邻。\emph{（两问均用抽屉原理：
+请指明抽屉。）}
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:counting:5}
+计算 $\sum_{k=0}^{n} k \binom{n}{k}$。\emph{提示：对
+$(1 + x)^n$ 求导，或利用 $k \binom nk = n \binom{n-1}{k-1}$（请证明之）。}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:counting:6}
+从 $\intint{1}{k}$ 到 $\intint{1}{n}$ 的严格递增映射有多少个？由此推出
+递增（不必严格）映射的个数。\emph{第二个计数的提示：
+$f$ 递增 $\mapsto$ $g(i) = f(i) + i - 1$。}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:counting:7}
+（范德蒙德）用计数集合的 $k$ 元子集的方法证明：将集合分为两块，
+大小分别为 $m$ 与 $n$：
+\[
+\binom{m+n}{k} = \sum_{j=0}^{k} \binom{m}{j} \binom{n}{k-j} .
+\]
+由此推出 $\sum_{j=0}^{n} \binom nj^2 = \binom{2n}{n}$。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:counting:8}
+$\intint{1}{1000}$ 中有多少个整数能被
+$2$、$3$ 或 $5$ 整除？（用容斥原理；$\lfloor 1000/6 \rfloor$
+计数 $6$ 的倍数的个数，依此类推。）
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:counting:9}
+计算从含 $4$ 个元素的集合到含 $2$ 个元素的集合的满射个数，
+再计算到含 $3$ 个元素的集合的满射个数。\emph{提示：
+对漏掉的取值用容斥原理，计数非满射的映射。}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:counting:10}
+（星与杠）证明：$k$ 元选法（即从 $n$ 个对象中
+\emph{允许重复}地取、不计顺序的取法）的个数 --- 等价地，即
+$(x_1, \dots, x_n) \in \N^n$ 满足 $x_1 + \dots + x_n = k$ 的解的个数
+--- 为 $\binom{n + k - 1}{k}$。\emph{提示：把一个解编码为
+由 $k$ 个星号与 $n - 1$ 个杠组成的一行。}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:counting:11}
+详细证明\cref{ex:b1:counting:derangement}中 $D_n$ 的公式，
+并由此推出 $n! = \sum_{k=0}^{n} \binom{n}{k} D_{n-k}$（也可
+直接按置换的不动点集对置换分类来证明
+此恒等式）。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:counting:12}
+对 $n \in \N^*$，用对（子集，
+带标记元素）的双重计数证明：
+\[
+\sum_{k=1}^{n} k \binom{n}{k} = n\, 2^{n-1},
+\qquad\text{再}\qquad
+\sum_{k=1}^{n} k^2 \binom{n}{k} = n(n+1)\, 2^{n-2} .
+\]
+\emph{对第二个等式：计数两个带标记元素的对，两元素可相同也可不同。}
+\end{exercise}
+
+\section{问题：错排，或装错信封的信}
+
+\begin{problem}\label{pb:b1:counting:1}
+一位秘书随机地将 $n$ 封信装入 $n$ 个写好地址的信封中：
+问\emph{没有任何一个}信封装着正确的信的概率是多少？
+这一经典问题（蒙莫尔，1708 年）引出错排数
+$D_n$（见\cref{ex:b1:counting:derangement}）。
+容斥公式只是开端，本题
+将发展计算 $D_n$ 的递推式，另外两种独立的
+证明该公式，并给出惊人的定理：$D_n$ 是
+最接近 $n!/\eu$ 的整数，随机置换不动点的完整分布，
+以及数列
+$(D_n)$ 的奇妙算术性质。\index{错排}
+全文中，$D_n$ 表示
+$\intint1n$ 的错排（无不动点的置换）个数，并约定 $D_0 = 1$
+（空置换没有不动点）。
+
+\medskip
+\noindent\textbf{第一部分 --- 小情形与
+不动点统计。}
+\begin{enumerate}
+  \item 直接计算 $D_1, D_2, D_3$，并计算 $D_4$：
+        列出 $\{1, 2, 3, 4\}$ 的错排，按
+        $\sigma(1)$ 的取值分组。（应得 $D_4 = 9$。）
+  \item 对 $0 \leq k \leq n$，记 $P_k(n)$ 为
+        $\intint1n$ 上\emph{恰有} $k$ 个
+        不动点的置换的个数，证明其为 $\binom nk D_{n-k}$。
+  \item 验证 $n = 4$ 时的不动点统计：计算 $P_0(4), \dots,
+        P_4(4)$，并验证它们之和为 $4! = 24$。对四封信而言，
+        哪种情形更可能出现：没有一封信装对，还是恰好一封信装对？
+  \item 利用双重计数（见\cref{met:b1:counting:doublecount}）
+        计数对 $(\sigma, i)$，其中 $\sigma(i) = i$，证明
+        \[
+        \sum_{\sigma} \abs{\mathrm{Fix}(\sigma)} = n! :
+        \]
+        平均而言，随机置换恰有 \emph{一个}
+        不动点，无论 $n \geq 1$ 为何值。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第二部分 --- 两个递推式与
+该公式的两种新证明。}
+\begin{enumerate}[resume]
+  \item 对 $n \geq 1$，用组合方法证明：
+        \[
+        D_{n+1} = n\,(D_n + D_{n-1}) .
+        \]
+        （设 $\sigma$ 为 $\intint1{n+1}$ 的错排，
+        先按 $j = \sigma(n+1)$ 分类，再按 $\sigma(j) = n + 1$ 是否成立分类；在
+        $\sigma(j) \neq n+1$ 的情形下，构造与
+        $\intint1n$ 的错排之间的双射，方法是把
+        $n + 1$ 的原像改指向 $j$。）用数值检验该递推式直至
+        $D_6$。
+  \item 设 $u_n = D_n - n D_{n-1}$，由第 5 题
+        推出 $u_{n+1} = -u_n$，并得到第二个递推式：
+        \[
+        D_n = n D_{n-1} + (-1)^n \qquad (n \geq 1).
+        \]
+  \item 由第 6 题，用归纳法证明
+        \cref{ex:b1:counting:derangement}中的公式，
+        \[
+        D_n = n! \sum_{k=0}^{n} \frac{(-1)^k}{k!},
+        \]
+        --- 一个完全独立于容斥原理的证明。
+  \item （二项式反演）设 $(a_n)$ 与 $(b_n)$ 为两个
+        数列，使得 $a_n = \sum_{k=0}^n \binom nk b_k$ 对
+        一切 $n$ 成立。证明：
+        \[
+        b_n = \sum_{k=0}^{n} (-1)^{n-k} \binom nk a_k
+        \qquad (n \in \N).
+        \]
+        （先证明 \emph{三项式修正}
+        $\binom nk \binom kj = \binom nj \binom{n-j}{k-j}$，再
+        利用
+        \cref{ex:b1:counting:binomial}中的交错行和。）
+  \item 将第 8 题应用于恒等式 $n! = \sum_k \binom nk
+        D_{n-k}$（见\cref{exo:b1:counting:11}），得到
+        关于 $D_n$ 公式的\emph{第三种}证明。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第三部分 --- 距
+$n!/\eu$ 最近的整数。}本部分承认以下结论（理论在
+\cref{ch:b1:series}中建立）：
+$\eu^{-1} = \lim_{n \to \infty} s_n$，其中 $s_n = \sum_{k=0}^{n}
+\frac{(-1)^k}{k!}$，并有严格的交错级数误差界
+$\abs{\eu^{-1} - s_n} < \frac1{(n+1)!}$ 对所有 $n$ 成立。
+\begin{enumerate}[resume]
+  \item 证明 $\bigl| D_n - n!/\eu \bigr| < \frac1{n+1}$
+        对所有 $n \in \N$ 成立。
+  \item 推出核心结论：\emph{对每个 $n \geq 1$，
+        $D_n$ 是距 $n!/\eu$ 最近的整数}。论证为何需要
+        $n \geq 1$？
+  \item 确定误差的符号：证明 $D_n > n!/\eu$
+        当且仅当 $n$ 为偶数时成立。（请指出
+        交错级数中第一个被舍去的项。）
+  \item 用第 5 问的递推式计算 $D_7$ 至 $D_{10}$，
+        再将 $D_{10}$ 与 $10!/\eu$ 作比较
+        （$10! = 3\,628\,800$，$\eu \approx 2.718281828$）。
+  \item （帽子问题的概率）设 $p_n = D_n/n!$ 为
+        均匀随机置换是错位排列的概率。
+        证明 $\abs{p_n - \eu^{-1}} < \frac1{(n+1)!}$
+        并计算 $p_6$ 精确到小数点后五位。说明为何
+        蒙莫尔问题的答案本质上
+        与 $n$ 无关——甚至只有十二封信时也如此？
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第四部分 --- 不动点的分布。}
+\begin{enumerate}[resume]
+  \item 固定 $k \in \N$，证明：
+        $\intint1n$ 上恰有 $k$ 个不动点的置换所占的比例满足
+        \[
+        \frac{P_k(n)}{n!} = \frac{s_{n-k}}{k!}
+        \;\xrightarrow[n \to \infty]{}\; \frac{\eu^{-1}}{k!} .
+        \]
+        （这些极限值之和为 $1$，构成
+        \emph{泊松分布}（参数为 $1$），是
+        本科二年级分册中概率课程的核心对象。）
+  \item 对三元组 $(\sigma, i, j)$ 作双重计数，其中 $i
+        \neq j$ 均为 $\sigma$ 的不动点，证明
+        $\sum_\sigma \abs{\mathrm{Fix}(\sigma)}\,
+        (\abs{\mathrm{Fix}(\sigma)} - 1) = n!$ 对 $n \geq 2$ 成立。
+        结合第 4 问，$\abs{\mathrm{Fix}}^2$ 的平均值为
+        $2$，故不动点个数的“离散程度”（方差）
+        等于 $1$，
+        与 $n$ 无关，同样与泊松律相吻合。
+  \item 计算具有至少一个
+        不动点的置换所占的比例，对 $n = 4, 5, 6$ 分别给出（以分数形式及
+        精确到小数点后四位），并与 $1 - \eu^{-1} \approx
+        0.6321$ 比较。
+  \item 直接证明（无需用到极限）：$s_{n+2} - s_n
+        = (-1)^{n+1}\bigl(\frac1{(n+1)!} - \frac1{(n+2)!}\bigr)$，
+        并由此推出第 14 问中的概率 $p_n = s_n$
+        呈振荡：$p_0 > p_2 > p_4 > \dots$，且
+        $p_1 < p_3 < p_5 < \dots$，其中偶数项（奇数项）
+        分别单调递减（递增），趋于共同的极限
+        $\eu^{-1}$。
+  \item （秘密圣诞老人）$n$ 个人各从帽子中抽取一个名字；
+        若有人抽到了自己的名字，则\emph{整次}抽取从头重新开始。
+        利用这一常用事实：概率为
+        $p$ 的事件平均需要 $1/p$ 次尝试，
+        估计完成抽取所需的平均次数，
+        由此得出该过程平均约需 $\eu \approx
+        2.72$ 次抽取，基本与
+        $n$ 无关。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第五部分 --- $D_n$ 的算术性质及
+综合分析。}
+\begin{enumerate}[resume]
+  \item 细化第 5 问：证明对固定的 $j \in
+        \intint2n$，$\intint1n$ 中满足
+        $\sigma(1) = j$ 的错位排列个数恰为 $D_{n-1} + D_{n-2}$，
+        与 $j$ 无关。由此推出 $n - 1$ 整除 $D_n$，
+        对每个 $n \geq 2$ 成立。
+  \item 证明 $D_n$ 为奇数当且仅当 $n$ 为偶数。（
+        在第 6 问的递推式中取模 $2$ 考虑。）
+  \item 证明 $D_n \equiv (-1)^n \pmod n$ 对 $n \geq 1$ 成立，
+        并就 $D_{10}$ 的末位数字检验该同余式。
+  \item 由第 6 问证明 $\dfrac{D_n}{D_{n-1}} = n +
+        \dfrac{(-1)^n}{D_{n-1}}$，对 $n \geq 3$ 成立，于是相邻错位数之比
+        \emph{几乎恰好}为
+        $n$；用一句话说明为何此结果与
+        $D_n \approx n!/\eu$ 相符。
+  \item 本题究竟在何处用到了：（i）乘法法则与
+        加法法则；（ii）双重计数；（iii）二项式
+        定理；（iv）所承认的交错级数误差界？请
+        每项各用一句话回答。
+  \item 综合分析。$D_n$ 的公式现有三种证明（容斥原理、递推式与归纳法、
+        二项式反演）。试用一段短文比较各种证明
+        所\emph{解释}的内容：哪一种计算最快，
+        哪一种可推广到其他不动点个数的情形，
+        哪一种揭示了
+        $\eu$ 为何会出现在信封问题中。
+\end{enumerate}
+\end{problem}

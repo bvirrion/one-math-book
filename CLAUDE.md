@@ -63,7 +63,7 @@ pushing is the local log.
 - `styles/onemath.sty` — **the only place** packages are loaded and
   macros/environments defined. Chapter files never `\usepackage` or
   `\newcommand`. Language UI strings live in `styles/lang/<lang>.tex`.
-- `styles/lang/<lang>.tex` (`en`, `fr`, `nl`, `es`, `pt`, `hi`, `ar`, `id`) —
+- `styles/lang/<lang>.tex` (`en`, `fr`, `nl`, `es`, `pt`, `hi`, `ar`, `id`, `zh`) —
   theorem titles, solution headers, cover strings, part titles
   (`\omstr{part.grade1}` … `part.grade12`).
 - Language-aware content paths:
@@ -110,6 +110,29 @@ declares no shorthands and no command redefinitions), but it does need
 `tools/check_indonesian_prose.py` — see the warning under *Verify a
 translation* below. Its edition identity, glossary and traps live in
 `../indonesian_style_card.md`.
+
+**Simplified Chinese (`zh`, all five books, 2026-11-17) is the reference for a
+CJK language.** Pilot tier (88/100 each, sampled, not read in full; Haiku 5.5
+per section, one Opus 5.5 coordinator), run file
+`sources/TRANSLATION_BOOKS_1-5_ZH.md`, score files `translation_scores/book_N/zh/`.
+What it needed that no other edition did:
+
+- XeLaTeX + xeCJK, Fandol fonts from TeX Live (Song, Kai as the italic so
+  `\emph` terms show, Hei sans) — the `zh` block at the end of
+  `styles/onemath.sty`; `latexmkrc` sends `_zh` to XeLaTeX and the index to
+  `upmendex` with `styles/zh-pinyin.ist` (pinyin order, no sort keys in the
+  sources; an empty `.idx` is tolerated).
+- The term linker's CJK mode (`tools/term_config/lang_zh.py`, `CJK = True`):
+  no word boundary inside Han text, terms of at least 2 characters (a
+  one-character term — 秩, 核, 环 — sits inside too many compounds and is never
+  linked), no space between two Han characters in a key. Index-only terms need
+  a space to be harvested, which no Chinese key has: declare them in `EXTRA`.
+  Words that are substrings of other terms (收敛, 交错, 代数, 方程) go in `DROP`.
+- `tools/check_chinese_prose.py` (gate 9 for `zh`): Latin words in visible
+  text, ASCII punctuation next to Han, spaces inside inline math.
+- `tools/zh_sweeps.py <year> --fix`: `——` for ` --- `, curly quotes, a space
+  before a table row's `\\` after Han ("Improper alphabetic constant" in
+  `tabular`), `！` back to `!` in index keys, 第三部分 for 第 III 部分.
 
 PDFs: `build/one_math_book_<N>_<slug>[_<lang>].pdf`.
 

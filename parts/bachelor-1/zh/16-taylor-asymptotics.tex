@@ -1,0 +1,899 @@
+\chapter{泰勒公式与渐近展开}\label{ch:b1:taylor}
+
+在一点附近，光滑函数与\omterm{def:b1:poly:def}{多项式}一样好——误差
+可以控制。泰勒公式以三种形式使这一点精确化
+（\omterm{thm:b1:integration:def}{积分}型余项、拉格朗日型余项、杨型余项），
+并由此得到的\emph{渐近展开}经代数运算后，
+成为初等分析中最锐利的工具：
+求极限、判定等价、研究局部行为与渐近线。
+
+\section{比较记号}
+
+\begin{definition}[兰道记号]\label{def:b1:taylor:landau}
+设 $f, g$ 在 $x_0$ 附近有定义（$x_0 \in \R$ 或 $\pm\infty$）。
+当 $x \to x_0$ 时，记作：\index{兰道记号}
+\begin{itemize}
+  \item $f = o(g)$（“小 o”），若 $f = \varepsilon g$，其中
+        $\varepsilon(x) \to 0$；
+  \item $f = O(g)$（“大 O”），若 $f = u g$，其中
+        $u$ 在 $x_0$ 附近有界；
+  \item $f \sim g$（“等价”\index{等价函数}），若
+        $f = (1 + \varepsilon) g$，其中 $\varepsilon \to 0$——
+        亦即 $f - g = o(g)$。
+\end{itemize}
+同样的记号也适用于数列（$n \to \infty$）。
+\end{definition}
+
+\begin{proposition}[运算法则]\label{prop:b1:taylor:landaurules}
+当 $x \to x_0$ 时：
+\begin{enumerate}
+  \item $\sim$ 是\omterm{def:b1:logic:equiv}{等价关系}；$f \sim g$ 蕴含
+        $f$ 与 $g$ 有相同的极限、相同的符号（在 $x_0$ 附近），
+        并且均无零点；
+  \item 等价可\emph{相乘、相除}：$f_1 \sim g_1$，$f_2
+        \sim g_2$ 蕴含 $f_1 f_2 \sim g_1 g_2$ 及 $\frac{f_1}{f_2}
+        \sim \frac{g_1}{g_2}$；
+  \item 等价\emph{不能}相加：$x + 1 \sim x$ 与 $-x \sim
+        -x + 2$（在 $+\infty$ 时），然而它们的和 $1$ 与 $2$ 并不
+        等价。若要相加，须回到
+        带显式 $o(\cdot)$ 项的展开式；
+  \item $o(g) + o(g) = o(g)$，$\;u \cdot o(g) = o(ug)$，$\;o(o(g)) =
+        o(g)$，以及 $f \sim g \iff f = g + o(g)$。
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+每一条都只是对定义的简单运算；例如
+$f_1 f_2 = (1+\varepsilon_1)(1+\varepsilon_2) g_1 g_2$，且 $(1 +
+\varepsilon_1)(1+\varepsilon_2) \to 1$。（4）中有两条值得
+单独说明。$u\cdot o(g) = o(ug)$：若 $f = \varepsilon g$，其中
+$\varepsilon \to 0$，则 $uf = \varepsilon\,(ug)$，且所取的
+$\varepsilon$ 不变。$o(o(g)) = o(g)$：若 $f = \varepsilon_1 h$ 且
+$h = \varepsilon_2 g$，且 $\varepsilon_i \to 0$ 均成立，则 $f =
+(\varepsilon_1\varepsilon_2) g$，而两个无穷小之积
+仍是无穷小。$f \sim g \iff f = g +
+o(g)$ 不过是把定义重读一遍：$f - g = \varepsilon g$。
+（3）中的反例即是（3）的证明。
+\end{proof}
+
+\begin{example}[比较阶梯]\label{ex:b1:taylor:scale}
+当 $x \to +\infty$ 时，标准阶梯按
+增长强度递增的次序排列：
+\[
+1 \;=\; o(\ln x), \quad
+\ln x = o(x^{0.01}), \quad
+x^{0.01} = o(\sqrt x), \quad
+\sqrt x = o(x^{10}), \quad
+x^{10} = o(\eu^{x}), \quad
+\eu^x = o(\eu^{2x}) ,
+\]
+每一步都是
+\cref{prop:b1:functions:powerrules} 中\omterm{prop:b1:functions:powerrules}{增长比较}的实例（幂胜过对数，
+指数胜过幂，同一族中由指数决定大小）。值得养成的两个习惯：
+其一，落入更小类的 $O(\cdot)$ 会悄然
+升级（$O(\ln x)$ 也是
+$o(x^{0.01})$）；其二，当 $x \to 0^+$ 时，整个阶梯
+通过代换 $x \mapsto \frac1x$ 而反转——
+在那里 $\ln x = o(x^{-0.01})$，因此“$x^\alpha \ln x \to 0$”
+对每个 $\alpha > 0$ 都成立。把握好这一阶梯，便完成了
+每一个渐近论证的一半，在
+\cref{ch:b1:series}中。
+\end{example}
+
+\begin{example}[展开式的唯一性与奇偶性的附带收获]\label{ex:b1:taylor:uniqueness}
+若函数在 $0$ 处有两个同阶的展开式，
+\[
+a_0 + a_1 x + \dots + a_n x^n + o(x^n)
+= b_0 + b_1 x + \dots + b_n x^n + o(x^n),
+\]
+则 $a_k = b_k$ 对每个 $k$ 成立：作差并记 $c_k =
+a_k - b_k$，在恒等式 $c_0 + c_1 x + \dots + c_n x^n
+= o(x^n)$ 中令 $x \to 0$，得 $c_0 = 0$；再除以 $x$，并
+重复此过程——（每一次除法都是合法的，因为剩余的式子
+仍是 $o(x^{n-k})$。因此系数是
+本质确定的，可以用\emph{任何}途径计算它们（泰勒导数、
+已知展开式的代数运算、\omterm{thm:b1:integration:def}{积分}）：所有途径
+所得结果必然一致。奇偶性的附带收获：\emph{偶}函数的展开式中
+只含偶次幂——将 $x$ 换成 $-x$，并利用唯一性；
+奇函数同理只含奇次幂。这正是
+$\cos$ 的展开式取 $o(x^{2p+1})$ 而非 $o(x^{2p})$ 的缘故，
+见下表：缺失的奇次项是白送的信息，
+即不费力地多得一阶精度。
+\end{example}
+
+\section{三种泰勒公式}
+
+\begin{theorem}[积分型余项的泰勒公式]\label{thm:b1:taylor:integral}
+设 $f$ 属于 $C^{n+1}$ 类，且定义在包含 $a$ 与 $x$ 的\omterm{prop:b1:reals:intervals}{区间}上。
+则\index{泰勒公式}
+\[
+f(x) = \sum_{k=0}^{n} \frac{f^{(k)}(a)}{k!}\,(x - a)^k
++ \int_a^x \frac{(x - t)^n}{n!}\, f^{(n+1)}(t)\, \dd t .
+\]
+\end{theorem}
+
+\begin{proof}
+对 $n$ 用归纳法。当 $n = 0$ 时，$f(x) = f(a) + \int_a^x f'(t)\dd t$ 即
+微\omterm{thm:b1:integration:def}{积分}基本定理（\cref{thm:b1:integration:ftc}）。归纳步骤：
+对余项\omterm{thm:b1:integration:parts}{分部积分}，
+\[
+\int_a^x \frac{(x-t)^n}{n!} f^{(n+1)}(t)\,\dd t
+= \Bigl[-\frac{(x-t)^{n+1}}{(n+1)!} f^{(n+1)}(t)\Bigr]_a^x
++ \int_a^x \frac{(x-t)^{n+1}}{(n+1)!} f^{(n+2)}(t)\,\dd t ,
+\]
+其中方括号项贡献出项 $\frac{f^{(n+1)}(a)}{(n+1)!}(x -
+a)^{n+1}$。
+\end{proof}
+
+\begin{example}[精确展开及其余项]\label{ex:b1:taylor:lnexact}
+对 $\ln(1 + x)$，\omterm{thm:b1:integration:def}{积分}型余项可以完全显式地
+写出，无需对任何函数求 $n$ 次导数：将有限几何恒等式
+$\frac{1}{1+t} =
+\sum_{k=0}^{n-1}(-t)^k + \frac{(-t)^n}{1+t}$ 从 $0$ 到 $x$ \omterm{thm:b1:integration:def}{积分}：
+\[
+\ln(1 + x) = \sum_{k=1}^{n} \frac{(-1)^{k-1}x^k}{k}
++ (-1)^n \int_0^x \frac{t^n}{1 + t}\,\dd t ,
+\]
+当 $0 \leq x \leq 1$ 时，余项的界为 $\int_0^x
+t^n\,\dd t = \frac{x^{n+1}}{n+1}$。这一结果比
+泰勒–杨公式更强，主要体现在两方面：其一，它是一个\emph{恒等式}，对固定的
+$x$（不仅限于 $x \to 0$）成立，而误差界是数值的。
+周末问题（\cref{pb:b1:taylor:1}）依赖于这类精确形式，
+下文的泰勒–杨公式是求极限时更轻便的工具，
+此时只需关心误差的形状。
+\end{example}
+
+\begin{theorem}[泰勒–拉格朗日不等式]\label{thm:b1:taylor:lagrange}
+设 $f$ 属于 $C^{n+1}$ 类，且 $\abs{f^{(n+1)}} \leq M$ 在
+$a$ 与 $x$ 之间成立。则
+\[
+\Bigl| f(x) - \sum_{k=0}^{n} \frac{f^{(k)}(a)}{k!}(x-a)^k \Bigr|
+\leq M\, \frac{\abs{x - a}^{n+1}}{(n+1)!} .
+\]
+\end{theorem}
+
+\begin{proof}
+估计\omterm{thm:b1:integration:def}{积分}型余项：$\bigl|\int_a^x \frac{(x-t)^n}{n!}
+f^{(n+1)}(t)\,\dd t\bigr| \leq M \bigl|\int_a^x
+\frac{\abs{x-t}^n}{n!}\dd t\bigr| = M\frac{\abs{x-a}^{n+1}}{(n+1)!}$。
+\end{proof}
+
+\begin{example}[有保证的数值计算]\label{ex:b1:taylor:certified}
+$\sqrt{1.02}$ 是多少？对函数 $f(t) =
+\sqrt{1 + t}$，取 $a = 0$、阶数 $2$、$x = 0.02$，应用泰勒–拉格朗日公式：
+\[
+\sqrt{1.02} \approx 1 + \frac{0.02}{2} - \frac{0.02^2}{8}
+= 1.00995 ,
+\qquad
+\abs{f'''(t)} = \frac{3}{8}(1+t)^{-5/2} \leq \frac 38 ,
+\]
+于是误差至多为 $\frac38 \cdot \frac{0.02^3}{6} =
+5\cdot10^{-7}$，因此 $\sqrt{1.02} = 1.00995$ 的六位
+小数均有保证（真值为 $1.0099504938\dots$——该界几乎
+最优）。关键在于，泰勒–杨公式只说明\emph{误差趋于零的
+速度}，而泰勒–拉格朗日公式把同一\omterm{def:b1:poly:def}{多项式}
+转化为一份\emph{凭证}：一个数
+连同一个经证明的误差界。本书中凡给出小数结论之处，背后
+都有一个拉格朗日型误差界作为支撑；周末问题
+（\cref{pb:b1:taylor:1}）使这一思想规模化。
+\end{example}
+
+\begin{theorem}[泰勒–杨公式]\label{thm:b1:taylor:young}
+设 $f$ 为 $n$ 次\omterm{def:b1:derivative:def}{可导}（于 $a$ 点）的函数。则当 $x \to a$ 时：
+\[
+f(x) = \sum_{k=0}^{n} \frac{f^{(k)}(a)}{k!}\,(x-a)^k
++ o\bigl((x-a)^n\bigr) .
+\]
+\end{theorem}
+
+\begin{proof}
+对 $n$ 归纳。当 $n = 1$ 时，这即是
+导数的定义（\cref{def:b1:derivative:def}）。假设结论对
+$n - 1$ 阶成立，并设 $f$ 为 $n$ 次\omterm{def:b1:derivative:def}{可导}（于 $a$ 点）的函数。对
+$f'$ 应用归纳假设（它为 $n-1$ 次\omterm{def:b1:derivative:def}{可导}，
+在 $a$ 处）：
+\[
+f'(t) = \sum_{k=0}^{n-1} \frac{f^{(k+1)}(a)}{k!}(t-a)^k + r(t),
+\qquad r(t) = o\bigl((t-a)^{n-1}\bigr).
+\]
+令 $g(x) = f(x) - \sum_{k=0}^{n} \frac{f^{(k)}(a)}{k!}(x-a)^k$，则
+$g' = r$，且 $g(a) = 0$。给定 $\varepsilon > 0$，取 $\delta$
+使 $\abs{r(t)} \leq \varepsilon\abs{t - a}^{n-1}$ 对 $\abs{t-a}
+\leq \delta$ 成立；由均值不等式
+（\cref{thm:b1:derivative:mvt}）应用于从 $a$ 到
+$x$ 的线段（此时 $\abs{g'} \leq \varepsilon\abs{x-a}^{n-1}$），得
+$\abs{g(x)} \leq \varepsilon\abs{x - a}^n$，即 $g(x) =
+o((x-a)^n)$。
+\end{proof}
+
+\begin{remark}[三种公式，三种代价，三种成果]
+假设的强弱与结论的强弱恰好对应。
+泰勒–杨公式要求最少（仅需 $n$ 次导数\emph{在该
+点}处），结论也最弱：定性的 $o((x-a)^n)$，
+适合求极限，对有保证的数字则毫无用处。拉格朗日
+不等式要求\emph{在\omterm{prop:b1:reals:intervals}{区间}上}属于 $C^{n+1}$ 类，并
+在其上以 $M$ 为界，给出数值误差界。\omterm{thm:b1:integration:def}{积分}型
+余项对光滑性的要求相同，却给出最多的信息：误差本身成为一个
+可以加以变形（\omterm{thm:b1:integration:parts}{分部积分}、分段估计、变量代换）的显式对象
+——这正是驱动
+\cref{pb:b1:integration:1} 中“无理性机器”的那种形式。选择
+能支撑目标的最弱公式，并非吹毛求疵：
+\cref{pb:b1:taylor:1} 中的平坦函数在每一阶上都满足泰勒–杨公式，
+而关于它的任何更强结论
+在远离 $0$ 处都不成立。
+\end{remark}
+
+\begin{proposition}[$0$ 处的标准展开式]
+当 $x \to 0$ 时，对每个固定的阶数 $n$：
+\index{泰勒展开!标准}
+\begin{align*}
+\eu^x &= 1 + x + \frac{x^2}{2!} + \dots + \frac{x^n}{n!} + o(x^n),\\
+\cos x &= 1 - \frac{x^2}{2!} + \frac{x^4}{4!} - \dots
++ \frac{(-1)^p x^{2p}}{(2p)!} + o(x^{2p+1}),\\
+\sin x &= x - \frac{x^3}{3!} + \dots + \frac{(-1)^p
+x^{2p+1}}{(2p+1)!} + o(x^{2p+2}),\\
+\frac{1}{1 - x} &= 1 + x + x^2 + \dots + x^n + o(x^n),\\
+\ln(1 + x) &= x - \frac{x^2}{2} + \frac{x^3}{3} - \dots +
+\frac{(-1)^{n-1} x^n}{n} + o(x^n),\\
+(1 + x)^\alpha &= 1 + \alpha x + \frac{\alpha(\alpha-1)}{2!}x^2 +
+\dots + \binom{\alpha}{n} x^n + o(x^n),
+\end{align*}
+其中 $\binom{\alpha}{n} = \frac{\alpha(\alpha - 1)\cdots(\alpha - n
++ 1)}{n!}$ 对实数 $\alpha$ 成立。（$\cosh$ 与 $\sinh$ 的展开式，分别与 $\cos$、
+$\sin$ 相同，只是去掉交替符号。）
+\label{prop:b1:taylor:standard}
+\end{proposition}
+
+\begin{proof}
+各函数在 $0$ 附近光滑，其导数易于计算：
+$(\eu^x)^{(k)} = \eu^x$；$\sin$ 与 $\cos$ 的导数
+以 $4$ 为周期循环；$\bigl((1+x)^\alpha\bigr)^{(k)} = \alpha(\alpha -
+1)\cdots(\alpha - k + 1)(1+x)^{\alpha - k}$；
+$\bigl(\ln(1+x)\bigr)^{(k)} = \frac{(-1)^{k-1}(k-1)!}{(1+x)^k}$。
+在 $a = 0$ 处应用泰勒–杨公式。（等比级数的情形是精确的：
+$\frac{1}{1-x} - \sum_0^n x^k = \frac{x^{n+1}}{1 - x} = o(x^n)$。）
+\end{proof}
+
+\begin{method}[利用展开式计算]\label{met:b1:taylor:compute}
+\begin{enumerate}
+  \item \emph{先确定目标阶数} $n$，并将每个中间结果都截断到该阶
+——保留更高阶的项是白费功夫，
+        丢掉低阶的项则是错误。
+  \item \emph{和与积}：将每个因子展开到 $n$ 阶，
+        相乘后舍去高于 $x^n$ 的项。
+  \item \emph{复合} $f(u(x))$，其中 $u(x) \to 0$：
+        把 $u$ 的展开式代入 $f$ 的展开式，逐阶进行。
+  \item \emph{商}：写成 $\frac{1}{1 + v}$，其中 $v \to 0$，
+        并利用等比级数的展开式。
+  \item \emph{逐项\omterm{thm:b1:integration:def}{积分}}展开式（求导需要更加小心——理由：
+        $o(t^n)$ 从 $0$ 到 $x$ 的\omterm{thm:b1:integration:def}{积分}
+        为 $o(x^{n+1})$，可直接放缩得到）。
+\end{enumerate}
+\end{method}
+
+\begin{example}[复合，并列出逐阶计算]\label{ex:b1:taylor:esin}
+将 $\eu^{\sin x}$ 展开到 $3$ 阶。内层函数为 $u = \sin x
+= x - \frac{x^3}{6} + o(x^3)$，它确实趋于 $0$。外层函数为
+$\eu^u = 1 + u + \frac{u^2}{2} + \frac{u^3}{6} + o(u^3)$，并且
+$o(u^3) = o(x^3)$，因为 $u \sim x$。取 $u$ 的各次幂，并截断到
+$x^3$ 为止：
+\[
+u^2 = x^2 + o(x^3), \qquad u^3 = x^3 + o(x^3)
+\]
+（交叉项 $2x\cdot(-\frac{x^3}{6})$ 已是 $x^4$ 阶。）
+合并：
+\[
+\eu^{\sin x} = 1 + \Bigl(x - \frac{x^3}{6}\Bigr) + \frac{x^2}{2}
++ \frac{x^3}{6} + o(x^3)
+= 1 + x + \frac{x^2}{2} + o(x^3) :
+\]
+两个 $x^3$ 的贡献恰好抵消。最后值得注意的是：
+$\eu^{\sin x}$ 与 $\eu^x$ 直到 $3$ 阶都相同——并非
+由于 $\sin x \approx x$ 只是粗略的近似，而是因为
+指数的第一处不一致（$-\frac{x^3}{6}$）进入，
+以 $\eu^0 = 1$ 为因子，随后与外层指数的三次项
+相遇；逐阶的计算能够发现这类巧合，
+而目测从来做不到。（下一项为
+$-\frac{x^4}{8}$，这种一致在 $4$ 阶即告结束。）
+\end{example}
+
+\begin{example}\label{ex:b1:taylor:tan}
+求 $\tan$ 的 $5$ 阶展开。写 $\tan x =
+\sin x \cdot \frac{1}{\cos x}$：
+\[
+\frac{1}{\cos x} = \frac{1}{1 - \bigl(\frac{x^2}{2} - \frac{x^4}{24}
++ o(x^5)\bigr)}
+= 1 + \Bigl(\frac{x^2}{2} - \frac{x^4}{24}\Bigr)
++ \Bigl(\frac{x^2}{2}\Bigr)^{\!2} + o(x^5)
+= 1 + \frac{x^2}{2} + \frac{5x^4}{24} + o(x^5),
+\]
+于是
+\[
+\tan x = \Bigl(x - \frac{x^3}{6} + \frac{x^5}{120}\Bigr)
+\Bigl(1 + \frac{x^2}{2} + \frac{5x^4}{24}\Bigr) + o(x^5)
+= x + \frac{x^3}{3} + \frac{2x^5}{15} + o(x^5) .
+\]
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}[x=1.15cm, y=1.05cm]
+  \draw[-Stealth] (-3.5,0) -- (3.6,0) node[below, font=\small]
+    {$x$};
+  \draw[-Stealth] (0,-2.15) -- (0,2.2);
+  \draw (3.1416,-0.05) -- (3.1416,0.05)
+    node[below=3pt, font=\small] {$\pi$};
+  \draw (-3.1416,-0.05) -- (-3.1416,0.05)
+    node[below=3pt, font=\small] {$-\pi$};
+  \draw (-0.05,1) -- (0.05,1) node[above left, font=\small,
+    inner sep=1pt] {$1$};
+  \draw (-0.05,-1) -- (0.05,-1) node[below right, font=\small,
+    inner sep=1pt] {$-1$};
+  \draw[omThm, very thick, smooth]
+    plot[domain=-3.3:3.3, samples=120] (\x, {sin(\x r)});
+  \draw[omDef, thick]
+    plot[domain=-2.0:2.0] (\x, \x)
+    node[right, font=\small] {$T_1$};
+  \draw[omDef, thick, dashed, smooth]
+    plot[domain=-2.7:2.7, samples=80] (\x, {\x - \x^3/6})
+    node[below right, font=\small, inner sep=1pt] {$T_3$};
+  \draw[omDef, thick, dotted, smooth]
+    plot[domain=-3.25:3.25, samples=90]
+    (\x, {\x - \x^3/6 + \x^5/120})
+    node[above right, font=\small, inner sep=1pt] {$T_5$};
+\end{tikzpicture}
+
+{\small 正弦曲线（深色）与其在 $0$ 处的泰勒\omterm{def:b1:poly:def}{多项式}：
+$T_1 = x$，$T_3 = x - \frac{x^3}{6}$（虚线），$T_5 = x -
+\frac{x^3}{6} + \frac{x^5}{120}$（点线）。每新增一对项，
+便能在明显更宽的范围内紧贴曲线，但每个\omterm{def:b1:poly:def}{多项式}
+最终都会偏离曲线：泰勒展开是一种\emph{局部}
+的约定，在 $0$ 处精确，远处则无话可说。
+泰勒–拉格朗日余项估计 $\frac{\abs{x}^{n+1}}{(n+1)!}$ 量化了这一范围；
+\cref{pb:b1:taylor:1}中的平坦函数表明，
+这一约定甚至可在该点本身之外毫无内容。}
+\end{omfigure}
+
+\section{应用}
+
+\begin{example}[极限]\label{ex:b1:taylor:limits}
+\[
+\lim_{x \to 0} \frac{x - \sin x}{x^3}:
+\qquad
+x - \sin x = \frac{x^3}{6} + o(x^3) \sim \frac{x^3}{6},
+\qquad\text{故极限为 } \frac16
+\]
+——解决了\cref{exo:b1:functions:9}中提出的问题。
+类似地，$\displaystyle\lim_{x\to0}\Bigl(\frac{\sin
+x}{x}\Bigr)^{1/x^2}$：其对数为
+\[
+\frac{1}{x^2}\ln\Bigl(1 - \frac{x^2}{6} + o(x^2)\Bigr)
+= \frac{1}{x^2}\Bigl(-\frac{x^2}{6} + o(x^2)\Bigr)
+\longrightarrow -\frac16,
+\qquad\text{极限 } \eu^{-1/6}.
+\]
+\end{example}
+
+\begin{remark}[展开中的常见误区]
+(i) \emph{切勿对等价无穷小作加减}：由 $\tan x \sim
+x$ 与 $\sin x \sim x$，\emph{不能}推出 $\tan x -
+\sin x \sim 0$（无意义）——稳妥的做法是
+利用展开式：
+\[
+\tan x - \sin x
+= \Bigl(x + \frac{x^3}{3}\Bigr) - \Bigl(x - \frac{x^3}{6}\Bigr)
++ o(x^3) = \frac{x^3}{2} + o(x^3) \sim \frac{x^3}{2} .
+\]
+(ii) \emph{越过相消处继续展开}：在同一计算中，
+阶 $1$ 只看到 $x - x = 0$；每当首项相消，
+须提高阶数，直至某个非零系数留存下来，并且只有
+此时才可转回等价无穷小。(iii) \emph{等价无穷小不能
+穿过指数运算}：$n^2 + n \sim n^2$，但
+$\eu^{n^2+n} = \eu^{n}\,\eu^{n^2}$ \emph{并不}等价于
+$\eu^{n^2}$——只对\emph{指数的展开式
+}取指数，其误差须趋于 $0$；绝不对指数的
+等价无穷小取指数。（对数更为稳妥：若 $u_n \sim v_n \to \ell \neq
+1$，$\ell > 0$，则 $\ln u_n \sim \ln v_n$。）(iv) \emph{
+$o(\cdot)$ 的运算是单向的}：$o(x^2) + o(x^2) =
+o(x^2)$，$5\,o(x^2) = o(x^2)$，$x\cdot o(x^2) = o(x^3)$——但
+一个 $o(x^2)$ 并非具体的函数，故绝不能将其中两个
+相互抵消：$o(x^2) - o(x^2)$ 为 $o(x^2)$，而非
+$0$。
+\end{remark}
+
+\begin{proposition}[局部性态]\label{prop:b1:taylor:local}
+设 $f(x) = f(a) + c\,(x - a)^p + o\bigl((x-a)^p\bigr)$，其中 $c
+\neq 0$（常数项之后的第一个非零项；在
+临界点处 $p \geq 2$）。
+\begin{itemize}
+  \item 若 $p$ 为偶数，则 $f$ 在 $a$ 处当 $c > 0$ 时取局部极小值，
+        当 $c < 0$ 时取局部极大值。
+  \item 若 $p$ 为奇数，则无极值（$f - f(a)$ 变号）；
+        若此外展开式从线性项 $f'(a)(x
+        - a)$ 之后开始，则图像穿过其切线：\emph{拐点}。
+\end{itemize}
+\end{proposition}
+
+\begin{proof}
+在 $a$ 附近，$f(x) - f(a) = (x-a)^p\bigl(c + o(1)\bigr)$ 与
+$c\,(x-a)^p$ 同号：$p$ 为偶数时符号不变，$p$ 为奇数时符号改变。
+\end{proof}
+
+\begin{example}[指数须展开到 $o(1)$]\label{ex:b1:taylor:expdiscipline}
+求 $u_n = \bigl(1 + \frac1n\bigr)^{n^2}$ 的一个等价式。
+将\emph{指数}展开，直至其误差趋于 $0$：
+\[
+n^2 \ln\Bigl(1 + \frac1n\Bigr)
+= n^2\Bigl(\frac1n - \frac{1}{2n^2} +
+O\Bigl(\frac{1}{n^3}\Bigr)\Bigr)
+= n - \frac12 + O\Bigl(\frac1n\Bigr),
+\]
+于是 $u_n = \eu^{\,n - 1/2}\,\eu^{O(1/n)}$，其中 $\eu^{O(1/n)} \to
+1$:
+\[
+u_n \;\sim\; \eu^{\,n - \frac12} .
+\]
+注意，若处理欠细致，将指数停在
+$n^2\cdot\frac1n = n + O(1)$ 处，便留下一个
+$\eu^{O(1)}$ 因子——有界但不趋于 $1$——以致
+无法断言任何等价式。上述误区的规则
+用正面表述即为：$\eu^{a_n}$ 的等价式
+需要把 $a_n$ 展开，\emph{直至一项
+趋于零}，之前的每个系数都须
+精确保留。
+\end{example}
+
+\begin{example}[平坦临界点的分类]\label{ex:b1:taylor:flatmin}
+研究 $f(x) = \cos x + \frac{x^2}{2}$ 在 $0$ 附近的情形。$f'(0) =
+0$ 及 $f''(0) = -\cos 0 + 1 = 0$：二阶导数判别法
+失效。改用展开：
+\[
+f(x) = \Bigl(1 - \frac{x^2}{2} + \frac{x^4}{24} +
+o(x^4)\Bigr) + \frac{x^2}{2}
+= 1 + \frac{x^4}{24} + o(x^4) :
+\]
+首个非零项为 $c\,x^p$，其中 $p = 4$ 为偶数，且 $c =
+\frac{1}{24} > 0$：局部极小值，平坦程度非同寻常（图像
+离开极小值的方式类似 $x^4$，而非 $x^2$）。结论性的要点是：
+展开式一行即可看出反复求导所掩盖的
+东西，而\cref{prop:b1:taylor:local}是
+由“首个留存项”通往
+“局部形态”的系统对照表。
+\end{example}
+
+\begin{example}[无穷远处的展开]\label{ex:b1:taylor:atinfinity}
+两个计算，其中变量趋于 $+\infty$，
+代换 $h = \frac1x \to 0^+$ 引入整套工具。
+首先，
+\[
+x - x^2\ln\Bigl(1 + \frac1x\Bigr)
+= x - x^2\Bigl(\frac1x - \frac{1}{2x^2} +
+O\Bigl(\frac{1}{x^3}\Bigr)\Bigr)
+= \frac12 + O\Bigl(\frac1x\Bigr) \longrightarrow \frac12 .
+\]
+其次，无穷远处的\omterm{def:b1:functions:arc}{反正切}：由 $\arctan x +
+\arctan\frac1x = \frac\pi2$ 当 $x > 0$ 时
+（\cref{prop:b1:functions:arcidentities}）及
+$\arctan$ 在 $0$ 处的展开（\cref{exo:b1:taylor:3}），
+\[
+\arctan x = \frac\pi2 - \arctan\frac1x
+= \frac\pi2 - \frac1x + \frac{1}{3x^3} +
+o\Bigl(\frac{1}{x^3}\Bigr) :
+\]
+图像自下方逼近其渐近线 $y = \frac\pi2$，
+速度为 $\frac1x$。要点是：无穷远处的展开
+并无单独的理论——只需一次倒数代换，
+便可将其化为 $0$ 处的展开，前提是每个中间的
+$O$ 与 $o$ 都要如实保留。
+\end{example}
+
+\begin{example}[用展开求渐近线]\label{ex:b1:taylor:asymptote}
+当 $x \to +\infty$ 时，
+\[
+\sqrt{x^2 + x} = x\sqrt{1 + \tfrac1x}
+= x\Bigl(1 + \frac{1}{2x} - \frac{1}{8x^2} + o\bigl(\tfrac{1}{x^2}\bigr)\Bigr)
+= x + \frac12 - \frac{1}{8x} + o\bigl(\tfrac 1x\bigr):
+\]
+直线 $y = x + \frac12$ 为一条渐近线，\emph{从
+下方}逼近（后一项 $-\frac{1}{8x}$ 为负）。
+\end{example}
+
+\begin{remark}[展开的后续应用]
+渐近展开是本书其余部分通用的语言；
+在\cref{ch:b1:series}中，它们决定收敛性
+（等价量供给比较判别法，而 $\sum
+\frac{1}{n^\alpha}$ 的研究实为伪装的展开）；在本科二年级
+分册中，它们变为\emph{幂级数}，其中泰勒\omterm{def:b1:poly:def}{多项式}
+获得无穷多项，并具有
+收敛半径；物理中的每一种线性化——单摆、
+一阶微扰等——都是 泰勒–杨 形式的陈述，其中
+$o(\cdot)$ 被默默略去。值得牢记的一条提醒是：
+展开仅在\emph{某一点附近}刻画函数——
+参见周末问题中的平坦函数，其在
+$0$ 处的展开恒等于零，而函数本身并非如此。
+\end{remark}
+
+\begin{remark}[本册内的展望]
+展开是本册余下分析的工作语言，
+以及今后几何的工作语言。\Cref{ch:b1:series}将它们转化为收敛性判断：
+通项的等价量即为
+截断于首项的展开，而更精细的判别法
+（如带误差控制的交错判别法）同样用到第二项。
+\Cref{ch:b1:curves}由两个坐标函数的展开读出局部几何：
+参数曲线在一点处是穿过、相切还是出现尖点，
+由 $t$ 的哪些幂次
+在 $x(t)$ 与 $y(t)$ 中留存所决定——这是
+\cref{prop:b1:taylor:local}的平面版本。而\cref{ch:b1:multivar}
+刻意停在一阶：切平面是双变量的
+泰勒–杨 陈述，完整的二阶理论
+（海森矩阵、鞍点）留待本科二年级分册。
+贯穿本书的共同线索是：每一个“局部”问题，
+都可通过写出展开式中第一个留存的项来回答。
+\end{remark}
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:b1:taylor:1}
+求下列函数在 $0$ 处的展开：$\eu^{2x}$ 展开到 $3$ 阶；
+$\;\ln(1 - x)$ 展开到 $4$ 阶；$\;\sqrt{1 + x}$ 展开到 $3$ 阶；
+$\;\dfrac{1}{1 + x^2}$ 展开到 $6$ 阶。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:taylor:2}
+求下列极限：
+\[
+\lim_{x\to 0} \frac{\eu^x - 1 - x}{x^2},
+\qquad
+\lim_{x\to 0} \frac{\cos x - \sqrt{1 - x^2}}{x^4},
+\qquad
+\lim_{x\to 0} \frac{\ln(1+x) - \sin x}{x^2}.
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:taylor:3}
+求 $\arctan x$ 在 $0$ 处精确到 $5$ 阶的展开，
+可对 $\frac{1}{1 + x^2}$ 的展开式逐项\omterm{thm:b1:integration:def}{积分}；求 $\arcsin x$ 精确到 $5$ 阶的展开，
+可对 $(1 - x^2)^{-1/2}$ 的展开式逐项\omterm{thm:b1:integration:def}{积分}。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:taylor:4}
+利用 $\exp$ 在 $\intcc{0}{1}$ 上的 泰勒–拉格朗日 公式，证明
+\[
+\Bigl| \eu - \sum_{k=0}^{n} \frac{1}{k!} \Bigr| \leq
+\frac{3}{(n+1)!},
+\]
+并确定一个 $n$，保证以 $6$ 位小数精确地求得 $\eu$。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:taylor:5}
+将下式展开到 $2$ 阶（变量为 $\frac1n$），并由此推出极限与
+收敛速度：
+\[
+\Bigl(1 + \frac 1n\Bigr)^{\!n}
+= \eu\Bigl(1 - \frac{1}{2n} + \frac{11}{24n^2} +
+o\Bigl(\frac{1}{n^2}\Bigr)\Bigr).
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:taylor:6}
+在 $0$ 附近研究 $f(x) = x^2 - x^4$ 与 $g(x) =
+x^3 + x^5$ 的局部性态；并求 $h(x) = \eu^x$ 的图像
+相对于它在 $a = 1$ 处的切线的位置，先局部、后整体。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:taylor:7}
+求 $\pm\infty$ 处 $f(x) =
+\sqrt[3]{x^3 + x^2}$ 的渐近线，并判断曲线与
+它们的相对位置。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:taylor:8}
+求 $n \to \infty$ 时下列各式的等价量：
+\[
+u_n = \sqrt{n+1} - \sqrt n, \qquad
+v_n = \ln(n+1) - \ln n, \qquad
+w_n = \sin\frac{1}{n} - \tan\frac{1}{n},
+\]
+各写成 $n$ 的幂与常数之积。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:taylor:9}
+设 $f$ 为 $C^2$ 函数，定义于 $\R$ 上。证明：对任意 $x$ 与 $h > 0$，
+\[
+\abs{f'(x)} \leq \frac{\abs{f(x+h) - f(x-h)}}{2h} +
+\frac{h}{2}\sup_{\intcc{x-h}{x+h}}\abs{f''} ,
+\]
+并由此推出兰道--柯尔莫哥洛夫型不等式：若 $\abs f \leq
+M_0$ 且 $\abs{f''} \leq M_2$ 在 $\R$ 上，则 $\abs{f'} \leq
+\sqrt{2 M_0 M_2}$ 处处成立。\emph{（对 $h$ 求最优。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:taylor:10}
+数列 $u_0 \in \intoo{0}{\pi}$，$u_{n+1} = \sin u_n$
+递减趋于 $0$（请简要说明理由）。为求其收敛速度，考虑 $v_n
+= \frac{1}{u_n^2}$：
+\begin{enumerate}
+  \item 利用 $\sin$ 的展开式，证明 $v_{n+1} - v_n \to
+        \frac13$；
+  \item 借助切萨罗的结果（\cref{exo:b1:seq:10}），推出 $\frac{v_n}{n}
+        \to \frac13$，进而得到等价式 $u_n \sim
+        \sqrt{\dfrac{3}{n}}$。
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:taylor:11}
+（无穷大之差）计算
+\[
+\lim_{x \to 0} \Bigl(\frac{1}{x^2} - \frac{1}{\sin^2 x}\Bigr)
+\qquad\text{和}\qquad
+\lim_{x \to 0^+} \Bigl(\frac 1x - \frac{1}{\ln(1 + x)}\Bigr)
+\]
+通过通分，并分别展开分子与分母，
+求上述两个极限。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:taylor:12}
+（隐根的渐近性）证明：对每个 $k \in
+\N^*$，方程 $\tan x = x$ 恰有一个解 $x_k$，
+位于 $\intoo{k\pi - \frac\pi2}{k\pi + \frac\pi2}$ 内，且 $x_k = k\pi
++ \frac\pi2 - \varepsilon_k$，其中 $\varepsilon_k =
+\arctan\frac{1}{x_k}$，并由此推出展开式
+\[
+x_k = k\pi + \frac\pi2 - \frac{1}{k\pi} + o\Bigl(\frac
+1k\Bigr) \qquad (k \to \infty).
+\]
+\end{exercise}
+
+\section{问题：交错和、已验证的数字与
+$\cos 1$ 的无理性}
+
+\begin{problem}[{周末问题——交错估计
+$\abs{S - S_n} \leq a_{n+1}$：$\ln 2$ 与 $\pi$ 的可验证小数、
+马青公式，以及 $\cos 1 \notin \Q$}]
+\label{pb:b1:taylor:1}
+各项递减的交错和是数值分析中最友好的对象：
+其误差由第一个被舍去的项控制，
+\emph{且符号已知}。本题借助\omterm{thm:b1:seq:adjacent}{相邻数列}定理证明这一原理，
+然后从三个方面运用这一原理：
+其一是 $\ln 2$ 的可验证小数（三条相互竞争的途径），
+其二是 $\pi$ 的可验证小数（先用莱布尼茨级数，再用马青 1706 年公式，
+这一思想至今仍是几个世纪以来纪录计算的基础），
+$\cos 1$、$\sin 1$ 与 $\cosh 1$ 的无理性，以及作为对照的
+泰勒–拉格朗日\emph{等式}与
+泰勒展开式却与之不符的平坦函数。\index{交错级数
+估计}\index{马青公式}\index{无理性!cos 1@
+$\cos 1$ 的}全文中，“级数”一词只作非正式用语：每个和
+都是\emph{部分和数列}，参见
+\cref{ex:b1:seq:e}；正式的理论将
+在\cref{ch:b1:series}中展开。
+
+\medskip
+\noindent\textbf{第一部分——交错估计。}设
+$(a_k)_{k \geq 0}$ 递减趋于 $0$，且 $S_n = \sum_{k=0}^{n}
+(-1)^k a_k$。
+\begin{enumerate}
+  \item 证明 $(S_{2n+1})$ 单调不减，$(S_{2n})$
+        单调不增，且二者为\omterm{thm:b1:seq:adjacent}{相邻数列}
+        （见\cref{thm:b1:seq:adjacent}），二者收敛于同一极限
+        $S$，且对每个 $n$，
+        \[
+        S_{2n+1} \leq S \leq S_{2n},
+        \qquad
+        \abs{S - S_n} \leq a_{n+1} ,
+        \]
+        误差与第一个被舍去的项同号。
+        进一步证明：若递减是\emph{严格}的，则
+        上述所有不等式均为严格不等式。
+  \item 第一项收获：在指数级数中取 $x = 1$，
+        对照 \cref{thm:b1:taylor:lagrange}，取 $a = 0$：
+        证明 $T_n = \sum_{k=0}^{n} \frac{(-1)^k}{k!}$
+        收敛于 $\eu^{-1}$，且 $\abs{\eu^{-1} - T_n} <
+        \frac{1}{(n+1)!}$。
+  \item （莱布尼茨，1674 年）由\emph{精确的}有限恒等式
+        \[
+        \frac{1}{1 + t^2} = \sum_{k=0}^{n} (-1)^k t^{2k}
+        + \frac{(-1)^{n+1} t^{2n+2}}{1 + t^2} ,
+        \]
+        对上式在 $\intcc{0}{1}$ 上\omterm{thm:b1:integration:def}{积分}，证明
+        \[
+        \frac\pi4 = \sum_{k=0}^{n} \frac{(-1)^k}{2k+1} + \rho_n,
+        \qquad \abs{\rho_n} \leq \frac{1}{2n+3} .
+        \]
+  \item 收敛之慢：需要取莱布尼茨级数的多少项，
+        才能保证 $\pi$ 的六位小数准确？（约两百万项。）求 $4 S_4
+        = 4\bigl(1 - \frac13 + \frac15 - \frac17 +
+        \frac19\bigr)$ 的值，及其与 $\pi$ 的距离，
+        以体会其中之艰辛。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第二部分——三种方法求 $\ln 2$。}
+\begin{enumerate}[resume]
+  \item （方法 1：交错调和级数）由 $\frac{1}{1+t} =
+        \sum_{k=0}^{n-1}(-1)^k t^k + \frac{(-1)^n t^n}{1+t}$
+        在 $\intcc{0}{1}$ 上\omterm{thm:b1:integration:def}{积分}，得：
+        \[
+        \ln 2 = \sum_{k=1}^{n} \frac{(-1)^{k-1}}{k} + (-1)^n
+        R_n, \qquad \frac{1}{2(n+1)} \leq R_n \leq
+        \frac{1}{n+1} :
+        \]
+        误差的阶恰为 $\frac 1n$——
+        六位小数约需一百万项。
+  \item （方法 2：快速级数）对 $\frac{1}{1 - t^2} =
+        \sum_{k=0}^{n} t^{2k} + \frac{t^{2n+2}}{1-t^2}$ 从 $0$
+        到 $x \in \intoo{0}{1}$ \omterm{thm:b1:integration:def}{积分}，并在 $x = \frac13$
+        处求值（注意 $\frac{1 + 1/3}{1 - 1/3} = 2$）：
+        \[
+        \ln 2 = 2\sum_{k=0}^{n} \frac{(1/3)^{2k+1}}{2k+1} +
+        \tilde\rho_n,
+        \qquad
+        0 < \tilde\rho_n \leq \frac{9}{4}\cdot
+        \frac{(1/3)^{2n+3}}{2n+3} :
+        \]
+        几何收敛，大致每项多得一位小数。
+  \item （方法 3：\omterm{thm:b1:integration:riemann}{黎曼和}与一个隐藏的恒等式）用
+        归纳法证明下列恒等式：
+        \[
+        \sum_{k=1}^{2n} \frac{(-1)^{k-1}}{k} = H_{2n} - H_n =
+        \sum_{k=1}^{n} \frac{1}{n + k} ,
+        \]
+        并将 $\ln 2$ 恢复为
+        \cref{ex:b1:integration:riemannexample}中\omterm{thm:b1:integration:riemann}{黎曼和}的极限；方法 1 与方法 3
+        实为同一个数的两次呈现。
+  \item 六项时的比较：$\sum_{k=1}^{6}
+        \frac{(-1)^{k-1}}{k} = 0.6167$ 与方法 2 在 $n = 5$ 时相比，
+        此时已得 $\ln 2 = 0.693147$，误差 $\leq
+        1.1\cdot10^{-7}$。并说明结构上的原因
+        （取值点位于收敛\omterm{prop:b1:reals:intervals}{区间}的\omterm{def:b1:topology:closure}{内部}，
+        而非位于其端点上）。
+  \item 方法 2 需取多少项，方能确定\emph{十}位
+        小数 $\ln 2$？证明 $n = 10$ 已足够。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第三部分——马青公式。}
+\begin{enumerate}[resume]
+  \item 计算 $(5 + \iu)^4$，并验证复数恒等式
+        \[
+        (5 + \iu)^4 = 2\,(1 + \iu)\,(239 + \iu) .
+        \]
+        取辐角（约定见\cref{ch:b1:complex}），
+        由此推出马青公式
+        \[
+        \frac\pi4 = 4\arctan\frac15 - \arctan\frac{1}{239} .
+        \]
+        （验证没有辐角超出
+        $\intoo{-\frac\pi2}{\frac\pi2}$。）
+  \item 与第 3 题类似，对 $0 < x < 1$ 证明：
+        \[
+        \arctan x = \sum_{k=0}^{n} \frac{(-1)^k
+        x^{2k+1}}{2k+1} + r_n(x), \qquad \abs{r_n(x)} \leq
+        \frac{x^{2n+3}}{2n+3} .
+        \]
+  \item 用六项将 $\pi$ 确定到七位小数：估计
+        下式的总误差
+        \[
+        \pi \approx 16\sum_{k=0}^{4}
+        \frac{(-1)^k (1/5)^{2k+1}}{2k+1}
+        - 4\Bigl(\frac{1}{239} - \frac{1}{3\cdot239^3}\Bigr)
+        \]
+        以 $16\,\frac{(1/5)^{11}}{11} +
+        4\,\frac{(1/239)^5}{5} < 5\cdot10^{-8}$ 为界，
+        并给出所得值 $3.1415926\dots$。
+  \item 比较目前可用的三条求 $\pi$ 的途径——
+        莱布尼茨级数（第 4 题）、达尔泽尔\omterm{thm:b1:integration:def}{积分}
+        （见\cref{pb:b1:integration:1}，误差 $4^{1-5m}$），马青
+        公式（误差 $\approx 16\cdot 5^{-(2n+3)}$）——按每项位数比较，
+        并说明为什么缩小取值点
+        便优于其他一切。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第四部分——整数陷阱，交错
+版。}
+\begin{enumerate}[resume]
+  \item 设 $\cos 1 = \frac pq$。将严格的
+        交错夹逼式 $\sum_{k}
+        \frac{(-1)^k}{(2k)!}$（第 1 题）乘以 $(2n)!$，使 $2n
+        \geq q$，并导出矛盾：$\cos 1$
+        为无理数。
+  \item 对 $\sin 1 = \sum_k \frac{(-1)^k}{(2k+1)!}$ 作类似处理
+        （乘以 $(2n+1)!$）：$\sin 1 \notin \Q$。二者都是
+        无理数，但 $\cos^2 1 + \sin^2 1 = 1$：无理性
+        在代数运算下并不稳定。
+  \item 非交错的“近亲”：$\cosh 1 = \sum_k
+        \frac{1}{(2k)!}$（部分和意义下，
+        附带双侧余项估计 $0 < \cosh 1 - \sum_{k \leq n}
+        \frac{1}{(2k)!} < \frac{2}{(2n+2)!}$，待证明）。
+        由同一陷阱得出 $\cosh 1 \notin \Q$。
+  \item 将结论推广到 $\cos\frac 1m$，对每个整数 $m \geq 1$：
+        乘以 $m^{2n}(2n)!$ 并得出 $\cos\frac1m
+        \notin \Q$。同一尝试对
+        一般的 $\cos\frac ab$（$b > 1$）在何处失效？（指出
+        不再能被消去的分母。）
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第五部分——更精细，也更幽深：等式形式，
+以及一个骗过泰勒展开的函数。}
+\begin{enumerate}[resume]
+  \item （泰勒–拉格朗日，等式形式）设 $f$ 为 $n + 1$
+        次\omterm{def:b1:derivative:def}{可导}（在 $a$ 与 $x$ 之间）。定义 $g(t) =
+        f(x) - \sum_{k=0}^{n} \frac{f^{(k)}(t)}{k!}(x - t)^k -
+        A\,\frac{(x-t)^{n+1}}{(n+1)!}$ 中的常数 $A$
+        取为使 $g(a) = 0$ 的值。计算 $g'$（其中和式
+        逐项相消），在 $\intcc{a}{x}$ 上应用罗尔定理，并得出
+        存在 $c$，严格位于 $a$ 与 $x$ 之间，使得
+        \[
+        f(x) = \sum_{k=0}^{n} \frac{f^{(k)}(a)}{k!}(x-a)^k
+        + \frac{f^{(n+1)}(c)}{(n+1)!}\,(x-a)^{n+1} .
+        \]
+  \item 等式的红利：对 $x > 0$ 证明
+        \[
+        \eu^x > 1 + x + \frac{x^2}{2!} + \dots +
+        \frac{x^n}{n!}
+        \]
+        （对每个 $n$ 严格成立），并指出
+        $x < 0$ 时，不等式在何处反向，依
+        $n$ 的奇偶性而定。
+  \item 在 $\sin(0.5)$ 的 $3$ 阶余项上作比较：
+        杨氏余项只给出 $o(x^3)$（无具体数值）；拉格朗日余项给出
+        $\abs{\sin 0.5 - (0.5 - \frac{0.5^3}{6})} \leq
+        \frac{0.5^5}{120} = 2.61\cdot10^{-4}$；交错
+        估计给出同样的界，\emph{外加}符号
+        信息 $\sin 0.5 > 0.5 - \frac{0.5^3}{6}$。比较
+        与真实误差 $2.59\cdot10^{-4}$ 相比，该界
+        几乎可以取到。你会选用哪种工具，以及
+        何时使用？
+  \item （平坦函数）设 $f(x) = \eu^{-1/x^2}$，当 $x
+        \neq 0$，$f(0) = 0$。证明 $f$ 在 $0$ 处\omterm{def:b1:continuity:continuous}{连续}，且
+        $f'(0) = 0$，更一般地——通过证明
+        每个导数都具有形式 $f^{(k)}(x) =
+        P_k\bigl(\frac1x\bigr)\eu^{-1/x^2}$，其中\omterm{def:b1:poly:def}{多项式}
+        $P_k$（用归纳法）——即 $f^{(k)}(0) = 0$，对一切 $k$
+        \emph{（\omterm{prop:b1:functions:powerrules}{增长比较}
+        \cref{prop:b1:functions:powerrules}）}。由此可得：所有
+        $f$ 在 $0$ 处的泰勒\omterm{def:b1:poly:def}{多项式}均为零，而 $f(x) > 0$
+        当 $x \neq 0$ 时：泰勒–杨公式在每一阶都成立，并且
+        对 $f$ 在远离 $0$ 处的情形一无所言。展开式
+        描述的是\emph{芽}，而非函数。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第六部分——综合。}
+\begin{enumerate}[resume]
+  \item 对 $\eu^{-1} = \sum_k
+        \frac{(-1)^k}{k!}$ 再用一次这一陷阱：将严格交错的
+        加括号乘以 $n!$，得 $\eu^{-1} \notin \Q$，
+        从而 $\eu \notin \Q$——这是本卷中此事实的第三种证明。
+        列出这三者（\omterm{thm:b1:seq:adjacent}{相邻数列}，
+        \cref{exo:b1:seq:9}；\omterm{thm:b1:integration:def}{积分}，
+        \cref{pb:b1:integration:1}；交错和，此处），
+        并说明各自所需的条件。
+  \item 单调性并非可有可无。设
+        $b_k = \frac1k$（$k$ 为奇数），$b_k = \frac{1}{k^2}$
+        （$k$ 为偶数），则 $b_k$ 为正且趋于 $0$，
+        但 $\sum (-1)^k b_k$ 的部分和发散到
+        $-\infty$。证明之 \emph{（将部分和拆分为
+        偶数项部分与奇数项部分，前者
+        借助\cref{ex:b1:seq:basel} 有界，后者
+        控制调和级数的一半，
+        见\cref{exo:b1:seq:5}）}，并指出第 1 问中
+        哪一步用到了单调性。
+  \item 验证欧拉更简单的恒等式 $\arctan\frac12 +
+        \arctan\frac13 = \frac\pi4$，利用 $(2 + \iu)(3 + \iu) =
+        5(1 + \iu)$ 这一等式，估计求 $\pi$ 精确到六位小数所需的项数
+        （取 $n = 10$ 即可），并将其置于
+        莱布尼茨与马青之间，第 13 问排序中的
+        位置。
+  \item 综述，每项用一句话作答：（i）陈述交错估计，
+        及其两个结论（界与符号）；（ii）为何带显式余项的
+        精确有限恒等式比极限表述更适于可验证的数值计算；
+        （iii）本题小结：手算 $\pi$ 到 $10^{-7}$，
+        $\ln 2$ 精确到十位小数，四个无理性证明，
+        一个等式定理，一个警示性例子；
+        （iv）其中哪些线索
+        将在\cref{ch:b1:series}中延续（交错级数判别法，
+        绝对收敛与条件收敛，以及其周末问题中的
+        重排之争）。
+\end{enumerate}
+\end{problem}

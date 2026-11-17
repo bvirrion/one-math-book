@@ -1,0 +1,815 @@
+\chapter{幂级数}\label{ch:b2:powerseries}
+
+幂级数是数学中性质最好的函数级数：
+在收敛盘内，它们在紧集上\omterm{def:b2:funcseq:series}{正规收敛}，
+可以毫无顾虑地逐项求导与逐项积分，并且
+其和——\emph{\omterm{def:b2:powerseries:analytic}{解析函数}}——
+由其系数唯一确定。本章证明这整套性质，
+并诚实地收回本科一年级分册中的每一个泰勒级数；
+末尾以\omterm{def:b2:structures:generated}{生成}函数作结，
+带来代数上的丰厚回报。
+
+\section{收敛半径}
+
+\begin{lemma}[阿贝尔]\label{lem:b2:powerseries:abel}
+若数列 $(a_n z_0^n)$ 对某个 $z_0 \neq 0$ 有界，
+则 $\sum a_n z^n$ 对满足 $\abs z < \abs
+{z_0}$ 的所有点\omterm{def:b2:series:def}{绝对收敛}，且在每个圆盘 $\abs z \leq r < \abs{z_0}$ 上\omterm{def:b2:funcseq:series}{正规收敛}。
+\end{lemma}
+
+\begin{proof}
+设 $\abs{a_n z_0^n} \leq M$，$\abs z \leq r$，则：
+\[
+\abs{a_n z^n} = \abs{a_n z_0^n}\,\Bigl|\frac{z}{z_0}\Bigr|^n
+\leq M\Bigl(\frac{r}{\abs{z_0}}\Bigr)^{\!n},
+\]
+这是一个收敛的几何界，在圆盘上一致成立。
+\end{proof}
+
+\begin{definition}[收敛半径]\label{def:b2:powerseries:radius}
+称\emph{收敛半径}\index{收敛半径}为
+级数 $\sum a_n z^n$ 的，其值为
+\[
+R = \sup\{r \geq 0 : (a_n r^n) \text{ 有界}\} \in
+\intcc{0}{+\infty} .
+\]
+由\cref{lem:b2:powerseries:abel}可知，当 $\abs
+z < R$ 时\omterm{def:b2:series:def}{绝对收敛}（在紧子圆盘上\omterm{def:b2:funcseq:series}{正规收敛}），
+当 $\abs z > R$ 时发散——事实上通项无界。边界圆周上，
+任何情况都可能发生（见\cref{exo:b2:powerseries:2}）。实际中 $R$ 通常
+由达朗贝尔比值判别法作用于 $\abs{a_n}\abs z^n$，或用比较法求得。
+\end{definition}
+
+\begin{example}[没有比值判别法的收敛半径]\label{ex:b2:powerseries:sinn}
+求 $\sum \sin(n)\,z^n$ 的\omterm{def:b2:powerseries:radius}{收敛半径}。比值
+$\abs{\sin(n+1)/\sin n}$ 没有极限，但
+直接用定义即可。\emph{$R \geq 1$：}由 $\abs{\sin n} \leq 1$，$(\sin
+n\cdot r^n)$ 对每个 $r < 1$ 有界，事实上 $r =
+1$ 时亦有界。\emph{$R \leq 1$：}只需 $\sin n \not\to 0$。
+设 $\sin n \to 0$，由加法公式
+\[
+\sin(n+1) = \sin n\cos 1 + \cos n\sin 1
+\]
+将推出 $\cos n \to 0$（解出 $\cos n$：$\sin 1 \neq
+0$），与 $\sin^2 n + \cos^2 n = 1$ 矛盾。故通项
+$\sin(n)\,1^n$ 不趋于 $0$：级数在 $z =
+1$ 处发散，从而 $R \leq 1$。结论：$R = 1$。收尾要点：
+\omterm{def:b2:powerseries:radius}{收敛半径}是关于 $\abs{a_n}r^n$ 有界性的命题，
+从不需要比值的极限，有界性论证
+可以处理比值判别法无能为力的情形（可对照
+\cref{exo:b2:powerseries:1}中的振荡系数）。
+\end{example}
+
+\begin{proposition}[运算]\label{prop:b2:powerseries:operations}
+设 $\sum a_nz^n$，$\sum b_nz^n$ 的\omterm{def:b2:powerseries:radius}{收敛半径}分别为 $R_a, R_b$。则对
+$\abs z < \min(R_a, R_b)$：
+\[
+\sum (a_n + b_n)z^n = \sum a_nz^n + \sum b_nz^n,
+\qquad
+\Bigl(\sum a_nz^n\Bigr)\Bigl(\sum b_nz^n\Bigr) = \sum c_n z^n,
+\quad c_n = \sum_{k=0}^{n} a_kb_{n-k},
+\]
+两级数的\omterm{def:b2:powerseries:radius}{收敛半径}均 $\geq \min(R_a, R_b)$。（乘积为
+\omterm{thm:b2:series:fubini}{柯西乘积}，其合理性由\omterm{def:b2:series:def}{绝对收敛}性及
+\cref{thm:b2:series:fubini}保证。）
+\end{proposition}
+
+\begin{proof}
+和的公式即收敛级数的线性性，且
+$(a_n + b_n)r^n$ 在 $a_nr^n$ 与 $b_nr^n$ 都有界时有界，
+故\omterm{def:b2:powerseries:radius}{收敛半径} $\geq \min(R_a, R_b)$。对乘积，固定 $\abs z
+< \min(R_a, R_b)$，两级数在该点\emph{\omterm{def:b2:series:def}{绝对收敛}}
+（见\cref{lem:b2:powerseries:abel}），故二重指标族
+$(a_kz^k\,b_lz^l)_{k,l}$ 可和，且
+\cref{thm:b2:series:fubini}允许任意归并，按 $k
++ l = n$ 归并：
+\[
+\Bigl(\sum_k a_kz^k\Bigr)\Bigl(\sum_l b_lz^l\Bigr)
+= \sum_{n\geq0}\Bigl(\sum_{k+l=n}a_kb_l\Bigr)z^n
+= \sum_{n\geq0}c_nz^n ,
+\]
+对每个这样的 $z$ \omterm{def:b2:series:def}{绝对收敛}，因此乘积级数
+的\omterm{def:b2:powerseries:radius}{收敛半径}同样 $\geq \min(R_a, R_b)$。
+\end{proof}
+
+\begin{example}[柯西平方的交叉验证]\label{ex:b2:powerseries:cauchysquare}
+对几何级数取平方：当 $\abs x < 1$ 时，
+$x^n$ 在 $\bigl(\sum x^k\bigr)^2$ 中的系数为 $c_n = \sum_{k+l=n}
+1\cdot1 = n + 1$，于是
+\[
+\frac{1}{(1-x)^2} = \sum_{n\geq0}(n+1)\,x^n .
+\]
+通过逐项求导进行交叉验证
+（见下文\cref{thm:b2:powerseries:calculus}）：对
+$\frac{1}{1-x} = \sum x^n$ 求导，得 $\frac{1}{(1-x)^2} = \sum
+nx^{n-1} = \sum(n+1)x^n$，由两条互不相关的
+途径得到同一级数。要点是：当某个系数恒等式看似神秘时，
+这两种手段之一（卷积或
+求导）通常一行即可得出；周末问题中
+关于 $\sum\binom{2k}k\binom{2n-2k}{n-k} = 4^n$ 的问题
+则充分发挥了卷积手段的威力。
+\end{example}
+
+\begin{example}[乘以 $\frac{1}{1-x}$ 即对系数求部分和]\label{ex:b2:powerseries:partialsums}
+与几何级数作\omterm{thm:b2:series:fubini}{柯西乘积}，有一个便于记忆的含义：
+对任意 $\sum a_nx^n$（其\omterm{def:b2:powerseries:radius}{收敛半径}为 $R > 0$），当 $\abs x <
+\min(R, 1)$，
+\[
+\frac{1}{1-x}\sum_{n\geq0}a_nx^n
+= \sum_{n\geq0}\Bigl(\sum_{k=0}^{n}a_k\Bigr)x^n :
+\]
+乘以 $\frac{1}{1-x}$ 即把各系数换为
+其部分和（即与全为 1 的数列作卷积）。
+例如 $\dfrac{\eu^x}{1-x} = \sum_n s_n x^n$，其中 $s_n =
+\sum_{k\leq n}\frac{1}{k!}$，即 $\eu$ 的部分和——
+可对比 \cref{exo:b2:powerseries:11}，其中同一乘积
+改用 $\eu^{-x}$ 即编码错排数。
+小结：幂级数上的运算，实为系数数列上的运算，
+只是换了个面貌（乘以 $\frac1{1-x}$ 即求和；
+乘以 $x$ 即平移；求导即乘以 $n$ 再平移）
+——这是一本词典，
+\omterm{def:b2:structures:generated}{生成}函数一章将读得游刃有余。
+\end{example}
+
+\section{和函数的正则性}
+
+\begin{theorem}[逐项微积分]\label{thm:b2:powerseries:calculus}
+设 $f(x) = \sum_{n\geq0} a_n x^n$ 的\omterm{def:b2:powerseries:radius}{收敛半径}为 $R > 0$（实变量
+$x \in \intoo{-R}{R}$）。
+\begin{enumerate}
+  \item 导出级数 $\sum n\,a_n x^{n-1}$ 与原级数具有\emph{相同}的
+        \omterm{def:b2:powerseries:radius}{收敛半径} $R$，且 $f$ 为 $C^1$ 函数，$f'(x) = \sum_{n \geq 1}
+        n a_n x^{n-1}$。反复求导可知 $f$ 为 $C^\infty$，并且
+        \[
+        a_n = \frac{f^{(n)}(0)}{n!} :
+        \]
+        幂级数的系数是唯一的（两个
+        在 $0$ 附近和为同一函数的幂级数，其系数必然相等）。
+  \item 逐项积分：$\sum \frac{a_n}{n+1}x^{n+1}$ 的
+        \omterm{def:b2:powerseries:radius}{收敛半径}为 $R$，导数为 $f$。
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\emph{\omterm{def:b2:powerseries:radius}{收敛半径}相同：}若 $(a_nr^n)$ 有界且 $r' < r$，则
+$n\abs{a_n} r'^{\,n-1} = \frac{n}{r'}\abs{a_nr^n}
+\bigl(\frac{r'}{r}\bigr)^n$ 有界（事实上 $\to 0$，几何
+因子压过 $n$），故 $R' \geq R$；反之，$\abs{a_n x^n} \leq \abs x
+\cdot n\abs{a_n}\abs x^{n-1}$ 得 $R \geq R'$。
+
+\emph{求导：}在 $\intcc{-r}{r}$ 上，$r < R$，导出
+级数\omterm{def:b2:funcseq:series}{正规收敛}（$n\abs{a_n}r^{n-1}$ 由
+\omterm{def:b2:powerseries:radius}{收敛半径}的计算可和）；原级数在 $x = 0$ 处收敛。于是，
+级数的求导定理
+（\cref{thm:b2:funcseq:seriestransfer}）适用于每一这样的
+区间，从而对 $\intoo{-R}{R}$ 成立。反复求导 $k$ 次，
+并在 $0$ 处取值：具体地，第 $k$ 次导出级数为
+\[
+f^{(k)}(x) = \sum_{n\geq k} n(n-1)\cdots(n-k+1)\,a_n\,x^{n-k},
+\]
+当 $x = 0$ 时，所有 $n > k$ 的项均为零，只剩下
+常数项 $k(k-1)\cdots1\cdot a_k$，$f^{(k)}(0) =
+k!\,a_k$。由此即得系数的唯一性：两个幂级数
+在 $0$ 附近和为同一函数，则在 $0$ 处各阶导数相同，
+因而 $a_k$ 相同。原函数的\omterm{def:b2:powerseries:radius}{收敛半径}同样由上述计算得出，
+再逐项求导即可复原。
+\end{proof}
+
+\begin{example}[在一点处计算级数]\label{ex:b2:powerseries:evaluate}
+$\sum_{n\geq1}\dfrac{n^2}{2^n}$ 是多少？它正是
+\cref{exo:b2:powerseries:3} 中的和 $\sum n^2x^n$ 在收敛圆盘
+\emph{内部}取值，在 $x = \frac12 < 1 = R$ 处，
+推出闭式所用的每一步运算都是合法的：
+\[
+\sum_{n\geq1} n^2x^n = \frac{x(1+x)}{(1-x)^3}
+\quad\Longrightarrow\quad
+\sum_{n\geq1}\frac{n^2}{2^n}
+= \frac{\frac12\cdot\frac32}{(\frac12)^3}
+= \frac{3/4}{1/8} = 6 .
+\]
+同一引擎，换个旋钮：取 $x = \frac13$，得
+$\sum\frac{n^2}{3^n} = \frac{\frac13\cdot\frac43}{(2/3)^3} =
+\frac32$。小结：幂级数恒等式是一台
+机器，而非单一公式——一次推导即可同时算出每个
+数值级数 $\sum n^2q^n$ 的和，对一切 $\abs q < 1$ 一并给出；
+这正是\omterm{def:b2:structures:generated}{生成}函数一章整批计算
+期望与方差的办法。
+\end{example}
+
+\begin{example}[经典展开，这次严格论证]\label{ex:b2:powerseries:classics}
+$\displaystyle\frac{1}{1 - x} = \sum x^n$（$R = 1$）；逐项积分
+（\cref{thm:b2:powerseries:calculus}~(2)）得：
+\[
+-\ln(1 - x) = \sum_{n\geq1} \frac{x^n}{n},
+\qquad
+\arctan x = \sum_{n \geq 0} \frac{(-1)^n x^{2n+1}}{2n+1}
+\quad (\abs x < 1),
+\]
+第二个分两步：在几何级数中代入 $-x^2$，
+得 $\frac{1}{1+x^2} = \sum(-1)^nx^{2n}$（\omterm{def:b2:powerseries:radius}{收敛半径}
+为 $1$，因 $\abs{x^2} < 1 \iff \abs x < 1$），再取
+逐项积分所得、在 $0$ 处取零的原函数；两边都是
+同一函数的原函数，且在 $0$ 处取值相同，
+故在 $\intoo{-1}{1}$ 上相等。至于 $\exp$：
+级数 $E(x) = \sum \frac{x^n}{n!}$（$R = \infty$）满足
+$E' = E$，$E(0) = 1$（由逐项求导得到），故 $E = \exp$，由
+本科一年级分册的唯一性。该分册中每个“标准展开”
+现在都是关于其全幂级数的定理。
+\end{example}
+
+\begin{example}[在圆盘内部计算一个对数]\label{ex:b2:powerseries:lntwo}
+将 $-\ln(1-x) = \sum\frac{x^n}{n}$ 在圆盘内点
+$x = \frac12$ 处取值：
+\[
+\sum_{n\geq1}\frac{1}{n\,2^n} = \ln 2 ,
+\]
+这是 $\ln 2$ 的一个快速收敛表示（前十项已
+给出 $0.69306\ldots$，而 $\ln 2 = 0.69314\ldots$），远
+优于仅在边界上可用的交错级数 $1 - \frac12 + \frac13 -
+\dots$。小结：
+只要某常数既能在收敛圆周上取得，又能严格位于圆盘内部，则
+内部计算在数值上胜出——几何衰减
+胜过调和衰减。
+\end{example}
+
+\begin{example}[求导保持收敛半径，而非边界]\label{ex:b2:powerseries:boundaryloss}
+级数 $\sum_{n\geq1}\frac{x^n}{n^2}$ 的\omterm{def:b2:powerseries:radius}{收敛半径}为 $1$，并且
+在\emph{两个}端点处均收敛（$\sum\frac1{n^2}$ 及其
+交错孪生级数）。其逐项求导所得的级数，
+\[
+\sum_{n\geq1}\frac{x^{n-1}}{n} ,
+\]
+\omterm{def:b2:powerseries:radius}{收敛半径}同样为 $1$——正如
+\cref{thm:b2:powerseries:calculus} 所保证的——但此时
+它在 $x = 1$ 处发散（调和级数），同时
+在 $x = -1$ 处仍收敛（交错级数）。再求导一次，得
+$\sum_{n\geq2}\frac{n-1}{n}x^{n-2}$，两端点处均发散
+（各项不趋于 $0$）。小结：每次求导都使系数乘以 $n$，
+这从不改变\omterm{def:b2:powerseries:radius}{收敛半径}（几何衰减胜过多项式衰减），却
+消耗掉一阶边界衰减；逐项微积分是
+内部的一种游戏，而落在边界上的
+一切都必须重新审视 ——周末问题中的
+阿贝尔–陶伯理论，正是这种
+重新审视。
+\end{example}
+
+\begin{example}[按剩余类分拆级数——算到底]\label{ex:b2:powerseries:quarter}
+求 $f(x) = \sum_{n\geq0} \dfrac{x^{4n}}{(4n)!}$ 的
+闭形式。$\cosh x = \sum \frac{x^{2m}}{(2m)!}$ 与 $\cos x =
+\sum \frac{(-1)^m x^{2m}}{(2m)!}$ 的\omterm{def:b2:powerseries:radius}{收敛半径}均为 $\infty$，故其
+平均值可逐项计算：
+\[
+\frac{\cosh x + \cos x}{2}
+= \sum_{m\geq0}\frac{1 + (-1)^m}{2}\,\frac{x^{2m}}{(2m)!}
+= \sum_{m \text{ 为偶数}}\frac{x^{2m}}{(2m)!}
+= \sum_{n\geq0}\frac{x^{4n}}{(4n)!} = f(x) .
+\]
+滤子 $\frac{1+(-1)^m}{2}$ 恰好保留偶数 $m$：这
+正是单位根滤子的实数形式（复数
+版本借助 $\iu^n$，一步提取模 $4$ 的剩余类）。
+小结检验：$f$ 满足 $f'''' = f$，且 $f(0) = 1$，
+$f'(0) = f''(0) = f'''(0) = 0$ ——对级数逐项求四次导数
+（\cref{thm:b2:powerseries:calculus}），看它如何
+复现自身；$\frac{\cosh + \cos}{2}$ 满足同样的
+初值条件。
+\end{example}
+
+\begin{definition}[解析函数]\label{def:b2:powerseries:analytic}
+称 $f$ 在 $x_0$ 处为\emph{解析}\index{解析函数}，若它
+在某邻域上是 $(x - x_0)$ 的幂级数之和；在区间上，
+则指在每一点处均如此。幂级数之和在其收敛圆盘内是
+解析的（展开式的重排——在本阶段不加证明地承认，
+用于换中心，$x_0 = 0$ 的情形即
+\cref{thm:b2:powerseries:calculus}）。解析蕴含 $C^\infty$；
+逆命题\emph{不成立}：平坦函数 $\eu^{-1/x^2}$
+（见\cref{exo:b2:powerseries:7}）。
+\end{definition}
+
+\begin{example}[重新中心化，以及作为距离的收敛半径]\label{ex:b2:powerseries:recenter}
+将 $f(x) = \frac{1}{1-x}$ 在 $x_0 = \frac12$ 附近展开：记
+$x = \frac12 + h$,
+\[
+\frac{1}{1 - x} = \frac{1}{\frac12 - h}
+= \frac{2}{1 - 2h}
+= \sum_{n\geq0} 2^{n+1}\,h^n
+= \sum_{n\geq0} 2^{n+1}\Bigl(x - \frac12\Bigr)^{\!n},
+\]
+当 $\abs{2h} < 1$ 时成立，即 $\abs{x - \frac12} < \frac12$。
+新的\omterm{def:b2:powerseries:radius}{收敛半径}恰为新中心到
+奇点 $x = 1$ 的距离：换中心会使圆盘缩小（或扩大），
+以恰好避开最近的障碍。小结：这正是
+\omterm{def:b2:powerseries:analytic}{解析}性定义背后的图景——同一函数，
+有多个局部幂级数，每一个都在避开麻烦的最大圆盘上成立；
+本科三年级分册将启发式的
+“\omterm{def:b2:powerseries:radius}{收敛半径} $=$ 到最近复奇点的距离”
+化为定理。
+\end{example}
+
+\begin{remark}[常见误区]
+\emph{(i) 比值判别法是充分的，而非必要的：}当
+$\abs{a_{n+1}/a_n}$ 无极限时
+（见\cref{ex:b2:powerseries:sinn}、\cref{exo:b2:powerseries:1}），
+回到定义：$R = \sup\{r : (a_nr^n)$
+有界$\}$。\emph{(ii) 边界处不能想当然：}逐项
+求导与积分是定理，
+仅在\emph{开}圆盘内成立；在 $\abs x = R$ 处，每个级数都须
+重新检验（这正是周末问题的全部主题）。
+\emph{(iii) 和的\omterm{def:b2:powerseries:radius}{收敛半径}：} $\min(R_a, R_b)$ 只是
+一个下界——抵消可能使其扩大（$a_n = 1,
+b_n = -1$：和恒等于 $0$，\omterm{def:b2:powerseries:radius}{收敛半径}为 $\infty$）。\emph{(iv)
+$C^\infty$ 并不等同于\omterm{def:b2:powerseries:analytic}{解析}：}收敛的泰勒级数可能
+收敛到\emph{错误的}函数
+（见\cref{exo:b2:powerseries:7}）；在写下 $f(x) = \sum
+\frac{f^{(n)}(0)}{n!}x^n$ 之前，须先证明之——借助
+常微分方程（见\cref{met:b2:powerseries:ode}）、余项估计，或
+积分公式。
+\end{remark}
+
+\begin{remark}[应用]
+幂级数是后续三章的主力工具：微分方程一章
+借助代入 $\sum a_nx^n$ 求解线性常微分方程
+（即下文的方法框，经系统化推广）；\omterm{ex:b2:powerseries:fibonacci}{母函数}一章
+将关于概率的恒等式化为幂级数的恒等式，
+再反过来；并且本科三年级分册正式引入复变量，
+使\omterm{def:b2:powerseries:analytic}{解析}性等价于复可微性，并使上文“承认”的
+换中心结论获得真正的证明。
+周末问题探讨的正是本章定理
+唯一保持沉默之处，
+即边界 $\abs x = R$ 本身。
+\end{remark}
+
+\begin{method}[借助微分方程展开]\label{met:b2:powerseries:ode}
+要将函数 $f$ 展开为幂级数：求出 $f$ 满足的
+系数为多项式的线性常微分方程；代入 $\sum a_nx^n$；
+比较系数，得到 $(a_n)$ 的递推关系；求解，并
+检验\omterm{def:b2:powerseries:radius}{收敛半径}与初值条件。例（二项级数）：
+$f(x) = (1+x)^\alpha$ 满足 $(1+x)f' = \alpha f$，$f(0)
+= 1$；代入得 $(n+1)a_{n+1} = (\alpha - n)a_n$，故 $a_n =
+\binom{\alpha}{n}$，\omterm{def:b2:powerseries:radius}{收敛半径}为 $1$（比值判别法），且和函数满足
+同一方程与同一初值，
+由线性常微分方程的唯一性定理（本科一年级分册）可知它等于 $(1 + x)^\alpha$。
+\end{method}
+
+\begin{example}[含强迫项方程的方法]\label{ex:b2:powerseries:odeforced}
+用幂级数求解 $y' = y + x$，$y(0) = 0$。代入 $y =
+\sum a_nx^n$：
+\[
+\sum_{n\geq0}(n+1)a_{n+1}x^n
+= \sum_{n\geq0}a_nx^n + x ,
+\]
+比较系数得 $a_1 = a_0 = 0$，$2a_2 = a_1 + 1
+= 1$，且 $(n+1)a_{n+1} = a_n$ 对 $n \geq 2$ 成立。于是 $a_2 =
+\frac{1}{2!}$，由归纳法得 $a_n = \frac{1}{n!}$，对每个
+$n \geq 2$，\omterm{def:b2:powerseries:radius}{收敛半径}为 $\infty$，且
+\[
+y(x) = \sum_{n\geq2}\frac{x^n}{n!} = \eu^x - 1 - x .
+\]
+验证：$y' = \eu^x - 1 = y + x$，$y(0) = 0$。
+小结：递推式\emph{就是}方程本身，逐个系数对应；
+强迫项只扰动有限个初值系数，此后
+便由齐次部分的规律接管，
+这正是“特解加齐次解”这一结构的
+离散影子。
+\end{example}
+
+\section{母函数}
+
+\begin{example}[斐波那契数列]\label{ex:b2:powerseries:fibonacci}
+设 $F(x) = \sum_{n\geq0} F_n x^n$（斐波那契数，$F_0 = 0$，
+$F_1 = 1$）。递推式 $F_{n+2} = F_{n+1} + F_n$ 经
+乘以 $x^{n+2}$ 并求和，化为
+\[
+F(x) - x = x\,F(x) + x^2 F(x)
+\quad\Longrightarrow\quad
+F(x) = \frac{x}{1 - x - x^2} ,
+\]
+在级数收敛处成立。\omterm{def:b2:powerseries:radius}{收敛半径}为
+$\frac{1}{\varphi}$：由 $F_n \sim
+\frac{\varphi^n}{\sqrt5}$（比内公式见下例，或粗略的
+归纳 $F_n \leq 2^n$ 加上递推式），由比值判别法
+得
+\[
+\frac{F_{n+1}\abs x^{n+1}}{F_n\abs x^n}
+\longrightarrow \varphi\abs x ,
+\qquad\text{收敛当且仅当 } \abs x < \frac1\varphi
+\approx 0.618 .
+\] 对 $\frac{x}{1 - x - x^2}$ 作部分分式分解，
+并借助几何级数，重新推出
+比内公式——\omterm{def:b2:structures:generated}{生成}函数使线性递推关系的
+求解程序化。\index{母函数}
+\end{example}
+
+\begin{example}[比内公式的具体计算]\label{ex:b2:powerseries:binet}
+设 $\varphi = \frac{1+\sqrt5}{2}$，$\psi =
+\frac{1-\sqrt5}{2}$，它们是 $X^2 = X + 1$ 的根；由于 $\varphi
++ \psi = 1$ 且 $\varphi\psi = -1$，
+\[
+1 - x - x^2 = (1 - \varphi x)(1 - \psi x) .
+\]
+部分分式：设 $\frac{x}{(1-\varphi x)(1-\psi x)} =
+\frac{A}{1 - \varphi x} + \frac{B}{1 - \psi x}$，比较常数项
+得 $A + B = 0$，比较 $x$ 的系数得 $-A\psi - B\varphi
+= 1$，于是 $A(\varphi - \psi) = 1$，从而 $A = \frac{1}{\sqrt5} = -B$。
+再经两次几何级数展开，
+\[
+F(x) = \frac{1}{\sqrt5}\sum_{n\geq0}
+\bigl(\varphi^n - \psi^n\bigr)x^n
+\quad\Longrightarrow\quad
+F_n = \frac{\varphi^n - \psi^n}{\sqrt5}
+\]
+由系数的唯一性
+（\cref{thm:b2:powerseries:calculus}）。由 $\abs\psi < 1$，
+这一项 $\frac{\psi^n}{\sqrt5}$ 的绝对值 $< \frac12$：
+$F_n$ 是\emph{最近整数}，即
+最接近 $\frac{\varphi^n}{\sqrt5}$ 的那个整数。小结：
+$\frac1\varphi$ 是 $F$ 的\omterm{def:b2:powerseries:radius}{收敛半径}，恰为主导根的倒数——
+系数的增长速度与\omterm{def:b2:powerseries:radius}{收敛半径}，
+是从相反方向读出的同一份信息。
+\end{example}
+
+\begin{example}[卡塔兰数]\label{ex:b2:powerseries:catalan}
+\omterm{ex:b2:powerseries:catalan}{卡塔兰数} $C_n$（三角剖分的个数、括号化的方式数、
+迪克路径的条数，\dots）满足 $C_0 = 1$ 且 $C_{n+1} = \sum_{k=0}^n
+C_kC_{n-k}$。\omterm{def:b2:structures:generated}{生成}函数 $C(x) = \sum C_nx^n$ 则
+满足（注意\omterm{thm:b2:series:fubini}{柯西乘积}！）
+\[
+C(x) = 1 + x\,C(x)^2
+\quad\Longrightarrow\quad
+C(x) = \frac{1 - \sqrt{1 - 4x}}{2x} ,
+\]
+取满足 $C(0) = 1$ 的根：解二次方程
+$xC^2 - C + 1 = 0$ 得两个候选解 $\frac{1 \pm
+\sqrt{1-4x}}{2x}$，当 $x \to 0$ 时“$+$”根
+以 $\frac1x$ 的量级趋于无穷，而“$-$”根趋于 $1$（展开
+$\sqrt{1-4x} = 1 - 2x + O(x^2)$）——只有取负号的根
+才能承载满足 $C_0 = 1$ 的幂级数。将 $\sqrt{1 - 4x}$ 用
+二项级数展开，得到闭式
+\[
+C_n = \frac{1}{n+1}\binom{2n}{n} ,
+\]
+具体计算见\cref{exo:b2:powerseries:8}。\index{卡塔兰数}
+\end{example}
+
+\begin{remark}[形式级数与收敛级数]
+上文每一个\omterm{def:b2:structures:generated}{生成}函数的计算，最终都要借助
+系数的唯一性，而该定理只在一个正半径的圆盘
+\emph{之内}成立：在“读出”
+$F_n$ 或 $C_n$ 之前，必须先知道 $R > 0$。粗略的先验界
+已足够：$F_n \leq 2^n$（直接归纳）给出 $R \geq
+\frac12$（对斐波那契数）；$C_n \leq 4^n$（每个\omterm{ex:b2:powerseries:catalan}{卡塔兰数}
+都计数路径的某些子集），给出 $R \geq \frac14$。当心
+尺度的退化一端：$\sum n!\,x^n$ 的\omterm{def:b2:powerseries:radius}{收敛半径}为 $0$，而
+将它当作函数处理毫无意义——涉及此类级数的恒等式
+属于系数的\emph{形式}演算，
+这是一种有着自身规则（与通常不同）的纯代数游戏。
+在本阶段，务必先确保\omterm{def:b2:powerseries:radius}{收敛半径}为正，
+再在其内自由计算。
+\end{remark}
+
+\begin{remark}[本卷中的不同视角]
+幂级数是本书的两大展开“机器”之一，
+另一台是调和分析各章中的傅里叶级数，
+二者对照颇有启发。幂级数是刚性的：
+其系数被唯一确定（$a_n = f^{(n)}(0)/n!$），
+收敛性极为严苛（在\omterm{def:b2:powerseries:radius}{收敛半径}内部\omterm{def:b2:funcseq:series}{正规收敛}，
+外部则毫无希望），其和函数是\omterm{def:b2:powerseries:analytic}{解析}的——无限刚性
+（见\cref{def:b2:powerseries:analytic}）。傅里叶级数则是柔性的：
+它只表示分段光滑的信号，
+代价是在光滑性的边界处出现精细的收敛问题。
+这两种理论在本章的周末问题中相遇：
+切萨罗与\omterm{thm:b2:series:abel}{阿贝尔求和}法在本章中针对边界圆周展开，
+并在傅里叶级数一章中以费耶核与泊松核的形式重现。
+与此同时，微分方程一章直接运用幂级数
+（如 $\eu^{tA}$ 与级数解），
+\omterm{def:b2:structures:generated}{生成}函数一章则把
+\cref{ex:b2:powerseries:fibonacci}中的技巧
+发展为计算概率的系统演算。
+\end{remark}
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:b2:powerseries:1}
+求下列级数的\omterm{def:b2:powerseries:radius}{收敛半径}：
+$\sum \dfrac{n^2}{2^n}z^n$; $\;\sum \dfrac{z^n}{\binom{2n}{n}}$;
+$\;\sum z^{n!}$; $\;\sum \bigl(2 + (-1)^n\bigr)^n z^n$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:powerseries:2}
+证明 $\sum z^n$、$\sum \frac{z^n}{n}$、$\sum \frac{z^n}{n^2}$
+的\omterm{def:b2:powerseries:radius}{收敛半径}均为 $1$，但它们在 $z = 1$ 与 $z = -1$ 处表现各异：
+依次为发散/发散、发散/收敛，
+收敛/收敛。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:powerseries:3}
+对 $\abs x < 1$，求下列级数的和：
+\[
+\sum_{n\geq0} n x^n,
+\qquad
+\sum_{n\geq0} n^2 x^n,
+\qquad
+\sum_{n\geq0} \frac{x^{2n+1}}{2n+1} .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:powerseries:4}
+将下列函数在 $0$ 处展开为幂级数，并给出\omterm{def:b2:powerseries:radius}{收敛半径}：$\dfrac{1}{(1-x)(2-x)}$
+（用部分分式）；$\;\ln(1 + x + x^2)$ \emph{（请写成 $1 + x + x^2
+= \frac{1 - x^3}{1 - x}$）}。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:powerseries:5}
+证明 $f(x) = \sum_{n\geq1} H_n x^n = -\dfrac{\ln(1 -
+x)}{1 - x}$ 对 $\abs x < 1$ 成立，其中 $H_n$ 为调和数
+\emph{（$\sum x^n$ 与 $\sum \frac{x^n}{n}$ 的\omterm{thm:b2:series:fubini}{柯西乘积}）}。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:powerseries:6}
+用\omterm{def:b2:structures:generated}{生成}函数求解递推关系 $u_0 = 1$，$u_{n+1} =
+2u_n + n$：求 $U(x) = \sum u_nx^n$ 的闭形式并作分解，
+并由此读出 $u_n = 2^{n+1} - n - 1$。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:powerseries:7}
+设 $f(x) = \eu^{-1/x^2}$（$x \neq 0$），$f(0) = 0$。证明
+$f$ 为 $C^\infty$ 函数，定义于 $\R$ 上，且 $f^{(n)}(0) = 0$ 对所有 $n$
+\emph{（用归纳法证明 $f^{(n)}(x) = P_n\bigl(\frac1x\bigr)
+\eu^{-1/x^2}$，其中 $P_n$ 为多项式，并利用增长比较）}。
+由此可知 $f$ 在 $0$ 处不\omterm{def:b2:powerseries:analytic}{解析}：其在 $0$ 处的泰勒
+级数收敛——却收敛到错误的函数。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:powerseries:8}
+补全\cref{ex:b2:powerseries:catalan}：将 $\sqrt{1 - 4x}$ 按二项级数展开，
+并证明
+\[
+\binom{1/2}{n+1}(-4)^{n+1} = -\frac{2}{n+1}\binom{2n}{n},
+\]
+由此推出 $C_n = \frac{1}{n+1}\binom{2n}{n}$；并确定
+$C(x)$ 的\omterm{def:b2:powerseries:radius}{收敛半径}，以及 $C_n$ 的渐近行为，借助
+斯特林公式。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:powerseries:9}
+（阿贝尔径向极限定理的特殊情形）设 $\sum a_n$
+收敛。证明 $\lim_{x \to 1^-} \sum_{n} a_n x^n = \sum_n
+a_n$。\emph{（\omterm{thm:b2:series:abel}{阿贝尔求和}法：记 $A_n$ 为部分和，$A =
+\lim A_n$，可写 $\sum a_nx^n = (1 - x)\sum A_n x^n$；于是 $\sum
+a_nx^n - A = (1-x)\sum (A_n - A)x^n$，将和式在较大的
+$N$ 处拆分）}。应用：$\sum \frac{(-1)^{n-1}}{n} = \ln 2$ 与 $\sum
+\frac{(-1)^n}{2n+1} = \frac\pi4$，并由幂级数重新证明。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:powerseries:10}
+证明 $\displaystyle\sum_{n\geq1}\frac{x^n}{n(n+1)} = 1 +
+\frac{1-x}{x}\,\ln(1-x)$，当 $0 < \abs x < 1$ 时，求
+\omterm{def:b2:powerseries:radius}{收敛半径}，并验证级数在
+$\intcc{-1}{1}$ 上\omterm{def:b2:funcseq:series}{正规收敛}；验证由\omterm{def:b2:metric:continuity}{连续}性预测的 $x = 1$ 处的值
+与裂项相消得到的和 $\sum
+\frac{1}{n(n+1)} = 1$ 相符。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:powerseries:11}
+（错排）设 $D_n$ 为 $n$ 个对象的
+无不动点的排列个数（$D_0 = 1$）。
+将 $\{1, \dots, n\}$ 的排列按不动点集合分类，可得
+$n! = \sum_{k=0}^{n}\binom nk D_{n-k}$，两边乘以
+$\frac{x^n}{n!}$ 后求和，识别其为\omterm{thm:b2:series:fubini}{柯西乘积}，从而得到
+指数\omterm{def:b2:structures:generated}{生成}函数
+\[
+\sum_{n\geq0} D_n\,\frac{x^n}{n!} = \frac{\eu^{-x}}{1-x}
+\qquad (\abs x < 1),
+\]
+由此读出闭形式 $\dfrac{D_n}{n!} =
+\sum_{k=0}^{n}\dfrac{(-1)^k}{k!}$，并求极限 $\dfrac{D_n}{n!}
+\to \eu^{-1}$。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:powerseries:12}
+证明：借助
+\cref{met:b2:powerseries:ode}中的二项级数，下式成立：
+\[
+\frac{1}{\sqrt{1 - 4x}} = \sum_{n\geq0}\binom{2n}{n}x^n
+\qquad \Bigl(\abs x < \frac14\Bigr),
+\]
+并通过平方（即与
+$\frac{1}{1-4x} = \sum 4^nx^n$ 作\omterm{thm:b2:series:fubini}{柯西乘积}），推出以下卷积恒等式：
+\[
+\sum_{k=0}^{n}\binom{2k}{k}\binom{2n-2k}{n-k} = 4^n .
+\]
+\end{exercise}
+
+\section{问题：阿贝尔、陶伯与收敛边界}
+
+\begin{problem}\label{pb:b2:powerseries:1}
+在收敛圆盘内部，一切都很容易；幂级数的全部
+精彩之处都发生在\emph{边界}上。本题
+在实变量下建立边界理论：阿贝尔
+定理的一致形式，及其在陶伯
+条件下的逆，切萨罗--阿贝尔求和方法的层次
+（含弗罗贝尼乌斯定理），逐项积分直至
+边界，以经典常数作为副产品，最后是
+\omterm{def:b2:powerseries:analytic}{解析函数}的刚性——恒等
+定理。\index{阿贝尔定理}\index{陶伯定理}
+全文设 $(a_n)$ 为实数列，$f(x) = \sum_{n\geq0}
+a_nx^n$，且 $A_n = a_0 + \dots + a_n$。
+
+\medskip
+\noindent\textbf{第一部分——一致形式的阿贝尔定理。}本部分假设
+$\sum a_n$ 收敛，并记 $r_n =
+\sum_{k\geq n} a_k$（于是 $r_n \to 0$，且 $a_n = r_n -
+r_{n+1}$）。
+\begin{enumerate}
+  \item 用分部求和证明：对所有 $0 \leq x
+        \leq 1$ 及 $N \leq M$，有
+        \[
+        \Bigl|\sum_{n=N}^{M} a_n x^n\Bigr|
+        \leq 2\sup_{n \geq N}\,\abs{r_n} .
+        \]
+  \item 由此可得 $\sum a_nx^n$ 在 $\intcc{0}{1}$ 上\emph{一致}
+        收敛，其和在该区间上\omterm{def:b2:metric:continuity}{连续}，并
+        重新得到
+        \cref{exo:b2:powerseries:9}中的径向极限：$f(x) \to \sum a_n$，当 $x
+        \to 1^-$ 时。
+  \item （\omterm{thm:b2:series:fubini}{柯西乘积}的阿贝尔定理）设 $\sum a_n = A$，
+        $\sum b_n = B$，且假设\omterm{thm:b2:series:fubini}{柯西乘积} $\sum
+        c_n$，$c_n = \sum_{k} a_kb_{n-k}$，\emph{收敛}，
+        其和为 $C$。证明 $C = AB$ \emph{（在收敛圆盘内，乘积恒等式
+        由
+        \cref{prop:b2:powerseries:operations}成立；令 $x \to
+        1^-$）}。
+  \item 说明该假设不可去掉：取 $a_n = b_n =
+        \frac{(-1)^n}{\sqrt{n+1}}$，两级数均收敛，但
+        $\abs{c_n} \geq \frac{2(n+1)}{n+2} \geq 1$ \emph{（对每个因子
+        $\sqrt{(k+1)(n-k+1)}$ 用算术--几何平均不等式估计）}：
+        两收敛级数的\omterm{thm:b2:series:fubini}{柯西乘积}可能发散。
+  \item （\cref{exo:b2:powerseries:5}的副产品）证明
+        $\bigl(\ln(1-x)\bigr)^2 = 2\sum_{n\geq1}
+        \frac{H_n}{n+1}x^{n+1}$ 在 $\intoo{-1}{1}$ 上成立，验证
+        $\bigl(\frac{H_n}{n+1}\bigr)_{n\geq1}$ 递减趋于
+        $0$，并借助阿贝尔定理得到：
+        \[
+        \sum_{n\geq1} (-1)^{n+1}\,\frac{H_n}{n+1}
+        = \frac{(\ln 2)^2}{2} .
+        \]
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第二部分——陶伯的逆定理。}称 $\sum
+a_n$ 为\emph{阿贝尔可和}，其值为 $L$，当 $f(x) \to L$ 且 $x \to
+1^-$ 时。
+\begin{enumerate}[resume]
+  \item 证明 $\sum (-1)^n$ 阿贝尔可和于 $\frac12$，
+        但它发散：阿贝尔定理没有无条件的
+        逆定理。
+  \item （切萨罗引理）若 $u_n \to 0$，则 $\frac{u_1 + \dots
+        + u_N}{N} \to 0$ \emph{（在固定的 $m$ 处将和式分拆）}。
+  \item 现设 $n\,a_n \to 0$ 且 $f(x) \to L$。取 $x_N =
+        1 - \frac1N$，证明以下两个估计：
+        \[
+        \Bigl|\sum_{n=0}^{N} a_n\bigl(1 - x_N^n\bigr)\Bigr|
+        \leq \frac{1}{N}\sum_{n=1}^{N} n\,\abs{a_n},
+        \qquad
+        \Bigl|\sum_{n>N} a_n x_N^n\Bigr|
+        \leq \sup_{n>N}\bigl(n\abs{a_n}\bigr)
+        \]
+        \emph{（对第一式，用 $1 - x^n \leq n(1-x)$；对
+        第二式，用 $\abs{a_n} \leq \frac{1}{N}\sup_{m>N}
+        m\abs{a_m}$ 及 $\sum x_N^n \leq N$）}。
+  \item 由此得出\emph{陶伯定理}：若 $n\,a_n \to 0$ 且
+        $\sum a_n$ 阿贝尔可和于 $L$，则 $\sum a_n$
+        收敛于 $L$。
+  \item （非负系数的简单陶伯型定理）若 $a_n
+        \geq 0$，且 $f$ 在 $\intco{0}{1}$ 上有界，证明
+        $\sum a_n$ 收敛，且 $\sum a_n = \lim_{x\to1^-}
+        f(x)$ \emph{（估计 $\sum_{n\leq N}a_nx^n \leq f(x)$，并
+        令 $x \to 1^-$，再用阿贝尔定理）}。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第三部分——切萨罗平均与弗罗贝尼乌斯
+定理。}称 $\sum a_n$ 为\emph{切萨罗可和}，其值为 $L$，当
+$\sigma_N = \frac{A_0 + \dots + A_{N-1}}{N} \to L$ 时。
+\begin{enumerate}[resume]
+  \item 证明收敛级数切萨罗可和于
+        其和，\emph{（对 $A_n - L$ 应用第 7 题）}。
+  \item 计算 $\sum(-1)^n$ 的切萨罗值，并验证其
+        与第 6 题中的阿贝尔值 $\frac12$ 一致。
+  \item 记 $S_n = A_0 + \dots + A_n = (n+1)\,\sigma_{n+1}$，
+        证明对 $0 \leq x < 1$，以下两个恒等式成立：
+        \[
+        f(x) = (1-x)^2\sum_{n\geq0}(n+1)\,\sigma_{n+1}x^n,
+        \qquad
+        (1-x)^2\sum_{n\geq0}(n+1)x^n = 1 .
+        \]
+  \item （弗罗贝尼乌斯）由此推出：若 $\sigma_N \to L$，则 $f(x) \to
+        L$，当 $x \to 1^-$ 时——切萨罗可和蕴含
+        阿贝尔可和，且值相同\emph{（将两个恒等式相减，
+        并在较大的 $N$ 处分拆和式，如
+        \cref{exo:b2:powerseries:9}中那样）}。
+  \item 证明下述层次关系：
+        \[
+        \text{收敛} \;\Longrightarrow\;
+        \text{切萨罗可和} \;\Longrightarrow\;
+        \text{阿贝尔可和}
+        \]
+        两个箭头都是严格的：第一个由第 6 题给出；
+        对第二个，证明 $\sum(-1)^n(n+1)$
+        阿贝尔可和于 $\frac14$（计算 $f$），但不是
+        切萨罗可和（先计算 $\sigma_N$，
+        再分别对偶数与奇数 $N$ 讨论）。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第四部分——积分到边界。}
+\begin{enumerate}[resume]
+  \item 设 $\sum a_nx^n$ 在 $\intco{0}{1}$ 上收敛，且
+        $\sum \frac{a_n}{n+1}$ 收敛。证明
+        \omterm{def:b2:integration:improper}{广义积分} $\int_0^1 f$ 存在，并且
+        \[
+        \int_0^1 \Bigl(\sum_{n\geq0} a_nx^n\Bigr)\dd x
+        = \sum_{n\geq0}\frac{a_n}{n+1}
+        \]
+        \emph{（原函数 $F(x) = \sum\frac{a_n}{n+1}x^{n+1}$
+        在 $1$ 处\omterm{def:b2:metric:continuity}{连续}，由第一部分可知）}。
+  \item 设 $\eta = \sum_{n\geq1}\frac{(-1)^{n-1}}{n^2}$。证明
+        $\int_0^1 \frac{\ln(1+x)}{x}\dd x = \eta$，并通过
+        按偶数与奇数下标拆分
+        \omterm{def:b2:series:def}{绝对收敛}的 $\sum \frac1{n^2}$，得 $\eta =
+        \frac12\sum_{n\geq1}\frac{1}{n^2}$。（傅里叶级数
+        一章的周末问题计算了
+        $\sum\frac1{n^2} = \frac{\pi^2}{6}$。）
+  \item 证明
+        \[
+        \sum_{n\geq0}\frac{(-1)^n}{3n+1}
+        = \int_0^1\frac{\dd x}{1+x^3}
+        = \frac13\Bigl(\ln 2 + \frac{\pi}{\sqrt3}\Bigr)
+        \]
+        \emph{（由莱布尼茨判别法，该级数收敛；对几何级数
+        $\sum(-1)^nx^{3n}$ 利用第 16 题逐项积分；
+        再用部分分式：$\frac{1}{1+x^3} =
+        \frac{1/3}{1+x} + \frac{(2-x)/3}{x^2-x+1}$）}。
+  \item 由 $(1-t)^{-1/2}$ 的二项级数
+        （见\cref{exo:b2:powerseries:12}）推出
+        \[
+        \arcsin x = \sum_{n\geq0}
+        \frac{\binom{2n}{n}}{4^n(2n+1)}\,x^{2n+1}
+        \quad(\abs x < 1),
+        \qquad\text{于是}\qquad
+        \sum_{n\geq0}\frac{\binom{2n}{n}}{4^n(2n+1)}
+        = \frac\pi2 ,
+        \]
+        以\emph{正规}收敛证明端点处的值，
+        即 $\intcc{-1}{1}$ 上的收敛（利用
+        $\binom{2n}n4^{-n} \sim \frac{1}{\sqrt{\pi n}}$，
+        见\cref{ex:b2:comparison:centralbinomial}）——此处甚至
+        也不需要阿贝尔定理。
+  \item （\omterm{ex:b2:powerseries:catalan}{卡塔兰数}在端点处）证明 $\sum C_n 4^{-n} =
+        2$：
+        \cref{ex:b2:powerseries:catalan}中的卡塔兰级数\emph{恰}在
+        其\omterm{def:b2:powerseries:radius}{收敛半径} $\frac14$ 处收敛（渐近估计见
+        \cref{exo:b2:powerseries:8}），其和在
+        $\intcc{0}{\frac14}$ 上\omterm{def:b2:metric:continuity}{连续}，而闭式在该处
+        的极限为 $2$。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第五部分——刚性：恒等定理。}
+\begin{enumerate}[resume]
+  \item （孤立零点）设 $f = \sum a_nx^n$ 的\omterm{def:b2:powerseries:radius}{收敛半径}为 $R >
+        0$，且并非所有 $a_n = 0$；设 $m$ 为最小的下标，
+        使 $a_m \neq 0$。证明 $f(x) = x^m g(x)$，其中 $g$ 为
+        \omterm{def:b2:powerseries:radius}{收敛半径}为 $R$ 的幂级数，$g(0) = a_m \neq 0$，并由此推出
+        $f$ 在
+        $0$ 的某去心邻域内没有零点。
+  \item （恒等定理）设 $f, h$ 为
+        在 $0$ 附近的幂级数和，$(x_k)$ 为一列\emph{非零}
+        点，满足 $x_k \to 0$ 且 $f(x_k) = h(x_k)$。证明
+        $f$ 与 $h$ 的系数相同，从而
+        二者在 $0$ 附近重合。
+  \item 求\emph{所有}函数 $f$，它在 $0$ 附近\omterm{def:b2:powerseries:analytic}{解析}，且使得
+        \[
+        f\Bigl(\frac1k\Bigr) = \frac{k^2}{k^2+1}
+        \qquad\text{对所有充分大的整数 } k .
+        \]
+  \item 证明在开区间 $I$ 上\omterm{def:b2:powerseries:analytic}{解析}、且在某一子区间上为零的函数，
+        在整个区间上恒为零
+        \emph{（在 $I$ 中，使 $f$ 在其附近恒为零的点之集是开的，
+        并且由在聚点处应用恒等定理，
+        该集合在 $I$ 中是闭的）}。
+        由此可得，$\R$ 上没有非零的\omterm{def:b2:powerseries:analytic}{解析函数}具有
+        紧支集——而 $C^\infty$ 凸起函数是存在的
+        （\cref{exo:b2:powerseries:7}提供了其基本构件）：
+        \omterm{def:b2:powerseries:analytic}{解析}性是刚性的，光滑性则
+        是松软的。
+  \item 综合。各用一句话回答：(i) 阿贝尔定理相对于
+        \omterm{def:b2:funcseq:series}{正规收敛}这一组结论增加了什么，
+        见\cref{lem:b2:powerseries:abel}；(ii) 逆命题成立的
+        精确假设（陶伯型定理），以及中间一级
+        （弗罗贝尼乌斯）；(iii) 第四部分中一个
+        你现在可以两行推出、讲给朋友听的端点常数；
+        (iv) 切萨罗均值将在本书何处再次出现，
+        用于一类
+        截然不同的级数。
+\end{enumerate}
+\end{problem}

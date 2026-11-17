@@ -1,0 +1,923 @@
+\chapter{Sequences}\label{ch:b1:seq}
+
+Sequences were manipulated in the High School volume with the limit
+concept taken half on faith. Here the theory is rebuilt on the
+completeness of $\R$ (\cref{ch:b1:reals}): every classical theorem
+--- monotone convergence, \omterm{thm:b1:seq:adjacent}{adjacent sequences}, Bolzano--Weierstrass,
+the Cauchy criterion --- is a face of that single axiom. The chapter
+ends with the practical study of sequences defined by $u_{n+1} =
+f(u_n)$.
+
+\section{Convergence}
+
+\begin{definition}[Limit of a sequence]\label{def:b1:seq:limit}
+A sequence $(u_n)$ of reals \emph{converges} to $\ell \in \R$
+when\index{limit!of a sequence}
+\[
+\forall \varepsilon > 0,\ \exists N \in \N,\ \forall n \geq N,
+\qquad \abs{u_n - \ell} \leq \varepsilon .
+\]
+One writes $u_n \to \ell$ or $\lim u_n = \ell$. A sequence that does
+not converge (to any real) \emph{diverges}. Divergence \emph{to
+$+\infty$}: $\forall M,\ \exists N,\ \forall n \geq N,\ u_n \geq M$
+(similarly $-\infty$).
+\end{definition}
+
+\begin{example}[An $\varepsilon$--$N$ proof, written out once]\label{ex:b1:seq:epsilonN}
+Claim: $u_n = \dfrac{n^2 + 1}{2n^2 - 3} \to \dfrac12$. First
+isolate the error:
+\[
+\Bigl| u_n - \frac12 \Bigr|
+= \Bigl| \frac{2(n^2 + 1) - (2n^2 - 3)}{2(2n^2 - 3)} \Bigr|
+= \frac{5}{2\,\abs{2n^2 - 3}}
+= \frac{5}{2\,(2n^2 - 3)} \quad (n \geq 2).
+\]
+Then dominate it by something simple: for $n \geq 2$, $2n^2 - 3
+\geq n^2$, so the error is $\leq \frac{5}{2n^2} \leq \frac 5{2n}$.
+Given $\varepsilon > 0$, the \omterm{thm:b1:reals:archimedes}{Archimedean property} provides $N \geq
+\max\bigl(2, \frac{5}{2\varepsilon}\bigr)$; for $n \geq N$ the
+error is $\leq \varepsilon$. Done. The closing insight: an
+$\varepsilon$--$N$ proof has exactly three moves --- compute the
+error, bound it by a decreasing elementary expression, solve for
+the threshold --- and after this chapter's theorems (operations,
+squeeze) one almost never writes such a proof again: the theorems
+package the three moves once and for all.
+\end{example}
+
+\begin{example}[Divergence to infinity, certified]\label{ex:b1:seq:toinfinity}
+Claim: $u_n = n^2 - 100n \to +\infty$. Factor the dominant term:
+$u_n = n^2\bigl(1 - \frac{100}{n}\bigr) \geq \frac{n^2}{2}$ for
+$n \geq 200$. Given $M$, take $N = \max\bigl(200,
+\lceil\sqrt{2M}\rceil\bigr)$: for $n \geq N$, $u_n \geq
+\frac{n^2}{2} \geq M$. Two habits are on display: dominant-term
+factoring converts a competition ($n^2$ against $-100n$) into a
+single scale times a factor tending to $1$; and the threshold
+may be huge ($u_{100} = 0$, the sequence is even negative before
+$n = 100$) --- divergence to $+\infty$ is a \omterm{def:b1:logic:statement}{statement} about the
+tail, indifferent to any finite amount of misbehavior.
+\end{example}
+
+\begin{proposition}[First properties]\label{prop:b1:seq:first}
+\begin{enumerate}
+  \item The limit, if it exists, is unique.
+  \item A convergent sequence is bounded.
+  \item If $u_n \to \ell$, every modification of finitely many terms
+        leaves the convergence and the limit unchanged.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(1) If $u_n \to \ell$ and $u_n \to \ell'$ with $\ell \neq \ell'$,
+take $\varepsilon = \frac{\abs{\ell - \ell'}}{3}$: beyond the two
+thresholds, $\abs{\ell - \ell'} \leq \abs{\ell - u_n} + \abs{u_n -
+\ell'} \leq 2\varepsilon = \frac23 \abs{\ell - \ell'}$, absurd.
+
+(2) With $\varepsilon = 1$: beyond $N$, $\abs{u_n} \leq \abs\ell +
+1$; the finitely many earlier terms are bounded too, so $\abs{u_n}
+\leq \max(\abs{u_0}, \dots, \abs{u_{N-1}}, \abs\ell + 1)$.
+
+(3) In detail: suppose $v_n = u_n$ for $n \geq n_0$ and $u_n \to
+\ell$. Given $\varepsilon > 0$, take the threshold $N$ for
+$(u_n)$: for $n \geq \max(N, n_0)$, $\abs{v_n - \ell} = \abs{u_n
+- \ell} \leq \varepsilon$. So $v_n \to \ell$: the definition
+quantifies only over $n \geq N$, and any finite prefix can be
+overwritten at the cost of enlarging the threshold. (This is why
+hypotheses ``for all large $n$'' suffice everywhere in this
+chapter.)
+\end{proof}
+
+\begin{theorem}[Operations on limits]\label{thm:b1:seq:operations}
+If $u_n \to \ell$ and $v_n \to m$, then
+\[
+u_n + v_n \to \ell + m, \qquad u_n v_n \to \ell m, \qquad
+\frac{u_n}{v_n} \to \frac{\ell}{m} \ (\text{if } m \neq 0),
+\qquad \abs{u_n} \to \abs\ell .
+\]
+\end{theorem}
+
+\begin{proof}
+\emph{Sum:} $\abs{(u_n + v_n) - (\ell + m)} \leq \abs{u_n - \ell} +
+\abs{v_n - m} \leq 2\varepsilon$ beyond the larger threshold.
+\emph{Product:} write
+\[
+u_n v_n - \ell m = (u_n - \ell)\,v_n + \ell\,(v_n - m);
+\]
+$(v_n)$ is bounded by some $B$ (\cref{prop:b1:seq:first}), so the
+right side is $\leq B\abs{u_n - \ell} + \abs{\ell}\,\abs{v_n - m}$,
+arbitrarily small. \emph{Quotient:} it suffices to treat $\frac
+1{v_n}$. With $\varepsilon = \frac{\abs m}{2}$: beyond some $N_0$,
+$\abs{v_n} \geq \frac{\abs m}{2}$, so
+\[
+\Bigl| \frac{1}{v_n} - \frac 1m \Bigr|
+= \frac{\abs{m - v_n}}{\abs{v_n m}}
+\leq \frac{2}{m^2}\,\abs{v_n - m} \longrightarrow 0 .
+\]
+\emph{Absolute value:} $\bigl|\abs{u_n} - \abs\ell\bigr| \leq
+\abs{u_n - \ell}$ (reverse triangle inequality,
+\cref{prop:b1:complex:rules}).
+\end{proof}
+
+\begin{example}[Operations plus one algebraic trick]\label{ex:b1:seq:conjugatetrick}
+Compute $\lim\,\bigl(\sqrt{n^2 + n} - n\bigr)$. The two pieces
+separately tend to $+\infty$: the operations theorem says nothing
+about their difference (an \emph{indeterminate form}). Multiply
+by the conjugate:
+\[
+\sqrt{n^2 + n} - n
+= \frac{(n^2 + n) - n^2}{\sqrt{n^2 + n} + n}
+= \frac{n}{\sqrt{n^2+n} + n}
+= \frac{1}{\sqrt{1 + \frac1n} + 1} .
+\]
+Now everything converges: $\sqrt{1 + \frac1n} \to 1$, because
+$0 \leq \sqrt{1 + h} - 1 = \frac{h}{\sqrt{1+h} + 1} \leq h$
+(conjugate again, then squeeze with $h = \frac1n$); then the
+operations theorem gives the limit $\frac{1}{1 + 1} =
+\frac12$. The closing insight: the operations theorem is not a
+calculator for all limits --- indeterminate forms ($\infty -
+\infty$, $\frac00$, $0 \times \infty$, $1^\infty$) must first be
+\emph{transformed} by algebra (conjugates, factoring the dominant
+term) until every piece converges; the systematic machine for
+resistant cases is the asymptotic expansion of
+\cref{ch:b1:taylor}.
+\end{example}
+
+\begin{theorem}[Limits and order]\label{thm:b1:seq:order}
+\begin{enumerate}
+  \item If $u_n \leq v_n$ for all large $n$, and both converge, then
+        $\lim u_n \leq \lim v_n$. (Strict inequalities do \emph{not}
+        pass to the limit: $\frac 1n > 0$ but $\lim = 0$.)
+  \item (Squeeze theorem\index{squeeze theorem}) If $u_n \leq w_n
+        \leq v_n$ for all large $n$ and $u_n, v_n \to \ell$, then
+        $w_n \to \ell$.
+  \item If $u_n \to \ell > 0$, then $u_n > \frac\ell2 > 0$ for all
+        large $n$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) Suppose $\ell = \lim u_n > m = \lim v_n$; with $\varepsilon =
+\frac{\ell - m}{3}$, large terms satisfy $v_n \leq m + \varepsilon <
+\ell - \varepsilon \leq u_n$, contradicting $u_n \leq v_n$.
+
+(2) Beyond the thresholds: $\ell - \varepsilon \leq u_n \leq w_n \leq
+v_n \leq \ell + \varepsilon$.
+
+(3) is \cref{def:b1:seq:limit} with $\varepsilon = \frac\ell2$.
+\end{proof}
+
+\begin{example}[Two squeezes]\label{ex:b1:seq:squeezes}
+(i) $\dfrac{\sin n}{n} \to 0$: from $-\frac1n \leq \frac{\sin
+n}{n} \leq \frac1n$, both walls collapsing on $0$ --- no need to
+understand the erratic numerator at all. (ii) $(2^n +
+3^n)^{1/n} \to 3$: frame the inside,
+\[
+3^n \leq 2^n + 3^n \leq 2\cdot3^n
+\quad\Longrightarrow\quad
+3 \leq (2^n + 3^n)^{1/n} \leq 3\cdot 2^{1/n} ,
+\]
+and $2^{1/n} = \eu^{\frac{\ln 2}{n}} \to 1$ (as for $5^{1/n}$ in
+\cref{exo:b1:seq:2}): the squeeze delivers $3$. The closing
+insight: a sum of competing exponentials behaves like its
+\emph{largest} term --- the smaller ones are absorbed by a
+harmless constant factor, which the $n$-th root then erases.
+\end{example}
+
+\section{Monotone sequences}
+
+\begin{theorem}[Monotone limit theorem]\label{thm:b1:seq:monotone}
+An increasing sequence bounded above converges, to $\sup\{u_n : n \in
+\N\}$; an increasing sequence not bounded above diverges to
+$+\infty$. (Mirror \omterm{def:b1:logic:statement}{statements} for decreasing
+sequences.)\index{monotone limit theorem}
+\end{theorem}
+
+\begin{proof}
+Let $s = \sup\{u_n\}$ (\cref{thm:b1:reals:sup}). Given $\varepsilon >
+0$, the $\varepsilon$-characterization
+(\cref{prop:b1:reals:epsilon}) yields $N$ with $u_N > s -
+\varepsilon$; by monotonicity, $s - \varepsilon < u_N \leq u_n \leq
+s$ for all $n \geq N$: convergence to $s$. If unbounded: for every
+$M$ some $u_N > M$, and monotonicity keeps all later terms above $M$.
+\end{proof}
+
+\begin{example}[The monotone theorem as an existence machine]\label{ex:b1:seq:existencemachine}
+Let $u_n = \prod_{k=1}^{n} \bigl(1 + \frac{1}{2^k}\bigr)$. Each
+factor exceeds $1$, so $(u_n)$ is increasing. Bounded above? Take
+logarithms and use $\ln(1 + x) \leq x$
+(\cref{ex:b1:derivative:convexineq} anticipates it; or the
+crude $1 + x \leq \eu^x$ from the High School volume):
+\[
+\ln u_n = \sum_{k=1}^{n} \ln\Bigl(1 + \frac{1}{2^k}\Bigr)
+\leq \sum_{k=1}^{n} \frac{1}{2^k} < 1 ,
+\]
+so $u_n < \eu$. Increasing and bounded: $(u_n)$ converges to some
+$\ell \in \intoc{u_1}{\eu}$ --- a perfectly well-defined real
+number with no closed form in sight ($\ell = 2.384\dots$). The
+closing insight: the monotone limit theorem is the cheapest
+existence machine in analysis; it named $\eu$ itself
+(\cref{ex:b1:seq:e} below), and in \cref{ch:b1:series} it will
+decide the convergence of every positive series by mere
+boundedness.
+\end{example}
+
+\begin{theorem}[Adjacent sequences]\label{thm:b1:seq:adjacent}
+Let $(a_n)$ be increasing, $(b_n)$ decreasing, with $b_n - a_n \to
+0$. Then both converge, to a \emph{common} limit $\ell$, and $a_n
+\leq \ell \leq b_n$ for all $n$.\index{adjacent sequences}
+\end{theorem}
+
+\begin{proof}
+First, $a_n \leq b_n$ for all $n$: the sequence $(b_n - a_n)$ is
+decreasing and tends to $0$, so it is $\geq 0$ (a negative term would
+freeze it below $0$). Then $(a_n)$ is increasing and bounded above by
+$b_0$: it converges to some $\ell$ (\cref{thm:b1:seq:monotone});
+likewise $(b_n) \to \ell'$; and $\ell' - \ell = \lim (b_n - a_n) =
+0$. The inequalities $a_n \leq \ell \leq b_n$ follow from
+monotonicity ($\ell = \sup a_k \geq a_n$, etc.).
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=10.5]
+  \draw[-Stealth] (-0.03,0) -- (1.08,0);
+  % a_n increasing (omDef), b_n decreasing (omProp)
+  \fill[omDef] (0,0) circle (0.3pt) node[below=2pt, font=\small]
+    {$a_0$};
+  \fill[omDef] (0.18,0) circle (0.3pt) node[below=2pt,
+    font=\small] {$a_1$};
+  \fill[omDef] (0.30,0) circle (0.3pt) node[below=2pt,
+    font=\small] {$a_2$};
+  \fill[omDef] (0.37,0) circle (0.3pt);
+  \fill[omDef] (0.41,0) circle (0.3pt);
+  \fill[omProp] (1.0,0) circle (0.3pt) node[below=2pt,
+    font=\small] {$b_0$};
+  \fill[omProp] (0.78,0) circle (0.3pt) node[below=2pt,
+    font=\small] {$b_1$};
+  \fill[omProp] (0.62,0) circle (0.3pt) node[below=2pt,
+    font=\small] {$b_2$};
+  \fill[omProp] (0.54,0) circle (0.3pt);
+  \fill[omProp] (0.50,0) circle (0.3pt);
+  \draw[omThm, thick] (0.455,-0.014) -- (0.455,0.014);
+  \node[above, omThm, font=\small] at (0.455,0.02) {$\ell$};
+  \draw[Stealth-Stealth, gray] (0.30,0.05) -- (0.62,0.05);
+  \node[above, font=\small, text=gray] at (0.46,0.055)
+    {$b_n - a_n \to 0$};
+\end{tikzpicture}
+
+{\small \omterm{thm:b1:seq:adjacent}{Adjacent sequences}: $(a_n)$ climbs, $(b_n)$ descends,
+and the gap between them shrinks to $0$. Each \omterm{prop:b1:reals:intervals}{interval}
+$\intcc{a_n}{b_n}$ contains all later ones, and the common limit
+$\ell$ is the unique point left in every \omterm{prop:b1:reals:intervals}{interval} --- the
+picture behind the dichotomy proofs of Bolzano--Weierstrass
+below and of the intermediate value theorem in
+\cref{ch:b1:continuity}.}
+\end{omfigure}
+
+\begin{example}[The number $\eu$]\label{ex:b1:seq:e}
+Set $a_n = \sum_{k=0}^{n} \frac{1}{k!}$ and $b_n = a_n + \frac{1}{n
+\cdot n!}$ ($n \geq 1$). Then $(a_n)$ increases; and
+\[
+b_{n+1} - b_n = \frac{1}{(n+1)!} + \frac{1}{(n+1)(n+1)!} -
+\frac{1}{n\,n!}
+= \frac{n(n+1) + n - (n+1)^2}{n(n+1)(n+1)!}
+= \frac{-1}{n(n+1)(n+1)!} < 0 ,
+\]
+so $(b_n)$ decreases, and $b_n - a_n \to 0$: adjacent. Their common
+limit is (by definition here) the number $\eu \approx 2.71828$; the
+inequalities $a_n < \eu < b_n$ are sharp enough to prove $\eu \notin
+\Q$ (\cref{exo:b1:seq:9}).
+\end{example}
+
+\section{Subsequences and Bolzano--Weierstrass}
+
+\begin{definition}[Subsequence]\label{def:b1:seq:subsequence}
+A \emph{subsequence}\index{subsequence} of $(u_n)$ is a sequence
+$(u_{\varphi(n)})$ where $\varphi \colon \N \to \N$ is strictly
+increasing (note $\varphi(n) \geq n$, by induction).
+\end{definition}
+
+\begin{proposition}\label{prop:b1:seq:subsequences}
+If $u_n \to \ell$ ($\ell \in \R$ or $\pm\infty$), every \omterm{def:b1:seq:subsequence}{subsequence}
+tends to $\ell$. Consequently, a sequence with two \omterm{def:b1:seq:subsequence}{subsequences} of
+different limits diverges. Conversely, if $(u_{2n})$ and
+$(u_{2n+1})$ both converge to the \emph{same} $\ell$, then $u_n \to
+\ell$.
+\end{proposition}
+
+\begin{proof}
+Beyond the threshold $N$ for $(u_n)$, all indices $\varphi(n) \geq n
+\geq N$ qualify (the inequality $\varphi(n) \geq n$ is the
+induction noted in \cref{def:b1:seq:subsequence}: $\varphi(0)
+\geq 0$, and $\varphi(n+1) > \varphi(n) \geq n$ forces
+$\varphi(n+1) \geq n + 1$). For the converse: given
+$\varepsilon$, take the two thresholds $N_0$ (evens) and $N_1$
+(odds); an arbitrary index $n \geq \max(2N_0, 2N_1 + 1)$ is
+either even, $n = 2k$ with $k \geq N_0$, or odd, $n = 2k+1$ with
+$k \geq N_1$ --- in both cases $\abs{u_n - \ell} \leq
+\varepsilon$: every index is covered by one of the two
+\omterm{def:b1:seq:subsequence}{subsequences}, and that is the whole point.
+\end{proof}
+
+\begin{example}[Subsequential limits]\label{ex:b1:seq:sublimits}
+For $u_n = (-1)^n \frac{n}{n+1}$: the even \omterm{def:b1:seq:subsequence}{subsequence} tends to
+$1$, the odd one to $-1$, so the sequence diverges --- but it does
+so in an organized way, clustering around the two values $\pm 1$.
+For $u_n = \cos\frac{2\pi n}{3}$: the three \omterm{def:b1:seq:subsequence}{subsequences} of
+indices $3k$, $3k + 1$, $3k + 2$ are constant, equal to $1$,
+$-\frac12$, $-\frac12$; the \omterm{def:b1:logic:sets}{set} of subsequential limits is $\{1,
+-\frac12\}$. The closing insight: a \emph{bounded} sequence
+converges exactly when it has a single subsequential limit
+(\cref{exo:b1:seq:8}); divergence of a bounded sequence always
+means at least two clusters, and Bolzano--Weierstrass below
+guarantees there is at least one.
+\end{example}
+
+\begin{theorem}[Bolzano--Weierstrass]\label{thm:b1:seq:bw}
+Every bounded sequence of reals has a convergent
+\omterm{def:b1:seq:subsequence}{subsequence}.\index{Bolzano--Weierstrass theorem}
+\end{theorem}
+
+\begin{proof}
+Let $u_n \in \intcc{a}{b}$ for all $n$. Build nested segments by
+dichotomy: set $\intcc{a_0}{b_0} = \intcc{a}{b}$; given
+$\intcc{a_k}{b_k}$ containing $u_n$ for infinitely many $n$, one of
+its two halves still contains $u_n$ for infinitely many $n$ --- call
+it $\intcc{a_{k+1}}{b_{k+1}}$. The sequences $(a_k)$, $(b_k)$ are
+adjacent ($b_k - a_k = \frac{b-a}{2^k} \to 0$), with common limit
+$\ell$ (\cref{thm:b1:seq:adjacent}).
+
+Extract: choose $\varphi(0)$ with $u_{\varphi(0)} \in
+\intcc{a_0}{b_0}$, then, inductively, $\varphi(k+1) > \varphi(k)$
+with $u_{\varphi(k+1)} \in \intcc{a_{k+1}}{b_{k+1}}$ --- possible
+since that segment contains infinitely many terms. Then $a_k \leq
+u_{\varphi(k)} \leq b_k$, and the squeeze theorem gives
+$u_{\varphi(k)} \to \ell$.
+\end{proof}
+
+\begin{remark}[What Bolzano--Weierstrass does, and does not, say]
+It \emph{does} say: from boundedness alone, some \omterm{def:b1:seq:subsequence}{subsequence}
+converges --- existence with no formula, as the dichotomy proof
+makes clear (nothing tells us \emph{which} indices survive). It
+does \emph{not} say the limit is unique: $((-1)^n)$ has
+\omterm{def:b1:seq:subsequence}{subsequences} converging to $1$ and to $-1$, and the \omterm{def:b1:logic:sets}{set} of
+subsequential limits can even be infinite
+(\cref{ex:b1:seq:sublimits}, and all of the Cantor \omterm{def:b1:logic:sets}{set} in
+\cref{pb:b1:topology:1}). It does not survive unboundedness:
+$(n)$ has no convergent \omterm{def:b1:seq:subsequence}{subsequence} at all --- though one can
+always extract a \omterm{def:b1:seq:subsequence}{subsequence} tending to $+\infty$ or $-\infty$
+from any unbounded sequence (choose $\varphi(k)$ with
+$u_{\varphi(k)} \geq k$, say). Used correctly, the theorem is an
+\emph{existence pump}: it appears at the crux of the Cauchy
+criterion below, of Heine's theorem, and of the extreme value
+theorem --- always to produce a point that no explicit
+construction offers.
+\end{remark}
+
+\section{Cauchy sequences and completeness}
+
+\begin{definition}\label{def:b1:seq:cauchy}
+A sequence $(u_n)$ is a \emph{Cauchy sequence}\index{Cauchy sequence}
+when its terms become arbitrarily close \emph{to each other}:
+\[
+\forall \varepsilon > 0,\ \exists N,\ \forall p, q \geq N,
+\qquad \abs{u_p - u_q} \leq \varepsilon .
+\]
+\end{definition}
+
+\begin{example}[Verifying the Cauchy property by hand]\label{ex:b1:seq:cauchyhand}
+Let $u_n = \sum_{k=0}^{n} \frac{\cos k}{2^k}$ --- no monotonicity,
+no guessable limit. For $p > q$:
+\[
+\abs{u_p - u_q}
+= \Bigl| \sum_{k=q+1}^{p} \frac{\cos k}{2^k} \Bigr|
+\leq \sum_{k=q+1}^{p} \frac{1}{2^k}
+< \frac{1}{2^{q}} ,
+\]
+by the triangle inequality, $\abs{\cos k} \leq 1$ and a finite
+geometric sum. Given $\varepsilon > 0$, choose $N$ with $2^{-N}
+\leq \varepsilon$: all gaps beyond $N$ are $\leq \varepsilon$,
+the sequence is Cauchy, hence converges --- to a limit nobody
+can name in closed form, which is exactly the point. The closing
+insight: geometric domination of the increments is the standard
+way to earn the Cauchy property, and \cref{ch:b1:series} will
+bottle the argument as ``absolute convergence implies
+convergence''.
+\end{example}
+
+\begin{theorem}[Completeness of $\R$]\label{thm:b1:seq:complete}
+A sequence of reals converges if and only if it is a \omterm{def:b1:seq:cauchy}{Cauchy
+sequence}.\index{completeness of R@completeness of $\R$}
+\end{theorem}
+
+\begin{proof}
+($\Rightarrow$) If $u_n \to \ell$: beyond the threshold for
+$\frac\varepsilon2$, $\abs{u_p - u_q} \leq \abs{u_p - \ell} +
+\abs{\ell - u_q} \leq \varepsilon$.
+
+($\Leftarrow$) Let $(u_n)$ be Cauchy. \emph{It is bounded}: with
+$\varepsilon = 1$, beyond $N$ all terms lie within $1$ of $u_N$, and
+the head is finite. \emph{Extract}: by
+\cref{thm:b1:seq:bw}, some \omterm{def:b1:seq:subsequence}{subsequence} $u_{\varphi(n)} \to \ell$.
+\emph{Conclude}: given $\varepsilon > 0$, take $N$ (Cauchy, for
+$\frac\varepsilon2$) and $n \geq N$ with $\abs{u_{\varphi(n)} - \ell}
+\leq \frac\varepsilon2$ and $\varphi(n) \geq N$; then for every $p
+\geq N$:
+\[
+\abs{u_p - \ell} \leq \abs{u_p - u_{\varphi(n)}} +
+\abs{u_{\varphi(n)} - \ell} \leq \varepsilon . \qedhere
+\]
+\end{proof}
+
+\begin{remark}
+The value of the criterion: it certifies convergence \emph{without
+naming the limit}. It fails over $\Q$ (the decimal truncations of
+$\sqrt 2$ form a \omterm{def:b1:seq:cauchy}{Cauchy sequence} of rationals with no rational
+limit): completeness is a property of $\R$, equivalent to the \omterm{def:b1:reals:bounds}{upper
+bound} axiom. It is also the workhorse behind the convergence of
+series (\cref{ch:b1:series}).
+\end{remark}
+
+\begin{example}[A Cauchy sequence with an invisible limit]\label{ex:b1:seq:basel}
+Let $S_n = \sum_{k=1}^{n} \frac{1}{k^2}$. For $p > q \geq 1$:
+\[
+S_p - S_q = \sum_{k=q+1}^{p} \frac{1}{k^2}
+\leq \sum_{k=q+1}^{p} \frac{1}{k(k-1)}
+= \sum_{k=q+1}^{p} \Bigl(\frac{1}{k-1} - \frac 1k\Bigr)
+= \frac 1q - \frac 1p < \frac 1q ,
+\]
+so beyond $N > \frac1\varepsilon$ all gaps are $\leq \varepsilon$:
+$(S_n)$ is Cauchy, hence converges. Notice what just happened: we
+proved that a specific real number exists without having any name
+for it. (It is $\frac{\pi^2}{6}$ --- a celebrated identity of
+Euler, proved in the Year 2 volume; nothing in this chapter could
+tell us that.) This division of labor --- existence now,
+identification later, if ever --- is the Cauchy criterion's whole
+point, and the engine of the theory of series in
+\cref{ch:b1:series}.
+\end{example}
+
+\section{Recurrent sequences}
+
+\begin{method}[Studying $u_{n+1} = f(u_n)$]\label{met:b1:seq:recurrent}
+Given $f$ and a starting point $u_0$:\index{recurrent sequence}
+\begin{enumerate}
+  \item \emph{Stable \omterm{prop:b1:reals:intervals}{interval}:} find an \omterm{prop:b1:reals:intervals}{interval} $I$ with $f(I)
+        \subseteq I$ containing $u_0$: then all $u_n \in I$ (by
+        induction).
+  \item \emph{Candidate limits:} if $u_n \to \ell \in I$ and $f$ is
+        continuous at $\ell$ (\cref{ch:b1:continuity}), then $\ell$
+        is a \emph{fixed point}: $f(\ell) = \ell$. Solve $f(x) = x$.
+  \item \emph{Monotonicity:} if $f$ is increasing on $I$, then
+        $(u_n)$ is monotonic (increasing if $u_1 \geq u_0$,
+        decreasing otherwise); combined with boundedness,
+        \cref{thm:b1:seq:monotone} concludes. If $f$ is decreasing,
+        study the two \omterm{def:b1:seq:subsequence}{subsequences} $(u_{2n})$ and $(u_{2n+1})$,
+        which are monotonic for $f \circ f$.
+  \item \emph{Error control:} an inequality $\abs{f(x) - \ell} \leq
+        k\abs{x - \ell}$ with $k < 1$ gives $\abs{u_n - \ell} \leq
+        k^n \abs{u_0 - \ell} \to 0$ directly.
+\end{enumerate}
+\end{method}
+
+\begin{example}[Heron's method]\label{ex:b1:seq:heron}
+Let $u_0 = 2$ and $u_{n+1} = \dfrac12\Bigl(u_n +
+\dfrac{2}{u_n}\Bigr)$: the ancient algorithm for
+$\sqrt 2$.\index{Heron's method}
+\begin{itemize}
+  \item \emph{Stability:} for $x > 0$, the arithmetic--geometric mean
+        inequality gives $\frac12(x + \frac2x) \geq \sqrt{x \cdot
+        \frac 2x} = \sqrt 2$; so $I = \intco{\sqrt 2}{+\infty}$ is
+        stable and contains $u_1$ (indeed $u_1 = \frac32 \geq
+        \sqrt 2$).
+  \item \emph{Monotonicity:} for $x \geq \sqrt 2$, $\;x - f(x) =
+        \frac{x^2 - 2}{2x} \geq 0$: the sequence decreases from
+        $u_1$ on, and is bounded below by $\sqrt 2$: it converges.
+  \item \emph{Limit:} the fixed points solve $x = \frac12(x +
+        \frac2x)$, i.e.\ $x^2 = 2$: on $I$, $\ell = \sqrt 2$.
+  \item \emph{Speed:} $u_{n+1} - \sqrt 2 = \frac{(u_n -
+        \sqrt2)^2}{2u_n} \leq \frac{(u_n - \sqrt 2)^2}{2\sqrt 2}$:
+        the number of correct digits roughly \emph{doubles} at each
+        step (quadratic convergence).
+\end{itemize}
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=8.6cm, height=7cm,
+    xmin=0.9, xmax=2.35, ymin=0.9, ymax=2.35,
+    xtick={1,1.5,2}, ytick={1,1.5,2},
+    xlabel={$x$}, ylabel={$y$}]
+  \addplot[gray, dashed, domain=0.9:2.3] {x}
+    node[pos=0.72, above left, font=\small] {$y = x$};
+  \addplot[omDef, very thick, domain=0.95:2.3, samples=100]
+    {0.5*(x + 2/x)} node[pos=0.88, above left, font=\small]
+    {$y = f(x)$};
+  % cobweb: u0=2, u1=1.5, u2=1.4167
+  \draw[gray, dashed, thin] (axis cs:1.5,0.9) -- (axis cs:1.5,1.4167);
+  \draw[omThm, thick, -Stealth] (axis cs:2,0.9) -- (axis cs:2,1.5);
+  \draw[omThm, thick, -Stealth] (axis cs:2,1.5) -- (axis cs:1.5,1.5);
+  \draw[omThm, thick, -Stealth] (axis cs:1.5,1.5) --
+    (axis cs:1.5,1.4167);
+  \draw[omThm, thick, -Stealth] (axis cs:1.5,1.4167) --
+    (axis cs:1.4167,1.4167);
+  \fill (axis cs:1.41421,1.41421) circle (1.6pt);
+  \node[anchor=north, font=\small] at (axis cs:1.4142,1.385)
+    {$\sqrt 2$};
+  \node[anchor=west, font=\small, omThm] at (axis cs:2.02,1.05)
+    {$u_0$};
+  \node[anchor=east, font=\small, omThm] at (axis cs:1.48,1.05)
+    {$u_1$};
+\end{axis}
+\end{tikzpicture}
+
+{\small Heron's iteration $u_{n+1} = \frac12\bigl(u_n +
+\frac{2}{u_n}\bigr)$, drawn as a staircase between the graph of $f$
+and the diagonal $y = x$: from $u_0 = 2$, the iterates slide down to
+the fixed point $\sqrt 2$.}
+\end{omfigure}
+
+\begin{remark}[Common pitfalls with limits]
+Four classics. (i) \emph{Small steps do not imply convergence}:
+$u_{n+1} - u_n \to 0$ is far weaker than the Cauchy property ---
+the harmonic sums $H_n$ have steps $\frac{1}{n+1} \to 0$ yet
+diverge to $+\infty$ (\cref{exo:b1:seq:5}); the Cauchy condition
+controls $\abs{u_p - u_q}$ for \emph{all} large pairs, not
+consecutive ones. (ii) \emph{Strict inequalities die in the
+limit}: from $u_n < v_n$ for all $n$ one gets only $\lim u_n
+\leq \lim v_n$ (\cref{thm:b1:seq:order}); $\frac1n > 0$ and yet
+$\lim = 0$. (iii) \emph{Bounded is not convergent}: $((-1)^n)$
+is bounded and diverges; boundedness plus \emph{monotonicity}
+converges, boundedness alone only guarantees a convergent
+\omterm{def:b1:seq:subsequence}{subsequence} (\cref{thm:b1:seq:bw}). (iv) \emph{The fixed-point
+equation comes second, not first}: for $u_{n+1} = f(u_n)$,
+solving $f(\ell) = \ell$ identifies the limit \emph{only after}
+convergence is proved. The recurrence $u_{n+1} = 2u_n$ has the
+unique fixed point $\ell = 0$, yet from $u_0 = 1$ the sequence
+runs to $+\infty$: the equation $\ell = 2\ell$ was never
+entitled to a limit. Order of operations, always: existence
+first (\cref{met:b1:seq:recurrent}, steps 1--3), identification
+second.
+\end{remark}
+
+\begin{example}[A decreasing $f$: the golden recurrence]\label{ex:b1:seq:golden}
+Let $u_0 = 1$ and $u_{n+1} = \dfrac{1}{1 + u_n}$. Here $f(x) =
+\frac{1}{1+x}$ is \emph{decreasing}, so the sequence is not
+monotonic (it alternates around its limit); the contraction step
+of \cref{met:b1:seq:recurrent} is the right tool. Stability: if
+$x \in \intcc{\frac12}{1}$ then $1 + x \in
+\intcc{\frac32}{2}$, so $f(x) \in \intcc{\frac12}{\frac23}
+\subseteq \intcc{\frac12}{1}$, and $u_1 = \frac12$ puts the
+whole sequence there. Fixed point: $\ell = \frac{1}{1+\ell}$
+with $\ell > 0$ gives $\ell^2 + \ell - 1 = 0$, i.e.
+\[
+\ell = \frac{\sqrt5 - 1}{2} = 0.6180\dots
+\]
+(the golden ratio's inverse). Contraction: for $x, y \in
+\intcc{\frac12}{1}$,
+\[
+\abs{f(x) - f(y)} = \frac{\abs{x - y}}{(1+x)(1+y)}
+\leq \frac{\abs{x-y}}{(3/2)^2} = \frac49\,\abs{x - y} ,
+\]
+so $\abs{u_n - \ell} \leq \bigl(\frac49\bigr)^{n-1}\abs{u_1 -
+\ell} \to 0$: convergence, with geometric speed, no
+monotonicity needed. The closing insight: monotone methods and
+contraction methods split the recurrent world between them ---
+increasing $f$ gives monotone orbits, decreasing $f$ gives
+alternating orbits tamed by a Lipschitz constant $< 1$ (the
+systematic theory is \cref{exo:b1:derivative:11}).
+\end{example}
+
+\begin{remark}[Perspectives inside this volume]
+Sequences are the measuring instrument the rest of the volume
+holds up to every object. In \cref{ch:b1:topology} they
+\emph{characterize} closedness and compactness; in
+\cref{ch:b1:continuity} they transport limits of functions; in
+\cref{ch:b1:integration} Riemann sums are sequences converging
+to the integral; \cref{ch:b1:series} \emph{is} the theory of one
+special class of sequences, the partial sums. Even the algebra
+chapters consume them: the iterates of a matrix in
+\cref{ch:b1:matrices} form sequences whose behavior
+(convergence of $A^n$) is a linear-algebra question with this
+chapter's vocabulary. The two theorems to carry everywhere:
+monotone limit (existence from order) and Bolzano--Weierstrass
+(existence from boundedness) --- between them, nearly every
+limit in this book is born.
+\end{remark}
+
+\begin{remark}[Complex sequences]
+A sequence $(z_n)$ of complex numbers converges to $\ell$ when
+$\abs{z_n - \ell} \to 0$; equivalently, when $\Re(z_n) \to \Re(\ell)$
+and $\Im(z_n) \to \Im(\ell)$ (compare $\abs{z}$ with $\abs{\Re z} +
+\abs{\Im z}$). The theorems not involving order --- operations,
+Bolzano--Weierstrass (extract twice), Cauchy criterion --- carry over
+verbatim.
+\end{remark}
+
+\section{Exercises}
+
+\begin{exercise}[$\star$]\label{exo:b1:seq:1}
+Directly from \cref{def:b1:seq:limit}, prove that
+$\dfrac{2n+1}{n+3} \to 2$, and that $(u_n) = ((-1)^n)$ diverges.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:seq:2}
+Compute the limits:
+\[
+\frac{n^2 - 3n + 1}{2n^2 + 5},
+\qquad
+\sqrt{n+1} - \sqrt n,
+\qquad
+\frac{2^n + n^3}{3^n - n^2},
+\qquad
+\sqrt[n]{5}\ \Bigl(= 5^{1/n}\Bigr).
+\]
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:seq:3}
+Prove the standard comparison: if $\abs{q} < 1$ then $q^n \to 0$
+\emph{(write $\frac{1}{\abs q} = 1 + h$, $h > 0$, and use the
+Bernoulli inequality $(1+h)^n \geq 1 + nh$, to be proved by
+induction)}. What are the behaviors for $q = 1$, $q = -1$, $\abs q >
+1$?
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:seq:4}
+Let $u_{n+1} = \frac{u_n + 3}{2}$, $u_0 = 0$. Find the fixed point
+$\ell$, prove that $v_n = u_n - \ell$ is geometric, and give an
+explicit formula and the limit of $(u_n)$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:seq:5}
+(Harmonic series) Let $H_n = \sum_{k=1}^{n} \frac 1k$. Prove that
+$H_{2n} - H_n \geq \frac12$ for all $n \geq 1$, and conclude that
+$(H_n)$ is \emph{not} a \omterm{def:b1:seq:cauchy}{Cauchy sequence}, hence diverges (to
+$+\infty$, being increasing).
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:seq:6}
+Suppose $(u_{2n})$, $(u_{2n+1})$ and $(u_{3n})$ all converge. Prove
+that $(u_n)$ converges. \emph{(Find common \omterm{def:b1:seq:subsequence}{subsequences} to equate the
+limits.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:seq:7}
+Study the sequence $u_0 = 0$, $u_{n+1} = \sqrt{2 + u_n}$:
+stability, monotonicity, limit. Then prove the error bound
+$\abs{u_n - 2} \leq \dfrac{2}{3^{\,n}}$ \emph{(show $2 - u_{n+1} =
+\dfrac{2 - u_n}{2 + \sqrt{2 + u_n}}$ and bound the denominator below
+by $3$)}.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:seq:8}
+Let $(u_n)$ be bounded, such that every convergent \omterm{def:b1:seq:subsequence}{subsequence} of
+$(u_n)$ has the \emph{same} limit $\ell$. Prove $u_n \to \ell$.
+\emph{(Contradiction plus Bolzano--Weierstrass.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:seq:9}
+With the notation of \cref{ex:b1:seq:e}, suppose $\eu = \frac pq$
+with $p, q \in \N^*$. Using $a_q < \eu < b_q = a_q + \frac{1}{q\,
+q!}$, multiply by $q!$ and derive a contradiction between two
+integers. Conclude: $\eu$ is irrational.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:seq:10}
+(Ces\`aro means) For a sequence $(u_n)_{n \geq 1}$, set $c_n =
+\frac{u_1 + \dots + u_n}{n}$.
+\begin{enumerate}
+  \item Prove that $u_n \to \ell$ implies $c_n \to \ell$ \emph{(cut
+        the sum at a threshold $N$; bound the head by a fixed
+        quantity over $n$, the tail by $\varepsilon$)}.
+  \item Show by example that the converse fails.
+  \item Deduce that if $u_{n+1} - u_n \to \ell$, then $\frac{u_n}{n}
+        \to \ell$.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:seq:11}
+Let $(u_n)$ satisfy $0 \leq u_{m+n} \leq u_m + u_n$ for all $m, n$
+(subadditivity). Prove that $\bigl(\frac{u_n}{n}\bigr)$ converges to
+$\inf_{n \geq 1} \frac{u_n}{n}$. \emph{(For fixed $m$, write $n = qm
++ r$ and bound $\frac{u_n}{n}$ using $u_n \leq q\,u_m + u_r$.)}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:seq:12}
+Using the density of the \omterm{def:b1:structures:subgroup}{subgroup} $\Z + 2\pi\Z$ of $(\R, +)$
+(\cref{exo:b1:reals:9}), prove that the sequence $(\sin n)_{n \in
+\N}$ is dense in $\intcc{-1}{1}$ --- in particular it diverges.
+\end{exercise}
+
+\section{Problem: Ces\`aro, Stolz, and the slow fall of the sine}
+
+\begin{problem}[{Weekend problem --- the Ces\`aro--Stolz theorem
+and the asymptotics $u_n \sim \sqrt{3/n}$ for $u_{n+1} = \sin
+u_n$}]
+\label{pb:b1:seq:1}
+The Ces\`aro--Stolz theorem is the discrete l'Hospital rule: to
+find the limit of a quotient $a_n/b_n$, it suffices to find the
+limit of the quotient of \emph{increments} $(a_{n+1} -
+a_n)/(b_{n+1} - b_n)$. This problem proves the theorem, harvests
+classical limits with it, and then aims it at a famous target:
+the sequence $u_{n+1} = \sin u_n$, which creeps to $0$ at the
+exactly computable speed $u_n \sim \sqrt{3/n}$.\index{Cesaro--Stolz
+theorem@Ces\`aro--Stolz theorem} Two facts from the High School
+volume are granted here and re-proved honestly later in this
+volume: the tangent-line inequality
+\[
+\tag{G1} \eu^{u} \geq 1 + u \quad (u \in \R),
+\]
+re-proved by convexity in \cref{ch:b1:derivative}, and the sine
+bracketing
+\[
+\tag{G2} x - \frac{x^3}{6} \;\leq\; \sin x \;\leq\; x -
+\frac{x^3}{6} + \frac{x^5}{120} \quad (0 \leq x \leq 1), \qquad
+\abs{\sin x} \leq \abs{x} \quad (x \in \R),
+\]
+re-proved by Taylor's formula in \cref{ch:b1:taylor}.
+
+\medskip
+\noindent\textbf{Part I --- Sums without closed formulas.}
+\begin{enumerate}
+  \item Using $1 + 2 + \dots + n = \frac{n(n+1)}{2}$ and $1^2 +
+        \dots + n^2 = \frac{n(n+1)(2n+1)}{6}$, compute
+        $\lim \frac{1 + 2 + \dots + n}{n^2}$ and $\lim \frac{1^2 +
+        \dots + n^2}{n^3}$.
+  \item Let $T_n = \sum_{k=1}^n \sqrt k$, for which no closed
+        formula exists. Prove the bracketing
+        \[
+        \frac{1}{2\sqrt 2}\,n^{3/2} \;\leq\; T_n \;\leq\;
+        n^{3/2}
+        \]
+        \emph{(keep only the terms $k > \frac n2$ for the lower
+        bound)}. So $T_n$ has the order $n^{3/2}$ --- but which
+        constant? Hold the question until question 8.
+  \item (Telescoping lemma) Let $(b_n)$ be strictly increasing
+        and suppose that for all $k \geq N$,
+        \[
+        m \;\leq\; \frac{a_{k+1} - a_k}{b_{k+1} - b_k} \;\leq\;
+        M .
+        \]
+        Prove that $m \leq \dfrac{a_n - a_N}{b_n - b_N} \leq M$
+        for every $n > N$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part II --- The Ces\`aro--Stolz theorem.} Let
+$(b_n)$ be strictly increasing with $b_n \to +\infty$, and
+suppose $\dfrac{a_{n+1} - a_n}{b_{n+1} - b_n} \to \ell \in \R$.
+\begin{enumerate}[resume]
+  \item Fix $\varepsilon > 0$. Show there is $N$ such that
+        $\ell - \varepsilon \leq \dfrac{a_n - a_N}{b_n - b_N}
+        \leq \ell + \varepsilon$ for all $n > N$.
+  \item Establish, for $n > N$, the identity
+        \[
+        \frac{a_n}{b_n} - \ell
+        = \frac{a_N - \ell\,b_N}{b_n}
+        + \Bigl(1 - \frac{b_N}{b_n}\Bigr)
+        \Bigl(\frac{a_n - a_N}{b_n - b_N} - \ell\Bigr),
+        \]
+        and conclude the theorem: $\dfrac{a_n}{b_n} \to \ell$.
+  \item Prove the $+\infty$ variant: if $\dfrac{a_{n+1} -
+        a_n}{b_{n+1} - b_n} \to +\infty$ (same hypotheses on
+        $(b_n)$), then $\dfrac{a_n}{b_n} \to +\infty$.
+  \item Take $b_n = n$: recover the Ces\`aro mean theorem of
+        \cref{exo:b1:seq:10}. Then show the converse of
+        Ces\`aro--Stolz fails: for $a_n = (-1)^n$, $b_n = n$, the
+        quotient $a_n/b_n$ converges while the quotient of
+        increments does not. Stolz is a one-way street.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part III --- First dividends.}
+\begin{enumerate}[resume]
+  \item Prove $(1+h)^{3/2} - 1 = \dfrac{3h + 3h^2 +
+        h^3}{(1+h)^{3/2} + 1}$ by conjugation, deduce
+        $n\bigl((1 + \tfrac1n)^{3/2} - 1\bigr) \to \tfrac32$,
+        and conclude with Ces\`aro--Stolz:
+        \[
+        T_n = \sum_{k=1}^{n} \sqrt k \;\sim\; \tfrac23\,
+        n^{3/2} ,
+        \]
+        resolving the cliffhanger of question 2.
+  \item From (G1) alone, derive the logarithm bracketing
+        \[
+        \frac{t}{1 + t} \;\leq\; \ln(1 + t) \;\leq\; t
+        \qquad (t > -1)
+        \]
+        \emph{(apply (G1) at $u = \ln(1+t)$ and at $u =
+        -t/(1+t)$)}.
+  \item Show that $b_n = \ln n$ is strictly increasing with
+        $\ln n \to +\infty$, and prove with Ces\`aro--Stolz and
+        question 9 that
+        \[
+        H_n = \sum_{k=1}^{n} \frac 1k \;\sim\; \ln n .
+        \]
+        (The finer structure $H_n = \ln n + \gamma + o(1)$ is the
+        weekend problem of \cref{ch:b1:series}.)
+  \item (From ratios to roots) Let $u_n > 0 $ with
+        $\frac{u_{n+1}}{u_n} \to L > 0$. Using question 9, show
+        $\ln\frac{u_{n+1}}{u_n} \to \ln L$; apply Ces\`aro to
+        conclude $\frac{\ln u_n}{n} \to \ln L$, then, with (G1),
+        that $u_n^{1/n} \to L$. Application: compute
+        $\lim\,\binom{2n}{n}^{1/n}$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part IV --- The slow fall of the sine.} Let
+$u_0 \in \R$ and $u_{n+1} = \sin u_n$.
+\begin{enumerate}[resume]
+  \item From (G2), show $0 < \sin x < x$ for $0 < x \leq 1$.
+        Deduce: $u_1 \in \intcc{-1}{1}$; if $u_1 = 0$ the
+        sequence is zero from rank $1$; and if $u_1 > 0$ (the
+        case $u_1 < 0$ being symmetric, $\sin$ odd), then
+        $(u_n)_{n \geq 1}$ is strictly decreasing, positive, and
+        converges to $0$ \emph{(identify the limit via $\ell =
+        \sin \ell$, using $\abs{\sin a - \sin b} \leq \abs{a -
+        b}$, itself a consequence of (G2) and the product-to-sum
+        formula)}.
+  \item Assume from now on $u_1 \in \intoc{0}{1}$. Show by
+        squeezing, using (G2):
+        \[
+        \frac{\sin u_n}{u_n} \to 1
+        \qquad\text{and}\qquad
+        \frac{u_n - \sin u_n}{u_n^{3}} \to \frac16 .
+        \]
+  \item Prove the factorization
+        \[
+        w_n := \frac{1}{u_{n+1}^{2}} - \frac{1}{u_n^{2}}
+        = \frac{u_n - \sin u_n}{u_n^{3}} \cdot
+        \frac{u_n + \sin u_n}{u_n} \cdot
+        \Bigl(\frac{u_n}{\sin u_n}\Bigr)^{2},
+        \]
+        and deduce $w_n \to \frac13$.
+  \item Conclude with \cref{exo:b1:seq:10} (increments version)
+        that $\frac{1}{n\,u_n^{2}} \to \frac13$, then, by a
+        conjugation argument for the square root, the headline:
+        \[
+        \sqrt n\;u_n \longrightarrow \sqrt 3 ,
+        \qquad\text{i.e.}\qquad
+        u_n \sim \sqrt{\frac 3n} .
+        \]
+  \item Quantify the slowness: show that eventually $\sqrt{2/n}
+        \leq u_n \leq 2/\sqrt n$, so that reaching $u_n \leq
+        10^{-2}$ requires more than $20\,000$ iterations (about
+        $30\,000$, by the asymptotics). Contrast with \omterm{ex:b1:seq:heron}{Heron's
+        method} (\cref{ex:b1:seq:heron}) and explain the
+        structural reason: at the fixed point $0$, the slope of
+        $\sin$ is $1$ (a \emph{neutral} fixed point), while
+        error-halving iterations need a slope of \omterm{def:b1:complex:field}{modulus} $< 1$.
+  \item Show that for \emph{every} starting point $u_0 \in \R$,
+        either $u_n = 0$ from rank $1$ on, or $\abs{u_n} \sim
+        \sqrt{3/n}$ --- the fall is universal, only the sign
+        remembers $u_0$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part V --- The general principle.} The sine is
+one instance of a machine.
+\begin{enumerate}[resume]
+  \item Let $u_n > 0$, $u_n \to 0$, and $\dfrac{u_n -
+        u_{n+1}}{u_n^{2}} \to a > 0$. Prove successively:
+        $\frac{u_{n+1}}{u_n} \to 1$; then $\frac{1}{u_{n+1}} -
+        \frac{1}{u_n} \to a$; then $n\,u_n \to \frac1a$.
+  \item (Exact model) For $u_{n+1} = \dfrac{u_n}{1 + u_n}$, $u_0
+        > 0$: show $\frac{1}{u_n}$ is arithmetic, solve exactly,
+        and check question 18's conclusion against the exact
+        formula.
+  \item For $u_{n+1} = u_n \eu^{-u_n}$, $u_0 > 0$: show $u_n \to
+        0$, use (G1) to squeeze $\frac{1 - \eu^{-t}}{t}$ between
+        $\frac{1}{1+t}$ and $1$ for $t > 0$, and conclude $u_n
+        \sim \frac 1n$.
+  \item (Cubic contact, squared telescope) Let $u_n > 0$, $u_n
+        \to 0$, $\dfrac{u_n - u_{n+1}}{u_n^{3}} \to a > 0$.
+        Adapt question 14's factorization to show
+        $\frac{1}{u_{n+1}^2} - \frac{1}{u_n^2} \to 2a$, and
+        conclude $n\,u_n^{2} \to \frac{1}{2a}$. Check that $a =
+        \frac16$ recovers Part IV.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part VI --- Limits of the method, and morals.}
+\begin{enumerate}[resume]
+  \item Show that the hypothesis $b_n \to +\infty$ cannot be
+        dropped: for $a_n = 2 - 2^{-n}$ and $b_n = 1 - 2^{-n}$,
+        the increment quotient tends to $1$ while $\frac{a_n}
+        {b_n} \to 2$. Point to the exact line of question 5's
+        proof that breaks.
+  \item (Stolz twice) Prove $\sum_{k=1}^{n} H_k \sim n \ln n$
+        \emph{(one application of Ces\`aro--Stolz, then question
+        10; bound $(n+1)\ln(n+1) - n\ln n$ using question 9)}.
+  \item (Geometric means) If $u_n > 0$ and $u_n \to \ell > 0$,
+        show $(u_1 u_2 \cdots u_n)^{1/n} \to \ell$; if $u_n \to
+        +\infty$, show $(u_1 \cdots u_n)^{1/n} \to +\infty$.
+        Deduce $(n!)^{1/n} \to +\infty$.
+  \item Synthesis, one sentence each: (i) where exactly did
+        completeness enter this problem; (ii) in what sense is
+        Ces\`aro--Stolz a discrete l'Hospital rule (its
+        differential twin rests on the mean value theorem of
+        \cref{ch:b1:derivative}); (iii) state the heuristic
+        linking the contact order of $f$ at a neutral fixed
+        point to the decay exponent of $u_{n+1} = f(u_n)$;
+        (iv) trace the constant $3$ of $\sqrt{3/n}$ back through
+        the pipeline $\frac16 \to \frac13 \to 3$.
+\end{enumerate}
+\end{problem}

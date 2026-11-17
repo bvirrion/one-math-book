@@ -1,0 +1,1013 @@
+\chapter{离散随机变量}\label{ch:b2:randomvar}
+
+\omterm{def:b2:randomvar:law}{随机变量}以函数而非\omterm{def:b2:proba:space}{事件}来组织概率计算。
+在可数空间上，该理论依托
+\cref{ch:b2:series}中的\omterm{def:b2:series:summable}{可和族}：
+\omterm{def:b2:randomvar:expectation}{期望}是以\omterm{def:b2:proba:space}{样本空间}为指标集的族之和，
+其全部性质——线性、变换公式、
+独立变量的乘积公式——都是关于\omterm{def:b2:series:summable}{可和族}的定理。
+本章证明马尔可夫、切比雪夫、柯西–施瓦茨和琴生的关键不等式，
+并以经典\omterm{def:b2:randomvar:law}{分布}与弱大数律作结，
+其证明在有了切比雪夫不等式后
+只需两行。
+
+\section{随机变量及其分布}
+
+\begin{definition}[离散随机变量；分布]\label{def:b2:randomvar:law}
+设 $(\Omega, \P)$ 为可数\omterm{def:b2:proba:space}{概率空间}。
+称\emph{随机变量}\index{随机变量}为映射 $X \colon \Omega \to E$（$E$ 为任一
+集合；当 $E = \R$ 时称为\emph{实}随机变量）。其\emph{分布}\index{分布!随机变量的}
+（或\emph{分布}\index{分布}）是\omterm{def:b2:proba:space}{概率测度} $\P_X$，定义在
+\omterm{def:b2:structures:countable}{可数集} $X(\Omega)$ 上，由下式给出：
+\[
+\P_X(\{x\}) = \P(X = x)
+= \P\bigl(\{\omega : X(\omega) = x\}\bigr) .
+\]
+\end{definition}
+
+\begin{example}[经典分布]\label{ex:b2:randomvar:laws}
+\leavevmode
+\begin{itemize}
+\item \emph{伯努利}\omterm{def:b2:randomvar:law}{分布} $\mathcal{B}(p)$：$X \in \{0, 1\}$，$\P(X =
+1) = p$。某\omterm{def:b2:proba:space}{事件}的示性变量。
+\item \emph{二项}\omterm{def:b2:randomvar:law}{分布} $\mathcal{B}(n, p)$：$\P(X = k) =
+\binom nk p^k(1-p)^{n-k}$，$0 \leq k \leq n$：$n$ 次独立伯努利试验中
+成功的次数（高中分册；下文借助
+独立变量之和重新证明）。
+\item \emph{几何}\omterm{def:b2:randomvar:law}{分布} $\mathcal{G}(p)$：$\P(X = k) =
+(1-p)^{k-1}p$，$k \in \N^*$：首次成功的
+序号（见\cref{ex:b2:proba:geometric}）。
+\item \emph{泊松}\omterm{def:b2:randomvar:law}{分布} $\mathcal{P}(\lambda)$：$\P(X = k) =
+e^{-\lambda}\frac{\lambda^k}{k!}$，$k \in \N$——由指数级数
+可知其为\omterm{def:b2:proba:space}{概率测度}。稀有\omterm{def:b2:proba:space}{事件}的\omterm{def:b2:randomvar:law}{分布}
+（见\cref{ch:b2:genfun}）。
+\end{itemize}
+\end{example}
+
+\begin{remark}[各分布分别刻画什么]
+四种\omterm{def:b2:randomvar:law}{分布}各回答一个基本问题：伯努利\omterm{def:b2:randomvar:law}{分布}回答
+“事情是否发生？”；二项\omterm{def:b2:randomvar:law}{分布}回答“$n$ 次
+试验中发生了几次？”；几何\omterm{def:b2:randomvar:law}{分布}回答“第一次发生要等多久？”；
+泊松\omterm{def:b2:randomvar:law}{分布}回答“在给定速率下，试验很多而单次发生的概率很小时，
+发生了多少次？”。认清所问的问题，
+便是建模的九成功夫：指示变量之和对应二项\omterm{def:b2:randomvar:law}{分布}，
+等待时间对应几何\omterm{def:b2:randomvar:law}{分布}，稀有\omterm{def:b2:proba:space}{事件}的计数对应
+泊松\omterm{def:b2:randomvar:law}{分布}——从二项\omterm{def:b2:randomvar:law}{分布}到泊松\omterm{def:b2:randomvar:law}{分布}的过渡，由稀有\omterm{def:b2:proba:space}{事件}的\omterm{def:b2:randomvar:law}{分布}律严格刻画，
+见
+\cref{ch:b2:genfun}。
+\end{remark}
+
+\begin{proposition}[几何
+分布的无记忆性]\label{prop:b2:randomvar:memoryless}
+若 $X \sim \mathcal{G}(p)$，则对所有 $m, n \in \N$：
+\[
+\P(X > m + n \mid X > m) = \P(X > n) ,
+\]
+且在 $\N^*$ 上，几何\omterm{def:b2:randomvar:law}{分布}是唯一
+具有此性质的\omterm{def:b2:randomvar:law}{分布}。
+\end{proposition}
+
+\begin{proof}
+对几何权重求和，得 $\P(X > n) = (1-p)^n$。于是
+\[
+\P(X > m + n \mid X > m)
+= \frac{\P(X > m + n)}{\P(X > m)}
+= \frac{(1-p)^{m+n}}{(1-p)^m} = (1-p)^n = \P(X > n).
+\]
+反之，若 $G(n) = \P(X > n)$ 满足 $G(m + n) =
+G(m)G(n)$，$G(0) = 1$，则由归纳法得 $G(n) = G(1)^n$；$q =
+G(1) \in \intco{0}{1}$，$q = 0$ 或\omterm{def:b2:randomvar:law}{分布}为
+$\mathcal{G}(1 - q)$：$\P(X = k) = G(k-1) - G(k) =
+q^{k-1}(1 - q)$。
+\end{proof}
+
+\begin{example}[没有哪个结果“该出现了”]
+掷一枚骰子，等待出现六点：等待时间 $X \sim
+\mathcal G(1/6)$。无记忆性说明，在 $10$ 次
+没有出现六点之后，\emph{剩余}等待时间 $X - 10$，
+在 $X > 10$ 的条件下，仍服从 $\mathcal G(1/6)$，
+即条件\omterm{def:b2:randomvar:expectation}{期望}等待时间仍为 $6$ 次投掷，与开始时完全相同。
+骰子不会“记得”，也没有哪次六点“该出现了”——赌徒
+谬误是相信条件\omterm{def:b2:randomvar:law}{分布}应已发生偏移。
+反之，命题中关于唯一性的部分说明，
+这种无差异性\emph{刻画}了几何
+等待时间：任何预测从不更新的等待时间，
+都服从几何\omterm{def:b2:randomvar:law}{分布}。真实的排队与寿命通常会更新，
+这正是人们借以发现它们并非
+几何\omterm{def:b2:randomvar:law}{分布}的途径。
+\end{example}
+
+\section{期望}
+
+\begin{definition}[期望]\label{def:b2:randomvar:expectation}
+称实\omterm{def:b2:randomvar:law}{随机变量} $X$ 在 $(\Omega, \P)$ 上
+\emph{有期望}，当族
+$\bigl(X(\omega)\,\P(\{\omega\})\bigr)_{\omega \in \Omega}$ 可和
+（见\cref{ch:b2:series}）时，其\emph{期望}\index{期望}为
+\[
+\E(X) = \sum_{\omega \in \Omega} X(\omega)\,\P(\{\omega\}) .
+\]
+\end{definition}
+
+\begin{theorem}[转移定理]\label{thm:b2:randomvar:transfer}
+$X$ 有\omterm{def:b2:randomvar:expectation}{期望}，当且仅当族 $\bigl(x\,\P(X =
+x)\bigr)_{x \in X(\Omega)}$ 可和，此时
+\[
+\E(X) = \sum_{x \in X(\Omega)} x\,\P(X = x) .
+\]
+更一般地，设 $f \colon X(\Omega) \to \R$，则变量
+$f(X)$ 有\omterm{def:b2:randomvar:expectation}{期望}当且仅当 $\sum_x \abs{f(x)}\,\P(X = x) <
+\infty$，此时 $\E(f(X)) = \sum_x f(x)\,\P(X = x)$。
+\end{theorem}
+
+\begin{proof}
+将 $\Omega$ 划分为水平集 $\Omega_x = \{X = x\}$，$x
+\in X(\Omega)$。由\omterm{def:b2:series:summable}{可和族}的分组求和定理
+（见\cref{ch:b2:series}），族
+$(X(\omega)\P(\{\omega\}))_\omega$ 可和当且仅当每个分组都
+（自动成立：$\sum_{\omega \in \Omega_x}\abs{x}\P(\{\omega\}) =
+\abs x\,\P(X = x)$）\emph{且}分组和构成的族
+$\bigl(x\,\P(X = x)\bigr)_x$ 可和——此时总和
+相等。对 $f(X)$，将已证明的结论用于变量 $Y =
+f \circ X$，其水平集为 $\{Y = y\} =
+\bigsqcup_{x : f(x) = y}\{X = x\}$；再作一次分组求和，
+将 $\sum_y y\,\P(Y = y)$ 化为 $\sum_x
+f(x)\,\P(X = x)$，此时分组将取值 $x$
+按其像 $f(x)$ 归并，且一族绝对可和当且仅当
+另一族绝对可和。
+\end{proof}
+
+\begin{theorem}[期望的性质]\label{thm:b2:randomvar:linearity}
+在有\omterm{def:b2:randomvar:expectation}{期望}的\omterm{def:b2:randomvar:law}{随机变量}全体上：
+\begin{enumerate}
+\item （线性性）$\E(aX + bY) = a\,\E(X) + b\,\E(Y)$。
+\item （非负性与单调性）$X \geq 0 \Rightarrow \E(X)
+\geq 0$；$X \leq Y \Rightarrow \E(X) \leq \E(Y)$；以及
+$\abs{\E(X)} \leq \E(\abs X)$。
+\item （控制性）若 $\abs X \leq Z$ 且 $Z$ 有\omterm{def:b2:randomvar:expectation}{期望}，
+则 $X$ 也有\omterm{def:b2:randomvar:expectation}{期望}。
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+以上各条均是\omterm{def:b2:series:summable}{可和族}之和的性质
+（见\cref{ch:b2:series}）：和的线性、逐项保号，
+以及可和性的控制判别法。（注意
+线性性在 $\Omega$ 上的\emph{定义}中显然成立，
+而在转移公式上则颇为麻烦——这正是
+预先定义 $\E$ 的好处之一）。
+\end{proof}
+
+\begin{example}\label{ex:b2:randomvar:expectations}
+$X \sim \mathcal{B}(n, p)$：将 $X = X_1 + \dots + X_n$
+写成伯努利指示变量之和，利用线性性得 $\E(X) = np$——
+无需二项式系数。$X \sim \mathcal{G}(p)$：$\E(X) =
+\sum_{k\geq1}k(1-p)^{k-1}p = p\cdot\frac{1}{(1 - (1-p))^2} =
+\frac1p$，由收敛圆盘内的几何级数逐项求导得出
+（见\cref{ch:b2:powerseries}）。$X \sim \mathcal{P}(\lambda)$：$\E(X)
+= \sum_{k\geq1}k e^{-\lambda}\frac{\lambda^k}{k!} = \lambda
+e^{-\lambda}\sum_{j\geq0}\frac{\lambda^j}{j!} = \lambda$。
+\end{example}
+
+\begin{example}[转移公式的应用]\label{ex:b2:randomvar:transferex}
+设 $X \sim \mathcal P(\lambda)$，求
+$\E\bigl(\frac1{1+X}\bigr)$——$\frac1{1+X}$ 的\omterm{def:b2:randomvar:law}{分布}
+本身较为繁琐，但转移公式从不需要它：
+\[
+\E\Bigl(\frac1{1+X}\Bigr)
+= \sum_{k\geq0}\frac{1}{k+1}\,\eu^{-\lambda}
+\frac{\lambda^k}{k!}
+= \frac{\eu^{-\lambda}}{\lambda}\sum_{k\geq0}
+\frac{\lambda^{k+1}}{(k+1)!}
+= \frac{\eu^{-\lambda}}{\lambda}\bigl(\eu^\lambda - 1\bigr)
+= \frac{1 - \eu^{-\lambda}}{\lambda} .
+\]
+两点启示。就计算而言：识别出平移后的指数级数
+即是全部工作——转移公式将
+$f(X)$ 的\omterm{def:b2:randomvar:expectation}{期望}化为级数运算。就结构而言：
+朴素代入的值应为 $\frac1{1 + \E X} =
+\frac1{1 + \lambda}$，而真实答案更大，
+\[
+\frac{1 - \eu^{-\lambda}}{\lambda} \geq
+\frac{1}{1 + \lambda},
+\]
+正如琴生不等式对凸函数 $t
+\mapsto \frac1{1+t}$ 的要求。凸函数作用后的\omterm{def:b2:randomvar:expectation}{期望}
+高于朴素代入的值，而转移公式
+加上级数验证，使抽象的不等式具体化。
+\end{example}
+
+\begin{theorem}[独立性与乘积]\label{thm:b2:randomvar:product}
+称\omterm{def:b2:randomvar:law}{随机变量} $X, Y$ 为\emph{独立}的，若 $\P(X = x, Y =
+y) = \P(X = x)\P(Y = y)$ 对一切 $x, y$ 成立——等价地，
+\omterm{def:b2:proba:space}{事件} $\{X \in A\}$ 与 $\{Y \in B\}$ 对一切 $A,
+B$ 均独立。若 $X$ 与 $Y$ 为独立的实\omterm{def:b2:randomvar:law}{随机变量}，
+且均有\omterm{def:b2:randomvar:expectation}{期望}，则 $XY$ 有\omterm{def:b2:randomvar:expectation}{期望}，并且
+\[
+\E(XY) = \E(X)\,\E(Y) .
+\]
+\end{theorem}
+
+\begin{proof}
+两种表述的等价性，由对
+$(x, y) \in A \times B$ 上的逐点恒等式求和得出
+（两次运用 $\sigma$ 可加性）。对乘积，二重族
+$\bigl(xy\,\P(X = x)\P(Y = y)\bigr)_{(x,y)}$ 可和，因为
+由族的富比尼定理（见\cref{ch:b2:series}）有
+\[
+\sum_{x, y}\abs x \abs y\,\P(X{=}x)\P(Y{=}y)
+= \Bigl(\sum_x \abs x \P(X{=}x)\Bigr)
+\Bigl(\sum_y \abs y \P(Y{=}y)\Bigr) < \infty ;
+\]
+由独立性，此族恰为 $\bigl(xy\,\P(X = x, Y =
+y)\bigr)$，其和为 $\E(XY)$，此即转移公式用于
+变量 $(X, Y) \mapsto xy$ 的结果；再由富比尼定理，
+将这一非负和算得乘积 $\E(X)\E(Y)$。
+\end{proof}
+
+\begin{example}[乘积：有独立与无独立
+两种情形]\label{ex:b2:randomvar:productcontrast}
+掷两颗均匀骰子。若 $Y$ 为第二颗骰子（与第一颗
+独立），则 $\E(XY) = \E(X)\E(Y) = 3.5^2 = 12.25$。若改为
+$Y = X$（一颗骰子与自身的“乘积”），
+\[
+\E(X^2) = \frac{1 + 4 + 9 + 16 + 25 + 36}{6} = \frac{91}{6}
+\approx 15.17 \neq 12.25 :
+\]
+两种情形的边缘\omterm{def:b2:randomvar:law}{分布}相同，联合\omterm{def:b2:randomvar:law}{分布}不同，
+乘积的\omterm{def:b2:randomvar:expectation}{期望}也不同。值得铭记的教训是：
+$\E(XY)$ 是\emph{二元组}的泛函，而非两个
+边缘\omterm{def:b2:randomvar:law}{分布}的泛函——而差 $\E(X^2) - \E(X)^2 \approx 2.92$
+由柯尼希--惠更斯公式，恰为骰子的\omterm{def:b2:randomvar:variance}{方差}
+$\frac{35}{12}$。
+\end{example}
+
+\section{方差、协方差与经典不等式}
+
+\begin{definition}[矩与方差]\label{def:b2:randomvar:variance}
+称 $X$ 具有\emph{二阶矩}，若 $X^2$ 有\omterm{def:b2:randomvar:expectation}{期望}
+（此时 $X$ 亦有\omterm{def:b2:randomvar:expectation}{期望}，由控制：$\abs X \leq \frac{1 +
+X^2}{2}$）。则其\emph{方差}\index{方差}与\emph{标准
+差}\index{标准差}为
+如下：
+\[
+V(X) = \E\bigl((X - \E(X))^2\bigr)
+= \E(X^2) - \E(X)^2 ,
+\qquad
+\sigma(X) = \sqrt{V(X)} ,
+\]
+（第二式即\emph{柯尼希--惠更斯}公式——由
+展开平方并利用线性性：
+\[
+\E\bigl((X - \E X)^2\bigr)
+= \E\bigl(X^2 - 2X\,\E X + \E(X)^2\bigr)
+= \E(X^2) - 2\,\E(X)^2 + \E(X)^2 ,
+\]
+中间一项利用 $\E X$ 为常数）。对于具有二阶矩的 $X, Y$，
+其\emph{协方差}\index{协方差}为
+\[
+\operatorname{Cov}(X, Y)
+= \E\bigl((X - \E X)(Y - \E Y)\bigr)
+= \E(XY) - \E(X)\E(Y) .
+\]
+\end{definition}
+
+\begin{theorem}[方差的常用性质]\label{thm:b2:randomvar:variancerules}
+对具有二阶矩的\omterm{def:b2:randomvar:law}{随机变量}，有：
+\begin{enumerate}
+\item $V(aX + b) = a^2\,V(X)$；
+\item $V(X + Y) = V(X) + V(Y) + 2\operatorname{Cov}(X, Y)$，
+更一般地有
+\[
+V\Bigl(\sum_{i=1}^n X_i\Bigr)
+= \sum_{i=1}^n V(X_i)
++ 2\sum_{i < j}\operatorname{Cov}(X_i, X_j) ;
+\]
+\item 若 $X, Y$ 独立，则 $\operatorname{Cov}(X, Y) = 0$
+（逆命题不成立），故独立\omterm{def:b2:randomvar:law}{随机变量}的\omterm{def:b2:randomvar:variance}{方差}
+相加。
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\emph{1}与\emph{2}均由展开平方并利用线性性得到；
+乘积 $X_iX_j$ 的\omterm{def:b2:randomvar:expectation}{期望}由下文柯西--施瓦茨不等式
+（或由 $\abs{X_iX_j} \leq \frac{X_i^2 + X_j^2}{2}$）得到。\emph{3}由
+\cref{thm:b2:randomvar:product}应用于中心化后的
+\omterm{def:b2:randomvar:law}{随机变量}即得。逆命题的一个标准反例为：$X$ 在
+$\{-1, 0, 1\}$ 上均匀\omterm{def:b2:randomvar:law}{分布}，$Y = X^2$ 二者不相关
+（$\E(XY) = \E(X^3) = 0 = \E X \cdot \E Y$），但显然不独立。
+\end{proof}
+
+\begin{theorem}[马尔可夫与切比雪夫
+不等式]\label{thm:b2:randomvar:markov}
+\leavevmode
+\begin{enumerate}
+\item （马尔可夫）若 $X \geq 0$ 有\omterm{def:b2:randomvar:expectation}{期望}，则对每个 $a
+> 0$：
+\[
+\P(X \geq a) \leq \frac{\E(X)}{a} .
+\]
+\item （切比雪夫）若 $X$ 具有二阶矩，则对每个
+$\varepsilon > 0$：
+\[
+\P\bigl(\abs{X - \E(X)} \geq \varepsilon\bigr)
+\leq \frac{V(X)}{\varepsilon^2} .
+\]
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\emph{1.} 逐点地，$a\,\mathbf{1}_{X \geq a} \leq X$（在
+\omterm{def:b2:proba:space}{事件}上左端为 $a \leq X$；在其外则为 $0 \leq X$）。
+两边取\omterm{def:b2:randomvar:expectation}{期望}，得 $a\,\P(X \geq a) \leq \E(X)$，由单调性
+及 $\E(\mathbf{1}_A) = \P(A)$。
+\emph{2.} 对非负\omterm{def:b2:randomvar:law}{随机变量} $(X - \E
+X)^2$ 取 $a = \varepsilon^2$ 应用马尔可夫不等式，\omterm{def:b2:proba:space}{事件} $\{(X - \E X)^2
+\geq \varepsilon^2\}$ 恰为 $\{\abs{X - \E X} \geq
+\varepsilon\}$。
+\end{proof}
+
+\begin{example}[不相关却
+彼此紧扣]\label{ex:b2:randomvar:sumdiff}
+掷两颗均匀骰子，$X$ 与 $Y$ 独立，并令 $S = X +
+Y$，$D = X - Y$。由\omterm{def:b2:randomvar:variance}{协方差}的双线性，
+\[
+\operatorname{Cov}(S, D) = V(X) - V(Y) +
+\operatorname{Cov}(Y, X) - \operatorname{Cov}(X, Y) = V(X) -
+V(Y) = 0 :
+\]
+和与差不相关。它们独立吗？当然不
+独立：$S = 12$ 迫使 $D = 0$，而 $\P(D = 0) =
+\frac16$（无条件）。相关性只检验
+\emph{线性}部分的依赖；这里的依赖由
+约束 $S$ 与 $D$ 奇偶性相同所承载，
+\omterm{def:b2:randomvar:variance}{协方差}无法察觉。（对此数对，零\omterm{def:b2:randomvar:variance}{协方差}
+需要 $V(X) = V(Y)$：起作用的是同\omterm{def:b2:randomvar:law}{分布}，
+而非独立性。）
+\end{example}
+
+\begin{example}[马尔可夫不等式何时取等]\label{ex:b2:randomvar:markovsharp}
+马尔可夫不等式取等号，当且仅当
+估计 $a\,\mathbf 1_{X\geq a} \leq X$ 中没有任何浪费：
+\omterm{def:b2:randomvar:law}{随机变量}必须只取 $0$ 与 $a$ 两个值。具体地说，
+若 $\P(X = a) = \pi$ 且 $\P(X = 0) = 1 - \pi$，则 $\E(X)
+= a\pi$，且有
+\[
+\P(X \geq a) = \pi = \frac{\E(X)}{a} .
+\]
+一个现实的解读：在平均财富为
+$100$、财富只能是 $0$ 或 $10^6$ 的人群中，
+百万富翁的比例恰为 $10^{-4}$——马尔可夫界恰好被取到，
+这正是极端情形。只要 $X$ 取到中间值，
+界便严格成立，往往差得很远；
+但由极端情形可见，仅由均值
+便不可能得到更好的不等式。
+\end{example}
+
+\begin{example}[切比雪夫不等式是精确的——无需
+进一步假设]\label{ex:b2:randomvar:chebsharp}
+固定 $\varepsilon > 0$，$q \in \intoc01$，设 $X$ 取
+$\pm\varepsilon$ 两值的概率各为 $\frac q2$，
+取 $0$ 的概率为 $1 - q$。则 $\E(X) = 0$，$V(X) =
+q\varepsilon^2$，且
+\[
+\P\bigl(\abs{X - \E X} \geq \varepsilon\bigr) = q
+= \frac{V(X)}{\varepsilon^2} :
+\]
+切比雪夫不等式取等号。因此，仅用\omterm{def:b2:randomvar:variance}{方差}，不等式无法再改进
+——$1/\varepsilon^2$ 的衰减
+正是二阶矩信息的精确代价。更快的衰减
+需要更强的假设：\omterm{def:b2:randomvar:law}{随机变量}的有界性
+便得到\emph{指数型}集中性，正如
+\cref{exo:b2:randomvar:7} 所预告，本章的周末问题
+系统地展开了这一点。
+\end{example}
+
+\begin{theorem}[柯西--施瓦茨不等式与琴生不等式]\label{thm:b2:randomvar:jensen}
+\leavevmode
+\begin{enumerate}
+\item （柯西--施瓦茨）若 $X, Y$ 有二阶矩，$XY$ 有
+\omterm{def:b2:randomvar:expectation}{期望}，且 $\E(XY)^2 \leq \E(X^2)\,\E(Y^2)$；由此
+$\operatorname{Cov}(X,Y)^2 \leq V(X)V(Y)$。
+\item （琴生）若 $\varphi \colon I \to \R$ 是
+包含 $X(\Omega)$ 的区间上的凸函数，且 $X$、$\varphi(X)$ 有
+\omterm{def:b2:randomvar:expectation}{期望}，则
+\[
+\varphi\bigl(\E(X)\bigr) \leq \E\bigl(\varphi(X)\bigr) .
+\]
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\emph{1.} $XY$ 的可和性：$\abs{XY} \leq \frac{X^2 + Y^2}2$。
+映射 $(X, Y) \mapsto \E(XY)$ 是
+二阶矩\omterm{def:b2:randomvar:law}{随机变量}空间上的正对称双线性型，因此
+\cref{ch:b2:quadratic} 中的抽象柯西--施瓦茨不等式适用
+（对该不等式而言，正\emph{半}定即已足够）。
+将其用于中心化\omterm{def:b2:randomvar:law}{随机变量}，即得\omterm{def:b2:randomvar:variance}{协方差}的界。
+
+\emph{2.} 首先，$m = \E(X)$ 属于 $I$：$I$ 是一个
+包含 $X$ 全部取值的区间，\omterm{def:b2:randomvar:expectation}{期望}具有单调性，故 $m$
+介于 $\inf X(\Omega)$ 与 $\sup X(\Omega)$ 之间。由
+凸函数的支撑线定理
+（见\cref{ch:b2:realfun}），存在 $\alpha, \beta$ 使得
+$\varphi(t) \geq \alpha t + \beta$ 对一切 $t \in I$ 成立，且
+$\varphi(m) = \alpha m + \beta$。于是在 $\Omega$ 上逐点有
+$\varphi(X) \geq \alpha X + \beta$；取\omterm{def:b2:randomvar:expectation}{期望}得
+\[
+\E\bigl(\varphi(X)\bigr) \geq \alpha\,\E(X) + \beta
+= \varphi\bigl(\E(X)\bigr). \qedhere
+\]
+\end{proof}
+
+\begin{example}
+取 $\varphi(t) = t^2$，琴生不等式给出 $\E(X)^2 \leq \E(X^2)$——
+即\omterm{def:b2:randomvar:variance}{方差}非负；取 $\varphi(t) = 1/t$，其定义域为
+$\intoo{0}{\infty}$ 上：$\frac{1}{\E X} \leq \E\bigl(\frac1X\bigr)$
+——调和平均不超过算术平均，此处即
+其随机形式。
+\end{example}
+
+\begin{remark}[常见陷阱]
+(i) $\E(XY) = \E(X)\E(Y)$ \emph{要求}独立性（或至少
+零\omterm{def:b2:randomvar:variance}{协方差}）。取 $Y = X$ 时，$\E(X^2) \neq
+\E(X)^2$，只要 $V(X) > 0$。(ii) 同理，$V(X + X) =
+4V(X)$，而非 $2V(X)$：\omterm{def:b2:randomvar:variance}{方差}只在独立
+（或不相关）的加项之间才可相加。(iii) $\E(f(X))$ 不等于
+$f(\E(X))$；对凸函数 $f$，琴生不等式甚至
+可指出误差的方向，如
+\cref{ex:b2:randomvar:transferex}。(iv) 存在性是一个真实的
+假设：对圣彼得堡变量 $X = 2^K$，其中
+$\P(K = k) = 2^{-k}$（$k \geq 1$），
+\[
+\sum_{k\geq1}2^k\cdot2^{-k} = \sum_{k\geq1}1 = \infty :
+\]
+$X$ 几乎必然有限，却没有\omterm{def:b2:randomvar:expectation}{期望}，因而
+该博弈不存在公平的入场价格。定义中 $\E$ 的可和性
+并非形式上的吹毛求疵，而是
+检测重尾的关键所在。(v) 最后，转移
+转移定理要求\emph{绝对}可和，方可合法地
+对取值上的求和作任何重排
+（见\cref{ch:b2:series}）。
+\end{remark}
+
+
+\begin{example}[切比雪夫不等式用于一百次
+抛掷]\label{ex:b2:randomvar:hundredtosses}
+对 $X \sim \mathcal B(100, \frac12)$：$\E X = 50$，$V(X) =
+25$。取 $\varepsilon = 6$，切比雪夫不等式给出
+\[
+\P(45 \leq X \leq 55) = \P(\abs{X - 50} < 6)
+\geq 1 - \frac{25}{36} \approx 0.31 ,
+\]
+而精确的二项\omterm{def:b2:randomvar:law}{分布}求和给出 $\approx 0.73$。
+保证的 $31\%$ 远离真值，但它
+\emph{仅}需要均值与\omterm{def:b2:randomvar:variance}{方差}——同一结论
+原样适用于任何满足 $\E = 50$、$V = 25$ 的
+\omterm{def:b2:randomvar:law}{随机变量}，无论多么奇特，且 \cref{ex:b2:randomvar:chebsharp} 表明
+确有这样的变量使之取等。普适性是有代价的；
+当\omterm{def:b2:randomvar:law}{分布}确为二项\omterm{def:b2:randomvar:law}{分布}时，
+周末问题中的指数型工具可弥合大部分差距。
+\end{example}
+
+\begin{example}[一部分与其整体的
+相关性]\label{ex:b2:randomvar:partwhole}
+若 $X, Y$ 为独立同\omterm{def:b2:randomvar:law}{分布}的\omterm{def:b2:randomvar:law}{随机变量}，\omterm{def:b2:randomvar:variance}{方差}为
+$\sigma^2 > 0$，则一个加项与和
+$S = X + Y$ 的相关程度有多大？试计算
+\[
+\operatorname{Cov}(X, S) = \operatorname{Cov}(X, X) +
+\operatorname{Cov}(X, Y) = \sigma^2 + 0 = \sigma^2,
+\qquad V(S) = 2\sigma^2,
+\]
+于是相关系数为
+\[
+\rho(X, S) = \frac{\operatorname{Cov}(X,
+S)}{\sigma(X)\,\sigma(S)}
+= \frac{\sigma^2}{\sigma\cdot\sigma\sqrt2}
+= \frac{1}{\sqrt2} \approx 0.707 ,
+\]
+无论共同\omterm{def:b2:randomvar:law}{分布}为何——骰子、硬币与泊松计数皆然。若有
+$n$ 个加项，同样的计算给出 $\rho(X_1, S_n) =
+1/\sqrt n$：每个加项对总和的影响
+按平方根规律衰减，这恰是涨落的
+$\sqrt n$ 尺度在相关性上的投影。柯西–施瓦茨
+不等式总保证 $\abs\rho \leq 1$；此处的界
+恰在退化情形 $n = 1$ 时取等，
+此后便按可预测的规律递减。
+\end{example}
+
+\begin{example}[由琴生不等式推出的加权
+算术–几何平均不等式]\label{ex:b2:randomvar:amgm}
+设 $Y$ 取正值 $a_1, \dots, a_k$，相应的
+概率为 $\lambda_1, \dots, \lambda_k$。函数
+$-\ln$ 在 $\intoo0\infty$ 上为凸函数，故由琴生不等式得
+$-\ln\E(Y) \leq \E(-\ln Y)$，即
+\[
+a_1^{\lambda_1}a_2^{\lambda_2}\cdots a_k^{\lambda_k}
+\;\leq\; \lambda_1a_1 + \lambda_2a_2 + \dots + \lambda_ka_k :
+\]
+即加权算术–几何平均不等式，其中等号
+当且仅当 $Y$ 为常数时成立。等权重 $\lambda_i = \frac1k$
+即得经典的算术–几何平均不等式。概率论悄悄证明了
+一条纯代数定理：选取一个概率\omterm{def:b2:randomvar:law}{分布}不过是
+对凸组合的一种记账工具——
+即\cref{ch:b2:affine}中的\omterm{def:b2:affine:barycenter}{重心}观点再次出现，此时以
+琴生不等式为引擎。
+\end{example}
+
+\section{弱大数定律}
+
+\begin{theorem}[弱大数定律]\label{thm:b2:randomvar:lln}
+设 $(X_k)_{k \geq 1}$ 为两两独立的\omterm{def:b2:randomvar:law}{随机变量}，
+它们具有相同\omterm{def:b2:randomvar:law}{分布}且存在二阶矩；记 $m = \E(X_1)$，
+并记 $S_n = X_1 + \dots + X_n$。则对每个 $\varepsilon > 0$：
+\[
+\P\Bigl(\,\Bigl|\frac{S_n}{n} - m\Bigr| \geq \varepsilon\Bigr)
+\;\leq\; \frac{V(X_1)}{n\,\varepsilon^2}
+\xrightarrow[n \to \infty]{} 0 .
+\]
+\end{theorem}
+
+\begin{proof}
+由线性性得 $\E(S_n/n) = m$；由
+\cref{thm:b2:randomvar:variancerules}（两两独立使\omterm{def:b2:randomvar:variance}{协方差}为零）得
+$V(S_n) = n\,V(X_1)$，于是 $V(S_n/n) =
+V(X_1)/n$。对 $S_n/n$ 应用切比雪夫不等式，即得
+所需的界。
+\end{proof}
+
+\begin{remark}
+本定理将概率与频率联系起来。取
+$X_k$ 为独立重复试验中\omterm{def:b2:proba:space}{事件} $A$ 的示性变量，
+则 $S_n/n$ 即为 $A$ 的观测频率，而大数定律
+表明它在 $\P(A)$ 附近集中，其速率为
+$\frac{p(1-p)}{n\varepsilon^2}$。\emph{强}大数定律（$S_n/n \to
+m$，几乎必然）是本科三年级定理，其对四阶矩的证明
+仍在可及范围之内：见\cref{exo:b2:randomvar:9}，
+该题将博雷尔–坎特利引理用于切比雪夫型界。同样的切比雪夫估计
+也支撑了魏尔斯特拉斯逼近定理的\omterm{thm:b2:funcseq:weierstrass}{伯恩斯坦多项式}证明，
+该证明见\cref{ch:b2:funcseq}——其中的
+计数引理\emph{正是}
+伪装形式下的弱大数定律。
+\end{remark}
+
+\begin{example}[收集五十张赠券]
+\label{ex:b2:randomvar:couponnumeric}
+\cref{exo:b2:randomvar:3}中的赠券收集者，取 $n =
+50$ 种互不相同的玩具，\omterm{def:b2:randomvar:expectation}{期望}总数为
+\[
+\E(T_{50}) = 50\,H_{50} = 50\sum_{k=1}^{50}\frac1k
+\approx 50 \times 4.499 \approx 225
+\]
+盒——是朴素猜测 $50$ 的四点五倍。
+调和增长便是全部要点：前 $25$ 件玩具
+大约在 $50\ln2 \approx 35$ 盒内集齐，而
+\emph{最后一件}玩具单独平均需要 $50$ 盒（
+参数为 $\frac1{50}$ 的几何等待）。完成型
+问题由其收尾阶段主导，这正是
+\cref{exo:b2:randomvar:12}得出阶为 $n$ 的涨落
+——即最后那段几何等待的规模——围绕
+均值 $n\ln n$ 附近。
+\end{example}
+
+\begin{example}[$n$ 至少要多大？]\label{ex:b2:randomvar:llnnumeric}
+要使观测频率在 $\varepsilon = 0.01$ 之内逼近
+$\P(A)$，置信度为 $95\%$，则切比雪夫界要求
+\[
+\frac{p(1-p)}{n\varepsilon^2} \leq \frac{1}{4n\varepsilon^2}
+\leq 0.05,
+\qquad\text{即}\qquad
+n \geq \frac{1}{4\cdot0.05\cdot(0.01)^2} = 50\,000 .
+\]
+对 $\varepsilon$ 的依赖十分苛刻（二次），而
+对置信度的依赖则较为温和（关于 $1/\alpha$ 线性）。两者皆
+是\emph{界}本身的性质，而非真实情况的性质：周末问题中的
+指数型不等式将置信度的代价由
+$1/\alpha$ 降为 $\ln(1/\alpha)$——相同的规格
+在那里约需 $18\,500$ 个样本——
+而 $1/\varepsilon^2$ 的尺度是真实的，
+且不可改进。知道界的哪一部分偏松，其价值
+与界本身同样重要。
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}[x=5.5cm, y=1.05cm]
+  \draw[->] (-0.05,0) -- (1.1,0) node[below] {$S_n/n$};
+  \draw[->] (0,-0.1) -- (0,2.35);
+  \draw[dashed] (0.4,0) -- (0.4,2.15);
+  \draw[dashed] (0.6,0) -- (0.6,2.15);
+  \node[below, font=\scriptsize] at (0.4,0)
+    {$m{-}\varepsilon$};
+  \node[below, font=\scriptsize] at (0.5,0) {$m$};
+  \node[below, font=\scriptsize] at (0.6,0)
+    {$m{+}\varepsilon$};
+  \draw[omDef, thick] plot[domain=0.06:0.94, samples=80]
+    (\x, {0.8*exp(-(\x-0.5)^2/0.0288)});
+  \draw[omThm, very thick] plot[domain=0.32:0.68, samples=80]
+    (\x, {2.0*exp(-(\x-0.5)^2/0.0032)});
+  \node[omDef, font=\small] at (0.16, 0.85) {$n$ 较小};
+  \node[omThm, font=\small] at (0.71, 1.95) {$n$ 较大};
+\end{tikzpicture}
+
+{\small 大数定律的图示：
+$S_n/n$（示意画出）的\omterm{def:b2:randomvar:law}{分布}中心 $m$ 保持不变，但
+随 $n$ 增大而变窄，于是落在
+区间 $\intcc{m-\varepsilon}{m+\varepsilon}$ 之外的概率——即两条尾部——
+趋于零。切比雪夫不等式将尾部
+界为 $V(X_1)/(n\varepsilon^2)$；周末问题表明它们
+实际上是指数级小的。}
+\end{omfigure}
+
+\begin{remark}[本册中的视角]
+向前看，本章全部内容都服务于\cref{ch:b2:genfun}：
+$\E(t^X)$ 是对 $X$ 的某个巧妙函数取的\omterm{def:b2:randomvar:expectation}{期望}，
+将整个\omterm{def:b2:randomvar:law}{分布}打包成一个幂级数，矩则化为
+ $1$ 处的导数，而随机和的瓦尔德型恒等式
+支撑分支过程理论；独立变量的
+乘积定理化为\omterm{ex:b2:powerseries:fibonacci}{母函数}的
+乘法性。向后看，\omterm{def:b2:randomvar:expectation}{期望}是以概率为权的
+\omterm{def:b2:affine:barycenter}{重心}（见\cref{ch:b2:affine}），琴生
+不等式是凸函数的支撑线几何
+（见\cref{ch:b2:realfun}），而本章周末问题中的
+指数矩方法即是对
+ $\eu^{tX}$ 应用马尔可夫不等式——这是一个不等式，经一次恰当的
+变量替换而推广，横跨三章。
+\end{remark}
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:b2:randomvar:1}
+计算 $\E(X)$ 与 $V(X)$，其中 $X \sim \mathcal{B}(n, p)$（借助
+指示变量），$X \sim \mathcal{P}(\lambda)$（证明 $V(X) =
+\lambda$），$X \sim \mathcal{G}(p)$（证明 $V(X) =
+\frac{1-p}{p^2}$；利用 $\E(X(X-1))$ 及
+几何级数的二阶导数）。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:randomvar:2}
+设 $X \sim \mathcal{P}(\lambda)$ 与 $Y \sim \mathcal{P}(\mu)$
+相互独立。证明 $X + Y \sim \mathcal{P}(\lambda + \mu)$
+（利用权的卷积与二项式定理），并证明
+$X$ 的条件\omterm{def:b2:randomvar:law}{分布}在 $X + Y = n$ 之下是二项\omterm{def:b2:randomvar:law}{分布}
+$\mathcal{B}\bigl(n, \frac{\lambda}{\lambda + \mu}\bigr)$。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:randomvar:3}
+（优惠券收集者问题，\omterm{def:b2:randomvar:expectation}{期望}）某麦片品牌在每盒中均匀地藏入
+$n$ 件互不相同的玩具之一。设 $T_n$ 为
+集齐全部 $n$ 件玩具所需的盒数。将 $T_n$ 写成
+独立几何变量之和（即见到一件\emph{新}玩具的等待时间，当仍缺
+$k$ 件时），证明
+\[
+\E(T_n) = n\sum_{k=1}^{n}\frac{1}{k} \sim n\ln n
+\]
+（由级数–积分比较得等价，
+见\cref{ch:b2:comparison}）。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:randomvar:4}
+设 $X \geq 0$ 为整值\omterm{def:b2:randomvar:law}{随机变量}。证明\emph{尾公式}
+\[
+\E(X) = \sum_{n=1}^{\infty} \P(X \geq n)
+\]
+（当其中一侧有限时），通过写出 $X =
+\sum_{n\geq1}\mathbf{1}_{X \geq n}$ 并交换求和次序
+（对非负族应用富比尼定理）。由此对几何\omterm{def:b2:randomvar:law}{分布}验证
+$\E(X) = \frac1p$。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:randomvar:5}
+（不放回抽样更为集中）一个罐子中有 $N$
+个球，其中 $M$ 个为白色。不放回地抽取 $n \leq N$ 个球，
+并令 $X$ 为白球的个数（\emph{超几何}\omterm{def:b2:randomvar:law}{分布}）。利用
+指示变量 $X = \sum_{i=1}^n Y_i$，其中 $Y_i$ 为第 $i$ 次抽取：
+证明每个 $Y_i$ 服从参数为 $p = M/N$ 的伯努利\omterm{def:b2:randomvar:law}{分布}（利用对称性！），
+由此得 $\E(X) = np$（与有放回时完全相同），并证明
+$\operatorname{Cov}(Y_i, Y_j) = -\frac{p(1-p)}{N-1} < 0$，其中 $i
+\neq j$，从而 $V(X) = np(1-p)\frac{N - n}{N - 1} \leq np(1-p)$。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:randomvar:6}
+设 $X$ 具有二阶矩。证明 $c \mapsto \E\bigl((X -
+c)^2\bigr)$ 恰在 $c = \E(X)$ 处取最小值，最小值为
+$V(X)$。再证明 $\P(X = \E(X)) = 1$ 当且仅当 $V(X) =
+0$。\emph{（关于第二点：若 $V(X) = 0$，利用切比雪夫不等式，
+取 $\varepsilon = 1/n$，并利用单调\omterm{def:b2:metric:continuity}{连续}性，
+见\cref{thm:b2:proba:continuity}。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:randomvar:7}
+（集中性胜过马尔可夫不等式）设 $S_n \sim \mathcal{B}(n,
+\frac12)$（$n$ 次公平投掷中正面出现的次数）。比较由
+马尔可夫不等式给出的界（$\P(S_n \geq \frac{3n}{4})$）、切比雪夫不等式，
+以及指数型（切尔诺夫）方法给出的界：
+\[
+\P\Bigl(S_n \geq \frac{3n}4\Bigr)
+\leq \E\bigl(e^{tS_n}\bigr)e^{-3nt/4}
+= \Bigl(\frac{1 + e^t}{2}\Bigr)^n e^{-3nt/4}
+\quad (t > 0),
+\]
+并对 $t$ 求优化，得到指数级小的界。\emph{（当
+$t = \ln 3$ 时，界为 $\bigl(2\cdot 3^{-3/4}\bigr)^n \approx
+(0.877)^n$。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:randomvar:8}
+（用概率方法再证魏尔斯特拉斯定理）设 $f \colon [0,1] \to \R$
+为\omterm{def:b2:metric:continuity}{连续}函数，且 $S_n \sim \mathcal{B}(n, x)$。证明
+\omterm{thm:b2:funcseq:weierstrass}{伯恩斯坦多项式} $B_nf(x) = \sum_{k=0}^n f\bigl(\frac
+kn\bigr)\binom nk x^k(1-x)^{n-k}$ 等于
+$\E\bigl[f\bigl(\frac{S_n}{n}\bigr)\bigr]$，并用概率语言重新推导
+在\cref{ch:b2:funcseq}中的估计 $\abs{B_nf(x) - f(x)} \leq \omega_f(\delta) +
+\frac{2\norm f_\infty}{4n\delta^2}$，
+按 $\bigl|\frac{S_n}{n} -
+x\bigr| \geq \delta$ 分情形，并用切比雪夫不等式。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:randomvar:9}
+（四阶矩条件下的强大数定律）设 $(X_k)$ 为独立的，
+同\omterm{def:b2:randomvar:law}{分布}、均值为零（$\E X_1 = 0$），且
+$\E(X_1^4) < \infty$。展开 $\E(S_n^4)$，并数出
+留下的项（只有 $\E(X_i^4)$ 与 $\E(X_i^2X_j^2)$ 形式的项，$i
+\neq j$），证明 $\E(S_n^4) \leq C n^2$，其中 $C$ 为常数。
+由此推出 $\sum_n \P\bigl(\abs{S_n/n} \geq \varepsilon\bigr) < \infty$
+对每个 $\varepsilon > 0$ 成立（用四阶马尔可夫不等式），并
+由博雷尔--坎特利引理（见\cref{thm:b2:proba:borelcantelli}）得
+$S_n/n \to 0$ 几乎必然成立，以适当的形式表述为：
+\omterm{def:b2:proba:space}{事件} $\bigcap_{j}\bigcup_N\bigcap_{n \geq N}\{\abs{S_n/n} <
+\frac1j\}$ 的概率为 $1$。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:randomvar:10}
+掷两枚均匀骰子，令 $M$ 为两次掷出的点数中
+较大者。利用\cref{exo:b2:randomvar:4}中的尾概率公式
+（有限形式），证明
+\[
+\E(M) = \sum_{k=1}^{6}\P(M \geq k)
+= 6 - \sum_{j=0}^5\Bigl(\frac j6\Bigr)^2 = \frac{161}{36}
+\approx 4.47 .
+\]
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:randomvar:11}
+设 $F_n$ 为 
+$\{1, \dots, n\}$ 上均匀随机置换的不动点个数（$n \geq 2$）。记 $F_n =
+\sum_i\mathbf 1_{\sigma(i) = i}$，计算 $\E(F_n) = 1$，
+$\operatorname{Cov}(\mathbf 1_{\sigma(i)=i}, \mathbf
+1_{\sigma(j)=j}) = \frac1{n^2(n-1)}$，当 $i \neq j$ 时，并
+得 $V(F_n) = 1$：平均而言恰有一封信回到原位，
+\omterm{def:b2:randomvar:variance}{方差}恰为 $1$，无论 $n$ 为何值。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:randomvar:12}
+（优惠券收集问题，集中性）在
+\cref{exo:b2:randomvar:3}的设定下，证明
+\[
+V(T_n) = \sum_{k=1}^n\frac{1 - k/n}{(k/n)^2}
+\leq n^2\sum_{k=1}^n\frac{1}{k^2} \leq \frac{\pi^2}{6}n^2,
+\]
+利用几何\omterm{def:b2:randomvar:law}{分布}各阶段的独立性以及 $V(\mathcal
+G(p)) = \frac{1-p}{p^2}$（见\cref{exo:b2:randomvar:1}；
+$\pi^2/6$ 的值见\cref{ex:b2:fourier:basel}）。
+由切比雪夫不等式可得 $\dfrac{T_n}{n\ln n} \to 1$ \emph{依概率}：
+收集者的总时间为 $n\ln n$，
+精确到阶为 $n$ 的涨落。
+\end{exercise}
+
+\section{问题：集中性工具，从马尔可夫到
+霍夫丁}
+
+\begin{problem}[{周末问题——指数型集中性的手算，
+以及民意调查须询问多少人}]
+\label{pb:b2:randomvar:1}
+马尔可夫不等式只需一阶矩，换来 $1/a$ 的衰减；
+切比雪夫不等式需要二阶矩，换来 $1/\varepsilon^2$——
+而\cref{ex:b2:randomvar:chebsharp}表明，这就是这些矩所能换来的全部。
+本题继续攀登余下的阶梯：
+指数型（切尔诺夫）方法，及其针对掷硬币的\emph{精确}速率，
+适用于一切有界变量的霍夫丁不等式，
+收获——明确而诚实的样本量，
+用于民意调查、选举预测与硬币检验。
+\index{集中性不等式}\index{霍夫丁不等式
+}\index{切尔诺夫界}全文中，$S_n \sim
+\mathcal B(n, p)$ 是 $n$ 个独立伯努利
+变量之和，$\widehat p_n = S_n/n$ 为经验频率。
+
+\medskip
+\noindent\textbf{第一部分——公平硬币上的校准。}
+这里 $p = \frac12$，且 $a \in \intoo{\frac12}{1}$。
+\begin{enumerate}
+  \item 对水平 $an$ 用马尔可夫不等式，证明 $\P(S_n \geq an) \leq
+        \frac1{2a}$，这一界甚至不趋于 $0$。
+        马尔可夫不等式在哪里损失了这么多？
+  \item 切比雪夫：利用公平二项\omterm{def:b2:randomvar:law}{分布}的
+        关于 $n/2$ 的对称性，证明
+        \[
+        \P(S_n \geq an) = \tfrac12\,
+        \P\bigl(\abs{S_n - \tfrac n2} \geq n(a -
+        \tfrac12)\bigr)
+        \leq \frac{1}{8n(a - 1/2)^2},
+        \]
+        即 $\frac2n$（$a = \frac34$ 时），
+        终究只是多项式衰减。
+  \item （切尔诺夫，一般水平）计算
+        $\E(\eu^{tS_n}) = \bigl(\frac{1 + \eu^t}2\bigr)^n$，并
+        优化 $\P(S_n \geq an) \leq
+        \E(\eu^{tS_n})\eu^{-tan}$ 关于 $t > 0$，证明
+        最优的 $t$ 为 $\ln\frac{a}{1-a}$，并得
+        \[
+        \P(S_n \geq an) \leq \eu^{-n\,I(a)},
+        \qquad
+        I(a) = \ln 2 + a\ln a + (1-a)\ln(1-a) > 0 .
+        \]
+        验证当 $a = \frac34$ 时，所得界恢复为
+        $\bigl(2\cdot3^{-3/4}\bigr)^n$，即
+        \cref{exo:b2:randomvar:7}中的界。
+  \item （指数是精确的）设 $k = an$ 为整数。
+        由 $\binom nk a^k(1-a)^{n-k}$ 是
+        某一概率\omterm{def:b2:randomvar:law}{分布}的 $n + 1$ 项中的最大者这一事实，
+        证明 $\binom nk \geq
+        \frac{\eu^{nH(a)}}{n+1}$，其中 $H(a) = -a\ln a -
+        (1-a)\ln(1-a)$，并由此推出匹配的下界
+        \[
+        \P(S_n \geq an) \geq \binom{n}{an}2^{-n}
+        \geq \frac{\eu^{-n\,I(a)}}{n + 1} .
+        \]
+  \item 在 $n = 100$、$a =
+        \frac34$ 时列表给出三个界：马尔可夫 $\frac23$，切比雪夫 $0.02$，
+        切尔诺夫 $\approx 2.1\cdot10^{-6}$（真值为
+        $\approx 2.8\cdot10^{-7}$）。试用一句话概括其中的启示。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第二部分——霍夫丁不等式。}
+\begin{enumerate}[resume]
+  \item （拉德马赫情形）设 $\varepsilon = \pm1$ 各以
+        概率 $\frac12$ 取值，证明
+        \[
+        \E(\eu^{t\varepsilon}) = \cosh t \leq \eu^{t^2/2}
+        \qquad (t \in \R)
+        \]
+        通过逐项比较两个级数（$(2k)! \geq
+        2^kk!$）。
+  \item 对独立的拉德马赫变量
+        $\varepsilon_1, \dots, \varepsilon_n$ 及任意 $s >
+        0$，推出：
+        \[
+        \P\Bigl(\sum_{i=1}^n\varepsilon_i \geq s\Bigr)
+        \leq \eu^{-s^2/(2n)} .
+        \]
+  \item 改写为公平硬币的情形（令 $X_i =
+        \frac{1+\varepsilon_i}2$），则 $\P\bigl(\widehat p_n -
+        \tfrac12 \geq \delta\bigr) \leq \eu^{-2n\delta^2}$，
+        以及带因子 $2$ 的双侧版本。
+  \item （霍夫丁引理）设 $X \in \intcc01$ 且 $\E X =
+        p$，记 $\psi(t) = \ln\E(\eu^{tX})$，并说明
+        $\psi$ 二阶可导，且
+        \[
+        \psi''(t) = \E_t(X^2) - \E_t(X)^2, \qquad
+        \E_t(Y) := \frac{\E(Y\eu^{tX})}{\E(\eu^{tX})},
+        \]
+        即一个重加权变量的\emph{\omterm{def:b2:randomvar:variance}{方差}}，该变量仍取值于
+        $\intcc01$ 中，以 $\frac14$ 为其上界
+        （\cref{exo:b2:randomvar:6}中的极小性论证），并由泰勒公式
+        得出：
+        \[
+        \E\bigl(\eu^{t(X - p)}\bigr) \leq \eu^{t^2/8} .
+        \]
+  \item （霍夫丁不等式）对独立的 $X_i \in
+        \intcc01$ 且有共同均值 $p$，推出
+        \[
+        \P\bigl(\abs{\widehat p_n - p} \geq \delta\bigr)
+        \leq 2\,\eu^{-2n\delta^2}
+        \qquad (\delta > 0).
+        \]
+  \item 比较切比雪夫速率
+        $\frac{p(1-p)}{n\delta^2}$ 与霍夫丁界
+        $2\eu^{-2n\delta^2}$：二者各需要何种假设，并
+        （大致）从哪个 $n$ 起，
+        在 $\delta = 0.03$、$p =
+        \frac12$ 时指数界更优？
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第三部分——民意调查须询问多少人
+？} 某次民调独立且均匀地选取 $n$ 位选民；
+每人如实作答；$p$ 为真实比例，$\widehat p_n$
+为该次民调的结果。
+\begin{enumerate}[resume]
+  \item 证明：民调结果精确到 $\pm\delta$，
+        置信度为 $1 - \alpha$（即\
+        $\P(\abs{\widehat p_n - p} \geq \delta) \leq \alpha$），
+        只要
+        \[
+        n \;\geq\; \frac{\ln(2/\alpha)}{2\,\delta^2} .
+        \]
+  \item 计算所需的 $n$，取标准规格“三个
+        百分点、百分之九十五”（$\delta
+        = 0.03$，$\alpha = 0.05$）：$n \geq 2050$；若只取一个点，则
+        $n \geq 18\,445$。试指出——并解释——一个引人注目的事实：
+        答案
+        不依赖于总体规模。
+  \item 用切比雪夫不等式重做第 13 题（$V(X_1) = p(1-p)
+        \leq \frac14$）：$n \geq \frac1{4\alpha\delta^2} =
+        5556$（取三个百分点时）。注意，
+        \emph{不放回}抽样只会更有利
+        （\cref{exo:b2:randomvar:5}：\omterm{def:b2:randomvar:variance}{方差}乘以
+        $\frac{N-n}{N-1}$）。
+  \item （预测选举）某候选人的真实比例为 $p
+        = 0.52$。至少需要询问多少选民，才能使
+        $\P(\widehat p_n \leq \tfrac12) \leq 0.01$？证明 $n
+        \geq \frac{\ln 100}{2\cdot(0.02)^2} \approx 5757$——
+        预测一场胶着的选举，其代价
+        远高于估计一个比例。
+  \item 数学\emph{未}涵盖的内容：列出
+        所用的建模假设（独立、均匀
+        抽样、如实作答、$p$ 固定），并用一小段文字说明
+        真实民调误差为何主要来自
+        \emph{偏差}（抽样不均匀、无应答等），
+        而这类误差不会随 $n$ 增大而减小。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第四部分——更精确、更经济。}
+\begin{enumerate}[resume]
+  \item （均值的中位数：由二阶矩得到指数衰减）
+        将 $km$ 个样本的预算分成 $k$ 个相互独立的
+        组，每组 $m$ 个；记 $\widehat p^{(1)}, \dots, \widehat
+        p^{(k)}$ 为各组的均值，$M$ 为它们的中位数。
+        取 $m$ 使每组满足
+        $\P(\abs{\widehat p^{(i)} - p} \geq \delta) \leq
+        \frac18$（由切比雪夫不等式，$m \geq \frac2{\delta^2}$
+        即可）。证明：若 $\abs{M - p} \geq \delta$
+        则至少有 $k/2$ 组出错，由此推出
+        \[
+        \P(\abs{M - p} \geq \delta)
+        \leq \binom{k}{\lceil k/2\rceil}\Bigl(\frac18
+        \Bigr)^{k/2}
+        \leq 2^k\cdot 8^{-k/2} = 2^{-k/2} :
+        \]
+        仅凭\omterm{def:b2:randomvar:variance}{方差}这一工具，即可得到
+        指数级的集中性。
+  \item （佩利–齐格蒙德）对具有二阶矩的 $X \geq 0$，
+        证明 $\P(X > 0) \geq \dfrac{\E(X)^2}{\E(X^2)}$
+        \emph{（对 $X\mathbf 1_{X>0}$ 使用柯西–施瓦茨不等式）}：这是
+        一个反方向的工具——矩同样可以迫使
+        \omterm{def:b2:proba:space}{事件}发生。
+  \item （平斯克简版）证明 $I(a) \geq 2\bigl(a -
+        \tfrac12\bigr)^2$ 在 $\intoo{\frac12}1$ 上成立 \emph{（此差
+        在 $\frac12$ 处二阶无穷小，且
+        其二阶导数为 $\frac1{a(1-a)} - 4 \geq
+        0$）}：切尔诺夫的精确指数总优于
+        霍夫丁给出的\omterm{def:b2:quadratic:def}{二次型}指数。
+  \item 展开 $I\bigl(\tfrac12 + \delta\bigr) = 2\delta^2 +
+        O(\delta^4)$，并结合第 4 题：对于小偏差，
+        霍夫丁指数 $2n\delta^2$ 渐近
+        \emph{精确}——任何方法都无法在多项式因子之外
+        超越它。
+  \item 列出工具表：对于马尔可夫、切比雪夫、
+        \cref{exo:b2:randomvar:9}中的四阶矩界、
+        霍夫丁，以及以 $I$ 为指数的切尔诺夫界，各用一行写出
+        所需假设、所得衰减速率，
+        以及本题中该界最为精确的
+        那一问。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第五部分——红利。}
+\begin{enumerate}[resume]
+  \item （检验硬币）一枚硬币或是公平的，或是有偏的，其
+        正面概率 $p = 0.55$。抛掷 $n$ 次，并在
+        $\widehat p_n > 0.525$ 时宣布“有偏”。证明
+        两类错误概率均至多为
+        $\eu^{-2n(0.025)^2}$，并证明 $n \geq 3685$ 次
+        抛掷即可保证两者均小于 $1\%$。
+  \item （稀有\omterm{def:b2:proba:space}{事件}需要考虑\omterm{def:b2:randomvar:variance}{方差}的界）设 $p =
+        0.01$，取相对精度要求 $\delta =
+        p/2 = 0.005$，$\alpha = 0.05$。比较
+        霍夫丁界（$n \approx 74\,000$）所要求的样本量，以及
+        由真实\omterm{def:b2:randomvar:variance}{方差} $p(1-p)$ 得到的切比雪夫界所要求的样本量（$n
+        \approx 7920$）。忽略\omterm{def:b2:randomvar:variance}{方差}的指数界输给朴素的二阶矩
+        界。并指出其寓意，
+        并说明所缺工具（一个考虑\omterm{def:b2:randomvar:variance}{方差}的指数界；
+        泊松近似，见
+        \cref{ch:b2:genfun}）从何而来。
+  \item （硬币的强大数律）由 $\sum_n
+        2\eu^{-2n\delta^2} < \infty$ 及博雷尔–坎泰利
+        （\cref{thm:b2:proba:borelcantelli}），证明
+        对独立的硬币抛掷，$\widehat p_n \to p$ 几乎必然成立，
+        将几乎必然\omterm{def:b2:proba:space}{事件}写成
+        $\bigcap_j\bigcup_N\bigcap_{n\geq N}
+        \{\abs{\widehat p_n - p} < \tfrac1j\}$，如
+        \cref{exo:b2:randomvar:9}所示，并由此得出结论。（有界性
+        代替了其中所用的四阶矩。）
+  \item 综合。用五句话说明梯子上每一级
+        （一、二、四阶矩；有界指数界；
+        精确指数）各自付出什么、得到什么；为何只需调查 $2050$
+        人即足以代表任意规模的国家；并指出其中
+        哪一个界将在本科三年级分册中精化为
+        中心极限定理的精确常数。
+\end{enumerate}
+\end{problem}

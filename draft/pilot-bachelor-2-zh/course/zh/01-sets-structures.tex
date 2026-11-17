@@ -1,0 +1,1163 @@
+\chapter{集合与结构}\label{ch:b2:structures}
+
+本章在本科一年级分册奠定的基础上，
+进一步打磨出实用的工具：集合与商集的运算、
+无限集合的比较（可数性、康托--伯恩斯坦定理），
+以及群与环的结构理论 ---
+拉格朗日定理、对称群及其符号、理想与中国剩余定理。
+本章内容在全书中被反复使用：
+置换的符号构造行列式（见\cref{ch:b2:linalg}），
+商环支撑算术，
+可数性则是拓扑与概率的基础。
+
+\section{集合、映射与商集}
+
+本科一年级分册中建立的集合、映射、
+等价关系与序关系的语言可自由使用。其中两处推广
+值得给出严格的陈述。
+
+\begin{proposition}[族的像与原像]\label{prop:b2:structures:images}
+设 $f \colon E \to F$，$(A_i)_{i \in I}$ 与 $(B_j)_{j \in J}$
+分别是 $E$、$F$ 的子集族。则
+\[
+f^{-1}\Bigl(\bigcup_j B_j\Bigr) = \bigcup_j f^{-1}(B_j),
+\qquad
+f^{-1}\Bigl(\bigcap_j B_j\Bigr) = \bigcap_j f^{-1}(B_j),
+\qquad
+f^{-1}(F \setminus B) = E \setminus f^{-1}(B),
+\]
+\[
+f\Bigl(\bigcup_i A_i\Bigr) = \bigcup_i f(A_i),
+\qquad
+f\Bigl(\bigcap_i A_i\Bigr) \subseteq \bigcap_i f(A_i)
+\quad (\text{对单射时等号成立} f).
+\]
+\end{proposition}
+
+\begin{proof}
+各恒等式都只是定义的展开；例如 $x \in
+f^{-1}(\bigcap B_j) \iff f(x) \in B_j$ 对所有 $j$ $\iff x \in
+f^{-1}(B_j)$ 对所有 $j$ 成立。像的恒等式，以及交集情形下
+等号不成立的情形（借助单射性修正）已在本科一年级分册中
+就两个集合证明过，论证
+对子集族完全相同。
+\end{proof}
+
+\begin{example}[像的包含何时严格]\label{ex:b2:structures:imagestrict}
+取 $f \colon \R \to \R$，$f(x) = x^2$，并令 $A_1 =
+\intcc{-1}{0}$ 与 $A_2 = \intcc{0}{1}$。则
+\[
+f(A_1 \cap A_2) = f(\{0\}) = \{0\},
+\qquad
+f(A_1) \cap f(A_2) = \intcc{0}{1} \cap \intcc{0}{1} =
+\intcc{0}{1} :
+\]
+\cref{prop:b2:structures:images}中的包含关系严格到不能再严格——
+同一像值的两个原像点 $\pm x$ 位于
+不同的 $A_i$ 中。单射性恰好禁止
+这种拆分，这也正是原像（从不合并点）
+在四个恒等式下无条件成立，而像
+在交集情形下失去其一。全书的经验法则是：
+对\emph{原像}做集合运算时尽可放心推进，
+而处理像时则须格外小心。
+\end{example}
+
+\begin{definition}[商集]\label{def:b2:structures:quotient}
+设 $\mathcal{R}$ 为 $E$ 上的等价关系。
+称\emph{商集}\index{商集} $E/\mathcal{R}$ 为
+等价类的全体；满射 $\pi \colon E \to E/\mathcal{R}$，
+$x \mapsto \mathrm{cl}(x)$，称为\emph{典范
+投影}\index{典范投影}。
+
+\emph{泛性质（分解）：}若 $f \colon E \to F$ 是
+\emph{相容}的（关于 $\mathcal{R}$，即 $x \mathbin{\mathcal{R}}
+y \implies f(x) = f(y)$），则存在唯一的映射 $\overline f
+\colon E/\mathcal{R} \to F$ 使得 $f = \overline f \circ \pi$。
+\end{definition}
+
+\begin{proof}[泛性质的证明]
+唯一性：条件 $f = \overline f \circ \pi$ 写成
+\[
+\overline f\bigl(\mathrm{cl}(x)\bigr) = f(x)
+\qquad (x \in E),
+\]
+由于 $\pi$ 为满射，$E/\mathcal{R}$ 的每个元素
+都是某个 $\mathrm{cl}(x)$，故
+$\overline f$ 的取值全部被确定。存在性：把上式取作
+\emph{定义}，即 $\overline f$ 的值；它良定，恰由相容性保证——
+若 $\mathrm{cl}(x) =
+\mathrm{cl}(y)$，则 $x \mathbin{\mathcal{R}} y$，于是 $f(x) =
+f(y)$，两个候选值一致，并且它按构造分解
+$f$。注意分工：
+$\pi$ 的满射性给出唯一性，相容性给出存在性。
+\end{proof}
+
+\begin{example}
+$\Z/n\Z$ 是 $\Z$ 按模 $n$ 同余关系所得的商；
+本科一年级分册中的良定性检验都是
+泛性质的实例。商把“关于代表元的相容构造”
+变成真正的映射——下文将频繁用到这一点。
+\end{example}
+
+\section{可数性与基数}
+
+\begin{definition}[等势与可数性]\label{def:b2:structures:countable}
+两个集合之间存在双射时，称它们为\emph{等势}\index{等势}。一个集合
+称为\emph{可数集}\index{可数集}，若它与
+$\N$ 等势（有些作者把有限集也包括在内；我们
+将“有限或可数”称为\emph{至多可数}）。
+\end{definition}
+
+\begin{proposition}[稳定性质]\label{prop:b2:structures:countablestable}
+\begin{enumerate}
+  \item $\N$ 的每个无限子集都是可数的；一个集合为至多可数的，
+        当且仅当它单射到 $\N$ 中，当且仅当它为空集或
+        为 $\N$ 的满射像。
+  \item $\N \times \N$ 是可数的；两个至多可数集的
+        乘积是至多可数的。
+  \item 至多可数个至多可数集的并集
+        仍是至多可数的。
+  \item $\Z$ 与 $\Q$ 都是可数的。
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(1) 对无限集 $A \subseteq \N$，通过反复取最小元来列举其元素：$a_0 =
+\min A$, $a_{k+1} = \min\,(A \setminus \{a_0, \dots, a_k\})$
+（因 $A$ 为无限集，故此差集非空）；映射 $k \mapsto a_k$ 严格递增，
+是单射，且满射到 $A$（对每个 $a \in A$
+只有有限多个 $A$ 中的元素小于它，故它必被取到）。若 $E$
+单射到 $\N$ 中，记为 $\varphi$，则 $E$ 与
+$\varphi(E) \subseteq \N$ 等势，故为有限或可数的。若 $s \colon \N \to
+E$ 为满射，则 $x \mapsto \min s^{-1}(\{x\})$ 将 $E$
+单射到 $\N$ 中。
+
+(2) 映射 $(p, q) \mapsto 2^p(2q + 1) - 1$ 是 $\N^2
+\to \N$ 的双射（每个正整数都可唯一地写成
+$2^p m$ 的形式，其中 $m$ 为奇数，由唯一分解定理可知）。关于乘积，
+只需复合单射即可。
+
+(3) 设集合 $E_n$ 及满射 $s_n \colon \N \to E_n$
+（某个 $E_n$ 为有限集时，允许取值重复，无妨），映射 $(n, k)
+\mapsto s_n(k)$ 是从可数集 $\N^2$ 到
+$\bigcup E_n$ 的满射。
+
+(4) $\Z = \N \cup (-\N^*)$：为两个可数集的并。$\Q$ 是
+$\Z \times \N^*$ 的满射像（经分数映射），因而至多
+可数，且为无限集。
+\end{proof}
+
+\begin{example}[配对函数的具体计算]\label{ex:b2:structures:pairing}
+证明中的双射 $(p, q) \mapsto 2^p(2q + 1) - 1$
+值得看看它的实际运作。其前几个值为：
+\[
+\begin{array}{c|ccccc}
+ & q = 0 & q = 1 & q = 2 & q = 3 & q = 4\\
+\hline
+p = 0 & 0 & 2 & 4 & 6 & 8\\
+p = 1 & 1 & 5 & 9 & 13 & 17\\
+p = 2 & 3 & 11 & 19 & 27 & 35\\
+p = 3 & 7 & 23 & 39 & 55 & 71
+\end{array}
+\]
+第 $p$ 行收集的整数 $n$ 满足
+$n + 1$ 恰被 $2^p$ 整除，于是每个自然数恰好出现一次。
+解码与编码同样明确：当 $n = 43$ 时，分解 $n + 1
+= 44 = 2^2\cdot 11 = 2^2(2\cdot5 + 1)$，于是 $(p, q) = (2, 5)$。
+点睛之处在于：可数性证明往往是
+伪装起来的\emph{算法} --- 这里即“把所有的 2 提出来”。
+\end{example}
+
+\begin{example}[代数数是可数的]\label{ex:b2:structures:algebraic}
+若复数是某个有理系数
+非零多项式的根，则称它为\emph{代数数}。代数数全体构成的集合
+$\overline\Q$ 是可数的：
+次数 $\leq d$ 的 $\Q$ 上多项式单射到 $\Q^{d+1}$ 中，而后者为
+有限个可数集的乘积
+（\cref{prop:b2:structures:countablestable}~(2)）；对
+$d$ 取并，便将非零有理多项式列举为 $P_0, P_1,
+P_2, \dots$；每个 $P_k$ 只有有限多个根，并且
+\[
+\overline\Q = \bigcup_{k \in \N}\ \{\text{ 的根 } P_k\}
+\]
+是可数个有限集的并，
+（\cref{prop:b2:structures:countablestable}~(3)），且
+因它包含 $\Q$ 而为无限集。结合 $\R$ 的不可数性
+（见下文\cref{thm:b2:structures:cantor}），由此可证 --- 不必写出任何一个
+超越数 --- 它们存在，并且构成
+不可数的绝大多数：这是康托于
+1874 年给出的计数论证，仅凭基数即可断定其存在。
+\end{example}
+
+\begin{theorem}[康托；$\R$ 的不可数性]\label{thm:b2:structures:cantor}
+\begin{enumerate}
+  \item 对任意集合 $E$，不存在 $E \to
+        \mathcal{P}(E)$ 的满射。
+  \item $\R$ 是\emph{不}可数的。
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) 已在本科一年级分册中证明（对角集 $D = \{x : x
+\notin f(x)\}$）。
+
+(2) 假设 $(x_n)_{n \in \N}$ 列举了 $\R$。构造闭区间套
+$I_0 \supseteq I_1 \supseteq \dots$，满足 $\abs{I_n} = 3^{-n}$ 且
+$x_n \notin I_n$：将当前区间三等分，得到三个闭子区间；
+至少有一个子区间不含 $x_n$（一点至多属于其中的两个
+子区间）。由闭区间套定理（端点相邻的版本）给出
+$\ell \in \bigcap_n I_n$；但 $\ell = x_N$ 对某个 $N$ 成立，而 $x_N
+\notin I_N$，矛盾。
+\end{proof}
+
+\begin{theorem}[康托--伯恩斯坦]\label{thm:b2:structures:cantorbernstein}
+若 $E$ 单射到 $F$ 中，且 $F$ 单射到 $E$ 中，则 $E$ 与 $F$
+等势。\index{康托--伯恩斯坦定理}
+\end{theorem}
+
+\begin{proof}
+设 $f \colon E \to F$、$g \colon F \to E$ 为单射。对
+$E$ 或 $F$ 中的每一点，追踪其\emph{祖先链}，
+即逐次取原像的序列：$x \mapsto g^{-1}(x) \mapsto
+f^{-1}(g^{-1}(x)) \mapsto \dots$ --- 每一步在当前点
+位于相应单射的像中时方有定义，
+且由单射性知其唯一。三种互斥的归宿：
+链停在 $E \setminus g(F)$ 的某点上（\emph{起点在
+$E$ 中}），链停在 $F \setminus f(E)$ 的某点上（\emph{起点在
+$F$ 中}），或永不停止。由此将 $E = E_E \cup E_F \cup
+E_\infty$ 与 $F = F_E \cup F_F \cup F_\infty$ 划分，
+各按其起点归类。
+
+现在观察：$f$ 将 $E_E$ \emph{满射}到 $F_E$ ---
+$f(x)$ 的链恰为 $x$ 的链前加一步，故起点一致；
+而每个 $y \in F_E$ 的链至少含一步（其起点
+位于 $E$ 中），故 $y = f(x)$，其中 $x \in E_E$。同理
+可得双射 $f \colon E_\infty \to F_\infty$ 与 $g \colon F_F
+\to E_F$。拼接可得
+\[
+h(x) =
+\begin{cases}
+f(x) & \text{ 若 } x \in E_E \cup E_\infty,\\
+g^{-1}(x) & \text{ 若 } x \in E_F,
+\end{cases}
+\]
+该映射是从 $E$ 到 $F = F_E \cup F_\infty \cup F_F$ 的双射：
+它逐段双射，且三个目标部分两两不交。
+\end{proof}
+
+\begin{example}\label{ex:b2:structures:cbexample}
+$\intoo{0}{1}$ 与 $\intcc{0}{1}$ 等势：恒等映射给出一个方向的单射，
+$x \mapsto \frac{x + 1}{3}$ 给出另一方向；定理
+构造出（必然不连续的）双射。类似地，
+$\R$、$\intoo{0}{1}$（经 $\tanh$ 型双射）与
+$\mathcal{P}(\N)$（二进制展开，见\cref{exo:b2:structures:3}）
+皆等势：“连续统的基数”。
+\end{example}
+
+\begin{example}[线段与正方形]\label{ex:b2:structures:squareseg}
+$\intcc{0}{1}$ 与 $\intcc{0}{1}^2$ 等势 --- 维数
+对基数不可见。一个单射是平凡的：$x
+\mapsto (x, 0)$。另一个：把 $(x, y)$ 映为这样的实数，
+其小数位与 $x$、$y$ 的小数位交错排列，
+\[
+(0.x_1x_2x_3\dots,\ 0.y_1y_2y_3\dots)
+\;\longmapsto\; 0.x_1y_1x_2y_2x_3y_3\dots,
+\]
+每个坐标都取不以
+全 $9$ 结尾的展开：依此约定，像的小数位
+唯一决定 $x$ 与 $y$ 的小数位，因此该映射是单射（它
+未必满射 --- 例如像从不会使奇数位小数
+最终全为 $9$ --- 这无妨）。
+康托–伯恩斯坦（\cref{thm:b2:structures:cantorbernstein}）
+给出一个真正的双射。当然，连续性是
+毫无希望：二者之间不存在连续双射 ---
+度量相关各章解释了其原因（连通性区分
+直线与平面，见\cref{ch:b2:metric}）。
+\end{example}
+
+\section{群}
+
+\begin{definition}[生成子群；阶]\label{def:b2:structures:generated}
+设 $G$ 为群，$A \subseteq G$。由 $A$ \emph{生成}的子群
+记作 $\langle A \rangle$，是
+包含 $A$ 的最小子群 --- 具体地说，$A$ 中元素的所有有限乘积
+及其逆元。若一个群
+可由一个元素生成，则称之为\emph{循环群}\index{循环群}：$\langle a\rangle = \{a^k : k \in \Z\}$。
+元素 $a \in G$ 的\emph{阶}\index{阶!元素的}为
+$\operatorname{ord}(a) = \abs{\langle a \rangle}$（可能
+为无限）。有限时，它是满足 $n \geq 1$ 且 $a^n = e$ 的最小正整数，
+并且 $a^k = e \iff \operatorname{ord}(a) \mid k$。
+\end{definition}
+
+\begin{proof}[阶的刻画的证明]
+若存在 $a^m = e$（$m \geq 1$），取最小的 $n \geq 1$ 使 $a^n
+= e$。元素 $e, a, \dots, a^{n-1}$ 两两不同
+（若 $a^{i} = a^{j}$，其中 $0 \leq i < j < n$，则 $a^{j-i} = e$，
+与最小性矛盾），且每个 $a^k$ 都可化为其中之一，
+由欧几里得除法 $k = nq + r$，$\langle a\rangle$ 恰有 $n$
+个元素，且 $a^k = a^r = e \iff r = 0 \iff n \mid k$。若没有任何幂
+为单位元，则所有 $a^k$（$k \in \Z$）两两不同（同上面的
+证法），阶为无限。
+\end{proof}
+
+\begin{theorem}[拉格朗日]\label{thm:b2:structures:lagrange}
+设 $G$ 为有限群，$H$ 为其子群。则 $\abs H$ 整除
+$\abs G$。\index{拉格朗日定理}特别地，任一元素的阶
+整除 $\abs G$，且 $a^{\abs G} = e$ 对所有 $a \in G$ 成立。
+\end{theorem}
+
+\begin{proof}
+关系 $x \sim y \iff x^{-1}y \in H$ 是等价关系
+（自反性：$e \in H$；对称性：取逆元；传递性：作乘积）。
+$x$ 所在的等价类即为\emph{左陪集} $xH = \{xh : h \in H\}$，
+而 $h \mapsto xh$ 是 $H \to xH$ 的双射（逆为 $y \mapsto
+x^{-1}y$），所以各等价类都有 $\abs H$ 个元素。等价类划分 $G$
+（本科一年级分册中的一般划分定理），故 $\abs G =
+\abs H \times (\text{陪集个数})$。对元素而言，将此用于
+$H = \langle a\rangle$，于是 $a^{\abs G} = (a^{\operatorname{ord}
+a})^{\abs G / \operatorname{ord} a} = e$。
+\end{proof}
+
+\begin{example}[陪集的应用：$A_3$ 在 $\mathfrak{S}_3$ 中]\label{ex:b2:structures:cosets}
+取 $G = \mathfrak{S}_3$（阶为 $6$）及 $H = A_3 =
+\{\mathrm{id},\ (1\,2\,3),\ (1\,3\,2)\}$。左陪集为
+\[
+H = \{\mathrm{id},\ (1\,2\,3),\ (1\,3\,2)\},
+\qquad
+(1\,2)H = \{(1\,2),\ (2\,3),\ (1\,3)\} :
+\]
+两个各含三个元素的类划分 $G$，恰与
+计数式 $\abs G = \abs H \times (\text{陪集个数})$ 的要求相符 ---
+并且一目了然地给出偶置换与奇置换的
+划分。注意 $(1\,3)H = (1\,2)H$，虽然 $(1\,3) \neq
+(1\,2)$：陪集是\emph{类}，不以其
+代表元来标记，而 $x^{-1}y \in H$ 才是唯一合法的
+比较。这一两类图景即为关于符号的一般情形：
+$A_n$ 与其唯一的另一陪集
+将 $\mathfrak{S}_n$ 一分为二，这正是周末问题
+计数可达谜题局面的方式。
+\end{example}
+
+\begin{example}\label{ex:b2:structures:lagrangeapp}
+两个直接的推论。\emph{质数阶群是循环群：}
+若 $\abs G = p$ 为质数且 $a \neq e$，则
+$\operatorname{ord}(a)$ 整除 $p$ 且不为 $1$，故它等于 $p$：
+$\langle a\rangle = G$。\emph{$\Z/12\Z$ 的子群格：}
+由下文\cref{prop:b2:structures:cyclic}，
+每个 $12$ 的因数恰对应一个子群 --- 阶分别为 $1, 2, 3, 4, 6, 12$，
+依次由 $\overline 0$、$\overline 6$、$\overline
+4$、$\overline 3$、$\overline 2$、$\overline 1$。
+最后需要注意：拉格朗日定理的\emph{逆}一般不成立 --- $A_4$
+的阶为 $12$，却没有阶为 $6$ 的子群，这一点在本章的周末问题中证明
+（见\cref{pb:b2:structures:1}，第 14 题）。
+拉格朗日定理限制了可能的阶，但并不保证这些阶都会出现。
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=1.05, every node/.style={font=\small}]
+  \node (G) at (0,3)  {$\Z/12\Z = \langle\overline1\rangle$};
+  \node (A) at (-1.6,2) {$\langle\overline2\rangle$};
+  \node (B) at (1.6,2)  {$\langle\overline3\rangle$};
+  \node (C) at (-1.6,1) {$\langle\overline4\rangle$};
+  \node (D) at (1.6,1)  {$\langle\overline6\rangle$};
+  \node (E) at (0,0)  {$\{\overline0\}$};
+  \draw[omDef] (G) -- (A); \draw[omDef] (G) -- (B);
+  \draw[omDef] (A) -- (C); \draw[omDef] (A) -- (D);
+  \draw[omDef] (B) -- (D); \draw[omDef] (C) -- (E);
+  \draw[omDef] (D) -- (E);
+  \node[omThm, right=2pt] at (0.1,3) {\ 阶为 $12$};
+  \node[omThm, left=2pt]  at (-2.1,2) {阶为 $6$\ };
+  \node[omThm, right=2pt] at (2.1,2) {\ 阶为 $4$};
+  \node[omThm, left=2pt]  at (-2.1,1) {阶为 $3$\ };
+  \node[omThm, right=2pt] at (2.1,1) {\ 阶为 $2$};
+\end{tikzpicture}
+
+{\small $\Z/12\Z$ 的子群格：每个
+$12$ 的因数对应一个子群（\cref{prop:b2:structures:cyclic}），
+当一个子群包含另一个且指标为素数时连一条边。包含关系
+与生成元的整除关系\emph{方向相反}：$\langle\overline
+4\rangle \subseteq \langle\overline2\rangle$ 因为 $4$ 是
+$2$ 的倍数。}
+\end{omfigure}
+
+\begin{proposition}[循环群]\label{prop:b2:structures:cyclic}
+设 $G = \langle a \rangle$ 为阶为 $n$ 的循环群。
+\begin{enumerate}
+  \item $G$ 与 $(\Z/n\Z, +)$ 同构，同构由 $\overline k \mapsto
+        a^k$ 给出。
+  \item $G$ 的每个子群都是循环群；对每个因数 $d \mid n$，
+        恰有一个阶为 $d$ 的子群，即 $\langle
+        a^{n/d}\rangle$。
+  \item $a^k$ 生成 $G$，当且仅当 $\gcd(k, n) = 1$：$G$ 有
+        $\varphi(n)$ 个生成元（欧拉函数\index{欧拉函数}
+        ）。
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(1) 映射 $k \mapsto a^k$ 由 $\Z$ 满射到 $G$，且与
+模 $n$ 的同余相容（$a^{k} = a^{k'} \iff n \mid k - k'$，由阶的
+刻画可得）；由泛性质
+（\cref{def:b2:structures:quotient}）得到一个良定义的
+从 $\Z/n\Z$ 出发的双射同态。
+
+(2) 设 $H \leq G$ 为非平凡子群，$m$（$\geq 1$）为使 $a^m \in
+H$ 的最小者。由带余除法可得 $H = \langle a^m\rangle$（对 $a^k \in
+H$：$k = mq + r$ 迫使 $a^r \in H$，故 $r = 0$），并且 $m \mid n$
+（用 $n$ 除以 $m$：$a^{n \bmod m} \in H$）。于是 $\abs H = n/m$；
+取 $m = n/d$ 即可实现每个因数 $d$。唯一性：任一阶为
+$d$ 的子群由上可知都形如 $\langle a^m \rangle$，
+且 $n/m = d$ ---
+因此 $m = n/d$ 唯一确定，子群也随之确定。
+
+(3) 我们断言 $\operatorname{ord}(a^k) = \frac{n}{\gcd(k, n)}$。
+记 $d = \gcd(k, n)$。对任意 $m \geq 1$，由
+\cref{def:b2:structures:generated}中阶的刻画，
+得到如下等价链
+\[
+(a^k)^m = e
+\iff n \mid km
+\iff \frac{n}{d} \,\Big|\, \frac{k}{d}\,m
+\iff \frac{n}{d} \,\Big|\, m ,
+\]
+最后一步由高斯引理得出，因为 $\frac nd$ 与 $\frac kd$
+互素。满足条件的最小的 $m$ 为 $\frac nd$：
+$\operatorname{ord}(a^k) = \frac n{\gcd(k,n)}$，它等于 $n$
+当且仅当 $\gcd(k, n) = 1$。满足条件的 $\varphi(n)$ 个
+类 $k$（模 $n$）。
+\end{proof}
+
+\section{对称群}
+
+\begin{definition}\label{def:b2:structures:sn}
+$\mathfrak{S}_n$ 为 $\intint{1}{n}$ 上的置换群
+（阶为 $n!$）。\emph{轮换}\index{轮换} $(a_1\,a_2\,\cdots\,a_k)$
+它将 $a_1 \mapsto a_2 \mapsto \dots \mapsto a_k \mapsto a_1$，并
+固定其余所有元素；$k$ 称为它的\emph{长度}，$2$ 轮换是一个
+\emph{对换}\index{对换}。两个轮换称为
+\emph{不相交}，当它们的
+支集（非不动点）互不相交。
+\end{definition}
+
+\begin{theorem}[轮换分解]\label{thm:b2:structures:cycles}
+每个置换 $\sigma \neq \mathrm{id}$ 都是两两
+不相交的轮换之积，在因子次序不计的意义下唯一。
+不相交的轮换彼此可交换，且 $\operatorname{ord}(\sigma)$ 等于各
+轮换长度的最小公倍数。
+\end{theorem}
+
+\begin{proof}
+考虑 $\sigma$ 的支集上的“轨道”关系：$x \sim y$
+当且仅当 $y = \sigma^k(x)$，其中 $k \in \Z$ ---
+这是一个等价关系。每个等价类 $\{x, \sigma(x), \dots, \sigma^{k-1}(x)\}$
+（有限，故迭代必循环回来 --- 第一次重复必
+回到 $x$，由单射性得出）对应轮换 $(x\ \sigma(x)\
+\cdots\ \sigma^{k-1}(x))$，且 $\sigma$ 即为这些轮换之积：
+在每个轨道上，只有相应的轮换起作用。
+唯一性：任一两两不相交的轮换分解恰好重现这些轨道
+（经过 $x$ 的轮换必为 $(x\ \sigma(x)\ \cdots)$）。
+不相交的轮换彼此可交换，因为它们移动的是不相交的点；阶的论断
+由于 $\sigma^m = \mathrm{id}$ 当且仅当每个轮换的
+$m$ 次幂都是恒等映射（由不相交性），当且仅当每个长度都整除 $m$。
+\end{proof}
+
+\begin{example}[轮换型的计数]\label{ex:b2:structures:cycletype}
+$\mathfrak{S}_9$ 中有多少个置换，其轮换型为
+$(4, 3, 2)$ ——即一个 $4$-轮换、一个 $3$-轮换和一个对换？
+选定各轮换的支集与循环次序：
+\[
+\frac{9!}{4\cdot 3\cdot 2}
+= \frac{362\,880}{24} = 15\,120 :
+\]
+将九个符号排成一行（共 $9!$ 种方式），把前
+四个、接下来的三个、最后两个分别括成轮换，再除以
+各括号内给出同一置换的循环移位（分别为 $4$、$3$ 与 $2$ 个）。
+（此处轮换的\emph{长度}互不相同，
+故无需再除；若长度相等，则还须
+再除以相等括号的排列数。）此类每个置换的
+阶为 $\operatorname{lcm}(4,3,2) = 12$，并且
+符号为 $(-1)^3(-1)^2(-1)^1 = +1$
+（由\cref{thm:b2:structures:cycles}及
+下文的符号定理可得）。$9$ 的一个划分，对应一个共轭类，即一次计数
+——$\mathfrak{S}_n$ 的组合学，
+即划分的算术。
+\end{example}
+
+\begin{theorem}[符号]\label{thm:b2:structures:signature}
+存在唯一的群同态 $\varepsilon \colon
+\mathfrak{S}_n \to \{\pm 1\}$（$n \geq 2$），使其在
+对换上取值 $-1$，该同态称为\emph{符号}\index{符号}。此外
+$\varepsilon(\sigma) = (-1)^{I(\sigma)}$，其中 $I(\sigma)$ 为
+\emph{逆序对}的个数（$i < j$ 且 $\sigma(i) >
+\sigma(j)$ 的数对），$k$-轮换的符号为 $(-1)^{k-1}$，
+而\emph{交错群} $A_n = \ker\varepsilon$ 的阶为
+$\frac{n!}{2}$.
+\end{theorem}
+
+\begin{proof}
+\emph{存在性。}对 $\sigma \in \mathfrak{S}_n$，令
+\[
+\varepsilon(\sigma)
+= \prod_{1 \leq i < j \leq n}
+\frac{\sigma(j) - \sigma(i)}{j - i} .
+\]
+各因子的绝对值之积为 $1$（无序对
+$\{\sigma(i), \sigma(j)\}$ 取遍所有数对），因此
+$\varepsilon(\sigma) = (-1)^{I(\sigma)} \in \{\pm1\}$。同态性：对
+$\sigma, \tau$,
+\[
+\varepsilon(\sigma\tau)
+= \prod_{i<j} \frac{\sigma(\tau(j)) - \sigma(\tau(i))}{j - i}
+= \prod_{i<j} \frac{\sigma(\tau(j)) - \sigma(\tau(i))}{\tau(j) -
+\tau(i)} \cdot \prod_{i<j} \frac{\tau(j) - \tau(i)}{j - i}
+= \varepsilon(\sigma)\,\varepsilon(\tau),
+\]
+中间乘积即 $\varepsilon(\sigma)$，其中按
+数对 $\{\tau(i), \tau(j)\}$ 重新标号（每个无序对恰出现一次，
+分子与分母同时变号）。对换
+$\tau = (a\,b)$（$a < b$）的逆序对个数为奇数；
+精确计数：逆序对 $(i, j)$（$i < j$），即满足
+$\tau(i) > \tau(j)$ 的对，为
+\[
+(a, j) \ \text{当 } a < j < b, \qquad
+(i, b) \ \text{当 } a < i < b, \qquad
+(a, b) \ \text{本身},
+\]
+即共 $(b - a - 1) + (b - a - 1) + 1 = 2(b - a) - 1$ 个，
+为奇数。（另法：直接验证 $(1\,2)$，恰有一个
+逆序对，并取共轭——共轭元素的符号相同，
+因为 $\varepsilon$ 是到阿贝尔群的同态。）由此
+$\varepsilon((a\,b)) = (-1)^{2(b-a)-1} = -1$.
+
+\emph{唯一性。}对换生成 $\mathfrak{S}_n$（任一
+轮换 $(a_1\cdots a_k) = (a_1\,a_k)(a_1\,a_{k-1})\cdots(a_1\,a_2)$，
+并由\cref{thm:b2:structures:cycles}即得）；到
+$\{\pm1\}$ 的同态由其在生成元上的取值唯一确定。
+
+\emph{推论。}由上面的轮换恒等式，$k$-轮换写作
+$k - 1$ 个对换，符号为 $(-1)^{k-1}$。关于 $A_n$：同态
+$\varepsilon$ 是满射（$n \geq 2$ 时对换存在），
+而两个“陪集” $A_n$ 与 $(1\,2)A_n$ 等势，并
+划分 $\mathfrak{S}_n$（拉格朗日论证）：$\abs{A_n} =
+\frac{n!}{2}$.
+\end{proof}
+
+\begin{example}\label{ex:b2:structures:snexample}
+$\sigma = \begin{pmatrix} 1&2&3&4&5&6\\ 3&6&5&4&1&2 \end{pmatrix}
+= (1\,3\,5)(2\,6)$：阶为 $\operatorname{lcm}(3,2) = 6$，符号为
+$(-1)^{2}\cdot(-1)^{1} = -1$。符号是检验洗牌奇偶性的
+最快方法，也是行列式的动力所在，参见
+\cref{ch:b2:linalg}。
+\end{example}
+
+\begin{example}[通向同一符号的三条路]\label{ex:b2:structures:threeroads}
+设 $\sigma \in \mathfrak{S}_5$，它将 $1, 2, 3, 4, 5$ 依次映为 $3, 5, 4,
+1, 2$。\emph{用轮换表示：}$1 \mapsto 3 \mapsto 4 \mapsto 1$，而 $2
+\mapsto 5 \mapsto 2$，于是 $\sigma = (1\,3\,4)(2\,5)$，且
+$\varepsilon(\sigma) = (-1)^{2}(-1)^{1} = -1$。\emph{用
+逆序：}在值列表 $3, 5, 4, 1, 2$ 中，逆序的
+数对为 $(3,1)$、$(3,2)$、$(5,4)$、$(5,1)$、$(5,2)$、$(4,1)$，
+$(4,2)$，共七个，故 $(-1)^7 = -1$。\emph{用
+对换：}$\sigma = (1\,4)(1\,3)(2\,5)$，共三个因子，
+$(-1)^3 = -1$。三种计算得出同一奇偶性：
+由\cref{thm:b2:structures:signature}中的唯一性保证，任何记账
+方案都不可能使其结果不一致——这正是使
+$\varepsilon$ 可用作不变量（见周末问题）。
+\end{example}
+
+\begin{remark}[符号的后续应用]
+符号是后续三项成果的种子：它构造了行列式
+及其乘积法则（在\cref{ch:b2:linalg}中）；它支撑
+为组合谜题提供奇偶不变量（本章的周末问题
+用它解决十五数码问题）；而它所定义的交错群
+$A_n$ 在本科三年级分册中居于核心地位，其中
+它们在 $n \geq 5$ 时的单性解释了为何 $5$ 次方程
+没有根式解。
+\end{remark}
+
+\section{环、理想、商}
+
+\begin{definition}[理想]\label{def:b2:structures:ideal}
+设 $A$ 为交换环。\emph{理想}\index{理想}$I
+\subseteq A$ 是加法子群，且 $a x \in I$（对所有
+$a \in A$、$x \in I$）。环同态的核是理想；$I = A$
+当且仅当 $1 \in I$，当且仅当 $I$ 含可逆元。由 $x$ \emph{生成}
+的理想为 $xA = \{xa\}$（\emph{主理想}）。
+\end{definition}
+
+\begin{theorem}[{$\Z$ 与 $K[X]$ 的理想}]\label{thm:b2:structures:principal}
+$\Z$ 的每个理想都是 $n\Z$，$n \in \N$ 唯一确定；
+$K[X]$（$K$ 为域）的每个理想都是 $P\,K[X]$，$P$ 为唯一的首一（或零）多项式。
+因此两环中最大公因子都存在，且有贝祖关系：$x\Z +
+y\Z = \gcd(x,y)\Z$，对多项式亦然。
+\end{theorem}
+
+\begin{proof}
+对 $\Z$，这即本科一年级分册中的子群定理（理想
+特别地是子群，且 $n\Z$ 是理想）。对 $K[X]$，设
+$I \neq \{0\}$ 为理想，$P \in I$ 为非零且次数最小的元素，
+取为首一。对 $F \in I$，由欧几里得除法 $F = PQ + R$
+得 $R = F - PQ \in I$ 且 $\deg R < \deg P$，由次数最小性知 $R
+= 0$，于是 $I = P\,K[X]$。唯一性：两个首一生成元互相
+整除。贝祖关系即理想 $x\Z +
+y\Z$（或其多项式类比）与
+最大公因子所生成的主理想相等——正是本科一年级分册中的最大公因子定义，
+如今被认作关于理想的一个陈述。
+\end{proof}
+
+\begin{example}[多项式的最大公因子，两种方法]\label{ex:b2:structures:polygcd}
+计算 $\gcd(X^3 - 1,\ X^2 - 1)$（在 $\Q[X]$ 中）。\emph{用欧几里得算法：}
+\[
+X^3 - 1 = X\,(X^2 - 1) + (X - 1),
+\qquad
+X^2 - 1 = (X + 1)(X - 1) + 0 ,
+\]
+于是最大公因子为 $X - 1$，回代得贝祖
+关系：
+\[
+X - 1 = 1\cdot(X^3 - 1) - X\cdot(X^2 - 1).
+\]
+\emph{用理想：}由 $(X^3 - 1)\Q[X] + (X^2 - 1)\Q[X]$ 生成的理想
+为主理想（见\cref{thm:b2:structures:principal}）；它包含 $X -
+1$（上式），且包含于 $(X - 1)\Q[X]$（两个
+生成元在 $1$ 处为零，因而都是 $X - 1$ 的倍式）：
+首一生成元即 $X - 1$。要点在于：理想的观点
+直接确定最大公因子，\emph{无需作除法}——公共根
+定位理想，而欧几里得算法仅作验证。
+\end{example}
+
+\begin{definition}[商环 $\Z/n\Z$，再探]\label{def:b2:structures:quotientring}
+设 $I$ 为 $A$ 的理想，关系 $x \sim y \iff x - y \in I$ 是
+与 $+$ 和 $\times$ 相容的等价关系；商集
+$A/I$ 继承环结构——\emph{商
+环}\index{商环}——使 $\pi \colon A \to A/I$ 成为
+以 $I$ 为核的同态。对 $A = \Z$、$I = n\Z$，此即
+本科一年级分册中的 $\Z/n\Z$，现带有其泛性质：
+任何把 $I$ 映为零的同态都经 $A/I$ 分解。
+\end{definition}
+
+\begin{theorem}[中国剩余定理，环的形式]\label{thm:b2:structures:crt}
+若 $\gcd(m, n) = 1$，则映射
+\[
+\Z/mn\Z \longrightarrow \Z/m\Z \times \Z/n\Z,
+\qquad
+\overline{x} \longmapsto (x \bmod m,\; x \bmod n)
+\]
+是环同构。\index{中国剩余定理}因此
+$\varphi(mn) = \varphi(m)\varphi(n)$（$m, n$ 互素），且
+\[
+\varphi(n) = n \prod_{p \mid n} \Bigl(1 - \frac 1p\Bigr)
+\quad (p \text{ 为质数}).
+\]
+\end{theorem}
+
+\begin{proof}
+该映射是良定义的环同态（相容性
+是显然的）。单射性：$x \equiv 0$（模 $m$ 与模 $n$）且
+$\gcd(m,n) = 1$ 蕴含 $mn \mid x$（高斯）。满射性：两边都
+有 $mn$ 个元素，故单射即足够（有限集的
+基数相等）；或显式地，由贝祖关系 $um +
+vn = 1$，则下式的类
+\[
+x = b\,um + a\,vn
+\]
+映为 $(a \bmod m,\ b \bmod n)$，因 $vn = 1 - um \equiv 1
+\pmod m$ 使 $x \equiv a \pmod m$，模 $n$ 同理
+——正是在
+\cref{ex:b2:structures:crtinverse}中数值计算所用的做法。可逆元对应于可逆元对（乘积环的可逆元
+即可逆元对），故 $\varphi(mn) =
+\varphi(m)\varphi(n)$。对质数幂，$\varphi(p^k) = p^k -
+p^{k-1}$（模 $p^k$ 的不可逆元即 $p$ 的倍数）；
+由积性即得乘积公式。
+\end{proof}
+
+\begin{example}[中国剩余同构的逆]\label{ex:b2:structures:crtinverse}
+取 $m = 8$，$n = 9$。该同构的逆可由
+两个\emph{幂等元}显式给出：求 $u \equiv 1 \pmod 8$，
+$u \equiv 0 \pmod 9$，且 $v \equiv 0 \pmod 8$，$v \equiv 1 \pmod
+9$。由 $u = 9k \equiv 1 \pmod 8$ 得 $k \equiv 1$，故 $u = 9$；由
+$v = 8k \equiv 1 \pmod 9$ 得 $-k \equiv 1$，$k \equiv 8$，故 $v =
+64$。则 $x = 9a + 64b$ 模 $72$ 所属的类是唯一的
+解，满足 $x \equiv a \pmod 8$、$x \equiv b \pmod 9$。取 $a =
+3$，$b = 5$ 时得 $27 + 320 = 347 \equiv 59 \pmod{72}$ ——
+恰为
+在\cref{exo:b2:structures:8}中用代入法求得的中间值。要点在于：$u$ 与 $v$
+满足 $u + v \equiv 1$，$uv \equiv 0$，$u^2 \equiv u$，$v^2
+\equiv v$（模 $72$）；它们分别是 $(1, 0)$ 与 $(0,
+1)$ 的像，而每一个中国剩余分解，归根结底，都是
+将 $1$ 分解为正交幂等元。
+\end{example}
+
+\begin{theorem}[欧拉；费马小定理再述]\label{thm:b2:structures:euler}
+$\Z/n\Z$ 的可逆元构成阶为 $\varphi(n)$ 的群；由此，
+当 $\gcd(a, n) = 1$ 时，有：
+\[
+a^{\varphi(n)} \equiv 1 \pmod n
+\qquad (\text{欧拉定理\index{欧拉定理}}),
+\]
+而费马小定理是 $n = p$ 为素数的情形，现在只需一行
+由拉格朗日定理即可得到。
+\end{theorem}
+
+\begin{proof}
+可逆剩余类恰是与 $n$ 互素的整数所在的类
+（见本科一年级分册）：共 $\varphi(n)$ 个，它们在乘法下构成一个
+群。由拉格朗日定理（\cref{thm:b2:structures:lagrange}）：
+即群中每个元素的群阶次幂都是单位元。
+\end{proof}
+
+\begin{example}[无生成元的可逆元群]\label{ex:b2:structures:units15}
+群 $(\Z/15\Z)^*$ 共有 $\varphi(15) = \varphi(3)\varphi(5)
+= 8$ 个元素。它是否循环？计算各元素的阶时，利用
+中国剩余定理给出的同构 $(\Z/15\Z)^* \simeq (\Z/3\Z)^* \times (\Z/5\Z)^*$
+（模 $15$ 的可逆元即为一对可逆元）：两个因子的阶分别为
+$2$ 与 $4$，故每个元素的阶都整除
+$\operatorname{lcm}(2, 4) = 4 < 8$ --- 没有元素能生成整个群。
+具体来说：
+\[
+2^4 = 16 \equiv 1, \qquad
+4^2 = 16 \equiv 1, \qquad
+7^4 \equiv 1, \qquad
+11^2 = 121 \equiv 1, \qquad
+14^2 \equiv 1 \pmod{15} :
+\]
+阶依次为 $4, 2, 4, 2, 2$，从未为 $8$。与
+\cref{exo:b2:structures:10}相对照：$(\Z/p\Z)^*$ \emph{是}循环群，
+当 $p$ 为素数时，因为此处可逆元群位于一个域之中。
+欧拉定理仍然适用，指数取 $\varphi(15) = 8$，
+但此处真正的普遍指数是 $4$ --- 欧拉定理只给出一个
+上界，并不总是最精确的。
+\end{example}
+
+\begin{definition}[代数]\label{def:b2:structures:algebra}
+称 \emph{$K$-代数}\index{代数} 为一个 $K$-向量空间 $A$，其上
+带有一个环结构，其乘法为 $K$-双线性。例如：
+$K[X]$、$\mathcal{M}_n(K)$、$\mathcal{L}(E)$、函数空间
+$\mathcal{F}(X, K)$、$\C$ 作为 $\R$-代数。代数的态射
+即线性环态射；\emph{求值映射} $P \mapsto P(u)$
+从 $K[X]$ 到 $\mathcal{L}(E)$（或 $\mathcal{M}_n(K)$）的
+核心例子，贯穿\cref{ch:b2:reduction}。
+\end{definition}
+
+\begin{example}[一个求值映射及其核]\label{ex:b2:structures:evaluation}
+取 $A = \begin{pmatrix}0 & 1\\ 0 & 0\end{pmatrix}$，并考虑
+求值映射 $\varepsilon_A \colon \R[X] \to \mathcal{M}_2(\R)$，
+$P \mapsto P(A)$。由于 $A^2 = 0$，
+\[
+P(A) = P(0)\,I + P'(0)\,A =
+\begin{pmatrix} P(0) & P'(0)\\ 0 & P(0)\end{pmatrix},
+\]
+（只有 $P$ 的常数项与一次项保留下来）。因此
+$\ker\varepsilon_A = \{P : P(0) = P'(0) = 0\} = X^2\,\R[X]$：是一个
+主理想，恰如\cref{thm:b2:structures:principal}
+所预言，由核中次数最低的首一多项式 $X^2$ 生成，
+即\emph{极小多项式}——对 $A$ 而言，它是
+\cref{ch:b2:reduction}的明星。像为二维
+交换代数 $\{aI + bA\}$：求值映射将
+无限维的 $\R[X]$ 压缩到小而可计算的代数上。
+\end{example}
+
+\begin{remark}[展望：值得留意的三条主旋律]\label{rem:b2:structures:perspectives}
+本章的三个结构性思想反复出现于全册，
+每次都以更繁复的编配再现。\emph{经由商
+的分解}（见\cref{def:b2:structures:quotient}）：它
+在此构造了 $\Z/n\Z$，并在线性方程组的解集上定义映射，
+\cref{ch:b2:linalg}中亦如此，并悄然支撑着每一个
+“在类上良定义”的论证。\emph{不变量}：符号
+是到 $\{\pm1\}$ 的态射，任何合法的移动都无法
+躲避 --- 同样的逻辑也给出行列式的乘积法则
+（\cref{ch:b2:linalg}）、迹的相似不变性，以及
+在\cref{ch:b2:diffeq}中的守恒量。
+\emph{依结构计数}：拉格朗日定理借助
+陪集计数，维数借助基计数，
+（见\cref{ch:b2:linalg}），重数借助多项式
+次数计数（见\cref{ch:b2:reduction}）；每当某个界看似
+神奇，背后必有某种划分或分次在起计数作用。
+\end{remark}
+
+\begin{remark}[常见陷阱]\label{rem:b2:structures:pitfalls}
+四个经典陷阱。(i) 商集上的映射必须验证
+\emph{良定义}：“$\overline x \mapsto$（关于 $x$ 的公式）”
+仅当该公式在各类上取常值时才合法 ---
+即\cref{def:b2:structures:quotient}中的相容性，而非
+形式问题。(ii) $\operatorname{ord}(ab) =
+\operatorname{lcm}(\operatorname{ord}a, \operatorname{ord}b)$
+一般而言\emph{不成立}，即使对可交换元素（$a$
+与 $a^{-1}$）；\cref{exo:b2:structures:4} 给出了正确的
+互素且可交换情形下的命题，而不交轮换则给出
+正确的置换版本。(iii) 可数性在
+可数\emph{并}与有限\emph{积}下保持，但不适用于
+可数积：$\{0,1\}^{\N}$ 是不可数的
+（\cref{exo:b2:structures:3}），尽管每个因子只有两个
+元素。(iv) 康托--伯恩斯坦定理只需两个方向的单射，
+但它所构造的双射通常不连续，且
+非显式 --- 不要指望有公式
+（\cref{ex:b2:structures:cbexample}）。
+\end{remark}
+
+\begin{remark}[本章的应用]
+几乎无处不在。符号用于构造行列式
+（\cref{ch:b2:linalg}）；求值映射 $P \mapsto P(u)$
+与 $K[X]$ 的主理想一起产生极小多项式，并
+给出\cref{ch:b2:reduction}中的核分解；可数性
+是\cref{ch:b2:proba}得以展开的舞台（可数空间上的概率论
+）；也解释了拓扑学屡屡产生可数
+稠密集（\cref{ch:b2:metric}）。商构造 $A/I$
+在本科三年级分册中被再次用于构造域 $K[X]/(P)$，并
+由此导出伽罗瓦理论：这里证明的泛性质在
+那里被逐字沿用。
+\end{remark}
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:b2:structures:1}
+下列集合中哪些是可数的？$\N$ 的有限子集全体；
+$\N$ 的\emph{全部}子集构成的集合；$\R \setminus \Q$；
+系数为有理数的多项式全体；
+由 $0$ 和 $1$ 组成、且最终为零的数列全体。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:structures:2}
+在 $\mathfrak{S}_7$ 中，设 $\sigma = (1\,4\,2\,6)(3\,5)$ 与 $\tau =
+(2\,3\,7)$。求 $\sigma\tau$ 与 $\tau\sigma$ 的不相交轮换形式，
+四个置换的阶与符号，以及
+$\sigma^{2026}$。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:structures:3}
+构造显式的单射，说明 $\mathcal{P}(\N)$、
+$\intcc{0}{1}$ 以及由二进制序列组成的集合 $\{0,1\}^{\N}$ 两两
+等势\emph{（两个方向都用二进制展开；
+康托–伯恩斯坦定理可消除双重表示带来的麻烦）}。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b2:structures:4}
+设 $G$ 为群，$a, b \in G$ 为两个可交换元素，
+其阶分别为有限且互素的 $m$ 与 $n$。证明 $\operatorname{ord}(ab) =
+mn$。试在 $\mathfrak{S}_3$ 中举例说明交换性
+是必不可少的。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:structures:5}
+设 $G$ 为偶数阶有限群。证明 $G$ 中存在
+一个阶为 $2$ 的元素。\emph{（将每个元素与其逆元配对；
+数一数自身配对的元素个数。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:structures:6}
+证明 $A_n$（$n \geq 3$）由所有 $3$-轮换生成。
+\emph{（两个对换之积是一个 $3$-轮换，或
+两个 $3$-轮换之积。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:structures:7}
+求出所有群同态：从 $(\Q, +)$ 到 $(\Z, +)$；从
+$(\Z/n\Z, +)$ 到 $(\Z/m\Z, +)$ \emph{（计数：
+$\gcd(m,n)$）}；从 $(\Q, +)$ 到 $(\Q_+^*, \times)$。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:structures:8}
+利用中国剩余定理，计算 $\varphi(360)$，并求
+所有 $x$，使 $x \equiv 3 \pmod 8$、$x \equiv 5 \pmod 9$ 且 $x
+\equiv 2 \pmod 5$，并计算 $3^{2026}$ 的末两位数字
+\emph{（模 $100$ 下使用欧拉定理；注意：需分别在模 $4$ 与模 $25$ 下计算。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:structures:9}
+证明有限整环是域。由此推出
+$\Z/n\Z$ 为域当且仅当 $n$ 为质数（再次）。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:structures:10}
+（经典题）设 $K$ 为域，$G$ 为
+$(K^*, \times)$ 的\emph{有限}子群。证明 $G$ 为循环群。
+\emph{提示：设 $m$ 为 $G$ 中元素的阶的最大者；
+证明每个元素的阶都整除 $m$（对适当的互素部分
+利用\cref{exo:b2:structures:4}），从而 $G$ 中所有元素
+满足 $x^m = 1$；计算 $X^m - 1$ 的根的个数。}
+特别地，$(\Z/p\Z)^*$ 是循环群。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b2:structures:11}
+证明群 $(\Q, +)$ 不是循环群，而且更进一步：它
+甚至不是有限生成的。另一方面，证明每个有限
+生成的 $(\Q, +)$ 子群都是循环群。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b2:structures:12}
+（戴德金判据）证明每个无限集都含有一个
+可数子集，并由此推出：集合 $E$ 是无限的，当且仅当
+它与自身的某个真子集等势。\emph{（对于正向，将可数子集
+平移一步；对于逆向，
+回顾鸽巢原理。）}
+\end{exercise}
+
+\section{周末问题：十五数码}
+
+十五数码是一个 $4 \times 4$ 的托盘，托盘上放有十五块可滑动的
+方块，编号为 $1$ 至 $15$，另有一个空格；每步移动是把
+与空格相邻的一块方块滑入空格。1890 年代，萨姆·洛伊德
+推广了这一游戏，以 \$1000 为赏金，承诺支付给任何能
+将方块 $14$ 与 $15$ 互换，并使其余每块方块都回到
+原位的人。无人领取赏金，本周末问题证明了其原因的两个
+方面：由
+\cref{thm:b2:structures:signature}可知，符号禁止了洛伊德的互换，而
+另一面 --- 较难的构造性一面 --- 是 \emph{凡是}符号所允许的情形
+都确实可解。完整陈述即
+约翰逊–斯托里定理（1879）。
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=0.72]
+  \draw[omDef, thick] (0,0) grid (4,4);
+  \draw[omDef, very thick] (0,0) rectangle (4,4);
+  \foreach \k in {1,...,15} {
+    \pgfmathtruncatemacro\row{int((\k-1)/4)}
+    \pgfmathtruncatemacro\col{int(mod(\k-1,4))}
+    \node at (\col+0.5, 3.5-\row) {$\k$};
+  }
+  \node[below, font=\small] at (2,-0.2) {复原};
+\end{tikzpicture}
+\qquad
+\begin{tikzpicture}[scale=0.72]
+  \draw[omDef, thick] (0,0) grid (4,4);
+  \draw[omDef, very thick] (0,0) rectangle (4,4);
+  \foreach \k in {1,...,13} {
+    \pgfmathtruncatemacro\row{int((\k-1)/4)}
+    \pgfmathtruncatemacro\col{int(mod(\k-1,4))}
+    \node at (\col+0.5, 3.5-\row) {$\k$};
+  }
+  \node[omThm] at (1.5,0.5) {$15$};
+  \node[omThm] at (2.5,0.5) {$14$};
+  \node[below, font=\small] at (2,-0.2) {洛伊德悬赏};
+\end{tikzpicture}
+
+{\small 已解配置与萨姆·洛伊德的 $14$--$15$
+配置。\$1000 问题：合法滑动能否把右侧
+托盘变成左侧托盘？}
+\end{omfigure}
+
+\begin{problem}[{周末问题 --- 约翰逊--斯托里
+可解性定理}]
+\label{pb:b2:structures:1}
+按阅读顺序（从左到右、从上到下）为各格编号 $1$ 至 $16$，
+使第 $k$ 格位于第 $i$ 行第 $j$ 列，且 $k
+= 4(i - 1) + j$。第 $16$ 格（右下角）是空格的\emph{归位格}；
+我们把空格视为第十六块方块，
+记为 $b$，并与数 $16$ 等同。称
+\emph{配置}为双射 $\sigma \colon \intint1{16}
+\to \intint1{16}$，即格 $\mapsto$ 内容；\emph{已解}
+配置为 $\sigma = \mathrm{id}$。全文中，
+$\varepsilon$ 是由
+\cref{thm:b2:structures:signature}定义的符号。若两格
+在托盘上共享一条边时，称这两格\emph{相邻}。
+
+\medskip
+\noindent\textbf{第一部分 --- 配置、移动与符号。}
+\begin{enumerate}
+  \item 说明配置恰为
+        $\mathfrak{S}_{16}$ 的元素，故共有 $16! =
+        20\,922\,789\,888\,000$ 种，且
+        自给定配置出发的合法移动数为 $2$、$3$ 或 $4$，
+        视空格位于角上、
+        边上还是内部而定。
+  \item 设 $\sigma$ 为配置，$p = \sigma^{-1}(16)$ 为空格所在格，
+        $c$ 为与 $p$ 相邻的格。证明
+        将格 $c$ 中的方块滑入 $p$，所得
+        配置为 $\sigma' = \sigma \circ \tau$，其中 $\tau =
+        (p\ c)$，并由此推出每次移动都改变符号：
+        $\varepsilon(\sigma') = -\varepsilon(\sigma)$。
+  \item 将托盘作棋盘染色：$\chi(k) = (-1)^{i+j}$，其中
+        $k$ 位于第 $i$ 行第 $j$ 列。证明每次移动都改变
+        $\chi(\text{空格所在格})$ 的值，并由此推出
+        若一串移动使空格回到出发格，
+        则其长度为偶数。
+  \item 证明
+        \[
+        I(\sigma) = \varepsilon(\sigma)\,
+        \chi\bigl(\sigma^{-1}(16)\bigr)
+        \]
+        该量在每次合法移动下不变，并计算
+        $I(\mathrm{id})$。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第二部分 --- 洛伊德悬赏：不变量的
+应用。}
+\begin{enumerate}[resume]
+  \item 洛伊德配置 $\sigma_L$ 与已解配置相同，
+        除格 $14$ 与 $15$ 中分别为方块 $15$ 与 $14$ 外。
+        计算 $I(\sigma_L)$，并由此得出：没有任何
+        移动序列能将 $\sigma_L$ 变为已解配置：
+        洛伊德的 \$1000 悬赏根本不可能兑现。
+  \item 证明恰有一半的配置满足 $I =
+        +1$，即 $\abs{\{\sigma : I(\sigma) = +1\}} = 16!/2$。
+        \emph{（固定空格所在格，将配置两两配对，
+        即与作用于另外两格的一个固定对换复合。
+        ）}
+  \item 证明每次移动都可由一次合法移动撤销，并证明
+        “$\sigma'$ 可由 $\sigma$ 经合法移动到达”是
+        等价关系，并证明已解配置所在的等价类 $R$
+        满足 $R \subseteq \{I = +1\}$。
+        由此得出至少存在两个等价类。
+  \item 设空格位于归位格：$\sigma(16) = 16$。证明
+        $I(\sigma) = \varepsilon(\rho)$，其中 $\rho \in
+        \mathfrak{S}_{15}$ 中的元素，是 $\sigma$ 限制到
+        格 $1, \dots, 15$ 上的结果，并证明任一配置都可经合法移动
+        化为空格位于归位格的配置。
+        由此得出：要证明 $R = \{I = +1\}$，只需实现
+        十五个非归位格上的每个\emph{偶置换}，
+        均可由一串移动实现，该串移动
+        以空格归位开始并以归位结束。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第三部分 --- 空格巡回与程序
+群。}一个\emph{程序}是有限个合法移动组成的序列，
+从空格位于归位格的配置出发，其终止配置
+再次使空格位于归位格。其\emph{作用}是
+由以下规则定义的格的置换 $\pi$：格 $x$ 中的内容
+最终位于格 $\pi(x)$。
+\begin{enumerate}[resume]
+  \item 证明从 $\sigma$ 出发运行一个程序，结束时配置为 $\sigma
+        \circ \pi^{-1}$；证明依次运行两个程序，
+        其作用复合；并证明所有作用构成的集合 $H$
+        是 $\mathfrak{S}_{15}$ 的子群（格的置换，
+        即 $1, \dots, 15$ 号格上的置换），且包含于交错
+        群 $A_{15}$。
+  \item （基本巡回）自空格位于归位格出发，移动
+        空格绕右下角的 $2 \times 2$ 块一周：格
+        $16 \to 12 \to 11 \to 15 \to 16$。证明其作用为
+        $3$-轮换 $(11\ 12\ 15)$，逆向巡回给出
+        $(11\ 15\ 12)$。二者均属于 $H$。
+  \item （总巡回）验证
+        \[
+        16 \to 15 \to 14 \to 13 \to 9 \to 5 \to 1 \to 2 \to 3
+        \to 4 \to 8 \to 7 \to 6 \to 10 \to 11 \to 12 \to 16
+        \]
+        是一条经过全部十六个格的闭合路径（每步都只走相邻格），
+        且其作用为 $15$-轮换
+        \[
+        \zeta = (15\ 12\ 11\ 10\ 6\ 7\ 8\ 4\ 3\ 2\ 1\ 5\ 9\ 13\
+        14) .
+        \]
+        记 $x_0 = 15$，$x_1 = 12$，$x_2 = 11$，\dots，$x_{14}
+        = 14$，为其轮换顺序，验证第 10 题中的逆向
+        基本巡回恰为 $(x_0\ x_1\
+        x_2)$。
+  \item 证明任意 $\mathfrak{S}_n$ 中的共轭公式：
+        对置换 $g$ 与 $3$-轮换，成立
+        \[
+        g\,(a\ b\ c)\,g^{-1} = \bigl(g(a)\ g(b)\ g(c)\bigr),
+        \]
+        并注意 $H$ 是群，因而在其自身元素的
+        共轭作用下封闭。
+  \item 由此推出 $H$ 包含全部十五个\emph{相继}
+        $3$-轮换（取自总巡回）：
+        \[
+        s_t = (x_t\ x_{t+1}\ x_{t+2}) \qquad (t \in \Z/15\Z,
+        \text{ 下标按模 } 15).
+        \]
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第 IV 部分 --- 生成交错群。}
+\begin{enumerate}[resume]
+  \item （引理 A）设 $s$ 与 $t$ 为 $3$-轮换，其支集分别为 $\{a, b, c\}$
+        与 $\{b, c, d\}$，且恰共享两点。
+        必要时以 $s$ 或 $t$ 之逆代替之（这不改变所生成的子群），
+        则乘积 $st$ 为双对换；
+        证明 $A_4$ 不含阶为 $6$ 的子群
+        \emph{（指数为 $2$ 的子群含有所有平方；
+        在平方中数出 $3$-轮换）}；由此推出
+        $\langle s, t\rangle$
+        即字母 $\{a, b, c, d\}$ 上的
+        全体交错群。
+  \item （引理 B）设 $X$ 为 $k \geq 4$ 个字母组成的集合，$w
+        \notin X$，$G$ 为某个 $\mathfrak{S}_n$ 的子群，它包含 $X$ 的
+        所有偶置换，以及一个 $3$-轮换 $(u\ v\ w)$，其中 $u, v \in X$。
+        证明：对任意不同的 $a, b \in X$，存在一个\emph{偶}
+        置换 $g$（$X$ 的置换），满足 $g(u) = a$，
+        $g(v) = b$，
+        并由此推出 $(a\ b\ w) \in G$。
+  \item 由此推出，引理 B 中的群 $G$ 包含
+        $X \cup \{w\}$ 的全部偶置换\emph{（用
+        \cref{exo:b2:structures:6}：$3$-轮换生成群）}。
+        然后，取第 13 题中相邻的
+        $3$-轮换 $s_0, s_1, \dots, s_{12}$，依次运用引理 A 与引理 B，
+        证明 $\langle s_0, \dots, s_{12}\rangle = A_{15}$。
+  \item 由此得 $H = A_{15}$：\emph{十五块方块的每一种偶排列都可由程序实现}，
+        且 $H$ 恰含
+        $15!/2 = 653\,837\,184\,000$ 个元素。
+  \item （约翰逊–斯托里定理，1879 年）综合第 6、7、8、17 题：
+        由已解配置出发可达的配置，
+        \emph{恰好}为 $16!/2 =
+        10\,461\,394\,944\,000$ 个满足 $I = +1$ 的配置；
+        且可达性恰有\emph{两}类，即已解配置所在的类
+        与洛伊德的
+        $\sigma_L$ 所在的类。\emph{（就第二点而言，对方块重新标号：
+        互换 $14$ 与 $15$ 的标号，证明 $\sigma \mapsto (14\ 15) \circ
+        \sigma$ 将移动序列映为移动序列，并使
+        $\{I = +1\}$ 与 $\{I = -1\}$ 互换。）}
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第 V 部分 --- 判别准则、变体与
+俯视视角。}
+\begin{enumerate}[resume]
+  \item （实用判别准则）按方格的阅读顺序读出十五块方块，
+        跳过空格，记此列表的逆序数为 $N$；
+        空格所在的行（自\emph{底}行起计）为第 $r$ 行。证明
+        $I(\sigma) = (-1)^{N + r + 1}$，
+        从而 $\sigma$ 可解，当且仅当
+        $N + r$ 为奇数。
+  \item （群作用）群 $G$ 在集合
+        $X$ 上的\emph{作用}是映射 $G \times X \to X$，$(g, x) \mapsto g \cdot
+        x$，满足 $e \cdot x = x$ 与 $g \cdot (h \cdot x) =
+        (gh) \cdot x$；称 $x$ 的\emph{轨道}为 $G \cdot x$，并称该作用
+        为\emph{自由的}，若 $g \cdot x = x$ 蕴含 $g =
+        e$。证明：$h \cdot \sigma = \sigma \circ h^{-1}$
+        给出 $H$ 在空格位于原位的配置集合上的一个自由作用，
+        其轨道恰为程序互相可达的类，
+        由轨道个数可推出，
+        这些配置恰分为
+        $15!\,/\,\abs H = 2$ 个类。
+  \item （$3 \times 3$ 障碍）证明：$3 \times 3$ 棋盘
+        不存在\emph{任何}访问每格恰好一次的闭路径：
+        第 III 部分的环游策略对八数码游戏失效。
+        \emph{（将九个方格
+        按棋盘方式黑白染色。）}
+  \item （修补）在 $3 \times 3$ 棋盘上，方格 $1$ 至
+        $9$ 按阅读顺序编号，原位为 $9$。计算周边回路
+        $9 \to 8 \to 7 \to 4 \to 1 \to 2 \to 3
+        \to 6 \to 9$（$7$-轮换 $\zeta'$，固定中心 $5$）的效果，
+        以及角回路 $9 \to 6 \to 5 \to 8 \to 9$（一个经过中心的
+        $3$-轮换）。将后者以
+        $\zeta'$ 的各次幂作共轭，并结合引理 A 与引理 B，证明
+        八数码游戏的程序群恰为 $A_8$，
+        从而恰有 $9!/2 = 181\,440$ 个配置可解，即全部 $9! =
+        362\,880$ 个配置的一半。
+  \item （贫瘠的棋盘）现设棋盘为一个含 $n
+        \geq 4$ 个方格的单圈，上面放有 $n - 1$ 块方块。证明：
+        方块的循环次序为不变量，且每个可达类恰含
+        $n(n - 1)$ 个配置\emph{（各类即某一循环群的轨道，
+        该群的阶为
+        $\operatorname{lcm}(n, n-1) = n(n-1)$）}，并且共有
+        $(n - 2)!$ 个类 --- 对 $n \geq 5$ 远多于
+        $2$ 个：在细窄的棋盘上，奇偶不变量几乎
+        无所刻画，几何起主导作用。
+  \item 依第 19 题的判别准则作两项判定：全逆序的托盘
+        （方块 $15, 14, \dots, 1$ 依次置于方格 $1$ 至
+        $15$，空格在原位）以及空格位于方格
+        $1$ 中，其后依次为方块 $15, 14, \dots, 1$，位于方格 $2$
+        至 $16$ 的托盘。哪一个可解？
+  \item （综述）本证明依赖两根相互独立的支柱：一是
+        \emph{不变量}（$I$，由符号同态构造），说明至多一半的配置可达，
+        另一根是
+        \emph{显式生成}定理（$H = A_{15}$），
+        说明至少一半的配置可达。各用一句话说明下列各项
+        分别出现在何处：
+        $\varepsilon$ 的同态性质、拉格朗日定理、$A_n$ 由
+        $3$-轮换生成、共轭。最后用一行
+        陈述元原理。
+\end{enumerate}
+\end{problem}

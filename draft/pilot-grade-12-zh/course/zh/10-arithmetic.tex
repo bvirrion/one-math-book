@@ -1,0 +1,420 @@
+\chapter{算术}\label{ch:g12:arith}
+
+算术研究整数：整除、质数、余数。
+长期被视为最纯粹的数学，如今它守护着每一笔
+网络支付：RSA 密码体制依赖于本章证明的贝祖、高斯与
+费马定理。
+
+\section{整除与带余除法}
+
+\begin{definition}[整除]\label{def:g12:arith:divides}
+设 $a, b \in \Z$。称 $b$ \emph{整除} $a$\index{整除}，记作
+$b \mid a$，若存在 $k \in \Z$ 使 $a = kb$，也称 $a$ 为 $b$ 的
+\emph{倍数}。
+\end{definition}
+
+\begin{proposition}\label{prop:g12:arith:divprops}
+若 $c \mid a$ 且 $c \mid b$，则 $c$ 整除每个
+形如 $au + bv$（$u, v \in \Z$）的整数组合。若 $a \mid b$ 且 $b \mid a$，其中
+$a,b \in \N$，则 $a = b$。若 $a \mid b$ 且 $b \neq 0$，则 $\abs a \leq \abs b$。
+\end{proposition}
+
+\begin{proof}
+写 $a = kc$，$b = lc$，则 $au + bv = (ku + lv)c$。其余结论
+由 $\abs{a} = \abs{k}\,\abs{b}$ 得出，其中
+$\abs k \geq 1$，当 $b = ka \neq 0$ 时。
+\end{proof}
+
+\begin{theorem}[带余除法]\label{thm:g12:arith:euclid}
+\index{带余除法}
+设 $a \in \Z$，$b \in \N^*$。存在唯一的数对
+$(q, r) \in \Z \times \N$，使得
+\[
+a = bq + r \qquad\text{且}\qquad 0 \leq r < b .
+\]
+$q$ 称为\emph{商}，$r$ 称为\emph{余数}。
+\end{theorem}
+
+\begin{proof}
+\emph{存在性。}$b$ 的倍数中不超过 $a$ 者构成的集合
+有最大元 $bq$（该集合非空且有上界），令 $r = a - bq$。
+由最大性，$b(q+1) > a$，从而 $0 \leq r < b$。
+\emph{唯一性。}若 $bq + r = bq' + r'$，其中 $0 \leq r, r' < b$，则
+$b(q - q') = r' - r$，且 $\abs{r' - r} < b$：$b$ 的倍数中绝对值
+小于 $b$ 者必为 $0$，于是 $r = r'$，$q = q'$。
+\end{proof}
+
+\section{同余}
+
+\begin{definition}[同余]\label{def:g12:arith:congruence}
+设 $n \in \N^*$。称整数 $a, b$ 模
+$n$ \emph{同余}\index{同余}，记作 $a \equiv b \pmod n$，若 $n \mid (a - b)$
+--- 等价地，若 $a$ 与 $b$ 在
+以 $n$ 作带余除法时余数相同。
+\end{definition}
+
+\begin{proposition}[运算的相容性]\label{prop:g12:arith:congops}
+若 $a \equiv b \pmod n$ 且 $c \equiv d \pmod n$，则
+\[
+a + c \equiv b + d, \qquad
+ac \equiv bd, \qquad
+a^k \equiv b^k \ (k \in \N) \pmod n .
+\]
+\end{proposition}
+
+\begin{proof}
+$n$ 整除 $(a-b) + (c-d) = (a+c) - (b+d)$，且
+$ac - bd = a(c - d) + d(a - b)$ 也是 $n$ 的倍数。幂的规则
+由乘法规则用归纳法推出。
+\end{proof}
+
+\begin{method}[计算模 $n$ 的幂]\label{met:g12:arith:powers}
+计算 $a^k \bmod n$ 时，先将底数模 $n$ 约化，再寻找
+$a$ 的某个较小的幂与 $\pm1$ 同余，并用它化简指数。例如
+求 $2^{100} \bmod 7$：由 $2^3 = 8 \equiv 1 \pmod 7$ 及
+$100 = 3\times33 + 1$,
+\[
+2^{100} = \left(2^{3}\right)^{33} \times 2 \equiv 1^{33}\times 2 = 2 \pmod 7 .
+\]
+\end{method}
+
+\section{最大公因数、贝祖与高斯}
+
+\begin{definition}[最大公因数]\label{def:g12:arith:gcd}
+设 $a, b$ 为不全为零的整数。\emph{最大
+公因数}\index{最大公因数} $\gcd(a, b)$ 是同时整除 $a$
+与 $b$。当 $\gcd(a,b) = 1$ 时，称 $a$ 与 $b$
+\emph{互质}\index{互质}。
+\end{definition}
+
+\begin{proposition}[欧几里得算法]\label{prop:g12:arith:euclidalgo}
+\index{欧几里得算法}
+若 $a = bq + r$（$b \neq 0$），则 $\gcd(a, b) = \gcd(b, r)$。反复进行
+带余除法，因此可求出 $\gcd(a,b)$：最大公因数即为最后一个
+非零余数。
+\end{proposition}
+
+\begin{proof}
+$a$ 与 $b$ 的任一公因数都整除 $r = a - bq$
+（由\cref{prop:g12:arith:divprops}），从而是 $b$ 与 $r$ 的公因数；
+反之，由 $a = bq + r$ 可知。两对数有相同的公因数，
+故最大公因数相同。算法之所以终止，是由于余数
+构成严格递减的非负整数数列。
+\end{proof}
+
+\begin{example}\label{ex:g12:arith:euclidalgo}
+$\gcd(252, 198)$: $252 = 198 + 54$; $198 = 3\times54 + 36$;
+$54 = 36 + 18$；$36 = 2 \times 18 + 0$。因此 $\gcd(252,198) = 18$。
+\end{example}
+
+\begin{theorem}[贝祖等式]\label{thm:g12:arith:bezout}
+\index{贝祖等式}
+设 $a, b$ 为不全为零的整数，$d = \gcd(a,b)$。存在
+$u, v \in \Z$，使得
+\[
+au + bv = d .
+\]
+特别地，$a$ 与 $b$ 互质，当且仅当 $au + bv = 1$
+对某些整数 $u, v$ 成立。
+\end{theorem}
+
+\begin{proof}
+将欧几里得算法反向进行：每个余数都是前两个数的整数组合，
+而初始数据 $a, b$ 也是它们自身的组合；
+由逐步代入可知，最后一个非零余数 $d$ 是
+$a$ 与 $b$ 的整数组合。（在\cref{ex:g12:arith:euclidalgo}中：
+$18 = 54 - 36 = 54 - (198 - 3\times54) = 4\times54 - 198 =
+4(252 - 198) - 198 = 4\times252 - 5\times198$。）
+
+对于等价性：若 $\gcd(a,b) = 1$，由贝祖等式可得 $u, v$；反之，
+$a$ 与 $b$ 的任一公因数都整除 $au + bv = 1$，
+从而 $\gcd(a,b) = 1$。
+\end{proof}
+
+\begin{theorem}[高斯引理]\label{thm:g12:arith:gauss}
+\index{高斯引理}
+设 $a, b, c \in \Z$，若 $a \mid bc$ 且 $\gcd(a, b) = 1$，则 $a \mid c$。
+\end{theorem}
+
+\begin{proof}
+由贝祖等式得 $au + bv = 1$，两边乘以 $c$ 得 $acu + bcv = c$。左边两项
+都是 $a$ 的倍数（第二项因 $a \mid bc$），从而
+$c$ 亦具有此性质。
+\end{proof}
+
+\begin{corollary}\label{cor:g12:arith:coprimeprod}
+若 $a \mid c$，$b \mid c$ 且 $\gcd(a,b) = 1$，则 $ab \mid c$。
+\end{corollary}
+
+\begin{proof}
+设 $c = ak$。由 $b \mid ak$ 且 $\gcd(a,b)=1$，依高斯引理
+得 $b \mid k$，记 $k = bl$，于是 $c = abl$。
+\end{proof}
+
+\section{质数}
+
+\begin{definition}[质数]\label{def:g12:arith:prime}
+称整数 $p \geq 2$ 为\emph{质数}\index{质数}，若它的
+正因数只有 $1$ 与 $p$。
+\end{definition}
+
+\begin{proposition}\label{prop:g12:arith:primedivides}
+每个整数 $n \geq 2$ 都有一个质因数；若 $n$ 不是质数，则它有一个
+质因数 $\leq \sqrt n$。若质数 $p$ 整除乘积 $ab$，则
+$p \mid a$ 或 $p \mid b$（\emph{欧几里得引理}）。
+\end{proposition}
+
+\begin{proof}
+$d \geq 2$ 为 $n$ 的最小因数，它是质数（$d$ 的任一真因数
+都会是 $n$ 的更小因数）。若 $n = de$ 为合数，且
+$2 \leq d \leq e$，则 $d^2 \leq de = n$，从而 $d \leq \sqrt n$。
+对欧几里得引理：若 $p \nmid a$，则 $\gcd(p, a) = 1$（$p$ 的因数只有
+$1$ 与 $p$），由高斯引理得 $p \mid b$。
+\end{proof}
+
+\begin{theorem}[欧几里得]\label{thm:g12:arith:infiniteprimes}
+质数有无穷多个。
+\end{theorem}
+
+\begin{proof}
+设 $p_1, \dots, p_k$ 为任意有限个质数，考虑
+$N = p_1 p_2 \cdots p_k + 1$。某个质数 $p$ 整除 $N$；但每个 $p_i$
+都不整除 $N$（余数为 $1$），因此 $p$ 是不在该表中的质数。
+因此任何有限个质数都不能穷尽所有质数。
+\end{proof}
+
+\begin{theorem}[算术基本定理]\label{thm:g12:arith:fta}
+\index{算术基本定理}
+每个整数 $n \geq 2$ 都可以写成若干质数之积，且该分解
+在不计因子次序的意义下唯一：
+\[
+n = p_1^{\alpha_1} p_2^{\alpha_2} \cdots p_r^{\alpha_r},
+\qquad p_1 < p_2 < \dots < p_r \text{ 为质数},\ \alpha_i \geq 1 .
+\]
+\end{theorem}
+
+\begin{proof}
+\emph{存在性}，用强归纳法：若 $n$ 为质数，则它本身即为其分解；
+否则 $n = de$，其中 $2 \leq d, e < n$，由归纳假设，两者都可分解
+为质数之积。\emph{唯一性}：设
+$p_1\cdots p_s = q_1 \cdots q_t$（均为质数，允许重复）。由
+欧几里得引理，$p_1$ 整除某个 $q_j$，二者皆为质数，故 $p_1 = q_j$；
+约去该因子并重复上述过程，两种分解逐项相同。
+\end{proof}
+
+\begin{theorem}[费马小定理]\label{thm:g12:arith:fermat}
+\index{费马小定理}
+设 $p$ 为质数，$a \in \Z$ 且 $p \nmid a$。则
+\[
+a^{p-1} \equiv 1 \pmod p .
+\]
+对每个 $a \in \Z$（无需假设互质），$a^p \equiv a \pmod p$。
+\end{theorem}
+
+\begin{proof}
+考虑 $p - 1$ 个整数 $a, 2a, 3a, \dots, (p-1)a$ 模 $p$ 的情形。其中
+没有一个 $\equiv 0$（若 $p \mid ka$，$1 \leq k \leq p-1$，则由欧几里得引理
+得 $p \mid k$，矛盾），且它们模 $p$ 两两不同余（若
+$ka \equiv la$，则 $p \mid (k - l)a$，从而 $p \mid k - l$，故 $k = l$）。
+因此模 $p$ 意义下，它们恰为 $1, 2, \dots, p-1$ 的某种排列。
+将所有同余式相乘得：
+\[
+a^{p-1}\,(p-1)! \equiv (p-1)! \pmod p .
+\]
+由于 $p$ 不整除 $1, \dots, p-1$ 中的任何数，反复应用欧几里得引理，
+可约去 $(p-1)!$，得 $a^{p-1} \equiv 1$。第二个式子
+由上式两边乘以 $a$ 即得（当 $p \mid a$ 时显然成立）。
+\end{proof}
+
+\begin{example}[密码学应用]\label{ex:g12:arith:rsa}
+费马小定理使模 $n$ 的幂运算在指数选取得当时可逆——
+这正是\emph{RSA}密码体制的核心。
+取大质数 $p, q$，令 $n = pq$，公开 $n$ 与一个指数
+$e$；加密映射为 $x \mapsto x^e \bmod n$。解密需要指数
+$d$，满足 $ed \equiv 1 \pmod{(p-1)(q-1)}$，只有知道 $p$
+与 $q$ 的人才能算出——而要恢复 $p, q$，就须
+分解一个位数达数百位的整数 $n$，目前没有已知算法能在
+可接受的时间内做到。
+\end{example}
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:g12:arith:1}
+计算 $2026$ 除以 $17$ 的欧几里得除法的商与余数，
+以及 $-2026$ 除以 $17$ 的商与余数。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:arith:2}
+$7^{100}$ 模 $10$ 的余数是多少？（即
+$7^{100}$ 的末位数字是多少？）
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:arith:3}
+用欧几里得算法计算 $\gcd(1071, 462)$，并求整数
+$u, v$ 使 $1071u + 462v = \gcd(1071, 462)$。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g12:arith:4}
+证明：对每个 $n \in \Z$，$n^2$ 同余于 $0$ 或 $1$。
+（模 $4$）。由此推出，满足 $\equiv 3 \pmod 4$ 的整数绝不可能是两个平方数
+之和。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:arith:5}
+证明：对所有 $n \in \N$，$n(n+1)(2n+1)$ 能被 $6$ 整除。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:arith:6}
+在 $\Z$ 中解同余式 $5x \equiv 3 \pmod{11}$。
+（提示：求 $5$ 模 $11$ 的逆元。）
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:arith:7}
+在 $\Z \times \Z$ 中解丢番图方程
+\[
+17x - 40y = 1,
+\]
+再写出 $17x - 40y = 6$ 的全部解。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g12:arith:8}
+证明 $\sqrt2$ 是无理数，利用质因数分解的唯一性
+（比较 $2$ 在 $a^2 = 2b^2$ 两边的指数）。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:arith:9}
+设 $p$ 为质数。
+\begin{enumerate}
+  \item 证明：对 $1 \leq k \leq p - 1$，$p$ 整除 $\dbinom{p}{k}$。
+        （提示：利用 $k\binom pk = p\binom{p-1}{k-1}$、\cref{exo:g12:comb:7}
+        以及高斯引理。）
+  \item 对 $a \geq 0$ 用归纳法，给出费马小定理的另一证明，
+        形式为 $a^p \equiv a \pmod p$。
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g12:arith:10}
+\emph{（中国剩余定理问题。）}求所有使下列各式成立的整数 $n$：
+\[
+n \equiv 2 \pmod 3, \qquad n \equiv 3 \pmod 5, \qquad n \equiv 2 \pmod 7 .
+\]
+（提示：先解前两个条件，再代入第三个条件；贝祖
+系数会有帮助。）
+\end{exercise}
+
+\section{问题：密码与校验码}
+
+\begin{problem}[{周末问题 --- 同余式守护着每个条形码与每张信用卡，
+而费马小定理掌管着
+世界机密的锁}]
+\label{pb:g12:arith:1}
+G.\,H.~哈代于 1940 年曾自夸，数论“未受应用玷污”。
+八十年后，每一声条形码的“嘀”响、每一笔
+信用卡支付与每一条加密信息，都与他唱反调
+--- 正是依靠本章的工具：同余式
+（\cref{prop:g12:arith:congops}）、贝祖逆元、
+（\cref{thm:g12:arith:bezout}）以及费马小定理
+（\cref{exo:g12:arith:9}）。本题检验这些编码，破解一把
+简化版的锁，并探究真正的锁为何安全。
+
+\medskip
+\noindent\textbf{第一部分 --- 同余运算熟练度。}
+\begin{enumerate}
+  \item 计算 $2026 \bmod 7$；再求
+        $7^{100}$ 的末位数字（先求 $7$ 的幂模
+        $10$ 的周期）。
+  \item 快速幂（\cref{met:g12:arith:powers}）：
+        计算 $5^{117} \bmod 13$（从
+        $5^2 \equiv -1$ 出发）。
+  \item 解同余式 $3x \equiv 5 \pmod 7$。
+  \item 对 $(97, 35)$ 运行欧几里得算法，回代
+        求整数 $u, v$ 使 $97u + 35v = 1$，
+        并由此推出 $35$ 模 $97$ 的逆元。
+  \item 准确叙述 $a$ 模 $n$ 可逆的条件，
+        并说明由哪个定理给出其逆元。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第二部分 --- 校验码。}
+\begin{enumerate}[resume]
+  \item ISBN-10：一本书编码的十个数字 $d_1 \dots d_{10}$
+        须满足下式
+        $10d_1 + 9d_2 + \dots + 2d_9 + 1d_{10} \equiv 0
+        \pmod{11}$。验证真实的 ISBN
+        $0\,306\,40615\,2$.
+  \item 证明 ISBN 方案能检测\emph{每一个}
+        单个数字错误：若某一位数字改变了 $d \not\equiv 0$，
+        则加权和改变了 $w d$，
+        其中 $1 \leq w \leq 10$ --- 为何它永远不可能
+        $\equiv 0 \pmod{11}$
+        （\cref{thm:g12:arith:gauss}）？
+  \item 证明它也能检测任意两个相邻（且不同）数字的
+        对调。再说明设计上的关键：
+        $11$ 具有什么性质使两个证明都成立，
+        若取模数 $10$，又会出什么问题？
+  \item EAN-13 条形码对各位数字赋予权重 $1, 3, 1, 3, \dots$
+        并取模 $10$，求使
+        $978\,2940199\,05$ 完整的校验位。下列相邻对调中，
+        哪些是 EAN \emph{无法}检测的？（何时
+        $2(a - b) \equiv 0 \pmod{10}$？）
+  \item 信用卡采用 Luhn 方案：从右往左，每隔一位数字加倍
+        （减去 $9$，条件是加倍后的数超过 $9$），
+        再将所有数字相加，并要求和为
+        $10$ 的倍数。验证测试号码
+        $4539\,1488\,0343\,6467$.
+  \item 用一句话说明：采用质数模数，使 ISBN 获得了什么，
+        而受限于模 $10$ 的 EAN 与 Luhn 方案所不具备的性质？
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第三部分 --- 费马之锁。}
+\begin{enumerate}[resume]
+  \item 宝藏之前的陷阱：计算
+        $2^{10} \bmod 341$，由此推出 $2^{340} \bmod 341$ ---
+        然后将 $341$ 作因数分解。这个例子（一个
+        \emph{费马伪素数}）对于把费马
+        小定理用作素性检验有何启示？
+  \item 迷你 RSA：取 $p = 3$，$q = 11$，于是
+        $n = 33$，$(p-1)(q-1) = 20$；公钥指数为
+        $e = 3$。求私钥指数 $d$，使得
+        $3d \equiv 1 \pmod{20}$（用第 4 题的方法）。
+  \item 加密消息 $m = 4$：计算
+        $c = m^3 \bmod 33$。
+  \item 解密：计算 $c^d \bmod 33$（取
+        $c \equiv -2 \pmod{33}$），并还原消息。
+  \item 解密为何总是成功：证明
+        $m^{21} \equiv m$ 对模 $3$ 与模 $11$ 都成立，
+        （在两个模中各自用费马小定理），并推出
+        对模 $33$ 成立（\cref{thm:g12:arith:gauss} 将这两个
+        同余式拼合起来）。$21 = ed$ 的特殊形式
+        $1 + 20k$ 是从哪里来的？
+  \item 这把锁的安全性：人人都知道 $n$ 与 $e$；
+        要恢复 $d$ 就需要 $(p-1)(q-1)$，进而需要
+        $n$ 的因数。我们的 $33$ 一眼即可分解——为什么同一方案
+        在 $n$ 为六百位数时，仍能保护全世界的银行？
+        （用一句话说明相乘与分解之间的
+        不对称性。）
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第四部分 --- 经典问题。}
+\begin{enumerate}[resume]
+  \item 中国古代的“孙子点兵”问题（比较
+        \cref{exo:g12:arith:10}）：某队士兵人数，余数为 $2$（模 $3$），
+        余数为 $3$（模 $5$）。求出所有可能的人数，
+        并说明
+        为什么答案在模 $15$ 下唯一。
+  \item 终于来了一句话的证明：由 $10 \equiv 1 \pmod 9$，
+        证明每个数都与其各位数字之和同余（模 $9$）；
+        由 $10 \equiv -1 \pmod{11}$ 推出
+        $11$ 的交错和规则。（初中分册
+        用显式代数证明了这些结论——请欣赏
+        这种简洁的写法。）
+  \item 终章 --- 哈代对抗条形码：回顾本章的工具
+        （同余运算、贝祖逆元、费马小定理、
+        拼合互质模数），以及每个工具在本题中
+        何时“豁然开朗”；
+        然后给出关于
+        “未受玷污”的现代判定。
+\end{enumerate}
+\end{problem}

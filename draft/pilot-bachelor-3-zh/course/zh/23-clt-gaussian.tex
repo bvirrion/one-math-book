@@ -1,0 +1,959 @@
+\chapter{特征函数与中心极限
+定理}\label{ch:b3:clt}
+
+大数定律说平均值收敛；中心极限
+定理说的是\emph{它们如何涨落}：误差，
+乘以 $\sqrt n$ 后渐近服从高斯分布 ---
+无论从哪种分布出发。这一普适性是
+初等概率论中最深刻的事实，其自然的证明
+是傅里叶分析式的：\emph{特征函数}
+（即分布的傅里叶变换）把独立和
+化为乘积，而\cref{ch:b3:fouriertransform}中的方法
+--- 单射性与高斯不动点 --- 将逐点
+收敛的这些乘积转化为分布的收敛
+（莱维定理，给出完整证明）。本章最后
+以高斯向量作结，并严格推导统计学中处处使用的置信
+区间；周末问题
+给出林德伯格的中心极限定理第二种证明，并附明确的
+误差阶。
+
+\section{特征函数}
+
+\begin{definition}\label{def:b3:clt:cf}
+称实随机变量 $X$ 的\emph{特征函数}\index{特征函数
+}为
+\[
+\varphi_X(\xi) = \E\bigl[\eu^{\iu\xi X}\bigr]
+= \int_\R \eu^{\iu\xi x}\,\dd\P_X(x)
+\qquad (\xi \in \R)
+\]
+（由变换定理从分布算出；若
+$f$ 为密度，则 $\varphi_X(\xi) = \hat f(-\xi)$，
+沿用\cref{ch:b3:fouriertransform}中的约定）。
+\end{definition}
+
+\begin{proposition}\label{prop:b3:clt:cfbasics}
+(a) $\varphi_X(0) = 1$，$\abs{\varphi_X} \leq 1$，且
+$\varphi_X$ 一致连续；
+$\varphi_{aX + b}(\xi) = \eu^{\iu b\xi}\varphi_X(a\xi)$。
+(b) 若 $X, Y$ 相互\emph{独立}：
+$\varphi_{X+Y} = \varphi_X\,\varphi_Y$。
+(c) 若 $\E\abs X^k < \infty$，则 $\varphi_X \in \mathcal
+C^k$，且 $\varphi_X^{(j)}(0) = \iu^j\,\E[X^j]$，对 $j \leq
+k$；特别地，对中心化的 $X \in L^2$，其方差为
+$\sigma^2$：
+\[
+\varphi_X(\xi) = 1 - \frac{\sigma^2\xi^2}{2} +
+o(\xi^2) \qquad (\xi \to 0).
+\]
+(d) 高斯情形：$X \sim \mathcal N(m, \sigma^2)$ 的特征函数
+为 $\varphi_X(\xi) = \eu^{\iu m\xi - \sigma^2\xi^2/2}$。
+\end{proposition}
+
+\begin{proof}
+(a) 有界性显然；连续性：$\abs{\varphi(\xi + h)
+- \varphi(\xi)} \leq \E\abs{\eu^{\iu hX} - 1} \to 0$，当 $h
+\to 0$ 时由控制收敛定理得出，且关于 $\xi$ 一致成立。
+仿射规则即变量代换。(b) $\eu^{\iu\xi(X+Y)} =
+\eu^{\iu\xi X}\eu^{\iu\xi Y}$，且独立变量乘积的期望
+等于各期望之积
+（\cref{thm:b3:probability:independence}，分别对实部与
+虚部应用）。(c) 对期望号下的求导，
+由 $\E\abs X^j$ 控制
+（\cref{thm:b3:lebesgue:paramdiff}）；
+于 $0$ 处的泰勒展开即是对 $\mathcal C^2$ 函数
+$\varphi$ 的泰勒–杨公式。(d) 对 $\mathcal N(0,1)$，由高斯变换
+（\cref{ex:b3:fouriertransform:gaussian}，取 $a = \frac12$）
+得 $\int\eu^{\iu\xi x}\frac{\eu^{-x^2/2}}{\sqrt{2\pi}}\dd
+x = \eu^{-\xi^2/2}$；一般情形由仿射规则得到。
+\end{proof}
+
+\begin{theorem}[单射性]\label{thm:b3:clt:injectivity}
+若 $\varphi_X = \varphi_Y$，则 $X$ 与 $Y$ 有相同的
+分布。更确切地说，对 $N \sim \mathcal N(0,1)$（与 $X$ 独立）
+及 $\varepsilon > 0$，光滑化变量 $X +
+\varepsilon N$ 具有如下密度
+\[
+p_\varepsilon(x) = \frac1{2\pi}\int_\R
+\varphi_X(-\xi)\,\eu^{-\varepsilon^2\xi^2/2}\,
+\eu^{\iu\xi x}\,\dd\xi ,
+\]
+仅由 $\varphi_X$ 决定；令 $\varepsilon \to 0$
+则恢复 $X$ 的分布。\index{特征函数,
+单射性}
+\end{theorem}
+
+\begin{proof}
+$X + \varepsilon N$ 具有密度 $p_\varepsilon(x) =
+\E\bigl[g_\varepsilon(x - X)\bigr]$，其中 $g_\varepsilon$ 为
+$\mathcal N(0, \varepsilon^2)$ 的密度：事实上，对博雷尔
+$B$，由独立性及托内利定理得 $\P(X + \varepsilon N \in
+B) = \int\!\!\int\mathbf 1_B(x + \varepsilon
+n)g_1(n)\,\dd n\,\dd\P_X(x) = \int_B\E[g_\varepsilon(t -
+X)]\dd t$（先作变量代换，再用一次托内利定理）。
+由其变换的傅里叶反演公式写出 $g_\varepsilon$
+（\cref{exo:b3:fouriertransform:4}，经伸缩）：
+$g_\varepsilon(u) = \frac1{2\pi}\int
+\eu^{-\varepsilon^2\xi^2/2}\eu^{\iu\xi u}\dd\xi$，并用富比尼定理
+（一切项均由高斯因子控制）：
+\[
+p_\varepsilon(x) = \frac1{2\pi}\int_\R
+\varphi_X(-\xi)\,\eu^{-\varepsilon^2\xi^2/2}\,
+\eu^{\iu\xi x}\,\dd\xi ,
+\]
+仅依赖于 $\varphi_X$ 的泛函。若 $\varphi_X =
+\varphi_Y$，则 $X + \varepsilon N$ 与 $Y + \varepsilon N$
+对每个 $\varepsilon$ 同分布；对有界连续
+$f$，$\E f(X + \varepsilon N) \to \E f(X)$，当 $\varepsilon
+\to 0$ 时（由控制收敛定理，$X + \varepsilon N \to X$
+在乘积空间上逐点收敛），故 $\E f(X) = \E f(Y)$ 对
+所有此类 $f$ 成立 --- 而这决定了分布：对每个 $t$，
+将 $\mathbf 1_{\intoc{-\infty}t}$ 夹在有界
+连续斜坡函数 $f_k^\pm$（取 $1$ 的范围为
+$\intoc{-\infty}{t \mp \frac1k}$，取 $0$ 的范围在 $t \pm
+\frac1k$ 之外，其间为仿射）；在 $\E
+f_k^-(X) \leq F_X(t) \leq \E f_k^+(X)$ 中取极限，得 $F_X(t) =
+F_Y(t)$，对两者都连续的每个 $t$，从而
+由右连续性与公共连续点的稠密性，处处成立
+（两个 $F$ 的跳点均可数）；
+分布函数相等则分布相等
+（\cref{exo:b3:measure:3}，依赖于
+\cref{thm:b3:measure:uniqueness}）。
+\end{proof}
+
+\section{依分布收敛}
+
+\begin{definition}\label{def:b3:clt:cid}
+$X_n$ \emph{依分布收敛}（或简称依分布）于 $X$，
+记作 $X_n \Rightarrow X$，若\index{依分布
+收敛}
+\[
+\E\bigl[f(X_n)\bigr] \longrightarrow \E\bigl[f(X)\bigr]
+\qquad\text{对每个有界连续函数 } f\colon\R\to\R .
+\]
+等价地（见\cref{exo:b3:clt:4}）：$F_{X_n}(t) \to F_X(t)$
+在 $t$ 为 $F_X$ 的每个连续点时成立。$X_n$ 不必
+定义在同一概率空间上，只有分布才重要。
+\end{definition}
+
+\begin{theorem}[赫利选择定理]
+\label{thm:b3:clt:helly}
+任一分布函数列 $(F_n)$ 都有一
+子列，在极限的每个连续点处逐点收敛于
+某个非降右连续的 $G \colon
+\R \to \intcc01$ --- 可能有 $G(+\infty) - G(-\infty) <
+1$（质量可能逃逸至无穷远）。\index{赫利定理}
+\end{theorem}
+
+\begin{proof}
+由对角线抽取，对每个有理数均有 $F_{n_k}(q) \to \ell(q)$，
+（$q$ 处的值取于紧集 $\intcc01$ 中）。定义
+$G(t) = \inf\{\ell(q) : q \in \Q, q > t\}$：非降；
+右连续（在右侧逐渐收缩的有理
+邻域上取下确界）。设 $t$ 为
+$G$ 的连续点，对有理数 $q_1 < t < q_2$，
+\[
+\ell(q_1) \leq \liminf F_{n_k}(t) \leq \limsup F_{n_k}(t)
+\leq \ell(q_2),
+\]
+由各 $F_{n_k}$ 的单调性。由
+$G$ 为下确界的定义及 $\ell$ 在有理数上的单调性：
+$G(s) \leq \ell(q) \leq G(q)$，只要 $s < q$。
+取 $s < q_1 < t$，得 $\ell(q_1) \geq G(s)$，并
+$\ell(q_2) \leq G(q_2)$；令 $s \uparrow t$ 及 $q_2
+\downarrow t$，由 $G$ 在 $t$ 处的连续性，
+$\liminf$ 与 $\limsup$ 都夹向 $G(t)$。
+\end{proof}
+
+\begin{lemma}[由特征函数得紧性]
+\label{lem:b3:clt:tightness}
+对任一随机变量 $X$ 及 $u > 0$：
+\[
+\P\Bigl(\abs X \geq \frac2u\Bigr) \;\leq\;
+\frac1u\int_{-u}^{u}\bigl(1 -
+\operatorname{Re}\varphi_X(\xi)\bigr)\,\dd\xi .
+\]
+\end{lemma}
+
+\begin{proof}
+由托内利--富比尼定理（被积函数有界，积分区域在
+$\xi$ 上有界）：
+\[
+\frac1u\int_{-u}^u\bigl(1 -
+\operatorname{Re}\varphi_X(\xi)\bigr)\dd\xi
+= \E\Bigl[\frac1u\int_{-u}^u(1 - \cos(\xi X))\,\dd\xi\Bigr]
+= 2\,\E\Bigl[1 - \frac{\sin(uX)}{uX}\Bigr]
+\]
+（将方括号理解为 $0$，即它在 $X = 0$ 处的极限）。
+被积函数非负（$\abs{\sin t} \leq \abs t$），且
+当 $\abs{uX} \geq 2$ 时：$1 - \frac{\sin(uX)}{uX} \geq 1 -
+\frac1{\abs{uX}} \geq \frac12$。仅保留期望中的
+事件 $\{\abs{uX} \geq 2\}$，因此
+至少留下 $2 \cdot \frac12\,\P(\abs X \geq \frac2u)$，
+即为所证。
+\end{proof}
+
+\begin{theorem}[莱维连续性定理]
+\label{thm:b3:clt:levy}
+设 $(X_n)$ 为随机变量序列，其特征函数
+逐点收敛：$\varphi_{X_n}(\xi) \to
+\varphi(\xi)$，对每个 $\xi$ 成立，其中 $\varphi =
+\varphi_X$ 为某个随机变量
+$X$ 的特征函数。则 $X_n \Rightarrow X$。\index{莱维
+连续性定理}
+\end{theorem}
+
+\begin{proof}
+\emph{紧性。}取 $\varepsilon > 0$。由于 $\varphi$ 在
+$0$ 处连续，且 $\varphi(0) = 1$，取 $u > 0$ 使
+$\frac1u\int_{-u}^u(1 - \operatorname{Re}\varphi) <
+\varepsilon$；由控制收敛定理（被积函数以
+$2$ 为界（区间 $[-u,u]$ 固定），对
+$\varphi_{X_n}$ 的同一积分 $< 2\varepsilon$（$n$ 充分大时）：
+由\cref{lem:b3:clt:tightness}得 $\P(\abs{X_n} \geq \frac2u)
+\leq 2\varepsilon$（$n$ 充分大时），并通过增大常数
+处理其余有限多个：各分布是\emph{紧的}
+--- 没有质量逃逸。
+
+\emph{子列。}设 $(F_{n_k})$ 为任一子列，
+由\cref{thm:b3:clt:helly}，可抽取 $F_{n_{k_j}} \to G$
+（在连续点处）。紧性迫使 $G(-\infty) = 0$，
+$G(+\infty) = 1$（$G(\frac2u) - G(-\frac2u) \geq 1 -
+2\varepsilon$，在连续点处成立）：$G$ 是真正的分布函数，
+即某随机变量 $Y$ 的分布函数。于是
+$X_{n_{k_j}} \Rightarrow Y$（见\cref{exo:b3:clt:4}，
+由 $F$ 的收敛即依分布收敛），故
+$\varphi_{X_{n_{k_j}}} \to \varphi_Y$ \emph{逐点}成立（$x
+\mapsto \eu^{\iu\xi x}$ 是有界连续函数，实部与
+虚部分别处理）；与假设比较得
+$\varphi_Y = \varphi = \varphi_X$，并由单射性
+（见\cref{thm:b3:clt:injectivity}）得 $Y \sim X$，即 $G =
+F_X$。
+
+\emph{结论。}$(F_n)$ 的每个子列都有一子子列，
+收敛于\emph{同一}个 $F_X$（在其
+连续点上）；因此 $F_n(t) \to F_X(t)$ 对每个
+连续点 $t$ 成立（实数列若其每个子列都有
+具有相同极限的子子列，则该数列收敛）：
+故 $X_n \Rightarrow X$。
+\end{proof}
+
+\section{中心极限定理}
+
+\begin{theorem}[中心极限定理]\label{thm:b3:clt:clt}
+设 $(X_n)$ 为独立同分布，$\E X_1 = m$ 且 $\V(X_1) =
+\sigma^2 \in \intoo0\infty$，则\index{中心
+极限定理}
+\[
+\frac{S_n - nm}{\sigma\sqrt n} \;\Longrightarrow\; \mathcal
+N(0, 1) :
+\qquad
+\P\Bigl(a \leq \frac{S_n - nm}{\sigma\sqrt n} \leq
+b\Bigr) \longrightarrow
+\frac{1}{\sqrt{2\pi}}\int_a^b\eu^{-x^2/2}\,\dd x
+\]
+对所有 $a < b$。
+\end{theorem}
+
+\begin{proof}
+中心化并标准化：$Z_i = \frac{X_i - m}{\sigma}$
+（独立同分布，均值为 $0$，方差为 $1$），并记 $T_n =
+\frac1{\sqrt n}\sum_{i\leq n}Z_i$。由独立性及
+仿射性质（\cref{prop:b3:clt:cfbasics}）：
+\[
+\varphi_{T_n}(\xi) =
+\varphi_{Z}\Bigl(\frac{\xi}{\sqrt n}\Bigr)^{n},
+\qquad
+\varphi_Z(\eta) = 1 - \frac{\eta^2}2 + \eta^2\rho(\eta),\quad
+\rho(\eta)\to0 .
+\]
+取定 $\xi$，令 $a_n = \varphi_Z(\xi/\sqrt n)$，$b_n = 1 -
+\frac{\xi^2}{2n}$，二者的模均 $\leq 1$（只要 $n$ 充分大）；
+$\abs{b_n} \leq 1$ 当 $\xi^2 \leq 4n$ 时成立，$\abs{a_n} \leq 1$
+总成立。由初等不等式 $\abs{a^n - b^n} \leq
+n\abs{a - b}$，对 $\abs a, \abs b \leq 1$ 成立（裂项相消：
+$a^n - b^n = \sum a^k(a - b)b^{n-1-k}$），可得
+\[
+\Bigl|\varphi_{T_n}(\xi) - \Bigl(1 -
+\frac{\xi^2}{2n}\Bigr)^{n}\Bigr|
+\leq n\,\Bigl|\varphi_Z\Bigl(\frac\xi{\sqrt n}\Bigr) - 1 +
+\frac{\xi^2}{2n}\Bigr|
+= \xi^2\,\Bigl|\rho\Bigl(\frac{\xi}{\sqrt n}\Bigr)\Bigr|
+\longrightarrow 0,
+\]
+而 $\bigl(1 - \frac{\xi^2}{2n}\bigr)^n \to
+\eu^{-\xi^2/2}$（取实对数）。于是 $\varphi_{T_n}(\xi) \to
+\eu^{-\xi^2/2} = \varphi_{\mathcal N(0,1)}(\xi)$
+（\cref{prop:b3:clt:cfbasics}(d)）对每个 $\xi$ 成立。由列维
+连续性定理（\cref{thm:b3:clt:levy}）推出 $T_n \Rightarrow \mathcal
+N(0,1)$。区间概率随之成立，因为 $F_{\mathcal
+N}$ 处处连续。
+\end{proof}
+
+\begin{example}[置信区间，诚实推导]
+\label{ex:b3:clt:confidence}
+对 $n$ 位独立选民作民意调查；$\hat p_n = S_n/n$ 用于估计
+真实比例 $p$，其中 $\sigma^2 = p(1-p) \leq \frac14$。由中心极限定理
+可得，对充分大的 $n$，
+\[
+\P\Bigl(\abs{\hat p_n - p} \leq
+\frac{z}{2\sqrt n}\Bigr)
+\;\geq\; \P\Bigl(\Bigl|\frac{S_n - np}{\sigma\sqrt n}\Bigr|
+\leq z\Bigr)
+\longrightarrow \Phi(z) - \Phi(-z),
+\]
+其中 $\Phi$ 为标准高斯分布的分布函数。
+取 $z = 1.96$，此时渐近置信水平为 $95\%$，而
+误差限 $\frac{1.96}{2\sqrt n} \leq 3\%$ 要求 $n \geq
+\bigl(\frac{1.96}{0.06}\bigr)^2 \approx 1068$ --- 这正是
+人们在每条“$\pm3$ 个百分点，$95\%$”报道背后读到的数字；与
+切比雪夫给出的 $5556$（\cref{exo:b3:probability:7}）相比。
+$\sqrt n$ 因子具有普遍性：要使误差减半，
+须将样本量增至四倍 --- 这与决定蒙特卡罗方法代价的规律相同
+（\cref{exo:b3:clt:7}）。
+\end{example}
+
+\section{高斯向量}
+
+\begin{definition}\label{def:b3:clt:gaussianvector}
+称随机向量 $X = (X_1, \dots, X_d)$ 为
+\emph{高斯向量}\index{高斯向量}，若其每个线性组合
+$\langle t, X\rangle = \sum t_iX_i$ 均为
+（可能退化的）实高斯变量。其分布
+由均值向量 $m = (\E X_i)$ 及
+\emph{协方差矩阵} $\Sigma = \bigl(\operatorname{Cov}
+(X_i, X_j)\bigr)$：事实上，
+向量的特征函数 $\varphi_X(t) = \E\eu^{\iu\langle t, X\rangle}$ 恰为
+在 $1$ 处取值的 $\langle t, X\rangle$ 的特征函数：
+\[
+\varphi_X(t) = \exp\Bigl(\iu\langle t, m\rangle -
+\tfrac12\,t^{\mathsf T}\Sigma\,t\Bigr),
+\]
+且 $d$ 维特征函数是单射
+（证明与\cref{thm:b3:clt:injectivity}中的光滑化方法相同，
+逐坐标取高斯变量）。
+\end{definition}
+
+\begin{theorem}\label{thm:b3:clt:gaussianvector}
+设 $X$ 为高斯向量。
+\begin{enumerate}
+  \item 任一仿射像 $AX + b$ 均为高斯向量。
+  \item 分量 $X_i$ 相互\emph{独立}当且仅当
+        $\Sigma$ 为对角矩阵：对联合高斯变量，
+        不相关 $=$ 独立。
+  \item 若 $\Sigma$ 可逆，则 $X$ 具有密度
+        $\frac{1}{(2\pi)^{d/2}\sqrt{\det\Sigma}}
+        \exp\bigl(-\frac12(x - m)^{\mathsf T}\Sigma^{-1}(x -
+        m)\bigr)$。
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) $AX + b$ 各分量的线性组合，
+均为 $X$ 的线性组合的仿射函数，而高斯变量的仿射像仍是高斯的，
+故此向量为高斯向量。
+(2) 若 $\Sigma$ 为对角矩阵，则特征函数可分解：
+factorizes: $\varphi_X(t) = \prod_i\exp(\iu t_im_i -
+\frac12\Sigma_{ii}t_i^2) = \prod\varphi_{X_i}(t_i)$，此即
+乘积分布的特征函数
+（由\cref{thm:b3:probability:independence}，
+借 $d$ 维单射性读出）：各分量相互独立。
+其逆为：独立的
+$L^2$ 变量之协方差为零。
+(3) 对 $\Sigma = P D P^{\mathsf T}$ 作对角化（$P$ 为正交矩阵，
+$D > 0$ 为对角矩阵 --- 见\cref{exo:b3:submanifolds:8}）；
+向量 $Y = P^{\mathsf T}(X - m)$ 为高斯向量，其协方差为
+$D$：由 (2)，其分量相互独立，
+各分量服从 $\mathcal N(0, d_i)$，故 $Y$ 的密度为乘积形式；
+再经保体积变换 $x = m + PY$ 作推前
+（由\cref{thm:b3:product:linearchange}，$\abs{\det P} = 1$），并
+将指数改写为不依赖坐标的形式。
+\end{proof}
+
+\begin{theorem}[多维中心极限定理]
+\label{thm:b3:clt:multiclt}
+设 $(X_n)$ 为独立同分布的平方可积随机
+\emph{向量}，取值于 $\R^d$，均值为 $m$，协方差矩阵为
+$\Sigma$。则 $\frac{S_n - nm}{\sqrt n}$ 依分布收敛于
+高斯向量 $\mathcal N(0,
+\Sigma)$。\index{中心极限定理!多维}
+\admitted
+\end{theorem}
+
+\begin{remark}\label{rem:b3:clt:multiclt}
+几乎全部材料已在手边。对每个
+方向 $t \in \R^d$，实随机变量 $\langle t,
+\frac{S_n - nm}{\sqrt n}\rangle$ 是
+方差为 $t^{\mathsf T}\Sigma t$ 的独立同分布实随机变量的规范化和，
+故由\cref{thm:b3:clt:clt}的计算得
+$d$ 维特征函数逐点收敛，
+趋于 $\eu^{-t^{\mathsf T}\Sigma t/2}$，即
+$\mathcal N(0, \Sigma)$ 的特征函数
+（见\cref{def:b3:clt:gaussianvector}）。尚未重新证明的是
+\emph{在 $\R^d$ 中}的莱维连续性定理：
+赫利选择定理与紧性估计可逐坐标推广，
+这是常规的（逐坐标进行），而此处的克拉默–沃尔德化归
+在任何研究生概率课程中都会认真完成；
+此外无需超出本章方法的内容即可。
+needed.
+\end{remark}
+
+\begin{method}\label{met:b3:clt:method}
+欲识别极限分布：计算特征函数，
+取逐点极限，辨认其形式（高斯
+$\eu^{-\sigma^2\xi^2/2}$，泊松
+$\eu^{\lambda(\eu^{\iu\xi}-1)}$，指数分布 $\frac{\lambda}
+{\lambda - \iu\xi}$，\dots），并援引莱维定理。三步
+程式（独立性 $\to$ 乘积；$0$ 处泰勒展开 $\to$
+指数极限；莱维 $\to$ 依分布收敛）证明
+中心极限定理、稀有事件的泊松分布
+（见\cref{exo:b3:clt:5}），以及本课程中每一个
+经典极限定理。对几乎必然成立的陈述，请回到
+\cref{ch:b3:probability}的工具：两章回答
+关于同一 $S_n$ 的不同问题。
+\end{method}
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:b3:clt:1}
+求下列分布的特征函数：
+$\intcc{-1}1$ 上的均匀分布；指数分布 $\mathcal E(\lambda)$；
+泊松分布 $\mathcal P(\lambda)$；二项分布 $\mathcal B(n, p)$。
+由\cref{thm:b3:clt:injectivity}可知，独立的
+泊松变量（参数 $\lambda, \mu$）之和服从泊松分布 $(\lambda +
+\mu)$。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:2}
+(a) 证明：$\varphi_X$ 为实值，当且仅当 $X$
+与 $-X$ 同分布（称为\emph{对称}变量）。
+(b) 设 $\abs{\varphi_X(\xi_0)} = 1$，其中 $\xi_0 \neq
+0$，证明 $X$ 几乎必然支撑于等差数列
+$a + \frac{2\pi}{\xi_0}\Z$ 上（\emph{记
+$\varphi_X(\xi_0) = \eu^{\iu\theta}$，并计算 $\E[1 -
+\cos(\xi_0X - \theta)]$）}。由此可得，若 $X$ 有密度，
+则 $\abs{\varphi_X(\xi)} < 1$ 对一切 $\xi \neq 0$ 成立。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:3}
+设 $X \sim \mathcal N(m_1, \sigma_1^2)$，$Y \sim
+\mathcal N(m_2, \sigma_2^2)$ 相互独立。证明 $X + Y
+\sim \mathcal N(m_1 + m_2, \sigma_1^2 + \sigma_2^2)$，并
+更一般地，证明高斯族在独立和与仿射映射下
+保持稳定。对比：两个\emph{相依}高斯变量之和
+是否总是高斯的？
+（见\cref{exo:b3:clt:9}。）
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:4}
+(a) 证明\cref{def:b3:clt:cid}中的等价性：若
+$\E f(X_n) \to \E f(X)$ 对一切有界连续函数 $f$ 成立，
+则 $F_{X_n}(t) \to F_X(t)$ 在连续点处成立，
+\emph{（用两个连续阶梯状斜坡函数夹住
+$\mathbf 1_{\intoc{-\infty}t}$）}；反之
+\emph{（用斜坡函数之和逼近有界连续 $f$，
+或在连续点的细网格上作条件化）}
+--- 逆命题可先对一致连续的 $f$ 处理，
+再推广到一般情形。
+(b) 证明：若 $X_n \Rightarrow c$（常数），则 $X_n
+\to c$ 依概率收敛。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:5}
+（稀有事件定律）设 $X_n \sim \mathcal B(n, p_n)$，其中
+$np_n \to \lambda > 0$。利用特征函数
+及\cref{thm:b3:clt:levy}，证明 $X_n \Rightarrow \mathcal
+P(\lambda)$。数值检验：比较 $\P(X = 0)$
+在 $\mathcal B(100, 0.02)$ 与 $\mathcal P(2)$ 下的取值。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:6}
+(a) 投掷一颗均匀骰子 $n = 1000$ 次，近似计算
+总点数超过 $3600$ 的概率（均值为 $3500$，
+每次投掷的方差为 $\frac{35}{12}$）。
+(b) 设 $S \sim \mathcal B(100, \frac12)$，用
+带连续性修正的中心极限定理近似计算 $\P(45 \leq S \leq 55)$，
+其中修正量取 $\pm\frac12$，
+并评述该修正的作用。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:7}
+（蒙特卡罗误差）
+在\cref{pb:b3:probability:1}第 11 问的设定下，取 $g \in
+L^2(\intcc01^d)$，记 $\sigma^2 = \V(g(U_1))$，且 $I = \int
+g$。证明
+\[
+\sqrt n\,\Bigl(\frac1n\sum_{k\leq n}g(U_k) - I\Bigr)
+\Longrightarrow \mathcal N(0, \sigma^2),
+\]
+并由此推出渐近 $95\%$ 误差界 $\pm
+1.96\,\sigma/\sqrt n$ --- 与维数 $d$ 无关。
+与确定性中点法则相比较，该法则在
+$d$ 维下误差为 $\sim n^{-2/d}$（对 $\mathcal C^2$ 被积函数）：
+从哪一维数起，随机抽样更优？
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:clt:8}
+（斯卢茨基）设 $X_n \Rightarrow X$，且 $Y_n \to c$ 依
+概率收敛（$c$ 为常数）。证明 $X_n + Y_n \Rightarrow X +
+c$，且 $Y_nX_n \Rightarrow cX$。\emph{（利用
+特征函数和不等式 $\abs{\E\eu^{\iu\xi
+(X_n+Y_n)} - \eu^{\iu\xi c}\E\eu^{\iu\xi X_n}} \leq
+\E\abs{\eu^{\iu\xi(Y_n - c)} - 1}$，按 $\abs{Y_n - c}
+\leq \delta$ 分两种情形讨论。）} 应用：
+在\cref{ex:b3:clt:confidence}中，论证将未知量
+$\sigma = \sqrt{p(1-p)}$ 换为 $\sqrt{\hat p_n(1 - \hat
+p_n)}$ 的合理性。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:clt:9}
+设 $X \sim \mathcal N(0,1)$，$\varepsilon$ 与之独立，
+且 $\P(\varepsilon = \pm1) = \frac12$；令 $Y =
+\varepsilon X$。
+(a) 证明 $Y \sim \mathcal N(0,1)$ 且
+$\operatorname{Cov}(X, Y) = 0$。
+(b) 证明 $X$ 与 $Y$ \emph{不}独立，并说明
+$(X, Y)$ 不是高斯向量 \emph{（计算 $\P(X + Y =
+0)$）}。
+(c) 寓意：\cref{thm:b3:clt:gaussianvector}(2) 要求
+联合高斯性 --- 仅凭“不相关的高斯变量”本身，
+不能说明任何问题。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:10}
+柯西分布的密度为 $\frac1{\pi(1 + x^2)}$。
+(a) 证明其特征函数为 $\eu^{-\abs\xi}$
+（利用\cref{exo:b3:fouriertransform:1} 及反演公式）。
+(b) 证明：若 $X_1, \dots, X_n$ 为独立同分布的柯西变量，则
+$\frac{S_n}n$ 仍服从柯西分布 --- 且为\emph{同一}分布：
+平均值永不集中。
+(c) 试与大数定律和中心极限定理相协调：
+哪些假设不成立？（计算 $\E\abs{X_1}$。）
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:11}
+（稳定律的雏形）设 $(X_n)$ 为独立同分布的
+标准柯西变量（\cref{exo:b3:clt:10}）。
+(a) 证明：对任意 $a, b > 0$，$aX_1 + bX_2$ 的分布
+与 $(a + b)X_1$ 同分布：柯西族是 \emph{严格
+稳定}的，指数为 $1$。
+(b) 证明高斯族是严格稳定的，指数为
+$2$：$aX_1 + bX_2 \sim \sqrt{a^2 + b^2}\,X_1$，对
+$X_i$ 独立同分布，服从 $\mathcal N(0,1)$。
+(c) 利用形如
+$\eu^{-c\abs\xi^\alpha}$ 的特征函数，解释为何指数为 $\alpha$ 的稳定性要求
+和的规范化为 $n^{1/\alpha}$，并说明
+这对中心极限定理的吸引域意味着什么：哪些
+独立同分布的和经仿射规范化后，可收敛于
+柯西分布而非高斯分布？
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:clt:12}
+（经验分布函数）设 $(X_n)$ 为独立同分布的
+随机变量，分布函数为 $F$，记 $F_n(t) =
+\frac1n\#\{k \leq n : X_k \leq t\}$。
+(a) 固定 $t$。证明 $n F_n(t) \sim \mathcal B(n, F(t))$，
+$F_n(t) \to F(t)$ 几乎必然成立（\cref{thm:b3:probability:slln}），
+并证明
+\[
+\sqrt n\,\bigl(F_n(t) - F(t)\bigr) \Longrightarrow
+\mathcal N\bigl(0,\ F(t)(1 - F(t))\bigr) .
+\]
+(b) 渐近方差在哪个 $t$ 处最大？
+解释：中位数恰是经验分布
+最难确定的位置。
+(c) 设 $F$ 连续，证明
+$\sup_t\abs{F_n(t) - F(t)}$ 的分布与 $F$ 无关
+\emph{（化为均匀变量，借助
+\cref{exo:b3:probability:1}）} --- 这一
+与分布无关的奇迹，正是柯尔莫哥洛夫--斯米尔诺夫检验的基础；此处
+不要求计算该分布。
+\end{exercise}
+
+\section{问题：林德伯格关于中心极限定理的证明，附
+带收敛速度}
+
+\begin{problem}[{周末问题 --- 替换法}]
+\label{pb:b3:clt:1}
+林德伯格（1922 年）借助一个极为朴素的想法
+证明了中心极限定理：\emph{逐个把求和项换成高斯变量}，
+并用泰勒展开控制每一次替换。该方法无需傅里叶分析，
+能给出显式的误差阶，
+如今已成为概率论中普适性证明的有力工具。
+设 $(X_i)$ 为独立同分布、均值为零的随机变量，
+$\V(X_1) = 1$，且 $\beta = \E\abs{X_1}^3 < \infty$；设
+$(N_i)$ 为独立同分布的 $\mathcal N(0,1)$ 变量，且与
+$X_i$ 相互独立（存在性见\cref{thm:b3:probability:existence}）。记
+\[
+T_n = \frac{X_1 + \dots + X_n}{\sqrt n},
+\qquad
+G_n = \frac{N_1 + \dots + N_n}{\sqrt n} \sim \mathcal N(0,1).
+\]
+
+\medskip
+\noindent\textbf{第 I 部分 --- 交换恒等式。}取定 $f
+\in \mathcal C^3_b(\R)$（即三阶导数均有界且连续；
+$M_3 = \sup\abs{f'''}$）。对 $0 \leq i \leq n$，
+定义混合和
+\[
+H_i = \frac{X_1 + \dots + X_i + N_{i+1} + \dots +
+N_n}{\sqrt n},
+\]
+于是 $H_n = T_n$，$H_0 = G_n$。
+\begin{enumerate}
+  \item 写出 $H_i = W_i + \frac{X_i}{\sqrt n}$ 与 $H_{i-1}
+        = W_i + \frac{N_i}{\sqrt n}$，其中 $W_i =
+        \frac{1}{\sqrt n}\bigl(\sum_{j<i}X_j +
+        \sum_{j>i}N_j\bigr)$，注意到 $W_i$
+        与数对 $(X_i, N_i)$ 独立，请说明理由。
+  \item 利用带积分余项或拉格朗日余项的泰勒公式，对任意
+        实数 $w, h$，有：
+        \[
+        \Bigl|f(w + h) - f(w) - f'(w)h -
+        \tfrac12f''(w)h^2\Bigr| \leq
+        \frac{M_3\,\abs h^3}{6} .
+        \]
+  \item 两次应用第 2 问（分别取 $h = \frac{X_i}{\sqrt n}$ 与
+        $h = \frac{N_i}{\sqrt n}$，并令 $w = W_i$），两边取期望，
+        再利用独立性，以及
+        $X_i$ 与 $N_i$ 前两阶矩相匹配，证明
+        \[
+        \bigl|\E f(H_i) - \E f(H_{i-1})\bigr|
+        \leq \frac{M_3}{6}\cdot
+        \frac{\beta + \gamma}{n^{3/2}},
+        \qquad \gamma = \E\abs{N_1}^3 =
+        \frac{2\sqrt2}{\sqrt\pi} .
+        \]
+  \item 对 $i$ 裂项求和，并得到\emph{林德伯格
+        界}：
+        \[
+        \bigl|\E f(T_n) - \E f(G_n)\bigr| \leq
+        \frac{M_3\,(\beta + \gamma)}{6\,\sqrt n} .
+        \]
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第 II 部分 --- 从光滑函数 $f$ 到中心极限定理。}
+\begin{enumerate}[resume]
+  \item 证明 $\E f(T_n) \to \E f(N)$，对每个 $f \in
+        \mathcal C_b^3$ 成立，并把结论推广到所有有界
+        连续函数 $f$：给定此类 $f$ 与 $\varepsilon$，
+        构造 $f_\varepsilon \in \mathcal C^3_b$，使得
+        $\norm{f - f_\varepsilon}_\infty \leq \varepsilon$
+        在一大区间上满足该估计 --- 例如将 $f$ 与一个
+        $\mathcal C^\infty$ 光滑凸起函数作卷积
+        （见\cref{thm:b3:lp:regularization}） --- 并借助紧性处理
+        尾部（$\V(T_n) = 1$ 与切比雪夫不等式）。
+        由此得 $T_n \Rightarrow \mathcal N(0, 1)$：这就是
+        重新证明的中心极限定理。
+  \item 证明中何处用到了 $X_i$ 的
+        \emph{同分布}性质？请说明实际上几乎没有用到它：
+        叙述并证明：对独立、均值为零、非同分布的
+        $X_i$ 的版本，
+        设 $\sum_i\V(X_i) = s_n^2$，并假设三阶矩存在，
+        得到误差 $\frac{M_3}{6s_n^3}\sum_i\bigl(\E\abs{X_i}^3
+        + \V(X_i)^{3/2}\gamma\bigr)$ --- 林德伯格的真正定理，
+        即其李雅普诺夫形式。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第 III 部分 --- 定量收获。}
+\begin{enumerate}[resume]
+  \item （分布函数）设 $t \in \R$，
+        以 $\mathbf 1_{\intoc{-\infty}t}$ 为对象，从上、下两侧
+        用 $\mathcal C^3_b$ 斜坡函数逼近，斜坡宽度为 $\delta$
+        （构造它们，使 $M_3 = O(\delta^{-3})$）。
+        结合第 I 部分，导出如下双项界：
+        \[
+        \sup_{t\in\R}\,\bigl|\P(T_n \leq t) -
+        \Phi(t)\bigr| \;\leq\;
+        \frac{C_1(\beta + \gamma)}{\delta^3\sqrt n} +
+        C_2\,\delta
+        \qquad (\text{对每个 } \delta > 0),
+        \]
+        常数可显式给出（$C_2\delta$ 一项用到了
+        $\Phi$ 的密度有界，界为
+        $\frac1{\sqrt{2\pi}}$），并取 $\delta \sim
+        n^{-1/8}$，从而得到一致的
+        阶为 $n^{-1/8}$ 的速率。
+        （最优阶 $n^{-1/2}$ 即贝里–埃森结果 ---
+        需要更精细的工具；要点在于由初等交换法得到一个\emph{显式}
+        速率。）
+  \item （定量的棣莫弗–拉普拉斯）特化到
+        $X_i = 2B_i - 1$（公平硬币的符号）：将
+        结论与局部估计比较（见
+        \cref{pb:b3:product:1} 第 7 问）--- 两种方法各自给出了
+        另一种方法所没有的什么？
+  \item （普适性）用一段话解释，为何替换法所证明的内容超过
+        中心极限定理：任何
+        形如 $\E f(\text{和})$ 的统计量，其中 $f$ 光滑，
+        在 $n^{-1/2}$ 阶上对求和项的
+        \emph{整个分布}（超出前两阶矩的部分）不敏感 ---
+        “不变性原理”，它
+        构成了现代普适性结果（如随机矩阵、随机多项式）的基础，
+        而中心极限定理是其中
+        最早的实例。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第四部分 --- 推进的光滑化：更好的
+速率。}从 $n^{-1/2}$（光滑 $f$）到
+$n^{-1/8}$（分布函数）的损失，源于在上确界范数下
+估计 $f'''$。混合量可以弥补其中一部分：它们
+含有高斯求和项，而高斯变量具有\emph{光滑化}作用。
+\begin{enumerate}[resume]
+  \item （隐藏的高斯项）对于 $1 \leq i \leq n - 1$，$h =
+        \frac{X_i}{\sqrt n}$ 或 $\frac{N_i}{\sqrt n}$，且
+        $\theta \in \intcc01$，写成 $W_i + \theta h = A +
+        Z$，其中 $Z = \frac{N_{i+1} + \dots + N_n}{\sqrt
+        n}$。证明 $Z \sim \mathcal N\bigl(0,
+        \frac{n-i}n\bigr)$ 与数对 $(A,
+        h)$ 独立，并由此推出，对每个连续函数 $g \in
+        L^1(\R)$，
+        \[
+        \E\bigl[\abs h^3\,\abs{g(W_i + \theta h)}\bigr]
+        \;\leq\; \sqrt{\frac{n}{2\pi(n - i)}}\;
+        \norm{g}_{L^1}\;\E\abs h^3 .
+        \]
+  \item 结合第 10 题与积分形式的
+        泰勒余项，
+        \[
+        f(w + h) = f(w) + f'(w)h + \tfrac12f''(w)h^2 +
+        \int_0^1\frac{(1 - \theta)^2}2\,f'''(w + \theta
+        h)\,h^3\,\dd\theta,
+        \]
+        用于重做第 3--4 题：设 $f \in \mathcal C^3_b$，
+        且另有 $f''' \in L^1(\R)$，
+        \[
+        \bigl|\E f(T_n) - \E f(G_n)\bigr| \leq
+        \frac{\beta + \gamma}{3\sqrt{2\pi}}\cdot
+        \frac{\norm{f'''}_{L^1}}{\sqrt n} +
+        \frac{M_3(\beta + \gamma)}{6\,n^{3/2}}
+        \]
+        \emph{（第 10 题处理交换 $i \leq n - 1$
+        --- 用 $\sum_{m=1}^{n-1}m^{-1/2} \leq 2\sqrt n$
+        --- 而第 3 题的粗略界处理最后一个
+        换位）}。验证第 7 题中的斜坡函数满足
+        $\norm{\psi_\delta'''}_{L^1} = K_1\delta^{-2}$
+        而 $M_3 = K\delta^{-3}$，将其代入，并
+        优化 $\delta$：一致的
+        分布函数速率改进为
+        $O(n^{-1/6})$。
+  \item （匹配再多一阶矩）另设 $\E
+        X_1^3 = 0$ 且 $\beta_4 = \E X_1^4 < \infty$。
+        计算 $\E N_1^3$ 与 $\E N_1^4$，展开到四阶，
+        并沿同样的思路证明，分布函数的
+        速率变为 $O(n^{-1/4})$
+        \emph{（此时 $\norm{\psi_\delta^{(4)}}_{L^1} =
+        K_2\delta^{-3}$ 且 $M_4 = K'\delta^{-4}$；取
+        $\delta = n^{-1/4}$）}。
+  \item （障碍）假设前 $k$ 阶矩
+        $X_1$ 的矩与高斯情形一致（$k = 2$ 总成立；
+        $k = 3$ 当且仅当 $\E X_1^3 = 0$ 时成立；$k \geq 4$
+        几乎从不成立（因为 $\E N_1^4 = 3$）。验证
+        第 10--12 题的方案给出分布函数
+        的速率
+        $n^{-(k-1)/(2k+2)}$，这通过平衡
+        $\delta^{-k}n^{-(k-1)/2}$ 与 $\delta$ 得到，并
+        观察到，该指数趋于
+        贝里--埃森值 $\frac12$，仅当 $k \to
+        \infty$ 时如此。用几句话说明，为何
+        换位法会饱和：每次换位都按绝对值计入，
+        而傅里叶路线
+        （埃森光滑化不等式）利用
+        特征函数之差的振荡，
+        并达到 $C\beta n^{-1/2}$，仅需三阶矩
+        即可。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第五部分 --- 二维情形：
+多维中心极限定理，用换位法。}现设 $X_i$ 为
+独立同分布的中心化随机\emph{向量}，取值于 $\R^2$，协方差矩阵为
+$\Sigma$，且 $\beta' = \E\norm{X_1}^3 <
+\infty$（欧几里得范数）。
+\begin{enumerate}[resume]
+  \item （高斯向量，精确地）将 $\Sigma =
+        PDP^{\mathsf T}$ 对角化（见\cref{exo:b3:submanifolds:8}），并
+        令 $C = P\sqrt DP^{\mathsf T}$。设 $Z = (Z^1,
+        Z^2)$ 为一对独立的标准高斯变量
+        （见\cref{thm:b3:probability:existence}），证明 $N
+        = CZ$ 是一个高斯向量
+        （见\cref{def:b3:clt:gaussianvector}），均值为 $0$，
+        协方差为 $\Sigma$，且 $\gamma' = \E\norm N^3 <
+        \infty$；并证明 $G_n = \frac{N_1 + \dots +
+        N_n}{\sqrt n}$ 服从 $\mathcal N(0, \Sigma)$，
+        对独立同分布的副本 $N_i$，\emph{恰好}成立。
+  \item （二元泰勒展开）设 $f \colon \R^2 \to
+        \R$ 为 $\mathcal C^3$ 类函数，且 $M_3 =
+        \max_{\abs\alpha = 3}\sup\abs{\partial^\alpha f} <
+        \infty$，证明
+        \[
+        \Bigl|f(w + h) - f(w) - \langle\nabla f(w),
+        h\rangle - \tfrac12\langle h, D^2f(w)\,h\rangle
+        \Bigr| \leq \frac{M_3}6\,\bigl(\abs{h_1} +
+        \abs{h_2}\bigr)^3 \leq \frac{\sqrt2\,M_3}3\,
+        \norm h^3
+        \]
+        \emph{（考察 $t \mapsto f(w + th)$ 在
+        $\intcc01$ 上的情形）}。
+  \item （$\R^2$ 中的中心极限定理）用替换方案处理
+        向量混合量 $H_i$：证明一阶与二阶项
+        相消（均值与协方差相配），裂项求和，
+        并仿照第 5 题加强
+        （紧性由 $\E\norm{T_n}^2 =
+        \operatorname{tr}\Sigma$ 得出；光滑化现在
+        在 $\R^2$ 中进行，见\cref{thm:b3:lp:regularization}）
+        推出结论：对每个有界连续函数 $f \colon
+        \R^2 \to \R$，
+        \[
+        \E\,f\Bigl(\frac{X_1 + \dots + X_n}{\sqrt n}\Bigr)
+        \longrightarrow \E\,f(N), \qquad N \sim \mathcal
+        N(0, \Sigma) :
+        \]
+        这即 \cref{thm:b3:clt:multiclt} 在 $2$ 维情形下，
+        对光滑的 $f$ 给出速率，且无需傅里叶分析。
+  \item （克拉默--沃尔德，以及联合涨落）由此推出
+        $\langle t, \frac{S_n}{\sqrt n}\rangle
+        \Rightarrow \mathcal N(0, t^{\mathsf T}\Sigma t)$
+        对每个固定的 $t \in \R^2$ 成立。应用：对
+        独立同分布的实随机变量 $(\xi_i)$，中心化，$\E\xi_1^2 = 1$，
+        $\E\xi_1^6 < \infty$（使得第五部分可用于
+        $V_i = (\xi_i, \xi_i^2 - 1)$），证明
+        \[
+        \frac1{\sqrt n}\Bigl(\sum_{i\leq n}\xi_i,\
+        \sum_{i\leq n}(\xi_i^2 - 1)\Bigr) \Longrightarrow
+        \mathcal N\Bigl(0, \begin{pmatrix} 1 & \E\xi_1^3\\
+        \E\xi_1^3 & \E\xi_1^4 - 1\end{pmatrix}\Bigr) :
+        \]
+        经验均值与经验二阶矩
+        联合呈高斯涨落 --- 在极限下相互独立，当且仅当
+        $\E\xi_1^3 = 0$ 时成立
+        （见\cref{thm:b3:clt:gaussianvector}）。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第 VI 部分 --- 德尔塔方法。}
+\begin{enumerate}[resume]
+  \item 设 $(\hat\theta_n)$ 为随机变量，满足
+        $\sqrt n(\hat\theta_n - \theta) \Rightarrow
+        \mathcal N(0, \sigma^2)$，其中 $\theta$ 为实参数，
+        设 $g$ 在
+        $\theta$ 处可导。证明\emph{德尔塔方法}：
+        \[
+        \sqrt n\bigl(g(\hat\theta_n) - g(\theta)\bigr)
+        \Longrightarrow \mathcal N\bigl(0,
+        g'(\theta)^2\sigma^2\bigr)
+        \]
+        \emph{（写 $g(x) - g(\theta) = (g'(\theta) +
+        \eta(x))(x - \theta)$，其中 $\eta \to 0$ 在
+        $\theta$ 处；先证 $\hat\theta_n \to \theta$，
+        依概率有 $\eta(\hat\theta_n) \to 0$，最后
+        用斯卢茨基定理、\cref{exo:b3:clt:8} 和
+        \cref{exo:b3:clt:4}(b)）}。
+  \item 应用。(a) 设 $(\xi_i)$ 为独立同分布的实值序列，
+        其均值为 $\mu$、方差为 $\sigma^2$，并记 $\bar X_n =
+        \frac1n\sum_{i\leq n}\xi_i$：证明 $\sqrt n(\bar
+        X_n^2 - \mu^2) \Rightarrow \mathcal N(0,
+        4\mu^2\sigma^2)$ 当 $\mu \neq 0$ 时成立，并说明
+        $\mu = 0$ 时，正确的结论需在另一尺度上给出：
+        $n\bar X_n^2 \Rightarrow \sigma^2N^2$，其中
+        $N \sim \mathcal N(0,1)$（求出极限的
+        分布函数）。(b)（方差
+        稳定化）。设 $\hat p_n$ 为
+        $\mathcal B(1, p)$ 样本的成功频率，$p \in \intoo01$：
+        证明 $g(p) = \arcsin\sqrt p$ 满足
+        \[
+        \sqrt n\,\bigl(g(\hat p_n) - g(p)\bigr)
+        \Longrightarrow \mathcal N\Bigl(0, \frac14\Bigr)
+        \]
+        \emph{无论} $p$ 取何值 --- 渐近误差
+        范围不依赖未知参数；可与
+        \cref{ex:b3:clt:confidence} 比较。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第 VII 部分 --- 泊松分布，用同样的方法：
+勒卡姆定理。}替换法还揭示了第二类普适类：
+许多独立的\emph{稀有}事件之和。对
+$\N$ 上的分布，正确的距离是\emph{全变差}，
+\[
+d_{\mathrm{TV}}(\mu, \nu) = \sup_{A\subseteq\N}\,
+\abs{\mu(A) - \nu(A)} .
+\]
+\begin{enumerate}[resume]
+  \item 证明 $d_{\mathrm{TV}}(\mu, \nu) =
+        \frac12\sum_{k\geq0}\abs{\mu(\{k\}) -
+        \nu(\{k\})}$，并证明耦合界：对
+        \emph{任意}随机变量对 $(X, Y)$，其
+        分布分别为 $\mu$ 与 $\nu$，且定义在同一空间上，
+        $d_{\mathrm{TV}}(\mu, \nu) \leq \P(X \neq Y)$。
+  \item 对 $p \in \intoo01$，精确计算：
+        \[
+        d_{\mathrm{TV}}\bigl(\mathcal B(1, p), \mathcal
+        P(p)\bigr) = p\bigl(1 - \eu^{-p}\bigr) \leq p^2 .
+        \]
+  \item （勒卡姆，交换法）设 $X_i \sim \mathcal B(1,
+        p_i)$ 与 $Y_i \sim \mathcal P(p_i)$，共 $2n$
+        个变量相互独立；$S = X_1 + \dots + X_n$，并
+        回忆 $Y_1 + \dots + Y_n \sim \mathcal P(\lambda)$，
+        其中 $\lambda = \sum_ip_i$（见\cref{exo:b3:clt:1}）。
+        每次交换一个坐标，构造整数型
+        混合量 $H_i = Y_1 + \dots + Y_i + X_{i+1} + \dots
+        + X_n$：对任意 $A \subseteq \N$，证明
+        \[
+        \abs{\P(H_{i-1} \in A) - \P(H_i \in A)} \leq
+        d_{\mathrm{TV}}\bigl(\mathcal B(1, p_i), \mathcal
+        P(p_i)\bigr),
+        \]
+        并得出\emph{勒卡姆不等式}：
+        \[
+        d_{\mathrm{TV}}\bigl(\text{ 的分布 } S,\ \mathcal
+        P(\lambda)\bigr) \leq \sum_{i=1}^np_i^2 .
+        \]
+  \item 收获。(a) 对 $p_i = \frac\lambda n$，
+        误差界为 $\frac{\lambda^2}n$ --- 稀有事件律
+        （见\cref{exo:b3:clt:5}）升级为显式速率，
+        对所有事件一致，且
+        对不等的 $p_i$ 同样有效。(b) $500$ 封信被投递，
+        各封信独立地误投，概率为
+        $\frac1{500}$：给出
+        参数为 $1$ 的泊松模型的误差界，并估计
+        一封信都不误投的概率。(c) 结束本题：比较
+        此处讨论的两类普适类 ---
+        高斯类（许多微小且分散的贡献；
+        两阶矩匹配；泰勒展开）与
+        泊松类（许多稀有贡献；一阶矩
+        匹配；精确的全变差耦合）--- 以及
+        二者背后统一的替换法。
+
+  \item （相对误差与对数变换）设 $(X_n)$
+        为独立同分布的正值序列，均值 $\mu > 0$，方差
+        $\sigma^2$，并记 $\bar X_n$ 为经验均值。
+        用德尔塔方法证明下式：
+        \[
+        \sqrt n\,\bigl(\ln\bar X_n - \ln\mu\bigr)
+        \Longrightarrow
+        \mathcal N\Bigl(0,\ \frac{\sigma^2}{\mu^2}\Bigr) :
+        \]
+        $\ln\bar X_n$ 的渐近参数是
+        \emph{变异系数} $\sigma/\mu$ ---
+        相对且与尺度无关的误差。由此导出 $95\%$
+        $\mu$ 的乘性置信区间，
+        形式为 $\bar X_n\cdot\eu^{\pm1.96\,\sigma/(\mu\sqrt
+        n)}$，并说明何时它优于
+        加性区间。
+  \item （三阶矩决定误差）设 $X \sim$
+        中心化的伯努利（$p$）分布，计算 $\E\bigl[(X -
+        p)^3\bigr] = p(1-p)(1-2p)$。利用第 IV 部分的分析
+        （交换误差由三阶矩主导），解释
+        为何 $\mathcal B(n, p)$ 的正态近似
+        在 $p \neq \frac12$ 时不对称：一侧过估，
+        另一侧欠估；并解释为何
+        $p = \frac12$ 时匹配矩的收敛速度更快。
+        数值验证偏度的符号：在 $\mathcal
+        B(20, 0.1)$ 与 $\mathcal N(2, 1.8)$ 的情形下，
+        比较 $\P(S = 0) = 0.9^{20}$ 与高斯分布在
+        $\intoo{-\infty}{0.5}$ 上的质量。
+\end{enumerate}
+\end{problem}

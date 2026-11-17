@@ -1,0 +1,816 @@
+\chapter{测度论}\label{ch:b3:measure}
+
+$\R$ 的子集有多“长”？朴素的回答——
+为每个集合指定一个平移不变、且推广区间长度的“长度”——
+是\emph{不可能}的：维塔利构造，
+见本章末，给出一个没有一致长度的集合。\omterm{def:b3:measure:measure}{测度}论的做法
+是有纪律的退让：只考虑一类丰富的\emph{可测}集，
+在其上存在且唯一的可数可加“长度”。
+这一理论的收获
+极为丰厚——勒贝格积分（见\cref{ch:b3:lebesgue}）、
+泛函分析中的 $L^p$ 空间，以及整个现代概率论
+（见\cref{ch:b3:probability}）都建立在此处证明的
+三个定理之上：戴金唯一性引理、
+卡拉西奥多里扩张定理，以及
+\omterm{def:b3:measure:lebesgueouter}{勒贝格测度}的存在性。
+
+\section{$\sigma$-代数}
+
+\begin{definition}\label{def:b3:measure:sigmaalgebra}
+\emph{$\sigma$-代数}\index{$\sigma$-代数}是
+集合 $X$ 上的子集族 $\mathcal A$，
+包含 $\varnothing$，对补运算封闭，
+并对\emph{可数}并运算封闭（从而对可数交、
+集合差运算封闭，且含 $X$）。二元组 $(X, \mathcal A)$
+称为\emph{可测空间}；$\mathcal A$ 中的元素称为
+\emph{可测集}。对任意子集族 $\mathcal E$，
+记 $\sigma(\mathcal E)$ 为最小的 $\sigma$-代数，
+包含 $\mathcal E$（即所有这样的代数之交——
+任意多个 $\sigma$-代数之交仍是一个）。
+\end{definition}
+
+\begin{definition}\label{def:b3:measure:borel}
+\omterm{def:b3:topology:topology}{拓扑}空间的\emph{博雷尔 $\sigma$-代数}\index{%
+博雷尔 $\sigma$-代数}是
+$\mathcal B(X) = \sigma(\{\text{开集}\})$。在 $\R$ 上，
+$\mathcal B(\R)$ 也可由开区间生成，亦可由
+闭区间、形如 $(-\infty, a]$ 的射线生成，也可由
+端点为有理数的射线生成（见\cref{exo:b3:measure:1}）——每一族都
+借助可数运算生成全部\omterm{def:b3:topology:topology}{开集}，例如
+$\R$ 的每个\omterm{def:b3:topology:topology}{开集}都是开区间的可数并，
+其端点均为有理数。
+\end{definition}
+
+\begin{definition}\label{def:b3:measure:dynkin}
+称\emph{$\pi$-系}\index{$\pi$-系}为
+对有限交封闭的子集族。一个
+\emph{$\lambda$-系}\index{$\lambda$-系}
+（戴金类）是子集族 $\mathcal D$，满足：$X \in \mathcal
+D$；若 $A, B \in \mathcal D$，$A \subseteq B$ $\Rightarrow$ $B
+\setminus A \in \mathcal D$；若 $A_n \uparrow A$，$A_n \in
+\mathcal D$ $\Rightarrow$ $A \in \mathcal D$。
+\end{definition}
+
+\begin{theorem}[戴金 $\pi$--$\lambda$ 引理]
+\label{thm:b3:measure:dynkin}
+若 $\lambda$-系 $\mathcal D$ 包含 $\pi$-系
+$\mathcal P$，则 $\mathcal D \supseteq
+\sigma(\mathcal P)$。\index{戴金引理}
+\end{theorem}
+
+\begin{proof}
+设 $\mathcal D_0$ 为最小的 $\lambda$-系，
+它包含 $\mathcal P$（所有这类系之交）。只需证明
+$\mathcal D_0$ 是 $\sigma$-代数，则
+$\sigma(\mathcal P) \subseteq \mathcal D_0 \subseteq \mathcal
+D$。对有限交封闭的 $\lambda$-系
+\emph{即是}一个 $\sigma$-代数：补运算（$X \setminus A = X
+\setminus A$，$A \subseteq X$），有限并（$A \cup B =
+X \setminus ((X\setminus A)\cap(X\setminus B))$），以及可数并
+经由 $\bigcup_{k \leq n}A_k \uparrow \bigcup_kA_k$ 得到。故
+只需分两步证明 $\mathcal D_0$ 是 $\pi$-系。令
+\[
+\mathcal D_1 = \{A \in \mathcal D_0 : A \cap P \in \mathcal
+D_0 \ \forall P \in \mathcal P\}.
+\]
+$\mathcal D_1$ 是 $\lambda$-系（三条公理均
+通过与 $P$ 相交来验证：例如 $(B\setminus A)\cap P
+= (B \cap P)\setminus(A \cap P)$，是
+$\mathcal D_0$ 中的真差），且包含 $\mathcal P$（$\pi$-系）：
+$\mathcal D_1 = \mathcal D_0$。现令
+\[
+\mathcal D_2 = \{A \in \mathcal D_0 : A \cap D \in \mathcal
+D_0\ \forall D \in \mathcal D_0\}.
+\]
+由上一步，$\mathcal D_2 \supseteq \mathcal P$；且
+同理可验 $\mathcal D_2$ 是 $\lambda$-系：
+$\mathcal D_2 = \mathcal D_0$，这恰说明
+$\mathcal D_0$ 对交运算封闭。
+\end{proof}
+
+\section{测度}
+
+\begin{definition}\label{def:b3:measure:measure}
+\emph{测度}\index{测度}是 $(X, \mathcal A)$ 上的一个映射
+$\mu \colon \mathcal A \to [0, +\infty]$，满足 $\mu(\varnothing)
+= 0$，且它是\emph{$\sigma$-可加}的：对两两不交的
+$(A_n)_{n\in\N}$,
+\[
+\mu\Bigl(\bigsqcup_n A_n\Bigr) = \sum_n \mu(A_n).
+\]
+$(X, \mathcal A, \mu)$ 称为\emph{测度空间}；$\mu$ 为
+\emph{有限}的，若 $\mu(X) < \infty$，为\emph{概率
+测度}，若 $\mu(X) = 1$，\emph{$\sigma$-有限}的，若 $X$ 为
+有限测度集的可数并。例子包括
+$(\N, \mathcal P(\N))$ 上的计数测度；狄拉克测度 $\delta_a(A)
+= \mathbf 1_{a \in A}$；以及本章的研究对象，
+\omterm{def:b3:measure:lebesgueouter}{勒贝格测度}。
+\end{definition}
+
+\begin{proposition}\label{prop:b3:measure:basics}
+设 $\mu$ 为\omterm{def:b3:measure:measure}{测度}。(a) 单调性：$A \subseteq B
+\Rightarrow \mu(A) \leq \mu(B)$。(b) 可数次可加性：
+$\mu(\bigcup A_n) \leq \sum\mu(A_n)$。(c) 从下
+连续性：$A_n \uparrow A \Rightarrow \mu(A_n) \to \mu(A)$。(d)
+上连续性：$A_n \downarrow A$ \emph{且
+$\mu(A_1) < \infty$} $\Rightarrow \mu(A_n) \to \mu(A)$。
+\end{proposition}
+
+\begin{proof}
+(a) $B = A \sqcup (B\setminus A)$。(b) 不交化：$B_n = A_n
+\setminus \bigcup_{k<n}A_k$ 两两不交，并集相同，
+且 $\mu(B_n) \leq \mu(A_n)$。(c) $A = \bigsqcup_n (A_n
+\setminus A_{n-1})$（约定 $A_0 = \varnothing$）：
+$\sum\mu(A_n\setminus A_{n-1})$ 的部分和为 $\mu(A_n)$。(d) 对
+$A_1 \setminus A_n \uparrow A_1 \setminus A$ 用 (c)，再
+从 $\mu(A_1)$ 中减去——有限性使减法
+合法。无此条件时的反例：取 $A_n = [n, \infty)$，
+对\omterm{def:b3:measure:lebesgueouter}{勒贝格测度}，$A_n \downarrow \varnothing$ 但 $\mu(A_n) =
+\infty$。
+\end{proof}
+
+\begin{theorem}[唯一性]\label{thm:b3:measure:uniqueness}
+设 $\mu, \nu$ 为 $\sigma(\mathcal P)$ 上的\omterm{def:b3:measure:measure}{测度}，$\mathcal
+P$ 为 $\pi$-系，且 $\mu = \nu$ 在 $\mathcal P$ 上成立。若存在
+集合 $P_k \in \mathcal P$ 满足 $P_k \uparrow X$ 且
+$\mu(P_k) < \infty$，则 $\mu = \nu$ 在
+整个 $\sigma(\mathcal P)$ 上成立。
+\end{theorem}
+
+\begin{proof}
+固定 $k$，考虑有限\omterm{def:b3:measure:measure}{测度} $\mu_k(A) = \mu(A \cap
+P_k)$ 与 $\nu_k(A) = \nu(A \cap P_k)$，均定义于 $\sigma(\mathcal
+P)$ 上：二者在 $\mathcal P$ 上一致，因 $P \cap P_k \in \mathcal
+P$（$\pi$-系），且二者对 $X$ 赋予同一有限值
+$\mu(P_k)$。集类 $\mathcal D = \{A : \mu_k(A) =
+\nu_k(A)\}$ 是 $\lambda$-系：$X \in \mathcal D$；对真差，
+由减法得出（取有限值）；递增极限
+由下方连续性（\cref{prop:b3:measure:basics}(c)）得出。
+它包含 $\pi$-系 $\mathcal P$，故由狄金
+（\cref{thm:b3:measure:dynkin}）得 $\mathcal D \supseteq
+\sigma(\mathcal P)$，故 $\mu_k = \nu_k$ 处处成立。最后，对
+任一 $A \in \sigma(\mathcal P)$，沿 $A
+\cap P_k \uparrow A$ 由下方连续性得 $\mu(A) = \lim_k\mu_k(A) =
+\lim_k\nu_k(A) = \nu(A)$。
+\end{proof}
+
+\section{外测度与卡拉西奥多里定理}
+
+\begin{definition}\label{def:b3:measure:outer}
+称 $X$ 上的\emph{外测度}\index{外测度}为
+映射 $\mu^* \colon \mathcal P(X) \to [0, \infty]$，满足
+$\mu^*(\varnothing) = 0$，单调，且可数次可加。
+集合 $A$ 称为\emph{$\mu^*$-可测}的（卡拉西奥多里意义下），若它
+可加地分割任一集合：
+\[
+\mu^*(E) = \mu^*(E \cap A) + \mu^*(E \setminus A)
+\qquad \text{对每个 } E \subseteq X
+\]
+（$\leq$ 由次可加性总成立；实质内容为 $\geq$）。
+\end{definition}
+
+\begin{theorem}[卡拉西奥多里]\label{thm:b3:measure:caratheodory}
+$\mu^*$-可测集构成一个 $\sigma$-代数 $\mathcal
+M$，且 $\mu^*\restriction_{\mathcal M}$ 是一个\omterm{def:b3:measure:measure}{测度}。
+此外，每个满足 $\mu^*(N) = 0$ 的集合都属于 $\mathcal M$
+（\omterm{def:b3:measure:measure}{测度}是\emph{完备}的）。\index{卡拉西奥多里
+定理}
+\end{theorem}
+
+\begin{proof}
+$\mathcal M$ 包含 $\varnothing$，且对补运算封闭
+（定义条件关于 $A$ 对称，
+即 $X\setminus A$ 同样满足）。\emph{有限并}：设 $A, B \in \mathcal
+M$，$E$ 任取；先将 $E$ 按 $A$ 分割，再对每一块以
+$B$ 分割：
+\[
+\mu^*(E) = \mu^*(E\cap A\cap B) + \mu^*(E\cap A\setminus B) +
+\mu^*(E\cap B\setminus A) + \mu^*(E\setminus(A\cup B)).
+\]
+前三部分覆盖 $E \cap (A \cup B)$，故
+由次可加性得 $\mu^*(E) \geq \mu^*(E\cap(A\cup B)) +
+\mu^*(E\setminus(A\cup B))$，即 $A \cup B \in \mathcal M$。由
+归纳得有限并；结合补运算，有限不交的
+运算亦可施行。
+
+\emph{$\mathcal M$ 上的可加性}：对不交的 $A, B \in
+\mathcal M$ 及任意 $E$：$\mu^*(E\cap(A\sqcup B)) = \mu^*(E\cap
+A) + \mu^*(E \cap B)$（按 $A$ 分割）；归纳可得
+\[
+\mu^*\Bigl(E \cap \bigsqcup_{k\leq n}A_k\Bigr)
+= \sum_{k\leq n}\mu^*(E\cap A_k).
+\tag{$*$}
+\]
+
+\emph{可数并}：设 $(A_k) \subseteq \mathcal M$
+为两两不交的（只需在代数
+$\mathcal M$ 内作不交化即可），$A = \bigsqcup A_k$，$E$ 任取。利用
+$\bigsqcup_{k\leq n}A_k \in \mathcal M$ 及单调性：
+\[
+\mu^*(E) = \mu^*\Bigl(E\cap\bigsqcup_{k\leq n}A_k\Bigr) +
+\mu^*\Bigl(E\setminus\bigsqcup_{k\leq n}A_k\Bigr)
+\geq \sum_{k \leq n}\mu^*(E\cap A_k) + \mu^*(E\setminus A)
+\]
+由（$*$）。令 $n \to \infty$，并
+逆用可数次可加性：
+\[
+\mu^*(E) \geq \sum_{k}\mu^*(E\cap A_k) + \mu^*(E\setminus A)
+\geq \mu^*(E \cap A) + \mu^*(E\setminus A) \geq \mu^*(E):
+\]
+所有不等式均取等号。由此证明 $A \in
+\mathcal M$，并取 $E = A$，得
+$\mu^*$ 在 $\mathcal M$ 上的可数可加性。
+
+\emph{零集}：若 $\mu^*(N) = 0$，则对任意 $E$：
+$\mu^*(E \cap N) + \mu^*(E\setminus N) \leq 0 + \mu^*(E)$：
+$N \in \mathcal M$。
+\end{proof}
+
+\section{\texorpdfstring{$\R$}{R} 上的勒贝格测度}
+
+\begin{definition}\label{def:b3:measure:lebesgueouter}
+集合 $A
+\subseteq \R$ 的\emph{勒贝格外测度}\index{勒贝格测度}为
+\[
+\lambda^*(A) = \inf\Bigl\{\sum_{n} (b_n - a_n) :
+A \subseteq \bigcup_n \intoo{a_n}{b_n}\Bigr\}
+\]
+（可数个开区间覆盖）。
+\end{definition}
+
+\begin{lemma}\label{lem:b3:measure:outerbasics}
+$\lambda^*$ 是\omterm{def:b3:measure:outer}{外测度}，关于平移不变，
+且 $\lambda^*(I) = \ell(I)$（即长度），对每个区间
+$I$ 成立。
+\end{lemma}
+
+\begin{proof}
+\omterm{def:b3:measure:outer}{外测度}：$\varnothing$ 可被任意小的
+区间覆盖；单调性显然；次可加性：取定
+各 $A_n$ 的覆盖，其总长与下确界之差不超过 $\varepsilon 2^{-n}$，
+它们的并覆盖 $\bigcup A_n$，总长 $\leq \sum
+\lambda^*(A_n) + \varepsilon$。平移不变性：
+将覆盖作平移即可。
+
+长度：只需对 $I = \intcc ab$ 讨论（其他类型
+仅差端点，端点的\omterm{def:b3:measure:outer}{外测度}为 $0$：用
+很小的区间覆盖；再夹逼 $\intcc{a+\varepsilon}{b -
+\varepsilon} \subseteq \intoo ab$ 型的比较）。
+$\lambda^*(\intcc ab) \leq b - a$：用
+$\intoo{a-\varepsilon}{b+\varepsilon}$ 覆盖。反之设 $\intcc
+ab \subseteq \bigcup_n\intoo{a_n}{b_n}$：由
+\emph{紧性}（博雷尔–勒贝格，
+\cref{thm:b3:topology:metriccompact}），有限个区间即可，
+记为 $I_1, \dots, I_N$。证明 $\sum_{k\leq N}(b_k -
+a_k) \geq b - a$，对 $N$ 归纳：取 $I_{k_1} \ni a$；若
+$b_{k_1} > b$，则已证（$b_{k_1} - a_{k_1} > b - a$）；否则
+线段 $\intcc{b_{k_1}}b$ 由其余 $N - 1$ 个
+区间覆盖，由归纳假设得 $\sum_{k \neq k_1}(b_k - a_k)
+\geq b - b_{k_1}$，而 $b_{k_1} - a_{k_1} > b_{k_1} - a$，
+相加即得。
+\end{proof}
+
+\begin{theorem}[勒贝格测度]\label{thm:b3:measure:lebesgue}
+$\R$ 中每个博雷尔集都是 $\lambda^*$-可测的。
+$\lambda$ 是 $\lambda^*$ 在
+$\sigma$-代数 $\mathcal L = \mathcal M_{\lambda^*} \supseteq \mathcal B(\R)$
+（即\emph{勒贝格 $\sigma$-代数}）上的限制，是
+$\mathcal B(\R)$ 上唯一把每个区间映为其长度的\omterm{def:b3:measure:measure}{测度}；它是
+平移不变且 $\sigma$-有限。
+\end{theorem}
+
+\begin{proof}
+由\cref{thm:b3:measure:caratheodory}，只需证明每条
+射线 $A = \intoo{-\infty}c$ 是 $\lambda^*$-可测的
+（射线生成 $\mathcal B$，
+\cref{def:b3:measure:borel}）。设 $E \subseteq \R$ 满足
+$\lambda^*(E) < \infty$，且 $\bigcup I_n \supseteq E$ 为覆盖，
+使得 $\sum\ell(I_n) \leq \lambda^*(E) + \varepsilon$。每个
+$I_n$ 分为两个区间 $I_n' = I_n \cap A$ 与
+$I_n'' = I_n\setminus A$（区间减去射线仍是
+区间），且 $\ell(I_n') + \ell(I_n'') = \ell(I_n)$；
+$I_n'$ 覆盖 $E \cap A$，$I_n''$ 覆盖 $E \setminus A$
+（将每个区间扩大为长为 $\ell +
+\varepsilon2^{-n}$ 的开区间，以符合定义），于是
+\[
+\lambda^*(E\cap A) + \lambda^*(E\setminus A)
+\leq \sum_n\bigl(\ell(I_n') + \ell(I_n'')\bigr) + 2\varepsilon
+\leq \lambda^*(E) + 3\varepsilon .
+\]
+唯一性：两个在
+区间的 $\pi$-系 $\intoc ab$ 上（其上有限）与长度一致的\omterm{def:b3:measure:measure}{测度}，
+在 $\sigma(\text{区间}) = \mathcal B$ 上也一致，由
+\cref{thm:b3:measure:uniqueness}，取 $P_k = \intoc{-k}k$。
+$\sigma$-有限性：$\R = \bigcup(-k, k]$。
+\end{proof}
+
+\begin{theorem}[正则性]\label{thm:b3:measure:regularity}
+对每个 $A \in \mathcal L$：\index{勒贝格测度的
+正则性}
+\[
+\lambda(A) = \inf\{\lambda(U) : U \supseteq A \text{ 开}\}
+= \sup\{\lambda(K) : K \subseteq A \text{ 紧}\}.
+\]
+\end{theorem}
+
+\begin{proof}
+\emph{外正则性}：覆盖 $\bigcup I_n$ 满足 $\sum\ell(I_n) \leq
+\lambda(A) + \varepsilon$，则其并为\omterm{def:b3:topology:topology}{开集} $U \supseteq A$，且
+$\lambda(U) \leq \lambda(A) + \varepsilon$（由次可加性）；若
+$\lambda(A) = \infty$，结论显然成立。\emph{内正则性}：
+先设 $A$ 有界，$A \subseteq [-M, M]$。取\omterm{def:b3:topology:topology}{开集}
+$U \supseteq ([-M,M]\setminus A)$，使 $\lambda(U) \leq
+\lambda([-M,M]\setminus A) + \varepsilon$；则 $K = [-M,
+M]\setminus U$ 为紧集，$K \subseteq A$，且
+\[
+\lambda(K) = \lambda([-M,M]) - \lambda([-M,M]\cap U)
+\geq \lambda([-M,M]) - \bigl(\lambda([-M,M]) - \lambda(A) +
+\varepsilon\bigr) = \lambda(A) - \varepsilon .
+\]
+一般的 $A$：$\lambda(A) = \lim_M\lambda(A\cap[-M,M])$
+（由下连续性），并对其应用有界情形。
+\end{proof}
+
+\begin{example}\label{ex:b3:measure:cantor}
+康托尔集（见\cref{exo:b3:topology:10}）满足 $\lambda(C) = 0$：
+$C \subseteq C_n$，它是 $2^n$ 个长度为
+$3^{-n}$ 的区间之并，故 $\lambda(C) \leq (2/3)^n \to 0$。一个不可数的
+零测集——基数并不反映\omterm{def:b3:measure:measure}{测度}。反之，
+\emph{肥康托尔集}（见\cref{exo:b3:measure:5}）是无处
+稠密但\omterm{def:b3:measure:measure}{测度}为正：\omterm{def:b3:topology:topology}{拓扑}同样不能反映\omterm{def:b3:measure:measure}{测度}。
+周末问题把这种相互作用推向其
+惊人的结论：存在勒贝格可测集，它们
+不是博雷尔集。
+\end{example}
+
+\begin{theorem}[维塔利]\label{thm:b3:measure:vitali}
+不存在定义在 $\R$ 的\emph{全部}子集上的\omterm{def:b3:measure:measure}{测度}，
+它平移不变，且将每个区间赋以其长度。
+特别地，$\mathcal L \neq \mathcal P(\R)$：
+存在不可测集。\index{维塔利不可测集}
+\end{theorem}
+
+\begin{proof}
+假设 $\mu$ 即为这样的\omterm{def:b3:measure:measure}{测度}。在 $\intcc01$ 上考虑等价关系
+$x \sim y \iff x - y \in \Q$。借助\emph{选择公理}，
+在每一等价类中各取一个 $\intcc01$ 中的代表元，所得集合记为 $V$。对
+$q \in \Q\cap\intcc{-1}1$，平移集 $V + q$ 两两
+不交（若 $V$ 中两点之差为有理数，则二者等价却为
+两个不同的代表元），且
+\[
+\intcc01 \subseteq \bigsqcup_{q \in \Q\cap\intcc{-1}1}(V + q)
+\subseteq \intcc{-1}2 :
+\]
+第一个包含关系成立，因为每个 $x \in \intcc01$ 与其代表元
+$v$ 之差为有理数 $q = x - v \in
+\intcc{-1}1$。由单调性与 $\sigma$-可加性可得
+\[
+1 \leq \sum_{q}\mu(V + q) \leq 3,
+\qquad\text{其中 } \mu(V + q) = \mu(V) \text{ 对所有 } q .
+\]
+常数 $\mu(V)$ 的无穷和只能是 $0$ 或 $\infty$：
+两个界不可能同时成立。故不存在这样的 $\mu$——且 $V
+\notin \mathcal L$，因为 $\lambda$ 在 $\mathcal L$ 上
+具有所用到的全部性质。
+\end{proof}
+
+\begin{remark}\label{rem:b3:measure:banachtarski}
+在 $\R^3$ 中，失败更为剧烈：巴拿赫--塔斯基
+悖论把一个球剖分为五块，这些块经
+旋转与平移，可重新拼成\emph{两个}
+半径相同的球——因此，连有限可加的旋转不变
+体积也不存在于 $\R^3$ 的全部子集上。这些块当然
+都是不可测的。可测性并非官僚式的
+谨慎，而是自洽性的边界。
+\end{remark}
+
+\begin{method}\label{met:b3:measure:goodsets}
+\emph{好集原理}：要证明
+$\sigma(\mathcal E)$ 的所有集合都具有某一性质，只需证明好集
+构成一个 $\sigma$-代数（或 $\lambda$-系，若该性质
+属于\omterm{def:b3:measure:measure}{测度}论，且 $\mathcal E$ 为 $\pi$-系——
+则用狄金定理），包含 $\mathcal E$。本章与下一章中
+几乎所有证明都是其实例。要证明两个\omterm{def:b3:measure:measure}{测度}相等，
+只需在生成的 $\pi$-系上检验，并加上
+$\sigma$-有限性（见\cref{thm:b3:measure:uniqueness}）。要
+构造\omterm{def:b3:measure:measure}{测度}：先以覆盖构造\omterm{def:b3:measure:outer}{外测度}，再引用
+卡拉西奥多里定理。
+\end{method}
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:b3:measure:1}
+(a) 证明 $\{A \subseteq X : A$ 或 $X\setminus A$ 是
+可数的$\}$ 构成一个 $\sigma$-代数：
+即由单点集生成的那一个。
+(b) 证明 $\mathcal B(\R)$ 可分别由下列各族生成：开区间；
+闭区间；射线 $\intoc{-\infty}a$；
+$a \in \Q$ 的射线。
+(c) 由\emph{有限个两两不交的区间之并}构成的族
+（区间形如 $\intoc ab$）是否为 $\sigma$-代数？
+是否为代数（对补运算与有限并封闭）？
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b3:measure:2}
+(a) 证明有限\omterm{def:b3:measure:measure}{测度}下的容斥原理：$\mu(A\cup
+B) = \mu(A) + \mu(B) - \mu(A\cap B)$，以及三集合的
+情形。
+(b) 举例说明：\omterm{def:b3:measure:measure}{测度}的上连续性
+（见\cref{prop:b3:measure:basics}(d)）在没有
+有限性假设时不成立。
+(c) 证明可数集的\omterm{def:b3:measure:lebesgueouter}{勒贝格测度}为零。
+由此推出 $\lambda(\Q) = 0$ 与 $\lambda(\intcc01\setminus\Q) =
+1$。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:measure:3}
+设 $\mu, \nu$ 为 $\mathcal B(\R)$ 上的概率\omterm{def:b3:measure:measure}{测度}，
+使得 $\mu(\intoc{-\infty}t) = \nu(\intoc{-\infty}t)$ 对所有
+$t \in \R$ 成立。证明 $\mu = \nu$。（这使得
+\emph{分布函数} $F(t) = \mu(\intoc{-\infty}t)$ 成为
+完全不变量——它是
+\cref{ch:b3:probability}的基础。）
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:measure:4}
+（博雷尔--坎特利，\omterm{def:b3:measure:measure}{测度}形式）设 $(A_n)$ 为可测集列，
+满足 $\sum_n\mu(A_n) < \infty$，且 $\limsup A_n =
+\bigcap_N\bigcup_{n\geq N}A_n$（即属于
+无穷多个 $A_n$ 的点）。证明 $\mu(\limsup A_n) = 0$。
+应用：对几乎每个 $x \in \intcc01$，只有有限多个
+$n$ 满足 $\abs{x - p/q_n} \leq 4^{-n}$，其中
+第 $n$ 个有理数 $p/q_n$ 取自
+$\Q\cap\intcc01$ 的一个枚举。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:measure:5}
+（胖康托尔集）在 $\intcc01$ 上重复康托尔构造，
+但在第 $n$ 步，仅从 $2^{n-1}$ 个区间中的每一个
+去掉一个长度为 $4^{-n}$ 的\emph{居中}开区间。证明
+所得的 $K = \bigcap K_n$ 是紧集，\omterm{def:b3:topology:interior}{内部}为空
+（没有区间被保留下来），且
+\[
+\lambda(K) = 1 - \sum_{n\geq1}2^{n-1}4^{-n} = \tfrac12 :
+\]
+即一个\omterm{def:b3:measure:measure}{测度}为 $\frac12$ 的无处\omterm{def:b3:topology:interior}{稠密集}。由此推出一个
+\emph{贫乏}子集，位于 $\intcc01$ 中且\omterm{def:b3:measure:measure}{测度}为 $1$，以及一个
+开稠密子集，其\omterm{def:b3:measure:measure}{测度} $< \varepsilon$。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:measure:6}
+设 $\mu$ 为 $\mathcal B(\R)$ 上的\omterm{def:b3:measure:measure}{测度}，关于
+平移不变，$c = \mu(\intoc01) < \infty$。证明 $\mu =
+c\,\lambda$ 在 $\mathcal B(\R)$ 上成立。\emph{（在二进区间上计算 $\mu$：将
+$\intoc01$ 分成 $2^n$ 个平移后的区间，再
+利用\cref{thm:b3:measure:uniqueness}。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:measure:7}
+（逼近）设 $A \in \mathcal L$，$\lambda(A) <
+\infty$，$\varepsilon > 0$。证明存在\emph{有限}
+个区间之并 $B$，使得 $\lambda(A\,\triangle\,B) <
+\varepsilon$（$\triangle$ 为对称差）。
+\emph{（正则性：夹住 $K \subseteq A \subseteq U$，并利用
+\omterm{def:b3:topology:topology}{开集} $U$ 作为可数个区间之并的结构，
+再结合 $K$ 的紧性。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:measure:8}
+（斯坦豪斯）设 $A \in \mathcal L$，$\lambda(A) > 0$。证明
+$A - A = \{x - y : x, y \in A\}$ 包含一个
+含 $0$ 的区间。
+\emph{（可化为 $\lambda(A) < \infty$ 的情形；由与
+\cref{exo:b3:measure:7}类似的正则性找区间 $I$，
+使 $\lambda(A \cap I) > \frac34\ell(I)$；则对 $\abs t <
+\frac12\ell(I)$，集合 $A\cap I$ 与 $(A\cap I) + t$ 都
+包含于长为 $\frac32\ell(I)$ 的区间中，且总\omterm{def:b3:measure:measure}{测度}
+$> \frac32\ell(I)$，故二者必相交。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:measure:9}
+证明对每个 $A \in \mathcal L$，只要 $\lambda(A) > 0$，
+就包含一个不可测子集。\emph{（将 $A$ 与维塔利集
+的各平移 $V + q$ 相交：若每个 $A \cap (V+q)$ 都可测，
+则每个都是零测集，论证同
+\cref{thm:b3:measure:vitali}——斯坦豪斯
+（\cref{exo:b3:measure:8}）可以帮忙：若 $V + q$ 中含有正\omterm{def:b3:measure:measure}{测度}的可测集，
+则 $(V+q) - (V+q) \supseteq$
+一个区间，而该差集与 $\Q$ 的公共点只有
+$0$，矛盾；最后由次可加性得出结论。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:measure:10}
+证明：若 $A \subseteq \R$ 且 $\lambda^*(A) < \infty$，则该集合是
+勒贝格可测的，当且仅当对每个 $\varepsilon > 0$，存在
+\omterm{def:b3:topology:topology}{开集} $U \supseteq A$，使得 $\lambda^*(U \setminus A) <
+\varepsilon$；当且仅当存在 $G_\delta$ 集 $G \supseteq A$，
+使得 $\lambda^*(G\setminus A) = 0$。（因此勒贝格可测集
+即模零测集意义下的博雷尔集。）
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b3:measure:11}
+（沿单调极限的连续性及其最优性）
+(a) 证明对可测集有 $\mu(\liminf A_n) \leq
+\liminf\mu(A_n)$（集合形式的法图引理），并证明若
+$\mu\bigl(\bigcup A_n\bigr) < \infty$，则也有
+$\limsup\mu(A_n) \leq \mu(\limsup A_n)$。
+(b) 对 $\R$ 上的\omterm{def:b3:measure:lebesgueouter}{勒贝格测度}，给出一个序列，使得
+$\mu(A_n) = 1$ 对所有 $n$ 成立，但 $\mu(\limsup A_n) = 0$：第二个不等式中的
+有限性假设并非
+可有可无。
+(c) 由此推出：若 $\sum\mu(A_n) < \infty$，则
+$\mu(\limsup A_n) = 0$（再次应用博雷尔–坎泰利引理），并且若
+$A_n$ 单调递增或单调递减（递减情形需 $\mu(A_1) < \infty$），
+则 $\mu(\lim A_n) = \lim\mu(A_n)$。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b3:measure:12}
+（叶戈罗夫定理）设 $\mu(X) < \infty$，$f_n \to f$
+逐点收敛，所有函数均可测（实值）。对 $k, N \geq 1$
+令
+\[
+E_{k,N} = \bigcap_{n \geq N}\Bigl\{x : \abs{f_n(x) - f(x)}
+\leq \tfrac1k\Bigr\} .
+\]
+(a) 证明固定 $k$ 时，$E_{k,N} \nearrow X$，当 $N \to
+\infty$ 时，并由此推出 $N_k$，使得 $\mu(X \setminus E_{k,N_k})
+\leq \varepsilon2^{-k}$。
+(b) 由此得出\emph{叶戈罗夫定理}：对每个 $\varepsilon
+> 0$，存在可测集 $A$，使得 $\mu(X\setminus A) \leq
+\varepsilon$，且 $f_n \to f$ \emph{在 $A$ 上一致收敛}
+——逐点收敛，即在任意小集合之外的
+一致收敛。
+(c) 证明该定理在 $(\R, \lambda)$ 上不成立：移动的
+凸块 $f_n = \mathbf 1_{\intcc n{n+1}}$ 逐点收敛
+到 $0$，但在任何有限\omterm{def:b3:measure:measure}{测度}集的补集上都
+不一致收敛。(a) 在何处用到了 $\mu(X) < \infty$？
+\end{exercise}
+
+\section{问题：康托–维塔利阶梯与一个
+可测但不是博雷尔集的集合}
+
+\begin{omfigure}
+\begin{tikzpicture}[scale=5.2]
+  \draw[->] (0,0) -- (1.06,0) node[right, font=\small] {$x$};
+  \draw[->] (0,0) -- (0,1.06);
+  \draw[black!30] (1,0) -- (1,1) -- (0,1);
+  \draw[omThm, thick]
+    (0,0)
+    -- (0.037,0.125) -- (0.074,0.125)
+    -- (0.111,0.25)  -- (0.222,0.25)
+    -- (0.259,0.375) -- (0.296,0.375)
+    -- (0.333,0.5)   -- (0.667,0.5)
+    -- (0.704,0.625) -- (0.741,0.625)
+    -- (0.778,0.75)  -- (0.889,0.75)
+    -- (0.926,0.875) -- (0.963,0.875)
+    -- (1,1);
+  \node[font=\small, omThm] at (0.32,0.86)
+    {$c$（深度 3 的近似）};
+\end{tikzpicture}
+
+{\small 康托尔–维塔利阶梯：在康托尔集的每个余区间上为常数，
+却又连续地从 $0$ 升至 $1$。
+其导数几乎处处为零——
+全部上升都集中在一个零测集上。}
+\end{omfigure}
+
+\begin{problem}[{周末问题——魔鬼阶梯，
+以及 $\mathcal B(\R) \subsetneq \mathcal L$}]
+\label{pb:b3:measure:1}
+构造\emph{康托尔–维塔利函数}（魔鬼阶梯），
+用它以病态的方式转移\omterm{def:b3:measure:measure}{测度}，并
+以一条软论证无法得到的定理作结：存在
+勒贝格可测而非博雷尔的集合。记号：
+$C$ 为康托尔集，$C_n$ 为其第 $n$ 阶段（$2^n$ 个区间，
+各长 $3^{-n}$），且每个 $x \in C$ 具有三进制数字
+$x = \sum 2b_n3^{-n}$, $b_n \in \{0,1\}$
+（见\cref{exo:b3:topology:10}）。
+
+\medskip
+\noindent\textbf{第一部分——阶梯函数。}令 $c_0(x) = x$，并
+$c_{n+1}$ 由 $c_n$ 按下式定义：
+\[
+c_{n+1}(x) = \begin{cases}
+\tfrac12\,c_n(3x) & 0 \leq x \leq \tfrac13,\\[2pt]
+\tfrac12 & \tfrac13 \leq x \leq \tfrac23,\\[2pt]
+\tfrac12 + \tfrac12\,c_n(3x - 2) & \tfrac23 \leq x \leq 1.
+\end{cases}
+\]
+\begin{enumerate}
+  \item 证明每个 $c_n$ 连续、不减，
+        满足 $c_n(0) = 0$，$c_n(1) = 1$，并且
+        $\norm{c_{n+1} - c_n}_\infty \leq
+        \tfrac12\norm{c_n - c_{n-1}}_\infty$。
+  \item 由此可得 $(c_n)$ 一致收敛于一个连续
+        不减函数 $c$，其中 $c(0) = 0$，$c(1) = 1$
+        （\emph{唯一的}康托尔–维塔利函数），它满足
+        与上面 $c_{n+1}$ 相同的自相似关系。
+  \item 证明 $c$ 在 $\intcc01\setminus C$ 的每个
+        \omterm{def:b3:topology:components}{连通分支}上为常数，并且对于 $x = \sum_n
+        2b_n3^{-n} \in C$，$c(x) = \sum_n b_n2^{-n}$，即
+        阶梯函数以二进制读取康托尔数字
+        （\cref{pb:b3:topology:1} 中的函数 $g$，
+        经单调化并整体化）。
+  \item 由此可得 $c$ 可导，且 $c' = 0$，
+        在 $\intcc01\setminus C$ 的每一点处 $c' = 0$
+        \emph{$\lambda$-几乎处处}
+        （见\cref{ex:b3:measure:cantor}）。由此可知
+        微积分基本定理对 $c$ 不成立：
+        \[
+        c(1) - c(0) = 1 \neq 0 = \int_0^1 c'(t)\,\dd t
+        \]
+        （积分取在使
+        $c' = 0$ 成立的全\omterm{def:b3:measure:measure}{测度}集上；提前参见\cref{ch:b3:lebesgue}，零测集
+        不影响积分）。哪一条
+        $\mathcal C^1$ 微积分基本定理的假设被破坏？
+  \item 证明 $c(C) = \intcc01$：零测集 $C$ 被
+        \emph{满射}到一个全\omterm{def:b3:measure:measure}{测度}集上。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第二部分——弯曲的\omterm{def:b3:topology:continuity}{同胚}。}设
+$h(x) = \frac{c(x) + x}{2}$。
+\begin{enumerate}[resume]
+  \item 证明 $h \colon \intcc01 \to \intcc01$ 是一个
+        \omterm{def:b3:topology:continuity}{同胚}（严格递增、连续、
+        满射）。
+  \item 证明 $\lambda\bigl(h(\intcc01\setminus C)\bigr) =
+        \tfrac12$：在每个长为 $\ell$ 的余区间上，$h$ 作为
+        斜率为 $\tfrac12$ 的仿射映射，且各余区间的总长为
+        $1$。
+  \item 由此可得 $\lambda\bigl(h(C)\bigr) = \tfrac12$：
+        零测集的\omterm{def:b3:topology:continuity}{同胚}像可以具有
+        正\omterm{def:b3:measure:measure}{测度}。（这与关于
+        “大小”的朴素直觉在何处相悖？）
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第三部分——一个可测而非
+博雷尔的集合。}
+\begin{enumerate}[resume]
+  \item 由\cref{exo:b3:measure:9}，取不可测集 $W
+        \subseteq h(C)$，证明 $Z = h^{-1}(W) \subseteq C$
+        是勒贝格可测的。\emph{（它是零测集的子集；
+        完备性见\cref{thm:b3:measure:caratheodory}。）}
+  \item 证明\omterm{def:b3:topology:continuity}{连续映射}下博雷尔集的原像
+        仍为博雷尔集。\emph{（好集原理：
+        $\{B : h^{-1}(B) \in \mathcal B\}$ 是一个
+        $\sigma$-代数，包含全部\omterm{def:b3:topology:topology}{开集}——注意映射的
+        方向。）}
+  \item 由此得出 $Z$ \emph{不}是博雷尔集：若它是，
+        则 $W = (h^{-1})^{-1}(Z)$ 将是博雷尔集（应用
+        第 10 题于\omterm{def:b3:topology:continuity}{连续映射} $h^{-1}$），因而可测——
+        矛盾。因此
+        \[
+        \boxed{\ \mathcal B(\R) \subsetneq \mathcal L\ }
+        \]
+        可见完备性确实扩大了博雷尔集的范围。
+  \item 举出一个勒贝格可测函数 $g$ 与一个
+        连续函数 $\varphi$，使得 $g \circ
+        \varphi$ 不是勒贝格可测的：可测性，
+        不同于连续性，不能复合。\emph{（取 $g =
+        \mathbf 1_Z$ 与 $\varphi = h^{-1}$，预先利用
+        可测函数的定义（
+        见\cref{ch:b3:lebesgue}）：博雷尔集的原像为
+        勒贝格可测集。须注意目标空间上使用哪一个
+        $\sigma$-代数？）}
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第四部分——尾声。}
+\begin{enumerate}[resume]
+  \item 将下列类按严格包含关系排序，并
+        用本章及其问题中的例子逐一说明每个包含确为严格：
+        可数集、博雷尔零测集、勒贝格零测集、博雷尔集、
+        勒贝格可测集、
+        任意集合。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第五部分——康托\omterm{def:b3:measure:measure}{测度}：零测集上的
+质量。} 阶梯函数是一个奇妙\omterm{def:b3:measure:measure}{测度}的
+分布函数，我们现在借助本章自己的
+工具来将其构造出来。
+\begin{enumerate}[resume]
+  \item （勒贝格–斯蒂尔杰斯，存在性）设 $F\colon\R\to\R$
+        为单调不减、连续且有界的函数。在半开
+        区间上定义 $\rho\bigl(\intoc ab\bigr) = F(b) -
+        F(a)$，并对 $A \subseteq \R$，令
+        \[
+        \mu_F^*(A) = \inf\Bigl\{\sum_k\bigl(F(b_k) -
+        F(a_k)\bigr) : A \subseteq
+        \bigcup_k\intoc{a_k}{b_k}\Bigr\} .
+        \]
+        证明 $\mu_F^*$ 是\omterm{def:b3:measure:outer}{外测度}，且
+        $\mu_F^*\bigl(\intoc ab\bigr) = F(b) - F(a)$
+        \emph{（仿照
+        \cref{thm:b3:measure:lebesgue} 中的紧性论证，将每个
+        $\intoc{a_k}{b_k}$ 扩大为开区间，使其
+        $F$-代价 $\leq \varepsilon2^{-k}$——
+        $F$ 的连续性在何处用到？）}。
+  \item 证明每个博雷尔集都是
+        卡拉泰奥多里意义下 $\mu_F^*$-可测，
+        \emph{（与勒贝格情形相同，只需检验半直线；
+        仿照
+        \cref{thm:b3:measure:caratheodory} 应用中的证明）}，于是
+        使 $\mu_F = \mu_F^*$ 在 $\mathcal B(\R)$ 上的限制
+        是\omterm{def:b3:measure:measure}{测度}，且 $\mu_F(\intoc ab) = F(b) - F(a)$，
+        即 $F$ 的\emph{勒贝格–斯蒂尔杰斯\omterm{def:b3:measure:measure}{测度}}。
+  \item 将此结果应用于阶梯函数（取 $F = c$，以 $0$ 延拓至 $\R_-$
+        上，以 $1$ 延拓至 $\intco1\infty$ 上），由此得到
+        \emph{康托\omterm{def:b3:measure:measure}{测度}} $\mu$。证明 $\mu(\R) = 1$，且
+        康托集的每个余区间都是 $\mu$-零测的（此处 $c$
+        为常数），并得出
+        \[
+        \mu(C) = 1, \qquad \lambda(C) = 0 :
+        \]
+        $\mu$ 与 $\lambda$ 分别集中在不相交的载体上（$C$
+        与其补集）。这样处于此种位置的两个\omterm{def:b3:measure:measure}{测度}称为
+        \emph{互相奇异}，记作 $\mu \perp
+        \lambda$。
+  \item 证明 $\mu$ 无原子，即 $\mu(\{x\}) = 0$
+        对每个 $x$ 成立 \emph{（利用 $c$ 的连续性）}。
+        注意：此为无原子的概率\omterm{def:b3:measure:measure}{测度}，载体是勒贝格零测的紧集；
+        可与迄今所见的\omterm{def:b3:measure:measure}{测度}作比较。
+  \item （伪装的掷硬币）对于字 $(\varepsilon_1,
+        \dots, \varepsilon_m) \in \{0,1\}^m$，令
+        $C_{\varepsilon}$ 为满足 $x \in C$ 的点的集合，其三进制
+        数字满足 $b_i(x) = \varepsilon_i$，$i \leq m$，
+        （$2^m$ 个深度为 $m$ 的康托片段之一）。证明
+        $\mu(C_\varepsilon) = 2^{-m}$ \emph{（阶梯函数在此片段上
+        升高 $2^{-m}$：利用第一部分
+        第 3 题）}。康托\omterm{def:b3:measure:measure}{测度}是以三进制读取的
+        无穷公平掷硬币序列的分布
+——\cref{ch:b3:probability} 将使此事精确化。
+  \item 证明自相似性：对每个博雷尔集 $A$，
+        \[
+        \mu(A) = \tfrac12\,\mu(3A) +
+        \tfrac12\,\mu(3A - 2) ,
+        \]
+        其中 $3A - 2 = \{3x - 2 : x \in A\}$ \emph{（先在生成区间
+        $\intoc ab$ 上利用 $c$ 的自相似关系检验，
+        然后援引唯一性，
+        \cref{thm:b3:measure:uniqueness}）}。
+  \item 证明反射 $s(x) = 1 - x$ 保持
+        $\mu$ 不变：$\mu(s(A)) = \mu(A)$ \emph{（借助 $c(1 - x) = 1 -
+        c(x)$，它由构造的对称性推出
+——请证明之）}。
+  \item 计算 $\mu$ 的前两阶矩，即随机点 $X$（其分布为
+        $\mu$，积分可视为深度 $m$ 的片段上和式的极限，
+        参见 \cref{ch:b3:lebesgue}）。
+        由对称性可得
+        $\int x\,\dd\mu = \frac12$，由自相似性可得
+        \[
+        \int x^2\,\dd\mu = \frac38,
+        \qquad\text{故}\qquad
+        \operatorname{Var}(X) = \frac18 .
+        \]
+        与 $\intcc01$ 上的均匀分布（方差为
+        $\frac1{12}$）相比，被推向两端的康托质量
+        分布得\emph{更为分散}。
+  \item 证明 $\mu$ 的（\omterm{def:b3:topology:topology}{拓扑}）\emph{支集}
+——即满\omterm{def:b3:measure:measure}{测度}的最小闭集——恰为
+        $C$。
+  \item （综合）阶梯函数 $c$ 连续且
+        单调不减，却不满足微积分基本定理
+        （第一部分）；\omterm{def:b3:measure:measure}{测度} $\mu_c$ 是一个
+        概率\omterm{def:b3:measure:measure}{测度}，无原子，且相对于
+        $\lambda$ 奇异。试用一小段文字说明这些结论
+        实为同一现象的两个方面，并陈述一般规律：
+        单调不减函数与\omterm{def:b3:measure:measure}{测度}相互对应
+        （$F \leftrightarrow \mu_F$），几乎处处可微性
+        对应于“绝对连续部分”，而
+        $c$ 是标准例子，说明连续的 $F$ 可以
+        \emph{完全不含}绝对连续部分。
+  \item （连续模的精确指数）设 $s =
+        \frac{\ln 2}{\ln 3}$。证明 $c$ 是指数为 $s$
+        的赫尔德连续函数：
+        \[
+        \abs{c(x) - c(y)} \leq 4\,\abs{x - y}^{s}
+        \qquad (x, y \in \intcc01),
+        \]
+        并且对任何 $t > s$ 都不成立，即使局部亦然。
+        由此推出\omterm{def:b3:measure:measure}{测度}论形式：对每个 $x$ 及
+        每个 $r \in \intoc01$，
+        \[
+        \mu\bigl(\intcc{x - r}{x + r}\bigr) \leq 8\,r^{s} .
+        \]
+        \emph{（将深度为 $m$ 的三分网格与 $\abs{x - y}$
+        的尺度作比较；第 18 题给出每个片段上的升高。
+        指数 $s$ 为豪斯多夫维数，
+        亦即 $C$ 的维数，后续课程将予以说明。）}
+  \item （自相似性刻画 $\mu$）证明第 19 题的逆：
+        若 $\nu$ 是 $\mathcal B(\R)$ 上
+        载体为 $\intcc01$ 的概率\omterm{def:b3:measure:measure}{测度}，且
+        满足
+        \[
+        \nu(A) = \tfrac12\,\nu(3A) + \tfrac12\,\nu(3A - 2)
+        \qquad (A \in \mathcal B(\R)),
+        \]
+        则 $\nu = \mu$。\emph{（将该关系迭代 $m$
+        次，把 $\nu$ 分散到 $2^m$ 个深度为 $m$ 的康托片段上，
+        将 $\nu(\intoc ab)$ 与落在 $\intoc ab$ 内的片段个数相比较，
+        并令 $m \to \infty$；
+        最后用 \cref{thm:b3:measure:uniqueness} 收尾）}。
+\end{enumerate}
+\end{problem}

@@ -1,0 +1,439 @@
+\chapter{Probability and Random Variables}\label{ch:g11:prob}
+
+\omterm{def:g10:proba:distribution}{Probability} models experiments whose outcome is uncertain: a die roll, a
+card drawn, a game played. This chapter sets up the vocabulary on finite
+sets, then introduces the central character of all of \omterm{def:g10:proba:distribution}{probability} theory:
+the \emph{\omterm{def:g11:prob:rv}{random variable}} and its \emph{\omterm{def:g11:prob:expectation}{expectation}}. These notions are
+reviewed and deepened in \cref{ch:g12:randvar}, and conditional
+probabilities follow in \cref{ch:g12:condprob}.
+
+\section{Probability on a finite set}
+
+\begin{definition}[Probability model]\label{def:g11:prob:model}
+An experiment with finitely many outcomes is modelled by its \emph{sample
+space}\index{sample space} $\Omega = \{\omega_1, \dots, \omega_n\}$ (the
+set of outcomes) together with a \emph{\omterm{def:g10:proba:distribution}{probability}} $\P$ assigning to each
+outcome $\omega_i$ a number $p_i \geq 0$, with $p_1 + \dots + p_n = 1$. An
+\emph{event}\index{event} is a subset $A \subseteq \Omega$, and
+\[
+\P(A) = \sum_{\omega_i \in A} p_i .
+\]
+When all outcomes are equally likely ($p_i = \frac1n$: the \emph{uniform
+model}\index{uniform model}),
+\[
+\P(A) = \frac{\text{number of outcomes in } A}
+{\text{number of outcomes in } \Omega}.
+\]
+\end{definition}
+
+\begin{example}\label{ex:g11:prob:twodice}
+Roll two distinguishable dice: $\Omega$ is the set of the $36$ ordered pairs
+$(i, j)$ with $1 \leq i, j \leq 6$, all equally likely. The \omterm{def:g11:prob:model}{event}
+$S$ = ``the sum is $7$'' contains the $6$ pairs
+$(1,6)$, $(2,5)$, $(3,4)$, $(4,3)$, $(5,2)$, $(6,1)$, so
+$\P(S) = \frac{6}{36} = \frac16$. The \omterm{def:g11:prob:model}{event} ``the sum is $12$'' contains
+only $(6,6)$: \omterm{def:g10:proba:distribution}{probability} $\frac{1}{36}$. Choosing the \emph{right}
+\omterm{def:g11:prob:model}{sample space} --- ordered pairs, not unordered --- is what makes the
+\omterm{def:g11:prob:model}{uniform model} applicable.
+\end{example}
+
+\begin{proposition}[Rules of probability]\label{prop:g11:prob:rules}
+For \omterm{def:g11:prob:model}{events} $A, B \subseteq \Omega$:
+\[
+\P(\emptyset) = 0, \qquad \P(\Omega) = 1, \qquad
+\P(\bar A) = 1 - \P(A),
+\]
+\[
+\P(A \cup B) = \P(A) + \P(B) - \P(A \cap B),
+\]
+where $\bar A$ is the \emph{\omterm{def:g10:proba:operations}{complement}} of $A$ (all outcomes not in $A$).
+In particular, $\P(A \cup B) = \P(A) + \P(B)$ when $A$ and $B$ are
+\emph{\omterm{def:g10:proba:operations}{incompatible}} ($A \cap B = \emptyset$).
+\end{proposition}
+
+\begin{proof}
+The empty \omterm{def:g11:prob:model}{event} contains no outcome (empty sum), and $\Omega$ contains
+them all (total sum $1$). Every outcome is in exactly one of $A$,
+$\bar A$, so $\P(A) + \P(\bar A) = 1$. For the \omterm{def:g10:numbers:interunion}{union}: summing the $p_i$
+over $A$ and then over $B$ counts the outcomes of $A \cap B$ twice;
+subtracting $\P(A \cap B)$ corrects the double count.
+\end{proof}
+
+\begin{example}
+In a class, $60\%$ study music ($M$), $45\%$ play a sport ($S$), and
+$25\%$ do both. The proportion doing at least one is
+$\P(M \cup S) = 0.60 + 0.45 - 0.25 = 0.80$, so $20\%$ do neither
+(\omterm{def:g10:proba:operations}{complement}).
+\end{example}
+
+\section{Random variables}
+
+\begin{definition}[Random variable, distribution]\label{def:g11:prob:rv}
+A \emph{random variable}\index{random variable} on $\Omega$ is a \omterm{def:g11:func:function}{function}
+$X$ assigning a number to each outcome. Its
+\emph{distribution}\index{distribution} is the table of its possible
+values $x_1, \dots, x_k$ together with their probabilities
+\[
+\P(X = x_i) = \P\bigl(\{\omega : X(\omega) = x_i\}\bigr),
+\qquad
+\sum_{i=1}^k \P(X = x_i) = 1 .
+\]
+\end{definition}
+
+\begin{example}\label{ex:g11:prob:game}
+A game: pay $2$ euros, roll one fair die, receive the value shown if it
+is at least $5$, nothing otherwise. Let $G$ be the \emph{gain} (received
+minus paid). The outcomes $1, 2, 3, 4$ give $G = -2$; the outcome $5$
+gives $G = 3$; the outcome $6$ gives $G = 4$. The \omterm{def:g11:prob:rv}{distribution} of $G$:
+\begin{center}
+\begin{tabular}{c|ccc}
+$g$ & $-2$ & $3$ & $4$\\
+\hline\rule{0pt}{11pt}%
+$\P(G = g)$ & $\dfrac46$ & $\dfrac16$ & $\dfrac16$
+\end{tabular}
+\end{center}
+\end{example}
+
+\begin{method}[Building a distribution table]\label{met:g11:prob:table}
+List the possible values of $X$; for each value, collect the outcomes
+producing it and add their probabilities; check that the row of
+probabilities sums to $1$.
+\end{method}
+
+\section{Expectation}
+
+\begin{definition}[Expectation]\label{def:g11:prob:expectation}
+The \emph{expectation}\index{expectation} (or \omterm{def:g11:stat:mean}{mean}) of $X$ is the average
+of its values weighted by their probabilities:
+\[
+\E(X) = \sum_{i=1}^{k} \P(X = x_i)\; x_i .
+\]
+\end{definition}
+
+\begin{remark}
+$\E(X)$ is what the \omterm{def:g11:stat:mean}{mean} of a huge number of independent repetitions of
+the experiment would be --- the precise version of this statement is the
+law of large numbers, proved in \cref{ch:g12:sums}. Note the formal
+analogy with the \omterm{def:g11:stat:mean}{mean} of a dataset with frequencies
+(\cref{def:g11:stat:mean}): probabilities play the role of the relative
+frequencies $\frac{n_i}{n}$.
+\end{remark}
+
+\begin{example}\label{ex:g11:prob:gameexp}
+For the game of \cref{ex:g11:prob:game}:
+\[
+\E(G) = \frac46 \times (-2) + \frac16 \times 3 + \frac16 \times 4
+= \frac{-8 + 3 + 4}{6} = -\frac16 \approx -0.17 .
+\]
+On average the player loses about $17$ cents per game: the game is
+unfavorable. A game is called \emph{fair} when the expected gain is $0$.
+\end{example}
+
+\begin{proposition}[Linearity]\label{prop:g11:prob:linearity}
+For all reals $a, b$:
+\[
+\E(aX + b) = a\,\E(X) + b .
+\]
+\end{proposition}
+
+\begin{proof}
+The variable $aX + b$ takes the value $a x_i + b$ with \omterm{def:g10:proba:distribution}{probability}
+$\P(X = x_i)$, so
+\[
+\E(aX + b) = \sum_i \P(X = x_i)(a x_i + b)
+= a \sum_i \P(X = x_i)\,x_i + b \underbrace{\sum_i \P(X =
+x_i)}_{=\,1} = a\,\E(X) + b .
+\]
+\end{proof}
+
+\section{Variance and standard deviation}
+
+\begin{definition}[Variance]\label{def:g11:prob:variance}
+The \emph{variance}\index{variance} of $X$ measures the spread of its
+values around the \omterm{def:g11:prob:expectation}{expectation} $m = \E(X)$:
+\[
+\V(X) = \E\bigl((X - m)^2\bigr)
+= \sum_{i=1}^{k} \P(X = x_i)\,(x_i - m)^2,
+\qquad
+\sigma(X) = \sqrt{\V(X)} .
+\]
+\end{definition}
+
+\begin{proposition}[Shortcut formula]\label{prop:g11:prob:konig}
+\[
+\V(X) = \E(X^2) - \E(X)^2 .
+\]
+\end{proposition}
+
+\begin{proof}
+Expand $(x_i - m)^2 = x_i^2 - 2m\,x_i + m^2$ inside the sum:
+\[
+\V(X) = \sum_i \P(X = x_i)\,x_i^2
+- 2m \sum_i \P(X = x_i)\,x_i + m^2\sum_i \P(X = x_i)
+= \E(X^2) - 2m^2 + m^2 ,
+\]
+which is $\E(X^2) - m^2$. This is the random-variable version of the
+identity proved for datasets in \cref{prop:g11:stat:shortcut}.
+\end{proof}
+
+\begin{proposition}[Affine transformation]\label{prop:g11:prob:affine}
+$\V(aX + b) = a^2\,\V(X)$ and $\sigma(aX + b) = \abs a\,\sigma(X)$.
+\end{proposition}
+
+\begin{proof}
+By linearity, $aX + b$ deviates from its \omterm{def:g11:prob:expectation}{expectation} $a m + b$ by
+$(aX + b) - (am + b) = a(X - m)$: every deviation is scaled by $a$, hence
+every squared deviation by $a^2$, and so is their weighted \omterm{def:g11:stat:mean}{mean}. The
+shift $b$ has disappeared --- shifting a variable does not change its
+spread.
+\end{proof}
+
+\begin{example}\label{ex:g11:prob:variance}
+For the game of \cref{ex:g11:prob:game}:
+$\E(G^2) = \frac46 \times 4 + \frac16 \times 9 + \frac16 \times 16
+= \frac{16 + 9 + 16}{6} = \frac{41}{6}$, so
+\[
+\V(G) = \frac{41}{6} - \left(-\frac16\right)^2
+= \frac{41}{6} - \frac{1}{36} = \frac{245}{36} \approx 6.8,
+\qquad
+\sigma(G) \approx 2.6 .
+\]
+The loss of $0.17$ per game on average comes with swings of typical size
+$2.6$ euros --- \omterm{def:g11:prob:expectation}{expectation} without \omterm{def:g11:stat:variance}{standard deviation} tells only half
+the story.
+\end{example}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[
+  width=8.6cm, height=5.2cm,
+  ybar, bar width=14pt,
+  xlabel={$g$}, ylabel={$\P(G = g)$},
+  xmin=-3.5, xmax=5.5, ymin=0, ymax=0.8,
+  xtick={-2,3,4}, ytick={1/6, 4/6},
+  yticklabels={$\tfrac16$,$\tfrac46$},
+  tick label style={font=\small},
+  label style={font=\small}]
+  \addplot[fill=omDef!40, draw=omDef] coordinates {
+    (-2,0.6667) (3,0.1667) (4,0.1667)};
+  \draw[omThm, dashed, thick] (axis cs:-0.1667,0) --
+    (axis cs:-0.1667,0.75);
+  \node[omThm, font=\small, anchor=south west] at (axis cs:-0.05,0.62)
+    {$\E(G)$};
+\end{axis}
+\end{tikzpicture}
+
+{\small The \omterm{def:g11:prob:rv}{distribution} of the gain $G$ of
+\cref{ex:g11:prob:game}, and its \omterm{def:g11:prob:expectation}{expectation} $\E(G) = -\frac16$ (dashed):
+the balance point of the \omterm{def:g10:proba:distribution}{probability} masses.}
+\end{omfigure}
+
+\section{Exercises}
+
+\begin{exercise}[$\star$]\label{exo:g11:prob:1}
+A card is drawn from a standard $52$-card deck. Compute the \omterm{def:g10:proba:distribution}{probability}
+of drawing: a heart; a king; a heart or a king; neither a heart nor a
+king.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g11:prob:2}
+Two fair dice are rolled and their sum $S$ is recorded. Using the
+$36$-outcome model of \cref{ex:g11:prob:twodice}, compute $\P(S = 6)$,
+$\P(S \geq 10)$ and $\P(S \text{ is even})$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g11:prob:3}
+A \omterm{def:g11:prob:rv}{random variable} has \omterm{def:g11:prob:rv}{distribution}
+\begin{center}
+\begin{tabular}{c|cccc}
+$x$ & $-1$ & $0$ & $2$ & $5$\\
+\hline
+$\P(X=x)$ & $0.3$ & $0.2$ & $0.4$ & $p$
+\end{tabular}
+\end{center}
+Find $p$, then compute $\E(X)$.
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:g11:prob:4}
+$X$ satisfies $\E(X) = 3$ and $\V(X) = 4$. Give the \omterm{def:g11:prob:expectation}{expectation}, \omterm{def:g11:prob:variance}{variance}
+and \omterm{def:g11:stat:variance}{standard deviation} of $Y = 2X - 5$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:prob:5}
+A wheel of fortune has $10$ equal sectors: $5$ show $0$ euros, $3$ show
+$2$ euros, $2$ show $5$ euros. Playing costs $2$ euros. Give the
+\omterm{def:g11:prob:rv}{distribution} of the gain $G$ (winnings minus stake), compute $\E(G)$, and
+decide whether the game is favorable.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:prob:6}
+An urn contains $3$ red and $2$ blue balls; two balls are drawn
+\emph{without} replacement. Let $X$ be the number of red balls drawn.
+Build the \omterm{def:g11:prob:rv}{distribution} of $X$ (enumerate the $20$ ordered draws, or use a
+\omterm{met:g10:proba:tree}{tree}), and compute $\E(X)$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:prob:7}
+For the wheel of \cref{exo:g11:prob:5}, compute $\V(G)$ and $\sigma(G)$.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:prob:8}
+An insurance company sells a policy for $80$ euros. With \omterm{def:g10:proba:distribution}{probability}
+$0.05$ the client claims $1000$ euros, with \omterm{def:g10:proba:distribution}{probability} $0.01$ the client
+claims $5000$ euros, otherwise nothing. Let $B$ be the company's benefit
+on one policy. Give the \omterm{def:g11:prob:rv}{distribution} of $B$, compute $\E(B)$, and
+interpret.
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:prob:9}
+A multiple-choice question has $4$ answers, one correct. A correct answer
+scores $+1$; to discourage guessing, a wrong answer scores $x < 0$.
+A student answers at random. For which value of $x$ is the student's
+expected score zero?
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:g11:prob:10}
+Two fair coins are tossed. Ann proposes: ``if both coins match, I pay you
+$1$ euro; if they differ, you pay me $1$ euro.'' Compute the expected
+gain of each player. Is the game fair? Same question with three coins,
+where Ann pays $2$ euros if all three match.
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:g11:prob:11}
+A lottery sells $1000$ tickets at $5$ euros each. One ticket wins
+$2000$ euros, five tickets win $200$ euros, twenty tickets win $25$
+euros.
+\begin{enumerate}
+  \item Give the \omterm{def:g11:prob:rv}{distribution} of the organizer's total revenue minus
+        prizes, and of a single player's gain $G$.
+  \item Compute $\E(G)$ and the total expected profit of the organizer.
+        Check that the two answers are consistent.
+\end{enumerate}
+\end{exercise}
+
+\section{Problem: The unfinished game}
+
+\begin{problem}[{Weekend problem --- Pascal, Fermat and the fair
+split of an interrupted bet: the birth of expectation, the magic
+of linearity, and what expectation cannot see}]
+\label{pb:g11:prob:1}
+In 1654 the Chevalier de M\'er\'e --- the same gambler whose dice
+bets opened the Middle School volume's \omterm{def:g10:proba:distribution}{probability} problem ---
+asked Blaise Pascal a deeper question: two equally skilled
+players must stop their series at the score of $5$ to $3$, six
+wins taking the $64$-pistole pot. \emph{How should the pot be
+split fairly?} The letters between Pascal and Fermat answering it
+founded the concept at the heart of this chapter: \omterm{def:g11:prob:expectation}{expectation}
+(\cref{def:g11:prob:expectation}). You will re-derive their
+answer both ways, then meet linearity's party trick and
+\omterm{def:g11:prob:expectation}{expectation}'s one blind spot.
+
+\medskip
+\noindent\textbf{Part I --- \omterm{def:g11:prob:expectation}{Expectation} fluency.}
+\begin{enumerate}
+  \item Roll a fair die; your gain is (face $- 3$) euros. Build
+        the \omterm{def:g11:prob:rv}{distribution} table of the gain $G$
+        (\cref{met:g11:prob:table}) and compute $\E(G)$.
+  \item Compute $V(G)$ with the shortcut formula
+        (\cref{prop:g11:prob:konig}) and $\sigma(G)$ (two
+        decimals).
+  \item Without any new table, give $\E(2G - 1)$ and
+        $V(2G - 1)$ (\cref{prop:g11:prob:affine}).
+  \item A stall charges $m$ euros to roll two dice and pockets
+        you the sum in euros. What is the \emph{fair} price
+        $m$? The stall charges $8$: what is your expected loss
+        per game?
+  \item A laptop worth $800$ euros has a $5\,\%$ chance of
+        destruction each year. Compute the fair insurance
+        premium, and the insurer's expected profit per policy
+        if it charges $60$ euros.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part II --- Splitting the pot.}
+Score $5$--$3$, first to $6$ wins the $64$ pistoles, rounds are
+fair coin flips.
+\begin{enumerate}[resume]
+  \item Two tempting wrong answers: split $5 : 3$
+        (proportionally to rounds won), or give everything to
+        the leader. Say in one sentence each what is unfair
+        about them.
+  \item Fermat's method: player A needs $1$ more win, B needs
+        $3$; imagine playing exactly $3$ more rounds regardless.
+        List the $8$ equally likely outcomes, mark who wins the
+        series in each, and deduce the fair split of the $64$
+        pistoles.
+  \item The subtle point Fermat had to defend: the real game
+        might stop after one round --- why is it nevertheless
+        legitimate to reason on all $3$ imaginary rounds?
+  \item Pascal's method, backwards from the end: compute A's
+        fair share at the (hypothetical) scores $5$--$5$, then
+        $5$--$4$, then $5$--$3$, each time averaging the two
+        equally likely futures. Compare with question 7.
+  \item Same question at the score $4$--$3$: how many imaginary
+        rounds, which outcomes give B the series, and what is
+        the fair split?
+  \item State the principle the two methods share --- the fair
+        value of an uncertain future is its \emph{\omterm{def:g11:prob:expectation}{expectation}}
+        --- and name two modern industries running entirely on
+        it (question 5 shows one).
+  \item A sanity check for every score: explain, with the
+        linearity of \omterm{def:g11:prob:expectation}{expectation}
+        (\cref{prop:g11:prob:linearity}), why the two players'
+        fair shares must always add up to exactly the
+        $64$-pistole pot.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part III --- Linearity's party trick.}
+\begin{enumerate}[resume]
+  \item Recover $\E(\text{sum of two dice}) = 7$ in one line
+        with linearity (\cref{prop:g11:prob:linearity}), no
+        $36$-cell table. For the \emph{\omterm{def:g11:prob:variance}{variance}} of the sum,
+        the rule $V(X + Y) = V(X) + V(Y)$ needs the dice to be
+        independent (admitted): compute it.
+  \item The hat-check party: $n$ guests throw their hats in a
+        pile and each takes one back at random. Let $X$ count
+        the guests who recover their own hat. For one fixed
+        guest, what is the \omterm{def:g10:proba:distribution}{probability} of recovering their own
+        hat? Summing these $n$ chances (linearity!), compute
+        $\E(X)$. The answer should surprise you: it does not
+        depend on $n$.
+  \item Verify $\E(X) = 1$ by brute force for $n = 2$ and
+        $n = 3$ (list the $2$ and $6$ equally likely
+        hat-assignments and average the counts).
+  \item The guests' recoveries are far from independent (if
+        $n - 1$ guests got their own hats back, the last one
+        must too). Where exactly did question 14's computation
+        \emph{not} require independence? State linearity's
+        superpower.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Part IV --- What \omterm{def:g11:prob:expectation}{expectation} cannot see.}
+\begin{enumerate}[resume]
+  \item Two $5$-euro scratch cards: card A wins $10$ euros with
+        \omterm{def:g10:proba:distribution}{probability} $\frac12$; card B wins $1\,000$ euros with
+        \omterm{def:g10:proba:distribution}{probability} $0.005$. Check that both gains have the
+        same \omterm{def:g11:prob:expectation}{expectation}, then compute both \omterm{def:g11:prob:variance}{variances}. Which
+        card do real people buy, and what are they buying?
+  \item The St Petersburg game: flip until the first tails;
+        if the first tails occurs at flip $n$ you receive
+        $2^n$ euros. Compute the contribution of each $n$ to
+        the \omterm{def:g11:prob:expectation}{expectation} and the \omterm{def:g11:prob:expectation}{expectation} itself. Would you
+        pay $1\,000$ euros to play once? What does the clash
+        teach about \omterm{def:g11:prob:expectation}{expectation}?
+  \item Insurance from the customer's side: pay $20$ euros, or
+        face a $1\,\%$ risk of losing $1\,000$? Compare the two
+        \omterm{def:g11:prob:expectation}{expectations}, and explain why buying the insurance can
+        still be rational (what can a single family not
+        ``average over''?).
+  \item Finale --- \omterm{def:g11:prob:expectation}{expectation}'s biography, one sentence per
+        chapter: born in 1654 to split a pot; its superpower,
+        linearity, which adds \omterm{def:g11:prob:expectation}{expectations} without asking
+        independence (the hats); its blind spot, risk, which
+        \omterm{def:g11:prob:variance}{variance} measures (cards, St Petersburg, insurance);
+        and its coronation next year, when the law of large
+        numbers explains exactly why the house always wins.
+\end{enumerate}
+\end{problem}

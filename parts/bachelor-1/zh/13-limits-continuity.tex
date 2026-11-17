@@ -1,0 +1,809 @@
+\chapter{极限与连续}\label{ch:b1:continuity}
+
+介值定理与最值定理在高中阶段
+仅凭直观接受。借助数列
+（\cref{ch:b1:seq}）与 $\R$ 的拓扑（\cref{ch:b1:topology}）
+已有的基础上，本章给出它们的证明，并以
+单调\omterm{def:b1:logic:inj}{双射}定理完善这一理论（它为 $\arcsin$、
+$\operatorname{arcosh}$ 等函数（见\cref{ch:b1:functions}）提供依据）
+以及关于\omterm{def:b1:continuity:uniform}{一致连续}的海涅定理。
+
+全文中，$I$ 为\omterm{prop:b1:reals:intervals}{区间}，$f \colon I \to \R$；“$x_0 \in
+\overline I$”允许在端点处取极限。
+
+\section{函数的极限}
+
+\begin{definition}[一点处的极限]\label{def:b1:continuity:limit}
+设 $x_0 \in \overline{I}$，$\ell \in \R$。则 $f(x) \to \ell$
+（$x \to x_0$ 时）当下式成立\index{极限!函数的}：
+\[
+\forall \varepsilon > 0,\ \exists \delta > 0,\ \forall x \in I,
+\qquad \abs{x - x_0} \leq \delta \implies \abs{f(x) - \ell} \leq
+\varepsilon .
+\]
+$\pm\infty$ 处的极限及无穷极限，其定义方式
+与上述相同（将 $\abs{x - x_0} \leq \delta$ 换为 $x \geq M$；将 $\abs{f(x) -
+\ell} \leq \varepsilon$ 换为 $f(x) \geq M'$）。单侧极限
+是将 $x$ 限制为 $x > x_0$（记作 $x \to x_0^+$）或 $x < x_0$。
+极限若存在则唯一（证明与
+\cref{prop:b1:seq:first}相同）。
+\end{definition}
+
+\begin{example}[用夹逼准则求极限]\label{ex:b1:continuity:floorlimit}
+求 $\lim_{x \to 0} x\,\bigl\lfloor \frac1x \bigr\rfloor$。
+由\omterm{thm:b1:reals:floor}{取整函数}的夹逼不等式 $\frac1x - 1 < \lfloor \frac1x \rfloor \leq
+\frac1x$，两边乘以 $x$（注意符号！）得：
+\[
+1 - x < x\Bigl\lfloor \frac1x \Bigr\rfloor \leq 1 \quad (x > 0),
+\qquad
+1 \leq x\Bigl\lfloor \frac1x \Bigr\rfloor < 1 - x \quad (x < 0),
+\]
+两侧夹逼都收敛于 $1$，故极限为 $1$。注意
+发生了什么：$\lfloor \frac1x\rfloor$ 本身在
+$0$ 附近跳动剧烈，但因子 $x$ 能抑制每次跳跃（$x$ 乘以单位跳跃
+仍然很小），只有夹逼式仍然有效。要点是：
+小因子与振荡有界因子之积的极限，
+都是夹逼问题，而非运算法则问题——
+运算法则要求\emph{两个}因子都收敛。
+\end{example}
+
+\begin{theorem}[数列刻画]\label{thm:b1:continuity:seqchar}
+$f(x) \to \ell$（$x \to x_0$ 时）当且仅当：对\emph{任一}
+数列 $(u_n)$，其各项属于 $I$，且 $u_n \to x_0$，
+都有 $f(u_n) \to \ell$。
+\end{theorem}
+
+\begin{proof}
+（$\Rightarrow$）设 $u_n \to x_0$，$\varepsilon > 0$。
+由定义取 $\delta$，再取 $N$，使得 $\abs{u_n - x_0} \leq
+\delta$ 对 $n \geq N$ 成立；当超过 $N$ 后，$\abs{f(u_n) - \ell} \leq
+\varepsilon$。
+
+（$\Leftarrow$）用逆否命题证明。若 $f \not\to \ell$，则存在
+$\varepsilon_0 > 0$，使每个 $\delta$ 都不合要求；取 $\delta =
+\frac{1}{n+1}$，得 $u_n \in I$，满足 $\abs{u_n - x_0} \leq
+\frac{1}{n+1}$，且 $\abs{f(u_n) - \ell} > \varepsilon_0$。于是 $u_n
+\to x_0$，但 $f(u_n) \not\to \ell$。
+\end{proof}
+
+\begin{corollary}[运算、复合与保序]\label{cor:b1:continuity:operations}
+极限的和、积、商（分母的极限非零）
+的运算规律与数列情形相同；若 $f \to \ell$（于 $x_0$ 处），$g \to m$（于 $\ell$ 处），
+且 $g$ 在 $\ell$ 附近有定义，并且 $g(\ell) = m$ 或 $f \neq \ell$
+在 $x_0$ 附近，则 $g \circ f \to m$（于 $x_0$ 处）；极限保持
+非严格不等式，夹逼定理也成立。
+\end{corollary}
+
+\begin{proof}
+每一条结论都借助
+\cref{thm:b1:continuity:seqchar}化为对应的数列结论
+（\cref{thm:b1:seq:operations,thm:b1:seq:order}）。对于复合，
+直接串联的论证值得写一次：给定 $\varepsilon >
+0$，由 $g$ 在 $\ell$ 处的极限，存在 $\eta > 0$，使
+\[
+\abs{y - \ell} \leq \eta \implies \abs{g(y) - m} \leq
+\varepsilon \quad (y \text{ 属于定义域，函数 } g),
+\]
+其中 $y = \ell$ 的情形由 $g(\ell) = m$ 包含；然后
+由 $f$ 在 $x_0$ 处的极限，存在 $\delta > 0$，使得 $\abs{x -
+x_0} \leq \delta \implies \abs{f(x) - \ell} \leq \eta$；串联可得
+$\abs{x - x_0} \leq \delta$ 时，$\abs{g(f(x)) - m} \leq
+\varepsilon$。在另一假设（$f \neq \ell$ 在
+$x_0$ 附近）下，$y = \ell$ 的值永远不会输入 $g$，
+故其在该点的取值无关紧要。
+\end{proof}
+
+\begin{example}[为何需要复合条件]\label{ex:b1:continuity:compositiontrap}
+设 $g(y) = 0$（$y \neq 0$），$g(0) = 1$，$f$ 恒等于
+$0$。则 $f(x) \to 0$（$x \to 0$ 时），且 $g(y) \to 0$
+（$y \to 0$ 时）；然而 $g(f(x)) = g(0) = 1$ 对每一个 $x$ 都成立，因此 $g
+\circ f \to 1 \neq 0$。内层函数永远\emph{恰好取到}
+被禁止的值 $\ell = 0$，而 $g$ 在 $0$ 处的极限
+与 $g$ 在 $0$ 处的取值无关。
+\cref{cor:b1:continuity:operations}中的条件——或 $g(\ell) = m$
+（即 $g$ 在 $\ell$ 处\omterm{def:b1:continuity:continuous}{连续}），或 $f \neq \ell$ 在 $x_0$ 附近——
+恰好排除了这一情形。要点是：在
+实际中通常复合的是\emph{\omterm{def:b1:continuity:continuous}{连续}}函数，此时
+条件自然满足；它只在沿去心\omterm{def:b1:topology:open}{邻域}取极限时起作用，
+这正是本书中
+$\lim_{x \to x_0}$ 的定义包含该点
+（当该点属于定义域时）的原因。
+\end{example}
+
+\section{连续}
+
+\begin{definition}\label{def:b1:continuity:continuous}
+称 $f$ 在 $x_0 \in I$ 处\emph{连续}\index{连续}，当 $f(x)
+\to f(x_0)$（$x \to x_0$）时；在 $I$ 上\emph{连续}，若
+它在每一点处都连续。由
+\cref{thm:b1:continuity:seqchar}，$f$ 在 $x_0$ 处连续当且仅当
+$f(u_n) \to f(x_0)$，其中 $u_n \to x_0$ 为 $I$ 中任一数列。
+\end{definition}
+
+\begin{example}[间断点的分类]\label{ex:b1:continuity:taxonomy}
+函数在一点处不\omterm{def:b1:continuity:continuous}{连续}的方式有三种，按严重程度由轻到重排列。
+\emph{可去间断}：$f(x) = \frac{\sin x}{x}$ 在 $\R^*$ 上，
+以 $1$ 为其在 $0$ 处的极限；令 $f(0) = 1$ 即可修补它——间断只是一个“洞”，
+并非函数本身的特征。\emph{跳跃间断}：$\lfloor x \rfloor$ 在整数处
+有两个不同的单侧极限（$n - 1$ 与 $n$）；无论取何值，
+都无法调和二者，但两个单侧极限都存在。
+\emph{本质间断}：$\sin\frac1x$ 在 $0$ 处
+根本没有单侧极限（见\cref{exo:b1:continuity:1}）——
+只振荡而不收敛。单调函数只能产生中间一类间断，
+它们的单侧极限总存在，因其为\omterm{def:b1:reals:bounds}{上确界}与\omterm{def:b1:reals:bounds}{下确界}，
+因此间断点集至多可数——
+每个跳跃点对应一个有理数。由达布定理
+（见\cref{exo:b1:derivative:10}）可知，导函数只能产生最后一类间断：
+具有跳跃间断的函数绝不会是
+任何函数的导函数。
+\end{example}
+
+\begin{proposition}\label{prop:b1:continuity:algebra}
+\omterm{def:b1:continuity:continuous}{连续}函数的和、积、商（在有定义处）及复合
+仍为\omterm{def:b1:continuity:continuous}{连续}函数。\omterm{def:b1:poly:def}{多项式}、\omterm{def:b1:fractions:field}{有理分式}
+（\omterm{def:b1:fractions:field}{极点}之外）、$\abs{\,\cdot\,}$、$\exp$、$\ln$、
+三角函数与\omterm{def:b1:functions:hyperbolic}{双曲函数}及其反函数
+（见\cref{ch:b1:functions}）在其定义域上\omterm{def:b1:continuity:continuous}{连续}。
+\end{proposition}
+
+\begin{proof}
+运算性质由\cref{cor:b1:continuity:operations}即得。常值函数
+与恒等函数可直接由定义得出\omterm{def:b1:continuity:continuous}{连续}性，
+（对恒等函数取 $\delta = \varepsilon$，对常值函数取任意 $\delta$）；
+\omterm{def:b1:continuity:continuous}{连续}函数之积仍\omterm{def:b1:continuity:continuous}{连续}，
+单项式 $a_k x^k$ 对 $k$ 归纳即得，
+再由和得出\omterm{def:b1:poly:def}{多项式}；\omterm{def:b1:fractions:field}{有理分式}是两个\omterm{def:b1:poly:def}{多项式}之商，
+在分母不为零处\omterm{def:b1:continuity:continuous}{连续}。
+$\abs{\,\cdot\,}$：由反向三角不等式，
+有下式成立：$\bigl|\abs{f(x)} - \abs{f(x_0)}\bigr| \leq \abs{f(x) -
+f(x_0)}$，故同一 $\delta$ 即可。对于初等函数，
+在本阶段不加证明地承认其\omterm{def:b1:continuity:continuous}{连续}性；可导性
+（在\cref{ch:b1:derivative}中证明）的要求更强。
+\end{proof}
+
+\begin{example}[连续函数的最大值与最小值]\label{ex:b1:continuity:maxmin}
+若 $f, g$ \omterm{def:b1:continuity:continuous}{连续}，则 $\max(f, g)$ 与 $\min(f, g)$ 也\omterm{def:b1:continuity:continuous}{连续}：
+无需分情形讨论，只需利用下列恒等式，
+\[
+\max(f, g) = \frac{f + g + \abs{f - g}}{2},
+\qquad
+\min(f, g) = \frac{f + g - \abs{f - g}}{2},
+\]
+再由和与 $\abs{\,\cdot\,}$ 的\omterm{def:b1:continuity:continuous}{连续}性
+（\cref{prop:b1:continuity:algebra}）即得。特别地，$f^+ =
+\max(f, 0)$ 与 $f^- = \max(-f, 0)$ 均\omterm{def:b1:continuity:continuous}{连续}，且 $f =
+f^+ - f^-$：级数中所用的符号分解
+（见\cref{ch:b1:series}），以及在本科三年级分册的积分理论中全面展开的
+同类分解，在正则性方面不付任何代价。
+\end{example}
+
+\begin{theorem}[介值定理]\label{thm:b1:continuity:ivt}
+设 $f$ 在 $\intcc{a}{b}$ 上\omterm{def:b1:continuity:continuous}{连续}，且 $f(a) \leq 0 \leq
+f(b)$，则 $f(c) = 0$，其中 $c \in \intcc{a}{b}$。
+由此可知，\omterm{prop:b1:reals:intervals}{区间}上的\omterm{def:b1:continuity:continuous}{连续}函数能取到其任意两个函数值之间的每一个值：
+即 $f(I)$ 是一个
+\omterm{prop:b1:reals:intervals}{区间}。\index{介值定理}
+\end{theorem}
+
+\begin{proof}
+二分法。令 $a_0 = a$，$b_0 = b$。给定 $\intcc{a_n}{b_n}$，满足
+$f(a_n) \leq 0 \leq f(b_n)$，令 $m$ 为中点：若 $f(m) \leq
+0$，则保留 $\intcc{m}{b_n}$；否则保留 $\intcc{a_n}{m}$；符号条件
+仍成立。数列 $(a_n), (b_n)$ 构成\omterm{thm:b1:seq:adjacent}{相邻数列}（$b_n -
+a_n = \frac{b-a}{2^n}$），公共极限为 $c$
+（见\cref{thm:b1:seq:adjacent}）。由\omterm{def:b1:continuity:continuous}{连续}性及
+\cref{thm:b1:seq:order}：$f(c) = \lim f(a_n) \leq 0$，且 $f(c) =
+\lim f(b_n) \geq 0$，故 $f(c) = 0$。
+
+关于后一结论：给定 $f(u) < v < f(w)$，将上述结论
+应用于 $x \mapsto f(x) - v$，其定义在以 $u$ 与 $w$ 为端点的线段上；
+因此 $f(I)$ 是凸的，即一个\omterm{prop:b1:reals:intervals}{区间}
+（见\cref{prop:b1:reals:intervals}）。
+\end{proof}
+
+\begin{omfigure}
+\begin{tikzpicture}
+\begin{axis}[omaxis, width=8.4cm, height=5.6cm,
+    xmin=0, xmax=4.4, ymin=-1.1, ymax=1.4,
+    xtick={0.6,3.8}, xticklabels={$a$,$b$}, ytick=\empty]
+  \addplot[omDef, very thick, domain=0.6:3.8, samples=160]
+    {0.5*(x-2) + 0.4*sin(deg(2.5*x))};
+  \draw[dashed, gray] (axis cs:0.6,0) -- (axis cs:0.6,-0.301);
+  \draw[dashed, gray] (axis cs:3.8,0) -- (axis cs:3.8,0.870);
+  \node[below, font=\small, omDef] at (axis cs:0.6,-0.32) {$f(a)$};
+  \node[above, font=\small, omDef] at (axis cs:3.8,0.89) {$f(b)$};
+\end{axis}
+\end{tikzpicture}
+
+{\small 满足 $f(a) < 0 < f(b)$ 的\omterm{def:b1:continuity:continuous}{连续}函数，其图像必穿过
+横轴：\cref{thm:b1:continuity:ivt} 的二分法证明将一个穿越点
+夹在两个\omterm{thm:b1:seq:adjacent}{相邻数列}之间。}
+\end{omfigure}
+
+\begin{example}[一个方程的完整步骤]\label{ex:b1:continuity:protocol}
+求方程 $\eu^x = 3 - x$ 在 $\R$ 上的解：存在性、唯一性、
+定位。设 $g(x) = \eu^x + x - 3$，它\omterm{def:b1:continuity:continuous}{连续}。定位与
+存在性：$g(0) = -2 < 0$，$g(1) = \eu - 2 > 0$，于是由
+介值定理知方程在
+$\intoo{0}{1}$ 内有一解。唯一性：$g$ 是
+严格递增的 $\eu^x$ 与 $x - 3$ 之和，因而
+在 $\R$ 上严格递增；严格单调函数每个值至多取一次，
+故解在 $\R$ 上唯一（而不仅限于
+所探测的\omterm{prop:b1:reals:intervals}{区间}内）。此步骤即：化为 $g = 0$、
+符号变化证存在，单调性证唯一——这一步骤
+三行之内即可解决大多数“有几个解”的问题，
+\cref{ch:b1:derivative}中的变化表
+可将其推广到非单调的 $g$，办法是把 $\R$ 切为
+若干单调分支。
+\end{example}
+
+\begin{example}[作为算法的二分法]\label{ex:b1:continuity:dichotomy}
+\cref{thm:b1:continuity:ivt} 的证明可直接用来计算。取 $f(x) =
+x^3 + x - 1$：$f(0) = -1 < 0 < 1 = f(1)$，于是根位于
+$\intoo{0}{1}$ 内。逐次二分：
+\[
+f(0.5) = -0.375 < 0, \qquad
+f(0.75) = 0.171875 > 0, \qquad
+f(0.625) = -0.130859375 < 0 ,
+\],
+于是根依次被夹在 $\intoo{0.5}{1}$ 内，
+再在 $\intoo{0.5}{0.75}$ 内，又在 $\intoo{0.625}{0.75}$ 内（真值
+$c \approx 0.6823$）。经过 $n$ 步后误差至多为
+$\frac{b - a}{2^n}$：十步可得三位小数，二十步可得
+六位小数。最后要点：介值定理不仅是存在性陈述——
+其二分法证明是一个
+有保证的（尽管较慢）求根算法，与之对照的是
+\cref{ch:b1:derivative}中快速却仅具局部性的牛顿法，
+应以它为标尺加以衡量。
+\end{example}
+
+\begin{theorem}[最值定理]\label{thm:b1:continuity:evt}
+闭\omterm{prop:b1:reals:intervals}{区间} $\intcc{a}{b}$ 上的\omterm{def:b1:continuity:continuous}{连续}函数有界，
+并能取到其界：存在 $c, d \in \intcc{a}{b}$，使得
+\[
+f(c) = \inf_{\intcc{a}{b}} f,
+\qquad
+f(d) = \sup_{\intcc{a}{b}} f .
+\]
+结合\cref{thm:b1:continuity:ivt}可知：\emph{闭\omterm{prop:b1:reals:intervals}{区间}的\omterm{def:b1:continuity:continuous}{连续}像
+仍为闭\omterm{prop:b1:reals:intervals}{区间}} $\intcc{f(c)}{f(d)}$。
+\index{最值定理}
+\end{theorem}
+
+\begin{proof}
+\emph{有\omterm{def:b1:reals:bounds}{上界}：}否则取 $u_n$ 使 $f(u_n) \geq n$。由
+闭\omterm{prop:b1:reals:intervals}{区间}的紧性（见\cref{thm:b1:topology:compact}），存在\omterm{def:b1:seq:subsequence}{子列}
+$u_{\varphi(n)} \to x \in \intcc{a}{b}$，由\omterm{def:b1:continuity:continuous}{连续}性得
+$f(u_{\varphi(n)}) \to f(x)$，但 $f(u_{\varphi(n)}) \geq \varphi(n)
+\to +\infty$，矛盾。
+
+\emph{\omterm{def:b1:reals:bounds}{上确界}可以取到：}设 $M = \sup f$，取 $v_n$ 使 $f(v_n) >
+M - \frac{1}{n+1}$（见\cref{prop:b1:reals:epsilon}）。取出\omterm{def:b1:seq:subsequence}{子列}
+$v_{\varphi(n)} \to d \in \intcc{a}{b}$，则 $f(d) = \lim
+f(v_{\varphi(n)}) = M$，由夹逼原理。\omterm{def:b1:reals:bounds}{下确界}可由
+$-f$ 同法处理。
+\end{proof}
+
+\begin{example}[闭区间上的正下界]\label{ex:b1:continuity:posmin}
+设 $f$ 在 $\intcc{0}{1}$ 上\omterm{def:b1:continuity:continuous}{连续}，且 $f(x) > 0$ 对
+每个 $x$ 成立。则 $\inf f > 0$：由最值定理，
+\omterm{def:b1:reals:bounds}{下确界}是一个\emph{值} $f(c)$，且由假设 $f(c) > 0$。
+因此闭\omterm{prop:b1:reals:intervals}{区间}上的\omterm{def:b1:continuity:continuous}{连续}正函数必
+一致地远离 $0$——这一两行的论证在后续各章
+中被用了十余次（控制分母、阶梯函数夹逼、误差估计）。
+在非紧\omterm{prop:b1:reals:intervals}{区间}上此结论彻底失效：
+$f(x) = x$ 在 $\intoc{0}{1}$ 上\omterm{def:b1:continuity:continuous}{连续}且为正，
+$\inf f = 0$，且不被取到。
+要点：“正”升级为“一致正”，恰好发生在
+定义域为紧集时；最值定理的每一条假设都
+不可或缺。
+\end{example}
+
+\begin{remark}[三个定理的常见误区]
+(i) \emph{\omterm{def:b1:continuity:continuous}{连续}像}：只有\emph{闭\omterm{prop:b1:reals:intervals}{区间}}是稳健的。
+开\omterm{prop:b1:reals:intervals}{区间}的\omterm{def:b1:continuity:continuous}{连续}像未必是\omterm{def:b1:topology:open}{开集}
+（$x \mapsto x^2$ 把 $\intoo{-1}{1}$ 映为 $\intco{0}{1}$），
+\omterm{def:b1:topology:closed}{闭集}的像未必是\omterm{def:b1:topology:closed}{闭集}（$\arctan$ 把
+闭的 $\R$ 映满
+开\omterm{prop:b1:reals:intervals}{区间} $\intoo{-\frac\pi2}{\frac\pi2}$）；但闭\omterm{prop:b1:reals:intervals}{区间}的像仍为
+闭\omterm{prop:b1:reals:intervals}{区间}（见\cref{thm:b1:continuity:evt}）。(ii) \emph{介值定理
+需要\omterm{prop:b1:reals:intervals}{区间}}：函数 $x
+\mapsto \frac1x$ 在 $\intco{-1}{0} \cup
+\intoc{0}{1}$ 上\omterm{def:b1:continuity:continuous}{连续}，取值 $-1$ 与 $1$，却从不
+为零——其定义域是两个不相交的部分，
+而值 $0$ 落入空隙中；务必指明定理所适用的
+\omterm{prop:b1:reals:intervals}{区间}。(iii) \emph{\omterm{def:b1:continuity:uniform}{一致连续}是函数与\omterm{def:b1:logic:sets}{集合}的
+联合性质}：$x^2$ 在每个
+闭\omterm{prop:b1:reals:intervals}{区间}上\omterm{def:b1:continuity:uniform}{一致连续}，却在 $\R$ 上不然
+（见\cref{ex:b1:continuity:notuniform}）——若不指明定义域，“\omterm{def:b1:continuity:uniform}{一致连续}”
+一词便毫无意义。(iv)
+\emph{逆\omterm{def:b1:logic:map}{映射}的\omterm{def:b1:continuity:continuous}{连续}性并非自动成立}：在
+\omterm{prop:b1:reals:intervals}{区间}上借助单调性成立
+（见\cref{thm:b1:continuity:bijection}），但若干\omterm{prop:b1:reals:intervals}{区间}之并上的\omterm{def:b1:continuity:continuous}{连续}\omterm{def:b1:logic:inj}{双射}
+其逆可以不\omterm{def:b1:continuity:continuous}{连续}——该定理之后的注记之所以存在，
+是因为学生常常在引用时略去\omterm{prop:b1:reals:intervals}{区间}假设，
+即不带\omterm{prop:b1:reals:intervals}{区间}假设地引用它。
+\end{remark}
+
+\section{单调函数与反函数}
+
+\begin{theorem}[单调双射定理]\label{thm:b1:continuity:bijection}
+设 $f$ 在\omterm{prop:b1:reals:intervals}{区间} $I$ 上\omterm{def:b1:continuity:continuous}{连续}且严格单调，则
+\begin{enumerate}
+  \item $f$ 是 $I$ 到\omterm{prop:b1:reals:intervals}{区间} $J = f(I)$ 上的\omterm{def:b1:logic:inj}{双射}；
+  \item 反函数 $f^{-1} \colon J \to I$ 严格单调（
+        方向相同），并且\emph{\omterm{def:b1:continuity:continuous}{连续}}。
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+设 $f$ 严格递增。（1）\omterm{def:b1:logic:inj}{单射}性由
+严格单调性立即可得；映到 $f(I)$ 上的\omterm{def:b1:logic:inj}{满射}显然成立，而 $f(I)$
+是\omterm{prop:b1:reals:intervals}{区间}，由\cref{thm:b1:continuity:ivt}可知。
+
+（2）$f^{-1}$ 严格递增：若 $y < y'$ 属于 $J$，但 $f^{-1}(y)
+\geq f^{-1}(y')$，对递增的 $f$ 作用后得 $y \geq y'$，
+矛盾。下证 $f^{-1}$ 在 $y_0 = f(x_0) \in J$ 处\omterm{def:b1:continuity:continuous}{连续}：设
+$\varepsilon > 0$。先设 $x_0$ 为 $I$ 的内点，
+并缩小 $\varepsilon$，使 $x_0 \pm \varepsilon \in I$，它们的
+像满足 $f(x_0 - \varepsilon) < y_0 < f(x_0 +
+\varepsilon)$。取
+$\delta = \min\bigl(y_0 - f(x_0 - \varepsilon),\, f(x_0 +
+\varepsilon) - y_0\bigr) > 0$：对于 $\abs{y - y_0} \leq \delta$，
+由 $f^{-1}$ 的单调性，将 $f^{-1}(y)$ 夹在 $x_0 -
+\varepsilon$ 与 $x_0 + \varepsilon$ 之间。若不妨设 $x_0$ 为 $I$ 的
+左端点，则只有 $x_0 + \varepsilon$ 可用：此时
+$y_0 = \min J$（由单调性），对每个 $y \in J$，只要 $y - y_0
+\leq f(x_0 + \varepsilon) - y_0$，就有 $x_0 \leq f^{-1}(y)
+\leq x_0 + \varepsilon$，单侧估计恰好就是端点处的
+\omterm{def:b1:continuity:continuous}{连续}性；右端点的情形完全对称。
+（注：$f^{-1}$ 的\omterm{def:b1:continuity:continuous}{连续}性
+\emph{并不}是由 $f$ 的\omterm{def:b1:continuity:continuous}{连续}性借助对称性推出的——起关键作用的是
+\omterm{prop:b1:reals:intervals}{区间}上的单调性。）
+\end{proof}
+
+\begin{remark}
+本定理正是\cref{def:b1:functions:arc}与
+\cref{prop:b1:functions:invhyp}所悄然使用的：$\arcsin$、$\arccos$、
+$\arctan$、$\operatorname{arsinh}$、\dots\ 都是\omterm{def:b1:continuity:continuous}{连续}的。
+还有一个补充（\cref{exo:b1:continuity:10}）：\omterm{prop:b1:reals:intervals}{区间}上的\omterm{def:b1:continuity:continuous}{连续}
+\emph{\omterm{def:b1:logic:inj}{单射}}函数必然严格单调，
+因此单调性假设并不增加任何代价。
+\end{remark}
+
+\begin{example}[各次方根]\label{ex:b1:continuity:nthroot}
+设 $n \in \N^*$，函数 $f(x) = x^n$ 在
+$\intco{0}{+\infty}$ 上\omterm{def:b1:continuity:continuous}{连续}且严格递增，$f(0) = 0$ 且
+$f(x) \to +\infty$，其像为 $\intco{0}{+\infty}$
+（由\cref{thm:b1:continuity:ivt}得其\omterm{prop:b1:reals:intervals}{区间}结构）。
+单调\omterm{def:b1:logic:inj}{双射}定理随即一举给出一个
+严格递增的\emph{\omterm{def:b1:continuity:continuous}{连续}}反函数
+\[
+x \mapsto x^{1/n} \colon \intco{0}{+\infty} \to
+\intco{0}{+\infty} :
+\]
+$n$ 次方根的存在性、唯一性与\omterm{def:b1:continuity:continuous}{连续}性，无需
+任何计算。比较\cref{exo:b1:reals:12}，它从\omterm{def:b1:reals:bounds}{上确界}出发
+一步步手工构造了 $\sqrt y$；一章理论把
+那一页的工作压缩成两行，而这两行此前还
+为 $\arcsin$、$\arctan$ 与
+$\operatorname{arsinh}$ 提供了依据。结语是：好的
+定理就是储存下来的劳动。
+\end{example}
+
+\section{一致连续}
+
+\begin{definition}\label{def:b1:continuity:uniform}
+称 $f \colon I \to \R$ 为\emph{一致连续}\index{一致
+连续}，若
+\[
+\forall \varepsilon > 0,\ \exists \delta > 0,\ \forall x, y \in I,
+\qquad \abs{x - y} \leq \delta \implies \abs{f(x) - f(y)} \leq
+\varepsilon .
+\]
+要点在于：$\delta$ 只依赖于 $\varepsilon$，而与
+$I$ 中的位置无关。一致\omterm{def:b1:continuity:continuous}{连续}蕴含\omterm{def:b1:continuity:continuous}{连续}；一个
+\emph{利普希茨}函数（$\abs{f(x) - f(y)} \leq k \abs{x - y}$）
+是一致\omterm{def:b1:continuity:continuous}{连续}的（$\delta = \varepsilon/k$）。
+\end{definition}
+
+\begin{example}\label{ex:b1:continuity:notuniform}
+$x \mapsto x^2$ 在 $\R$ 上\omterm{def:b1:continuity:continuous}{连续}，但\emph{并非}\omterm{def:b1:continuity:uniform}{一致
+连续}：$\abs{(n + \frac 1n)^2 - n^2} = 2 + \frac{1}{n^2} \geq 2$
+虽然两自变量的距离 $\frac 1n \to 0$。在任意
+有界\omterm{prop:b1:reals:intervals}{区间}上它是利普希茨的，因而\omterm{def:b1:continuity:uniform}{一致连续}——
+这与下文的海涅定理相一致。
+\end{example}
+
+\begin{example}[一致连续模的显式计算]\label{ex:b1:continuity:moduli}
+在闭\omterm{prop:b1:reals:intervals}{区间}上，海涅定理保证存在一致的 $\delta$；通常还能
+\emph{计算}出它。对 $f(x) = x^2$ 在 $\intcc{0}{10}$ 上：
+\[
+\abs{x^2 - y^2} = \abs{x + y}\,\abs{x - y} \leq 20\,\abs{x - y},
+\]
+于是 $\delta = \frac{\varepsilon}{20}$ 一致有效（
+即一个利普希茨模，关于 $\varepsilon$ 线性的）。对 $\sqrt x$ 在
+$\intcc{0}{1}$ 上：$\abs{\sqrt x - \sqrt y} \leq \sqrt{\abs{x -
+y}}$（见\cref{exo:b1:continuity:9}），于是 $\delta = \varepsilon^2$
+成立——一致但\emph{并非}线性：在 $0$ 附近，平方
+根很陡，代价体现在
+$\varepsilon$ 的指数上，而不是一致性的失效。结语
+是：\omterm{def:b1:continuity:uniform}{一致连续}是一个谱系，而非简单的是非题——
+函数 $\delta(\varepsilon)$ 称为模，衡量
+一致性的代价有多高，而利普希茨则只是它
+最好的一档。
+\end{example}
+
+\begin{theorem}[海涅]\label{thm:b1:continuity:heine}
+在\emph{闭\omterm{prop:b1:reals:intervals}{区间}} $\intcc{a}{b}$ 上的\omterm{def:b1:continuity:continuous}{连续}函数是
+\omterm{def:b1:continuity:uniform}{一致连续}的。\index{海涅定理}
+\end{theorem}
+
+\begin{proof}
+用反证法：假设存在某个 $\varepsilon_0 > 0$，使每个
+$\delta$ 都不再有效。取 $\delta = \frac{1}{n+1}$，选取 $x_n, y_n \in
+\intcc{a}{b}$，使 $\abs{x_n - y_n} \leq \frac{1}{n+1}$ 且
+$\abs{f(x_n) - f(y_n)} > \varepsilon_0$。由紧性
+（\cref{thm:b1:topology:compact}）可取出 $x_{\varphi(n)} \to c \in
+\intcc{a}{b}$；于是 $y_{\varphi(n)} \to c$ 也成立（由 $\abs{x -
+y}$ 的夹逼）。$c$ 处的\omterm{def:b1:continuity:continuous}{连续}性给出 $f(x_{\varphi(n)}) \to f(c)$ 且
+$f(y_{\varphi(n)}) \to f(c)$，故 $\abs{f(x_{\varphi(n)}) -
+f(y_{\varphi(n)})} \to 0 < \varepsilon_0$，与假设矛盾。
+\end{proof}
+
+\begin{example}[有界且连续，但并非一致连续]\label{ex:b1:continuity:sinx2}
+函数 $f(x) = \sin(x^2)$ 在
+$\R$ 上\omterm{def:b1:continuity:continuous}{连续}且有界，但不\omterm{def:b1:continuity:uniform}{一致连续}。取
+\[
+x_n = \sqrt{2\pi n}, \qquad y_n = \sqrt{2\pi n + \tfrac\pi2}:
+\qquad
+y_n - x_n = \frac{\pi/2}{\sqrt{2\pi n + \frac\pi2} +
+\sqrt{2\pi n}} \longrightarrow 0 ,
+\]
+但 $f(y_n) - f(x_n) = \sin\bigl(2\pi n + \frac\pi2\bigr) -
+\sin(2\pi n) = 1 - 0 = 1$ 对每个 $n$ 成立，因此没有单一的 $\delta$ 能
+对所有点都满足 $\varepsilon = \frac12$。从几何上看，
+$\sin(x^2)$ 的振荡\emph{越来越快}：图像
+在越来越短的\omterm{prop:b1:reals:intervals}{区间}上完成一个完整的波动，因此
+给定 $\varepsilon$ 所需的水平尺度
+随 $x$ 增大而趋于零。本段要点是：有界性不能换来一致性
+（本例），而无界也不排除一致性
+（$\sqrt x$，\cref{exo:b1:continuity:9}）；真正起决定作用的是
+\emph{振荡模}，而海涅定理表明紧致的定义域
+会自动控制它。
+\end{example}
+
+\begin{example}[计算器实验的解释]\label{ex:b1:continuity:cositeration}
+在计算器中输入任意数，然后反复按 $\cos$ 键：
+显示屏会稳定在 $0.7390851\dots$。为什么？按一次之后
+数值位于 $\intcc{-1}{1}$ 中，按两次后位于 $\intcc{\cos 1}{1}
+\subseteq \intcc{0.54}{1}$ 中，这是 $\cos$ 的一个稳定\omterm{prop:b1:reals:intervals}{区间}。在其上，
+$\abs{\cos a - \cos b} \leq \sin(1)\,\abs{a - b}$，其中 $\sin 1 =
+0.841\dots < 1$（积化和差估计，见
+\cref{pb:b1:seq:1}，或
+\cref{ch:b1:derivative}中的中值不等式）：迭代收缩，因此
+由\cref{met:b1:seq:recurrent}中的误差控制步骤，有
+\[
+\abs{u_n - c} \leq (0.842)^{\,n-2}\,\abs{u_2 - c}
+\longrightarrow 0 ,
+\]
+其中 $c$ 是唯一的不动点 $\cos c = c$
+（见\cref{exo:b1:continuity:6}）。约 $40$ 次按键即可得到三位小数
+（$0.842^{40} \approx 10^{-3}$）——几何速率，
+比二分法每步的 $2^{-n}$ 温和，但每按一次
+只需一次击键，而二分法每步都要完整地做一次符号判断。
+小结：\cref{ch:b1:seq}中的不动点图景与本章的存在性定理
+是同一个故事的两个部分——
+介值定理找到 $c$，压缩性使迭代抵达
+它。
+\end{example}
+
+\begin{remark}[这些定理的后续应用]
+本章的三大支柱各自支撑后面的一个内容。
+介值定理为一切解的存在性论证提供基础，
+并支撑单调\omterm{def:b1:logic:inj}{双射}定理；最值定理把最优化问题
+变成定理（罗尔定理与
+\cref{ch:b1:derivative}中的中值定理恰好从这里开始）；
+海涅定理则说明闭\omterm{prop:b1:reals:intervals}{区间}上的\omterm{def:b1:continuity:continuous}{连续}函数
+能在\cref{ch:b1:integration}中积分——一致的 $\delta$
+正是使黎曼和收敛的关键。在本科二年级分册中，同样的三大支柱
+会在赋范向量空间中再次出现，
+由紧性承担这里闭\omterm{prop:b1:reals:intervals}{区间}所起的作用。
+\end{remark}
+
+\begin{remark}[本分册内的展望]
+\omterm{def:b1:continuity:continuous}{连续}性即将被更强的概念超越，但永远不会被废弃。
+\Cref{ch:b1:derivative}把\omterm{def:b1:continuity:continuous}{连续}性加强为可导性，并
+作为回报（可导蕴含\omterm{def:b1:continuity:continuous}{连续}）；
+\cref{ch:b1:integration}两次依赖于\omterm{def:b1:continuity:continuous}{连续}性，一次通过海涅定理
+用于构造，另一次通过微积分基本定理，其
+核心对象 $x \mapsto \int_a^x f$ 把仅仅
+\omterm{def:b1:continuity:continuous}{连续}的 $f$ 提升为 $C^1$ 原函数。在
+\cref{ch:b1:multivar}中，二元\omterm{def:b1:continuity:continuous}{连续}性隐藏着一个
+值得预先介绍的陷阱：函数 $\frac{xy}{x^2 + y^2}$（补充定义为
+$0$），它关于 $x$ \omterm{def:b1:continuity:continuous}{连续}（$y$ 固定），关于 $y$ \omterm{def:b1:continuity:continuous}{连续}（$x$ 固定），
+但在原点不\omterm{def:b1:continuity:continuous}{连续}——沿着
+对角线 $x = y$ 它恒为 $\frac12$。分别\omterm{def:b1:continuity:continuous}{连续}性
+严格弱于\omterm{def:b1:continuity:continuous}{连续}性：序列刻画在
+迁移到 $\R^2$ 后依然成立，但序列必须
+允许从\emph{每一个}方向趋近，而不只是
+沿坐标轴。
+\end{remark}
+
+\section{练习}
+
+\begin{exercise}[$\star$]\label{exo:b1:continuity:1}
+用序列刻画，证明 $x \mapsto
+\sin\frac 1x$ 在 $0^+$ 处没有极限\emph{（给出两个数列）}。
+$x \mapsto x \sin\frac 1x$ 是否有极限？
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:continuity:2}
+研究下列函数在 $\R$ 上的\omterm{def:b1:continuity:continuous}{连续}性：$f(x) = \lfloor x \rfloor$，
+$g(x) = x - \lfloor x \rfloor$，以及 $h(x) = \lfloor x \rfloor +
+(x - \lfloor x\rfloor)^2$。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:continuity:3}
+证明方程 $x^5 - 3x + 1 = 0$ 至少有三个
+实数解\emph{（在适当选取的点处求值，并在三个互不相交的闭\omterm{prop:b1:reals:intervals}{区间}上应用
+\cref{thm:b1:continuity:ivt}）}。
+\end{exercise}
+
+\begin{exercise}[$\star$]\label{exo:b1:continuity:4}
+证明每个奇次\omterm{def:b1:poly:def}{多项式}都有实根。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:continuity:5}
+（不动点）设 $f \colon \intcc{0}{1} \to \intcc{0}{1}$ 为
+\omterm{def:b1:continuity:continuous}{连续}函数。证明 $f$ 有不动点，即 $f(c) = c$ 对某个
+$c$ 成立。举例说明\omterm{def:b1:continuity:continuous}{连续}性与
+闭\omterm{prop:b1:reals:intervals}{区间}两者都不能去掉。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:continuity:6}
+证明方程 $\cos x = x$ 恰有一个实根，
+且该根位于 $\intoo{0}{1}$ 中。
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:continuity:7}
+设 $f \colon \R \to \R$ 为\omterm{def:b1:continuity:continuous}{连续}函数，且 $f(x) \to +\infty$，当 $x
+\to \pm\infty$ 时。证明 $f$ 在 $\R$ 上取得全局最小值。
+\emph{（化为包含某一下水平集的闭\omterm{prop:b1:reals:intervals}{区间}上的问题。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:continuity:8}
+设 $f \colon \R \to \R$ 为\omterm{def:b1:continuity:continuous}{连续}的周期函数（周期为 $T >
+0$）。证明 $f$ 有界，且能取到其上、\omterm{def:b1:reals:bounds}{下确界}，并证明存在
+$c$ 使得 $f(c + \frac T2) = f(c)$。\emph{（对第二个结论，
+在一个周期上考察 $g(x) = f(x + \frac T2) - f(x)$。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star$]\label{exo:b1:continuity:9}
+证明\omterm{def:b1:logic:map}{映射} $x \mapsto \sqrt x$ 在
+$\intco{0}{+\infty}$ 上\omterm{def:b1:continuity:uniform}{一致连续}，尽管它在 $0$ 附近不满足利普希茨条件。
+\emph{（证明并利用 $\abs{\sqrt x - \sqrt y} \leq \sqrt{\abs{x -
+y}}$。）}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:continuity:10}
+设 $f$ 为\omterm{prop:b1:reals:intervals}{区间} $I$ 上的\omterm{def:b1:continuity:continuous}{连续}\omterm{def:b1:logic:inj}{单射}。证明
+$f$ 严格单调。\emph{提示：若不然，则存在 $a < b < c$
+使得（不妨设）$f(b) > f(a)$ 且 $f(b) > f(c)$；对
+介于 $\max(f(a), f(c))$ 与 $f(b)$ 之间的值，
+在 $b$ 两侧分别应用介值定理。}
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:continuity:11}
+（柯西函数方程，\omterm{def:b1:continuity:continuous}{连续}情形）设 $f \colon \R \to
+\R$ 为\omterm{def:b1:continuity:continuous}{连续}函数，且 $f(x + y) = f(x) + f(y)$ 对所有 $x, y$ 成立。
+证明 $f(x) = f(1)\,x$ 对所有 $x$ 成立：先在 $\N$、$\Z$、$\Q$ 上证明
+（仅由可加性），再在 $\R$ 上利用\omterm{def:b1:continuity:continuous}{连续}性与\omterm{def:b1:topology:dense}{稠密}性
+（见\cref{thm:b1:reals:density}）得出结论。
+\end{exercise}
+
+\begin{exercise}[$\star\star\star$]\label{exo:b1:continuity:12}
+设 $f \colon \intco{0}{+\infty} \to \R$ 为\omterm{def:b1:continuity:continuous}{连续}函数，且
+$f(x) \to \ell \in \R$（当 $x \to +\infty$ 时）。证明 $f$ 在
+$\intco{0}{+\infty}$ 上\emph{\omterm{def:b1:continuity:uniform}{一致连续}}。\emph{（取充分大的 $A$ 分段讨论：
+在 $\intcc{0}{A+1}$ 上用海涅定理，在 $A$ 之后用极限；
+使两个区域有所重叠。）}
+\end{exercise}
+
+\section{问题：柯西函数方程及其同类方程}
+
+\begin{problem}[{周末问题——$f(x + y) = f(x) + f(y)$：
+正则性导出线性，以及“怪物”的画像}]
+\label{pb:b1:continuity:1}
+哪些函数满足 $f(x + y) = f(x) + f(y)$，对所有实数 $x,
+y$？柯西于 1821 年提出了这一问题，其答案堪称典范。
+\Cref{exo:b1:continuity:11} 表明，此类\emph{可加}函数在 $\Q$ 上是线性的，
+且若其处处\omterm{def:b1:continuity:continuous}{连续}，则 $f(x)
+= cx$。本题大幅减弱了这一假设——
+仅需在\emph{某一点}处\omterm{def:b1:continuity:continuous}{连续}、或单调、或仅在一小\omterm{prop:b1:reals:intervals}{区间}上有界，
+每一条件均已足够——随后描绘
+一个假想非线性解的画像（其图像
+充满整个平面），求解刻画
+$\eu^{cx}$、$c\ln x$、$x^c$ 与 $cx^2$，并以延森方程
+及定理\emph{中点凸 $+$ \omterm{def:b1:continuity:continuous}{连续}
+$\implies$ 凸}作结。\index{柯西函数方程}
+\index{函数方程}全文中，\emph{可加}
+指 $f(x + y) = f(x) + f(y)$，对所有 $x, y \in \R$。
+
+\medskip
+\noindent\textbf{第一部分——$\Q$-线性，以及
+某一点处的\omterm{def:b1:continuity:continuous}{连续}性。}
+\begin{enumerate}
+  \item 设 $f$ 为可加函数。由\cref{exo:b1:continuity:11}，
+        $f(r) = f(1)\,r$ 对有理数 $r$ 成立。证明下述较细的结论
+        （后文将用到）：对\emph{每个} $x \in \R$ 及 $r
+        \in \Q$，有 $f(rx) = r\,f(x)$（$f$ 是
+        $\Q$-\emph{线性}的）。
+  \item 设可加函数 $f$ 在某一
+        点 $x_0$ 处\omterm{def:b1:continuity:continuous}{连续}。证明 $f$ 处处\omterm{def:b1:continuity:continuous}{连续}，
+        \emph{（将 $f(x + h) - f(x)$ 用 $f(x_0 + h)
+        - f(x_0)$）}，从而 $f(x) = f(1)\,x$。
+  \item 证明可加函数由其在任一\omterm{def:b1:topology:dense}{稠密}\omterm{def:b1:structures:subgroup}{子群}上的限制所唯一确定：
+        即若两个可加函数，
+        在 $\Z + \sqrt2\,\Z$ 上取值相同，且二者均\omterm{def:b1:continuity:continuous}{连续}，则二者相等——
+        而若不假设\omterm{def:b1:continuity:continuous}{连续}性，
+        规定 $f(1) = 0$ 与 $f(\sqrt 2) = 1$ 仍与\omterm{def:b1:structures:subgroup}{子群}上的
+        $\Q$-线性性相容。在此规定下计算 $f(m +
+        n\sqrt2)$ 的值。
+  \item 设可加函数 $f$ 在某\omterm{prop:b1:reals:intervals}{区间}上以 $M$ 为\omterm{def:b1:reals:bounds}{上界}，
+        其中\omterm{prop:b1:reals:intervals}{区间}为 $\intcc{a}{b}$（$a < b$）。证明 $f$ 在
+        $\intcc{0}{\ell}$ 上有\omterm{def:b1:reals:bounds}{上界}，其中 $\ell = b - a$
+        \emph{（作平移 $a$）}。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第二部分——正则性阶梯。}
+\begin{enumerate}[resume]
+  \item 承接第 4 题：利用 $f(\ell - t) + f(t) =
+        f(\ell)$，证明 $f$ 在
+        $\intcc{0}{\ell}$ 上也\emph{有下界}，即 $\abs f \leq C$。
+  \item 证明 $\abs{f(t)} \leq \frac{C}{n}$ 对 $t \in
+        \intcc{0}{\ell/n}$ 成立，并由此推出 $f$ 在
+        $0$ 处\omterm{def:b1:continuity:continuous}{连续}\emph{（可用奇性处理左侧）}，从而由第 2 题
+        得其处处\omterm{def:b1:continuity:continuous}{连续}：在某一\omterm{prop:b1:reals:intervals}{区间}上有界的可加函数
+        必是线性的。
+  \item 推出单调情形：可加函数
+        在某一\omterm{prop:b1:reals:intervals}{区间} $\intcc{a}{b}$（$a < b$）上单调不减，则 $f(x)
+        = cx$，其中 $c \geq 0$。
+  \item 汇总得到\emph{正则性阶梯}：对可加函数
+        $f$，下列各条件等价——(a) $f(x) = cx$；
+        (b) $f$ \omterm{def:b1:continuity:continuous}{连续}；(c) $f$ 在某一点\omterm{def:b1:continuity:continuous}{连续}；(d)
+        $f$ 在某一非退化\omterm{prop:b1:reals:intervals}{区间}上单调；(e) $f$
+        在某一非退化\omterm{prop:b1:reals:intervals}{区间}上有界。安排各蕴涵的顺序，
+        使每一蕴涵或为平凡，
+        或已被证明。
+  \item 验证第 4--6 题只用到了
+        \emph{\omterm{def:b1:reals:bounds}{上界}}：可加函数若在某一
+        非退化\omterm{prop:b1:reals:intervals}{区间}上有\omterm{def:b1:reals:bounds}{上界}，则它已是线性的。由此推出
+        下界情形的对偶结论，并记录
+        由此得到的阶梯第 (e) 级的最强形式。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第三部分——怪物的画像。}
+现设 $f$ 可加，但\emph{不}线性。
+\begin{enumerate}[resume]
+  \item 证明存在非零实数 $u, v$，使得
+        $\dfrac{f(u)}{u} \neq \dfrac{f(v)}{v}$，且
+        向量 $(u, f(u))$ 与 $(v, f(v))$ 张成平面（它们的
+        行列式 $u f(v) - v f(u)$ 不为零）。
+  \item 证明 $f$ 的图像包含下列形式的所有点
+        \[
+        r\,(u, f(u)) + s\,(v, f(v)), \qquad r, s \in \Q ,
+        \]
+        并由此推出该图像\emph{在 $\R^2$ 中\omterm{def:b1:topology:dense}{稠密}}：对
+        平面上每一点 $(x_0, y_0)$ 以及每个
+        $\varepsilon > 0$，存在某个 $(x, f(x))$ 与其距离
+        小于 $\varepsilon$\emph{（先解 $2\times2$ 实方程组，
+        再用有理数逼近其中的实系数
+        ）}。
+  \item 由第 11 题推出完整画像：非线性
+        可加函数在每个非退化
+        \omterm{prop:b1:reals:intervals}{区间}上无界，处处不\omterm{def:b1:continuity:continuous}{连续}，在任何
+        \omterm{prop:b1:reals:intervals}{区间}上都不单调，且其在任一\omterm{prop:b1:reals:intervals}{区间}上的像
+        在 $\R$ 中\omterm{def:b1:topology:dense}{稠密}。并与第 8 题相协调。
+  \item 怪物确实存在——在\omterm{def:b1:topology:dense}{稠密}\omterm{def:b1:structures:subgroup}{子群}上，可以构造性地给出：
+        在 $G = \Z + \sqrt2\,\Z$ 上定义 $f(m + n\sqrt2) = n$。
+        验证 $f$ 在 $G$ 上良定且可加，并且
+        $f$ 在 $G \cap \intoo{0}{\varepsilon}$ 上无界，
+        对每个 $\varepsilon > 0$ \emph{（固定 $N$ 时，
+        仅有有限多个 $g = m + n\sqrt2 \in \intoo{0}{1}$ 满足
+        $\abs n \leq N$；而 $G \cap \intoo{0}{\varepsilon}$ 是
+        无限的）}。用一段话说明，为何将这样的
+        $f$ 延拓到整个 $\R$ 上，需要 $\R$ 作为
+        $\Q$-向量空间的一组基（\emph{哈默尔基}），其
+        存在性属于选择公理问题，超出本册
+        范围。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第四部分——姊妹方程。}
+本部分所有函数均\omterm{def:b1:continuity:continuous}{连续}。
+\begin{enumerate}[resume]
+  \item 设 $f \colon \R \to \R$ \omterm{def:b1:continuity:continuous}{连续}，且不恒为
+        $0$，满足 $f(x + y) = f(x)f(y)$。证明 $f(x) =
+        f\bigl(\frac x2\bigr)^2 \geq 0$，再证 $f > 0$ 处处成立，
+        再证 $f(x) = \eu^{cx}$，其中 $c$ 为某常数：指数函数
+        恰是从 $(\R, +)$ 到
+        $(\R^*, \times)$ 的\omterm{def:b1:continuity:continuous}{连续}\omterm{def:b1:structures:morphism}{同态}。
+  \item 设 $f \colon \intoo{0}{+\infty} \to \R$ \omterm{def:b1:continuity:continuous}{连续}，
+        满足 $f(xy) = f(x) + f(y)$。证明 $f(x) = c\ln x$
+        \emph{（借助 $\exp$ 进行转移）}。
+  \item 设 $f \colon \intoo{0}{+\infty} \to \intoo{0}{+\infty}$
+        \omterm{def:b1:continuity:continuous}{连续}，且满足 $f(xy) = f(x)f(y)$。证明 $f(x) = x^c$。
+  \item 求所有\omterm{def:b1:continuity:continuous}{连续}函数 $f \colon \R \to \R$，满足
+        \[
+        f(x + y) = f(x) + f(y) + f(x)f(y) .
+        \]
+        \emph{（考察 $h = 1 + f$；退化情形
+        单独讨论。）}
+  \item （平行四边形）求所有\omterm{def:b1:continuity:continuous}{连续}函数 $f \colon \R \to \R$，
+        使得 $f(x + y) + f(x - y) = 2f(x) + 2f(y)$：证明 $f$ 为
+        偶函数，$f(0) = 0$，用归纳法得 $f(nx) = n^2 f(x)$，进而
+        $f(x) = f(1)\,x^2$。（此方程是
+        二次型的特征——即平行四边形律，用以检验
+        在本科二年级分册中判断哪些范数来自
+        内积。）
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第五部分——琴生与中点凸性。}
+\begin{enumerate}[resume]
+  \item （琴生方程）设 $f \colon \R \to \R$，
+        \omterm{def:b1:continuity:continuous}{连续}，且满足 $f\bigl(\frac{x+y}{2}\bigr) = \frac{f(x)
+        + f(y)}{2}$。证明 $g = f - f(0)$ 满足
+        $g\bigl(\frac x2\bigr) = \frac{g(x)}{2}$，由此推出
+        $g$ 可加，从而 $f(x) = cx + d$。
+  \item 现只假设\emph{不等式}：$f$ \omterm{def:b1:continuity:continuous}{连续}，
+        且满足
+        \[
+        f\Bigl(\frac{x + y}{2}\Bigr) \leq \frac{f(x) +
+        f(y)}{2} \qquad (x, y \in \R).
+        \]
+        用对 $n$ 的归纳法证明，对所有二进权重
+        $\lambda = \frac{k}{2^n} \in \intcc{0}{1}$:
+        \[
+        f\bigl(\lambda x + (1 - \lambda)y\bigr) \leq \lambda
+        f(x) + (1 - \lambda) f(y) .
+        \]
+  \item 借助\omterm{def:b1:continuity:continuous}{连续}性及二进有理数的\omterm{def:b1:topology:dense}{稠密}性
+        （见\cref{exo:b1:reals:8}），将结论推广到每个 $\lambda \in
+        \intcc{0}{1}$：\omterm{def:b1:continuity:continuous}{连续}的中点凸函数满足
+        完整的凸性不等式（这一概念
+        在\cref{ch:b1:derivative}中系统研究）。
+  \item 说明\omterm{def:b1:continuity:continuous}{连续}性不可去掉：非线性可加
+        函数 $f$ 满足
+        第 19 题中的\emph{中点等式}，但在任何\omterm{prop:b1:reals:intervals}{区间}上都不满足凸性不等式（第
+        12 题）。寓意：中点凸性是可数阶段的
+        性质（二进有理数），凸性则是\omterm{def:b1:continuity:continuous}{连续}统的性质；
+        \omterm{def:b1:continuity:continuous}{连续}性是桥梁——正如第一至二部分那样。
+\end{enumerate}
+
+\medskip
+\noindent\textbf{第六部分——最后的变式与综合。}
+\begin{enumerate}[resume]
+  \item 求所有\omterm{def:b1:continuity:continuous}{连续}函数 $f \colon \R \to \R$，满足 $f(x + y)
+        = f(x) + f(y) + xy$ \emph{（减去特解
+        $\frac{x^2}{2}$）}。
+  \item 证明：若 $f \colon \R \to \R$ \omterm{def:b1:continuity:continuous}{连续}，且
+        仅在\emph{\omterm{def:b1:topology:dense}{稠密}\omterm{def:b1:structures:subgroup}{子群}} $G$ 上可加（即
+        $f(g + g') = f(g) + f(g')$，对 $g, g' \in G$ 成立），则 $f$
+        在 $\R$ 上可加。更一般地，两个\omterm{def:b1:continuity:continuous}{连续}
+        函数在 $\R$ 的某个\omterm{def:b1:topology:dense}{稠密}子集上取值相同，
+        则二者相等。
+  \item 综合题，每问各用一句话作答：(i) 凭记忆叙述正则性
+        阶梯（第 8 题）；(ii) 解释为何
+        “图像在平面中\omterm{def:b1:topology:dense}{稠密}”是
+        正则性失效的恰当直观；(iii) 列出
+        第四至五部分中刻画的五个经典函数，以及
+        统一捕获它们的单一方法；(iv) 指出两处
+        $\Q$（或二进有理数）在 $\R$ 中\omterm{def:b1:topology:dense}{稠密}推动了证明，
+        以及\omterm{def:b1:topology:dense}{稠密}性未能起作用的一处
+        （第 13 题）。
+\end{enumerate}
+\end{problem}
