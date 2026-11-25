@@ -213,8 +213,26 @@ class LangStrings:
                                 ("inthefield", "InTheField"),
                                 ("inthelab", "InTheLab"),
                                 ("history", "History"),
-                                ("safety", "Safety"))
+                                ("safety", "Safety"),
+                                # economics and computer science books
+                                ("model", "Model"),
+                                ("debate", "Debate"),
+                                ("record", "Record"),
+                                ("measure", "Measure"),
+                                ("inpractice", "InPractice"))
             if f"omname{macro}" in cmds}
+        # economics: the four run-in leads of a model box, the source line
+        # of a chart; economics and computer science: captured outputs
+        self.model_leads = {
+            key: _typo(cmds[f"omname{macro}"])
+            for key, macro in (("assumes", "Assumes"),
+                               ("predicts", "Predicts"),
+                               ("tested", "Tested"), ("breaks", "Breaks"))
+            if f"omname{macro}" in cmds}
+        self.source_name = _typo(cmds.get("omnameSource", "Source"))
+        self.names["output"] = _typo(cmds.get("omnameOutput", "Output"))
+        self.plurals["output"] = _typo(cmds.get("omnameOutputs", "Outputs"))
+        self.some_lines_out = _typo(cmds.get("omnameSomeLinesOut", ""))
         self.iq_lookfor = _quant(cmds.get(
             "omnameLookingFor", "What the interviewer is looking for:"))
         self.sources_head = _quant(cmds.get(

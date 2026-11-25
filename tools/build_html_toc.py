@@ -109,6 +109,8 @@ def detex(text, where):
     text = re.sub(r"\\omterm\{[^{}]*\}\{([^{}]*)\}", r"\1", text)
     text = re.sub(r"\\protect\b\s*", "", text)
     text = re.sub(r"\\babelsublr\{([^{}]*)\}", r"\1", text)
+    # computer science titles: a keyword in typewriter type (its text)
+    text = re.sub(r"\\(?:texttt|code)\{([^{}]*)\}", r"\1", text)
     # \texorpdfstring{TeX}{PDF}: the TeX branch is what the book prints
     # (chemistry fr: Licence 1\texorpdfstring{ʳᵉ}{re} année)
     text = re.sub(r"\\texorpdfstring\{([^{}]*)\}\{[^{}]*\}", r"\1", text)
@@ -127,6 +129,9 @@ def detex(text, where):
 
 def part_dirs(entry_path):
     text = entry_path.read_text(encoding="utf-8")
+    # (a part after \appendix is not a year of the course: the typing
+    # drills of computer science Book 1 are not published)
+    text = text.split("\\appendix")[0]
     dirs = re.findall(r"\\input\{(parts/[a-z0-9-]+)/part\}", text)
     if not dirs:
         fail(f"{entry_path}: no \\input{{parts/<dir>/part}} lines found")
@@ -143,6 +148,8 @@ def part_of(part_path):
     The English-only interview books write \\part{Title}: no key, a literal
     title."""
     text = part_path.read_text(encoding="utf-8")
+    # (a header comment may name \ominput or \part)
+    text = re.sub(r"(?m)^[ \t]*%.*$", "", text)
     heads = list(PART_RE.finditer(text))
     if not heads:
         fail(f"{part_path}: no \\part{{\\omstr{{...}}}} line")

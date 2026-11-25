@@ -16,8 +16,11 @@ OUT="$SAAS/resources/onecourse/chapters"
 SVG_OUT="$SAAS/public/images/onecourse/chapters"
 cd "$(dirname "$0")/.."
 
-# Parts in entry-file order (same pattern build_html_toc.py uses).
-mapfile -t PARTS < <(grep -oP '(?<=\\input\{parts/)[a-z0-9-]+(?=/part\})' "$ENTRY")
+# Parts in entry-file order (same pattern build_html_toc.py uses), up to
+# \appendix: a part after it (the typing drills of computer science Book 1)
+# is not a year of the course and is not published.
+mapfile -t PARTS < <(sed '/\\appendix/q' "$ENTRY" \
+    | grep -oP '(?<=\\input\{parts/)[a-z0-9-]+(?=/part\})')
 [ ${#PARTS[@]} -gt 0 ] || { echo "no \\input{parts/<dir>/part} lines in $ENTRY"; exit 1; }
 
 chapters() { # part-dir -> ominput slugs in order

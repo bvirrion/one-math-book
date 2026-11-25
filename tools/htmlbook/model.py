@@ -12,7 +12,7 @@ from .lexer import STATEMENT_KINDS, ParseError
 # Kinds numbered N.M by their own per-chapter counter (the quant books'
 # \refstepcounter'd boxes, listings and table floats).
 OWN_COUNTER_KINDS = ("listing", "table", "dated", "strategyfile",
-                     "predictorcard", "interviewq", "question")
+                     "predictorcard", "interviewq", "question", "output")
 
 
 def anchor_for(label):
@@ -26,7 +26,8 @@ def has_questions(blocks):
                for node in blocks)
 
 
-def number_chapter(blocks, chapter_number, solutions=None):
+def number_chapter(blocks, chapter_number, solutions=None,
+                   solution_outputs=None):
     """Walk the tree, assign numbers in place, return the label map.
 
     Adds to each numbered node:  node["number"] = "1.4"
@@ -90,6 +91,16 @@ def number_chapter(blocks, chapter_number, solutions=None):
                 if not node["star"]:
                     subsection += 1
                     node["number"] = f"{chapter_number}.{section}.{subsection}"
+                elif node.get("label") and section:
+                    # \subsection*{…}\label{…}: \cref names the enclosing
+                    # section, as cleveref does; the link lands on the
+                    # heading itself
+                    labels[node["label"]] = {
+                        "kind": "section",
+                        "number": f"{chapter_number}.{section}",
+                        "anchor": anchor_for(node["label"]),
+                    }
+                    node["anchor"] = True
                 continue
             if t == "anchor":
                 record(node["label"], "anchor", None)
@@ -110,6 +121,11 @@ def number_chapter(blocks, chapter_number, solutions=None):
                 continue
             if t == "listing":
                 count(node, "listing")
+                continue
+            if t == "output":
+                # captured outputs (economics, computer science): their own
+                # per-chapter counter, "Output N.M."
+                count(node, "output")
                 continue
             if t == "tablefloat":
                 # a \caption'ed table float steps LaTeX's table counter;
@@ -143,6 +159,22 @@ def number_chapter(blocks, chapter_number, solutions=None):
     in_solutions = True
     for body in (solutions or {}).values():
         walk(body)
+
+    def walk_outputs(nodes):
+        for node in nodes:
+            if node["t"] == "output":
+                count(node, "output")
+            elif node["t"] in ("env", "ivrunin", "quote"):
+                walk_outputs(node["body"])
+            elif node["t"] == "list":
+                for item in node["items"]:
+                    walk_outputs(item)
+    if solutions is None:
+        # computer science: a solution may refer to its own captured
+        # output ("as Output 7.9 shows") — the outputs of the solutions
+        # run on from the chapter's
+        for body in (solution_outputs or {}).values():
+            walk_outputs(body)
     return labels
 
 

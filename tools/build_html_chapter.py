@@ -81,6 +81,20 @@ KATEX_MACROS = {
     "\\sign": "\\operatorname{sign}",
     "\\pnl": "\\mathrm{P\\&L}",
     "\\euro": "\\text{€}\\,",
+    # styles/oneeconomics.sty (\\Var and \\Cov: as onequant.sty above)
+    "\\Corr": "\\operatorname{Corr}",
+    "\\plim": "\\operatorname{plim}",
+    "\\argmax": "\\operatorname*{arg\\,max}",
+    "\\argmin": "\\operatorname*{arg\\,min}",
+    "\\pd": "\\frac{\\partial #1}{\\partial #2}",
+    "\\pdd": "\\frac{\\partial^2 #1}{\\partial #2\\,\\partial #3}",
+    # styles/onecs.sty
+    "\\BigO": "\\operatorname{O}",
+    "\\Oh": "O\\!\\left(#1\\right)",
+    # (rule names beside an inference rule, a straight quote in a type
+    # variable: KaTeX has neither small capitals nor \\textquotesingle)
+    "\\textsc": "\\textrm{#1}",
+    "\\textquotesingle": "\\char\"27 ",
     # styles/onechemistry.sty: the dispersity symbol Đ (\\text{\\DH})
     "\\DH": "\u0110",
 }
@@ -128,7 +142,90 @@ def _clean_math(t):
                   "\\left(\\begin{smallmatrix}")
     t = t.replace("\\end{psmallmatrix}",
                   "\\end{smallmatrix}\\right)")
+    if "\\inferrule" in t:
+        t = _inference_rules(t)
+    if "\\code" in t:
+        t = _code_in_math(t)
+    # computer science: typewriter text and a caret inside a formula
+    t = t.replace("\\text{\\ttfamily", "\\texttt{")
+    t = re.sub(r"\\textasciicircum(?![a-zA-Z])(\{\})?",
+               lambda m: "\\text{\\textasciicircum}", t)
     return t
+
+
+# \code{…} inside a formula: KaTeX typewriter text, its characters escaped.
+_CODE_ESCAPES = {"_": "\\_", "#": "\\#", "%": "\\%", "&": "\\&", "$": "\\$",
+                 "{": "\\{", "}": "\\}", "~": "\\textasciitilde ",
+                 "^": "\\textasciicircum ", "\\": "\\textbackslash "}
+
+
+def _code_in_math(t):
+    out, i = [], 0
+    while True:
+        j = t.find("\\code{", i)
+        if j < 0:
+            out.append(t[i:])
+            return "".join(out)
+        out.append(t[i:j])
+        depth, k = 0, j + len("\\code")
+        while k < len(t):
+            if t[k] == "{":
+                depth += 1
+            elif t[k] == "}":
+                depth -= 1
+                if depth == 0:
+                    break
+            k += 1
+        body = t[j + len("\\code{"):k]
+        out.append("\\texttt{"
+                   + "".join(_CODE_ESCAPES.get(c, c) for c in body) + "}")
+        i = k + 1
+
+
+def _inference_rules(t):
+    """mathpartir (computer science books): KaTeX has no \\inferrule. The
+    premises go over the conclusion as a fraction, the rule name to its
+    right; \\\\ between premises becomes a quad. The last rule of the string
+    holds no other one, so proof trees convert from the inside out."""
+    while True:
+        m = None
+        for m in re.finditer(r"\\inferrule\*?\s*", t):
+            pass
+        if m is None:
+            return t
+        i, name = m.end(), ""
+        if t[i:i + 1] == "[":
+            j = t.find("]", i)
+            if j < 0:
+                sys.exit(f"error: unbalanced \\inferrule option in {t!r}")
+            opt = t[i + 1:j]
+            named = re.match(r"\s*(?:[Rr]ight|[Ll]eft)\s*=\s*(.*)", opt, re.S)
+            name = (named.group(1) if named else opt).strip()
+            i = j + 1
+        groups = []
+        for _ in range(2):
+            while t[i:i + 1] in (" ", "\n", "\t"):
+                i += 1
+            if t[i:i + 1] != "{":
+                sys.exit(f"error: \\inferrule needs two groups in {t!r}")
+            depth, k = 0, i
+            while k < len(t):
+                if t[k] == "\\":
+                    k += 2
+                    continue
+                if t[k] == "{":
+                    depth += 1
+                elif t[k] == "}":
+                    depth -= 1
+                    if depth == 0:
+                        break
+                k += 1
+            groups.append(t[i + 1:k])
+            i = k + 1
+        premises = groups[0].replace("\\\\", "\\qquad ").strip() or "\\ "
+        label = f"\\,\\scriptstyle\\text{{{name}}}" if name else ""
+        t = (t[:m.start()] + f"{{\\dfrac{{{premises}}}{{{groups[1]}}}"
+             + label + "}" + t[i:])
 
 
 def render_math(segments, macros):
@@ -243,7 +340,8 @@ def main():
             if sols_path else {}
         labels = model.number_chapter(
             blocks, args.chapter_number,
-            solutions=solutions if model.has_questions(blocks) else None)
+            solutions=solutions if model.has_questions(blocks) else None,
+            solution_outputs=solutions)
         model.resume_list_starts(blocks)
         editions[lang] = {
             "title": title, "label": ch_label, "blocks": blocks,

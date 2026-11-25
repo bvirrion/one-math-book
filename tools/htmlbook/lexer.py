@@ -53,14 +53,31 @@ QUANT_BOXES = {"dated": 2, "strategyfile": 1, "predictorcard": 1,
 # Chemistry- and Earth-book asides (styles/onechemistry.sty, oneearth.sty),
 # unnumbered: recall (no argument), inthefield/inthelab/history ([optional
 # title]), safety ({GHS pictograms} in chemistry, no argument in Earth).
-ASIDE_BOXES = ("recall", "inthefield", "inthelab", "history", "safety")
+ASIDE_BOXES = ("recall", "inthefield", "inthelab", "history", "safety",
+               # economics (oneeconomics.sty) and computer science
+               # (onecs.sty) asides, all with an [optional title]
+               "debate", "record", "measure", "inpractice")
+# Economics books: the four-point frame of a model box, in print order
+# (\assumes … \predicts … \tested … \breaks …, each a run-in lead).
+MODEL_POINTS = ("assumes", "predicts", "tested", "breaks")
+# Money (oneeconomics.sty): real currencies with their sign, the invented
+# ones with their name; the amount is a siunitx \num.
+MONEY = {"usd": "\\$\\num{#1}", "eur": "\\texteuro\\num{#1}",
+         "gbp": "\\textsterling\\num{#1}", "jpy": "\\textyen\\num{#1}",
+         "dal": "\\num{#1}~dalens", "kst": "\\num{#1}~kests"}
 # Pictures that are not tikzpicture environments (chemistry books): a
 # chemfig reaction scheme, a molecular-orbital diagram, the periodic table,
 # a lone structure. Compiled like a tikzpicture, from their raw source.
 CHEM_PICTURE = re.compile(
-    r"\\begin\{(tikzpicture|circuitikz|MOdiagram)\}"
+    r"\\begin\{(tikzpicture|circuitikz|MOdiagram|forest|bytefield)\}"
     r"|\\(schemestart|omperiodictable|chemfig|setchemfig"
-    r"|tdplotsetmaincoords)(?![a-zA-Z])")
+    r"|tdplotsetmaincoords|pgfplotstabletypeset)(?![a-zA-Z])")
+# Picture environments that compile as they are (no chemfig set-up prefix):
+# forest trees and bytefield layouts in the economics and computer science
+# books, beside tikzpicture and circuitikz.
+PLAIN_PICTURE_ENVS = ("tikzpicture", "circuitikz", "forest", "bytefield")
+PLAIN_PICTURE_RE = (r"\\begin\{(tikzpicture|circuitikz|forest|bytefield)\}"
+                    r".*?\\end\{\1\}")
 
 
 class ParseError(Exception):
@@ -118,6 +135,8 @@ def drop_print_tweaks(text):
     # (\tabcolsep: a tighter table for the print page)
     text = re.sub(r"\\setlength\{\\(?:emergencystretch|tabcolsep)\}"
                   r"\{[^{}]*\}%?", "", text)
+    # (\needspace{4\baselineskip}, \Needspace*{…}: keep-together hints)
+    text = re.sub(r"\\[Nn]eedspace\*?\{[^{}]*\}", "", text)
     text = re.sub(r"\{\\sisetup\{range-phrase=\{\\text\{--\}\}\}"
                   r"(\\\[.*?\\\])\}", r"\1", text, flags=re.S)
     return re.sub(r"\\qty\{([^{}]*)\}(?!\s*\{)", r"\1", text)
@@ -205,6 +224,13 @@ def find_inline_math_end(s, start):
     while i < len(s):
         c = s[i]
         if c == "\\":
+            m = re.match(r"\\inferrule\*?\s*\[", s[i:i + 16])
+            if m:
+                # mathpartir: \inferrule*[right=$\to$e]{…}{…} — the rule
+                # name is a bracket option that may hold its own $…$
+                end = s.find("]", i + m.end())
+                i = len(s) if end < 0 else end + 1
+                continue
             i += 2
             continue
         if c == "{":
@@ -215,6 +241,31 @@ def find_inline_math_end(s, start):
             return i
         i += 1
     return -1
+
+
+def mathpar_tex(body):
+    """mathpartir's mathpar (computer science books): inference rules
+    separated by \\and, which print wraps like a paragraph. Here: display
+    rows of rules, a row filled while its source stays short."""
+    rules = [r.strip() for r in re.split(r"\\and\b", body) if r.strip()]
+
+    def width(rule):
+        # printed width, roughly: a command is one sign, and a rule is as
+        # wide as the longer of its two storeys (about half its source)
+        signs = re.sub(r"\\[a-zA-Z]+\*?|right=", "x", rule)
+        return len(re.sub(r"[{}\[\]$\s]", "", signs)) // 2 + 4
+    rows, row, size = [], [], 0
+    for rule in rules:
+        if row and size + width(rule) > 62:
+            rows.append(row)
+            row, size = [], 0
+        row.append(rule)
+        size += width(rule)
+    if row:
+        rows.append(row)
+    return ("\\begin{gather*}"
+            + " \\\\[2ex] ".join(" \\qquad ".join(r) for r in rows)
+            + "\\end{gather*}")
 
 
 def find_env_end(cur, name):
@@ -245,6 +296,24 @@ def find_env_end(cur, name):
     cur.err(f"missing \\end{{{name}}}")
 
 
+def _verbatim_group_end(s, i):
+    """Index just past the balanced {...} group opening at s[i] (the
+    argument of \\code, read without interpreting what is inside)."""
+    depth = 0
+    while i < len(s):
+        if s[i] == "\\":
+            i += 2
+            continue
+        if s[i] == "{":
+            depth += 1
+        elif s[i] == "}":
+            depth -= 1
+            if depth == 0:
+                return i + 1
+        i += 1
+    return len(s)
+
+
 def split_top_level(body, sep_cmd, filename):
     """Split env body on a top-level command (\\item) — outside math, braces
     and nested environments. Returns list of chunks (first chunk = preamble
@@ -258,6 +327,13 @@ def split_top_level(body, sep_cmd, filename):
     while i < n:
         c = body[i]
         if c == "\\":
+            if body.startswith("\\code{", i) and not in_math:
+                # inline code is verbatim: a $ or & in it is a character
+                # (\code{"$f"}), not the start of a formula
+                end = _verbatim_group_end(body, i + len("\\code"))
+                buf.append(body[i:end])
+                i = end
+                continue
             if body.startswith("\\begin{", i):
                 env_depth += 1
             elif body.startswith("\\end{", i):
@@ -485,6 +561,55 @@ class Parser:
                     cur.i += m.end() - 1
                     blocks.append(self.parse_listing(cur))
                     continue
+                m = re.match(r"\\omcodes\s*\{", s[cur.i:])
+                if m:
+                    flush()
+                    cur.i += m.end() - 1
+                    blocks.append(self.parse_listing(cur, ranged=True))
+                    continue
+                m = re.match(r"\\input\s*\{(code/[^{}]+)\}\s*"
+                             r"(?=\\begin\{omfigure\})", s[cur.i:])
+                if m:
+                    # computer science: a generated file of definitions
+                    # read by the figure that follows it
+                    flush()
+                    cur.i += m.end()
+                    saved = self.chem_setup
+                    self.chem_setup += f"\\input{{{m.group(1)}}}\n"
+                    try:
+                        blocks.append(self.parse_env(cur))
+                    finally:
+                        self.chem_setup = saved
+                    continue
+                m = re.match(r"\\centerline\s*\{", s[cur.i:])
+                if m:
+                    # a centred line (computer science: a line of markup)
+                    flush()
+                    cur.i += m.end() - 1
+                    blocks.append({"t": "centered", "inl":
+                                   self.parse_inlines(read_group(cur))})
+                    continue
+                m = re.match(r"\\omimg\s*\{", s[cur.i:])
+                if m:
+                    # economics, computer science: \omimg{file}{width}
+                    # {caption}, a photograph in an omfigure with its
+                    # caption (\graphicspath is images/)
+                    flush()
+                    cur.i += m.end() - 1
+                    path, width, caption = [read_group(cur) for _ in range(3)]
+                    path = path.strip()
+                    if not path.startswith(("images/", "assets/")):
+                        path = "images/" + path
+                    blocks.append(self.parse_figure(
+                        f"\\includegraphics[width={width.strip()}]{{{path}}}\n"
+                        f"{{\\small {caption}}}"))
+                    continue
+                m = re.match(r"\\omoutput\s*(?=[\[{])", s[cur.i:])
+                if m:
+                    flush()
+                    cur.i += m.end()
+                    blocks.append(self.parse_output(cur))
+                    continue
                 m = re.match(r"\\(setchemfig|tdplotsetmaincoords)\s*\{",
                              s[cur.i:])
                 if m:
@@ -583,11 +708,17 @@ class Parser:
                         "chemfig": 1, "omorbs": 1, "babelsublr": 1,
                         "url": 1, "enlargethispage": 1, "markboth": 2,
                         "foreignlanguage": 2, "mbox": 1,
-                        "shortstack": 1}.get(name, 0)
+                        "shortstack": 1,
+                        "code": 1, "key": 1, "menu": 1, "phantom": 1,
+                        "usd": 1, "eur": 1, "gbp": 1, "jpy": 1,
+                        "dal": 1, "kst": 1}.get(name, 0)
             if name in ("H", "c", "v") \
                     and (cur.i >= len(s) or s[cur.i] != "{"):
                 n_groups = 0  # bare-letter accent form (\v S)
             out = [s[start:cur.i]]
+            if name in ("hspace", "vspace") and s[cur.i:cur.i + 1] == "*":
+                out.append("*")     # starred form: its group follows
+                cur.i += 1
             if name in ("omwx", "shortstack") \
                     and s[cur.i:cur.i + 1] == "[":
                 # an optional argument kept with the command
@@ -602,13 +733,21 @@ class Parser:
         cur.i += 2
         return out
 
-    def parse_listing(self, cur):
+    def parse_listing(self, cur, ranged=False):
         """\\omcode{path}{first}{last}{caption}, optionally followed by
         \\label{lst:...}: lines first..last of a tested source file (quant
-        books), read and highlighted by the emitter."""
+        books), read and highlighted by the emitter.
+        \\omcodes{path}{5-5,46-49}{caption} (economics, computer science):
+        several ranges of one file under one caption — "ranges" on the
+        node, "first"/"last" the outer bounds."""
         path = read_group(cur).strip()
-        first = read_group(cur).strip()
-        last = read_group(cur).strip()
+        ranges = None
+        if ranged:
+            ranges = self.line_ranges(cur, read_group(cur), "\\omcodes")
+            first, last = str(ranges[0][0]), str(ranges[-1][1])
+        else:
+            first = read_group(cur).strip()
+            last = read_group(cur).strip()
         caption = read_group(cur)
         if not (first.isdigit() and last.isdigit()):
             cur.err(f"\\omcode line range {first!r}..{last!r} is not numeric")
@@ -617,9 +756,46 @@ class Parser:
         if m:
             cur.i += m.end() - 1
             label = read_group(cur)
-        return {"t": "listing", "path": path, "first": int(first),
+        node = {"t": "listing", "path": path, "first": int(first),
                 "last": int(last), "caption": self.parse_inlines(caption),
                 "label": label}
+        if ranges and len(ranges) > 1:
+            node["ranges"] = ranges
+        return node
+
+    def line_ranges(self, cur, spec, macro, open_end=False):
+        """"3-5,9" -> [(3, 5), (9, 9)]: a lone number is one line; "8-"
+        (outputs only) runs to the end of the file, as (8, None)."""
+        ranges = []
+        for part in spec.split(","):
+            m = re.fullmatch(r"\s*(\d+)\s*(?:(-)\s*(\d*))?\s*", part)
+            if not m or (m.group(2) and not m.group(3) and not open_end):
+                cur.err(f"{macro} line ranges {spec!r} are not numeric")
+            first = int(m.group(1))
+            last = first if not m.group(2) else \
+                int(m.group(3)) if m.group(3) else None
+            if last is not None and last < first:
+                cur.err(f"{macro} line range {part.strip()!r} runs backwards")
+            ranges.append((first, last))
+        return ranges
+
+    def parse_output(self, cur):
+        """\\omoutput[1-1,10-18]{path}{caption}, optionally followed by
+        \\label{out:...}: a captured output file (written by the book's
+        tools/capture_output.py), whole or only the listed lines, with its
+        own numbered caption ("Output N.M.")."""
+        opt = read_optional(cur)
+        ranges = self.line_ranges(cur, opt, "\\omoutput", open_end=True) \
+            if opt and opt.strip() else None
+        path = read_group(cur).strip()
+        caption = read_group(cur)
+        label = None
+        m = re.match(r"[ \t]*\n?[ \t]*\\label\{", cur.s[cur.i:])
+        if m:
+            cur.i += m.end() - 1
+            label = read_group(cur)
+        return {"t": "output", "path": path, "ranges": ranges,
+                "caption": self.parse_inlines(caption), "label": label}
 
     # ------------------------------------------------------------------ envs
 
@@ -646,6 +822,8 @@ class Parser:
             body = find_env_end(cur, name)
             return {"t": "dmath",
                     "tex": f"\\begin{{{name}}}" + body + f"\\end{{{name}}}"}
+        if name == "mathpar":
+            return {"t": "dmath", "tex": mathpar_tex(find_env_end(cur, name))}
         if name == "multline*":
             # KaTeX has no multline: the same lines, centred
             body = find_env_end(cur, name)
@@ -753,6 +931,76 @@ class Parser:
             return {"t": "env", "kind": name, "title": title, "label": label,
                     "difficulty": None, "sol_key": None, "asof": asof,
                     "body": body_blocks}
+        if name in ("omchart", "openingchart"):
+            # economics: a chart drawn from data — {caption}{source line},
+            # then the picture; print sets both under it (an omfigure)
+            caption, source = read_group(cur), read_group(cur)
+            node = self.parse_figure(find_env_end(cur, name))
+            if node["caption"]:
+                raise ParseError(
+                    f"{self.filename}: text beside the picture of a {name}")
+            node["caption"] = self.parse_inlines(caption)
+            node["source"] = self.parse_inlines(source)
+            return node
+        if name == "model":
+            # economics: \begin{model}{Name} \assumes … \predicts …
+            # \tested … \breaks … — four run-in points, in that order
+            title = self.parse_inlines(read_group(cur))
+            pieces = re.split(r"\\(" + "|".join(MODEL_POINTS) + r")\b",
+                              find_env_end(cur, name))
+            # (an \index entry may open the box, and a \label when the
+            # model is itself a defined term: the target of its \omterm)
+            lead_in = re.sub(r"\\index\{[^{}]*\}", "", pieces[0])
+            mlab = re.fullmatch(r"\s*\\label\{([^{}]*)\}\s*", lead_in)
+            label = mlab.group(1) if mlab else None
+            if (lead_in.strip() and not mlab) \
+                    or tuple(pieces[1::2]) != MODEL_POINTS:
+                raise ParseError(
+                    f"{self.filename}: a model box needs \\assumes, "
+                    "\\predicts, \\tested and \\breaks, once each, in order")
+            body_blocks = []
+            for key, chunk in zip(pieces[1::2], pieces[2::2]):
+                point = self.parse_blocks(chunk)
+                if not point or point[0]["t"] != "para":
+                    raise ParseError(
+                        f"{self.filename}: \\{key} of a model box must "
+                        "open with a paragraph")
+                point[0]["lead"] = key
+                body_blocks += point
+            return {"t": "env", "kind": "model", "title": title,
+                    "label": label, "difficulty": None, "sol_key": None,
+                    "pics": [], "body": body_blocks}
+        if name == "quote":
+            # computer science: a displayed block — a project brief in
+            # italics, or pseudo-code set line by line (\\ ends a line,
+            # \hspace*{1.5em} indents the next)
+            body = find_env_end(cur, name)
+            italic = re.match(r"\s*\\itshape\b\s*", body)
+            if italic:
+                body = body[italic.end():]
+            body = "\\newline ".join(split_top_level(body, "\\",
+                                                     self.filename))
+            node = {"t": "quote", "body": self.parse_blocks(body)}
+            if italic:
+                node["italic"] = True
+            return node
+        if name == "minipage":
+            # economics: a row of minipages in the running text (tables
+            # typeset from data, each under its title) — one picture,
+            # composed as in print
+            start = cur.i - len("\\begin{minipage}")
+            while True:
+                find_env_end(cur, "minipage")
+                more = re.match(r"\s*(?:\\hfill|\\q?quad)?\s*"
+                                r"\\begin\{minipage\}", s[cur.i:])
+                if not more:
+                    break
+                cur.i += more.end()
+            src = s[start:cur.i]
+            if not CHEM_PICTURE.search(src):
+                cur.err("a minipage outside a figure must hold pictures")
+            return {"t": "figure", "label": None, "caption": [],
+                    "tikzs": ["\\noindent " + self.chem_setup + src]}
         if name in ASIDE_BOXES:
             title, pics = None, []
             if name == "safety" and s[cur.i:cur.i + 1] != "{":
@@ -806,9 +1054,15 @@ class Parser:
             opt = read_optional(cur)
             resume = bool(opt) and "resume" in opt
             alpha = False
+            marker = None
             for o in (opt or "").split(","):
+                mk = re.fullmatch(r"label=([A-Za-z]*)\\arabic\*([.)]?)",
+                                  o.strip())
                 if o.strip() == "label=(\\alph*)":
                     alpha = True    # Earth books: (a), (b)…
+                elif mk:
+                    # computer science: requirements numbered R1., R2.…
+                    marker = (mk.group(1), mk.group(2))
                 # beginpenalty (chemistry): a print page-break hint
                 elif o.strip() and o.strip() != "resume" \
                         and not re.fullmatch(r"beginpenalty=\d+|leftmargin=\*"
@@ -827,6 +1081,8 @@ class Parser:
                     "items": items}
             if alpha:
                 node["alpha"] = True
+            if marker:
+                node["marker"] = marker
             return node
         if name in BLOCK_ENVS:
             title, sol_key, difficulty = None, None, None
@@ -965,7 +1221,10 @@ class Parser:
 
     FIGURE_SETUP = re.compile(
         r"\\(setchemfig|tdplotsetmaincoords|pgfplotsset|tikzset|colorlet"
-        r"|pgfplotstableread|pgfplotstablegetelem)\s*\{")
+        r"|pgfplotstableread|pgfplotstablegetelem"
+        # computer science: colours and forest styles local to a figure,
+        # and a generated file of definitions the picture reads
+        r"|definecolor|forestset|input)\s*\{")
 
     def expand_photo_macro(self, body):
         """A photo-grid macro defined inside the figure (Earth books):
@@ -999,8 +1258,7 @@ class Parser:
         saved = self.chem_setup
         body = self.expand_photo_macro(body)
         pictures = [(m.start(), m.end()) for m in re.finditer(
-            r"\\begin\{(tikzpicture|circuitikz)\}.*?\\end\{\1\}", body,
-            re.S)]
+            PLAIN_PICTURE_RE, body, re.S)]
         pos = 0
         while True:
             m = self.FIGURE_SETUP.search(body, pos)
@@ -1012,7 +1270,8 @@ class Parser:
             cur = Cursor(body, self.filename)
             cur.i = m.end() - 1
             groups = 2 if m.group(1) in ("tdplotsetmaincoords", "colorlet",
-                                         "pgfplotstablegetelem") else 1
+                                         "pgfplotstablegetelem") else \
+                3 if m.group(1) == "definecolor" else 1
             setup = f"\\{m.group(1)}" + "".join(
                 "{" + read_group(cur) + "}" for _ in range(groups))
             trailer = {
@@ -1058,6 +1317,10 @@ class Parser:
         # \makebox[0.32\linewidth]{\includegraphics…}: print-only cell width
         rest = re.sub(r"\\makebox\[[^\]]*\]\{(\\includegraphics"
                       r"(?:\[[^\]]*\])?\{[^{}]*\})\}", r"\1", body)
+        # \raisebox{-0.5\height}{\includegraphics…}: a photo centred on the
+        # drawing beside it (computer science) — print-only alignment
+        rest = re.sub(r"\\raisebox\{[^{}]*\}\{(\\includegraphics"
+                      r"(?:\[[^\]]*\])?\{[^{}]*\})\}", r"\1", rest)
         composed = self.composed_picture(rest)
         if composed:
             tikzs, rest = [composed[0]], composed[1]
@@ -1083,7 +1346,8 @@ class Parser:
             table, rest = self.parse_table_figure(rest)
         math = None
         if not tikzs and table is None:
-            mm = re.search(r"\\begin\{(align\*|equation\*|gather\*)\}", rest)
+            mm = re.search(r"\\begin\{(align\*|equation\*|gather\*|mathpar)\}",
+                           rest)
             if mm:
                 end_pat = f"\\end{{{mm.group(1)}}}"
                 e = rest.find(end_pat, mm.start())
@@ -1094,6 +1358,10 @@ class Parser:
                 if mm.group(1) == "equation*":
                     math = math[len("\\begin{equation*}"):
                                 -len("\\end{equation*}")].strip()
+                elif mm.group(1) == "mathpar":
+                    # a figure of inference rules (computer science)
+                    math = mathpar_tex(math[len("\\begin{mathpar}"):
+                                            -len("\\end{mathpar}")])
                 rest = rest[:mm.start()] + rest[e:]
         if not tikzs and table is None and math is None and grid is None:
             raise ParseError(
@@ -1366,12 +1634,26 @@ class Parser:
             table = self.parse_center(inner)
             return table, body[:m.start()] + body[cur.i:]
         m = re.search(r"\\begin\{tabular\}", body)
-        cur = Cursor(body, self.filename)
-        cur.i = m.end()
-        read_group(cur)   # colspec; parse_center re-reads it
-        find_env_end(cur, "tabular")
-        table = self.parse_center(body[m.start():cur.i])
-        return table, body[:m.start()] + body[cur.i:]
+        prefix, rest = body[:m.start()], body[m.start():]
+        tables = []
+        while True:
+            cur = Cursor(rest, self.filename)
+            cur.i = len("\\begin{tabular}")
+            read_group(cur)   # colspec; parse_center re-reads it
+            find_env_end(cur, "tabular")
+            tables.append(self.parse_center(rest[:cur.i]))
+            rest = rest[cur.i:]
+            # economics: bank balance sheets set one under the other,
+            # with only vertical space between them
+            more = re.match(r"(?:\s|\\(?:medskip|smallskip|bigskip|par)\b)*"
+                            r"(?=\\begin\{tabular\})", rest)
+            if not more:
+                break
+            rest = rest[more.end():]
+        if len(tables) == 1:
+            return tables[0], prefix + rest
+        return ({"t": "tables", "tables": tables, "stacked": True},
+                prefix + rest)
 
     INCLUDEGRAPHICS = re.compile(
         r"\\includegraphics(?:\[((?:[^\[\]{}]|\{[^{}]*\})*)\])?\s*\{([^{}]*)\}")
@@ -1498,11 +1780,18 @@ class Parser:
         are separated by \\qquad), optionally after an \\arraystretch
         row-height tweak (print-only; CSS handles it in HTML)."""
         body = body.strip()
+        mono = False
         while True:
             # print-only row height and sizing, in either order
             stripped = re.sub(r"^\\renewcommand\{\\arraystretch\}"
                               r"\{[\d.]+\}\s*", "", body)
             stripped = re.sub(r"^\\small\s+", "", stripped)
+            # computer science: \small\ttfamily\frenchspacing before a
+            # typewriter block (a derivation, a formula typed by a clerk)
+            tt = re.match(r"(?:\\small\s*)?\\ttfamily\b\s*"
+                          r"(?:\\frenchspacing\b\s*)?", stripped)
+            if tt:
+                mono, stripped = True, stripped[tt.end():]
             # {\small \begin{tabular}…} as one group (Earth books)
             group = re.fullmatch(r"(?:\{\s*(?:\\small\s+)?|\\babelsublr\{\s*)"
                                  r"(\\begin\{tabular\}.*)\}",
@@ -1514,7 +1803,16 @@ class Parser:
             body = stripped
         if "\\begin{tabular}" not in body:
             # a centred line of text (a displayed DNA sequence)
-            return {"t": "centered", "inl": self.parse_inlines(body)}
+            inl = self.parse_inlines(body)
+            if mono:
+                inl = [{"t": "code", "inl": inl}]
+            return {"t": "centered", "inl": inl}
+        if mono:
+            # rows indented by hand with "\ \ ": keep the indent
+            body = re.sub(
+                r"(?m)^((?:\\ )+)",
+                lambda m: "\\hspace*{%.1fem}" % (0.6 * (len(m.group(1)) // 2)),
+                body)
         tables = []
         cur = Cursor(body, self.filename)
         while True:
@@ -1553,6 +1851,9 @@ class Parser:
             tables.append(self.parse_tabular(colspec, tab_body))
         if not tables:
             raise ParseError(f"{self.filename}: empty center block")
+        if mono:
+            for table in tables:
+                table["mono"] = True
         if len(tables) == 1:
             return tables[0]
         return {"t": "tables", "tables": tables}
@@ -1602,6 +1903,12 @@ class Parser:
         while i < n:
             c = raw[i]
             if c == "\\":
+                if raw.startswith("\\code{", i) and not in_math:
+                    # verbatim inline code: its $ and & are characters
+                    end = _verbatim_group_end(raw, i + len("\\code"))
+                    buf.append(raw[i:end])
+                    i = end
+                    continue
                 buf.append(raw[i:i + 2])
                 i += 2
                 continue
@@ -1675,8 +1982,7 @@ class Parser:
         "+" signs and \\chemmove arrows joining them — is one picture: its
         whole source up to the closing {\\small caption} compiles at once.
         Returns (source, caption) or None for every other figure."""
-        bare = re.sub(r"\\begin\{(tikzpicture|circuitikz)\}.*?\\end\{\1\}",
-                      "", body, flags=re.S)
+        bare = re.sub(PLAIN_PICTURE_RE, "", body, flags=re.S)
         # a tabular of tikzpictures and their labels (Earth books) as well
         grid = re.search(r"\\begin\{tabular\}.*\\begin\{tikzpicture\}"
                          r".*\\end\{tabular\}", body, re.S)
@@ -1741,6 +2047,13 @@ class Parser:
                 cur.i = e + len("\\schemestop")
             elif cmd == "omperiodictable":
                 read_optional(cur)
+            elif cmd == "pgfplotstabletypeset":
+                # economics: a table typeset from a figdata CSV — compiled
+                # as a picture, so every number is formatted as in print
+                read_optional(cur)
+                while cur.i < len(rest) and rest[cur.i] in " \n":
+                    cur.i += 1
+                read_group(cur)
             else:
                 read_group(cur)
             # curved arrows drawn over the structure just set
@@ -1751,11 +2064,17 @@ class Parser:
                 cur.i += mm.end()
                 read_optional(cur)
                 read_group(cur)
-            src = rest[m.start():cur.i]
-            sources.append(src if env in ("tikzpicture", "circuitikz")
+            start = m.start()
+            if cmd == "pgfplotstabletypeset":
+                # its size switch (\small before the table) is part of it
+                pre = re.search(r"\\(small|footnotesize)\s*$", rest[:start])
+                if pre:
+                    start = pre.start()
+            src = rest[start:cur.i]
+            sources.append(src if env in PLAIN_PICTURE_ENVS
                            and not setup else setup + src)
-            rest = rest[:m.start()] + rest[cur.i:]
-            pos = m.start()
+            rest = rest[:start] + rest[cur.i:]
+            pos = start
         return sources, rest
 
     # --------------------------------------------------------------- inlines
@@ -1920,6 +2239,32 @@ class Parser:
                     emit_text()
                     out.append({"t": "code",
                                 "inl": [{"t": "text", "s": read_group(cur)}]})
+                elif name == "code":
+                    # inline code (economics, computer science): the
+                    # argument as written (\detokenize in print), its runs
+                    # of blanks read as one space, as TeX reads them
+                    emit_text()
+                    out.append({"t": "code", "inl": [{
+                        "t": "text",
+                        "s": re.sub(r"\s+", " ", read_group(cur))}]})
+                elif name in ("key", "menu"):
+                    # a keyboard key (\key{Shift}), a menu path
+                    # (\menu{File > Save})
+                    emit_text()
+                    out.append({"t": "kbd" if name == "key" else "menu",
+                                "inl": self.parse_inlines(read_group(cur))})
+                elif name in MONEY:
+                    emit_text()
+                    out.extend(self.parse_inlines(
+                        MONEY[name].replace("#1", read_group(cur))))
+                elif name == "textyen":
+                    text.append("¥")
+                elif name == "phantom":
+                    # invisible text that keeps its width (aligned labels
+                    # in a table)
+                    emit_text()
+                    out.append({"t": "phantom",
+                                "inl": self.parse_inlines(read_group(cur))})
                 elif name == "si":
                     # siunitx v2 name of \unit
                     emit_text()
@@ -2006,9 +2351,42 @@ class Parser:
                     # \ensuremath{\mathrm{CO_2}} in prose = inline math
                     emit_text()
                     out.append({"t": "math", "tex": read_group(cur)})
+                elif name == "hspace" and s.startswith("*", cur.i):
+                    # \hspace*{2em}: an indent that survives a line start
+                    # (computer science: pseudo-code and code lines set by
+                    # hand) — kept as a spacer of that width in em
+                    cur.i += 1
+                    width = read_group(cur).strip()
+                    m2 = re.fullmatch(r"([\d.]+)\s*em", width)
+                    if m2:
+                        emit_text()
+                        out.append({"t": "indent", "em": float(m2.group(1))})
+                    else:
+                        text.append(" ")
                 elif name == "hspace":
                     read_group(cur)
                     text.append(" ")
+                elif name == "textasciicircum":
+                    if s.startswith("{}", cur.i):
+                        cur.i += 2
+                    text.append("^")
+                elif name == "string":
+                    # \string" : the next character, as it is
+                    text.append(s[cur.i:cur.i + 1])
+                    cur.i += 1
+                elif name == "char":
+                    # \char34 : the character with that code
+                    m2 = re.match(r"(\d+)\s?", s[cur.i:])
+                    if not m2:
+                        cur.err("unsupported \\char form")
+                    text.append(chr(int(m2.group(1))))
+                    cur.i += m2.end()
+                elif name == "ss":
+                    text.append("ß")
+                elif name == "qed":
+                    text.append("∎")    # end-of-proof mark in running text
+                elif name in ("frenchspacing", "sffamily", "ttfamily"):
+                    pass  # sentence spacing, a font switch inside a group
                 elif name == "rule":
                     # struts like \rule{0pt}{11pt} (table row spacing)
                     read_group(cur)
@@ -2236,7 +2614,8 @@ def parse_solutions(path, iv=None):
     # Drop the \section*{Chapter \ref{...} --- ...} header (it repeats the
     # chapter title and its \ref cannot be resolved standalone). The title
     # may span lines, so strip the balanced group, not a single line.
-    m = re.match(r"\s*\\section\*", text)
+    # (a comment line may stand above it)
+    m = re.match(r"(?:\s*%[^\n]*\n)*\s*\\section\*", text)
     if m:
         cur = Cursor(text, str(path))
         cur.i = m.end()

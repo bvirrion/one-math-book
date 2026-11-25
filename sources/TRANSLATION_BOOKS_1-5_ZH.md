@@ -94,8 +94,8 @@ Sweeps for installed years: `tools/zh_sweeps.py <year> [--fix]` (in `draft/zh-sw
 
 - 1,182 Haiku calls, about $17.3 list: the year ran across the pause and five passes, and still ended with 10 rejected
   sections (a `$` moved to the next line, `\operatorname{diam}` written `\text{直径}`, two formulas swapped by Chinese
-  word order). Finished by hand from each last reply and saved through every check (`fixsec.py` in scratch: dump the
-  last reply, edit, save via `C.Run.save_section`), then a re-run rebuilt the files with no call. Bachelor-2 ended the
+  word order). Finished by hand from each last reply and saved through every check (`fixsec.py`, now
+  `pilot_translation/fixsec.py`: dump the last reply, edit, save through every check), then a re-run rebuilt the files with no call. Bachelor-2 ended the
   same way (4 sections).
 - 363 pp, 0/0/0, missing character 0; gate green; 3,954 term links to 101 targets (English 3,944 to 106).
 - Score file `translation_scores/book_3/zh/translation_score.md` (defect table there).
@@ -135,7 +135,8 @@ Sweeps for installed years: `tools/zh_sweeps.py <year> [--fix]` (in `draft/zh-sw
 - The 24 were all "ordered math-span sequence differs". Two scripted rules fixed 12 of them with no other edit: a
   formula split over two lines in English that Haiku reopened with a `$` on the next line, and a `$x` left unclosed at a
   line end where English closes it. The other 12 were finished by hand (formulas swapped by Chinese word order, an extra
-  or missing variable, `\index{西罗 $p$-子群}` adding math). Scripts: scratch `leaddollar.py`, `taildollar.py`.
+  or missing variable, `\index{西罗 $p$-子群}` adding math). Scripts: scratch `leaddollar.py`, `taildollar.py`, since built into the reply check (`repair_dollars` in
+  `pilot_translation/common.py`, 2026-11-18).
 - 361 pp, 0/0/0, missing character 0; gate green; 3,008 term links to 125 targets (English 4,326 to 130).
 - Score file `translation_scores/book_5/zh/translation_score.md` (defect table there).
 - 140 Latin names converted (one name map, then 4 by hand); the map now covers about 90 mathematicians.

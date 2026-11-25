@@ -361,12 +361,26 @@ class FigureBuilder:
             # Arabic pictures (lualatex) stay serial: under concurrent
             # load luaotfload shapes their labels differently run to run
             if not is_raster(tikz) and not ARABIC.search(tikz):
-                todo.setdefault(tikz_hash(tikz), tikz)
+                h = tikz_hash(tikz)
+                if not self.published(h):
+                    todo.setdefault(h, tikz)
         if jobs < 2 or len(todo) < 2:
             return
         with ThreadPoolExecutor(max_workers=jobs) as pool:
             for h, result in zip(todo, pool.map(build_svg, todo.values())):
                 self.built[h] = result
+
+    def published(self, h):
+        """OM_FIG_REUSE=1: the figure already in the output directory, for a
+        rebuild that changes text only (a converter fix in the fragments).
+        The file name is the hash of the picture's source, so a published
+        file is that picture — unless the style file or the figure toolchain
+        changed since, which the hash does not see: leave the variable unset
+        for those."""
+        path = self.svg_dir / f"fig-{h}.svg"
+        if os.environ.get("OM_FIG_REUSE") == "1" and path.exists():
+            return path
+        return None
 
     def figure_info(self, tikz):
         if tikz in self.cache:
@@ -379,10 +393,14 @@ class FigureBuilder:
             if info["hash"] == h:
                 self.cache[tikz] = info
                 return info
-        svg, width, height = self.built.pop(h, None) or build_svg(tikz)
-        self.svg_dir.mkdir(parents=True, exist_ok=True)
         filename = f"fig-{h}.svg"
-        (self.svg_dir / filename).write_text(svg, encoding="utf-8")
+        if self.published(h):
+            width, height = _svg_size(
+                self.published(h).read_text(encoding="utf-8"))
+        else:
+            svg, width, height = self.built.pop(h, None) or build_svg(tikz)
+            self.svg_dir.mkdir(parents=True, exist_ok=True)
+            (self.svg_dir / filename).write_text(svg, encoding="utf-8")
         info = {"hash": h, "file": filename, "width": width,
                 "height": height, "url": f"{self.url_prefix}/{filename}"}
         self.cache[tikz] = info

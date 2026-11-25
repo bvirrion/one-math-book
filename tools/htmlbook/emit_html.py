@@ -32,6 +32,13 @@ LISTING_LEXERS = {
     ".v": "systemverilog", ".xml": "xml", ".xhtml": "html", ".sh": "bash",
     ".json": "json", ".toml": "toml", ".txt": "text", ".csv": "text",
     ".cs": "csharp", ".java": "java", ".sol": "solidity",
+    # economics and computer science books; where their style file names no
+    # listings language (RISC-V .S, the toy machine, grammars…) the code is
+    # plain text, as in print. A Makefile is keyed by its name.
+    ".c": "c", ".cc": "cpp", ".html": "html", "Makefile": "make",
+    ".Makefile": "make",
+    ".css": "text", ".S": "text", ".toy": "text", ".moor": "text",
+    ".grammar": "text", ".y": "text", ".lam": "text",
 }
 # Pygments short token classes kept in the HTML, coarsened to what the
 # reader CSS colours (keywords, strings, comments, numbers, a few names).
@@ -121,7 +128,9 @@ _SCRIPT_GROUP = r"\{((?:[^{}]|\{[^{}]*\})*)\}"
 def _script(text, table, mark):
     """An exponent or an index: Unicode when every character has a form."""
     text = text.replace("{", "").replace("}", "").strip()
-    if text and all(c in table for c in text):
+    if not text:        # an empty group, as in {}^{2}x written x^{}: no mark
+        return ""
+    if all(c in table for c in text):
         return "".join(table[c] for c in text)
     simple = len(text) < 2 or (mark == "_" and text.isalnum())
     return f"{mark}{text}" if simple else f"{mark}({text})"
@@ -160,22 +169,25 @@ def tex_to_text(tex):
     s = re.sub(r"\\sqrt\{([^{}]{2,})\}", r"√(\1)", s)
     s = re.sub(r"\\([a-zA-Z]+)", command, s)
     s = re.sub(r"\^" + _SCRIPT_GROUP + r"|\^(\S)",
-               lambda m: _script(m.group(1) or m.group(2), SUPERSCRIPTS, "^"), s)
+               lambda m: _script(m.group(1) or m.group(2) or "", SUPERSCRIPTS, "^"), s)
     s = re.sub(r"_" + _SCRIPT_GROUP + r"|_(\S)",
-               lambda m: _script(m.group(1) or m.group(2), SUBSCRIPTS, "_"), s)
+               lambda m: _script(m.group(1) or m.group(2) or "", SUBSCRIPTS, "_"), s)
     s = s.replace("{", "").replace("}", "")
     s = s.replace("\x01", "{").replace("\x02", "}")
     return re.sub(r"\s+", " ", s).strip()
 
 
-def plaintext(inlines, refs=None, math=tex_to_alt):
-    """Visible text of an inline run (titles, headings, meta descriptions).
+def plaintext(inlines, refs=None, math=tex_to_alt, phrases=None):
+    """Visible text of an inline run (titles, headings, meta descriptions,
+    image alt text).
 
     `refs` is an optional callable node -> str that spells out \cref /
     \eqref nodes ("Chapter 3", "(2.1)"); the Emitter provides one via
     plain_ref(). Without it references vanish, which leaves residues like
     "appeared in ;" in a meta description — pass it whenever labels are
-    resolvable. `math` turns a formula into text."""
+    resolvable. `math` turns a formula into text; `phrases` are the edition's
+    siunitx range and list words (unused here: the math books have no
+    siunitx; the argument keeps the call the same in every copy)."""
     out = []
     for node in inlines:
         t = node["t"]
@@ -183,12 +195,13 @@ def plaintext(inlines, refs=None, math=tex_to_alt):
             out.append(node["s"])
         elif t == "math":
             out.append(math(node["tex"]))
-        elif t in ("emph", "bold", "sup", "sub", "code", "span", "u", "ltr"):
-            out.append(plaintext(node["inl"], refs, math))
+        elif t in ("emph", "bold", "sup", "sub", "code", "span", "u", "ltr",
+                   "kbd", "menu"):
+            out.append(plaintext(node["inl"], refs, math, phrases))
         elif t == "term":
-            out.append(plaintext(node["inl"], refs, math))
+            out.append(plaintext(node["inl"], refs, math, phrases))
         elif t == "field":
-            out.append(plaintext(node["inl"], refs, math) + ".")
+            out.append(plaintext(node["inl"], refs, math, phrases) + ".")
         elif t in ("cref", "eqref", "ref", "pageref") and refs is not None:
             out.append(refs(node))
     return "".join(out)
@@ -204,7 +217,10 @@ def printed_page(label, lang):
         pages = {}
         root = Path(__file__).resolve().parents[2]
         for aux in (root / "build").glob("*.aux"):
-            m = re.search(r"_(fr|nl|es|pt|hi|ar|id)$", aux.stem)
+            # every edition suffix, published in the reader or not: an
+            # unlisted one (zh, 2026-11-19) was read as English and its
+            # pages overwrote the English ones
+            m = re.search(r"_(fr|nl|es|pt|hi|ar|id|zh)$", aux.stem)
             if (m.group(1) if m else "en") != lang:
                 continue
             text = aux.read_text(encoding="utf-8", errors="replace")
@@ -322,6 +338,17 @@ class Emitter:
                 out.append(f"<strong>{self.inlines(node['inl'])}</strong>")
             elif t == "code":
                 out.append(f"<code>{self.inlines(node['inl'])}</code>")
+            elif t == "kbd":
+                out.append(f"<kbd>{self.inlines(node['inl'])}</kbd>")
+            elif t == "menu":
+                out.append(f'<span class="om-menu">'
+                           f"{self.inlines(node['inl'])}</span>")
+            elif t == "phantom":
+                out.append(f'<span class="om-phantom" aria-hidden="true">'
+                           f"{self.inlines(node['inl'])}</span>")
+            elif t == "indent":
+                out.append(f'<span class="om-indent" '
+                           f'style="width:{node["em"]:g}em"></span>')
             elif t == "u":
                 out.append(f"<u>{self.inlines(node['inl'])}</u>")
             elif t == "span":
@@ -429,7 +456,12 @@ class Emitter:
         out = []
         for node in nodes:
             t = node["t"]
-            if t == "para":
+            if t == "para" and node.get("lead"):
+                # a point of an economics model box: "Assumes. …"
+                out.append(f'<p><strong class="om-model-lead">'
+                           f"{self.lang.model_leads[node['lead']]}</strong> "
+                           f"{self.inlines(node['inl'])}</p>")
+            elif t == "para":
                 css = f' class="{node["css"]}"' if node.get("css") else ""
                 out.append(f"<p{css}>{self.inlines(node['inl'])}</p>")
             elif t == "dmath":
@@ -452,7 +484,11 @@ class Emitter:
                         f"</span> {title}</h2>")
             elif t == "subsection":
                 title = self.inlines(node["inl"])
-                if node["star"]:
+                if node["star"] and node.get("anchor"):
+                    # a labelled unnumbered subsection: a \cref target
+                    out.append(f'<h3 id="{anchor_for(node["label"])}">'
+                               f"{title}</h3>")
+                elif node["star"]:
                     out.append(f"<h3>{title}</h3>")
                 else:
                     num = node["number"]
@@ -488,6 +524,13 @@ class Emitter:
                 out.append(self.table_float(node))
             elif t == "listing":
                 out.append(self.listing(node))
+            elif t == "output":
+                out.append(self.output(node))
+            elif t == "quote":
+                css = "om-quote om-quote-it" if node.get("italic") \
+                    else "om-quote"
+                out.append(f'<blockquote class="{css}">\n'
+                           f"{self.blocks(node['body'])}\n</blockquote>")
             elif t == "lookfor":
                 out.append(f'<p class="om-iq-lookfor"><em>'
                            f"{self.lang.iq_lookfor} "
@@ -524,7 +567,7 @@ class Emitter:
         if kind in ("dated", "strategyfile", "predictorcard",
                     "tutorial", "build"):
             return self.quant_box(node)
-        if kind in ASIDE_BOXES:
+        if kind in ASIDE_BOXES or kind == "model":
             return self.aside(node)
         raise ParseError(f"emitter: unexpected environment {kind!r}")
 
@@ -560,8 +603,10 @@ class Emitter:
                     f'<div class="om-aside-pics{stack}"{style}>'
                     f'{"".join(pics)}</div>\n'
                     f'<div class="om-aside-text">\n{body}\n</div>\n</div>')
-        return (f'<section class="om-box om-aside om-{kind}">\n{head}\n'
-                f"{body}\n</section>")
+        # (an economics model box may be a defined term: its anchor)
+        anchor = f' id="{anchor_for(node["label"])}"' if node["label"] else ""
+        return (f'<section class="om-box om-aside om-{kind}"{anchor}>\n'
+                f"{head}\n{body}\n</section>")
 
     def inline_pic(self, node):
         """A picture inside the text (chemfig structure, orbital boxes,
@@ -611,10 +656,25 @@ class Emitter:
             raise ParseError(f"listing range {first}..{last} outside "
                              f"{path} ({len(lines)} lines)")
         code = "\n".join(lines[first - 1:last])
-        hl = highlight_lines(code, path.suffix)
-        body = "\n".join(f'<span class="om-line" data-n="{first + k}">'
-                         f"{line}</span>" for k, line in enumerate(hl))
-        lang = LISTING_LEXERS[path.suffix]
+        # (a Makefile has no suffix: keyed by its name)
+        ext = path.suffix or path.name
+        hl = highlight_lines(code, ext)
+        numbered = [(first + k, line) for k, line in enumerate(hl)]
+        if node.get("ranges"):
+            # \omcodes: several ranges of the file, each numbered from its
+            # own first line as in print (the file is highlighted from the
+            # first range to the last so that tokens keep their context)
+            for a, b in node["ranges"]:
+                if not first <= a <= b <= last:
+                    raise ParseError(f"listing range {a}..{b} outside "
+                                     f"{path} ({len(lines)} lines)")
+            numbered = [(n, line) for n, line in numbered
+                        if any(a <= n <= b for a, b in node["ranges"])]
+        gaps = {a for a, _ in (node.get("ranges") or [])[1:]}
+        body = "\n".join(
+            f'<span class="om-line{" om-line-gap" if n in gaps else ""}" '
+            f'data-n="{n}">{line}</span>' for n, line in numbered)
+        lang = LISTING_LEXERS[ext]
         anchor = f' id="{anchor_for(node["label"])}"' if node["label"] else ""
         # listings in solutions are unnumbered here (print runs one counter
         # across the whole solutions appendix; nothing references them),
@@ -628,6 +688,39 @@ class Emitter:
                 f'<pre class="om-code" data-lang="{lang}"><code>{body}'
                 f"</code></pre>\n<figcaption>{caption}</figcaption>\n"
                 f"</figure>")
+
+    def output(self, node):
+        """\\omoutput: a captured output file (or the listed lines of it),
+        plain monospace, with its numbered caption below ("Output N.M." —
+        unnumbered in the solutions, like the listings there)."""
+        from pathlib import Path
+        path = Path(node["path"])     # relative to the book repo root
+        if not path.exists():
+            raise ParseError(f"output file not found: {path}")
+        lines = path.read_text(encoding="utf-8").split("\n")
+        if lines and lines[-1] == "":
+            lines.pop()               # the file's final newline
+        if node["ranges"]:
+            kept = []
+            for a, b in node["ranges"]:
+                # an open end (8-), or an end past the file's last line,
+                # runs to the end of the file, as listings does in print
+                b = len(lines) if b is None else min(b, len(lines))
+                if not 1 <= a <= b <= len(lines):
+                    raise ParseError(f"output range {a}..{b} outside "
+                                     f"{path} ({len(lines)} lines)")
+                kept += lines[a - 1:b]
+            lines = kept
+        body = html.escape("\n".join(lines), quote=False)
+        anchor = f' id="{anchor_for(node["label"])}"' if node["label"] else ""
+        num = (f'<strong>{self.lang.names["output"]} '
+               f"{node['number']}.</strong> " if "number" in node else "")
+        caption = f"{num}{self.inlines(node['caption'])}"
+        if node["ranges"]:
+            caption += f" {self.lang.some_lines_out}"
+        return (f'<figure class="om-listing om-output"{anchor}>\n'
+                f'<pre class="om-out"><code>{body}</code></pre>\n'
+                f"<figcaption>{caption}</figcaption>\n</figure>")
 
     def table_float(self, node):
         tbl = node["table"]
@@ -774,14 +867,21 @@ class Emitter:
             attr = f' start="{start}"' if start != 1 else ""
             if node.get("alpha"):
                 attr += ' class="om-alpha"'
+            if node.get("marker"):
+                # its own labels (R1., R2.…), written out in each item
+                attr += ' class="om-list-labelled"'
             tag_open, tag_close = f"<ol{attr}>", "</ol>"
         items = []
-        for item in node["items"]:
+        for k, item in enumerate(node["items"]):
             body = self.blocks(item)
             # single-paragraph items read better without the <p> wrapper
             if body.startswith("<p>") and body.endswith("</p>") \
                     and body.count("<p>") == 1:
                 body = body[len("<p>"):-len("</p>")]
+            if node.get("marker"):
+                pre, post = node["marker"]
+                body = (f'<span class="om-item-label">{pre}'
+                        f"{node.get('start', 1) + k}{post}</span> {body}")
             items.append(f"<li>{body}</li>")
         out = tag_open + "\n" + "\n".join(items) + "\n" + tag_close
         if node.get("sources"):
@@ -791,7 +891,14 @@ class Emitter:
 
     def figure(self, node):
         caption = self.inlines(node["caption"])
-        alt = plaintext(node["caption"]).strip()
+        # readable text, as for the meta descriptions: formulas through
+        # tex_to_text (tex_to_alt, kept for the slugs, leaves "23\, k m"
+        # and drops what it cannot spell), references spelled out, the
+        # edition's own range words; the bidi isolates of those words are
+        # for the math island and have no place in an attribute
+        alt = re.sub("[\u2066-\u2069]", "", plaintext(
+            node["caption"], self.plain_ref, tex_to_text,
+            getattr(self.lang, "si_phrases", None))).strip()
         sublabels = node.get("sublabels") or {}
         widths = node.get("widths") or {}
         parts = []
@@ -814,9 +921,11 @@ class Emitter:
             tbl = node["table"]
             inner = (self.table_inner(tbl) if tbl["t"] == "table"
                      else "\n".join(self.table_inner(x) for x in tbl["tables"]))
-            # (beside a picture in the chemistry books: both, in a row)
+            # (beside a picture in the chemistry books: both, in a row;
+            # economics balance sheets: one table under the other)
+            stack = " om-table-stack" if tbl.get("stacked") else ""
             imgs = (imgs + "\n" if imgs else "") \
-                + f'<div class="om-table-wrap">{inner}</div>'
+                + f'<div class="om-table-wrap{stack}">{inner}</div>'
         if node.get("math") is not None:
             # a figure that is a display formula (a reaction mechanism)
             imgs = self.math_ph(node["math"], display=True)
@@ -839,6 +948,11 @@ class Emitter:
         if node.get("number"):
             caption = (f'<strong>{self.lang.names["figure"]} '
                        f"{node['number']}.</strong> {caption}")
+        if node.get("source"):
+            # economics charts: the dataset line under the caption
+            caption += (f' <span class="om-figure-source">'
+                        f"{self.lang.source_name}: "
+                        f"{self.inlines(node['source'])}</span>")
         row = f'<div class="om-figure-row">\n{imgs}\n</div>' if imgs else ""
         return (f'<figure class="om-figure"{anchor}>\n'
                 f"{row}{grid}\n"
@@ -882,6 +996,8 @@ class Emitter:
             body_rows.append(f"<tr{attr}>{cells}</tr>")
         rows.append("<tbody>" + "".join(body_rows) + "</tbody>")
         css = "om-table om-booktabs" if node.get("booktabs") else "om-table"
+        if node.get("mono"):
+            css += " om-table-mono"     # a typewriter block (derivations)
         return f'<table class="{css}">' + "".join(rows) + "</table>"
 
     def row_cells(self, tag, cells, align):
